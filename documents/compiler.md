@@ -1,0 +1,16 @@
+## Compiler
+  * The compiler gets a list of files.
+  * Each (uncompiled) file is transformed to a (compiled) module.
+    * Step 1: Lexer reads file and generates list of tokens.
+    * Step 2: For each Module: Parser reads tokens and generates AST.
+    * Step 3 (type-crawling): Type-Crawler traverses each AST in search for type
+      * foreach type: create object with type information and store it inside type-store (global typestore or typestore of enclosing class)
+      * type information stores class/enum/interface/record identifier with attributes and methods
+      * generic Types are also types. they may have upper and lower class bounds
+      * global typestore includes primitive types and library-types
+    * Step 4 (type-resolving): Type-Resolver traverses AST and enriches type-nodes with reference to type
+    * Step 5 (code generation pass 1): Code generator traverses AST and generates programs (statements only as strings, jumps not resolved)
+      * global program for each module
+      * static initialization program for each class
+      * program for each method
+    * Step 6 (code generation pass 2): Code generator resolves jumps and compiles statements to javascript
