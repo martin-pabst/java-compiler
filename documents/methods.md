@@ -25,88 +25,75 @@ Leads to this object structure:
     age: number,
 
     prototype: {    // class-Object of class Test1
-        _m$getName$$string: (t: Thread) => Promise<string>,       // overwrites _m$getName() of prototype
-        _m$setName$String$void: (t: Thread, n: string) => Promise<void>,
+        _m$getName$$string: (t: Thread) => void,       // overwrites _m$getName() of prototype; return value is pushed to current stackframe t.sf
+        _m$setName$$String: (t: Thread, n: string) => void,
+        _mo1249: { ... }  // method-objects, see later
+        _mo1250: { ... }
 
         protoype: {  // class-object of class Test
-            _m$toString$$string: (t: Thread) => Promise<string>,
-            _m$getName$$String: (t: Thread) => Promise<string>,
+            _m$toString$string: (t: Thread) => void, // return value is pushed to current stackframe t.sf
+            _m$getName$String: (t: Thread) => void,  // return value is pushed to current stackframe t.sf
+            _mo1248: { ... }
+            _mo1247: { ... }
         }
     }
 }
 ```
 
 ## naming conventions:
-  * method: _m$<identifier><>$<parametertypes>$<returntype>
-  * static method: _sm$<identifier>$<parametertypes>$<returntype>
+  * method: _m$<identifier>$<returntype>$<parametertypes>
+  * static method: _sm$<identifier>$<returntype>$<parametertypes>
   * constructor: _c$<identifier>$<parametertypes>
-  * parametertypes are separated by _
   * parametertypes and returntypes are given **without generics**, so ArrayList instead of ArrayList<String>
+  * parametertypes are separated by $
+  * if return type is void, don't write $void$, but $$
 
 ## calling methods
-  * Parameter 1: thread-object
-  * Parameter 2..n: method parameters
-  * If it's a static method then it's called with this == static class object, otherwise with this == object
-  * Method returns a promise
+Async/await and (even more so...) promises are slow, see [this test case](https://madelinemiller.dev/blog/javascript-promise-overhead/). So the compiler
+should use them only if necessary. We therefore want to have as many library methods as possible returning their values with simple return statements.
+On the other hand there may be library methods overridden by java methods or library methods and java methods implementing the same interface. 
 
-### Example:
-```java
-   println(student.toString("Mister"));
-```
-Let's assume, student-object is on top of stack and ho[0] is the println-method, then this code is compiled to
+We have these cases:
+### a) library method wich is static or (final and doesn't implement an interface method) and does only call other such library methods
+  * Implement as simple javascript method and return values by return statement.
+  * tag this method as `simple` so that the compiler knows that return value doesn't lie on the stack and it can be inlined inside a term.
+
+### b) other method
+  * signature is `methodIdentifier(t: Thread, callback: () => void, p1, ..., pn)`
+  * when calling other methods that don't belong to case a) then use the **unified method call**: 
 ```javascript
-   // step 21:
-   sf.pop()._m$toString$string$string(t, "Mister").then(
-    (ret: string) => {
-        push(ret);
-        t.nextStepIndex = 22;
-    }
-   )
-    // step 22:
-    ho[0](t, pop());
-```
+let callback1 = () => {
+  let returnValue = t.sf.pop();
+  // ... go on ...  
+  t.sf.push(myReturnValue);
+  if(callback != null) callback();
+}
+object.methodIdentifier(t: Thread, callback1, p1, ..., pn) 
+ 
+```  
+  
 
-## Methods written in Typescript
-```typescript
-
-    doSomething(t: Thread, s: string): Promise<string> {
-        return new Promise
-    }
-
-
-```
-
-
-
-
-Alternative: 
-  * method call is always last call of step
-  * return values are always pushed to current stackframe with t.push(value)
-  * Java methods only do
+### c) java method
+  * in order to make unified method calls possible, a java-method is represented by a javascript-proxy-method:
 ```javascript
-m(t: thread, p1, p2){
-    t.pushMethod(program); // pushes Method to method stack and opens new stackframe
-    t.push(this, p1, p2);  // pushes, this, p1, p2 to new stackframe
-    return;  // after this the calling method returns and the thread continues with called method on next step
+methodIdentifier(t: Thread, callback, p1, ..., pn){
+  push(this, p1, ..., pn);
+  t.pushMethod(this._mo1248, callback);   // methodObject encapsulates all in
 }
 ```
+  * calling a unified method in java:
+```javascript
+// ... code before ...
+// subsequent method call is last statement of this step:
+object.methodIdentifier(t, null, p1, ..., pn);   // we don't need a callback as thread won't execute next step before method is complete   
+```
+  * if method returns a value you can get it via ``t.sf.pop()`` in the next step.
 
- * Typescript methods can be quite simple:
- ```javascript
-   m(t: thread, p1, p2): void {
-        // do something with p1 and p2
-        t.push(returnvalue); // t pushes this on top of current stackframe
-   }
- ```
 
- * If typescript method wants to call other method which could be a Java method:
- ```javascript
-   m(t: thread, p1, p2): void {
 
-        // we want to call p1.doSomething(p2)
-        t.call(p1, p1.doSomething, p2).then((ret) => {
-            
-        })
-
-   }
- ```
+## method objects
+```javascript
+type MethodObject = {
+  steps: Step[]
+}
+```

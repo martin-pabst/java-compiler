@@ -1,0 +1,47 @@
+body, html, #main {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #202020;
+    font-family: sans-serif;
+}
+
+#main {
+    display:grid;
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: 3fr 1fr;
+}
+
+#main>div {
+    border: 1px solid #a0a0a0;
+}
+
+#editor {
+    grid-area: 1/1;
+}
+
+#tabs {
+    grid-area: 1/2;
+
+}
+
+.tabBodyElement {
+    overflow: auto;
+    font-family: consolas;
+    color: white;
+}
+
+#buttons {
+    grid-area: 2/1;
+}
+
+.myButton {
+    margin: 5px 10px 5px 5px;
+}
+
+#output {
+    grid-area: 2/2;
+}
+
+

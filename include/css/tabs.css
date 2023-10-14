@@ -1,0 +1,42 @@
+.jo_tabs_container {
+    position: relative;
+    display:flex;
+    flex-direction: column;
+}
+
+.jo_tabs_tabheadings {
+    display: flex;
+    flex-direction: row;
+    height: 30px;
+    background-color: #505050;
+}
+
+.jo_tabs_tabheading {
+    padding: 6px 10px 3px 10px;
+    margin: 0 5px;
+    height: 16px;
+    color: #b0b0b0;
+    user-select: none;
+    cursor: pointer;
+}
+
+.jo_tabs_tabheading:hover {
+    border-bottom: 1px solid #b0b0b0;
+    color: #e0e0e0;
+}
+
+.jo_tabs_tabheading.jo_tabs_active {
+    color: white;
+    border-bottom: 2px solid blue;
+}
+
+.jo_tabs_tabbodies {
+    display: flex;
+    position: relative;
+    flex: 1;
+}
+
+.jo_tabs_tabbody {
+    width: 100%;
+    height: 100%;
+}

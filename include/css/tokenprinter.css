@@ -1,0 +1,26 @@
+.jo_tokenprinter_tokendiv {
+    display: flex;
+    flex-direction: column;
+}
+
+.jo_tokenprinter_tokenline {
+    display: flex;
+    flex-direction: row;
+}
+
+.jo_tokenprinter_linenumber {
+    color: #8080ff;
+    width: 30px;
+}
+
+.jo_tokenprinter_token {
+    margin-right: 8px;
+}
+
+.jo_tokenprinter_tokentype {
+    color: white;
+}
+
+.jo_tokenprinter_text {
+    color: #808080;
+}

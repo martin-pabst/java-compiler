@@ -4,9 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + TS</title>
+    <script src="lib/monaco-editor/dev/vs/loader.js"></script>
     <script type="module" src="/src/main.ts"></script>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="main">
+      <div id="editor"></div>
+      <div id="tabs"></div>
+      <div id="buttons"></div>
+      <div id="output"></div>
+    </div>
   </body>
 </html>

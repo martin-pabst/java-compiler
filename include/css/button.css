@@ -1,0 +1,9 @@
+.jo_button {
+    padding: 5px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.jo_button:hover {
+    filter: brightness(150%);
+}
