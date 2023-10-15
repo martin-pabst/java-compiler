@@ -1,6 +1,6 @@
 import { DOM } from "../../../tools/DOM";
+import { TokenList } from "../Token";
 import { TokenType, TokenTypeReadable } from "../TokenType";
-import { LexerOutput } from "./Lexer";
 
 import '/include/css/tokenprinter.css';
 
@@ -12,10 +12,10 @@ export class TokenPrinter {
         TokenType.charConstant
     ]
 
-    public static print(lexerOutput: LexerOutput, parentDiv: HTMLElement){
+    public static print(tokens: TokenList, parentDiv: HTMLElement){
 
         DOM.clear(parentDiv);
-        if(lexerOutput.tokens.length == 0) return;
+        if(tokens.length == 0) return;
 
 
         let tokenDiv = DOM.makeDiv(parentDiv, 'jo_tokenprinter_tokendiv')
@@ -23,10 +23,10 @@ export class TokenPrinter {
         let lineDiv = DOM.makeDiv(tokenDiv, 'jo_tokenprinter_tokenline');
         let linenumberDiv = DOM.makeDiv(lineDiv, 'jo_tokenprinter_linenumber');
 
-        let lineNumber: number = lexerOutput.tokens[0].range.startLineNumber;
+        let lineNumber: number = tokens[0].range.startLineNumber;
         linenumberDiv.textContent = "" + lineNumber;
 
-        for(let t of lexerOutput.tokens){
+        for(let t of tokens){
             if(t.range.startLineNumber != lineNumber){
                 lineDiv = DOM.makeDiv(tokenDiv, 'jo_tokenprinter_tokenline');
                 linenumberDiv = DOM.makeDiv(lineDiv, 'jo_tokenprinter_linenumber');

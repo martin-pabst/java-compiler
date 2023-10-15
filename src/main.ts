@@ -1,4 +1,5 @@
 import { Language } from "./compiler/common/Language";
+import { Module } from "./compiler/common/module/module";
 import { JavaLanguage } from "./compiler/java/JavaLanguage";
 import { Lexer } from "./compiler/java/lexer/Lexer";
 import { TokenPrinter } from "./compiler/java/lexer/TokenPrinter";
@@ -50,10 +51,11 @@ export class Main {
   compile(){
     let text = this.editor.editor.getModel()?.getValue();
     if(text){
-      let lexer = new Lexer(text);
-      let lexerOutput = lexer.lex();
+      let module = new Module(text);
+      let lexer = new Lexer(module);
+      lexer.lex();
 
-      TokenPrinter.print(lexerOutput, this.tokenDiv);
+      TokenPrinter.print(module.tokens!, this.tokenDiv);
     }
   }
 

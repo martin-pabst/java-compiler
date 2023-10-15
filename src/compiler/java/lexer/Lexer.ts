@@ -3,14 +3,9 @@ import { ColorLexer } from "./ColorLexer.js";
 import { ColorHelper } from "./ColorHelper.js";
 import { Error, ErrorLevel } from "../../common/Error.js";
 import { EscapeSequenceList, TokenType, TokenTypeReadable, keywordList as KeywordList, specialCharList } from "../TokenType.js";
+import { Module } from "../../common/module/module.js";
 
 
-export type LexerOutput = {
-    tokens: TokenList,
-    errors: Error[],
-    bracketError?: string,
-    colorInformation: monaco.languages.IColorInformation[]
-}
 
 var endChar = "►"; // \u10000
 
@@ -51,8 +46,11 @@ export class Lexer {
 
     colorIndices: number[];
 
-    constructor(private input: string) {
+    private input: string;
 
+    constructor(private module: Module) {
+
+        this.input = module.text;
         this.tokenList = [];
         this.errorList = [];
         this.bracketError = undefined;
@@ -65,7 +63,7 @@ export class Lexer {
         this.colorIndices = []; // indices of identifier 'Color' inside tokenList
     }
 
-    lex(): LexerOutput {
+    lex() {
 
         if (this.input.length == 0) {
             return { tokens: this.tokenList, errors: this.errorList, bracketError: undefined, colorInformation: [] };
@@ -89,12 +87,16 @@ export class Lexer {
 
         this.processColorIndices();
 
-        return {
-            tokens: this.tokenList,
-            errors: this.errorList,
-            bracketError: this.bracketError,
-            colorInformation: this.colorInformation
-        };
+        this.tokenList.push({
+            range: {startLineNumber: this.line, startColumn: this.column, endLineNumber: this.line, endColumn: this.column},
+            tt: TokenType.endofSourcecode,
+            value: "das Ende des Programms"
+        })
+
+        this.module.tokens = this.tokenList;
+        this.module.errors = this.errorList;
+        this.module.bracketError = this.bracketError;
+        this.module.colorInformation = this.colorInformation;
 
     }
 

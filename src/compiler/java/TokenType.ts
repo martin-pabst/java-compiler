@@ -179,6 +179,9 @@ export enum TokenType {
     forLoopOverCollection,
 
     // additional AST node types
+    global,    
+    mainProgram,
+
     type, // e.g. int[][]
     typeParameter, // e.g. <E extends String implements Comparable<E>>
     attributeDeclaration,
