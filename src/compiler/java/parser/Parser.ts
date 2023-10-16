@@ -1,4 +1,3 @@
-import { Error } from "../../common/Error";
 import { Module } from "../../common/module/module";
 import { TokenType } from "../TokenType";
 import { TokenIterator } from "./TokenIterator";
