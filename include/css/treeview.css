@@ -1,0 +1,10 @@
+.jo_treeview_main {
+    display: flex;
+    flex-direction: column;
+}
+
+.jo_treeview_caption {
+    display: flex;
+    flex-direction: row;
+}
+
