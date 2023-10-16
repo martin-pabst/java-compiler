@@ -6,8 +6,8 @@ export class TreeviewStack {
 
     treeviewList: Treeview<Object>[] = [];
 
-    constructor(){
-        let tv1:Treeview<HTMLElement> = new Treeview(document.getElementById("x")!)
+    constructor(public parentHtmlELement: HTMLElement){
+
     }
 
 

@@ -14,8 +14,7 @@ export type TreeviewAction<T> = {
 export type TreeviewConfig = {
     captionLine: {
         enabled: boolean,
-        text: string,
-
+        text: string
     }
 }
 
@@ -23,13 +22,44 @@ export type TreeviewConfig = {
 export class Treeview<T> {
 
     treeviewStack?: TreeviewStack;
-    mainDiv: HTMLDivElement;
     elements: TreeviewElement<T>[] = [];
 
-    constructor(parent: HTMLElement){
+    mainDiv!: HTMLDivElement;
+    captionLineDiv!: HTMLDivElement;
+    captionLineExpandCollapse!: HTMLDivElement;
+    captionLineText!: HTMLDivElement;
 
-        this.mainDiv = DOM.makeDiv(parent, 'jo_treeview_main');
+    config: TreeviewConfig;
 
+    constructor(public parent: HTMLElement, config?: TreeviewConfig) {
+
+        let c = config ? config : {};
+
+        this.config = Object.assign(
+            {
+                captionLine: {
+                    enabled: true,
+                    text: "Überschrift"
+                }
+
+            }, c);
+
+        this.buildHtmlScaffolding();
+
+    }
+
+    buildHtmlScaffolding() {
+        this.mainDiv = DOM.makeDiv(this.parent, 'jo_treeview_main');
+        this.captionLineDiv = DOM.makeDiv(this.mainDiv, 'jo_treeview_caption');
+        this.captionLineExpandCollapse = DOM.makeDiv(this.captionLineDiv, 'jo_treevew_caption_expandcollapse')
+        this.captionLineText = DOM.makeDiv(this.captionLineDiv, 'jo_treevew_caption_text')
+
+        this.buildCaption();
+    }
+
+    buildCaption(){
+        this.captionLineDiv.style.display = this.config.captionLine.enabled ? "flex" : "none";
+        this.captionLineText.textContent = this.config.captionLine.text;
     }
 
 }
