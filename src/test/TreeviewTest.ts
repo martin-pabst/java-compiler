@@ -12,8 +12,8 @@ export class TreeviewTest {
             }
         })
 
-        tv.addButtonToCaptionLine('img_start', () => {}, "Start Program");
-        tv.addButtonToCaptionLine('img_start', () => {});
+        tv.captionLineAddButton('img_start', () => {}, "Start Program");
+        tv.captionLineAddButton('img_start', () => {});
     }
 
 }
