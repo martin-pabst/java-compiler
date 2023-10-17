@@ -4,6 +4,7 @@
     background-color: #181818;
     color: #d7d7d7;
     font-size: 13px;
+    height: 100%;
 }
 
 .jo_treeview_caption {
@@ -16,5 +17,39 @@
     border-color: #2b2b2b;
     border-width: 1px;
     font-weight: bold;
+    user-select: none;
+
 }
 
+.jo_treeview_caption_text {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    flex: 1;
+}
+
+.jo_exandCollapseComponent {
+    cursor: pointer;
+}
+
+.jo_exandCollapseComponent:hover {
+    cursor: pointer;
+    filter: brightness(150%);
+}
+
+.jo_iconButton {
+    cursor: pointer;
+}
+
+.jo_iconButton:hover {
+    filter: brightness(150%);
+}
+
+.jo_iconButton:active {
+    transform: scale(1.2);
+}
+
+.jo_treeview_caption_buttons {
+    display: flex;
+    flex-direction: row;
+    margin-top: 2px;
+}

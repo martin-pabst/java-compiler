@@ -2,6 +2,9 @@ import { resolve } from 'path'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  server: {
+    open: '/treeviewtest.html',
+  },
   build: {
     sourcemap: true,
     rollupOptions: {

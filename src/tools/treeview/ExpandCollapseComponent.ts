@@ -1,6 +1,7 @@
 import { DOM } from "../DOM.ts";
+import '/include/css/icons.css';
 
-export type ExpandCollapseState = "expanded" | "collapsed" | "hidden";
+export type ExpandCollapseState = "expanded" | "collapsed";
 
 export type ExpandCollapseListener = (newState: ExpandCollapseState) => void;
 
@@ -12,33 +13,62 @@ export class ExpandCollapseComponent {
 
     private darkLightState: DarkLightState = "dark";
 
+    private currentIconClass?: string;
+
     private static iconClasses = {
         "light" : {
-            "expanded": "img_arrow-down",
-            "collapsed": "img_arrow-right"
+            "expanded": "img_chevron-down",
+            "collapsed": "img_chevron-right"
         },
         "dark" : {
-            "expanded": "img_arrow-down-dark",
-            "collapsed": "img_arrow-right-dark"
+            "expanded": "img_chevron-down-dark",
+            "collapsed": "img_chevron-right-dark"
         }
     };
 
     constructor(private _parent: HTMLElement, private listener: ExpandCollapseListener){
 
-        this.divElement = DOM.makeDiv(parent, 'jo_exandCollapseComponent');
+        this.divElement = DOM.makeDiv(_parent, 'jo_exandCollapseComponent');
+
+        this.divElement.onclick = () => {
+            this.toggleState();
+        }
+
+        this.render();
 
     }    
+
+    public toggleState(){
+        switch(this.state){
+            case "collapsed": this.setState("expanded", true);
+            break;
+            case "expanded": this.setState("collapsed", true);
+            break;
+        }
+    }
 
     public get parent(): HTMLElement {
         return this._parent;
     }
 
     setState(newState: ExpandCollapseState, invokeListener: boolean = true){
-
+        this.state = newState;
+        this.render();
+        if(invokeListener) this.listener(newState);
     }
 
     render(){
-        
+
+        if(this.currentIconClass) this.divElement.classList.remove(this.currentIconClass);
+
+        this.currentIconClass = ExpandCollapseComponent.iconClasses[this.darkLightState][this.state];
+
+        this.divElement.classList.add(this.currentIconClass);
+    }
+
+    setDarkLightState(darkLightState: DarkLightState){
+        this.darkLightState = darkLightState;
+        this.render();
     }
 
 }

@@ -8,9 +8,12 @@ export class TreeviewTest {
         let tv = new Treeview(leftDiv, {
             captionLine: {
                 enabled: true,
-                text: "Hier!"
+                text: "Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!"
             }
         })
+
+        tv.addButtonToCaptionLine('img_start', () => {}, "Start Program");
+        tv.addButtonToCaptionLine('img_start', () => {});
     }
 
 }
