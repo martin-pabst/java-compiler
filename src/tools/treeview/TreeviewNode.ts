@@ -187,20 +187,15 @@ export class TreeviewNode<E> extends NodeContainer<E> {
     }
 
     initDragAndDrop() {
-        this.nodeLineDiv.setAttribute("draggable", "true");
-        this.nodeLineDiv.ondragstart = (event) => {
-            TreeviewNode.currentlyDraggedNode = this;
-            this.treeview.addToSelection(this);
-        }
-
-
 
         if (this.isFolder) {
+            this.nodeWithChildrenDiv.setAttribute("draggable", "true");
             this.nodeWithChildrenDiv.ondragover = (event) => {
                 if (TreeviewNode.currentlyDraggedNode?.parent != this) {
-                    event.preventDefault();
                     this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDestinationFolder', true);
                 }
+                event.preventDefault();
+                event.stopPropagation();
             }
             this.nodeWithChildrenDiv.ondragleave = (event) => {
                 let bcr = this.nodeWithChildrenDiv.getBoundingClientRect();
@@ -210,42 +205,55 @@ export class TreeviewNode<E> extends NodeContainer<E> {
                 if (x > bcr.right - d || x < bcr.left + d || y < bcr.top + d || y > bcr.bottom - d) {
                     this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDestinationFolder', false);
                 }
-            }
-            this.nodeWithChildrenDiv.ondragend = () => {
-                TreeviewNode.currentlyDraggedNode = undefined;
-            }
-            this.nodeWithChildrenDiv.ondrop = (event) => {
-                event.stopPropagation();
-                this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDestinationFolder', false);
+
+                this.nodeWithChildrenDiv.ondragend = () => {
+                    TreeviewNode.currentlyDraggedNode = undefined;
+                }
+
+                this.nodeWithChildrenDiv.ondrop = (event) => {
+                    event.stopPropagation();
+                    this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDestinationFolder', false);
+                }
             }
         } else {
+            this.nodeLineDiv.setAttribute("draggable", "true");
+            this.nodeLineDiv.ondragstart = (event) => {
+
+                TreeviewNode.currentlyDraggedNode = this;
+                this.treeview.addToSelection(this);
+
+            }
+
             this.nodeLineDiv.ondragover = (event) => {
-                if (this.isDragToReorder() && !this.isFolder) {
+                if (this.isDragToReorder()) {
+                    event.stopPropagation();
                     event.preventDefault();
                     let bcr = this.nodeLineDiv.getBoundingClientRect();
                     let midHeight = bcr.top + bcr.height / 2;
                     let destinationIsparentOfDraggedNode = TreeviewNode.currentlyDraggedNode?.parent == this;
-                    this.nodeLineDiv.classList.toggle('jo_treeviewNode_highlightReorderAbove', event.pageY - midHeight < 0 && !destinationIsparentOfDraggedNode);
-                    this.nodeLineDiv.classList.toggle('jo_treeviewNode_highlightReorderBelow', event.pageY - midHeight >= 0);
+                    this.higlightReoderPosition(event.pageY - midHeight < 0, event.pageY - midHeight >= 0 || !destinationIsparentOfDraggedNode);
                 }
             }
 
             this.nodeLineDiv.ondragleave = (event) => {
-                this.nodeLineDiv.classList.toggle('jo_treeviewNode_highlightReorderAbove', false);
-                this.nodeLineDiv.classList.toggle('jo_treeviewNode_highlightReorderBelow', false);
+                this.higlightReoderPosition(true, false);
             }
             this.nodeLineDiv.ondragend = (event) => {
                 TreeviewNode.currentlyDraggedNode = undefined;
-                this.nodeLineDiv.classList.toggle('jo_treeviewNode_highlightReorderAbove', false);
-                this.nodeLineDiv.classList.toggle('jo_treeviewNode_highlightReorderBelow', false);
+                this.higlightReoderPosition(true, false);
             }
             this.nodeWithChildrenDiv.ondrop = (event) => {
-                event.stopPropagation();
-                this.nodeLineDiv.classList.toggle('jo_treeviewNode_highlightReorderAbove', false);
-                this.nodeLineDiv.classList.toggle('jo_treeviewNode_highlightReorderBelow', false);
+                this.higlightReoderPosition(true, false);
             }
         }
 
+    }
+
+    higlightReoderPosition(isAbove: boolean, doHighlight: boolean) {
+        let klassEnable = 'jo_treeviewNode_highlightReorder' + (isAbove ? 'Above' : 'Below');
+        let klassDisable = 'jo_treeviewNode_highlightReorder' + (!isAbove ? 'Above' : 'Below');
+        this.nodeLineDiv.classList.toggle(klassEnable, doHighlight);
+        this.nodeLineDiv.classList.toggle(klassDisable, false);
     }
 
     isDragToReorder(): boolean {
