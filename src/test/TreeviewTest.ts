@@ -1,4 +1,5 @@
 import { Treeview } from '../tools/treeview/Treeview.ts';
+import { TreeviewNode } from '../tools/treeview/TreeviewNode.ts';
 import '/include/css/treeviewtest.css';
 
 type Element = {
@@ -6,7 +7,8 @@ type Element = {
     isFolder: boolean,
     id: number,
     parentId?: number,
-    parent?: Element
+    parent?: Element,
+    treeviewLine?: TreeviewNode<Element>
 }
 
 
@@ -17,19 +19,21 @@ export class TreeviewTest {
 
     constructor(){
         let leftDiv = document.getElementById('left')!;
-        let tv = new Treeview(leftDiv, {
+        let tv: Treeview<Element> = new Treeview(leftDiv, {
             captionLine: {
                 enabled: true,
                 text: "Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!"
             },
             withDeleteButtons: true,
-            withFolders: true
+            withFolders: true,
+            comparator: ((e1, e2) => e1.caption.localeCompare(e2.caption))
         })
 
         this.initElements();
 
         for(let el of this.elements){
-            tv.addFileOrFolder(el.isFolder, el.caption, el.isFolder ? undefined : 'img_file-dark-empty', el, el, el.parent);
+            let tvLine = tv.addNode(el.isFolder, el.caption, el.isFolder ? undefined : 'img_file-dark-empty', el, el, el.parent);
+            el.treeviewLine = tvLine;
         }
 
         tv.renderAll();
@@ -40,13 +44,13 @@ export class TreeviewTest {
     initElements(){
         this.elements = [
             {caption: "First Folder", isFolder: true, id: 10},
-            {caption: "AFirst File", isFolder: false, id: 11, parentId: 10},
             {caption: "ASecond File", isFolder: false, id: 12, parentId: 10},
+            {caption: "BFirst File", isFolder: false, id: 11, parentId: 10},
+            {caption: "ASecond Folder", isFolder: true, id: 13, parentId: 10},
             {caption: "AThird File", isFolder: false, id: 14, parentId: 10},
             {caption: "BFirst File", isFolder: false, id: 15, parentId: 13},
             {caption: "BSecond File", isFolder: false, id: 16, parentId: 13},
             {caption: "BThird File", isFolder: false, id: 17, parentId: 13},
-            {caption: "Second Folder", isFolder: true, id: 13, parentId: 10},
         ]
 
         let  idToElementMap: Map<number, Element> = new Map();

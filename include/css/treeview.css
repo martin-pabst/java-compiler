@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     background-color: #181818;
-    color: #d7d7d7;
+    color: #c0c0c0;
     font-size: 13px;
     height: 100%;
 }
@@ -69,15 +69,39 @@
 }
 
 /* treeview line (== file or folder) */
-.jo_treeviewlineWithChildren {
+.jo_treeviewNodeWithChildren {
     display: flex;
     flex-direction: column;
 }
 
+.jo_treeviewNode_expandCollapse {
+    position: relative;
+    left: -2px;
+}
 
-.jo_treeviewline {
+.jo_treeviewNode {
     display: flex;
     flex-direction: row;
+    /* height: 20px; */
+    line-height: 18px;
+    cursor: pointer;
+    z-index: 2;
+    border: 1px solid transparent;
+}
+
+.jo_treeviewNode.jo_treeview_selected {
+    background-color: #50505090;
+}
+
+.jo_treeviewNode.jo_treeview_focus {
+    background-color: #114c74c0;
+    border-color: #66b6ecab;
+    border-width: 1px;
+    border-style: solid;
+}
+
+.jo_treeviewNode:hover:not(.jo_treeview_focus) {
+    background-color: #5050508c;
 }
 
 .jo_treeviewChildren {
@@ -88,37 +112,59 @@
 
 .jo_treeviewChildrenLineDiv {
     position: absolute;
-    top: 0;
+    top: -4px;
     left: 0;
     height: 100%;
-    border-left: 1px solid gray;
+    border-left: 1px solid transparent;
     margin-left: 7px;
+    z-index: 1;
 }
 
-.jo_treeviewline_verticallines {
-    display: flex;
-    flex-direction: row;
+.jo_treeview_main:hover .jo_treeviewChildrenLineDiv {
+    border-left-color: #555;    
 }
 
-.jo_treeviewline_expandCollapse {
-
-}
-
-.jo_treeviewline_caption {
+.jo_treeviewNode_caption {
     text-overflow: ellipsis;
     overflow: hidden;
     flex: 1;
+    user-select: none;
 }
 
-.jo_treeviewline_errors {
+.jo_treeviewNode_icon {
+    margin-top: 1px;
+    margin-right: 2px;
+}
+
+.jo_treeviewNode_errors {
     color: rgb(125, 0, 0);
 }
 
-.jo_treeviewline_buttons {
-    display: flex;
+.jo_treeviewNode_buttons {
+    visibility: hidden;
     flex-direction: row;
+    display: flex;
+    margin-top: 1px;
+    margin-right: 2px;
 }
 
-.jo_treeviewline_marginLeft {
+.jo_treeviewNode:hover .jo_treeviewNode_buttons {
+    visibility: visible;
+}
+
+.jo_treeviewNode_marginLeft {
     width: 7px;
+}
+
+/* drag'n drop */
+.jo_treeviewNode_highlightReorderAbove {
+    border-top: 1px solid rgba(64, 168, 60);
+}
+
+.jo_treeviewNode_highlightReorderBelow {
+    border-bottom: 1px solid rgba(64, 168, 60);
+}
+
+.jo_treeviewNode_highlightDestinationFolder {
+    background-color: rgba(64, 168, 60, 0.678);
 }

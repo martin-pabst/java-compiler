@@ -14,14 +14,16 @@ export class IconButtonComponent {
     private currentIconClass?: string;
 
     constructor(private _parent: HTMLElement, private iconClass: string, private listener: IconButtonListener, tooltip?: string){
-
-        this.divElement = DOM.makeDiv(_parent, 'jo_iconButton');
+        
+        this.divElement = DOM.makeDiv(undefined, 'jo_iconButton');
+        _parent.prepend(this.divElement);
 
         if(tooltip) this.divElement.title = tooltip;
 
         if(this.iconClass.endsWith("-dark")) this.iconClass = this.iconClass.substring(0, this.iconClass.length - "-dark".length);
 
-        this.divElement.onclick = () => {
+        this.divElement.onpointerup = (ev) => {
+            ev.stopPropagation();
             if(this.listener) this.listener();
         }
 

@@ -7,10 +7,10 @@ export class DOM {
         element.textContent = '';
     }
 
-    public static makeDiv(parent: HTMLElement, ...classes: string[]): HTMLDivElement{
+    public static makeDiv(parent: HTMLElement | undefined, ...classes: string[]): HTMLDivElement{
         let div = document.createElement('div');
         if(classes != null) div.classList.add(...classes);
-        parent.appendChild(div); 
+        if(parent) parent.appendChild(div); 
         return div;
     }
 

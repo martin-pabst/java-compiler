@@ -26,14 +26,16 @@ export class ExpandCollapseComponent {
         }
     };
 
-    constructor(private _parent: HTMLElement, private listener: ExpandCollapseListener){
+    constructor(private _parent: HTMLElement, private listener: ExpandCollapseListener,
+        initialState: ExpandCollapseState){
 
         this.divElement = DOM.makeDiv(_parent, 'jo_exandCollapseComponent');
 
-        this.divElement.onclick = () => {
+        this.divElement.onpointerup = () => {
             this.toggleState();
         }
 
+        this.state = initialState;
         this.render();
 
     }    
