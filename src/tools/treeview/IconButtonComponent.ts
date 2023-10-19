@@ -13,7 +13,7 @@ export class IconButtonComponent {
 
     private currentIconClass?: string;
 
-    constructor(private _parent: HTMLElement, private iconClass: string, private listener: IconButtonListener, tooltip: string){
+    constructor(private _parent: HTMLElement, private iconClass: string, private listener: IconButtonListener, tooltip?: string){
 
         this.divElement = DOM.makeDiv(_parent, 'jo_iconButton');
 

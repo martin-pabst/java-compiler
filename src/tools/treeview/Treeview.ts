@@ -1,5 +1,5 @@
 import { DOM } from '../DOM.ts';
-import { TreeviewStack as TreeviewAccordion } from './TreeviewStack.ts';
+import { TreeviewAccordion } from './TreeviewAccordion.ts';
 import '/include/css/treeview.css';
 import '/include/css/icons.css';
 import { ExpandCollapseComponent } from './ExpandCollapseComponent.ts';
@@ -60,6 +60,7 @@ export class Treeview<E> {
 
         this.buildCaption();
         this.buildTreeview();
+
     }
 
     buildTreeview() {
@@ -71,16 +72,22 @@ export class Treeview<E> {
         this.captionLineExpandCollapseDiv = DOM.makeDiv(this.captionLineDiv, 'jo_treevew_caption_expandcollapse')
         this.captionLineTextDiv = DOM.makeDiv(this.captionLineDiv, 'jo_treeview_caption_text')
         this.captionLineButtonsDiv = DOM.makeDiv(this.captionLineDiv, 'jo_treeview_caption_buttons')
+        this.captionLineDiv.style.display = this.config.captionLine.enabled ? "flex" : "none";
+        this.captionLineTextDiv.textContent = this.config.captionLine.text;
 
         this.captionLineExpandCollapseComponent = new ExpandCollapseComponent(this.captionLineExpandCollapseDiv, () => {
 
         })
 
-        this.captionLineDiv.style.display = this.config.captionLine.enabled ? "flex" : "none";
-        this.captionLineTextDiv.textContent = this.config.captionLine.text;
+        if(this.config.withFolders){
+            this.captionLineAddButton("img_add-folder-dark", () => {
+
+            }, "Ordner hinzufügen");
+        }
+
     }
 
-    captionLineAddButton(iconClass: string, callback: IconButtonListener, tooltip: string): IconButtonComponent {
+    captionLineAddButton(iconClass: string, callback: IconButtonListener, tooltip?: string): IconButtonComponent {
         return new IconButtonComponent(this.captionLineButtonsDiv, iconClass, callback, tooltip);
     }
 
@@ -88,15 +95,41 @@ export class Treeview<E> {
         this.captionLineTextDiv.textContent = text;
     }
 
-    addFileOrFolder(isFolder: boolean, caption: string, iconClass: string,
-        correspondingExternalObject: E, externalParent?: E) {
+    addFileOrFolder(isFolder: boolean, caption: string, iconClass: string | undefined,
+        externalObject: E,
+        externalReference: any,
+        parentExternalReference: any, renderImmediately: boolean = false) {
 
-        let parent = this.elements.find(e => e.externalObject == externalParent);
+        let element = new TreeviewFileOrFolder(this, isFolder, caption, iconClass,
+            externalObject, externalReference, parentExternalReference,);
+        this.elements.push(element);
 
-        new TreeviewFileOrFolder(this, isFolder, caption, iconClass,
-            correspondingExternalObject, parent);
+        if(renderImmediately) element.render();        
 
+    }
 
+    renderAll(){
+        let renderedExternalReferences: Map<any, boolean> = new Map();
+
+        // the following algorithm ensures that parents are rendered before their children:
+        let elementsToRender = this.elements.slice();
+        let done: boolean = false;
+
+        while(!done){
+            
+            done = true;
+
+            for(let i = 0; i < elementsToRender.length; i++){
+                let e = elementsToRender[i];
+                if(e.parentExternalReference == null || renderedExternalReferences.get(e.parentExternalReference) != null){
+                    e.render();
+                    renderedExternalReferences.set(e.externalReference, true);
+                    elementsToRender.splice(i, 1);
+                    i--;
+                    done = false;
+                } 
+            }
+        }
 
     }
 
@@ -104,5 +137,8 @@ export class Treeview<E> {
         return this._treeviewMainDiv;
     }
 
+    findParent(fileOrFolder: TreeviewFileOrFolder<E>){
+        return this.elements.find(e => e.externalReference == fileOrFolder.parentExternalReference);
+    }
 
 }

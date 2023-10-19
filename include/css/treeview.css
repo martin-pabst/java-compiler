@@ -31,7 +31,8 @@
 .jo_treeview_caption_buttons {
     display: flex;
     flex-direction: row;
-    margin-top: 2px;
+    margin: 2px 4px 0 2px;
+
 }
 
 /* ExpandCollapseComponent */
@@ -70,7 +71,7 @@
 /* treeview line (== file or folder) */
 .jo_treeviewlineWithChildren {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
 }
 
 
@@ -82,6 +83,16 @@
 .jo_treeviewChildren {
     display: flex;
     flex-direction: column;
+    position: relative;
+}
+
+.jo_treeviewChildrenLineDiv {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-left: 1px solid gray;
+    margin-left: 7px;
 }
 
 .jo_treeviewline_verticallines {
@@ -108,8 +119,6 @@
     flex-direction: row;
 }
 
-.jo_treeviewVerticalLine {
-    margin-left: 2px;
-    border-left: 1px solid gray;
-    margin-right: 2px;
+.jo_treeviewline_marginLeft {
+    width: 7px;
 }
