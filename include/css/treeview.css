@@ -72,6 +72,7 @@
 .jo_treeviewNodeWithChildren {
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .jo_treeviewNode_expandCollapse {
@@ -157,14 +158,13 @@
 }
 
 /* drag'n drop */
-.jo_treeviewNode_highlightReorderAbove {
-    border-top: 1px solid rgba(64, 168, 60);
+.jo_treeviewNode_dragAndDropDestinationLine {
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    background-color: rgb(128, 41, 0);
 }
 
-.jo_treeviewNode_highlightReorderBelow {
-    border-bottom: 1px solid rgba(64, 168, 60);
-}
-
-.jo_treeviewNode_highlightDestinationFolder {
+.jo_treeviewNode_highlightDragDropDestination {
     background-color: rgba(64, 168, 60, 0.678);
 }

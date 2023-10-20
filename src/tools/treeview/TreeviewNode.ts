@@ -29,6 +29,10 @@ export class TreeviewNode<E> extends NodeContainer<E> {
     /* whole line */
     private nodeWithChildrenDiv!: HTMLElement;
 
+    private dragAndDropDestinationDiv!: HTMLElement;
+    private dropzoneDiv!: HTMLElement;
+
+
     private nodeLineDiv!: HTMLElement;
     private marginLeftDiv!: HTMLDivElement;
     private expandCollapseDiv!: HTMLDivElement;
@@ -135,6 +139,10 @@ export class TreeviewNode<E> extends NodeContainer<E> {
 
         this.parent?.appendHtmlChild(this.nodeWithChildrenDiv);
 
+        this.dropzoneDiv = DOM.makeDiv(this.nodeWithChildrenDiv, 'jo_treeviewNode_dropzone');
+        this.dragAndDropDestinationDiv = DOM.makeDiv(this.nodeWithChildrenDiv, 'jo_treeviewNode_dragAndDropDestinationLine');
+        this.dragAndDropDestinationDiv.style.display = "none";
+
         this.nodeLineDiv = DOM.makeDiv(this.nodeWithChildrenDiv, 'jo_treeviewNode');
         this.childrenDiv = DOM.makeDiv(this.nodeWithChildrenDiv, 'jo_treeviewChildren');
         this.childrenLineDiv = DOM.makeDiv(this.childrenDiv, 'jo_treeviewChildrenLineDiv');
@@ -186,66 +194,82 @@ export class TreeviewNode<E> extends NodeContainer<E> {
 
     }
 
+    /**
+     * Return
+     *  -1 if mouse cursor is above mid-line of caption
+     *  0 if insert-position is between caption and first child
+     *  1 if insert-position is between first child and second child
+     *  ...
+     * @param mouseX 
+     * @param mouseY 
+     */
+    getDragAndDropIndex(mouseX: number, mouseY: number): { index: number, insertPosY: number } {
+        let nodeLineBoundingRect = this.nodeLineDiv.getBoundingClientRect();
+        let top = nodeLineBoundingRect.top;
+
+        if (mouseY <= nodeLineBoundingRect.top + nodeLineBoundingRect.height / 2) {
+            return { index: -1, insertPosY: nodeLineBoundingRect.top - top };
+        }
+
+        for (let i = 0; i < this.children.length; i++) {
+            let tvn = <TreeviewNode<E>>this.children[i];
+            let boundingRect = tvn.nodeLineDiv.getBoundingClientRect();
+            if (mouseY < boundingRect.top + boundingRect.height / 2)
+                return { index: i, insertPosY: boundingRect.top - top };
+        }
+
+        return { index: this.children.length, insertPosY: this.nodeWithChildrenDiv.getBoundingClientRect().bottom - top }
+    }
+
+
     initDragAndDrop() {
+        this.nodeWithChildrenDiv.setAttribute("draggable", "true");
 
         if (this.isFolder) {
-            this.nodeWithChildrenDiv.setAttribute("draggable", "true");
-            this.nodeWithChildrenDiv.ondragover = (event) => {
-                if (TreeviewNode.currentlyDraggedNode?.parent != this) {
-                    this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDestinationFolder', true);
-                }
+            this.dropzoneDiv.ondragover = (event) => {
+                console.log("Hier!")
+                let ddi = this.getDragAndDropIndex(event.pageX, event.pageY);
+                if (ddi.index < 0) return; // event bubbles up to parent div's handler
+
+                this.dragAndDropDestinationDiv.style.top = (ddi.insertPosY - 1) + "px";
+                this.dragAndDropDestinationDiv.style.display = "block";
+
+                this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', true);
+                console.log("OnDragover:" + this.caption)
                 event.preventDefault();
                 event.stopPropagation();
             }
-            this.nodeWithChildrenDiv.ondragleave = (event) => {
-                let bcr = this.nodeWithChildrenDiv.getBoundingClientRect();
-                let x = event.pageX;
-                let y = event.pageY;
-                let d = 3;
-                if (x > bcr.right - d || x < bcr.left + d || y < bcr.top + d || y > bcr.bottom - d) {
-                    this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDestinationFolder', false);
-                }
 
-                this.nodeWithChildrenDiv.ondragend = () => {
-                    TreeviewNode.currentlyDraggedNode = undefined;
-                }
-
-                this.nodeWithChildrenDiv.ondrop = (event) => {
-                    event.stopPropagation();
-                    this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDestinationFolder', false);
-                }
-            }
-        } else {
-            this.nodeLineDiv.setAttribute("draggable", "true");
-            this.nodeLineDiv.ondragstart = (event) => {
-
-                TreeviewNode.currentlyDraggedNode = this;
-                this.treeview.addToSelection(this);
-
-            }
-
-            this.nodeLineDiv.ondragover = (event) => {
-                if (this.isDragToReorder()) {
-                    event.stopPropagation();
+            this.dropzoneDiv.ondragleave = (event) => {
+                if ((<HTMLElement>event.target).classList.contains("jo_treeviewNode_caption")) {
                     event.preventDefault();
-                    let bcr = this.nodeLineDiv.getBoundingClientRect();
-                    let midHeight = bcr.top + bcr.height / 2;
-                    let destinationIsparentOfDraggedNode = TreeviewNode.currentlyDraggedNode?.parent == this;
-                    this.higlightReoderPosition(event.pageY - midHeight < 0, event.pageY - midHeight >= 0 || !destinationIsparentOfDraggedNode);
+                    event.stopPropagation();
+                    console.log("Hier")
+                    return;
                 }
+                console.log("OnDragleave:" + this.caption)
+                this.dragAndDropDestinationDiv.style.display = "none";
+
+                this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', false);
+                event.preventDefault();
+                event.stopPropagation();
+
             }
 
-            this.nodeLineDiv.ondragleave = (event) => {
-                this.higlightReoderPosition(true, false);
+            this.dropzoneDiv.ondrop = (event) => {
+                this.dragAndDropDestinationDiv.style.display = "none";
+
+                this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', false);
+                let ddi = this.getDragAndDropIndex(event.pageX, event.pageY);
+                if (ddi.index < 0) return; // event bubbles up to parent div's handler
+                event.preventDefault();
+                event.stopPropagation();
+
             }
-            this.nodeLineDiv.ondragend = (event) => {
-                TreeviewNode.currentlyDraggedNode = undefined;
-                this.higlightReoderPosition(true, false);
-            }
-            this.nodeWithChildrenDiv.ondrop = (event) => {
-                this.higlightReoderPosition(true, false);
-            }
+
         }
+
+
 
     }
 
@@ -256,13 +280,6 @@ export class TreeviewNode<E> extends NodeContainer<E> {
         this.nodeLineDiv.classList.toggle(klassDisable, false);
     }
 
-    isDragToReorder(): boolean {
-        let draggedNodeParent = TreeviewNode.currentlyDraggedNode?.parent;
-
-        return this.treeview.getCurrentlySelectedNodes().length == 1 &&
-            (draggedNodeParent == this.parent || draggedNodeParent == this)
-
-    }
 
     toggleChildrenDiv(state: ExpandCollapseState) {
         switch (state) {

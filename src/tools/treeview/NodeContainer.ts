@@ -2,7 +2,7 @@ import { DOM } from "../DOM.ts";
 import { TreeviewNode } from "./TreeviewNode.ts";
 
 export class NodeContainer<E> {
-    private children: TreeviewNode<E>[] = [];
+    protected children: TreeviewNode<E>[] = [];
 
     protected childrenDiv!: HTMLDivElement;
 
