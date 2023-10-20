@@ -248,14 +248,30 @@ export class TreeviewNode<E> {
     initDragAndDrop() {
         this.nodeWithChildrenDiv.setAttribute("draggable", "true");
 
-        this.nodeWithChildrenDiv.ondragstart = ()=>{
+        this.nodeWithChildrenDiv.ondragstart = (event)=>{
+            
+            if(!this.treeview.isSelected(this)){
+                this.treeview.unselectAllNodes();
+                this.treeview.addToSelection(this);
+                this.setFocus(true);
+            }
+            
+
+            if(event.dataTransfer){
+                event.dataTransfer.dropEffect = "move";
+                event.dataTransfer.setDragImage(this.treeview.getDragGhost(), -10, 10);                
+            } 
+
+            event.stopPropagation();
             setTimeout(() => {
                 this.treeview.startStopDragDrop(true);
             }, 100);
         }
         
         this.nodeWithChildrenDiv.ondragend = () => {
+            
             this.treeview.startStopDragDrop(false);
+            this.treeview.removeDragGhost();
         }
 
         if (this.isFolder) {

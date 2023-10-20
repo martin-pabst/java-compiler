@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     background-color: #181818;
-    color: #c0c0c0;
+    color: #b8b8b8;
     font-size: 13px;
     height: 100%;
 }
@@ -91,7 +91,7 @@
 }
 
 .jo_treeviewNode.jo_treeview_selected {
-    background-color: #50505090;
+    background-color: #114c74c0;
 }
 
 .jo_treeviewNode.jo_treeview_focus {
@@ -179,3 +179,11 @@
     z-index: 100;
 }
 
+.jo_treeview_drag_ghost {
+    background-color: #114c74c0;
+    border: 1px solid #66b6ecab;
+    font-size: 12px;
+    color: white;
+    width: fit-content;
+    padding: 4px;
+}

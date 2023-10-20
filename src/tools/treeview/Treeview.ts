@@ -70,7 +70,7 @@ export class Treeview<E> {
 
     buildHtmlScaffolding() {
         this.outerDiv = DOM.makeDiv(this.parentElement, 'jo_treeview_outer');
-        
+
         this.buildCaption();
         this.nodeDiv = DOM.makeDiv(this.outerDiv, "jo_treeview_nodediv");
 
@@ -96,7 +96,7 @@ export class Treeview<E> {
 
         }, "expanded")
 
-        if(this.config.withFolders){
+        if (this.config.withFolders) {
             this.captionLineAddButton("img_add-folder-dark", () => {
 
             }, "Ordner hinzufügen");
@@ -121,38 +121,38 @@ export class Treeview<E> {
             externalElement, externalReference, parentExternalReference,);
         this.nodes.push(node);
 
-        if(renderImmediately) node.render();        
+        if (renderImmediately) node.render();
 
         return node;
     }
 
-    renderAll(){
+    renderAll() {
         let renderedExternalReferences: Map<any, boolean> = new Map();
 
         // the following algorithm ensures that parents are rendered before their children:
         let elementsToRender = this.nodes.slice();
         let done: boolean = false;
 
-        while(!done){
-            
+        while (!done) {
+
             done = true;
 
-            for(let i = 0; i < elementsToRender.length; i++){
+            for (let i = 0; i < elementsToRender.length; i++) {
                 let e = elementsToRender[i];
-                if(e.parentExternalReference == null || renderedExternalReferences.get(e.parentExternalReference) != null){
+                if (e.parentExternalReference == null || renderedExternalReferences.get(e.parentExternalReference) != null) {
                     e.render();
                     e.findAndCorrectParent();
                     renderedExternalReferences.set(e.externalReference, true);
                     elementsToRender.splice(i, 1);
                     i--;
                     done = false;
-                } 
+                }
             }
         }
 
         this.nodes.forEach(node => node.adjustLeftMarginToDepth());
 
-        if(this.config.comparator){
+        if (this.config.comparator) {
             this.rootNode.sort(this.config.comparator);
         }
 
@@ -167,31 +167,35 @@ export class Treeview<E> {
     }
 
     unselectAllNodes() {
-        this.nodes.forEach(el => el.setSelected(false));
+        this.nodes.forEach(el => {
+            el.setSelected(false);
+            el.setFocus(false);
+        });
         this.currentSelection = [];
     }
 
-    addToSelection(node: TreeviewNode<E>){
-        if(this.currentSelection.indexOf(node) < 0) this.currentSelection.push(node);
+    addToSelection(node: TreeviewNode<E>) {
+        if (this.currentSelection.indexOf(node) < 0) this.currentSelection.push(node);
+        console.log(this.currentSelection)
     }
 
-    setLastSelectedElement(el: TreeviewNode<E>){
+    setLastSelectedElement(el: TreeviewNode<E>) {
         this.lastSelectedElement = el;
     }
 
-    expandSelectionTo(selectedElement: TreeviewNode<E>){
-        if(this.lastSelectedElement){
+    expandSelectionTo(selectedElement: TreeviewNode<E>) {
+        if (this.lastSelectedElement) {
             let list = this.rootNode.getOrderedNodeListRecursively();
             let index1 = list.indexOf(this.lastSelectedElement);
             let index2 = list.indexOf(selectedElement);
-            if(index1 >= 0 && index2 >= 0){
-                if(index2 < index1){
+            if (index1 >= 0 && index2 >= 0) {
+                if (index2 < index1) {
                     let z = index1;
                     index1 = index2;
                     index2 = z;
                 }
                 this.unselectAllNodes();
-                for(let i = index1; i <= index2; i++){
+                for (let i = index1; i <= index2; i++) {
                     list[i].setSelected(true);
                     this.currentSelection.push(list[i]);
                 }
@@ -212,5 +216,28 @@ export class Treeview<E> {
         this.outerDiv.classList.toggle("jo_dragdrop", start);
     }
 
+    getDragGhost(): HTMLElement {
+        let element = document.createElement("div");
+        element.classList.add('jo_treeview_drag_ghost');
+        element.style.top = "-10000px";
+        if (this.currentSelection.length == 1) {
+            element.textContent = this.currentSelection[0].caption;
+        } else {
+            element.textContent = this.currentSelection.length + " Dateien/Ordner";
+        }
+        document.body.appendChild(element);
+        return element;
+    }
+
+    removeDragGhost() {
+        let ghosts = document.getElementsByClassName('jo_treeview_drag_ghost');
+        for (let ghost of ghosts) {
+            ghost.remove();
+        }
+    }
+
+    isSelected(node: TreeviewNode<E>) {
+        return this.currentSelection.indexOf(node) >= 0;
+    }
 
 }
