@@ -121,7 +121,7 @@
     z-index: 1;
 }
 
-.jo_treeview_main:hover .jo_treeviewChildrenLineDiv {
+.jo_treeview_nodediv:hover .jo_treeviewChildrenLineDiv {
     border-left-color: #555;    
 }
 

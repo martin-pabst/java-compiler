@@ -5,7 +5,6 @@ import '/include/css/icons.css';
 import { ExpandCollapseComponent } from './ExpandCollapseComponent.ts';
 import { IconButtonComponent, IconButtonListener } from './IconButtonComponent.ts';
 import { TreeviewNode } from './TreeviewNode.ts';
-import { NodeContainer } from './NodeContainer.ts';
 
 
 export type TreeviewConfig<E> = {
@@ -20,16 +19,22 @@ export type TreeviewConfig<E> = {
 }
 
 
-export class Treeview<E> extends NodeContainer<E> {
+export class Treeview<E> {
 
     private treeviewAccordion?: TreeviewAccordion;
+
     private nodes: TreeviewNode<E>[] = [];
+
+    private rootNode: TreeviewNode<E>;
 
     private currentSelection: TreeviewNode<E>[] = [];
 
     private lastSelectedElement?: TreeviewNode<E>;
 
     private outerDiv!: HTMLDivElement;
+
+    // div with nodes
+    private nodeDiv!: HTMLDivElement;
 
     // caption
     private captionLineDiv!: HTMLDivElement;
@@ -42,7 +47,6 @@ export class Treeview<E> extends NodeContainer<E> {
     config: TreeviewConfig<E>;
 
     constructor(private parentElement: HTMLElement, config?: TreeviewConfig<E>) {
-        super(undefined);
 
         let c = config ? config : {};
 
@@ -59,18 +63,25 @@ export class Treeview<E> extends NodeContainer<E> {
 
         this.buildHtmlScaffolding();
 
+        this.rootNode = new TreeviewNode<E>(this, true, 'Root', undefined, null, null, null);
+        this.rootNode.render();
+
     }
 
     buildHtmlScaffolding() {
         this.outerDiv = DOM.makeDiv(this.parentElement, 'jo_treeview_outer');
-
+        
         this.buildCaption();
+        this.nodeDiv = DOM.makeDiv(this.outerDiv, "jo_treeview_nodediv");
+
         this.buildTreeview();
-        this.initializeDragDropZone();
+    }
+
+    getNodeDiv(): HTMLDivElement {
+        return this.nodeDiv;
     }
 
     buildTreeview() {
-        this.childrenDiv = DOM.makeDiv(this.outerDiv, 'jo_treeview_main');
     }
 
     buildCaption() {
@@ -142,13 +153,13 @@ export class Treeview<E> extends NodeContainer<E> {
         this.nodes.forEach(node => node.adjustLeftMarginToDepth());
 
         if(this.config.comparator){
-            this.sort(this.config.comparator);
+            this.rootNode.sort(this.config.comparator);
         }
 
     }
 
-    findParent(node: TreeviewNode<E>): NodeContainer<E> | undefined {
-        return node.parentExternalReference == null ? this : <NodeContainer<E> | undefined>this.nodes.find(e => e.externalReference == node.parentExternalReference);
+    findParent(node: TreeviewNode<E>): TreeviewNode<E> | undefined {
+        return node.parentExternalReference == null ? this.rootNode : <TreeviewNode<E> | undefined>this.nodes.find(e => e.externalReference == node.parentExternalReference);
     }
 
     unfocusAllNodes() {
@@ -170,7 +181,7 @@ export class Treeview<E> extends NodeContainer<E> {
 
     expandSelectionTo(selectedElement: TreeviewNode<E>){
         if(this.lastSelectedElement){
-            let list = this.getOrderedNodeListRecursively();
+            let list = this.rootNode.getOrderedNodeListRecursively();
             let index1 = list.indexOf(this.lastSelectedElement);
             let index2 = list.indexOf(selectedElement);
             if(index1 >= 0 && index2 >= 0){
@@ -199,23 +210,7 @@ export class Treeview<E> extends NodeContainer<E> {
 
     startStopDragDrop(start: boolean) {
         this.outerDiv.classList.toggle("jo_dragdrop", start);
-        console.log("Start/Stop: " + start)
     }
 
-    initializeDragDropZone(){
-        this.outerDiv.ondragover = (event) => {
-            this.outerDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', true);
-            event.preventDefault();
-        }
-        
-        this.outerDiv.ondragleave = (event) => {
-            this.dragLeave(event);
-        }
-    }
-    
-    dragLeave(event: DragEvent){        
-        this.outerDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', false);
-        event.preventDefault();
-    }
 
 }

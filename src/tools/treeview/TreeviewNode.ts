@@ -1,10 +1,9 @@
 import { DOM } from "../DOM.ts";
 import { ExpandCollapseComponent, ExpandCollapseState } from "./ExpandCollapseComponent.ts";
 import { IconButtonComponent, IconButtonListener } from "./IconButtonComponent.ts";
-import { NodeContainer } from "./NodeContainer.ts";
 import { Treeview } from "./Treeview.ts";
 
-export class TreeviewNode<E> extends NodeContainer<E> {
+export class TreeviewNode<E> {
 
     private _hasFocus: boolean = false;
 
@@ -25,6 +24,13 @@ export class TreeviewNode<E> extends NodeContainer<E> {
         this._isSelected = value;
         this.nodeLineDiv.classList.toggle('jo_treeview_selected', value);
     }
+
+
+    protected children: TreeviewNode<E>[] = [];
+
+    private parent?: TreeviewNode<E>;
+
+    protected childrenDiv!: HTMLDivElement;
 
     /* whole line */
     private nodeWithChildrenDiv!: HTMLElement;
@@ -50,10 +56,9 @@ export class TreeviewNode<E> extends NodeContainer<E> {
     constructor(private _treeview: Treeview<E>,
         private _isFolder: boolean, private _caption: string,
         private _iconClass: string | undefined,
-        private _externalObject: E,
+        private _externalObject: E | null,
         private _externalReference: any,
         private _parentExternalReference: any) {
-        super();
     }
 
     findAndCorrectParent() {
@@ -73,6 +78,8 @@ export class TreeviewNode<E> extends NodeContainer<E> {
         if (!this.nodeWithChildrenDiv) {
             this.buildHtmlScaffolding();
         }
+
+        if(this.isRootNode()) return;
 
         this.captionDiv.textContent = this.caption;
 
@@ -100,7 +107,7 @@ export class TreeviewNode<E> extends NodeContainer<E> {
         this._externalReference = value;
     }
 
-    public get externalObject(): E {
+    public get externalObject(): E | null {
         return this._externalObject;
     }
     public get iconClass(): string | undefined {
@@ -128,16 +135,20 @@ export class TreeviewNode<E> extends NodeContainer<E> {
         this._treeview = value;
     }
 
-    public getDepth(): number {
-        if (!this.parent) return 0;
-        return this.parent.getDepth() + 1;
+    isRootNode(): boolean {
+        return this.externalObject == null;
     }
 
     buildHtmlScaffolding() {
 
         this.nodeWithChildrenDiv = DOM.makeDiv(undefined, 'jo_treeviewNodeWithChildren');
 
-        this.parent?.appendHtmlChild(this.nodeWithChildrenDiv);
+        if(this.isRootNode()){
+            this.treeview.getNodeDiv().appendChild(this.nodeWithChildrenDiv);
+        } else {
+            this.parent?.appendHtmlChild(this.nodeWithChildrenDiv);
+        }
+
 
         if(this.isFolder){
             this.dropzoneDiv = DOM.makeDiv(this.nodeWithChildrenDiv, this._isFolder ? 'jo_treeviewNode_dropzone': 'jo');
@@ -146,49 +157,54 @@ export class TreeviewNode<E> extends NodeContainer<E> {
         this.dragAndDropDestinationDiv = DOM.makeDiv(this.nodeWithChildrenDiv, 'jo_treeviewNode_dragAndDropDestinationLine');
         this.dragAndDropDestinationDiv.style.display = "none";
 
-        this.nodeLineDiv = DOM.makeDiv(this.nodeWithChildrenDiv, 'jo_treeviewNode');
+        if(!this.isRootNode()){
+            this.nodeLineDiv = DOM.makeDiv(this.nodeWithChildrenDiv, 'jo_treeviewNode');        
+            this.marginLeftDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_marginLeft');
+            this.expandCollapseDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_expandCollapse');
+            this.iconDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_icon');
+            this.captionDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_caption');
+            this.errorsDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_errors');
+            this.buttonsDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_buttons');
+
+            this.nodeLineDiv.onpointerup = (ev) => {
+                ev.stopPropagation();
+                if (!ev.shiftKey && !ev.ctrlKey) {
+                    this.treeview.unselectAllNodes();
+                }
+    
+                if (ev.shiftKey) {
+                    this.treeview.expandSelectionTo(this);
+                } else {
+                    this.treeview.setLastSelectedElement(this);
+                }
+    
+    
+                this.setSelected(true);
+                this.treeview.addToSelection(this);
+                this.setFocus(true);
+            }
+    
+        }
+
         this.childrenDiv = DOM.makeDiv(this.nodeWithChildrenDiv, 'jo_treeviewChildren');
         this.childrenLineDiv = DOM.makeDiv(this.childrenDiv, 'jo_treeviewChildrenLineDiv');
-
-        this.marginLeftDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_marginLeft');
-        this.expandCollapseDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_expandCollapse');
-        this.iconDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_icon');
-        this.captionDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_caption');
-        this.errorsDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_errors');
-        this.buttonsDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_buttons');
 
         if (this._isFolder) {
             this.expandCollapseComponent =
                 new ExpandCollapseComponent(this.expandCollapseDiv, (state: ExpandCollapseState) => {
                     this.toggleChildrenDiv(state);
                 }, "expanded")
-            this.captionDiv.onpointerup = () => {
-                this.expandCollapseComponent.toggleState();
+            if(!this.isRootNode()){
+                this.captionDiv.onpointerup = () => {
+                    this.expandCollapseComponent.toggleState();
+                }
             }
         }
 
-        if (this.treeview.config.withDeleteButtons) {
+        if (this.treeview.config.withDeleteButtons && !this.isRootNode()) {
             this.addIconButton("img_delete", () => {
                 // TODO!
             }, "Löschen");
-        }
-
-        this.nodeLineDiv.onpointerup = (ev) => {
-            ev.stopPropagation();
-            if (!ev.shiftKey && !ev.ctrlKey) {
-                this.treeview.unselectAllNodes();
-            }
-
-            if (ev.shiftKey) {
-                this.treeview.expandSelectionTo(this);
-            } else {
-                this.treeview.setLastSelectedElement(this);
-            }
-
-
-            this.setSelected(true);
-            this.treeview.addToSelection(this);
-            this.setFocus(true);
         }
 
         this.adjustLeftMarginToDepth();
@@ -207,12 +223,16 @@ export class TreeviewNode<E> extends NodeContainer<E> {
      * @param mouseY 
      */
     getDragAndDropIndex(mouseX: number, mouseY: number): { index: number, insertPosY: number } {
-        let nodeLineBoundingRect = this.nodeLineDiv.getBoundingClientRect();
-        let top = nodeLineBoundingRect.top;
+        let boundingRect = this.nodeWithChildrenDiv.getBoundingClientRect();
+        let top = boundingRect.top;
 
-        if (mouseY <= nodeLineBoundingRect.top + nodeLineBoundingRect.height / 2) {
-            return { index: -1, insertPosY: nodeLineBoundingRect.top - top };
+        if(!this.isRootNode()){
+            let nodeLineRect = this.nodeLineDiv.getBoundingClientRect();
+            if (mouseY <= nodeLineRect.top + nodeLineRect.height / 2) {
+                return { index: -1, insertPosY: nodeLineRect.top - top };
+            }
         }
+
 
         for (let i = 0; i < this.children.length; i++) {
             let tvn = <TreeviewNode<E>>this.children[i];
@@ -241,7 +261,17 @@ export class TreeviewNode<E> extends NodeContainer<E> {
         if (this.isFolder) {
             this.dropzoneDiv.ondragover = (event) => {
                 let ddi = this.getDragAndDropIndex(event.pageX, event.pageY);
-                if (ddi.index < 0) return; // event bubbles up to parent div's handler
+                if (ddi.index < 0) {
+                    if(this.parent?.dropzoneDiv.ondragover){
+                        this.parent.dropzoneDiv.ondragover(event);
+                        this.dropzoneDiv.ondragleave!(event);
+                    }
+                    return; // event bubbles up to parent div's handler
+                }
+
+                if(this.parent?.dropzoneDiv.ondragleave){
+                    this.parent.dropzoneDiv.ondragleave(event);
+                }
 
                 this.dragAndDropDestinationDiv.style.top = (ddi.insertPosY - 1) + "px";
                 this.dragAndDropDestinationDiv.style.display = "block";
@@ -249,7 +279,6 @@ export class TreeviewNode<E> extends NodeContainer<E> {
                 this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', true);
                 event.preventDefault();
                 event.stopPropagation();
-                this.treeview.dragLeave(event);
             }
 
             this.dropzoneDiv.ondragleave = (event) => {
@@ -271,9 +300,16 @@ export class TreeviewNode<E> extends NodeContainer<E> {
 
                 this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', false);
                 let ddi = this.getDragAndDropIndex(event.pageX, event.pageY);
-                if (ddi.index < 0) return; // event bubbles up to parent div's handler
+                if (ddi.index < 0){
+                    if(this.parent?.dropzoneDiv?.ondrop){
+                        this.parent.dropzoneDiv.ondrop(event);
+                        return;
+                    }
+                }
                 event.preventDefault();
                 event.stopPropagation();
+
+                console.log("OnDrop: " + this.caption + ", pos: " + ddi.index);
 
             }
 
@@ -303,11 +339,14 @@ export class TreeviewNode<E> extends NodeContainer<E> {
     }
 
     adjustLeftMarginToDepth() {
-        let depth = this.getDepth();
-        this.childrenLineDiv.style.marginLeft = (7 + depth * 7) + "px";
-
-        this.marginLeftDiv.style.width = 2 + (depth * 7) + "px";
-
+        if(this.isRootNode()){
+            this.childrenLineDiv.style.marginLeft = "0";
+        } else {
+            let depth = this.getDepth();
+            this.childrenLineDiv.style.marginLeft = (7 + depth * 7) + "px";
+    
+            this.marginLeftDiv.style.width = 2 + (depth * 7) + "px";
+        }
     }
 
     setErrors(errors: string) {
@@ -325,5 +364,61 @@ export class TreeviewNode<E> extends NodeContainer<E> {
         if (removeFromTreeviewNodeList) this.treeview.removeNode(this);
     }
 
+    public add(child: TreeviewNode<E>) {
+        if (this.children.indexOf(child) < 0) {
+            this.children.push(child);
+        }
+
+        if (this.childrenDiv) {
+            if (child.getMainDiv()) {
+                this.childrenDiv.appendChild(child.getMainDiv());
+            }
+        }
+    }
+
+    public appendHtmlChild(htmlElement: HTMLElement) {
+        if (this.childrenDiv) this.childrenDiv.appendChild(htmlElement);
+    }
+
+    public remove(child: TreeviewNode<E>) {
+        this.children.splice(this.children.indexOf(child), 1);
+    }
+
+    public sort(comparator: (e1: E, e2: E) => number) {
+        this.children.sort((node1, node2) => comparator(node1.externalObject!, node2.externalObject!));
+        
+        let toRemove: HTMLElement[] = [];
+        for(let child of this.childrenDiv.childNodes){
+            let hChild: HTMLElement = <HTMLElement> child;
+            if(!hChild.classList.contains('jo_treeviewChildrenLineDiv')){
+                toRemove.push(hChild);
+            }
+        }
+        toRemove.forEach(c => this.childrenDiv.removeChild(c));
+
+        this.children.forEach(node => {
+            this.childrenDiv.appendChild(node.getMainDiv());
+            node.sort(comparator);
+        }
+        );
+    }
+
+    public getDepth(): number {
+        if (this.parent) return this.parent.getDepth() + 1;
+        return 0;
+    }
+
+    public getOrderedNodeListRecursively(): TreeviewNode<E>[] {
+
+        let list: TreeviewNode<E>[] = [];
+
+        this.children.forEach(c => {
+            list.push(c);
+            list = list.concat(c.getOrderedNodeListRecursively())
+        })
+
+        return list;
+
+    }
 
 }
