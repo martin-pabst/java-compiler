@@ -18,6 +18,9 @@ export type TreeviewConfig<E> = {
     comparator?: (externalElement1: E, externalElement2: E) => number
 }
 
+// Callback functions return true if changes shall be executed on treeview, false if action should get cancelled
+
+export type TreeviewMoveNodesCallback<E> = (movedElements: E[], destinationFolder: E | null, position: {order: number, elementBefore: E | null, elementAfter: E | null}) => boolean;
 
 export class Treeview<E> {
 
@@ -46,6 +49,9 @@ export class Treeview<E> {
 
     config: TreeviewConfig<E>;
 
+    //callbacks
+    private treeviewMoveNodesCallback?: TreeviewMoveNodesCallback<E>;
+
     constructor(private parentElement: HTMLElement, config?: TreeviewConfig<E>) {
 
         let c = config ? config : {};
@@ -66,6 +72,15 @@ export class Treeview<E> {
         this.rootNode = new TreeviewNode<E>(this, true, 'Root', undefined, null, null, null);
         this.rootNode.render();
 
+    }
+
+    setTreeviewMoveNodesCallback(tvmn: TreeviewMoveNodesCallback<E>){
+        this.treeviewMoveNodesCallback = tvmn;
+    }
+
+    invokeMoveNodesCallback(movedElements: E[], destinationFolder: E | null, position: {order: number, elementBefore: E | null, elementAfter: E | null}): boolean {
+        if(this.treeviewMoveNodesCallback) return this.treeviewMoveNodesCallback(movedElements, destinationFolder, position);
+        return true;
     }
 
     buildHtmlScaffolding() {
@@ -126,7 +141,7 @@ export class Treeview<E> {
         return node;
     }
 
-    renderAll() {
+    public initialRenderAll() {
         let renderedExternalReferences: Map<any, boolean> = new Map();
 
         // the following algorithm ensures that parents are rendered before their children:
@@ -181,6 +196,10 @@ export class Treeview<E> {
 
     setLastSelectedElement(el: TreeviewNode<E>) {
         this.lastSelectedElement = el;
+    }
+
+    getOrderedNodeListRecursively(): TreeviewNode<E>[] {
+        return this.rootNode.getOrderedNodeListRecursively();
     }
 
     expandSelectionTo(selectedElement: TreeviewNode<E>) {

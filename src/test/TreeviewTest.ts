@@ -36,7 +36,7 @@ export class TreeviewTest {
             el.treeviewLine = tvLine;
         }
 
-        tv.renderAll();
+        tv.initialRenderAll();
 
     }
 

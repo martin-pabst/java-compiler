@@ -7,6 +7,26 @@ export class DOM {
         element.textContent = '';
     }
 
+    public static clearAllButGivenClasses(element: HTMLElement, ...classes: string[]){
+        let elementsToPreserve: HTMLElement[] = [];
+
+        let e: HTMLElement;
+        while(e = <HTMLElement>element.firstChild){
+            
+            for(let s of classes){
+                if(e.classList.contains(s)){
+                    elementsToPreserve.push(e);
+                    break;
+                }
+            }
+
+            element.removeChild(e);
+        }
+        element.textContent = '';
+
+        elementsToPreserve.forEach(e => element.appendChild(e));
+    }
+
     public static makeDiv(parent: HTMLElement | undefined, ...classes: string[]): HTMLDivElement{
         let div = document.createElement('div');
         if(classes != null) div.classList.add(...classes);
