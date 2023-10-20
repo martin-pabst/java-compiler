@@ -66,7 +66,7 @@ export class Treeview<E> extends NodeContainer<E> {
 
         this.buildCaption();
         this.buildTreeview();
-
+        this.initializeDragDropZone();
     }
 
     buildTreeview() {
@@ -197,5 +197,25 @@ export class Treeview<E> extends NodeContainer<E> {
         return this.currentSelection;
     }
 
+    startStopDragDrop(start: boolean) {
+        this.outerDiv.classList.toggle("jo_dragdrop", start);
+        console.log("Start/Stop: " + start)
+    }
+
+    initializeDragDropZone(){
+        this.outerDiv.ondragover = (event) => {
+            this.outerDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', true);
+            event.preventDefault();
+        }
+        
+        this.outerDiv.ondragleave = (event) => {
+            this.dragLeave(event);
+        }
+    }
+    
+    dragLeave(event: DragEvent){        
+        this.outerDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', false);
+        event.preventDefault();
+    }
 
 }

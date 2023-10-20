@@ -168,3 +168,14 @@
 .jo_treeviewNode_highlightDragDropDestination {
     background-color: rgba(64, 168, 60, 0.678);
 }
+
+.jo_treeview_outer.jo_dragdrop .jo_treeviewNode_dropzone {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+}
+

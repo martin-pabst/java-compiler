@@ -139,7 +139,10 @@ export class TreeviewNode<E> extends NodeContainer<E> {
 
         this.parent?.appendHtmlChild(this.nodeWithChildrenDiv);
 
-        this.dropzoneDiv = DOM.makeDiv(this.nodeWithChildrenDiv, 'jo_treeviewNode_dropzone');
+        if(this.isFolder){
+            this.dropzoneDiv = DOM.makeDiv(this.nodeWithChildrenDiv, this._isFolder ? 'jo_treeviewNode_dropzone': 'jo');
+        }
+
         this.dragAndDropDestinationDiv = DOM.makeDiv(this.nodeWithChildrenDiv, 'jo_treeviewNode_dragAndDropDestinationLine');
         this.dragAndDropDestinationDiv.style.display = "none";
 
@@ -225,9 +228,18 @@ export class TreeviewNode<E> extends NodeContainer<E> {
     initDragAndDrop() {
         this.nodeWithChildrenDiv.setAttribute("draggable", "true");
 
+        this.nodeWithChildrenDiv.ondragstart = ()=>{
+            setTimeout(() => {
+                this.treeview.startStopDragDrop(true);
+            }, 100);
+        }
+        
+        this.nodeWithChildrenDiv.ondragend = () => {
+            this.treeview.startStopDragDrop(false);
+        }
+
         if (this.isFolder) {
             this.dropzoneDiv.ondragover = (event) => {
-                console.log("Hier!")
                 let ddi = this.getDragAndDropIndex(event.pageX, event.pageY);
                 if (ddi.index < 0) return; // event bubbles up to parent div's handler
 
@@ -235,19 +247,17 @@ export class TreeviewNode<E> extends NodeContainer<E> {
                 this.dragAndDropDestinationDiv.style.display = "block";
 
                 this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', true);
-                console.log("OnDragover:" + this.caption)
                 event.preventDefault();
                 event.stopPropagation();
+                this.treeview.dragLeave(event);
             }
 
             this.dropzoneDiv.ondragleave = (event) => {
                 if ((<HTMLElement>event.target).classList.contains("jo_treeviewNode_caption")) {
                     event.preventDefault();
                     event.stopPropagation();
-                    console.log("Hier")
                     return;
                 }
-                console.log("OnDragleave:" + this.caption)
                 this.dragAndDropDestinationDiv.style.display = "none";
 
                 this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', false);

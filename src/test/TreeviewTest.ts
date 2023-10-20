@@ -51,6 +51,11 @@ export class TreeviewTest {
             {caption: "BFirst File", isFolder: false, id: 15, parentId: 13},
             {caption: "BSecond File", isFolder: false, id: 16, parentId: 13},
             {caption: "BThird File", isFolder: false, id: 17, parentId: 13},
+            {caption: "File0", isFolder: false, id: 18, parentId: undefined},
+            {caption: "File1", isFolder: false, id: 19, parentId: undefined},
+            {caption: "File2", isFolder: false, id: 20, parentId: undefined},
+            {caption: "ZFile0", isFolder: false, id: 21, parentId: undefined},
+            {caption: "ZFile1", isFolder: false, id: 22, parentId: undefined},
         ]
 
         let  idToElementMap: Map<number, Element> = new Map();
