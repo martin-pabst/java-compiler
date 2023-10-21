@@ -37,6 +37,7 @@ export class TreeviewTest {
         }
 
         tv.renameCallback = (element, newName, _node) => {
+            element.caption = newName;
             console.log(element.caption + " is renamed to " + newName);
             return true;
         }

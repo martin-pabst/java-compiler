@@ -2,7 +2,7 @@ import jQuery from 'jquery';
 import { escapeHtml } from "./StringTools.js";
 
 export function makeEditable(elementWithText: JQuery<HTMLElement>,
-    elementToReplace: JQuery<HTMLElement>,
+    elementToReplace: JQuery<HTMLElement> | undefined,
     renameDoneCallback: (newContent: string) => void, selectionRange?: { start: number, end: number }) {
 
     let mousePointer = window.PointerEvent ? "pointer" : "mouse";
@@ -40,18 +40,18 @@ export function makeEditable(elementWithText: JQuery<HTMLElement>,
             $input.off("keydown.me");
             $input.off("focusout.me");
             $input.remove();
-            elementToReplace.show();
+            elementToReplace!.show();
             let newValue = escapeHtml(<string>$input.val());
             renameDoneCallback(newValue);
             return;
         }
     });
 
-    $input.on("focusout.me", (ev) => {
+    $input.on("focusout.me", (_ev) => {
         $input.off("keydown.me");
         $input.off("focusout.me");
         $input.remove();
-        elementToReplace.show();
+        elementToReplace!.show();
         let newValue = escapeHtml(<string>$input.val());
         renameDoneCallback(newValue);
         return;
@@ -125,7 +125,7 @@ export function openContextMenu(items: ContextMenuItem[], x: number, y: number):
         $contextMenu.append($item);
     }
 
-    jQuery(document).on(mousePointer + "down.contextmenu", (e) => {
+    jQuery(document).on(mousePointer + "down.contextmenu", (_e) => {
         jQuery(document).off(mousePointer + "down.contextmenu");
         jQuery(document).off("keydown.contextmenu");
         jQuery('.jo_contextmenu').remove();
@@ -296,7 +296,7 @@ function fallbackCopyTextToClipboard(text: string) {
     textArea.select();
 
     try {
-        var successful = document.execCommand('copy');
+        document.execCommand('copy');
     } catch (err) {
         console.error('Fallback: Oops, unable to copy', err);
     }

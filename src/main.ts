@@ -68,6 +68,9 @@ async function initMonacoEditor(): Promise<void> {
 
   return new Promise((resolve) => {
     //@ts-ignore
+    window.AMDLoader.Configuration.ignoreDuplicateModules = ["jquery"];
+
+    //@ts-ignore
     window.require.config({ paths: { 'vs': 'lib/monaco-editor/dev/vs' } });
     //@ts-ignore
     window.require.config({
@@ -76,7 +79,7 @@ async function initMonacoEditor(): Promise<void> {
           '*': 'de'
         }
       },
-      ignoreDuplicateModules: ["vs/editor/editor.main"]
+      ignoreDuplicateModules: ["vs/editor/editor.main", 'jquery']
     });
 
     //@ts-ignore

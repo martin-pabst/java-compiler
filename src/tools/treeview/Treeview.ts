@@ -227,7 +227,6 @@ export class Treeview<E> {
 
     addToSelection(node: TreeviewNode<E>) {
         if (this.currentSelection.indexOf(node) < 0) this.currentSelection.push(node);
-        console.log(this.currentSelection)
     }
 
     setLastSelectedElement(el: TreeviewNode<E>) {

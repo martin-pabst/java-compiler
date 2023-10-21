@@ -1,5 +1,5 @@
 import { DOM } from "../DOM.ts";
-import { ContextMenuItem, openContextMenu } from "../HtmlTools.ts";
+import { ContextMenuItem, makeEditable, openContextMenu } from "../HtmlTools.ts";
 import { ExpandCollapseComponent, ExpandCollapseState } from "./ExpandCollapseComponent.ts";
 import { IconButtonComponent, IconButtonListener } from "./IconButtonComponent.ts";
 import { Treeview } from "./Treeview.ts";
@@ -120,6 +120,7 @@ export class TreeviewNode<E> {
     }
     public set caption(value: string) {
         this._caption = value;
+        this.captionDiv.textContent = value;
     }
     public get isFolder(): boolean {
         return this._isFolder;
@@ -144,6 +145,7 @@ export class TreeviewNode<E> {
 
         if (this.isRootNode()) {
             this.treeview.getNodeDiv().appendChild(this.nodeWithChildrenDiv);
+            this.nodeWithChildrenDiv.style.flex = "1";
         } else {
             this.parent?.appendHtmlChild(this.nodeWithChildrenDiv);
         }
@@ -166,7 +168,7 @@ export class TreeviewNode<E> {
             this.buttonsDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_buttons');
 
             this.nodeLineDiv.onpointerup = (ev) => {
-                if(ev.button == 2) return;
+                if (ev.button == 2) return;
                 ev.stopPropagation();
                 if (!ev.shiftKey && !ev.ctrlKey) {
                     this.treeview.unselectAllNodes();
@@ -214,8 +216,8 @@ export class TreeviewNode<E> {
 
     }
 
-    initContextMenu(){
-        if(this.isRootNode()) return;
+    initContextMenu() {
+        if (this.isRootNode()) return;
         let contextmenuHandler = (event: MouseEvent) => {
 
             let contextMenuItems: ContextMenuItem[] = [];
@@ -223,7 +225,7 @@ export class TreeviewNode<E> {
                 contextMenuItems.push({
                     caption: "Umbenennen",
                     callback: () => {
-                        //this.renameNode();
+                        this.renameNode();
                     }
                 })
             }
@@ -279,6 +281,22 @@ export class TreeviewNode<E> {
         }, false);
     }
 
+
+    renameNode() {
+        makeEditable(jQuery(this.captionDiv), undefined, (newText: string) => {
+            if (this.treeview.renameCallback && newText != this._caption) {
+
+                if (this.treeview.renameCallback(this._externalObject!, newText, this)) {
+                    this.caption = newText;
+                    if(this.treeview.config.comparator){
+                        this.parent?.sort(this.treeview.config.comparator);
+                    }
+                }
+
+            }
+        }, {start: 0, end: this._caption.length});
+    }
+
     /**
      * Return
      *  -1 if mouse cursor is above mid-line of caption
@@ -299,7 +317,6 @@ export class TreeviewNode<E> {
             }
         }
 
-
         for (let i = 0; i < this.children.length; i++) {
             let tvn = <TreeviewNode<E>>this.children[i];
             let boundingRect = tvn.nodeLineDiv.getBoundingClientRect();
@@ -307,7 +324,10 @@ export class TreeviewNode<E> {
                 return { index: i, insertPosY: boundingRect.top - top };
         }
 
-        return { index: this.children.length, insertPosY: this.nodeWithChildrenDiv.getBoundingClientRect().bottom - top }
+        let endPos = this.nodeWithChildrenDiv.getBoundingClientRect().bottom - top;
+        if(this.children.length > 0) endPos = this.children[this.children.length - 1].nodeWithChildrenDiv.getBoundingClientRect().bottom - top;
+
+        return { index: this.children.length, insertPosY: endPos }
     }
 
 
@@ -408,7 +428,7 @@ export class TreeviewNode<E> {
                             this.children.splice(ddi.index++, 0, node);
                         }
                     }
-                    
+
                     DOM.clearAllButGivenClasses(this.childrenDiv, 'jo_treeviewChildrenLineDiv');
 
                     this.children.forEach(c => {
@@ -449,9 +469,9 @@ export class TreeviewNode<E> {
             this.childrenLineDiv.style.marginLeft = "0";
         } else {
             let depth = this.getDepth();
-            this.childrenLineDiv.style.marginLeft = (7 + depth * 7) + "px";
+            this.childrenLineDiv.style.marginLeft = (5 + depth * 7) + "px";
 
-            this.marginLeftDiv.style.width = 2 + (depth * 7) + "px";
+            this.marginLeftDiv.style.width = (depth * 7) + "px";
         }
     }
 
@@ -491,16 +511,9 @@ export class TreeviewNode<E> {
     }
 
     public sort(comparator: (e1: E, e2: E) => number) {
-        this.children.sort((node1, node2) => comparator(node1.externalObject!, node2.externalObject!));
+        this.children = this.children.sort((node1, node2) => comparator(node1.externalObject!, node2.externalObject!));
 
-        let toRemove: HTMLElement[] = [];
-        for (let child of this.childrenDiv.childNodes) {
-            let hChild: HTMLElement = <HTMLElement>child;
-            if (!hChild.classList.contains('jo_treeviewChildrenLineDiv')) {
-                toRemove.push(hChild);
-            }
-        }
-        toRemove.forEach(c => this.childrenDiv.removeChild(c));
+        DOM.clearAllButGivenClasses(this.childrenDiv, 'jo_treeviewChildrenLineDiv');
 
         this.children.forEach(node => {
             this.childrenDiv.appendChild(node.getMainDiv());

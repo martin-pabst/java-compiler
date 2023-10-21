@@ -121,6 +121,12 @@
     z-index: 1;
 }
 
+.jo_treeview_nodediv {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
 .jo_treeview_nodediv:hover .jo_treeviewChildrenLineDiv {
     border-left-color: #555;    
 }
