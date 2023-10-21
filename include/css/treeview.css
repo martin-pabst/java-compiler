@@ -128,7 +128,7 @@
 }
 
 .jo_treeview_nodediv:hover .jo_treeviewChildrenLineDiv {
-    border-left-color: #555;    
+    border-left-color: #555;
 }
 
 .jo_treeviewNode_caption {
@@ -144,7 +144,8 @@
 }
 
 .jo_treeviewNode_errors {
-    color: rgb(125, 0, 0);
+    color: rgb(222, 31, 31);
+    margin-right: 4px;
 }
 
 .jo_treeviewNode_buttons {
@@ -168,11 +169,31 @@
     position: absolute;
     height: 2px;
     width: 100%;
-    background-color: rgb(128, 41, 0);
+    background-color: rgb(53, 167, 0);
+}
+
+.jo_treeviewNode_dragAndDropDestinationLine.jo_treeview_invald_dragdestination {
+    animation-name: jo_treeview_invalid_dragdestination_animation;
+    animation-duration: 0.7s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes jo_treeview_invalid_dragdestination_animation {
+    0% {
+        background-color: #b92929;
+    }
+
+    50% {
+        background-color: #dc0e0e;
+    }
+
+    100% {
+        background-color: #b92929;
+    }
 }
 
 .jo_treeviewNode_highlightDragDropDestination {
-    background-color: rgba(98, 98, 98, 0.678);
+    background-color: rgba(74, 74, 74, 0.678);
 }
 
 .jo_treeview_outer.jo_dragdrop .jo_treeviewNode_dropzone {
@@ -186,6 +207,7 @@
 }
 
 .jo_treeview_drag_ghost {
+    position: absolute;
     background-color: #114c74c0;
     border: 1px solid #66b6ecab;
     font-size: 12px;

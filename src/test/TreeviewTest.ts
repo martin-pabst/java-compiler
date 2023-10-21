@@ -1,5 +1,5 @@
-import { Treeview } from '../tools/treeview/Treeview.ts';
-import { TreeviewNode } from '../tools/treeview/TreeviewNode.ts';
+import { Treeview } from '../tools/components/treeview/Treeview.ts';
+import { TreeviewNode } from '../tools/components/treeview/TreeviewNode.ts';
 import '/include/css/treeviewtest.css';
 
 type Element = {
@@ -36,13 +36,15 @@ export class TreeviewTest {
             el.treeviewLine = tvLine;
         }
 
+        
         tv.renameCallback = (element, newName, _node) => {
             element.caption = newName;
             console.log(element.caption + " is renamed to " + newName);
             return true;
         }
-
+        
         tv.initialRenderAll();
+        this.elements[0].treeviewLine?.setErrors("(10)");
 
     }
 

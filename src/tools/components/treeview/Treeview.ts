@@ -1,9 +1,9 @@
-import { DOM } from '../DOM.ts';
+import { DOM } from '../../DOM.ts';
 import { TreeviewAccordion } from './TreeviewAccordion.ts';
 import '/include/css/treeview.css';
 import '/include/css/icons.css';
-import { ExpandCollapseComponent } from './ExpandCollapseComponent.ts';
-import { IconButtonComponent, IconButtonListener } from './IconButtonComponent.ts';
+import { ExpandCollapseComponent } from '../ExpandCollapseComponent.ts';
+import { IconButtonComponent, IconButtonListener } from '../IconButtonComponent.ts';
 import { TreeviewNode } from './TreeviewNode.ts';
 
 
@@ -148,15 +148,19 @@ export class Treeview<E> {
         }, "expanded")
 
         if (this.config.withFolders) {
-            this.captionLineAddButton("img_add-folder-dark", () => {
+            this.captionLineAddIconButton("img_add-folder-dark", () => {
 
             }, "Ordner hinzufügen");
         }
 
     }
 
-    captionLineAddButton(iconClass: string, callback: IconButtonListener, tooltip?: string): IconButtonComponent {
+    captionLineAddIconButton(iconClass: string, callback: IconButtonListener, tooltip?: string): IconButtonComponent {
         return new IconButtonComponent(this.captionLineButtonsDiv, iconClass, callback, tooltip);
+    }
+
+    captionLineAddElementToButtonDiv(element: HTMLElement){
+        this.captionLineButtonsDiv.prepend(element);
     }
 
     captionLineSetText(text: string) {

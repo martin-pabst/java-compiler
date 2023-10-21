@@ -1,7 +1,7 @@
-import { DOM } from "../DOM.ts";
-import { ContextMenuItem, makeEditable, openContextMenu } from "../HtmlTools.ts";
-import { ExpandCollapseComponent, ExpandCollapseState } from "./ExpandCollapseComponent.ts";
-import { IconButtonComponent, IconButtonListener } from "./IconButtonComponent.ts";
+import { DOM } from "../../DOM.ts";
+import { ContextMenuItem, makeEditable, openContextMenu } from "../../HtmlTools.ts";
+import { ExpandCollapseComponent, ExpandCollapseState } from "../ExpandCollapseComponent.ts";
+import { IconButtonComponent, IconButtonListener } from "../IconButtonComponent.ts";
 import { Treeview } from "./Treeview.ts";
 
 export class TreeviewNode<E> {
@@ -330,6 +330,22 @@ export class TreeviewNode<E> {
         return { index: this.children.length, insertPosY: endPos }
     }
 
+    containsNode(node: TreeviewNode<E>): boolean {
+        if(this == node) return true;
+        for(let c of this.children){
+            if(c.containsNode(node)) return true;
+        }
+        return false;
+    }
+
+    selectionContainsThisNode(): boolean {
+        for(let node of this.treeview.getCurrentlySelectedNodes()){
+            if(node.containsNode(this)){
+                return true;
+            }
+        }
+        return false;
+    }
 
     initDragAndDrop() {
         this.nodeWithChildrenDiv.setAttribute("draggable", "true");
@@ -362,6 +378,11 @@ export class TreeviewNode<E> {
 
         if (this.isFolder) {
             this.dropzoneDiv.ondragover = (event) => {
+                
+                if(event.dataTransfer){
+                    event.dataTransfer.dropEffect = "move";
+                }
+
                 let ddi = this.getDragAndDropIndex(event.pageX, event.pageY);
                 if (ddi.index < 0) {
                     if (this.parent?.dropzoneDiv.ondragover) {
@@ -378,29 +399,44 @@ export class TreeviewNode<E> {
                 this.dragAndDropDestinationDiv.style.top = (ddi.insertPosY - 1) + "px";
                 this.dragAndDropDestinationDiv.style.display = "block";
 
+                let selectionContainsThisNode = this.selectionContainsThisNode();
+                this.dragAndDropDestinationDiv.classList.toggle('jo_treeview_invald_dragdestination', selectionContainsThisNode);
+
                 this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', true);
-                event.preventDefault();
-                event.stopPropagation();
+
+                if(!selectionContainsThisNode){
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
             }
 
             this.dropzoneDiv.ondragleave = (event) => {
                 if ((<HTMLElement>event.target).classList.contains("jo_treeviewNode_caption")) {
-                    event.preventDefault();
                     event.stopPropagation();
                     return;
                 }
+
                 this.dragAndDropDestinationDiv.style.display = "none";
 
                 this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', false);
-                event.preventDefault();
                 event.stopPropagation();
 
             }
+
+            this.dropzoneDiv.onclick = () => {this.stopDragAndDrop();}
+            this.nodeWithChildrenDiv.onclick = () => {this.stopDragAndDrop();}
 
             this.dropzoneDiv.ondrop = (event) => {
                 this.dragAndDropDestinationDiv.style.display = "none";
 
                 this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', false);
+
+                if(this.selectionContainsThisNode()){
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return;
+                }
+
                 let ddi = this.getDragAndDropIndex(event.pageX, event.pageY);
                 if (ddi.index < 0) {
                     if (this.parent?.dropzoneDiv?.ondrop) {
@@ -411,23 +447,39 @@ export class TreeviewNode<E> {
                 event.preventDefault();
                 event.stopPropagation();
 
-                console.log("OnDrop: " + this.caption + ", pos: " + ddi.index);
+                // console.log("OnDrop: " + this.caption + ", pos: " + ddi.index);
 
                 let movedElements: E[] = this.treeview.getCurrentlySelectedNodes().map(n => n.externalObject!);
                 let folder: E | null = this.externalObject;
-                let elementBefore: E | null = ddi.index > 0 ? this.children[ddi.index - 1].externalObject : null;
+                
+                let nodeBefore: TreeviewNode<E> | null = null;
+                let index = ddi.index;
+                while(nodeBefore == null && index > 0){
+                    nodeBefore = index > 0 ? this.children[ddi.index - 1] : null;
+                    if(nodeBefore?.selectionContainsThisNode()){
+                        nodeBefore = null;
+                        index--;
+                    }
+                }
+
+                let elementBefore: E | null = nodeBefore == null ? null : nodeBefore._externalObject;
+
                 let elementAfter: E | null = ddi.index < this.children.length ? this.children[ddi.index].externalObject : null;
 
                 if (this.treeview.invokeMoveNodesCallback(movedElements, folder, { order: ddi.index, elementBefore: elementBefore, elementAfter: elementAfter })) {
 
+                    let nodesToInsert: TreeviewNode<E>[] = [];
                     // iterate over selected nodes in order from top to bottom of tree:
                     for (let node of this.treeview.getOrderedNodeListRecursively()) {
                         if (this.treeview.getCurrentlySelectedNodes().indexOf(node) >= 0) {
                             node.parent?.children.splice(node.parent.children.indexOf(node), 1);
                             node.parent = this;
-                            this.children.splice(ddi.index++, 0, node);
+                            nodesToInsert.push(node);
                         }
                     }
+                    
+                    let insertIndex: number = nodeBefore == null ? 0 : this.children.indexOf(nodeBefore) + 1;
+                    this.children.splice(insertIndex, 0, ...nodesToInsert);
 
                     DOM.clearAllButGivenClasses(this.childrenDiv, 'jo_treeviewChildrenLineDiv');
 
@@ -442,6 +494,14 @@ export class TreeviewNode<E> {
         }
 
 
+
+    }
+
+    stopDragAndDrop(){
+        this.dragAndDropDestinationDiv.style.display = "none";
+
+        this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', false);
+        this.dragAndDropDestinationDiv.style.display = "none";
 
     }
 
