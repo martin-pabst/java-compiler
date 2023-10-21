@@ -1,4 +1,5 @@
 import { DOM } from "../DOM.ts";
+import { ContextMenuItem, openContextMenu } from "../HtmlTools.ts";
 import { ExpandCollapseComponent, ExpandCollapseState } from "./ExpandCollapseComponent.ts";
 import { IconButtonComponent, IconButtonListener } from "./IconButtonComponent.ts";
 import { Treeview } from "./Treeview.ts";
@@ -49,9 +50,7 @@ export class TreeviewNode<E> {
     private expandCollapseComponent!: ExpandCollapseComponent;
     private childrenLineDiv!: HTMLDivElement;
 
-    private currentCountOfVerticalLines: number = 0;
     private currentIconClass?: string;
-    private static currentlyDraggedNode?: TreeviewNode<any>;
 
     constructor(private _treeview: Treeview<E>,
         private _isFolder: boolean, private _caption: string,
@@ -167,6 +166,7 @@ export class TreeviewNode<E> {
             this.buttonsDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_buttons');
 
             this.nodeLineDiv.onpointerup = (ev) => {
+                if(ev.button == 2) return;
                 ev.stopPropagation();
                 if (!ev.shiftKey && !ev.ctrlKey) {
                     this.treeview.unselectAllNodes();
@@ -210,7 +210,73 @@ export class TreeviewNode<E> {
         this.adjustLeftMarginToDepth();
 
         if (this.treeview.config.withDragAndDrop) this.initDragAndDrop();
+        this.initContextMenu();
 
+    }
+
+    initContextMenu(){
+        if(this.isRootNode()) return;
+        let contextmenuHandler = (event: MouseEvent) => {
+
+            let contextMenuItems: ContextMenuItem[] = [];
+            if (this.treeview.renameCallback != null) {
+                contextMenuItems.push({
+                    caption: "Umbenennen",
+                    callback: () => {
+                        //this.renameNode();
+                    }
+                })
+            }
+
+            if (this.isFolder) {
+                contextMenuItems = contextMenuItems.concat([
+                    {
+                        caption: "Neuen Unterordner anlegen (unterhalb '" + this.caption + "')...",
+                        callback: () => {
+                            // TODO
+                        }
+                    }, {
+                        caption: "Neuer Workspace...",
+                        callback: () => {
+                            // TODO
+                        }
+                    }
+                ])
+            }
+
+
+            if (this.treeview.contextMenuProvider != null) {
+
+                for (let cmi of this.treeview.contextMenuProvider(this._externalObject!, this)) {
+                    contextMenuItems.push({
+                        caption: cmi.caption,
+                        callback: () => {
+                            cmi.callback(this._externalObject!, this);
+                        },
+                        color: cmi.color,
+                        subMenu: cmi.subMenu == null ? undefined : cmi.subMenu.map((mi) => {
+                            return {
+                                caption: mi.caption,
+                                callback: () => {
+                                    mi.callback(this._externalObject!, this);
+                                },
+                                color: mi.color
+                            }
+                        })
+                    })
+                }
+            }
+
+            if (contextMenuItems.length > 0) {
+                event.preventDefault();
+                event.stopPropagation();
+                openContextMenu(contextMenuItems, event.pageX, event.pageY);
+            }
+        };
+
+        this.nodeLineDiv.addEventListener("contextmenu", (event) => {
+            contextmenuHandler(event);
+        }, false);
     }
 
     /**
@@ -219,10 +285,10 @@ export class TreeviewNode<E> {
      *  0 if insert-position is between caption and first child
      *  1 if insert-position is between first child and second child
      *  ...
-     * @param mouseX 
+     * @param _mouseX 
      * @param mouseY 
      */
-    getDragAndDropIndex(mouseX: number, mouseY: number): { index: number, insertPosY: number } {
+    getDragAndDropIndex(_mouseX: number, mouseY: number): { index: number, insertPosY: number } {
         let boundingRect = this.nodeWithChildrenDiv.getBoundingClientRect();
         let top = boundingRect.top;
 

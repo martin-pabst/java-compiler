@@ -12,15 +12,29 @@ export type TreeviewConfig<E> = {
         enabled: boolean,
         text: string
     },
+    contextMenu?: {
+        messageNewNode?: string
+    }
     withFolders?: boolean,
     withDeleteButtons?: boolean,
     withDragAndDrop?: boolean,
     comparator?: (externalElement1: E, externalElement2: E) => number
 }
 
+
+export type TreeviewContextMenuItem<E> = {
+    caption: string;
+    color?: string;
+    callback: (element: E, node: TreeviewNode<E>) => void;
+    subMenu?: TreeviewContextMenuItem<E>[]
+}
+
 // Callback functions return true if changes shall be executed on treeview, false if action should get cancelled
 
-export type TreeviewMoveNodesCallback<E> = (movedElements: E[], destinationFolder: E | null, position: {order: number, elementBefore: E | null, elementAfter: E | null}) => boolean;
+export type TreeviewMoveNodesCallback<E> = (movedElements: E[], destinationFolder: E | null, position: { order: number, elementBefore: E | null, elementAfter: E | null }) => boolean;
+export type TreeviewRenameCallback<E> = (element: E, newName: string, node: TreeviewNode<E>) => boolean;
+export type TreeviewContextMenuProvider<E> = (element: E, node: TreeviewNode<E>) => TreeviewContextMenuItem<E>[];
+
 
 export class Treeview<E> {
 
@@ -50,7 +64,29 @@ export class Treeview<E> {
     config: TreeviewConfig<E>;
 
     //callbacks
-    private treeviewMoveNodesCallback?: TreeviewMoveNodesCallback<E>;
+    private _moveNodesCallback?: TreeviewMoveNodesCallback<E>;
+    public get moveNodesCallback(): TreeviewMoveNodesCallback<E> | undefined {
+        return this._moveNodesCallback;
+    }
+    public set moveNodesCallback(value: TreeviewMoveNodesCallback<E> | undefined) {
+        this._moveNodesCallback = value;
+    }
+
+    private _renameCallback?: TreeviewRenameCallback<E> | undefined;
+    public get renameCallback(): TreeviewRenameCallback<E> | undefined {
+        return this._renameCallback;
+    }
+    public set renameCallback(value: TreeviewRenameCallback<E> | undefined) {
+        this._renameCallback = value;
+    }
+
+    private _contextMenuProvider?: TreeviewContextMenuProvider<E> | undefined;
+    public get contextMenuProvider(): TreeviewContextMenuProvider<E> | undefined {
+        return this._contextMenuProvider;
+    }
+    public set contextMenuProvider(value: TreeviewContextMenuProvider<E> | undefined) {
+        this._contextMenuProvider = value;
+    }
 
     constructor(private parentElement: HTMLElement, config?: TreeviewConfig<E>) {
 
@@ -64,7 +100,10 @@ export class Treeview<E> {
                 },
                 withFolders: true,
                 withDeleteButtons: true,
-                withDragAndDrop: true
+                withDragAndDrop: true,
+                contextMenu: {
+                    messageNewNode: "Neues Element anlegen..."
+                }
             }, c);
 
         this.buildHtmlScaffolding();
@@ -74,12 +113,9 @@ export class Treeview<E> {
 
     }
 
-    setTreeviewMoveNodesCallback(tvmn: TreeviewMoveNodesCallback<E>){
-        this.treeviewMoveNodesCallback = tvmn;
-    }
 
-    invokeMoveNodesCallback(movedElements: E[], destinationFolder: E | null, position: {order: number, elementBefore: E | null, elementAfter: E | null}): boolean {
-        if(this.treeviewMoveNodesCallback) return this.treeviewMoveNodesCallback(movedElements, destinationFolder, position);
+    invokeMoveNodesCallback(movedElements: E[], destinationFolder: E | null, position: { order: number, elementBefore: E | null, elementAfter: E | null }): boolean {
+        if (this._moveNodesCallback) return this._moveNodesCallback(movedElements, destinationFolder, position);
         return true;
     }
 
