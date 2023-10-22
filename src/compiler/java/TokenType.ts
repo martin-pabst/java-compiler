@@ -181,6 +181,7 @@ export enum TokenType {
     // additional AST node types
     global,    
     mainProgram,
+    multiNode,  // used for debugging output
 
     type, // e.g. int[][]
     typeParameter, // e.g. <E extends String implements Comparable<E>>

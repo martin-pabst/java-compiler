@@ -1,8 +1,10 @@
+import { AstComponent } from "./AstComponent";
 import { Language } from "./compiler/common/Language";
 import { Module } from "./compiler/common/module/module";
 import { JavaLanguage } from "./compiler/java/JavaLanguage";
 import { Lexer } from "./compiler/java/lexer/Lexer";
 import { TokenPrinter } from "./compiler/java/lexer/TokenPrinter";
+import { Parser } from "./compiler/java/parser/Parser";
 import { Editor } from "./editor/Editor";
 import { Button } from "./tools/Button";
 import { TabManager } from "./tools/TabManager";
@@ -21,6 +23,8 @@ export class Main {
   codeDiv: HTMLDivElement;
   errorDiv: HTMLDivElement;
 
+  astComponent: AstComponent;
+
 
   constructor() {
     this.language = new JavaLanguage();
@@ -36,6 +40,8 @@ export class Main {
     this.astDiv = this.tabManager.getBodyElement(1);
     this.codeDiv = this.tabManager.getBodyElement(2);
     this.errorDiv = this.tabManager.getBodyElement(3);
+
+    this.astComponent = new AstComponent(this.astDiv);
 
     this.initButtons();
 
@@ -54,8 +60,13 @@ export class Main {
       let module = new Module(text);
       let lexer = new Lexer(module);
       lexer.lex();
-
       TokenPrinter.print(module.tokens!, this.tokenDiv);
+
+      let parser = new Parser(module);
+      parser.parse();
+
+      this.astComponent.buildTreeView(module.ast);
+
     }
   }
 

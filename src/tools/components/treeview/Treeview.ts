@@ -4,13 +4,13 @@ import '/include/css/treeview.css';
 import '/include/css/icons.css';
 import { ExpandCollapseComponent, ExpandCollapseState } from '../ExpandCollapseComponent.ts';
 import { IconButtonComponent, IconButtonListener } from '../IconButtonComponent.ts';
-import { TreeviewNode } from './TreeviewNode.ts';
+import { TreeviewNode, TreeviewNodeOnClickHandler } from './TreeviewNode.ts';
 
 
 export type TreeviewConfig<E> = {
     captionLine: {
         enabled: boolean,
-        text: string
+        text?: string
     },
     contextMenu?: {
         messageNewNode?: string
@@ -21,7 +21,7 @@ export type TreeviewConfig<E> = {
     withDragAndDrop?: boolean,
     comparator?: (externalElement1: E, externalElement2: E) => number,
     minHeight?: number,
-    
+
     initialExpandCollapseState?: ExpandCollapseState
 }
 
@@ -56,13 +56,13 @@ export class Treeview<E> {
     private _lastExpandedHeight: number;
 
     private _outerDiv!: HTMLDivElement;
-    get outerDiv():HTMLElement {
+    get outerDiv(): HTMLElement {
         return this._outerDiv;
     }
 
     // div with nodes
     private _nodeDiv!: HTMLDivElement;
-    get nodeDiv():HTMLDivElement {
+    get nodeDiv(): HTMLDivElement {
         return this._nodeDiv;
     }
 
@@ -101,9 +101,18 @@ export class Treeview<E> {
         this._contextMenuProvider = value;
     }
 
+    private _onNodeClickedHandler?: TreeviewNodeOnClickHandler<E>;
+    set onNodeClickedHandler(och: TreeviewNodeOnClickHandler<E>){
+        this._onNodeClickedHandler = och;
+    }
+    get onNodeClickedHandler(): TreeviewNodeOnClickHandler<E> | undefined{
+        return this._onNodeClickedHandler;
+    }
+
+
     constructor(parent: HTMLElement | TreeviewAccordion, config?: TreeviewConfig<E>) {
 
-        if(parent instanceof TreeviewAccordion){
+        if (parent instanceof TreeviewAccordion) {
             this.treeviewAccordion = parent;
             this.parentElement = this.treeviewAccordion.mainDiv;
         } else {
@@ -128,25 +137,25 @@ export class Treeview<E> {
         }
 
         this._lastExpandedHeight = config?.minHeight!;
-        
+
         this.config = Object.assign(standardConfig, c);
-        
+
         this.buildHtmlScaffolding();
-        
-        if(config?.flexWeight) this.setFlexWeight(config.flexWeight);
-        
+
+        if (config?.flexWeight) this.setFlexWeight(config.flexWeight);
+
         this.rootNode = new TreeviewNode<E>(this, true, 'Root', undefined, null, null, null);
         this.rootNode.render();
-        
-        if(this.treeviewAccordion) this.treeviewAccordion.addTreeview(this);
 
-        if(this.config.initialExpandCollapseState == "expanded"){
+        if (this.treeviewAccordion) this.treeviewAccordion.addTreeview(this);
+
+        if (this.config.initialExpandCollapseState == "expanded") {
             this._lastExpandedHeight = this.outerDiv.getBoundingClientRect().height;
         }
 
     }
 
-    setFlexWeight(flex: string){
+    setFlexWeight(flex: string) {
         this._outerDiv.style.flexGrow = flex;
         this._outerDiv.style.flexBasis = this.config.minHeight + "px";
     }
@@ -161,7 +170,7 @@ export class Treeview<E> {
 
         this.buildCaption();
         this._nodeDiv = DOM.makeDiv(this._outerDiv, "jo_treeview_nodediv", "jo_scrollable");
-        if(this.config.initialExpandCollapseState! == "collapsed"){
+        if (this.config.initialExpandCollapseState! == "collapsed") {
             this._nodeDiv.style.display = "none";
         }
 
@@ -177,20 +186,20 @@ export class Treeview<E> {
         this.captionLineTextDiv = DOM.makeDiv(this.captionLineDiv, 'jo_treeview_caption_text')
         this.captionLineButtonsDiv = DOM.makeDiv(this.captionLineDiv, 'jo_treeview_caption_buttons')
         this.captionLineDiv.style.display = this.config.captionLine.enabled ? "flex" : "none";
-        this.captionLineTextDiv.textContent = this.config.captionLine.text;
+        this.captionLineTextDiv.textContent = this.config.captionLine.text!;
 
         this.captionLineExpandCollapseComponent = new ExpandCollapseComponent(this.captionLineExpandCollapseDiv, (newState: ExpandCollapseState) => {
-            if(this.isCollapsed()){
+            if (this.isCollapsed()) {
                 this._lastExpandedHeight = this._outerDiv.getBoundingClientRect().height;
                 let deltaHeight: number = this._lastExpandedHeight - this.getCaptionHeight();
                 this._outerDiv.style.height = this.getCaptionHeight() + "px";
-                if(this.treeviewAccordion) this.treeviewAccordion.onExpandCollapseTreeview(this, newState, deltaHeight);
+                if (this.treeviewAccordion) this.treeviewAccordion.onExpandCollapseTreeview(this, newState, deltaHeight);
             } else {
                 let deltaHeight: number = this.getCaptionHeight() - this._lastExpandedHeight;
                 this._outerDiv.style.height = this._lastExpandedHeight + "px";
-                if(this.treeviewAccordion) this.treeviewAccordion.onExpandCollapseTreeview(this, newState, deltaHeight);
+                if (this.treeviewAccordion) this.treeviewAccordion.onExpandCollapseTreeview(this, newState, deltaHeight);
             }
-                
+
         }, "expanded")
 
         if (this.config.withFolders) {
@@ -205,7 +214,7 @@ export class Treeview<E> {
         return new IconButtonComponent(this.captionLineButtonsDiv, iconClass, callback, tooltip);
     }
 
-    captionLineAddElementToButtonDiv(element: HTMLElement){
+    captionLineAddElementToButtonDiv(element: HTMLElement) {
         this.captionLineButtonsDiv.prepend(element);
     }
 
@@ -350,5 +359,10 @@ export class Treeview<E> {
 
     getCaptionHeight(): number {
         return this.captionLineDiv.getBoundingClientRect().height;
+    }
+
+    clear() {
+        this.nodes = [];
+        this.rootNode.removeChildren();
     }
 }

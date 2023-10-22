@@ -4,6 +4,8 @@ import { ExpandCollapseComponent, ExpandCollapseState } from "../ExpandCollapseC
 import { IconButtonComponent, IconButtonListener } from "../IconButtonComponent.ts";
 import { Treeview } from "./Treeview.ts";
 
+export type TreeviewNodeOnClickHandler<E> = (element: E) => void;
+
 export class TreeviewNode<E> {
 
     private _hasFocus: boolean = false;
@@ -51,6 +53,11 @@ export class TreeviewNode<E> {
     private childrenLineDiv!: HTMLDivElement;
 
     private currentIconClass?: string;
+
+    private _onClickHandler?: TreeviewNodeOnClickHandler<E>;
+    set onClickHandler(och: TreeviewNodeOnClickHandler<E>){
+        this._onClickHandler = och;
+    }
 
     constructor(private _treeview: Treeview<E>,
         private _isFolder: boolean, private _caption: string,
@@ -184,6 +191,8 @@ export class TreeviewNode<E> {
                 this.setSelected(true);
                 this.treeview.addToSelection(this);
                 this.setFocus(true);
+                if(this._onClickHandler) this._onClickHandler(this._externalObject!);
+                if(this.treeview.onNodeClickedHandler) this.treeview.onNodeClickedHandler(this._externalObject!);
             }
 
         }
@@ -598,6 +607,11 @@ export class TreeviewNode<E> {
 
         return list;
 
+    }
+
+    removeChildren(){
+        this.children = [];
+        DOM.clear(this.childrenDiv);
     }
 
 }

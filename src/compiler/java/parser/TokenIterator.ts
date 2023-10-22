@@ -4,7 +4,7 @@ import { Token, TokenList } from "../Token";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 
 export class TokenIterator {
-    pos: number = -1;        // current index in tokens
+    pos: number = 0;        // current index in tokens
 
     dummy: Token = {
         range: { startLineNumber: 0, startColumn: 0, endLineNumber: 0, endColumn: 0 },
@@ -47,6 +47,7 @@ export class TokenIterator {
     initializeLookahead() {
 
         this.ct = [];
+        this.pos = 0;
 
         for (let i = 0; i < this.lookahead; i++) {
 

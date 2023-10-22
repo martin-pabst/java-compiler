@@ -1,0 +1,29 @@
+.jo_ast_main {
+    display: flex;
+    flex-direction: row;
+
+}
+
+.jo_ast_treeview {
+    flex: 1;
+}
+
+.jo_ast_details {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid gray;    
+}
+
+.jo_ast_details_heading {
+    font-size: 16;
+}
+
+.jo_ast_details_line {
+}
+
+.jo_ast_details_key {
+}
+
+.jo_ast_details_value {
+}
