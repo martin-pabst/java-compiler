@@ -1,7 +1,36 @@
+/* TreeviewAccordion */
+.jo_treeviewAccordion_mainDiv {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #181818;
+}
+
+.jo_treeview_splitter {
+    display: block;
+    height: 4px;
+    cursor: ns-resize;
+}
+
+.jo_treeview_splitter:hover {
+    display: block;
+    background-color: #1b74b0;
+}
+
+.jo_treeview_splitter_overlay{
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background-color: #b9292920;
+    z-index: 1000;
+}
+
+/* Treeview */
 .jo_treeview_outer {
     display: flex;
     flex-direction: column;
-    background-color: #181818;
     color: #b8b8b8;
     font-size: 13px;
     height: 100%;
@@ -60,12 +89,12 @@
 
 
 /* Treeview main div */
-.jo_treeview_main {
+.jo_treeview_nodediv {
     display: flex;
     flex-direction: column;
-    flex: 1;
+    flex: 1 0;
     width: 100%;
-    overflow: auto;
+    overflow-y:auto;
 }
 
 /* treeview line (== file or folder) */

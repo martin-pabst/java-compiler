@@ -9,7 +9,11 @@ export class ExpandCollapseComponent {
 
     private divElement: HTMLDivElement;
 
-    private state: ExpandCollapseState = "collapsed";
+    private _state: ExpandCollapseState = "collapsed";
+
+    public get state(): ExpandCollapseState{
+        return this._state;
+    }
 
     private darkLightState: DarkLightState = "dark";
 
@@ -35,13 +39,13 @@ export class ExpandCollapseComponent {
             this.toggleState();
         }
 
-        this.state = initialState;
+        this._state = initialState;
         this.render();
 
     }    
 
     public toggleState(){
-        switch(this.state){
+        switch(this._state){
             case "collapsed": this.setState("expanded", true);
             break;
             case "expanded": this.setState("collapsed", true);
@@ -54,7 +58,7 @@ export class ExpandCollapseComponent {
     }
 
     setState(newState: ExpandCollapseState, invokeListener: boolean = true){
-        this.state = newState;
+        this._state = newState;
         this.render();
         if(invokeListener) this.listener(newState);
     }
@@ -63,7 +67,7 @@ export class ExpandCollapseComponent {
 
         if(this.currentIconClass) this.divElement.classList.remove(this.currentIconClass);
 
-        this.currentIconClass = ExpandCollapseComponent.iconClasses[this.darkLightState][this.state];
+        this.currentIconClass = ExpandCollapseComponent.iconClasses[this.darkLightState][this._state];
 
         this.divElement.classList.add(this.currentIconClass);
     }

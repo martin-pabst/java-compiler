@@ -1,4 +1,5 @@
 import { Treeview } from '../tools/components/treeview/Treeview.ts';
+import { TreeviewAccordion } from '../tools/components/treeview/TreeviewAccordion.ts';
 import { TreeviewNode } from '../tools/components/treeview/TreeviewNode.ts';
 import '/include/css/treeviewtest.css';
 
@@ -14,43 +15,59 @@ type Element = {
 
 export class TreeviewTest {
 
-    elements: Element[] = [];
-
-
     constructor(){
         let leftDiv = document.getElementById('left')!;
-        let tv: Treeview<Element> = new Treeview(leftDiv, {
+
+        let accordion = new TreeviewAccordion(leftDiv);
+
+        let tv1: Treeview<Element> = new Treeview(accordion, {
             captionLine: {
                 enabled: true,
                 text: "Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!"
             },
             withDeleteButtons: true,
             withFolders: true,
-            comparator: ((e1, e2) => e1.caption.localeCompare(e2.caption))
+            comparator: ((e1, e2) => e1.caption.localeCompare(e2.caption)),
+            flexWeight: "2"
         })
 
-        this.initElements();
+        this.initElementsForTreeview(tv1);
 
-        for(let el of this.elements){
-            let tvLine = tv.addNode(el.isFolder, el.caption, el.isFolder ? undefined : 'img_file-dark-empty', el, el, el.parent);
-            el.treeviewLine = tvLine;
-        }
+        let tv2: Treeview<Element> = new Treeview(accordion, {
+            captionLine: {
+                enabled: true,
+                text: "Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!"
+            },
+            withDeleteButtons: true,
+            withFolders: true,
+            comparator: ((e1, e2) => e1.caption.localeCompare(e2.caption)),
+            flexWeight: "2"
+        })
 
-        
-        tv.renameCallback = (element, newName, _node) => {
-            element.caption = newName;
-            console.log(element.caption + " is renamed to " + newName);
-            return true;
-        }
-        
-        tv.initialRenderAll();
-        this.elements[0].treeviewLine?.setErrors("(10)");
+        this.initElementsForTreeview(tv2);
+
+        let tv3: Treeview<Element> = new Treeview(accordion, {
+            captionLine: {
+                enabled: true,
+                text: "Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!Hier!"
+            },
+            withDeleteButtons: true,
+            withFolders: true,
+            comparator: ((e1, e2) => e1.caption.localeCompare(e2.caption)),
+            flexWeight: "1"
+        })
+
+        this.initElementsForTreeview(tv3);
+
+        accordion.switchToPixelHeights();
 
     }
 
 
-    initElements(){
-        this.elements = [
+    initElementsForTreeview(tv1: Treeview<Element>){
+        let elements: Element[] = [];
+
+        elements = [
             {caption: "First Folder", isFolder: true, id: 10},
             {caption: "ASecond File", isFolder: false, id: 12, parentId: 10},
             {caption: "BFirst File", isFolder: false, id: 11, parentId: 10},
@@ -67,8 +84,24 @@ export class TreeviewTest {
         ]
 
         let  idToElementMap: Map<number, Element> = new Map();
-        this.elements.forEach(el => idToElementMap.set(el.id, el));
-        this.elements.forEach(el => {if(el.parentId) el.parent = idToElementMap.get(el.parentId)});
+        elements.forEach(el => idToElementMap.set(el.id, el));
+        elements.forEach(el => {if(el.parentId) el.parent = idToElementMap.get(el.parentId)});
+
+        for(let el of elements){
+            let tvLine = tv1.addNode(el.isFolder, el.caption, el.isFolder ? undefined : 'img_file-dark-empty', el, el, el.parent);
+            el.treeviewLine = tvLine;
+        }
+
+        
+        tv1.renameCallback = (element, newName, _node) => {
+            element.caption = newName;
+            console.log(element.caption + " is renamed to " + newName);
+            return true;
+        }
+        
+        tv1.initialRenderAll();
+        elements[0].treeviewLine?.setErrors("(10)");
+
     }
 
 
