@@ -160,7 +160,7 @@ export class Treeview<E> {
         this._outerDiv = DOM.makeDiv(this.parentElement, 'jo_treeview_outer');
 
         this.buildCaption();
-        this._nodeDiv = DOM.makeDiv(this._outerDiv, "jo_treeview_nodediv");
+        this._nodeDiv = DOM.makeDiv(this._outerDiv, "jo_treeview_nodediv", "jo_scrollable");
         if(this.config.initialExpandCollapseState! == "collapsed"){
             this._nodeDiv.style.display = "none";
         }
@@ -180,17 +180,17 @@ export class Treeview<E> {
         this.captionLineTextDiv.textContent = this.config.captionLine.text;
 
         this.captionLineExpandCollapseComponent = new ExpandCollapseComponent(this.captionLineExpandCollapseDiv, (newState: ExpandCollapseState) => {
-            let deltaHeight: number = this._outerDiv.getBoundingClientRect().height;
-            if(this.isCollapsed()) this._lastExpandedHeight = deltaHeight;
-
-            this._nodeDiv.style.display = newState == "collapsed" ? "none" : "";
-        
-            deltaHeight = this.isCollapsed() ? this.getCaptionHeight() - deltaHeight : deltaHeight - this.getCaptionHeight();
-
-            this._outerDiv.style.height = (this.isCollapsed() ? this.getCaptionHeight() : this._lastExpandedHeight) + "px";
-            this._outerDiv.style.flex = "none";
-    
-            if(this.treeviewAccordion) this.treeviewAccordion.onExpandCollapseTreeview(this, newState, -deltaHeight);
+            if(this.isCollapsed()){
+                this._lastExpandedHeight = this._outerDiv.getBoundingClientRect().height;
+                let deltaHeight: number = this._lastExpandedHeight - this.getCaptionHeight();
+                this._outerDiv.style.height = this.getCaptionHeight() + "px";
+                if(this.treeviewAccordion) this.treeviewAccordion.onExpandCollapseTreeview(this, newState, deltaHeight);
+            } else {
+                let deltaHeight: number = this.getCaptionHeight() - this._lastExpandedHeight;
+                this._outerDiv.style.height = this._lastExpandedHeight + "px";
+                if(this.treeviewAccordion) this.treeviewAccordion.onExpandCollapseTreeview(this, newState, deltaHeight);
+            }
+                
         }, "expanded")
 
         if (this.config.withFolders) {

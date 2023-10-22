@@ -19,13 +19,36 @@ export class TreeviewAccordion {
 
     constructor(public parentHtmlELement: HTMLElement){
         this._mainDiv = DOM.makeDiv(parentHtmlELement, 'jo_treeviewAccordion_mainDiv');
+        window.addEventListener('resize', () => {this.onResize()});
+    }
+
+    onResize(){
+        let overallHeight = this._mainDiv.getBoundingClientRect().height;
+    
+        let fixedHeight: number = 0;
+        let variableHeight: number = 0;
+        for(let tv of this.treeviewList){
+            let height = tv.outerDiv.getBoundingClientRect().height;
+            if(tv.isCollapsed()){
+                fixedHeight += height;
+            } else {
+                variableHeight += height;
+            }
+        }
+
+        let factor = (overallHeight - fixedHeight)/variableHeight;
+        for(let tv of this.treeviewList){
+            if(!tv.isCollapsed()){
+                let height = tv.outerDiv.getBoundingClientRect().height * factor;
+                tv.outerDiv.style.height = height + "px";
+            }
+        }
     }
 
     addTreeview(treeview: Treeview<any>){
         this.treeviewList.push(treeview);
-        this.splitterList.push(new TreeviewSplitter(this, this.treeviewList.length - 1));
-        if(this.splitterList.length > 1){
-            this.splitterList[this.splitterList.length - 2].enable();
+        if(this.treeviewList.length > 1){
+            this.splitterList.push(new TreeviewSplitter(this, this.treeviewList.length - 1));
         }
     }
 
@@ -87,9 +110,11 @@ class TreeviewSplitter {
 
     transparentOverlay: HTMLDivElement | undefined;
 
-    constructor(private accordion: TreeviewAccordion, private treeviewAboveIndex: number){
-        this.div = DOM.makeDiv(accordion.mainDiv, 'jo_treeview_splitter');
+    constructor(private accordion: TreeviewAccordion, private treeviewBelowIndex: number){
+        let parentDiv = accordion.treeviewList[treeviewBelowIndex].outerDiv;
+        this.div = DOM.makeDiv(parentDiv, 'jo_treeview_splitter');
         this.div.style.display = 'none';
+        this.enable();
     }
 
     enable(){
@@ -127,21 +152,20 @@ class TreeviewSplitter {
     onPointerMove(newY: number){
         let dyCursor = newY - this.yStart!;
         let treeviewList: Treeview<any>[] = this.accordion.treeviewList;
-        let treeviewBelowIndex = this.treeviewAboveIndex + 1;
-        let treeviewBelow = treeviewList[treeviewBelowIndex];
+        let treeviewBelow = treeviewList[this.treeviewBelowIndex];
 
         let targetHeights: number[] = this.divsStartHeights.slice();
 
-        if(this.divsStartHeights[treeviewBelowIndex] - dyCursor < treeviewBelow.config.minHeight!){
-            dyCursor = this.divsStartHeights[treeviewBelowIndex] - treeviewBelow.config.minHeight!;
+        if(this.divsStartHeights[this.treeviewBelowIndex] - dyCursor < treeviewBelow.config.minHeight!){
+            dyCursor = this.divsStartHeights[this.treeviewBelowIndex] - treeviewBelow.config.minHeight!;
         }
 
         if(dyCursor > 0){
-            targetHeights[treeviewBelowIndex - 1] += dyCursor;
-            targetHeights[treeviewBelowIndex] -= dyCursor;
+            targetHeights[this.treeviewBelowIndex - 1] += dyCursor;
+            targetHeights[this.treeviewBelowIndex] -= dyCursor;
         } else {
             let dyTodo:  number = dyCursor;  // < 0!
-            for(let i = this.treeviewAboveIndex; i >= 0; i--){
+            for(let i = this.treeviewBelowIndex - 1; i >= 0; i--){
                 let achievable = treeviewList[i].config.minHeight! - targetHeights[i];
                 if(achievable <= dyTodo){
                     targetHeights[i] += dyTodo;
@@ -152,10 +176,10 @@ class TreeviewSplitter {
                     targetHeights[i] += achievable;
                 }
             }
-            targetHeights[treeviewBelowIndex] -= dyCursor - dyTodo;
+            targetHeights[this.treeviewBelowIndex] -= dyCursor - dyTodo;
         }
 
-        for(let i = 0; i <= treeviewBelowIndex; i++){
+        for(let i = 0; i <= this.treeviewBelowIndex; i++){
             treeviewList[i].outerDiv.style.height = targetHeights[i] + "px";
         }
 

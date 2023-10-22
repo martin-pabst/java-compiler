@@ -4,6 +4,12 @@
     --contextmenu-color: rgb(212,212,212);
     --contextmenu-hover-background: #094771;
     --contextmenu-hover-color: #ffffff;
+
+    --scrollbar: #1e1e1e;
+    --scrollbar-thumb: #3e3e3e;
+    --scrollbar-thumb-hover: #5e5e5e;
+    --scrollbar-thumb-active: #7e7e7e;
+
 }   
 
 

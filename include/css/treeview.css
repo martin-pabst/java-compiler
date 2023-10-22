@@ -8,8 +8,12 @@
 
 .jo_treeview_splitter {
     display: block;
+    position: absolute;
+    top: -1px;
     height: 4px;
+    width: 100%;
     cursor: ns-resize;
+    z-index:10;
 }
 
 .jo_treeview_splitter:hover {
@@ -29,6 +33,7 @@
 
 /* Treeview */
 .jo_treeview_outer {
+    position: relative;
     display: flex;
     flex-direction: column;
     color: #b8b8b8;
@@ -43,7 +48,7 @@
     padding-left: 4px;
     height: 20px;
     line-height: 20px;
-    border-style: solid none;
+    border-top-style: solid;
     border-color: #2b2b2b;
     border-width: 1px;
     font-weight: bold;
