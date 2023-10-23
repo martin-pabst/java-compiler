@@ -1,5 +1,6 @@
 import { Module } from "../../common/module/module";
 import { TokenType } from "../TokenType";
+import { Visibility } from "../types/Visibility.ts";
 import { TokenIterator } from "./TokenIterator";
 
 export class Parser extends TokenIterator {
@@ -24,6 +25,10 @@ export class Parser extends TokenIterator {
     TokenType.identifier, TokenType.rightCurlyBracket, TokenType.keywordStatic, TokenType.keywordAbstract,
     TokenType.keywordClass, TokenType.keywordEnum, TokenType.keywordInterface];
 
+    static visibilityModifiers = [TokenType.keywordPrivate, TokenType.keywordProtected, TokenType.keywordPublic];
+    static classOrInterfaceOrEnum = [TokenType.keywordClass, TokenType.keywordEnum, TokenType.keywordInterface];
+
+    static visibilityModifiersOrTopLevelTypeDeclaration = Parser.visibilityModifiers.concat(Parser.classOrInterfaceOrEnum);
 
     constructor(private module: Module) {
         super(module.tokens!, 7);
@@ -42,8 +47,79 @@ export class Parser extends TokenIterator {
 
     parse() {
 
+        while(!this.isEnd()){
+            let pos = this.pos;
+
+            if(this.comesToken(Parser.visibilityModifiersOrTopLevelTypeDeclaration)){
+                this.parseClassOrInterfaceOrEnum();
+            } else {
+                this.parseMainProgramFragment();
+            }
+
+            if(pos == this.pos){
+                this.pushError("Mit dem Token " + this.cct.value + " kann der Compiler nichts anfangen.", "warning");
+                this.nextToken();   // last safety net to prevent getting stuck in an endless loop
+            } 
+        }
+
+    }
+
+    parseClassOrInterfaceOrEnum(){
+        let visibility = this.parseVisibilityModifierIfPresent();
+
+        let tt = this.tt; // preserve "class", "interface", "enum" for switch later on
+
+        if(this.expect(Parser.classOrInterfaceOrEnum, false)){
+
+            let identifier = this.expectAndSkipIdentifier();
+
+            if(identifier != null){
+                this.nextToken();  // skip "class", "interface", "enum"
+                switch(tt){
+                    case TokenType.keywordClass:
+                        this.parseClassDeclaration(visibility, identifier);
+                        break;
+                    case TokenType.keywordEnum:
+                        this.parseEnumDeclaration(visibility, identifier);
+                        break;
+                    case TokenType.keywordInterface:
+                        this.parseInterfaceDeclaration(visibility, identifier);
+                        break;
+                }
+            }
+        }
+
+    }
+
+    parseClassDeclaration(visibility: Visibility, identifier: string) {
+        let genericParameters = this.parseGenericParameterDefinition()
+        throw new Error("Function not implemented.");
+    }
+    
+    parseEnumDeclaration(visibility: Visibility, identifier: string) {
+        throw new Error("Function not implemented.");
+    }
+    
+    parseInterfaceDeclaration(visibility: Visibility, identifier: string) {
+        let genericParameters = this.parseGenericParameterDefinition()
+        throw new Error("Function not implemented.");
+    }
+
+
+    parseMainProgramFragment(){
+
+    }
+
+    parseVisibilityModifierIfPresent(): Visibility {
+        if(this.comesToken(Parser.visibilityModifiers)){
+            let tt = <TokenType.keywordPrivate| TokenType.keywordProtected| TokenType.keywordPublic> this.tt;
+            this.nextToken();
+            return <Visibility><any>Visibility[tt];
+        }
+        return Visibility.public;
     }
 
 
 
 }
+

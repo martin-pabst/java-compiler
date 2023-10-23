@@ -14,8 +14,8 @@ export class TokenIterator {
 
     ct: Token[] = [];
     lastToken: Token = this.dummy;
-    cct: Token = this.dummy;
-    tt: TokenType = TokenType.comment;
+    cct: Token = this.dummy;                // current token
+    tt: TokenType = TokenType.comment;      // current tokentype
     lastComment?: Token;
 
     endToken: Token;
@@ -137,15 +137,47 @@ export class TokenIterator {
         });
     }
 
-    expect(tt: TokenType, skip: boolean = true, invokeSemicolonAngel: boolean = false): boolean {
-        if (this.tt != tt) {
-            if (tt == TokenType.semicolon && this.tt == TokenType.endofSourcecode) {
+
+
+
+    expect(tt: TokenType | TokenType[], skip: boolean = true): boolean {
+
+        if (!Array.isArray(tt)){
+            if(this.tt == tt){
+                if(skip) this.nextToken();
+                return true;
+            }
+            this.pushError("Erwartet wird: " + TokenTypeReadable[tt] + " - Gefunden wurde: " + this.cct.value, "error");
+            return false;
+        }
+        
+        if (tt.indexOf(this.tt) >= 0) {
+            if (skip) this.nextToken();
+            return true;
+        }
+
+        let tokenListReadable = tt.map(tt1 => TokenTypeReadable[tt1]).join(", ");
+
+        this.pushError("Erwartet wird eines der Token (" + tokenListReadable + ") - Gefunden wurde: " + TokenTypeReadable[this.tt], "error");
+        return false;
+    }
+
+    expectSemicolon(skip: boolean = true, invokeSemicolonAngel: boolean = false): boolean {
+        if (this.tt == TokenType.semicolon) {
+            if (skip) {
+                this.nextToken();
+            }
+
+            return true;
+        }
+        else {
+            if (this.tt == TokenType.endofSourcecode) {
                 return true;
             }
 
             let quickFix: QuickFix | undefined = undefined;
             let range: IRange = this.cct.range;
-            if (tt == TokenType.semicolon && this.lastToken != null) {
+            if (this.lastToken != null) {
 
                 if (this.lastToken.range.endLineNumber < this.cct.range.startLineNumber) {
                     range = {
@@ -155,7 +187,7 @@ export class TokenIterator {
                         endColumn: this.lastToken.range.endColumn
                     }
 
-                    if (tt == TokenType.semicolon && !this.isOperatorOrDot(this.lastToken.tt)
+                    if (!this.isOperatorOrDot(this.lastToken.tt)
                     ) {
                         quickFix = {
                             title: 'Strichpunkt hier einfügen',
@@ -189,16 +221,22 @@ export class TokenIterator {
 
 
 
-            this.pushError("Erwartet wird: " + TokenTypeReadable[tt] + " - Gefunden wurde: " + TokenTypeReadable[this.tt], "error",
-               range, quickFix);
+            this.pushError("Erwartet wird ein Strichpunkt (Semicolon). Gefunden wurde: " + TokenTypeReadable[this.tt], "error",
+                range, quickFix);
             return false;
         }
 
-        if (skip) {
+    }
+
+    expectAndSkipIdentifier(): string | null {
+        if(this.tt == TokenType.identifier){
+            let identifier: string = <string>this.cct.value;
             this.nextToken();
+            return identifier;
         }
 
-        return true;
+        this.pushError("Erwartet wird ein Bezeichner (engl.: 'identifier'), d.h. der Name einer Klasse, Variable, ... - Gefunden wurde: " + this.cct.value);
+        return null;
     }
 
     isOperatorOrDot(tt: TokenType): boolean {
