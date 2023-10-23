@@ -57,16 +57,15 @@ export enum TokenType {
     leftCurlyBracket, // {}
     rightCurlyBracket,
     leftRightSquareBracket, // []
-    
-    // operators
-    doubleMinus, doublePlus,
+
+    // operators -- ++
+    minusMinus, plusPlus,
 
     // binary operators
     dot, //.
     modulo,
     minus, plus, multiplication, division,
-    singleQuote, doubleQuote, // ', "
-    lower, greater, lowerOrEqual, greaterOrEqual, 
+    lower, greater, lowerOrEqual, greaterOrEqual,
     equal, // ==
     notEqual, // !=
     assignment, // =
@@ -78,6 +77,8 @@ export enum TokenType {
     moduloAssignment, // /%=
     and, or,   // &&, ||
     ampersand, // &
+
+    singleQuote, doubleQuote, // ', "
 
     ANDAssigment,
     XORAssigment,
@@ -93,12 +94,15 @@ export enum TokenType {
     shiftRight, // >>
     shiftLeft, // <<
 
-    ternaryOperator,
+    ternaryOperator,  // ?-Operator
     colon, //:
     ellipsis, // ...
 
     not,    // !
-    
+    // used by parser
+    negation,
+
+
     // semicolon
     semicolon, // ;
 
@@ -128,12 +132,10 @@ export enum TokenType {
     // Comment
     comment,
 
-    // used by parser
-    negation, 
     referenceElement, // for arrays
 
     endofSourcecode, // will be generated after sourcecode end
-    
+
     // Program statement types:
     binaryOp, // +, -, *, <=, ...
     unaryOp, // ! and - 
@@ -143,7 +145,7 @@ export enum TokenType {
     popAndStoreIntoVariable,
     pushFromHeapToStack, // push value from heap to stack
     pushAttribute, // value of a attribute to stack
-    pushArrayLength, 
+    pushArrayLength,
     pushConstant, // literal
     pushStaticClassObject, // push class-Object to stack (which holds static attributes)
     pushStaticAttribute, // push static attribute to stack
@@ -153,7 +155,7 @@ export enum TokenType {
     selectArrayElement, // select Element from Array (e.g. a[20])
     callMethod,
     callMainMethod,
-    processPostConstructorCallbacks, 
+    processPostConstructorCallbacks,
     callInputMethod, // Methods of Input class
     makeEllipsisArray,
     decreaseStackpointer, // decrease stack-pointer, nothing else
@@ -179,9 +181,11 @@ export enum TokenType {
     forLoopOverCollection,
 
     // additional AST node types
-    global,    
-    mainProgram,
+    global,
+    program,
+    block,    // block of statements
     multiNode,  // used for debugging output
+    plusPlusMinusMinus,
 
     type, // e.g. int[][]
     typeParameter, // e.g. <E extends String implements Comparable<E>>
@@ -193,9 +197,9 @@ export enum TokenType {
     newArray,
     arrayInitialization,
     print,
-    println, 
+    println,
     pushEnumValue,
-    initializeEnumValue, 
+    initializeEnumValue,
     scopeNode,
     returnIfDestroyed,
     extendedForLoopInit,
@@ -204,7 +208,7 @@ export enum TokenType {
     pause
 }
 
-export var TokenTypeReadable: {[tt: number]: string} = {
+export var TokenTypeReadable: { [tt: number]: string } = {
     [TokenType.identifier]: "Bezeichner",
     // constants
     [TokenType.integerConstant]: "Integer-Konstante",
@@ -260,23 +264,23 @@ export var TokenTypeReadable: {[tt: number]: string} = {
     [TokenType.rightSquareBracket]: "]",
     [TokenType.leftCurlyBracket]: "{", // {}
     [TokenType.rightCurlyBracket]: "}",
-    [TokenType.leftRightSquareBracket]: "[]", 
-    
+    [TokenType.leftRightSquareBracket]: "[]",
+
     // operators
     [TokenType.dot]: ".", //.
-    [TokenType.minus]: "-", 
-    [TokenType.modulo]: "%", 
-    [TokenType.plus]: "+", 
-    [TokenType.multiplication]: "*", 
+    [TokenType.minus]: "-",
+    [TokenType.modulo]: "%",
+    [TokenType.plus]: "+",
+    [TokenType.multiplication]: "*",
     [TokenType.division]: "/",
-    [TokenType.singleQuote]: "'", 
+    [TokenType.singleQuote]: "'",
     [TokenType.doubleQuote]: "\"", // ']: "", "
-    [TokenType.doubleMinus]: "--", 
-    [TokenType.doublePlus]: "++",
-    [TokenType.lower]: "<", 
-    [TokenType.greater]: ">", 
-    [TokenType.lowerOrEqual]: "<=", 
-    [TokenType.greaterOrEqual]: ">=", 
+    [TokenType.minusMinus]: "--",
+    [TokenType.plusPlus]: "++",
+    [TokenType.lower]: "<",
+    [TokenType.greater]: ">",
+    [TokenType.lowerOrEqual]: "<=",
+    [TokenType.greaterOrEqual]: ">=",
     [TokenType.equal]: "==", // ==
     [TokenType.notEqual]: "!=", // !=
     [TokenType.assignment]: "=", // =
@@ -285,10 +289,10 @@ export var TokenTypeReadable: {[tt: number]: string} = {
     [TokenType.multiplicationAssignment]: "*=", // *=
     [TokenType.divisionAssignment]: "/=", // /=
     [TokenType.moduloAssignment]: "%=",
-    [TokenType.ampersand]: "&", 
-    [TokenType.and]: "&&", 
-    [TokenType.or]: "||", 
-    [TokenType.not]: "!", 
+    [TokenType.ampersand]: "&",
+    [TokenType.and]: "&&",
+    [TokenType.or]: "||",
+    [TokenType.not]: "!",
 
     [TokenType.ANDAssigment]: "&=",
     [TokenType.XORAssigment]: "^=",
@@ -305,8 +309,8 @@ export var TokenTypeReadable: {[tt: number]: string} = {
     [TokenType.shiftRightUnsigned]: ">>>",
 
 
-    [TokenType.ternaryOperator]: "?", 
-    
+    [TokenType.ternaryOperator]: "?",
+
     // semicolon
     [TokenType.semicolon]: ";", // ;
 
@@ -314,7 +318,7 @@ export var TokenTypeReadable: {[tt: number]: string} = {
     [TokenType.ellipsis]: "...", // ;
 
     // comma
-    [TokenType.comma]: ",", 
+    [TokenType.comma]: ",",
 
     // backslash
     [TokenType.backslash]: "\\",
@@ -339,25 +343,25 @@ export var TokenTypeReadable: {[tt: number]: string} = {
 
 }
 
-export var specialCharList: {[keyword: string]:TokenType} = {
+export var specialCharList: { [keyword: string]: TokenType } = {
     '(': TokenType.leftBracket, // ()
     ')': TokenType.rightBracket,
     '[': TokenType.leftSquareBracket, // []
     ']': TokenType.rightSquareBracket,
     '{': TokenType.leftCurlyBracket, // {}
     '}': TokenType.rightCurlyBracket,
-    
+
     // operators
     '.': TokenType.dot, //.
     ',': TokenType.comma, //.
     '-': TokenType.minus,
     '%': TokenType.modulo,
-    '+': TokenType.plus, 
-    '*': TokenType.multiplication, 
+    '+': TokenType.plus,
+    '*': TokenType.multiplication,
     '/': TokenType.division,
     '\\': TokenType.backslash,
     '@': TokenType.at,
-    '\'': TokenType.singleQuote, 
+    '\'': TokenType.singleQuote,
     '"': TokenType.doubleQuote, // ', "
     "<": TokenType.lower,
     ">": TokenType.greater,
@@ -369,7 +373,7 @@ export var specialCharList: {[keyword: string]:TokenType} = {
 
     "^": TokenType.XOR,
     "~": TokenType.tilde,
-    
+
     ';': TokenType.semicolon, // ;
     ':': TokenType.colon, // ;
 
@@ -384,7 +388,7 @@ export var specialCharList: {[keyword: string]:TokenType} = {
     '\r': TokenType.linefeed
 }
 
-export var keywordList: {[keyword: string]:TokenType} = {
+export var keywordList: { [keyword: string]: TokenType } = {
     "class": TokenType.keywordClass,
     "this": TokenType.keywordThis,
     "super": TokenType.keywordSuper,
@@ -426,7 +430,7 @@ export var keywordList: {[keyword: string]:TokenType} = {
     // "char": TokenType.keywordChar
 };
 
-export var EscapeSequenceList: {[keyword: string]:string} = {
+export var EscapeSequenceList: { [keyword: string]: string } = {
     "n": "\n",
     "r": "\r",
     "t": "\t",

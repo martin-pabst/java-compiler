@@ -39,7 +39,7 @@ export class TokenPrinter {
             let withContent = TokenPrinter.typesWithContent.indexOf(t.tt) >= 0;
 
             let ttSpan = DOM.makeSpan(tokend, 'jo_tokenprinter_tokentype');
-            ttSpan.textContent = "[" + TokenTypeReadable[t.tt] + (withContent ? "" : "]");
+            ttSpan.textContent = "[" + TokenType[t.tt] + (withContent ? "" : "]");
 
             if(TokenPrinter.typesWithContent.indexOf(t.tt) >= 0){
                 let contentSpan = DOM.makeSpan(tokend, 'jo_tokenprinter_text');

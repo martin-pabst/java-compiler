@@ -1,6 +1,8 @@
 import { Module } from "../../common/module/module";
 import { TokenType } from "../TokenType";
 import { Visibility } from "../types/Visibility.ts";
+import { ASTGenericDefinition, ASTTypeNode } from "./AST.ts";
+import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator";
 
 export class Parser extends TokenIterator {
@@ -30,8 +32,11 @@ export class Parser extends TokenIterator {
 
     static visibilityModifiersOrTopLevelTypeDeclaration = Parser.visibilityModifiers.concat(Parser.classOrInterfaceOrEnum);
 
+    nodeFactory: ASTNodeFactory;
+
     constructor(private module: Module) {
         super(module.tokens!, 7);
+        this.nodeFactory = new ASTNodeFactory(this);
         this.initializeAST();
     }
 
@@ -40,7 +45,7 @@ export class Parser extends TokenIterator {
             type: TokenType.global,
             range: {startLineNumber: 0, startColumn: 0, 
                 endLineNumber: this.endToken.range.endLineNumber, endColumn: this.endToken.range.endColumn},
-            classDefinitions: [],
+            classOrInterfaceOrEnumDefinitions: [],
             mainProgramNodes: []
         }
     }
@@ -67,14 +72,13 @@ export class Parser extends TokenIterator {
     parseClassOrInterfaceOrEnum(){
         let visibility = this.parseVisibilityModifierIfPresent();
 
-        let tt = this.tt; // preserve "class", "interface", "enum" for switch later on
+        let tt = this.tt; // preserve "class", "interface", "enum" for switch-case below
 
-        if(this.expect(Parser.classOrInterfaceOrEnum, false)){
+        if(this.expect(Parser.classOrInterfaceOrEnum, true)){
 
             let identifier = this.expectAndSkipIdentifier();
 
-            if(identifier != null){
-                this.nextToken();  // skip "class", "interface", "enum"
+            if(identifier != ""){
                 switch(tt){
                     case TokenType.keywordClass:
                         this.parseClassDeclaration(visibility, identifier);
@@ -95,7 +99,6 @@ export class Parser extends TokenIterator {
         let genericParameters = this.parseGenericParameterDefinition()
         throw new Error("Function not implemented.");
     }
-    
     parseEnumDeclaration(visibility: Visibility, identifier: string) {
         throw new Error("Function not implemented.");
     }
@@ -104,8 +107,60 @@ export class Parser extends TokenIterator {
         let genericParameters = this.parseGenericParameterDefinition()
         throw new Error("Function not implemented.");
     }
+    
+    parseGenericParameterDefinition(): ASTGenericDefinition[] {
+        let genericParameterDefinitions: ASTGenericDefinition[] = [];
+        if(this.comesToken(TokenType.lower, true)){
+            do {
+
+                let identifier = this.expectAndSkipIdentifier();
+                if(identifier != ""){
+
+                    let genericDefinition: ASTGenericDefinition = {
+                        identifier: identifier
+                    }
+
+                    genericParameterDefinitions.push(genericDefinition);
+
+                    if(this.comesToken(TokenType.keywordExtends, true)){
+                        genericDefinition.extends = [];
+
+                        do {
+                            let type = this.parseType();
+                            if(type != null) genericParameterDefinitions.push(type);
+                        } while(this.comesToken(TokenType.comma), true);
+
+                    } else if(this.comesToken(TokenType.keywordSuper, true)){
+                        let type = this.parseType();
+                        if(type != null) genericDefinition.super = type;
+                    }
+                }
+
+            } while(this.comesToken(TokenType.comma, true));
+
+            this.expect(TokenType.greater, true);
+        } 
+
+        return genericParameterDefinitions;
+    }
+    
+    parseType(): ASTTypeNode | undefined {
+        // ArrayList; HashMap<Integer, ArrayList<Boolean>>; int[][], ...
+        // general Syntax: <identifier><genericParameterInvocation><ArrayDimension[]>
+
+        let type = this.nodeFactory.buildTypeNode();
+
+        type.identifier = this.expectAndSkipIdentifier();
+        if(type.identifier == "") return type;  // erroneous type
+    
+        if(this.comesToken(TokenType.lower, true)){
+             
+        }
 
 
+        this.setEndOfRange(type);
+    }
+    
     parseMainProgramFragment(){
 
     }

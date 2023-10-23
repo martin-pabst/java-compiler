@@ -349,7 +349,7 @@ export class Lexer {
                     }
                 case TokenType.plus:
                     if (this.nextChar == '+') {
-                        this.pushToken(TokenType.doublePlus, '++');
+                        this.pushToken(TokenType.plusPlus, '++');
                         this.next();
                         this.next();
                         return;
@@ -422,7 +422,7 @@ export class Lexer {
                     }
                 case TokenType.minus:
                     if (this.nextChar == '-') {
-                        this.pushToken(TokenType.doubleMinus, '--');
+                        this.pushToken(TokenType.minusMinus, '--');
                         this.next();
                         this.next();
                         return;

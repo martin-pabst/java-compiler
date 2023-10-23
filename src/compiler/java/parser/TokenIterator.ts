@@ -2,6 +2,7 @@ import { Error, ErrorLevel, QuickFix } from "../../common/Error";
 import { IRange } from "../../common/range/Range";
 import { Token, TokenList } from "../Token";
 import { TokenType, TokenTypeReadable } from "../TokenType";
+import { ASTNode } from "./AST";
 
 export class TokenIterator {
     pos: number = 0;        // current index in tokens
@@ -12,7 +13,7 @@ export class TokenIterator {
         value: ""
     }
 
-    ct: Token[] = [];
+    lookahead: Token[] = [];
     lastToken: Token = this.dummy;
     cct: Token = this.dummy;                // current token
     tt: TokenType = TokenType.comment;      // current tokentype
@@ -39,17 +40,17 @@ export class TokenIterator {
 
 
 
-    constructor(private tokenList: TokenList, private lookahead: number) {
+    constructor(private tokenList: TokenList, private lookaheadLength: number) {
         this.endToken = tokenList[tokenList.length - 1];
         this.initializeLookahead();
     }
 
     initializeLookahead() {
 
-        this.ct = [];
+        this.lookahead = [];
         this.pos = 0;
 
-        for (let i = 0; i < this.lookahead; i++) {
+        for (let i = 0; i < this.lookaheadLength; i++) {
 
             let token: Token = this.endToken;
 
@@ -75,15 +76,15 @@ export class TokenIterator {
 
             }
 
-            this.ct.push(token);
+            this.lookahead.push(token);
 
-            if (i < this.lookahead - 1) {
+            if (i < this.lookaheadLength - 1) {
                 this.pos++;
             }
 
         }
 
-        this.cct = this.ct[0];
+        this.cct = this.lookahead[0];
         this.tt = this.cct.tt;
 
     }
@@ -115,13 +116,13 @@ export class TokenIterator {
 
         }
 
-        for (let i = 0; i < this.lookahead - 1; i++) {
-            this.ct[i] = this.ct[i + 1];
+        for (let i = 0; i < this.lookaheadLength - 1; i++) {
+            this.lookahead[i] = this.lookahead[i + 1];
         }
 
-        this.ct[this.lookahead - 1] = token;
+        this.lookahead[this.lookaheadLength - 1] = token;
 
-        this.cct = this.ct[0];
+        this.cct = this.lookahead[0];
         this.tt = this.cct.tt;
 
     }
@@ -137,14 +138,11 @@ export class TokenIterator {
         });
     }
 
-
-
-
-    expect(tt: TokenType | TokenType[], skip: boolean = true): boolean {
+    expect(tt: TokenType | TokenType[], skipIfTrue: boolean = true): boolean {
 
         if (!Array.isArray(tt)){
             if(this.tt == tt){
-                if(skip) this.nextToken();
+                if(skipIfTrue) this.nextToken();
                 return true;
             }
             this.pushError("Erwartet wird: " + TokenTypeReadable[tt] + " - Gefunden wurde: " + this.cct.value, "error");
@@ -152,7 +150,7 @@ export class TokenIterator {
         }
         
         if (tt.indexOf(this.tt) >= 0) {
-            if (skip) this.nextToken();
+            if (skipIfTrue) this.nextToken();
             return true;
         }
 
@@ -228,7 +226,7 @@ export class TokenIterator {
 
     }
 
-    expectAndSkipIdentifier(): string | null {
+    expectAndSkipIdentifier(): string {
         if(this.tt == TokenType.identifier){
             let identifier: string = <string>this.cct.value;
             this.nextToken();
@@ -236,7 +234,7 @@ export class TokenIterator {
         }
 
         this.pushError("Erwartet wird ein Bezeichner (engl.: 'identifier'), d.h. der Name einer Klasse, Variable, ... - Gefunden wurde: " + this.cct.value);
-        return null;
+        return "";
     }
 
     isOperatorOrDot(tt: TokenType): boolean {
@@ -251,13 +249,27 @@ export class TokenIterator {
         return this.cct == this.endToken;
     }
 
-    comesToken(token: TokenType | TokenType[]): boolean {
+    comesToken(token: TokenType | TokenType[], skipIfTrue: boolean = false): boolean {
 
+        // comestoken is called very often, so we try to implement this in a performant way:
         if (!Array.isArray(token)) {
-            return this.tt == token;
+            if(!skipIfTrue) return this.tt == token;
+            if(this.tt == token){
+                this.nextToken();
+                return true;
+            }            
+            return false;
         }
 
-        return token.indexOf(this.tt) >= 0;
+        // token is of type TokenType[]
+        if(!skipIfTrue) return token.indexOf(this.tt) >= 0;
+
+        if(token.indexOf(this.tt) >= 0){
+            this.nextToken();
+            return true;
+        }
+
+        return false;
 
     }
 
@@ -265,6 +277,19 @@ export class TokenIterator {
         return Object.assign({}, this.cct.range);
     }
 
+    setEndOfRange(node: ASTNode): ASTNode {
+        let r1 = node.range;
+        let lastRange = this.lastToken.range;
+
+        node.range = {
+            startLineNumber: r1.startLineNumber,
+            startColumn: r1.startColumn,
+            endLineNumber: lastRange.endLineNumber,
+            endColumn: lastRange.endColumn
+        }
+
+        return node;
+    }
 
 
 }
