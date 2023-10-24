@@ -186,6 +186,7 @@ export enum TokenType {
     block,    // block of statements
     multiNode,  // used for debugging output
     plusPlusMinusMinus,
+    genericParameterDefinition,
 
     type, // e.g. int[][]
     typeParameter, // e.g. <E extends String implements Comparable<E>>

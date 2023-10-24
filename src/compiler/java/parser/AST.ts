@@ -1,6 +1,6 @@
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
-import { Visibility } from "../types/Visibility.ts";
+import { VisibilityType } from "../types/Visibility.ts";
 
 export type ASTNodes = ASTNode[];
 
@@ -12,13 +12,16 @@ export type BinaryOperator = TokenType.plus | TokenType.minus | TokenType.multip
 export type UnaryOperator = TokenType.negation | TokenType.not;
 
 export interface ASTNode {
-    type: TokenType;
+    kind: TokenType;
     range: IRange;    
 }
 
-export interface ASTGlobalNode extends ASTNode {
-    type: TokenType.global;
+export interface TypeScope {
     classOrInterfaceOrEnumDefinitions: ASTClassDefinitionNode[];
+}
+
+export interface ASTGlobalNode extends ASTNode, TypeScope {
+    kind: TokenType.global;
     mainProgramNodes: ASTProgramNode[];
 }
 
@@ -26,39 +29,45 @@ export interface ASTGlobalNode extends ASTNode {
  * Building blocks for nodes...
  */
 
-export interface ASTWithVisibilityModifier {
-    visibility: Visibility
+export interface ASTDeclarationWithIdentifier {
+    identifier: string;
+    identifierRange: IRange;
 }
 
+export interface ASTNodeWithModifiers {
+    range: IRange,
+    visibility: VisibilityType;
+    isFinal: boolean;
+    isStatic: boolean;
+    isAbstract: boolean;
+}
+
+
 // e.g. ..., int count, ...
-export interface ASTParameter {
-    identifier: string;
+export interface ASTParameterNode extends ASTNode, ASTDeclarationWithIdentifier {
     type: ASTTypeNode;
+    isEllipsis: boolean;
 }
 
 export interface TypeDefinitionWithMethods {
-    methods: ASTMethodDefinitionNode[]
+    methods: ASTMethodDeclarationNode[]
 }
 
 export interface ASTTypeDefinitionWithAttributes {
-    attributes: ASTAttributeDefinitionNode[]
+    attributes: ASTAttributeDeclarationNode[]
 }
 
-export interface ASTGenericDefinition {
-    identifier: string;
+export interface ASTGenericParameterDeclarationNode extends ASTDeclarationWithIdentifier, ASTNode {
+    kind: TokenType.genericParameterDefinition;
     extends?: ASTTypeNode[];
     super?: ASTTypeNode;
 }
 
 // e.g. class List<E extends Comparable<E>>
 export interface ASTTypeDefinitionWithGenerics {
-    genericDefinitions: ASTGenericDefinition[]
+    genericParameterDefinitions: ASTGenericParameterDeclarationNode[]
 }
 
-export interface ASTIsFinalOrStatic {
-    isStatic: boolean;
-    isFinal: boolean;
-}
 
 /**
  * Nodes for class, interface, enum
@@ -66,46 +75,47 @@ export interface ASTIsFinalOrStatic {
 // e.g. HashMap<String, Integer>
 export interface ASTTypeNode extends ASTNode {
     identifier: string;
-    genericParameterAssignments: ASTTypeNode[];
+    genericParameterInvocations: ASTTypeNode[];
     arrayDimensions: number;
 }
 
 // e.g. public int getValue(String key)
-export interface ASTMethodDefinitionNode extends ASTWithVisibilityModifier, ASTIsFinalOrStatic {
-    identifier: string;
-    parameters: ASTParameter[];
-    returnParameterType: ASTTypeNode;
+export interface ASTMethodDeclarationNode extends ASTNode, ASTNodeWithModifiers, ASTDeclarationWithIdentifier {
+    kind: TokenType.methodDeclaration;
+    parameters: ASTParameterNode[];
+    returnParameterType: ASTTypeNode | undefined;  // undefined in case of constructor
     isContructor: boolean;
     isAbstract: boolean;
+    block: ASTBlockNode | undefined;  // undefined in case of abstract method and methoddeclaration in interface
 }                
 
-export interface ASTAttributeDefinitionNode extends ASTWithVisibilityModifier, ASTIsFinalOrStatic {
-    identifier: string;
+export interface ASTAttributeDeclarationNode extends ASTNodeWithModifiers, ASTNode, ASTDeclarationWithIdentifier {
     type: ASTTypeNode;
+    initialization: ASTTermNode | undefined;
 }            
 
 export interface ASTClassDefinitionNode 
-extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTWithVisibilityModifier,
-    ASTTypeDefinitionWithAttributes
+extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers,
+    ASTTypeDefinitionWithAttributes, TypeScope, ASTDeclarationWithIdentifier
 {
-    type: TokenType.keywordClass;
-    identifier: string;
+    kind: TokenType.keywordClass;
+    parent: TypeScope;
     innerClasses: ASTClassDefinitionNode[]
 }
 
 export interface ASTInterfaceDefinitionNode 
-extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTWithVisibilityModifier
+extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers, ASTDeclarationWithIdentifier
 {
-    type: TokenType.keywordInterface;
-    identifier: string;
+    kind: TokenType.keywordInterface;
+    parent: ASTClassDefinitionNode | null;
 }
 
 export interface ASTEnumDefinitionNode 
-extends ASTNode, TypeDefinitionWithMethods, ASTWithVisibilityModifier,
-    ASTTypeDefinitionWithAttributes
+extends ASTNode, TypeDefinitionWithMethods, ASTNodeWithModifiers,
+    ASTTypeDefinitionWithAttributes, ASTDeclarationWithIdentifier
 {
-    type: TokenType.keywordEnum;
-    identifier: string;
+    kind: TokenType.keywordEnum;
+    parent: ASTClassDefinitionNode | null;
 }
 
 
@@ -114,12 +124,12 @@ extends ASTNode, TypeDefinitionWithMethods, ASTWithVisibilityModifier,
  */
 
 export interface ASTBlockNode extends ASTNode {
-    type: TokenType.block;
+    kind: TokenType.block;
     statements: ASTStatementNode[];
 }
 
 export interface ASTProgramNode extends ASTNode {
-    type: TokenType.program;
+    kind: TokenType.program;
     block: ASTBlockNode;
 }
 
@@ -132,7 +142,7 @@ export interface ASTStatementNode extends ASTNode {
  */
 
 export interface ASTAssignmentNode extends ASTStatementNode {
-    type: AssignmentOperator;
+    kind: AssignmentOperator;
     leftSide: ASTTermNode;
     rightSide: ASTTermNode;
 }
@@ -142,46 +152,46 @@ export interface ASTTermNode extends ASTStatementNode {
 }
 
 export interface ASTTernaryNode extends ASTTermNode {
-    type: TokenType.ternaryOperator;
+    kind: TokenType.ternaryOperator;
     condition: ASTTermNode;
     termIfTrue: ASTTermNode;
     termIfFalse: ASTTermNode;
 }
 
 export interface ASTBinaryNode extends ASTTermNode {
-    type: TokenType.binaryOp;
+    kind: TokenType.binaryOp;
     operator: BinaryOperator;
     leftSide: ASTTermNode;
     rightSide: ASTTermNode;
 }
 
 export interface ASTUnaryNode extends ASTTermNode {
-    type: TokenType.unaryOp;
+    kind: TokenType.unaryOp;
     operator: UnaryOperator;
     rightSide: ASTTermNode;
 }
 
 export interface ASTPlusPlusMinusMinusNode extends ASTTermNode {
-    type: TokenType.plusPlusMinusMinus;
+    kind: TokenType.plusPlusMinusMinus;
     operator: TokenType.plusPlus | TokenType.minusMinus;
     term: ASTTermNode;
     prefixOrSuffix: "prefix" | "suffix"
 }
 
 export interface ASTMethodCall extends ASTTermNode {
-    type: TokenType.callMethod;
+    kind: TokenType.callMethod;
     methodIdentifier: string;
     parameterValues: ASTTermNode[];
 }
 
 export interface ASTNewObjectNode extends ASTTermNode {
-    type: TokenType.newObject;
+    kind: TokenType.newObject;
     classIdentifier: string;
     parameterValues: ASTTermNode;
 }
 
 export interface ASTNewArrayNode extends ASTTermNode {
-    type: TokenType.newArray;
+    kind: TokenType.newArray;
     arrayType: ASTTypeNode;
     dimensions: ASTTermNode[];
 
@@ -190,26 +200,26 @@ export interface ASTNewArrayNode extends ASTTermNode {
  * Structural statements: while, if, for, case, do...while
  */
 export interface ASTWhileNode extends ASTStatementNode {
-    type: TokenType.keywordWhile;
+    kind: TokenType.keywordWhile;
     condition: ASTTermNode;
     block: ASTBlockNode;
 }
 
 export interface ASTDoWhileNode extends ASTStatementNode {
-    type: TokenType.keywordDo;
+    kind: TokenType.keywordDo;
     condition: ASTTermNode;
     block: ASTBlockNode;
 }
 
 export interface ASTIfNode extends ASTStatementNode {
-    type: TokenType.keywordIf;
+    kind: TokenType.keywordIf;
     condition: ASTTermNode;
     blockIfTrue: ASTBlockNode;
     blockIfFalse: ASTBlockNode;
 }
 
 export interface ASTForLoopNode extends ASTStatementNode {
-    type: TokenType.keywordFor;
+    kind: TokenType.keywordFor;
     firstStatement: ASTStatementNode;
     condition: ASTTermNode;
     lastStatement: ASTStatementNode;

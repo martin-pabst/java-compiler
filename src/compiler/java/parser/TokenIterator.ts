@@ -226,7 +226,7 @@ export class TokenIterator {
 
     }
 
-    expectAndSkipIdentifier(): string {
+    expectAndSkipIdentifierAsString(): string {
         if(this.tt == TokenType.identifier){
             let identifier: string = <string>this.cct.value;
             this.nextToken();
@@ -235,6 +235,20 @@ export class TokenIterator {
 
         this.pushError("Erwartet wird ein Bezeichner (engl.: 'identifier'), d.h. der Name einer Klasse, Variable, ... - Gefunden wurde: " + this.cct.value);
         return "";
+    }
+
+    expectAndSkipIdentifierAsToken(): Token {
+        if(this.tt == TokenType.identifier){
+            return this.lastToken;
+        }
+
+        this.pushError("Erwartet wird ein Bezeichner (engl.: 'identifier'), d.h. der Name einer Klasse, Variable, ... - Gefunden wurde: " + this.cct.value);
+
+        return {
+            tt: TokenType.identifier,
+            value: "",
+            range: this.cct.range
+        };
     }
 
     isOperatorOrDot(tt: TokenType): boolean {
@@ -291,5 +305,8 @@ export class TokenIterator {
         return node;
     }
 
+    comesIdentifier(identifier: string){
+        return this.tt == TokenType.identifier && this.cct.value == identifier;
+    }
 
 }

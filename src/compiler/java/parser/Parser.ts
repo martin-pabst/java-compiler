@@ -1,26 +1,17 @@
 import { Module } from "../../common/module/module";
+import { Range } from "../../common/range/Range.ts";
+import { Token } from "../Token.ts";
 import { TokenType } from "../TokenType";
-import { Visibility } from "../types/Visibility.ts";
-import { ASTGenericDefinition, ASTTypeNode } from "./AST.ts";
-import { ASTNodeFactory } from "./ASTNodeFactory.ts";
-import { TokenIterator } from "./TokenIterator";
+import {
+    ASTClassDefinitionNode,
+    ASTEnumDefinitionNode,
+    ASTGenericParameterDeclarationNode,
+    ASTInterfaceDefinitionNode, ASTMethodDeclarationNode,
+    ASTNodeWithModifiers, ASTTypeNode, TypeScope
+} from "./AST.ts";
+import { StatementParser } from "./StatementParser.ts";
 
-export class Parser extends TokenIterator {
-    static assignmentOperators = [TokenType.assignment, TokenType.plusAssignment, TokenType.minusAssignment,
-    TokenType.multiplicationAssignment, TokenType.divisionAssignment, TokenType.moduloAssignment,
-    TokenType.ANDAssigment, TokenType.XORAssigment, TokenType.ORAssigment,
-    TokenType.shiftLeftAssigment, TokenType.shiftRightAssigment, TokenType.shiftRightUnsignedAssigment];
-
-    static operatorPrecedence: TokenType[][] = [Parser.assignmentOperators,
-    [TokenType.ternaryOperator], [TokenType.colon],
-
-    [TokenType.or], [TokenType.and], [TokenType.OR], [TokenType.XOR], [TokenType.ampersand],
-    [TokenType.equal, TokenType.notEqual],
-    [TokenType.keywordInstanceof, TokenType.lower, TokenType.lowerOrEqual, TokenType.greater, TokenType.greaterOrEqual],
-    [TokenType.shiftLeft, TokenType.shiftRight, TokenType.shiftRightUnsigned],
-
-    [TokenType.plus, TokenType.minus], [TokenType.multiplication, TokenType.division, TokenType.modulo]
-    ];
+export class Parser extends StatementParser {
 
 
     static forwardToInsideClass = [TokenType.keywordPublic, TokenType.keywordPrivate, TokenType.keywordProtected, TokenType.keywordVoid,
@@ -32,19 +23,18 @@ export class Parser extends TokenIterator {
 
     static visibilityModifiersOrTopLevelTypeDeclaration = Parser.visibilityModifiers.concat(Parser.classOrInterfaceOrEnum);
 
-    nodeFactory: ASTNodeFactory;
-
-    constructor(private module: Module) {
-        super(module.tokens!, 7);
-        this.nodeFactory = new ASTNodeFactory(this);
+    constructor(module: Module) {
+        super(module);
         this.initializeAST();
     }
 
-    initializeAST(){
+    initializeAST() {
         this.module.ast = {
-            type: TokenType.global,
-            range: {startLineNumber: 0, startColumn: 0, 
-                endLineNumber: this.endToken.range.endLineNumber, endColumn: this.endToken.range.endColumn},
+            kind: TokenType.global,
+            range: {
+                startLineNumber: 0, startColumn: 0,
+                endLineNumber: this.endToken.range.endLineNumber, endColumn: this.endToken.range.endColumn
+            },
             classOrInterfaceOrEnumDefinitions: [],
             mainProgramNodes: []
         }
@@ -52,42 +42,42 @@ export class Parser extends TokenIterator {
 
     parse() {
 
-        while(!this.isEnd()){
+        while (!this.isEnd()) {
             let pos = this.pos;
 
-            if(this.comesToken(Parser.visibilityModifiersOrTopLevelTypeDeclaration)){
-                this.parseClassOrInterfaceOrEnum();
+            if (this.comesToken(Parser.visibilityModifiersOrTopLevelTypeDeclaration)) {
+                this.parseClassOrInterfaceOrEnum(this.module.ast!);
             } else {
                 this.parseMainProgramFragment();
             }
 
-            if(pos == this.pos){
+            if (pos == this.pos) {
                 this.pushError("Mit dem Token " + this.cct.value + " kann der Compiler nichts anfangen.", "warning");
                 this.nextToken();   // last safety net to prevent getting stuck in an endless loop
-            } 
+            }
         }
 
     }
 
-    parseClassOrInterfaceOrEnum(){
-        let visibility = this.parseVisibilityModifierIfPresent();
+    parseClassOrInterfaceOrEnum(parent: TypeScope, modifiers?: ASTNodeWithModifiers) {
+        if (modifiers == null) modifiers = this.parseModifiers();
 
         let tt = this.tt; // preserve "class", "interface", "enum" for switch-case below
 
-        if(this.expect(Parser.classOrInterfaceOrEnum, true)){
+        if (this.expect(Parser.classOrInterfaceOrEnum, true)) {
 
-            let identifier = this.expectAndSkipIdentifier();
+            let identifier = this.expectAndSkipIdentifierAsToken();
 
-            if(identifier != ""){
-                switch(tt){
+            if (identifier.value != "") {
+                switch (tt) {
                     case TokenType.keywordClass:
-                        this.parseClassDeclaration(visibility, identifier);
+                        this.parseClassDeclaration(modifiers, identifier, parent);
                         break;
                     case TokenType.keywordEnum:
-                        this.parseEnumDeclaration(visibility, identifier);
+                        this.parseEnumDeclaration(modifiers, identifier);
                         break;
                     case TokenType.keywordInterface:
-                        this.parseInterfaceDeclaration(visibility, identifier);
+                        this.parseInterfaceDeclaration(modifiers, identifier);
                         break;
                 }
             }
@@ -95,84 +85,207 @@ export class Parser extends TokenIterator {
 
     }
 
-    parseClassDeclaration(visibility: Visibility, identifier: string) {
+    parseClassDeclaration(modifiers: ASTNodeWithModifiers, identifier: Token, parent: TypeScope) {
+        let classASTNode = this.nodeFactory.buildClassNode(modifiers, identifier, parent);
+        classASTNode.genericParameterDefinitions = this.parseGenericParameterDefinition();
+
+        if (this.expect(TokenType.leftCurlyBracket, true)) {
+            while (!this.comesToken([TokenType.rightCurlyBracket, TokenType.endofSourcecode])) {
+
+                let modifiers = this.parseModifiers();
+
+                switch (this.tt) {
+                    case TokenType.identifier:
+                        this.parseAttributeOrMethodDeclaration(classASTNode, modifiers);
+                        break;
+                    case TokenType.keywordClass:
+                    case TokenType.keywordEnum:
+                    case TokenType.keywordInterface:
+                        this.parseClassOrInterfaceOrEnum(classASTNode, modifiers);
+                        break;
+                }
+
+            }
+            this.expect(TokenType.rightCurlyBracket, true);
+        }
+
+        this.setEndOfRange(classASTNode);
+    }
+
+    parseAttributeOrMethodDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers) {
+        /**
+         * Problem:
+         * class Test { Test a; Test(); Test getValue()}
+         */
+
+        if (this.comesIdentifier(classASTNode.identifier) && this.lookahead[1].tt == TokenType.leftBracket) {
+            this.parseMethodDeclaration(classASTNode, modifiers, true);
+        } else {
+            let type = this.parseType();
+            if (this.lookahead[1].tt == TokenType.leftBracket) {
+                this.parseMethodDeclaration(classASTNode, modifiers, false, type);
+            } else {
+                if(classASTNode.kind == TokenType.keywordClass || classASTNode.kind == TokenType.keywordEnum){
+                    this.parseAttributeDeclaration(classASTNode, modifiers, type);
+                } else {
+                    this.pushError("Ein Interface kann keine Attribute besitzen.", "error");
+                }
+            }
+        }
+
+
+    }
+
+    parseMethodDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers, isContructor: boolean, returnType?: ASTTypeNode) {
+        let rangeStart = modifiers.range;
+        let identifier = this.expectAndSkipIdentifierAsToken();
+        let methodNode = this.nodeFactory.buildMethodNode(returnType, isContructor, modifiers, identifier, rangeStart);
+        classASTNode.methods.push(methodNode);
+
+        if (this.expect(TokenType.leftBracket, true)) {
+            while (this.comesToken(TokenType.identifier)) {
+                this.parseParameter(methodNode);
+            }
+            this.expect(TokenType.rightBracket);
+        }
+
+        if (this.comesToken(TokenType.leftCurlyBracket)) {
+            let block = this.parseBlock();
+            methodNode.block = block;
+        } else {
+            this.expectSemicolon(true, true);
+        }
+
+        this.setEndOfRange(methodNode);
+    }
+
+    parseParameter(methodNode: ASTMethodDeclarationNode) {
+        let startRange = this.cct.range;
+        let type = this.parseType();
+
+        let isEllipsis = this.comesToken(TokenType.ellipsis, true);
+
+        let identifier = this.expectAndSkipIdentifierAsToken();
+
+        if (type != null && identifier.value != "") {
+            let parameterNode = this.nodeFactory.buildParameterNode(startRange, identifier, type, isEllipsis);
+            this.setEndOfRange(parameterNode);
+            methodNode.parameters.push(parameterNode);
+        }
+    }
+
+    parseAttributeDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode, modifiers: ASTNodeWithModifiers, type: ASTTypeNode | undefined) {
+        let rangeStart = this.cct.range;
+        let identifier = this.expectAndSkipIdentifierAsToken();
+
+        let initialization = this.comesToken(TokenType.assignment, true) ? this.parseTerm() : undefined;
+
+        if(identifier.value != "" && type != null){
+            let node = this.nodeFactory.buildAttributeNode(rangeStart, identifier, type, initialization, modifiers);
+            classASTNode.attributes.push(node);
+            this.setEndOfRange(node);
+        }
+
+        this.expectSemicolon(true, true);
+
+
+    }
+
+    parseModifiers(): ASTNodeWithModifiers {
+        let visibilityModifiers: Token[] = []
+        let foundTokenWhichIsNotModifier: boolean = false;
+        let astNodeWithModifiers = this.nodeFactory.buildNodeWithModifiers(this.cct.range);
+        do {
+            foundTokenWhichIsNotModifier = true;
+            switch (this.tt) {
+                case TokenType.keywordPrivate:
+                case TokenType.keywordProtected:
+                case TokenType.keywordPublic:
+                    visibilityModifiers.push(this.cct);
+                    astNodeWithModifiers.visibility = this.tt;
+                    break;
+                case TokenType.keywordStatic:
+                    astNodeWithModifiers.isStatic = true;
+                    break;
+                case TokenType.keywordFinal:
+                    astNodeWithModifiers.isFinal = true;
+                    break;
+                case TokenType.keywordAbstract:
+                    astNodeWithModifiers.isAbstract = true;
+                    break;
+                default:
+                    foundTokenWhichIsNotModifier = false;
+            }
+
+            if (foundTokenWhichIsNotModifier) this.nextToken();
+
+        } while (!foundTokenWhichIsNotModifier);
+
+        if (visibilityModifiers.length > 0) {
+            this.pushError(`Es ist nicht zulässig, mehrere visibility-modifiers gleichzeitig zu setzen (hier: ${visibilityModifiers.map(vm => vm.value).join(", ")})`, "warning", Range.lift(visibilityModifiers[0].range).plusRange(visibilityModifiers.pop()!.range));
+        }
+
+        return astNodeWithModifiers;
+    }
+
+
+    parseEnumDeclaration(modifiers: ASTNodeWithModifiers, identifier: Token) {
+        throw new Error("Function not implemented.");
+    }
+
+    parseInterfaceDeclaration(modifiers: ASTNodeWithModifiers, identifier: Token) {
         let genericParameters = this.parseGenericParameterDefinition()
         throw new Error("Function not implemented.");
     }
-    parseEnumDeclaration(visibility: Visibility, identifier: string) {
-        throw new Error("Function not implemented.");
-    }
-    
-    parseInterfaceDeclaration(visibility: Visibility, identifier: string) {
-        let genericParameters = this.parseGenericParameterDefinition()
-        throw new Error("Function not implemented.");
-    }
-    
-    parseGenericParameterDefinition(): ASTGenericDefinition[] {
-        let genericParameterDefinitions: ASTGenericDefinition[] = [];
-        if(this.comesToken(TokenType.lower, true)){
+
+    parseGenericParameterDefinition(): ASTGenericParameterDeclarationNode[] {
+        // e.g. <E extends ArrayList<Integer> & Throwable, F super String> 
+        // in example above Definition of E is the first generic parameter definition, definition of F the second one
+        let genericParameterDefinitions: ASTGenericParameterDeclarationNode[] = [];
+        if (this.comesToken(TokenType.lower, true)) {
             do {
 
-                let identifier = this.expectAndSkipIdentifier();
-                if(identifier != ""){
+                let identifier = this.expectAndSkipIdentifierAsToken();
+                if (identifier.value != "") {
 
-                    let genericDefinition: ASTGenericDefinition = {
-                        identifier: identifier
+                    let genericParameterDeclaration: ASTGenericParameterDeclarationNode = {
+                        kind: TokenType.genericParameterDefinition,
+                        range: identifier.range,
+                        identifier: <string>identifier.value,
+                        identifierRange: identifier.range
                     }
 
-                    genericParameterDefinitions.push(genericDefinition);
+                    genericParameterDefinitions.push(genericParameterDeclaration);
 
-                    if(this.comesToken(TokenType.keywordExtends, true)){
-                        genericDefinition.extends = [];
+                    if (this.comesToken(TokenType.keywordExtends, true)) {
+                        genericParameterDeclaration.extends = [];
 
                         do {
                             let type = this.parseType();
-                            if(type != null) genericParameterDefinitions.push(type);
-                        } while(this.comesToken(TokenType.comma), true);
+                            if (type != null) genericParameterDeclaration.extends.push(type);
+                        } while (this.comesToken(TokenType.ampersand), true);
 
-                    } else if(this.comesToken(TokenType.keywordSuper, true)){
+                    } else if (this.comesToken(TokenType.keywordSuper, true)) {
                         let type = this.parseType();
-                        if(type != null) genericDefinition.super = type;
+                        if (type != null) genericParameterDeclaration.super = type;
                     }
+
+                    this.setEndOfRange(genericParameterDeclaration)
                 }
 
-            } while(this.comesToken(TokenType.comma, true));
+            } while (this.comesToken(TokenType.comma, true));
 
             this.expect(TokenType.greater, true);
-        } 
+        }
 
         return genericParameterDefinitions;
     }
-    
-    parseType(): ASTTypeNode | undefined {
-        // ArrayList; HashMap<Integer, ArrayList<Boolean>>; int[][], ...
-        // general Syntax: <identifier><genericParameterInvocation><ArrayDimension[]>
-
-        let type = this.nodeFactory.buildTypeNode();
-
-        type.identifier = this.expectAndSkipIdentifier();
-        if(type.identifier == "") return type;  // erroneous type
-    
-        if(this.comesToken(TokenType.lower, true)){
-             
-        }
 
 
-        this.setEndOfRange(type);
-    }
-    
-    parseMainProgramFragment(){
+    parseMainProgramFragment() {
 
     }
 
-    parseVisibilityModifierIfPresent(): Visibility {
-        if(this.comesToken(Parser.visibilityModifiers)){
-            let tt = <TokenType.keywordPrivate| TokenType.keywordProtected| TokenType.keywordPublic> this.tt;
-            this.nextToken();
-            return <Visibility><any>Visibility[tt];
-        }
-        return Visibility.public;
-    }
 
 
 

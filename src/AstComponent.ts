@@ -57,7 +57,7 @@ export class AstComponent {
         let childNodeInfo = this.getChildNodeInfo(node).filter(cni => cni.isChildNode);
         
         this.astTreeview.addNode(childNodeInfo.length > 0,
-            TokenType[node.type], undefined, node, node, parent);
+            TokenType[node.kind], undefined, node, node, parent);
 
         for(let cni of childNodeInfo){
 
@@ -72,7 +72,7 @@ export class AstComponent {
                             startColumn: firstChild.range.startColumn,
                             endLineNumber: lastChild.range.endLineNumber,
                             endColumn: lastChild.range.endColumn},
-                    type: TokenType.multiNode,
+                    kind: TokenType.multiNode,
                     childNodes: cni.childNodes!,
                     role: cni.key
                 }
@@ -126,7 +126,7 @@ export class AstComponent {
 
     showDetails(node: ASTNode){
         DOM.clear(this.detailsDiv);
-        DOM.makeDiv(this.detailsDiv, 'jo_ast_details_heading').textContent = "Type: " + TokenType[node.type];
+        DOM.makeDiv(this.detailsDiv, 'jo_ast_details_heading').textContent = "Type: " + TokenType[node.kind];
         
         let childNodeInfoList = this.getChildNodeInfo(node);
         for(let cni of childNodeInfoList){
@@ -143,7 +143,7 @@ export class AstComponent {
                 let value: string = "";
                 if(Array.isArray(cni.childNodes)){
                     let type: string = "";
-                    if(cni.childNodes.length > 0) type = TokenType[cni.childNodes[0].type];
+                    if(cni.childNodes.length > 0) type = TokenType[cni.childNodes[0].kind];
                     value = type + "[" + cni.childNodes.length + "]";
                 } else {
                     let type1: string = "";
