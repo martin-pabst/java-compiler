@@ -1,6 +1,6 @@
 import { Module } from "../../common/module/module.ts";
 import { TokenType } from "../TokenType.ts";
-import { ASTTypeNode } from "./AST.ts";
+import { ASTTermNode, ASTTypeNode } from "./AST.ts";
 import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator.ts";
 
@@ -10,7 +10,8 @@ export class TermParser extends TokenIterator {
     TokenType.ANDAssigment, TokenType.XORAssigment, TokenType.ORAssigment,
     TokenType.shiftLeftAssigment, TokenType.shiftRightAssigment, TokenType.shiftRightUnsignedAssigment];
 
-    static operatorPrecedence: TokenType[][] = [TermParser.assignmentOperators,
+    static operatorPrecedence: TokenType[][] = [
+    TermParser.assignmentOperators,
     [TokenType.ternaryOperator], [TokenType.colon],
 
     [TokenType.or], [TokenType.and], [TokenType.OR], [TokenType.XOR], [TokenType.ampersand],
@@ -28,9 +29,19 @@ export class TermParser extends TokenIterator {
         this.nodeFactory = new ASTNodeFactory(this);
     }
 
-    
 
+    parseTerm(): ASTTermNode {
 
+        return parseLambda();
+
+    }
+
+    parseLambda(): ASTTermNode {
+        let left = parseAssignment();
+        if(this.tt == TokenType.lamdaOperator){
+            
+        }
+    }
 
 
 
