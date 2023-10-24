@@ -29,6 +29,11 @@ export class TermParser extends TokenIterator {
         this.nodeFactory = new ASTNodeFactory(this);
     }
 
+    /**
+     * Grammar:
+     * https://docs.oracle.com/javase/specs/jls/se7/html/jls-18.html
+     * @returns 
+     */
 
     parseTerm(): ASTTermNode {
 
@@ -39,7 +44,7 @@ export class TermParser extends TokenIterator {
     parseLambda(): ASTTermNode {
         let left = parseAssignment();
         if(this.tt == TokenType.lamdaOperator){
-            
+
         }
     }
 
