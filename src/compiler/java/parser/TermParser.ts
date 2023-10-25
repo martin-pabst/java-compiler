@@ -11,21 +11,25 @@ export class TermParser extends TokenIterator {
     TokenType.shiftLeftAssigment, TokenType.shiftRightAssigment, TokenType.shiftRightUnsignedAssigment];
 
     static operatorPrecedence: TokenType[][] = [
-        TermParser.assignmentOperators,
-        [TokenType.ternaryOperator],
-        [TokenType.colon],
-        [TokenType.or],
-        [TokenType.and],
-        [TokenType.OR],
-        [TokenType.XOR],
-        [TokenType.ampersand],
-        [TokenType.equal, TokenType.notEqual],
-        [TokenType.keywordInstanceof, TokenType.lower, TokenType.lowerOrEqual, TokenType.greater, TokenType.greaterOrEqual],
-        [TokenType.shiftLeft, TokenType.shiftRight, TokenType.shiftRightUnsigned],
-        [TokenType.plus, TokenType.minus],
-        [TokenType.multiplication, TokenType.division, TokenType.modulo],
-        [TokenType.dot]
+        TermParser.assignmentOperators, // 0
+        [TokenType.ternaryOperator],    // 1
+        [TokenType.colon],              // 2
+        [TokenType.or],                 // 3
+        [TokenType.and],                // 4
+        [TokenType.OR],                 // 5
+        [TokenType.XOR],                // 6
+        [TokenType.ampersand],          // 7
+        [TokenType.equal, TokenType.notEqual],      // 8
+        [TokenType.keywordInstanceof, TokenType.lower, TokenType.lowerOrEqual, TokenType.greater, TokenType.greaterOrEqual],    // 9
+        [TokenType.shiftLeft, TokenType.shiftRight, TokenType.shiftRightUnsigned],  // 10
+        [TokenType.plus, TokenType.minus],                                          // 11
+        [TokenType.multiplication, TokenType.division, TokenType.modulo],           // 12
+        [TokenType.plusPlus, TokenType.minusMinus],                                 // 13
+        [TokenType.dot]     // 14
     ];
+
+    static plusPlusMinusMinusPrecedence = 13;
+    static dotPrecedence = 14;
 
 
     operatorToPrecedenceMap: { [op: number]: number } = {};
@@ -57,23 +61,24 @@ export class TermParser extends TokenIterator {
 
     parseTerm(): ASTTermNode {
 
-        return parseTermBinary(0);
+        return this.parseTermBinary(0);
 
     }
 
-    parseTermBinary( ): ASTTermNode {
+    parseTermBinary(minPrecedence: number): ASTTermNode | undefined {
 
-        let node: ASTTermNode = this.parseTermUnary();
-        if (node == null) return node;
+        let node: ASTTermNode | undefined = this.parseTermUnary();
+        if (!node) return node;
 
         let precedence: number | undefined;
         let rightRidgeHeight = 1;
 
-        while ((precedence = this.operatorToPrecedenceMap[this.tt])) {
+        while ((precedence = this.operatorToPrecedenceMap[this.tt]) >= minPrecedence) {
 
             let operator = this.tt;
+            let isPlusPlusMinusMinus = precedence == TermParser.plusPlusMinusMinusPrecedence;
             this.nextToken();
-            let newRightNode: ASTTermNode = this.parseTermUnary();
+            let newRightNode: ASTTermNode | undefined = isPlusPlusMinusMinus ? undefined : this.parseTermUnary();
             if (newRightNode == null) return node;
 
             let h: number = 1;
@@ -85,17 +90,19 @@ export class TermParser extends TokenIterator {
                 h++;
             }
 
-            let newNode: ASTBinaryNode = {
-                kind: TokenType.binaryOp,
-                range: {
-                    startLineNumber: newLeftNode.range.startLineNumber, startColumn: newLeftNode.range.startColumn,
-                    endLineNumber: newRightNode.range.endLineNumber, endColumn: newRightNode.range.endColumn
-                },
-                precedence: precedence,
-                operator: <BinaryOperator>operator,
-                leftSide: newLeftNode,
-                rightSide: newRightNode
-            }
+            let newNode: ASTBinaryNode =
+                isPlusPlusMinusMinus ? this.nodeFactory.buildPlusPlusMinusMinusNode(newLeftNode) :
+                    {
+                        kind: TokenType.binaryOp,
+                        range: {
+                            startLineNumber: newLeftNode.range.startLineNumber, startColumn: newLeftNode.range.startColumn,
+                            endLineNumber: newRightNode.range.endLineNumber, endColumn: newRightNode.range.endColumn
+                        },
+                        precedence: precedence,
+                        operator: <BinaryOperator>operator,
+                        leftSide: newLeftNode,
+                        rightSide: newRightNode
+                    }
 
             if (newLeftNodesParent) {
                 newLeftNodesParent.rightSide = newNode;
@@ -112,12 +119,15 @@ export class TermParser extends TokenIterator {
     }
 
 
-    parseTermUnary(): ASTTermNode {
+    parseTermUnary(): ASTTermNode | undefined {
 
-        let node: ASTTermNode;
+        let node: ASTTermNode | undefined = undefined;
+
         switch (this.tt) {
             case TokenType.leftBracket:
                 this.nextToken();
+                // TODO: check for casting...
+                // TODO: check for lambda function
                 node = this.parseTerm();
                 this.expect(TokenType.rightBracket, true);
                 if (node) node = checkForArrayBrackets(node);
@@ -136,22 +146,25 @@ export class TermParser extends TokenIterator {
                 if (node) node = checkForArrayBrackets(node);
                 break;
             case TokenType.plusPlus:
-
-
-
-
+            case TokenType.minusMinus:
+                node = this.parseTermBinary(TermParser.plusPlusMinusMinusPrecedence);
+                if (node) {
+                    node = this.nodeFactory.buildPlusPlusMinusMinusNode(node);
+                }
+                break;
+            case TokenType.minus:
+            case TokenType.plus:
+            case TokenType.tilde:
+            case TokenType.not:
+                node = this.parseTermBinary(TermParser.plusPlusMinusMinusPrecedence);
+                if (node) {
+                    node = this.nodeFactory.buildUnaryNode(node);
+                }
+                break;
 
         }
 
-
-
-
-
-
-
-
-
-
+        return node;
 
     }
 
