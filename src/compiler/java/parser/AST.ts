@@ -141,14 +141,13 @@ export interface ASTStatementNode extends ASTNode {
  * Nodes for Terms
  */
 
-export interface ASTAssignmentNode extends ASTStatementNode {
+export interface ASTTermNode extends ASTStatementNode {
+}
+
+export interface ASTAssignmentNode extends ASTTermNode {
     kind: AssignmentOperator;
     leftSide: ASTTermNode;
     rightSide: ASTTermNode;
-}
-
-export interface ASTTermNode extends ASTStatementNode {
-
 }
 
 export interface ASTTernaryNode extends ASTTermNode {
@@ -168,7 +167,7 @@ export interface ASTBinaryNode extends ASTTermNode {
 export interface ASTUnaryNode extends ASTTermNode {
     kind: TokenType.unaryOp;
     operator: UnaryOperator;
-    rightSide: ASTTermNode;
+    term: ASTTermNode;
 }
 
 export interface ASTPlusPlusMinusMinusNode extends ASTTermNode {
