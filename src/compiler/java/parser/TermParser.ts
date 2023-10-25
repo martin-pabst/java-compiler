@@ -1,6 +1,6 @@
 import { Module } from "../../common/module/module.ts";
 import { TokenType } from "../TokenType.ts";
-import { ASTBinaryNode, ASTTermNode, ASTTypeNode } from "./AST.ts";
+import { ASTBinaryNode, ASTTermNode, ASTTypeNode, BinaryOperator } from "./AST.ts";
 import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator.ts";
 
@@ -36,8 +36,17 @@ export class TermParser extends TokenIterator {
         super(module.tokens!, 7);
         this.nodeFactory = new ASTNodeFactory(this);
 
+        this.initOperatorToPrecedenceMap();
+
     }
 
+    initOperatorToPrecedenceMap() {
+        for (let i = 0; i < TermParser.operatorPrecedence.length; i++) {
+            for (let op of TermParser.operatorPrecedence[i]) {
+                this.operatorToPrecedenceMap[op] = i;
+            }
+        }
+    }
 
     /**
      * Grammar:
@@ -52,156 +61,143 @@ export class TermParser extends TokenIterator {
 
     }
 
-    parseTermBinary(precedence: number): ASTTermNode {
+    parseTermBinary( ): ASTTermNode {
 
-        let left: ASTTermNode;
-        if (precedence < TermParser.operatorPrecedence.length - 1) {
-            left = this.parseTermBinary(precedence + 1);
-        } else {
-            left = this.parsePlusPlusMinusMinus();
-        }
+        let node: ASTTermNode = this.parseTermUnary();
+        if (node == null) return node;
 
-        let operators = TermParser.operatorPrecedence[precedence];
+        let precedence: number | undefined;
+        let rightRidgeHeight = 1;
 
-        if (left == null || operators.indexOf(this.tt) < 0) {
-            return left;
-        }
+        while ((precedence = this.operatorToPrecedenceMap[this.tt])) {
 
-        let first = true;
-
-        while (first || operators.indexOf(this.tt) >= 0) {
-
-            let operator: TokenType = this.tt;
-
-            first = false;
-            let position = this.getCurrentPosition();
-
+            let operator = this.tt;
             this.nextToken();
+            let newRightNode: ASTTermNode = this.parseTermUnary();
+            if (newRightNode == null) return node;
 
-            for (let opData of [{ op: TokenType.lower, wrong: "=<", right: "<=", correctOp: TokenType.lowerOrEqual },
-            { op: TokenType.greater, wrong: "=>", right: ">=", correctOp: TokenType.greaterOrEqual }]) {
-                if (operator == TokenType.assignment && this.tt == opData.op) {
-                    let position2 = this.getCurrentPosition();
-                    this.pushError(`Den Operator ${opData.wrong} gibt es nicht. Du meintest sicher: ${opData.right}`, "error",
-                        Object.assign({}, position, { length: 2 }), {
-                        title: `${opData.wrong} durch ${opData.right} ersetzen`,
-                        editsProvider: (uri) => {
-                            return [
-                                {
-                                    resource: uri,
-                                    edit: {
-                                        range: { startLineNumber: position.line, startColumn: position.column, endLineNumber: position.line, endColumn: position2.column + position2.length },
-                                        text: opData.right
-                                    }
-                                }
-                            ]
-                        }
-                    });
-                    this.nextToken();
-                    operator = opData.correctOp;
-                }
+            let h: number = 1;
+            let newLeftNodesParent: ASTBinaryNode | null = null;
+            let newLeftNode: ASTTermNode = node;
+            while (h < rightRidgeHeight && (<ASTBinaryNode>node).precedence! > precedence) {
+                newLeftNodesParent = <ASTBinaryNode>newLeftNode;
+                newLeftNode = (<ASTBinaryNode>newLeftNode).rightSide;
+                h++;
             }
 
-            let right: TermNode;
-            if (precedence < Parser.operatorPrecedence.length - 1) {
-                right = this.parseTermBinary(precedence + 1);
+            let newNode: ASTBinaryNode = {
+                kind: TokenType.binaryOp,
+                range: {
+                    startLineNumber: newLeftNode.range.startLineNumber, startColumn: newLeftNode.range.startColumn,
+                    endLineNumber: newRightNode.range.endLineNumber, endColumn: newRightNode.range.endColumn
+                },
+                precedence: precedence,
+                operator: <BinaryOperator>operator,
+                leftSide: newLeftNode,
+                rightSide: newRightNode
+            }
+
+            if (newLeftNodesParent) {
+                newLeftNodesParent.rightSide = newNode;
             } else {
-                right = this.parsePlusPlusMinusMinus();
+                node = newNode;
             }
 
-            if (right != null) {
+            rightRidgeHeight++;
 
-                let constantFolding = false;
-                if (this.isConstant(left) && this.isConstant(right)) {
-                    let pcLeft = <ConstantNode>left;
-                    let pcRight = <ConstantNode>right;
-                    let typeLeft = TokenTypeToDataTypeMap[pcLeft.constantType];
-                    let typeRight = TokenTypeToDataTypeMap[pcRight.constantType];
-                    let resultType = typeLeft.getResultType(operator, typeRight);
-                    if (resultType != null) {
-                        constantFolding = true;
+        }
 
-                        if (typeLeft == charPrimitiveType && typeRight == intPrimitiveType) {
-                            pcLeft.constant = (<string>pcLeft.constant).charCodeAt(0);
-                        }
-                        if (typeRight == charPrimitiveType && typeLeft == intPrimitiveType) {
-                            pcRight.constant = (<string>pcRight.constant).charCodeAt(0);
-                        }
+        return node;
+
+    }
 
 
-                        let result = typeLeft.compute(operator, { type: typeLeft, value: pcLeft.constant },
-                            { type: typeRight, value: pcRight.constant });
+    parseTermUnary(): ASTTermNode {
 
-                        this.considerIntDivisionWarning(operator, typeLeft, pcLeft.constant, typeRight, pcRight.constant, position);
-
-                        pcLeft.constantType = (<PrimitiveType>resultType).toTokenType();
-                        pcLeft.constant = result;
-                        pcLeft.position.length = pcRight.position.column + pcRight.position.length - pcLeft.position.column;
-                    }
+        let node: ASTTermNode;
+        switch (this.tt) {
+            case TokenType.leftBracket:
+                this.nextToken();
+                node = this.parseTerm();
+                this.expect(TokenType.rightBracket, true);
+                if (node) node = checkForArrayBrackets(node);
+                break;
+            case TokenType.identifier:
+                // TODO: differentiate between variable and method call
+                if (this.lookahead[1].tt == TokenType.leftBracket) {
+                    node = this.parseMethodCall();
+                } else {
+                    node = this.parseVariable();
                 }
+                if (node) node = checkForArrayBrackets(node);
+                break;
+            case TokenType.keywordNew:
+                node = parseObjectInstantiation();
+                if (node) node = checkForArrayBrackets(node);
+                break;
+            case TokenType.plusPlus:
 
-                if (!constantFolding)
-                    left = {
-                        type: TokenType.binaryOp,
-                        position: position,
-                        operator: operator,
-                        firstOperand: left,
-                        secondOperand: right
-                    };
 
-            }
+
 
 
         }
 
-        return left;
+
+
+
+
+
+
+
+
+
 
     }
 
 
+}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+parseType(): ASTTypeNode | undefined {
+    // ArrayList; HashMap<Integer, ArrayList<Boolean>>; int[][], ...
+    // general Syntax: <identifier><genericParameterInvocation><ArrayDimension[]>
+
+    let type = this.nodeFactory.buildTypeNode();
+
+    type.identifier = this.expectAndSkipIdentifierAsString();
+    if (type.identifier == "") return type;  // erroneous type
+
+    if (this.comesToken(TokenType.lower, true)) {     // generic parameter invocation?
+        do {
+            let genericParameterType = this.parseType();
+            if (genericParameterType) type.genericParameterInvocations.push(genericParameterType);
+        } while (this.comesToken(TokenType.comma, true))
+        this.expect(TokenType.greater, true);
     }
 
+    // [][][] at the end of type
+    while (this.comesToken(TokenType.leftRightSquareBracket, true)) type.arrayDimensions++;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    parseType(): ASTTypeNode | undefined {
-        // ArrayList; HashMap<Integer, ArrayList<Boolean>>; int[][], ...
-        // general Syntax: <identifier><genericParameterInvocation><ArrayDimension[]>
-
-        let type = this.nodeFactory.buildTypeNode();
-
-        type.identifier = this.expectAndSkipIdentifierAsString();
-        if (type.identifier == "") return type;  // erroneous type
-
-        if (this.comesToken(TokenType.lower, true)) {     // generic parameter invocation?
-            do {
-                let genericParameterType = this.parseType();
-                if (genericParameterType) type.genericParameterInvocations.push(genericParameterType);
-            } while (this.comesToken(TokenType.comma, true))
-            this.expect(TokenType.greater, true);
-        }
-
-        // [][][] at the end of type
-        while (this.comesToken(TokenType.leftRightSquareBracket, true)) type.arrayDimensions++;
-
-        this.setEndOfRange(type);
-    }
+    this.setEndOfRange(type);
+}
 
 
 }

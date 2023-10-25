@@ -159,6 +159,7 @@ export interface ASTTernaryNode extends ASTTermNode {
 
 export interface ASTBinaryNode extends ASTTermNode {
     kind: TokenType.binaryOp;
+    precedence?: number;
     operator: BinaryOperator;
     leftSide: ASTTermNode;
     rightSide: ASTTermNode;
