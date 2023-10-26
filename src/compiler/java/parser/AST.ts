@@ -5,11 +5,13 @@ import { VisibilityType } from "../types/Visibility.ts";
 export type ASTNodes = ASTNode[];
 
 export type AssignmentOperator = TokenType.assignment | TokenType.minusAssignment | TokenType.plusAssignment | TokenType.multiplicationAssignment | TokenType.divisionAssignment | TokenType.moduloAssignment;
+
 export type BinaryOperator = TokenType.plus | TokenType.minus | TokenType.multiplication | TokenType.division | 
                              TokenType.shiftLeft | TokenType.shiftRight | TokenType.shiftRightUnsigned | 
                              TokenType.and | TokenType.or | TokenType.XOR | 
                              TokenType.lower | TokenType.greater | TokenType.lowerOrEqual | TokenType.greaterOrEqual | TokenType.notEqual;
-export type UnaryOperator = TokenType.negation | TokenType.not;
+
+export type UnaryPrefixOperator = TokenType.negation | TokenType.not | TokenType.tilde | TokenType.plus | TokenType.plusPlus | TokenType.minusMinus;
 
 export interface ASTNode {
     kind: TokenType;
@@ -165,23 +167,27 @@ export interface ASTBinaryNode extends ASTTermNode {
     rightSide: ASTTermNode;
 }
 
-export interface ASTUnaryNode extends ASTTermNode {
-    kind: TokenType.unaryOp;
-    operator: UnaryOperator;
+export interface ASTUnaryPrefixNode extends ASTTermNode {
+    kind: TokenType.unaryPrefixOp;
+    operator: UnaryPrefixOperator;
     term: ASTTermNode;
 }
 
-export interface ASTPlusPlusMinusMinusNode extends ASTTermNode {
-    kind: TokenType.plusPlusMinusMinus;
+export interface ASTPlusPlusMinusMinusSuffixNode extends ASTTermNode {
+    kind: TokenType.plusPlusMinusMinusSuffix;
     operator: TokenType.plusPlus | TokenType.minusMinus;
     term: ASTTermNode;
-    prefixOrSuffix: "prefix" | "suffix"
 }
 
-export interface ASTMethodCall extends ASTTermNode {
+export interface ASTMethodCallNode extends ASTTermNode {
     kind: TokenType.callMethod;
     methodIdentifier: string;
     parameterValues: ASTTermNode[];
+}
+
+export interface ASTAttributeDereferencingNode extends ASTTermNode {
+    kind: TokenType.pushAttribute;
+    attributeIdentifier: string;
 }
 
 export interface ASTNewObjectNode extends ASTTermNode {

@@ -309,4 +309,25 @@ export class TokenIterator {
         return this.tt == TokenType.identifier && this.cct.value == identifier;
     }
 
+
+    findTokenTypeAfterCorrespondingRightBracket(): TokenType {
+        let p = this.pos + 1; // skip left bracket
+        let depth = 1;
+        while(p < this.tokenList.length && depth > 0){
+            switch(this.tokenList[p++].tt){
+                case TokenType.leftBracket: depth++;
+                break;
+                case TokenType.rightBracket: depth--;
+            }
+        }
+
+        if(depth == 0 && p < this.tokenList.length){
+            return this.tokenList[p].tt;
+        }
+
+        return TokenType.endofSourcecode;
+
+    }
+
+
 }

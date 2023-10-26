@@ -1,7 +1,7 @@
 import { IRange, Range } from "../../common/range/Range";
 import { Token } from "../Token.ts";
 import { TokenType } from "../TokenType";
-import { ASTAttributeDeclarationNode, ASTClassDefinitionNode, ASTMethodDeclarationNode, ASTNode, ASTNodeWithModifiers, ASTParameterNode, ASTTermNode, ASTTypeNode, TypeScope } from "./AST";
+import { ASTAttributeDeclarationNode, ASTAttributeDereferencingNode, ASTBinaryNode, ASTClassDefinitionNode, ASTMethodDeclarationNode, ASTNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTTypeNode, ASTUnaryPrefixNode, TypeScope, UnaryPrefixOperator } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
 export class ASTNodeFactory {
@@ -104,6 +104,32 @@ export class ASTNodeFactory {
             identifierRange: identifier.range,
             type: type,
             isEllipsis: isEllipsis
+        }
+    }
+
+    buildPlusPlusMinusMinusSuffixNode(operator: Token, childNode: ASTTermNode):ASTPlusPlusMinusMinusSuffixNode {
+        return {
+            kind: TokenType.plusPlusMinusMinusSuffix,
+            range: {startLineNumber: operator.range.startLineNumber, startColumn: operator.range.startColumn, endLineNumber: childNode.range.endLineNumber, endColumn: childNode.range.endColumn},
+            operator: <any>operator.tt,
+            term: childNode
+        }
+    }
+
+    buildUnaryPrefixNode(operator: Token, childNode: ASTTermNode): ASTUnaryPrefixNode {
+        return {
+            kind: TokenType.unaryPrefixOp,
+            range: {startLineNumber: operator.range.startLineNumber, startColumn: operator.range.startColumn, endLineNumber: childNode.range.endLineNumber, endColumn: childNode.range.endColumn},
+            operator: <any>operator.tt,
+            term: childNode
+        }
+    }
+
+    buildAttributeDereferencingNode(identifier: Token): ASTAttributeDereferencingNode {
+        return {
+            kind: TokenType.pushAttribute,
+            range: identifier.range,
+            attributeIdentifier: <string>identifier.value
         }
     }
 

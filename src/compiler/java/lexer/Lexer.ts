@@ -426,6 +426,12 @@ export class Lexer {
                         this.next();
                         this.next();
                         return;
+                    } 
+                    else if (this.nextChar == '>') {
+                        this.pushToken(TokenType.lambda, '->');
+                        this.next();
+                        this.next();
+                        return;
                     }
                     else if (this.isDigit(this.nextChar, 10) && !
                         ([TokenType.identifier, TokenType.integerConstant, TokenType.floatingPointConstant, TokenType.stringConstant, TokenType.rightBracket, TokenType.rightSquareBracket].indexOf(this.nonSpaceLastTokenType!) >= 0)

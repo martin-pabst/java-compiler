@@ -77,6 +77,7 @@ export enum TokenType {
     moduloAssignment, // /%=
     and, or,   // &&, ||
     ampersand, // &
+    lambda, // ->
 
     singleQuote, doubleQuote, // ', "
 
@@ -138,7 +139,7 @@ export enum TokenType {
 
     // Program statement types:
     binaryOp, // +, -, *, <=, ...
-    unaryOp, // ! and - 
+    unaryPrefixOp, // ! and - 
     localVariableDeclaration,
     heapVariableDeclaration,
     pushLocalVariableToStack, // push value of a local variable to stack
@@ -185,7 +186,7 @@ export enum TokenType {
     program,
     block,    // block of statements
     multiNode,  // used for debugging output
-    plusPlusMinusMinus,
+    plusPlusMinusMinusSuffix,
     genericParameterDefinition,
 
     type, // e.g. int[][]
@@ -291,6 +292,7 @@ export var TokenTypeReadable: { [tt: number]: string } = {
     [TokenType.divisionAssignment]: "/=", // /=
     [TokenType.moduloAssignment]: "%=",
     [TokenType.ampersand]: "&",
+    [TokenType.lambda]: "->",
     [TokenType.and]: "&&",
     [TokenType.or]: "||",
     [TokenType.not]: "!",
