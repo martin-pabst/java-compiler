@@ -31,7 +31,7 @@ export interface ASTGlobalNode extends ASTNode, TypeScope {
  * Building blocks for nodes...
  */
 
-export interface ASTDeclarationWithIdentifier {
+export interface ASTNodeWithIdentifier {
     identifier: string;
     identifierRange: IRange;
 }
@@ -46,8 +46,8 @@ export interface ASTNodeWithModifiers {
 
 
 // e.g. ..., int count, ...
-export interface ASTParameterNode extends ASTNode, ASTDeclarationWithIdentifier {
-    type: ASTTypeNode;
+export interface ASTParameterNode extends ASTNode, ASTNodeWithIdentifier {
+    type: ASTTypeNode | undefined;    // lambda functions may have parameters without type declaration
     isEllipsis: boolean;
 }
 
@@ -59,7 +59,7 @@ export interface ASTTypeDefinitionWithAttributes {
     attributes: ASTAttributeDeclarationNode[]
 }
 
-export interface ASTGenericParameterDeclarationNode extends ASTDeclarationWithIdentifier, ASTNode {
+export interface ASTGenericParameterDeclarationNode extends ASTNodeWithIdentifier, ASTNode {
     kind: TokenType.genericParameterDefinition;
     extends?: ASTTypeNode[];
     super?: ASTTypeNode;
@@ -82,23 +82,29 @@ export interface ASTTypeNode extends ASTNode {
 }
 
 // e.g. public int getValue(String key)
-export interface ASTMethodDeclarationNode extends ASTNode, ASTNodeWithModifiers, ASTDeclarationWithIdentifier {
+export interface ASTMethodDeclarationNode extends ASTNode, ASTNodeWithModifiers, ASTNodeWithIdentifier {
     kind: TokenType.methodDeclaration;
     parameters: ASTParameterNode[];
     returnParameterType: ASTTypeNode | undefined;  // undefined in case of constructor
     isContructor: boolean;
     isAbstract: boolean;
-    block: ASTBlockNode | undefined;  // undefined in case of abstract method and methoddeclaration in interface
-}                
+    statement: ASTStatementNode | undefined;  // undefined in case of abstract method and methoddeclaration in interface
+}    
 
-export interface ASTAttributeDeclarationNode extends ASTNodeWithModifiers, ASTNode, ASTDeclarationWithIdentifier {
+export interface ASTLambdaFunctionDeclarationNode extends ASTNode {
+    kind: TokenType.lambda,
+    parameters: ASTParameterNode[],
+    statement: ASTStatementNode | undefined
+}
+
+export interface ASTAttributeDeclarationNode extends ASTNodeWithModifiers, ASTNode, ASTNodeWithIdentifier {
     type: ASTTypeNode;
     initialization: ASTTermNode | undefined;
 }            
 
 export interface ASTClassDefinitionNode 
 extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers,
-    ASTTypeDefinitionWithAttributes, TypeScope, ASTDeclarationWithIdentifier
+    ASTTypeDefinitionWithAttributes, TypeScope, ASTNodeWithIdentifier
 {
     kind: TokenType.keywordClass;
     parent: TypeScope;
@@ -106,7 +112,7 @@ extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNo
 }
 
 export interface ASTInterfaceDefinitionNode 
-extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers, ASTDeclarationWithIdentifier
+extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers, ASTNodeWithIdentifier
 {
     kind: TokenType.keywordInterface;
     parent: ASTClassDefinitionNode | null;
@@ -114,7 +120,7 @@ extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNo
 
 export interface ASTEnumDefinitionNode 
 extends ASTNode, TypeDefinitionWithMethods, ASTNodeWithModifiers,
-    ASTTypeDefinitionWithAttributes, ASTDeclarationWithIdentifier
+    ASTTypeDefinitionWithAttributes, ASTNodeWithIdentifier
 {
     kind: TokenType.keywordEnum;
     parent: ASTClassDefinitionNode | null;
@@ -125,7 +131,7 @@ extends ASTNode, TypeDefinitionWithMethods, ASTNodeWithModifiers,
  * Nodes for Program, statements
  */
 
-export interface ASTBlockNode extends ASTNode {
+export interface ASTBlockNode extends ASTStatementNode {
     kind: TokenType.block;
     statements: ASTStatementNode[];
 }
@@ -144,6 +150,17 @@ export interface ASTStatementNode extends ASTNode {
  */
 
 export interface ASTTermNode extends ASTStatementNode {
+}
+
+export interface ASTCastNode extends ASTTermNode {
+    kind: TokenType.castValue;
+    castType: ASTTypeNode;
+    objectToCast: ASTTermNode;
+}
+
+export interface ASTVariableNode extends ASTTermNode {
+    kind: TokenType.variable;
+    identifier: string;
 }
 
 export interface ASTAssignmentNode extends ASTTermNode {
@@ -179,9 +196,9 @@ export interface ASTPlusPlusMinusMinusSuffixNode extends ASTTermNode {
     term: ASTTermNode;
 }
 
-export interface ASTMethodCallNode extends ASTTermNode {
+export interface ASTMethodCallNode extends ASTNodeWithIdentifier, ASTTermNode {
     kind: TokenType.callMethod;
-    methodIdentifier: string;
+    nodeToGetObject: ASTTermNode | undefined; // undefined if method is called inside class
     parameterValues: ASTTermNode[];
 }
 
@@ -192,8 +209,8 @@ export interface ASTAttributeDereferencingNode extends ASTTermNode {
 
 export interface ASTNewObjectNode extends ASTTermNode {
     kind: TokenType.newObject;
-    classIdentifier: string;
-    parameterValues: ASTTermNode;
+    type: ASTTypeNode;
+    parameterValues: ASTTermNode[];
 }
 
 export interface ASTNewArrayNode extends ASTTermNode {
@@ -202,26 +219,32 @@ export interface ASTNewArrayNode extends ASTTermNode {
     dimensions: ASTTermNode[];
 
 }
+
+export interface ASTSelectArrayElementNode extends ASTTermNode {
+    kind: TokenType.selectArrayElement,
+    array: ASTTermNode,
+    indices: ASTTermNode[]
+}
 /**
  * Structural statements: while, if, for, case, do...while
  */
 export interface ASTWhileNode extends ASTStatementNode {
     kind: TokenType.keywordWhile;
     condition: ASTTermNode;
-    block: ASTBlockNode;
+    statementToRepeat: ASTStatementNode;
 }
 
 export interface ASTDoWhileNode extends ASTStatementNode {
     kind: TokenType.keywordDo;
     condition: ASTTermNode;
-    block: ASTBlockNode;
+    statementToRepeat: ASTStatementNode;
 }
 
 export interface ASTIfNode extends ASTStatementNode {
     kind: TokenType.keywordIf;
     condition: ASTTermNode;
-    blockIfTrue: ASTBlockNode;
-    blockIfFalse: ASTBlockNode;
+    statementIfTrue: ASTStatementNode;
+    statementIfFalse: ASTStatementNode | undefined;
 }
 
 export interface ASTForLoopNode extends ASTStatementNode {
@@ -229,7 +252,7 @@ export interface ASTForLoopNode extends ASTStatementNode {
     firstStatement: ASTStatementNode;
     condition: ASTTermNode;
     lastStatement: ASTStatementNode;
-    block: ASTBlockNode;
+    statementToRepeat: ASTStatementNode;
 }
 
 

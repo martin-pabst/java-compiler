@@ -42,13 +42,13 @@ export class TokenIterator {
 
     constructor(private tokenList: TokenList, private lookaheadLength: number) {
         this.endToken = tokenList[tokenList.length - 1];
+        this.pos = 0;
         this.initializeLookahead();
     }
 
     initializeLookahead() {
 
         this.lookahead = [];
-        this.pos = 0;
 
         for (let i = 0; i < this.lookaheadLength; i++) {
 
@@ -126,6 +126,19 @@ export class TokenIterator {
         this.tt = this.cct.tt;
 
     }
+
+    skipTokensTillEndOfLineOr(skippedTokens: TokenType | TokenType[]){
+        if(!Array.isArray(skippedTokens)) skippedTokens = [skippedTokens];
+        skippedTokens.push(TokenType.linefeed, TokenType.newline);
+        while(this.pos < this.tokenList.length && skippedTokens.indexOf(this.tokenList[this.pos].tt) < 0){
+            this.pos++;
+        }
+        if(this.pos < this.tokenList.length){
+            this.pos++;
+        } 
+
+        this.initializeLookahead();
+}
 
 
     pushError(message: string, errorLevel: ErrorLevel = "error", range?: IRange, quickFix?: QuickFix) {

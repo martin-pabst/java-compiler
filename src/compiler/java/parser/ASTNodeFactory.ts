@@ -1,7 +1,7 @@
 import { IRange, Range } from "../../common/range/Range";
 import { Token } from "../Token.ts";
 import { TokenType } from "../TokenType";
-import { ASTAttributeDeclarationNode, ASTAttributeDereferencingNode, ASTBinaryNode, ASTClassDefinitionNode, ASTMethodDeclarationNode, ASTNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTTypeNode, ASTUnaryPrefixNode, TypeScope, UnaryPrefixOperator } from "./AST";
+import { ASTAttributeDeclarationNode, ASTAttributeDereferencingNode, ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTUnaryPrefixNode, ASTVariableNode, ASTWhileNode, TypeScope, UnaryPrefixOperator } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
 export class ASTNodeFactory {
@@ -63,7 +63,7 @@ export class ASTNodeFactory {
             isContructor: isContructor,
             parameters: [],
             returnParameterType: returnParameterType,
-            block: undefined
+            statement: undefined
         }
 
         return node;
@@ -96,7 +96,7 @@ export class ASTNodeFactory {
         }
     }
 
-    buildParameterNode(startRange: IRange, identifier: Token, type: ASTTypeNode, isEllipsis: boolean): ASTParameterNode {
+    buildParameterNode(startRange: IRange, identifier: Token, type: ASTTypeNode | undefined, isEllipsis: boolean): ASTParameterNode {
         return {
             kind: TokenType.parameterDeclaration,
             range: startRange,
@@ -130,6 +130,104 @@ export class ASTNodeFactory {
             kind: TokenType.pushAttribute,
             range: identifier.range,
             attributeIdentifier: <string>identifier.value
+        }
+    }
+
+    buildMethodCallNode(identifier: Token, nodeToGetObject: ASTTermNode | undefined): ASTMethodCallNode {
+        return {
+            kind: TokenType.callMethod,
+            identifier: <string>identifier.value,
+            identifierRange: identifier.range,
+            range: identifier.range,
+            nodeToGetObject: nodeToGetObject,
+            parameterValues: []
+        }
+    }
+
+    buildLambdaFunctionDeclarationNode(startToken: Token): ASTLambdaFunctionDeclarationNode{
+        return {
+            kind: TokenType.lambda,
+            range: startToken.range,
+            parameters: [],
+            statement: undefined
+        }
+    }
+
+    buildCastNode(startToken: Token, castType: ASTTypeNode, objectToCast: ASTTermNode): ASTCastNode {
+        return {
+            range: startToken.range,
+            kind: TokenType.castValue,
+            castType: castType,
+            objectToCast: objectToCast
+        }    
+    }
+
+    buildVariableNode(identifier: Token): ASTVariableNode {
+        return {
+            kind: TokenType.variable,
+            range: identifier.range,
+            identifier: <string>identifier.value
+        }
+    }
+
+    buildNewObjectNode(startToken: Token, type: ASTTypeNode): ASTNewObjectNode {
+        return {
+            kind: TokenType.newObject,
+            range: startToken.range,
+            parameterValues: [], 
+            type: type
+        }
+    }
+
+    buildSelectArrayElement(array: ASTTermNode): ASTSelectArrayElementNode {
+        return {
+            kind: TokenType.selectArrayElement,
+            range: array.range,
+            array: array,
+            indices: []
+        };
+    }
+
+    buildWhileNode(whileToken: Token, tokenAfterWhileBlock: Token, condition: ASTTermNode, statementToRepeat: ASTStatementNode): ASTWhileNode{
+        return {
+            kind: TokenType.keywordWhile,
+            range: {startLineNumber: whileToken.range.startLineNumber, startColumn: whileToken.range.startColumn, endLineNumber: tokenAfterWhileBlock.range.endLineNumber, endColumn: tokenAfterWhileBlock.range.endColumn},
+            condition: condition,
+            statementToRepeat: statementToRepeat
+        }
+    }
+
+    buildDoWhileNode(doToken: Token, tokenAfterDoWhileBlock: Token, condition: ASTTermNode, statementToRepeat: ASTStatementNode): ASTDoWhileNode{
+        return {
+            kind: TokenType.keywordDo,
+            range: {startLineNumber: doToken.range.startLineNumber, startColumn: doToken.range.startColumn, endLineNumber: tokenAfterDoWhileBlock.range.endLineNumber, endColumn: tokenAfterDoWhileBlock.range.endColumn},
+            condition: condition,
+            statementToRepeat: statementToRepeat
+        }
+    }
+
+    buildIfNode(ifToken: Token, tokenAfterIfBlock: Token, condition: ASTTermNode, statementIfTrue: ASTStatementNode, statementIfFalse: ASTStatementNode | undefined): ASTIfNode{
+        return {
+            kind: TokenType.keywordIf,
+            range: {startLineNumber: ifToken.range.startLineNumber, startColumn: ifToken.range.startColumn, endLineNumber: tokenAfterIfBlock.range.endLineNumber, endColumn: tokenAfterIfBlock.range.endColumn},
+            condition: condition,
+            statementIfTrue: statementIfTrue,
+            statementIfFalse: statementIfFalse,
+
+        }
+    }
+
+    buildForLoopNode(forToken: Token, tokenAfterforBlock: Token, 
+        firstStatement: ASTStatementNode, condition: ASTTermNode, 
+        lastStatement: ASTStatementNode, 
+        statementToRepeat: ASTStatementNode): ASTForLoopNode{
+        return {
+            kind: TokenType.keywordFor,
+            range: {startLineNumber: forToken.range.startLineNumber, startColumn: forToken.range.startColumn, endLineNumber: tokenAfterforBlock.range.endLineNumber, endColumn: tokenAfterforBlock.range.endColumn},
+            firstStatement: firstStatement,
+            condition: condition,
+            lastStatement: lastStatement,
+            statementToRepeat: statementToRepeat
         }
     }
 

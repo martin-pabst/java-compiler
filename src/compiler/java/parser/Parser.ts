@@ -150,8 +150,8 @@ export class Parser extends StatementParser {
         }
 
         if (this.comesToken(TokenType.leftCurlyBracket)) {
-            let block = this.parseBlock();
-            methodNode.block = block;
+            let statement = this.parseStatementOrExpression();
+            methodNode.statement = statement;
         } else {
             this.expectSemicolon(true, true);
         }

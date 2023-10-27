@@ -1,10 +1,10 @@
 import { Module } from "../../common/module/module.ts";
 import { TokenType } from "../TokenType.ts";
-import { ASTBinaryNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTTypeNode, BinaryOperator } from "./AST.ts";
+import { ASTBinaryNode, ASTCastNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTPlusPlusMinusMinusSuffixNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTVariableNode, BinaryOperator } from "./AST.ts";
 import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator.ts";
 
-export class TermParser extends TokenIterator {
+export abstract class TermParser extends TokenIterator {
     static assignmentOperators = [TokenType.assignment, TokenType.plusAssignment, TokenType.minusAssignment,
     TokenType.multiplicationAssignment, TokenType.divisionAssignment, TokenType.moduloAssignment,
     TokenType.ANDAssigment, TokenType.XORAssigment, TokenType.ORAssigment,
@@ -51,10 +51,15 @@ export class TermParser extends TokenIterator {
         }
     }
 
+    abstract parseStatementOrExpression(): ASTStatementNode | undefined;
+
     /**
      * Grammar:
      * https://docs.oracle.com/javase/specs/jls/se8/html/jls-19.html
-     * @returns 
+     * 
+     * Operator precedence:
+     * https://introcs.cs.princeton.edu/java/11precedence/
+     * 
      */
 
 
@@ -117,19 +122,19 @@ export class TermParser extends TokenIterator {
 
     parsePraefixSuffix(): ASTTermNode | undefined {
         let prefix = TermParser.unaryPrefixOperators.indexOf(this.tt) >= 0 ? this.cct : undefined;
-        if(prefix) this.nextToken();
-        
+        if (prefix) this.nextToken();
+
         let term: ASTTermNode | undefined = this.parseTermUnary();
-        
-        if(term && prefix){
+
+        if (term && prefix) {
             term = this.nodeFactory.buildUnaryPrefixNode(prefix, term);
         }
 
         let plusPlusMinusMinusSuffix = (this.tt == TokenType.plusPlus || this.tt == TokenType.minusMinus) ? this.cct : undefined;
-        if(term && plusPlusMinusMinusSuffix){
-            term = this.nodeFactory.buildPlusPlusMinusMinusSuffixNode(plusPlusMinusMinusSuffix, term, "suffix");
+        if (term && plusPlusMinusMinusSuffix) {
+            term = this.nodeFactory.buildPlusPlusMinusMinusSuffixNode(plusPlusMinusMinusSuffix, term);
         }
-        
+
         return term;
     }
 
@@ -139,7 +144,7 @@ export class TermParser extends TokenIterator {
 
         let done: boolean = false;
 
-        while(!done){
+        while (!done) {
             done = true;
 
             switch (this.tt) {
@@ -148,9 +153,9 @@ export class TermParser extends TokenIterator {
                     break;
                 case TokenType.leftBracket:
                     let tokenTypeAfterRightBracket = this.findTokenTypeAfterCorrespondingRightBracket();
-                    switch(tokenTypeAfterRightBracket){
-                        case TokenType.lambda: node = this.parseLambdaFunction();
-                         break;
+                    switch (tokenTypeAfterRightBracket) {
+                        case TokenType.lambda: node = this.parseLambdaFunctionDefinition();
+                            break;
                         case TokenType.leftBracket:
                         case TokenType.identifier:
                         case TokenType.keywordThis:
@@ -164,22 +169,27 @@ export class TermParser extends TokenIterator {
                     }
                     break;
                 case TokenType.identifier:
-                    // TODO: differentiate between variable and method call
-                    if (this.lookahead[1].tt == TokenType.leftBracket) {
-                        node = this.parseMethodCall(undefined);
-                    } else {
-                        node = this.parseVariable();
+                    switch(this.lookahead[1].tt){
+                        case TokenType.leftBracket:
+                            node = this.parseMethodCall(undefined);
+                        break;
+                        case TokenType.lambda:
+                            node = this.parseLambdaFunctionDefinition();
+                        break;
+                        default:
+                            node = this.parseVariable();
+
                     }
                     break;
                 case TokenType.keywordNew:
-                    node = parseObjectInstantiation();
+                    node = this.parseObjectInstantiation();
                     break;
                 case TokenType.leftSquareBracket:
-                    node = this.parseArrayDereferencing(node);
+                    node = this.parseSelectArrayElement(node);
                     break;
 
-                    default: done = false;
-    
+                default: done = false;
+
             }
 
         }
@@ -190,17 +200,17 @@ export class TermParser extends TokenIterator {
     }
 
 
-    parseAttributeOrMethodCall(node: ASTTermNode | undefined): ASTTermNode | undefined{
+    parseAttributeOrMethodCall(node: ASTTermNode | undefined): ASTTermNode | undefined {
         this.nextToken(); // skip .
-        if(!node){
+        if (!node) {
             this.pushError("Der Punkt-Operator kann nur nach einem Bezeichner (identifier) kommen.", "error");
             return undefined;
         } else {
-            if(this.lookahead[1].tt == TokenType.leftBracket){
+            if (this.lookahead[1].tt == TokenType.leftBracket) {
                 this.parseMethodCall(node);
             } else {
                 let identifier = this.expectAndSkipIdentifierAsToken();
-                if(identifier.value == "") return node;
+                if (identifier.value == "") return node;
                 return this.nodeFactory.buildAttributeDereferencingNode(identifier);
             }
         }
@@ -208,57 +218,148 @@ export class TermParser extends TokenIterator {
 
     parseMethodCall(nodeToGetObject: ASTTermNode | undefined): ASTTermNode | undefined {
         let identifier = this.expectAndSkipIdentifierAsToken();
-        if(identifier.value == "") return nodeToGetObject;
+        if (identifier.value == "") return nodeToGetObject;
 
         this.expect(TokenType.leftBracket, true);
-        do {
-            
+        let methodCallNode = this.nodeFactory.buildMethodCallNode(identifier, nodeToGetObject);
+
+        if (this.tt != TokenType.rightBracket) {
+            do {
+                let termNode = this.parseTerm();
+                if (termNode) methodCallNode.parameterValues.push(termNode);
+            } while (this.comesToken(TokenType.comma, true));
         }
 
+        this.expect(TokenType.rightBracket, true);
+        this.setEndOfRange(methodCallNode);
     }
 
-}
+    parseLambdaFunctionDefinition(): ASTLambdaFunctionDeclarationNode {
 
+        let lambdaNode = this.nodeFactory.buildLambdaFunctionDeclarationNode(this.cct);
 
+        // form (int x, y) -> ... or 
+        if (this.tt == TokenType.leftBracket) {
+            this.nextToken();
+            //@ts-ignore
+            if (this.tt != TokenType.rightBracket) {
+                do {
+                    let startRange = this.cct.range;
+                    let withoutType = this.lookahead[1].tt == TokenType.comma;
 
+                    let type: ASTTypeNode | undefined;
 
+                    if (!withoutType) {
+                        type = this.parseType();
+                    }
 
+                    let identifier = this.expectAndSkipIdentifierAsToken();
+                    if(identifier.value != ""){
+                        lambdaNode.parameters.push(this.nodeFactory.buildParameterNode(startRange, identifier, type, false));
+                    }
 
+                } while (this.comesToken(TokenType.comma, true));
+            }
 
+            this.expect(TokenType.rightBracket, true);
+        }
 
+        lambdaNode.statement = this.parseStatementOrExpression();
 
+        this.setEndOfRange(lambdaNode);
 
-
-
-
-
-
-
-
-
-
-parseType(): ASTTypeNode | undefined {
-    // ArrayList; HashMap<Integer, ArrayList<Boolean>>; int[][], ...
-    // general Syntax: <identifier><genericParameterInvocation><ArrayDimension[]>
-
-    let type = this.nodeFactory.buildTypeNode();
-
-    type.identifier = this.expectAndSkipIdentifierAsString();
-    if (type.identifier == "") return type;  // erroneous type
-
-    if (this.comesToken(TokenType.lower, true)) {     // generic parameter invocation?
-        do {
-            let genericParameterType = this.parseType();
-            if (genericParameterType) type.genericParameterInvocations.push(genericParameterType);
-        } while (this.comesToken(TokenType.comma, true))
-        this.expect(TokenType.greater, true);
+        return lambdaNode;
     }
 
-    // [][][] at the end of type
-    while (this.comesToken(TokenType.leftRightSquareBracket, true)) type.arrayDimensions++;
+    parseType(): ASTTypeNode | undefined {
+        // ArrayList; HashMap<Integer, ArrayList<Boolean>>; int[][], ...
+        // general Syntax: <identifier><genericParameterInvocation><ArrayDimension[]>
 
-    this.setEndOfRange(type);
-}
+        let type = this.nodeFactory.buildTypeNode();
 
+        type.identifier = this.expectAndSkipIdentifierAsString();
+        if (type.identifier == "") return type;  // erroneous type
 
+        if (this.comesToken(TokenType.lower, true)) {     // generic parameter invocation?
+            do {
+                let genericParameterType = this.parseType();
+                if (genericParameterType) type.genericParameterInvocations.push(genericParameterType);
+            } while (this.comesToken(TokenType.comma, true))
+            this.expect(TokenType.greater, true);
+        }
+
+        // [][][] at the end of type
+        while (this.comesToken(TokenType.leftRightSquareBracket, true)) type.arrayDimensions++;
+
+        this.setEndOfRange(type);
+    }
+
+    parseCastedObject(): ASTCastNode | undefined {
+        let startToken = this.cct;
+        this.nextToken(); // skip (
+        let type = this.parseType();
+        this.expect(TokenType.rightBracket);
+        let term = this.parseTerm();
+        
+        if(type && term){
+            let castNode = this.nodeFactory.buildCastNode(startToken, type, term);
+            this.setEndOfRange(castNode);
+            return castNode;
+        }
+    
+        return undefined;
+    }
+
+    parseVariable(): ASTVariableNode | undefined {
+        let identifier = this.expectAndSkipIdentifierAsToken();
+        if(identifier.value != ""){
+            return this.nodeFactory.buildVariableNode(identifier);
+        }
+
+        return undefined;
+    }
+
+    parseObjectInstantiation(): ASTNewObjectNode | undefined {
+        let startToken = this.cct;
+        this.nextToken(); // skip new keyword
+        let type = this.parseType();
+
+        if(!type) return undefined;
+
+        let newObjectNode = this.nodeFactory.buildNewObjectNode(startToken, type);
+
+        if(this.expect(TokenType.leftBracket), true){
+
+            if (this.tt != TokenType.rightBracket) {
+                do {
+                    let termNode = this.parseTerm();
+                    if (termNode) newObjectNode.parameterValues.push(termNode);
+                } while (this.comesToken(TokenType.comma, true));
+            }
+    
+            this.expect(TokenType.rightBracket, true);           
+        }
+
+        this.setEndOfRange(newObjectNode);
+    }
+
+    parseSelectArrayElement(array: ASTTermNode | undefined): ASTSelectArrayElementNode | undefined {
+        if(!array) {
+            this.skipTokensTillEndOfLineOr([TokenType.rightSquareBracket]);
+            return undefined;
+        }
+
+        let saeNode = this.nodeFactory.buildSelectArrayElement(array);
+
+        while(this.tt == TokenType.rightSquareBracket){
+            this.nextToken();
+            let term = this.parseTerm();
+            if(term) saeNode.indices.push(term)
+        }
+
+        this.setEndOfRange(saeNode);
+
+        return saeNode;
+
+    }
 }
