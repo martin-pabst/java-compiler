@@ -1,7 +1,7 @@
-import { IRange, Range } from "../../common/range/Range";
+import { IRange } from "../../common/range/Range";
 import { Token } from "../Token.ts";
 import { TokenType } from "../TokenType";
-import { ASTAttributeDeclarationNode, ASTAttributeDereferencingNode, ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTUnaryPrefixNode, ASTVariableNode, ASTWhileNode, TypeScope, UnaryPrefixOperator } from "./AST";
+import { ASTAttributeDeclarationNode, ASTAttributeDereferencingNode, ASTCastNode, ASTClassDefinitionNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTUnaryPrefixNode, ASTVariableNode, ASTWhileNode, TypeScope } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
 export class ASTNodeFactory {
@@ -16,7 +16,7 @@ export class ASTNodeFactory {
 
         return {
             kind: TokenType.type,
-            range: Object.assign({}, startRange),
+            range: startRange,
             identifier: "",
             arrayDimensions: 0,
             genericParameterInvocations: []
