@@ -207,7 +207,7 @@ export class TreeviewNode<E> {
                 }, "expanded")
             if (!this.isRootNode()) {
                 this.captionDiv.onpointerup = () => {
-                    this.expandCollapseComponent.toggleState();
+                    // this.expandCollapseComponent.toggleState();
                 }
             }
         }

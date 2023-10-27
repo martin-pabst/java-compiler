@@ -1,7 +1,7 @@
 import { IRange } from "../../common/range/Range";
 import { Token } from "../Token.ts";
 import { TokenType } from "../TokenType";
-import { ASTAttributeDeclarationNode, ASTAttributeDereferencingNode, ASTCastNode, ASTClassDefinitionNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTUnaryPrefixNode, ASTVariableNode, ASTWhileNode, TypeScope } from "./AST";
+import { ASTAttributeDeclarationNode, ASTAttributeDereferencingNode, ASTCastNode, ASTClassDefinitionNode, ASTConstantNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTUnaryPrefixNode, ASTVariableNode, ASTWhileNode, ConstantType, TypeScope } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
 export class ASTNodeFactory {
@@ -228,6 +228,34 @@ export class ASTNodeFactory {
             condition: condition,
             lastStatement: lastStatement,
             statementToRepeat: statementToRepeat
+        }
+    }
+
+    buildMainProgramNode(beginToken: Token): ASTProgramNode {
+        return {
+            kind: TokenType.program,
+            range: beginToken.range, 
+            statements: []
+        }
+
+    }
+
+    buildPrintStatement(beginToken: Token, isPrintln: boolean): ASTPrintStatementNode {
+        return {
+            kind: TokenType.print,
+            range: beginToken.range,
+            isPrintln: isPrintln,
+            firstParameter: undefined,
+            secondParameter: undefined
+        }
+    }
+
+    buildConstantNode(token: Token): ASTConstantNode {
+        return {
+            kind: TokenType.pushConstant,
+            range: token.range,
+            constantType: token.tt,
+            value: token.value
         }
     }
 

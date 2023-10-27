@@ -252,7 +252,9 @@ export class TokenIterator {
 
     expectAndSkipIdentifierAsToken(): Token {
         if(this.tt == TokenType.identifier){
-            return this.lastToken;
+            let t = this.cct;
+            this.nextToken();
+            return t;
         }
 
         this.pushError("Erwartet wird ein Bezeichner (engl.: 'identifier'), d.h. der Name einer Klasse, Variable, ... - Gefunden wurde: " + this.cct.value);

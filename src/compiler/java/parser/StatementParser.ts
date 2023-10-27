@@ -29,7 +29,7 @@ export class StatementParser extends TermParser {
         let whileToken = this.cct;
         this.nextToken();
 
-        if(this.comesToken(TokenType.leftBracket)){
+        if(this.comesToken(TokenType.leftBracket, true)){
             let condition = this.parseTerm();
             this.expect(TokenType.rightBracket);
 

@@ -93,7 +93,9 @@ export class AstComponent {
 
         for(const [field, value] of Object.entries(node)){
 
-            if(value['type'] != null && value['range'] != null){
+            if(!value) continue;
+
+            if(value['kind'] != null && value['range'] != null){
                 childNodes.push({
                     isChildNode: true,
                     key: field,
@@ -102,7 +104,7 @@ export class AstComponent {
                 });
             } else if (Array.isArray(value) && value.length > 0){
                 let firstElement = value[0];
-                if(firstElement['type'] != null && firstElement['range'] != null){
+                if(firstElement['kind'] != null && firstElement['range'] != null){
                     childNodes.push({
                         isChildNode: true,
                         key: field,

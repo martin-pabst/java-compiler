@@ -145,7 +145,7 @@ export abstract class TermParser extends TokenIterator {
         let done: boolean = false;
 
         while (!done) {
-            done = true;
+            done = false;
 
             switch (this.tt) {
                 case TokenType.dot:
@@ -187,8 +187,21 @@ export abstract class TermParser extends TokenIterator {
                 case TokenType.leftSquareBracket:
                     node = this.parseSelectArrayElement(node);
                     break;
+                case TokenType.keywordPrint:
+                case TokenType.keywordPrintln:
+                    node = this.parsePrintStatement();
+                    break;
+                case TokenType.shortConstant:
+                case TokenType.integerConstant:
+                case TokenType.longConstant:
+                case TokenType.charConstant:
+                case TokenType.stringConstant:
+                case TokenType.booleanConstant:
+                    node = this.nodeFactory.buildConstantNode(this.cct);
+                    this.nextToken();
+                break;
 
-                default: done = false;
+                default: done = true;
 
             }
 
@@ -232,6 +245,7 @@ export abstract class TermParser extends TokenIterator {
 
         this.expect(TokenType.rightBracket, true);
         this.setEndOfRange(methodCallNode);
+        return methodCallNode;
     }
 
     parseLambdaFunctionDefinition(): ASTLambdaFunctionDeclarationNode {
@@ -361,5 +375,26 @@ export abstract class TermParser extends TokenIterator {
 
         return saeNode;
 
+    }
+
+    parsePrintStatement(){
+        let printlnStatement = this.nodeFactory.buildPrintStatement(this.cct, this.tt == TokenType.println);
+
+        this.nextToken();
+
+
+        if(this.expect(TokenType.leftBracket, true)){
+            if(this.tt != TokenType.rightBracket){
+                printlnStatement.firstParameter = this.parseTerm();
+            }
+            
+            if(this.comesToken(TokenType.comma, true)){
+                printlnStatement.secondParameter = this.parseTerm();
+            }
+
+            this.expect(TokenType.rightBracket, true);
+        }
+
+        return printlnStatement;
     }
 }

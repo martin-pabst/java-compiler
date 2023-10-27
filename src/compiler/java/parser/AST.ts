@@ -13,6 +13,8 @@ export type BinaryOperator = TokenType.plus | TokenType.minus | TokenType.multip
 
 export type UnaryPrefixOperator = TokenType.negation | TokenType.not | TokenType.tilde | TokenType.plus | TokenType.plusPlus | TokenType.minusMinus;
 
+export type ConstantType = TokenType.shortConstant | TokenType.integerConstant | TokenType.longConstant | TokenType.charConstant | TokenType.stringConstant | TokenType.booleanConstant;
+
 export interface ASTNode {
     kind: TokenType;
     range: IRange;    
@@ -24,7 +26,7 @@ export interface TypeScope {
 
 export interface ASTGlobalNode extends ASTNode, TypeScope {
     kind: TokenType.global;
-    mainProgramNodes: ASTProgramNode[];
+    mainProgramNode: ASTProgramNode;
 }
 
 /**
@@ -138,7 +140,7 @@ export interface ASTBlockNode extends ASTStatementNode {
 
 export interface ASTProgramNode extends ASTNode {
     kind: TokenType.program;
-    block: ASTBlockNode;
+    statements: ASTStatementNode[];
 }
 
 export interface ASTStatementNode extends ASTNode {
@@ -225,6 +227,20 @@ export interface ASTSelectArrayElementNode extends ASTTermNode {
     array: ASTTermNode,
     indices: ASTTermNode[]
 }
+
+export interface ASTPrintStatementNode extends ASTTermNode {
+    kind: TokenType.print,
+    isPrintln: boolean,
+    firstParameter: ASTTermNode | undefined,
+    secondParameter: ASTTermNode | undefined
+}
+
+export interface ASTConstantNode extends ASTTermNode {
+    kind: TokenType.pushConstant,
+    constantType: TokenType,
+    value: string | boolean | number
+}
+
 /**
  * Structural statements: while, if, for, case, do...while
  */

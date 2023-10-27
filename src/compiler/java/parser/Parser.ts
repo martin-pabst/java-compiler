@@ -36,12 +36,14 @@ export class Parser extends StatementParser {
                 endLineNumber: this.endToken.range.endLineNumber, endColumn: this.endToken.range.endColumn
             },
             classOrInterfaceOrEnumDefinitions: [],
-            mainProgramNodes: []
+            mainProgramNode: this.nodeFactory.buildMainProgramNode(this.cct)
         }
+
     }
 
     parse() {
 
+        
         while (!this.isEnd()) {
             let pos = this.pos;
 
@@ -283,6 +285,22 @@ export class Parser extends StatementParser {
 
 
     parseMainProgramFragment() {
+
+        while(!this.isEnd() && Parser.visibilityModifiersOrTopLevelTypeDeclaration.indexOf(this.tt) < 0){
+            let pos = this.pos;            
+            let statement = this.parseStatementOrExpression();
+    
+            if(statement){
+                this.module.ast!.mainProgramNode.statements.push(statement);
+            }
+
+            if(pos == this.pos) this.nextToken(); // prevent endless loop
+        }
+
+
+        
+
+
 
     }
 
