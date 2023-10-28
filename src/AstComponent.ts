@@ -52,17 +52,17 @@ export class AstComponent {
         this.astTreeview.initialRenderAll();        
     }
 
-    addNode(parent: ASTNode | undefined, node: ASTNode){
+    addNode(parent: ASTNode | undefined, node: ASTNode, role?: string){
 
         let childNodeInfo = this.getChildNodeInfo(node).filter(cni => cni.isChildNode);
         
-        this.astTreeview.addNode(childNodeInfo.length > 0,
+        this.astTreeview.addNode(childNodeInfo.length > 0, (role ? role + ": " : "") +
             TokenType[node.kind], undefined, node, node, parent);
 
         for(let cni of childNodeInfo){
 
             if(cni.childNodes!.length == 1){
-                this.addNode(node, cni.childNodes![0]);
+                this.addNode(node, cni.childNodes![0], cni.key);
             } else {
                 let firstChild = cni.childNodes![0];
                 let lastChild = cni.childNodes![cni.childNodes!.length - 1];
@@ -79,7 +79,7 @@ export class AstComponent {
                 this.astTreeview.addNode(true, cni.key, undefined,
                     multiNode, multiNode, node);
                 cni.childNodes!.forEach( cn => {
-                    this.addNode(multiNode, cn);
+                    this.addNode(multiNode, cn, cni.key);
                 })
             }
 
@@ -128,11 +128,11 @@ export class AstComponent {
 
     showDetails(node: ASTNode){
         DOM.clear(this.detailsDiv);
-        DOM.makeDiv(this.detailsDiv, 'jo_ast_details_heading').textContent = "Type: " + TokenType[node.kind];
+        DOM.makeDiv(this.detailsDiv, 'jo_ast_details_heading').textContent = "Kind: " + TokenType[node.kind];
         
         let childNodeInfoList = this.getChildNodeInfo(node);
         for(let cni of childNodeInfoList){
-            if(cni.key == 'type') continue;
+            if(cni.key == 'kind') continue;
             if(cni.key == 'range'){
 
                 continue;
@@ -157,6 +157,7 @@ export class AstComponent {
                 DOM.makeSpan(line, '.jo_st_details_value').textContent =  value;
             } else {
                 let value: string = "" + cni.value;
+                if(cni.key == "operator") value = TokenType[cni.value];
                 if(Array.isArray(cni.value)) value = "[" + value.length + "]";
                 DOM.makeSpan(line, '.jo_st_details_value').textContent =  value;
             }

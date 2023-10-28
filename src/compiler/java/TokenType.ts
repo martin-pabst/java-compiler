@@ -43,6 +43,8 @@ export enum TokenType {
     keywordNull,
     keywordFinal,
     keywordInstanceof,
+    keywordTry,
+    keywordCatch,
     // keywordInt,
     // keywordBoolean,
     // keywordString,
@@ -189,6 +191,7 @@ export enum TokenType {
     plusPlusMinusMinusSuffix,
     genericParameterDefinition,
     variable,
+    annotation,
 
     type, // e.g. int[][]
     typeParameter, // e.g. <E extends String implements Comparable<E>>
@@ -252,6 +255,8 @@ export var TokenTypeReadable: { [tt: number]: string } = {
     [TokenType.keywordNull]: "null",
     [TokenType.keywordFinal]: "final",
     [TokenType.keywordInstanceof]: "instanceof",
+    [TokenType.keywordTry]: "try",
+    [TokenType.keywordCatch]: "catch",
     [TokenType.keywordPrint]: "print",
     [TokenType.keywordPrintln]: "println",
     // keywordInt,
@@ -423,6 +428,8 @@ export var keywordList: { [keyword: string]: TokenType } = {
     "null": TokenType.keywordNull,
     "final": TokenType.keywordFinal,
     "instanceof": TokenType.keywordInstanceof,
+    "try": TokenType.keywordTry,
+    "catch": TokenType.keywordCatch,
     "true": TokenType.true,
     "false": TokenType.false,
     "print": TokenType.keywordPrint,

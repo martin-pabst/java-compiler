@@ -21,7 +21,7 @@ export interface ASTNode {
 }
 
 export interface TypeScope {
-    classOrInterfaceOrEnumDefinitions: ASTClassDefinitionNode[];
+    classOrInterfaceOrEnumDefinitions: (ASTClassDefinitionNode | ASTInterfaceDefinitionNode | ASTEnumDefinitionNode)[];
 }
 
 export interface ASTGlobalNode extends ASTNode, TypeScope {
@@ -53,6 +53,10 @@ export interface ASTParameterNode extends ASTNode, ASTNodeWithIdentifier {
     isEllipsis: boolean;
 }
 
+export interface AnnotatedNode {
+    annotations: ASTAnnotationNode[]
+}
+
 export interface TypeDefinitionWithMethods {
     methods: ASTMethodDeclarationNode[]
 }
@@ -81,10 +85,12 @@ export interface ASTTypeNode extends ASTNode {
     identifier: string;
     genericParameterInvocations: ASTTypeNode[];
     arrayDimensions: number;
+    isVoidType: boolean;
 }
 
 // e.g. public int getValue(String key)
-export interface ASTMethodDeclarationNode extends ASTNode, ASTNodeWithModifiers, ASTNodeWithIdentifier {
+export interface ASTMethodDeclarationNode extends ASTNode, ASTNodeWithModifiers,
+ ASTNodeWithIdentifier, AnnotatedNode {
     kind: TokenType.methodDeclaration;
     parameters: ASTParameterNode[];
     returnParameterType: ASTTypeNode | undefined;  // undefined in case of constructor
@@ -99,33 +105,46 @@ export interface ASTLambdaFunctionDeclarationNode extends ASTNode {
     statement: ASTStatementNode | undefined
 }
 
-export interface ASTAttributeDeclarationNode extends ASTNodeWithModifiers, ASTNode, ASTNodeWithIdentifier {
+export interface ASTAttributeDeclarationNode extends ASTNodeWithModifiers, ASTNode, 
+ASTNodeWithIdentifier, AnnotatedNode {
     type: ASTTypeNode;
     initialization: ASTTermNode | undefined;
 }            
 
 export interface ASTClassDefinitionNode 
 extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers,
-    ASTTypeDefinitionWithAttributes, TypeScope, ASTNodeWithIdentifier
+    ASTTypeDefinitionWithAttributes, TypeScope, ASTNodeWithIdentifier, AnnotatedNode
 {
     kind: TokenType.keywordClass;
     parent: TypeScope;
-    innerClasses: ASTClassDefinitionNode[]
+    innerClasses: ASTClassDefinitionNode[],
+    extends: ASTTypeNode | undefined,
+    implements: ASTTypeNode[]
 }
 
 export interface ASTInterfaceDefinitionNode 
-extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers, ASTNodeWithIdentifier
+extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers, 
+ASTNodeWithIdentifier, AnnotatedNode
 {
     kind: TokenType.keywordInterface;
-    parent: ASTClassDefinitionNode | null;
+    parent: TypeScope ;
+    implements: ASTTypeNode[];
+}
+
+export interface ASTEnumValueNode extends ASTNode {
+    kind: TokenType.initializeEnumValue;
+    identifier: string;
+    identifierRange: IRange;
+    parameterValues: ASTTermNode[];
 }
 
 export interface ASTEnumDefinitionNode 
 extends ASTNode, TypeDefinitionWithMethods, ASTNodeWithModifiers,
-    ASTTypeDefinitionWithAttributes, ASTNodeWithIdentifier
+    ASTTypeDefinitionWithAttributes, ASTNodeWithIdentifier, AnnotatedNode
 {
     kind: TokenType.keywordEnum;
-    parent: ASTClassDefinitionNode | null;
+    parent: TypeScope;
+    valueNodes: ASTEnumValueNode[];
 }
 
 
@@ -241,6 +260,14 @@ export interface ASTConstantNode extends ASTTermNode {
     value: string | boolean | number
 }
 
+export interface ASTThisNode extends ASTTermNode {
+    kind: TokenType.keywordThis;
+}
+
+export interface ASTSuperNode extends ASTTermNode {
+    kind: TokenType.keywordSuper;
+}
+
 /**
  * Structural statements: while, if, for, case, do...while
  */
@@ -265,15 +292,62 @@ export interface ASTIfNode extends ASTStatementNode {
 
 export interface ASTForLoopNode extends ASTStatementNode {
     kind: TokenType.keywordFor;
-    firstStatement: ASTStatementNode;
-    condition: ASTTermNode;
-    lastStatement: ASTStatementNode;
+    firstStatement: ASTStatementNode | undefined;
+    condition: ASTTermNode | undefined;
+    lastStatement: ASTStatementNode | undefined;
     statementToRepeat: ASTStatementNode;
 }
 
+export interface ASTSimpifiedForLoopNode extends ASTStatementNode {
+    kind: TokenType.forLoopOverCollection;
+    elementType: ASTTypeNode;
+    elementIdentifier: string;
+    elementIdentifierPosition: IRange;
+    collection: ASTTermNode;
+    statementToRepeat: ASTStatementNode;
+}
 
+export interface ASTCaseNode extends ASTNode {
+    kind: TokenType.keywordCase;
+    constant: ASTTermNode | undefined;  // undefined in case of default:
+    statements: ASTStatementNode[];
+}
 
+export interface ASTSwitchCaseNode extends ASTStatementNode {
+    kind: TokenType.keywordSwitch;
+    term: ASTTermNode;
+    caseNodes: ASTCaseNode[];
+    defaultNode: ASTCaseNode | undefined;
+}
 
+export interface ASTContinueNode extends ASTStatementNode {
+    kind: TokenType.keywordContinue;
+}
 
+export interface ASTBreakNode extends ASTStatementNode {
+    kind: TokenType.keywordBreak;
+}
 
+export interface ASTReturnNode extends ASTStatementNode {
+    kind: TokenType.keywordReturn;
+    term: ASTTermNode | undefined;
+}
 
+export interface ASTCatchNode extends ASTStatementNode {
+    kind: TokenType.keywordCatch;
+    exceptionTypes: ASTTypeNode[],
+    exceptionIdentifier: string,
+    exceptionIdentifierPosition: IRange,
+    statement: ASTStatementNode
+}
+
+export interface ASTTryCatchNode extends ASTStatementNode {
+    kind: TokenType.keywordTry;
+    statement: ASTStatementNode;
+    catchCases: ASTCatchNode[]
+}
+
+export interface ASTAnnotationNode extends ASTStatementNode {
+    kind: TokenType.annotation;
+    identifier: string;
+}

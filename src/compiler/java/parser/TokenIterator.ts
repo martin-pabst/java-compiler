@@ -89,6 +89,11 @@ export class TokenIterator {
 
     }
 
+    getAndSkipToken(): Token {
+        this.nextToken();
+        return this.lastToken;
+    }
+
     nextToken() {
 
         let token: Token;
@@ -344,5 +349,19 @@ export class TokenIterator {
 
     }
 
+    lookForTokenTillOtherToken(tokensToLookFor: TokenType | TokenType[], tillToken: TokenType | TokenType[] ): TokenType | null {
+        if(!Array.isArray(tokensToLookFor)) tokensToLookFor = [tokensToLookFor];
+        if(!Array.isArray(tillToken)) tillToken = [tillToken];
+
+        let pos1: number = this.pos;
+        while(pos1 < this.tokenList.length){
+            let tt = this.tokenList[pos1].tt;
+            if(tokensToLookFor.indexOf(tt) >= 0) return tt; 
+            pos1++;
+        }
+
+        return null;
+
+    }
 
 }

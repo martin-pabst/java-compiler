@@ -87,7 +87,7 @@ export abstract class TermParser extends TokenIterator {
             let h: number = 1;
             let newLeftNodesParent: ASTBinaryNode | null = null;
             let newLeftNode: ASTTermNode = node;
-            while (h < rightRidgeHeight && (<ASTBinaryNode>node).precedence! > precedence) {
+            while (h < rightRidgeHeight && (<ASTBinaryNode>node).precedence! < precedence) {
                 newLeftNodesParent = <ASTBinaryNode>newLeftNode;
                 newLeftNode = (<ASTBinaryNode>newLeftNode).rightSide;
                 h++;
@@ -197,9 +197,15 @@ export abstract class TermParser extends TokenIterator {
                 case TokenType.charConstant:
                 case TokenType.stringConstant:
                 case TokenType.booleanConstant:
-                    node = this.nodeFactory.buildConstantNode(this.cct);
-                    this.nextToken();
+                    node = this.nodeFactory.buildConstantNode(this.getAndSkipToken());
                 break;
+                case TokenType.keywordThis:
+                    node = this.nodeFactory.buildThisNode(this.getAndSkipToken());
+                break;
+                case TokenType.keywordSuper:
+                    node = this.nodeFactory.buildSuperNode(this.getAndSkipToken());
+                break;
+                    
 
                 default: done = true;
 
@@ -290,6 +296,13 @@ export abstract class TermParser extends TokenIterator {
         // general Syntax: <identifier><genericParameterInvocation><ArrayDimension[]>
 
         let type = this.nodeFactory.buildTypeNode();
+
+        if(this.tt == TokenType.keywordVoid){
+            type.isVoidType = true;
+            type.identifier = "void";
+            this.nextToken();
+            return type;
+        }
 
         type.identifier = this.expectAndSkipIdentifierAsString();
         if (type.identifier == "") return type;  // erroneous type
