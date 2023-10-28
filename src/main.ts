@@ -1,4 +1,5 @@
 import { AstComponent } from "./AstComponent";
+import { ErrorLevel } from "./compiler/common/Error";
 import { Language } from "./compiler/common/Language";
 import { Module } from "./compiler/common/module/module";
 import { JavaLanguage } from "./compiler/java/JavaLanguage";
@@ -49,7 +50,13 @@ export class Main {
 
   initButtons(){
     let buttonDiv = document.getElementById('buttons')!;
-    new Button(buttonDiv, 'compile', '#30c030', () => {this.compile()}, 'myButton');
+    new Button(buttonDiv, 'compile', '#30c030', () => {
+      this.compile()
+      setInterval(() => {
+      }, 1000)
+    
+    
+    }, 'myButton');
 
 
   }
@@ -67,6 +74,33 @@ export class Main {
 
       this.astComponent.buildTreeView(module.ast);
 
+      this.markErrors(module);  
+
+    }
+  }
+
+  markErrors(module: Module){
+
+    let markers: monaco.editor.IMarkerData[] = module.errors.map((error) => {
+       return {
+        startLineNumber: error.range.startLineNumber,
+        startColumn: error.range.startColumn,
+        endLineNumber: error.range.endLineNumber,
+        endColumn: error.range.endColumn,
+        message: error.message,
+        severity: this.errorLevelToMarkerSeverity(error.level)
+       }
+    })
+
+    monaco.editor.setModelMarkers(this.editor.editor.getModel()!, "martin", markers);
+
+  }
+
+  errorLevelToMarkerSeverity(errorlevel: ErrorLevel): monaco.MarkerSeverity {
+    switch(errorlevel){
+      case "info": return monaco.MarkerSeverity.Info;
+      case "warning": return monaco.MarkerSeverity.Warning;
+      case "error": return monaco.MarkerSeverity.Error;
     }
   }
 

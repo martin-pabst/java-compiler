@@ -36,7 +36,7 @@ export abstract class TermParser extends TokenIterator {
     nodeFactory: ASTNodeFactory;
 
     constructor(protected module: Module) {
-        super(module.tokens!, 7);
+        super(module.tokens!);
         this.nodeFactory = new ASTNodeFactory(this);
 
         this.initOperatorToPrecedenceMap();
@@ -77,7 +77,7 @@ export abstract class TermParser extends TokenIterator {
         let precedence: number | undefined;
         let rightRidgeHeight = 1;
 
-        while ((precedence = this.operatorToPrecedenceMap[this.tt])) {
+        while ((precedence = this.operatorToPrecedenceMap[this.tt]) != null) {
 
             let operator = this.tt;
             this.nextToken();
@@ -131,88 +131,94 @@ export abstract class TermParser extends TokenIterator {
         }
 
         let plusPlusMinusMinusSuffix = (this.tt == TokenType.plusPlus || this.tt == TokenType.minusMinus) ? this.cct : undefined;
-        if (term && plusPlusMinusMinusSuffix) {
-            term = this.nodeFactory.buildPlusPlusMinusMinusSuffixNode(plusPlusMinusMinusSuffix, term);
+        if (plusPlusMinusMinusSuffix) {
+            this.nextToken();
+            if (term) {
+                term = this.nodeFactory.buildPlusPlusMinusMinusSuffixNode(plusPlusMinusMinusSuffix, term);
+            }
         }
 
         return term;
     }
 
+    /**
+     * 
+     */
+
     parseTermUnary(): ASTTermNode | undefined {
 
         let node: ASTTermNode | undefined = undefined;
 
-        let done: boolean = false;
 
-        while (!done) {
-            done = false;
-
-            switch (this.tt) {
-                case TokenType.dot:
-                    node = this.parseAttributeOrMethodCall(node)
-                    break;
-                case TokenType.leftBracket:
-                    let tokenTypeAfterRightBracket = this.findTokenTypeAfterCorrespondingRightBracket();
-                    switch (tokenTypeAfterRightBracket) {
-                        case TokenType.lambda: node = this.parseLambdaFunctionDefinition();
-                            break;
-                        case TokenType.leftBracket:
-                        case TokenType.identifier:
-                        case TokenType.keywordThis:
-                        case TokenType.keywordSuper:
-                            node = this.parseCastedObject();
-                            break;
-                        default:
-                            this.nextToken();
-                            node = this.parseTerm();
-                            this.expect(TokenType.rightBracket, true);
-                    }
-                    break;
-                case TokenType.identifier:
-                    switch(this.lookahead[1].tt){
-                        case TokenType.leftBracket:
-                            node = this.parseMethodCall(undefined);
+        switch (this.tt) {
+            case TokenType.leftBracket:
+                let tokenTypeAfterRightBracket = this.findTokenTypeAfterCorrespondingRightBracket();
+                switch (tokenTypeAfterRightBracket) {
+                    case TokenType.lambda: node = this.parseLambdaFunctionDefinition();
                         break;
-                        case TokenType.lambda:
-                            node = this.parseLambdaFunctionDefinition();
+                    case TokenType.leftBracket:
+                    case TokenType.identifier:
+                    case TokenType.keywordThis:
+                    case TokenType.keywordSuper:
+                        node = this.parseCastedObject();
                         break;
-                        default:
-                            node = this.parseVariable();
-
-                    }
-                    break;
-                case TokenType.keywordNew:
-                    node = this.parseObjectInstantiation();
-                    break;
-                case TokenType.leftSquareBracket:
-                    node = this.parseSelectArrayElement(node);
-                    break;
-                case TokenType.keywordPrint:
-                case TokenType.keywordPrintln:
-                    node = this.parsePrintStatement();
-                    break;
-                case TokenType.shortConstant:
-                case TokenType.integerConstant:
-                case TokenType.longConstant:
-                case TokenType.charConstant:
-                case TokenType.stringConstant:
-                case TokenType.booleanConstant:
-                    node = this.nodeFactory.buildConstantNode(this.getAndSkipToken());
+                    default:
+                        this.nextToken();
+                        node = this.parseTerm();
+                        this.expect(TokenType.rightBracket, true);
+                }
                 break;
-                case TokenType.keywordThis:
-                    node = this.nodeFactory.buildThisNode(this.getAndSkipToken());
-                break;
-                case TokenType.keywordSuper:
-                    node = this.nodeFactory.buildSuperNode(this.getAndSkipToken());
-                break;
-                    
+            case TokenType.identifier:
+                switch (this.lookahead(1).tt) {
+                    case TokenType.leftBracket:
+                        node = this.parseMethodCall(undefined);
+                        break;
+                    case TokenType.lambda:
+                        node = this.parseLambdaFunctionDefinition();
+                        break;
+                    default:
+                        node = this.parseVariable();
 
-                default: done = true;
-
-            }
+                }
+                break;
+            case TokenType.keywordNew:
+                node = this.parseObjectInstantiation();
+                break;
+            case TokenType.keywordPrint:
+            case TokenType.keywordPrintln:
+                node = this.parsePrintStatement();
+                break;
+            case TokenType.shortConstant:
+            case TokenType.integerConstant:
+            case TokenType.longConstant:
+            case TokenType.charConstant:
+            case TokenType.stringConstant:
+            case TokenType.booleanConstant:
+                node = this.nodeFactory.buildConstantNode(this.getAndSkipToken());
+                break;
+            case TokenType.keywordThis:
+                node = this.nodeFactory.buildThisNode(this.getAndSkipToken());
+                break;
+            case TokenType.keywordSuper:
+                node = this.nodeFactory.buildSuperNode(this.getAndSkipToken());
+                break;
 
         }
 
+        if(node){
+            while ([TokenType.dot, TokenType.leftSquareBracket].indexOf(this.tt) >= 0) {
+    
+                switch (this.tt) {
+                    case TokenType.dot:
+                        node = this.parseAttributeOrMethodCall(node)
+                        break;
+                    case TokenType.leftSquareBracket:
+                        node = this.parseSelectArrayElement(node);
+                        break;
+                }
+    
+            }
+        }
 
         return node;
 
@@ -225,7 +231,7 @@ export abstract class TermParser extends TokenIterator {
             this.pushError("Der Punkt-Operator kann nur nach einem Bezeichner (identifier) kommen.", "error");
             return undefined;
         } else {
-            if (this.lookahead[1].tt == TokenType.leftBracket) {
+            if (this.lookahead(1).tt == TokenType.leftBracket) {
                 this.parseMethodCall(node);
             } else {
                 let identifier = this.expectAndSkipIdentifierAsToken();
@@ -265,7 +271,7 @@ export abstract class TermParser extends TokenIterator {
             if (this.tt != TokenType.rightBracket) {
                 do {
                     let startRange = this.cct.range;
-                    let withoutType = this.lookahead[1].tt == TokenType.comma;
+                    let withoutType = [TokenType.comma, TokenType.rightBracket].indexOf(this.lookahead(1).tt) >= 0;
 
                     let type: ASTTypeNode | undefined;
 
@@ -274,7 +280,7 @@ export abstract class TermParser extends TokenIterator {
                     }
 
                     let identifier = this.expectAndSkipIdentifierAsToken();
-                    if(identifier.value != ""){
+                    if (identifier.value != "") {
                         lambdaNode.parameters.push(this.nodeFactory.buildParameterNode(startRange, identifier, type, false));
                     }
 
@@ -283,6 +289,8 @@ export abstract class TermParser extends TokenIterator {
 
             this.expect(TokenType.rightBracket, true);
         }
+
+        this.expect(TokenType.lambda, true);
 
         lambdaNode.statement = this.parseStatementOrExpression();
 
@@ -297,9 +305,16 @@ export abstract class TermParser extends TokenIterator {
 
         let type = this.nodeFactory.buildTypeNode();
 
-        if(this.tt == TokenType.keywordVoid){
+        if (this.tt == TokenType.keywordVoid) {
             type.isVoidType = true;
             type.identifier = "void";
+            this.nextToken();
+            return type;
+        }
+
+        if (this.tt == TokenType.keywordVar) {
+            type.isVarKeyword = true;
+            type.identifier = "var";
             this.nextToken();
             return type;
         }
@@ -319,6 +334,8 @@ export abstract class TermParser extends TokenIterator {
         while (this.comesToken(TokenType.leftRightSquareBracket, true)) type.arrayDimensions++;
 
         this.setEndOfRange(type);
+
+        return type;
     }
 
     parseCastedObject(): ASTCastNode | undefined {
@@ -327,19 +344,19 @@ export abstract class TermParser extends TokenIterator {
         let type = this.parseType();
         this.expect(TokenType.rightBracket);
         let term = this.parseTerm();
-        
-        if(type && term){
+
+        if (type && term) {
             let castNode = this.nodeFactory.buildCastNode(startToken, type, term);
             this.setEndOfRange(castNode);
             return castNode;
         }
-    
+
         return undefined;
     }
 
     parseVariable(): ASTVariableNode | undefined {
         let identifier = this.expectAndSkipIdentifierAsToken();
-        if(identifier.value != ""){
+        if (identifier.value != "") {
             return this.nodeFactory.buildVariableNode(identifier);
         }
 
@@ -351,11 +368,11 @@ export abstract class TermParser extends TokenIterator {
         this.nextToken(); // skip new keyword
         let type = this.parseType();
 
-        if(!type) return undefined;
+        if (!type) return undefined;
 
         let newObjectNode = this.nodeFactory.buildNewObjectNode(startToken, type);
 
-        if(this.expect(TokenType.leftBracket), true){
+        if (this.expect(TokenType.leftBracket), true) {
 
             if (this.tt != TokenType.rightBracket) {
                 do {
@@ -363,25 +380,25 @@ export abstract class TermParser extends TokenIterator {
                     if (termNode) newObjectNode.parameterValues.push(termNode);
                 } while (this.comesToken(TokenType.comma, true));
             }
-    
-            this.expect(TokenType.rightBracket, true);           
+
+            this.expect(TokenType.rightBracket, true);
         }
 
         this.setEndOfRange(newObjectNode);
     }
 
     parseSelectArrayElement(array: ASTTermNode | undefined): ASTSelectArrayElementNode | undefined {
-        if(!array) {
+        if (!array) {
             this.skipTokensTillEndOfLineOr([TokenType.rightSquareBracket]);
             return undefined;
         }
 
         let saeNode = this.nodeFactory.buildSelectArrayElement(array);
 
-        while(this.tt == TokenType.rightSquareBracket){
+        while (this.tt == TokenType.rightSquareBracket) {
             this.nextToken();
             let term = this.parseTerm();
-            if(term) saeNode.indices.push(term)
+            if (term) saeNode.indices.push(term)
         }
 
         this.setEndOfRange(saeNode);
@@ -390,18 +407,18 @@ export abstract class TermParser extends TokenIterator {
 
     }
 
-    parsePrintStatement(){
+    parsePrintStatement() {
         let printlnStatement = this.nodeFactory.buildPrintStatement(this.cct, this.tt == TokenType.println);
 
         this.nextToken();
 
 
-        if(this.expect(TokenType.leftBracket, true)){
-            if(this.tt != TokenType.rightBracket){
+        if (this.expect(TokenType.leftBracket, true)) {
+            if (this.tt != TokenType.rightBracket) {
                 printlnStatement.firstParameter = this.parseTerm();
             }
-            
-            if(this.comesToken(TokenType.comma, true)){
+
+            if (this.comesToken(TokenType.comma, true)) {
                 printlnStatement.secondParameter = this.parseTerm();
             }
 

@@ -8,11 +8,12 @@ type NodePropertyInfo = {
     isChildNode: boolean,
     key: string,
     value: any,
-    childNodes: ASTNode[] | undefined
+    childNodes: ASTNode[] | undefined,
+    isArray: boolean
 }
 
 interface ASTMultiNode extends ASTNode {
-    role: string,
+    role: string | undefined,
     childNodes: ASTNode[]
 }
 
@@ -74,12 +75,12 @@ export class AstComponent {
                             endColumn: lastChild.range.endColumn},
                     kind: TokenType.multiNode,
                     childNodes: cni.childNodes!,
-                    role: cni.key
+                    role: cni.isArray ? undefined : cni.key
                 }
                 this.astTreeview.addNode(true, cni.key, undefined,
                     multiNode, multiNode, node);
                 cni.childNodes!.forEach( cn => {
-                    this.addNode(multiNode, cn, cni.key);
+                    this.addNode(multiNode, cn, undefined);
                 })
             }
 
@@ -93,6 +94,7 @@ export class AstComponent {
 
         for(const [field, value] of Object.entries(node)){
 
+            if(field == 'parent') continue;
             if(!value) continue;
 
             if(value['kind'] != null && value['range'] != null){
@@ -100,7 +102,8 @@ export class AstComponent {
                     isChildNode: true,
                     key: field,
                     value: value,
-                    childNodes: [value]
+                    childNodes: [value],
+                    isArray: false
                 });
             } else if (Array.isArray(value) && value.length > 0){
                 let firstElement = value[0];
@@ -109,7 +112,8 @@ export class AstComponent {
                         isChildNode: true,
                         key: field,
                         value: value,
-                        childNodes: value
+                        childNodes: value,
+                        isArray: true
                     });
                 }       
             } else {
@@ -117,7 +121,8 @@ export class AstComponent {
                     isChildNode: false,
                     key: field,
                     value: value,
-                    childNodes: undefined
+                    childNodes: undefined,
+                    isArray: false
                 })
             }
 

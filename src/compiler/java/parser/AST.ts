@@ -86,6 +86,7 @@ export interface ASTTypeNode extends ASTNode {
     genericParameterInvocations: ASTTypeNode[];
     arrayDimensions: number;
     isVoidType: boolean;
+    isVarKeyword: boolean;  // type inference...
 }
 
 // e.g. public int getValue(String key)
@@ -266,6 +267,12 @@ export interface ASTThisNode extends ASTTermNode {
 
 export interface ASTSuperNode extends ASTTermNode {
     kind: TokenType.keywordSuper;
+}
+
+export interface ASTLocalVariableDeclaration extends ASTStatementNode, ASTNodeWithIdentifier {
+    kind: TokenType.localVariableDeclaration;
+    type: ASTTypeNode;
+    initialization: ASTTermNode | undefined;
 }
 
 /**

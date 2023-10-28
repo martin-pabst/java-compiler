@@ -51,7 +51,7 @@ export class Parser extends StatementParser {
         while (!this.isEnd()) {
             let pos = this.pos;
 
-            if (this.comesToken(Parser.visibilityModifiersOrTopLevelTypeDeclaration)) {
+            if (this.comesToken(Parser.visibilityModifiersOrTopLevelTypeDeclaration, false)) {
                 this.parseClassOrInterfaceOrEnum(this.module.ast!);
             } else if (this.tt == TokenType.at) {
                 this.parseAnnotation();
@@ -64,6 +64,8 @@ export class Parser extends StatementParser {
                 this.nextToken();   // last safety net to prevent getting stuck in an endless loop
             }
         }
+
+        this.module.errors = this.errorList;
 
     }
 
@@ -97,7 +99,7 @@ export class Parser extends StatementParser {
         let classASTNode = this.nodeFactory.buildClassNode(modifiers, identifier, parent, this.collectedAnnotations);
         classASTNode.genericParameterDefinitions = this.parseGenericParameterDefinition();
 
-        while (this.comesToken([TokenType.keywordExtends, TokenType.keywordImplements])) {
+        while (this.comesToken([TokenType.keywordExtends, TokenType.keywordImplements], false)) {
             switch (this.tt) {
                 case TokenType.keywordImplements: this.nextToken(); this.parseImplements(classASTNode); break;
                 case TokenType.keywordExtends: this.parseExtends(classASTNode); break;
@@ -105,12 +107,13 @@ export class Parser extends StatementParser {
         }
 
         if (this.expect(TokenType.leftCurlyBracket, true)) {
-            while (!this.comesToken([TokenType.rightCurlyBracket, TokenType.endofSourcecode])) {
+            while (!this.comesToken([TokenType.rightCurlyBracket, TokenType.endofSourcecode], false)) {
 
                 let modifiers = this.parseModifiers();
 
                 switch (this.tt) {
                     case TokenType.identifier:
+                    case TokenType.keywordVoid:
                         this.parseAttributeOrMethodDeclaration(classASTNode, modifiers);
                         break;
                     case TokenType.keywordClass:
@@ -121,6 +124,7 @@ export class Parser extends StatementParser {
                     case TokenType.at:
                         this.parseAnnotation();
                         break;
+                    default: this.pushErrorAndSkipToken();
                 }
 
             }
@@ -136,11 +140,11 @@ export class Parser extends StatementParser {
          * class Test { Test a; Test(); Test getValue()}
          */
 
-        if (this.comesIdentifier(classASTNode.identifier) && this.lookahead[1].tt == TokenType.leftBracket) {
+        if (this.comesIdentifier(classASTNode.identifier) && this.lookahead(1).tt == TokenType.leftBracket) {
             this.parseMethodDeclaration(classASTNode, modifiers, true);
         } else {
             let type = this.parseType();
-            if (this.lookahead[1].tt == TokenType.leftBracket) {
+            if (this.lookahead(1).tt == TokenType.leftBracket) {
                 this.parseMethodDeclaration(classASTNode, modifiers, false, type);
             } else {
                 if (classASTNode.kind == TokenType.keywordClass || classASTNode.kind == TokenType.keywordEnum) {
@@ -162,13 +166,13 @@ export class Parser extends StatementParser {
         classASTNode.methods.push(methodNode);
 
         if (this.expect(TokenType.leftBracket, true)) {
-            while (this.comesToken(TokenType.identifier)) {
+            while (this.comesToken(TokenType.identifier, false)) {
                 this.parseParameter(methodNode);
             }
-            this.expect(TokenType.rightBracket);
+            this.expect(TokenType.rightBracket, true);
         }
 
-        if (this.comesToken(TokenType.leftCurlyBracket)) {
+        if (this.comesToken(TokenType.leftCurlyBracket, false)) {
             let statement = this.parseStatementOrExpression();
             methodNode.statement = statement;
         } else {
@@ -213,10 +217,10 @@ export class Parser extends StatementParser {
 
     parseModifiers(): ASTNodeWithModifiers {
         let visibilityModifiers: Token[] = []
-        let foundTokenWhichIsNotModifier: boolean = false;
+        let foundModifier: boolean;
         let astNodeWithModifiers = this.nodeFactory.buildNodeWithModifiers(this.cct.range);
         do {
-            foundTokenWhichIsNotModifier = true;
+            foundModifier = true;
             switch (this.tt) {
                 case TokenType.keywordPrivate:
                 case TokenType.keywordProtected:
@@ -234,12 +238,12 @@ export class Parser extends StatementParser {
                     astNodeWithModifiers.isAbstract = true;
                     break;
                 default:
-                    foundTokenWhichIsNotModifier = false;
+                    foundModifier = false;
             }
 
-            if (foundTokenWhichIsNotModifier) this.nextToken();
+            if (foundModifier) this.nextToken();
 
-        } while (!foundTokenWhichIsNotModifier);
+        } while (foundModifier);
 
         if (visibilityModifiers.length > 0) {
             this.pushError(`Es ist nicht zulässig, mehrere visibility-modifiers gleichzeitig zu setzen (hier: ${visibilityModifiers.map(vm => vm.value).join(", ")})`, "warning", Range.lift(visibilityModifiers[0].range).plusRange(visibilityModifiers.pop()!.range));
@@ -260,7 +264,7 @@ export class Parser extends StatementParser {
 
             this.comesToken(TokenType.semicolon, true); // skip if present
 
-            while (!this.comesToken([TokenType.rightCurlyBracket, TokenType.endofSourcecode])) {
+            while (!this.comesToken([TokenType.rightCurlyBracket, TokenType.endofSourcecode], false)) {
 
                 let modifiers = this.parseModifiers();
 
@@ -271,6 +275,7 @@ export class Parser extends StatementParser {
                     case TokenType.at:
                         this.parseAnnotation();
                         break;
+                    default: this.pushErrorAndSkipToken();
                 }
 
             }
@@ -286,7 +291,7 @@ export class Parser extends StatementParser {
 
         let node = this.nodeFactory.buildEnumValueNode(identifier);
         if(this.comesToken(TokenType.leftBracket, true)){
-            if(!this.comesToken(TokenType.rightBracket)){
+            if(!this.comesToken(TokenType.rightBracket, false)){
                 do {
                     let term = this.parseTerm();
                     if(term) node.parameterValues.push(term);
@@ -306,18 +311,21 @@ export class Parser extends StatementParser {
         if (this.comesToken(TokenType.keywordExtends, true)) this.parseImplements(interfaceNode);
 
         if (this.expect(TokenType.leftCurlyBracket, true)) {
-            while (!this.comesToken([TokenType.rightCurlyBracket, TokenType.endofSourcecode])) {
+            while (!this.comesToken([TokenType.rightCurlyBracket, TokenType.endofSourcecode], false)) {
 
                 let modifiers = this.parseModifiers();
 
                 switch (this.tt) {
                     case TokenType.identifier:
+                    case TokenType.keywordVoid:
                         let returnType = this.parseType();
                         if (returnType) this.parseMethodDeclaration(interfaceNode, modifiers, false, returnType);
                         break;
                     case TokenType.at:
                         this.parseAnnotation();
                         break;
+                    default: 
+                    this.pushErrorAndSkipToken();
                 }
 
             }
@@ -367,7 +375,7 @@ export class Parser extends StatementParser {
                         do {
                             let type = this.parseType();
                             if (type != null) genericParameterDeclaration.extends.push(type);
-                        } while (this.comesToken(TokenType.ampersand), true);
+                        } while (this.comesToken(TokenType.ampersand, true));
 
                     } else if (this.comesToken(TokenType.keywordSuper, true)) {
                         let type = this.parseType();

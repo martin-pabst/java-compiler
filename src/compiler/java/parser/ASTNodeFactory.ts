@@ -1,7 +1,7 @@
 import { IRange } from "../../common/range/Range";
 import { Token } from "../Token.ts";
 import { TokenType } from "../TokenType";
-import { ASTAnnotationNode, ASTAttributeDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTConstantNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTVariableNode, ASTWhileNode, TypeScope } from "./AST";
+import { ASTAnnotationNode, ASTAttributeDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTConstantNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTVariableNode, ASTWhileNode, TypeScope } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
 export class ASTNodeFactory {
@@ -20,7 +20,8 @@ export class ASTNodeFactory {
             identifier: "",
             arrayDimensions: 0,
             genericParameterInvocations: [],
-            isVoidType: false
+            isVoidType: false,
+            isVarKeyword: false
         }
 
     }
@@ -205,7 +206,7 @@ export class ASTNodeFactory {
     buildPlusPlusMinusMinusSuffixNode(operator: Token, childNode: ASTTermNode): ASTPlusPlusMinusMinusSuffixNode {
         return {
             kind: TokenType.plusPlusMinusMinusSuffix,
-            range: { startLineNumber: operator.range.startLineNumber, startColumn: operator.range.startColumn, endLineNumber: childNode.range.endLineNumber, endColumn: childNode.range.endColumn },
+            range: { startLineNumber: childNode.range.startLineNumber, startColumn: childNode.range.startColumn, endLineNumber: operator.range.endLineNumber, endColumn: operator.range.endColumn },
             operator: <any>operator.tt,
             term: childNode
         }
@@ -453,6 +454,19 @@ export class ASTNodeFactory {
             kind: TokenType.annotation,
             range: identifer.range,
             identifier: <string>identifer.value
+        }
+    }
+
+    buildLocalVariableDeclaration(type: ASTTypeNode, identifer: Token, initialization: ASTTermNode | undefined): ASTLocalVariableDeclaration | undefined {
+        let end = initialization? initialization : identifer;
+
+        return {
+            kind: TokenType.localVariableDeclaration,
+            identifier: <string>identifer.value,
+            identifierRange: identifer.range,
+            range: {startLineNumber: type.range.startLineNumber, startColumn: type.range.startColumn, endLineNumber: end.range.endLineNumber, endColumn: end.range.endColumn},
+            type: type,
+            initialization: initialization
         }
     }
 }

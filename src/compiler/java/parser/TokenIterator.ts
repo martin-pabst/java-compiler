@@ -5,6 +5,20 @@ import { TokenType, TokenTypeReadable } from "../TokenType";
 import { ASTNode } from "./AST";
 
 export class TokenIterator {
+
+    static possibleTokensInsideVariableDeclaration:TokenType[] = [
+        TokenType.identifier, TokenType.linefeed, TokenType.newline,
+        TokenType.space, TokenType.comment,
+        TokenType.lower, TokenType.greater, TokenType.dot,
+        TokenType.leftRightSquareBracket, TokenType.comma,
+        TokenType.keywordVar
+    ]
+
+    static spaceTokenTypes: TokenType[] = [
+        TokenType.space, TokenType.comment, TokenType.linefeed, TokenType.newline
+    ]
+
+
     pos: number = 0;        // current index in tokens
 
     dummy: Token = {
@@ -13,7 +27,6 @@ export class TokenIterator {
         value: ""
     }
 
-    lookahead: Token[] = [];
     lastToken: Token = this.dummy;
     cct: Token = this.dummy;                // current token
     tt: TokenType = TokenType.comment;      // current tokentype
@@ -40,54 +53,12 @@ export class TokenIterator {
 
 
 
-    constructor(private tokenList: TokenList, private lookaheadLength: number) {
+    constructor(private tokenList: TokenList) {
         this.endToken = tokenList[tokenList.length - 1];
-        this.pos = 0;
-        this.initializeLookahead();
+        this.pos = -1;
+        this.nextToken(); // fetch first non-space token
     }
 
-    initializeLookahead() {
-
-        this.lookahead = [];
-
-        for (let i = 0; i < this.lookaheadLength; i++) {
-
-            let token: Token = this.endToken;
-
-            while (true) {
-
-                if (this.pos >= this.tokenList.length) break;
-
-                let token1 = this.tokenList[this.pos]
-                if (token1.tt == TokenType.comment) {
-                    this.lastComment = token1;
-                }
-
-                if (token1.tt != TokenType.newline && token1.tt != TokenType.space && token1.tt != TokenType.comment) {
-                    token = token1;
-                    if (this.lastComment != null) {
-                        token.commentBefore = this.lastComment;
-                        this.lastComment = undefined;
-                    }
-                    break;
-                }
-
-                this.pos++;
-
-            }
-
-            this.lookahead.push(token);
-
-            if (i < this.lookaheadLength - 1) {
-                this.pos++;
-            }
-
-        }
-
-        this.cct = this.lookahead[0];
-        this.tt = this.cct.tt;
-
-    }
 
     getAndSkipToken(): Token {
         this.nextToken();
@@ -97,6 +68,9 @@ export class TokenIterator {
     nextToken() {
 
         let token: Token;
+
+        if(this.pos >= this.tokenList.length) return;
+
         this.lastToken = this.cct;
 
         while (true) {
@@ -121,15 +95,36 @@ export class TokenIterator {
 
         }
 
-        for (let i = 0; i < this.lookaheadLength - 1; i++) {
-            this.lookahead[i] = this.lookahead[i + 1];
-        }
-
-        this.lookahead[this.lookaheadLength - 1] = token;
-
-        this.cct = this.lookahead[0];
+        this.cct = token;
         this.tt = this.cct.tt;
 
+    }
+
+    /**
+     * Looks n tokens ahead, omitting space, comments and newLine
+     * n == 0 => return current token
+     * @param n 
+     */
+    lookahead(n: number): Token {
+        let k = n;
+        let pos = this.pos;
+        let token = this.cct;
+
+        while(k > 0 && pos < this.tokenList.length){
+            pos++;
+            let t: Token = this.tokenList[pos];
+            if(TokenIterator.spaceTokenTypes.indexOf(t.tt) < 0){
+                k--;
+                token = t;
+            }
+        }
+
+        return token;
+    }
+
+    pushErrorAndSkipToken(){
+        this.pushError("Das Token '" + this.cct.value + "' wird hier nicht erwartet.", "error");
+        this.nextToken();
     }
 
     skipTokensTillEndOfLineOr(skippedTokens: TokenType | TokenType[]){
@@ -142,7 +137,6 @@ export class TokenIterator {
             this.pos++;
         } 
 
-        this.initializeLookahead();
 }
 
 
@@ -244,6 +238,22 @@ export class TokenIterator {
 
     }
 
+    skipTillNextTokenAfter(tt: TokenType[]){
+        
+        while(this.pos < this.tokenList.length - 1){
+            this.pos++;
+            let token = this.tokenList[this.pos];
+            if(TokenIterator.spaceTokenTypes.indexOf(token.tt) < 0){
+                this.lastToken = this.cct;
+                this.cct = token;
+            }
+            if(tt.indexOf(token.tt) >= 0){
+                this.nextToken();
+                return;
+            }
+        }
+    }
+
     expectAndSkipIdentifierAsString(): string {
         if(this.tt == TokenType.identifier){
             let identifier: string = <string>this.cct.value;
@@ -283,7 +293,7 @@ export class TokenIterator {
         return this.cct == this.endToken;
     }
 
-    comesToken(token: TokenType | TokenType[], skipIfTrue: boolean = false): boolean {
+    comesToken(token: TokenType | TokenType[], skipIfTrue: boolean): boolean {
 
         // comestoken is called very often, so we try to implement this in a performant way:
         if (!Array.isArray(token)) {
@@ -341,8 +351,14 @@ export class TokenIterator {
             }
         }
 
-        if(depth == 0 && p < this.tokenList.length){
-            return this.tokenList[p].tt;
+        if(depth == 0){
+            while(p < this.tokenList.length && TokenIterator.spaceTokenTypes.indexOf(this.tokenList[p].tt) >= 0){
+                p++;
+            }
+
+            if(p < this.tokenList.length){
+                return this.tokenList[p].tt;
+            }
         }
 
         return TokenType.endofSourcecode;
@@ -361,6 +377,32 @@ export class TokenIterator {
         }
 
         return null;
+
+    }
+
+    analyzeIfVariableDeclarationAhead(): boolean {
+        let pos = this.pos;
+        let nonSpaceTokenTypesFound: TokenType[] = [];
+
+        while(pos < this.tokenList.length){
+            let token = this.tokenList[pos];
+            let tt = token.tt;
+            if(tt == TokenType.semicolon || tt == TokenType.assignment) break;
+            if(TokenIterator.possibleTokensInsideVariableDeclaration.indexOf(tt) < 0) return false;
+            if(TokenIterator.spaceTokenTypes.indexOf(tt) < 0) nonSpaceTokenTypesFound.push(tt);
+            pos++;
+        }
+
+        let length = nonSpaceTokenTypesFound.length;
+        if(length < 2) return false;
+
+        if(nonSpaceTokenTypesFound[length - 1] != TokenType.identifier) return false;
+
+        if([TokenType.identifier, TokenType.greater, TokenType.leftRightSquareBracket, TokenType.keywordVar].indexOf(nonSpaceTokenTypesFound[length - 2]) < 0){
+            return false;
+        }
+
+        return true;
 
     }
 

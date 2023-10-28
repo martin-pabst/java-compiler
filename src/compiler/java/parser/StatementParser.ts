@@ -1,7 +1,7 @@
 import { Module } from "../../common/module/module.ts";
 import { Token } from "../Token.ts";
 import { TokenType } from "../TokenType.ts";
-import { ASTForLoopNode, ASTIfNode, ASTReturnNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode } from "./AST.ts";
+import { ASTForLoopNode, ASTIfNode, ASTReturnNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode } from "./AST.ts";
 import { TermParser } from "./TermParser.ts";
 
 export class StatementParser extends TermParser {
@@ -10,7 +10,7 @@ export class StatementParser extends TermParser {
         super(module);
     }
 
-    parseStatementOrExpression(): ASTStatementNode | undefined {
+    parseStatementOrExpression(expectSemicolonAfterStatement: boolean = true): ASTStatementNode | undefined {
 
         switch (this.tt) {
             case TokenType.keywordWhile:
@@ -32,11 +32,38 @@ export class StatementParser extends TermParser {
             case TokenType.keywordReturn:
                 return this.parseReturn();
             default:
-                let statement = this.parseTerm();
-                this.expectSemicolon(true, true);
+                let statement = this.parseVariableDeclarationOrTerm();
+                if( (expectSemicolonAfterStatement && !this.expectSemicolon(true, true))
+                      || !statement){
+                    this.skipTillNextTokenAfter([TokenType.semicolon, TokenType.newline, TokenType.rightCurlyBracket]);
+                }
                 return statement;
         }
 
+    }
+
+    parseVariableDeclarationOrTerm(): ASTStatementNode | undefined {
+        
+        if(this.analyzeIfVariableDeclarationAhead()){
+            return this.parseLocalVariableDeclaration();
+        } else {
+            return this.parseTerm();
+        }
+    }
+
+    parseLocalVariableDeclaration(): ASTStatementNode | undefined {
+        let type = this.parseType();
+        let identifer = this.expectAndSkipIdentifierAsToken();
+        let initialization: ASTTermNode | undefined = undefined;
+        if(this.comesToken(TokenType.assignment, true)){
+            initialization = this.parseTerm();
+        }       
+
+        if(type && identifer){
+            return this.nodeFactory.buildLocalVariableDeclaration(type, identifer, initialization);
+        }
+
+        return undefined;
     }
 
     parseWhile(): ASTWhileNode | undefined {
@@ -68,7 +95,7 @@ export class StatementParser extends TermParser {
 
         let ifToken = this.getAndSkipToken();
 
-        if (this.comesToken(TokenType.leftBracket)) {
+        if (this.comesToken(TokenType.leftBracket, true)) {
             let condition = this.parseTerm();
             this.expect(TokenType.rightBracket);
 
@@ -76,7 +103,7 @@ export class StatementParser extends TermParser {
 
             let statementIfFalse: ASTStatementNode | undefined;
 
-            if (this.comesToken(TokenType.keywordElse), true) {
+            if (this.comesToken(TokenType.keywordElse, true)) {
 
                 statementIfFalse = this.parseStatementOrExpression();
             }
@@ -105,6 +132,8 @@ export class StatementParser extends TermParser {
             if (statement) blockNode.statements.push(statement);
         }
 
+        this.expect(TokenType.rightCurlyBracket, true);
+
         return blockNode;
     }
 
@@ -118,15 +147,19 @@ export class StatementParser extends TermParser {
         let colonFound = this.lookForTokenTillOtherToken(TokenType.colon, [TokenType.rightBracket, TokenType.leftCurlyBracket, TokenType.rightCurlyBracket]);
         if (colonFound) return this.parseSimplifiedForLoop(tokenFor);
 
-        let firstStatement = this.parseStatementOrExpression();
+        let firstStatement = this.parseStatementOrExpression(false);
         this.expect(TokenType.semicolon, true);
         let condition = this.parseTerm();
         this.expect(TokenType.semicolon, true);
         let lastStatement = this.parseTerm();
         this.expect(TokenType.rightBracket, true);
-        let statementToRepeat = this.parseStatementOrExpression();
+        let statementToRepeat = this.parseStatementOrExpression(false);
 
-        if (!statementToRepeat) return undefined;
+        if (!statementToRepeat)
+        {
+            this.pushError("Hier wird eine Anweisung oder ein Anweisungsblock (in geschweiften Klammern) erwartet.");
+            return undefined;
+        }
 
         return this.nodeFactory.buildForLoopNode(tokenFor, firstStatement, condition, lastStatement, statementToRepeat);
 
@@ -140,6 +173,12 @@ export class StatementParser extends TermParser {
         let collection = this.parseTerm();
         this.expect(TokenType.rightBracket);
         let statementToRepeat = this.parseStatementOrExpression();
+
+        if (!statementToRepeat)
+        {
+            this.pushError("Hier wird eine Anweisung oder ein Anweisungsblock (in geschweiften Klammern) erwartet.");
+            return undefined;
+        }
 
         if (elementType && elementIdentifier && collection && statementToRepeat) {
             return this.nodeFactory.buildSimplifiedForLoop(tokenFor, elementType, elementIdentifier, collection, statementToRepeat);
@@ -156,7 +195,7 @@ export class StatementParser extends TermParser {
         if (!this.expect(TokenType.leftCurlyBracket, true) || !term) return undefined;
 
         let switchNode = this.nodeFactory.buildSwitchCaseNode(switchToken, term);
-        while(this.comesToken([TokenType.keywordCase, TokenType.keywordDefault])){
+        while(this.comesToken([TokenType.keywordCase, TokenType.keywordDefault], true)){
             let isCase = this.tt == TokenType.keywordCase;
             let caseDefaultToken = this.cct;
             this.nextToken(); // skip case or default
@@ -164,7 +203,7 @@ export class StatementParser extends TermParser {
             this.expect(TokenType.colon, true);
  
             let caseNode = this.nodeFactory.buildCaseNode(caseDefaultToken, constant);
-            while(!this.isEnd() && !this.comesToken([TokenType.keywordCase, TokenType.keywordDefault, TokenType.rightCurlyBracket])){
+            while(!this.isEnd() && !this.comesToken([TokenType.keywordCase, TokenType.keywordDefault, TokenType.rightCurlyBracket], true)){
                 let statement = this.parseStatementOrExpression();
                 if(statement) caseNode.statements.push(statement);
             }
@@ -187,14 +226,14 @@ export class StatementParser extends TermParser {
         if(!statement) return undefined;
         let tryNode = this.nodeFactory.buildTryCatchNode(tryToken, statement);
 
-        while(this.comesToken(TokenType.keywordCatch)){
+        while(this.comesToken(TokenType.keywordCatch, false)){
             let catchToken = this.getAndSkipToken();
             if(!this.expect(TokenType.leftBracket, true)) continue;
             let exceptionTypes: ASTTypeNode[] = [];
             do {
                 let type = this.parseType();
                 if(type) exceptionTypes.push(type);
-            } while(this.comesToken(TokenType.OR))
+            } while(this.comesToken(TokenType.OR, true))
             let identifier = this.expectAndSkipIdentifierAsToken();
             if(!this.expect(TokenType.rightBracket, true)) continue;
             let statement = this.parseStatementOrExpression();
@@ -209,7 +248,7 @@ export class StatementParser extends TermParser {
     parseReturn(): ASTReturnNode {
         let returnToken = this.getAndSkipToken();
         
-        let term = this.comesToken(TokenType.semicolon) ? undefined : this.parseTerm();
+        let term = this.tt == TokenType.semicolon ? undefined : this.parseTerm();
 
         return this.nodeFactory.buildReturnNode(returnToken, term);
 
