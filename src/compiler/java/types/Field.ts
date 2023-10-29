@@ -1,10 +1,11 @@
+import { TokenType } from "../TokenType";
 import { GenericTypeParameter } from "./GenericInformation";
 import { JavaType } from "./JavaType";
 import { Visibility } from "./Visibility";
 
 export class Field {
 
-    constructor(public identifier: string, public type: JavaType, public visibility: Visibility = Visibility.public){
+    constructor(public identifier: string, public type: JavaType, public visibility: Visibility = TokenType.keywordPublic){
 
     }
 

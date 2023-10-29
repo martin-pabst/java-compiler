@@ -1,6 +1,7 @@
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
-import { VisibilityType } from "../types/Visibility.ts";
+import { JavaType } from "../types/JavaType.ts";
+import { Visibility } from "../types/Visibility.ts";
 
 export type ASTNodes = ASTNode[];
 
@@ -27,6 +28,8 @@ export interface TypeScope {
 export interface ASTGlobalNode extends ASTNode, TypeScope {
     kind: TokenType.global;
     mainProgramNode: ASTProgramNode;
+
+    collectedTypeNodes: ASTTypeNode[];
 }
 
 /**
@@ -40,7 +43,7 @@ export interface ASTNodeWithIdentifier {
 
 export interface ASTNodeWithModifiers {
     range: IRange,
-    visibility: VisibilityType;
+    visibility: Visibility;
     isFinal: boolean;
     isStatic: boolean;
     isAbstract: boolean;
@@ -87,6 +90,8 @@ export interface ASTTypeNode extends ASTNode {
     arrayDimensions: number;
     isVoidType: boolean;
     isVarKeyword: boolean;  // type inference...
+
+    resolvedType?: JavaType;
 }
 
 // e.g. public int getValue(String key)

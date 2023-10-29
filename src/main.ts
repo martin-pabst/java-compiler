@@ -1,13 +1,18 @@
 import { AstComponent } from "./AstComponent";
 import { ErrorLevel } from "./compiler/common/Error";
 import { Language } from "./compiler/common/Language";
+import { File } from "./compiler/common/module/File";
 import { Module } from "./compiler/common/module/module";
+import { JavaCompiler } from "./compiler/java/JavaCompiler";
 import { JavaLanguage } from "./compiler/java/JavaLanguage";
 import { Lexer } from "./compiler/java/lexer/Lexer";
 import { TokenPrinter } from "./compiler/java/lexer/TokenPrinter";
+import { JavaModule } from "./compiler/java/module/JavaModule";
+import { JavaModuleManager } from "./compiler/java/module/JavaModuleManager";
 import { Parser } from "./compiler/java/parser/Parser";
 import { Editor } from "./editor/Editor";
 import { Button } from "./tools/Button";
+import { DOM } from "./tools/DOM";
 import { TabManager } from "./tools/TabManager";
 
 import '/include/css/main.css';
@@ -26,6 +31,9 @@ export class Main {
 
   astComponent: AstComponent;
 
+  file: File;
+
+  compiler: JavaCompiler;
 
   constructor() {
     this.language = new JavaLanguage();
@@ -46,14 +54,18 @@ export class Main {
 
     this.initButtons();
 
+    this.file = new File();
+    this.file.monacoModel = this.editor.editor.getModel()!;
+
+    this.compiler = new JavaCompiler();
   }
 
   initButtons(){
     let buttonDiv = document.getElementById('buttons')!;
     new Button(buttonDiv, 'compile', '#30c030', () => {
-      this.compile()
       setInterval(() => {
-      }, 1000)
+        this.compile()
+      }, 500)
     
     
     }, 'myButton');
@@ -62,21 +74,16 @@ export class Main {
   }
 
   compile(){
-    let text = this.editor.editor.getModel()?.getValue();
-    if(text){
-      let module = new Module(text);
-      let lexer = new Lexer(module);
-      lexer.lex();
+
+      this.compiler.compile([this.file]);
+
+      let module = this.compiler.moduleManager.getModuleFromFile(this.file)!;
+
       TokenPrinter.print(module.tokens!, this.tokenDiv);
-
-      let parser = new Parser(module);
-      parser.parse();
-
       this.astComponent.buildTreeView(module.ast);
 
       this.markErrors(module);  
-
-    }
+      this.printErrors(module);
   }
 
   markErrors(module: Module){
@@ -102,6 +109,20 @@ export class Main {
       case "warning": return monaco.MarkerSeverity.Warning;
       case "error": return monaco.MarkerSeverity.Error;
     }
+  }
+
+  printErrors(module: Module){
+    DOM.clear(this.errorDiv);
+    this.errorDiv.classList.add('errorDiv');
+
+    for(let error of module.errors){
+      let errorLine = DOM.makeDiv(this.errorDiv, 'errorLine');
+      let errorPos = DOM.makeSpan(errorLine, 'errorPosition');
+      errorPos.textContent = `[${error.range.startLineNumber}:${error.range.startColumn}]`;
+      let errorText = DOM.makeSpan(errorLine, 'errorText');
+      errorText.textContent = error.message;
+    }
+
   }
 
 }

@@ -1,7 +1,7 @@
-import { Module } from "../../common/module/module";
 import { Range } from "../../common/range/Range.ts";
-import { Token } from "../Token.ts";
+import { Token } from "../lexer/Token.ts";
 import { TokenType } from "../TokenType";
+import { JavaModule } from "../module/JavaModule.ts";
 import {
     ASTAnnotationNode,
     ASTClassDefinitionNode,
@@ -27,7 +27,7 @@ export class Parser extends StatementParser {
 
     collectedAnnotations: ASTAnnotationNode[] = [];
 
-    constructor(module: Module) {
+    constructor(module: JavaModule) {
         super(module);
         this.initializeAST();
     }
@@ -40,7 +40,8 @@ export class Parser extends StatementParser {
                 endLineNumber: this.endToken.range.endLineNumber, endColumn: this.endToken.range.endColumn
             },
             classOrInterfaceOrEnumDefinitions: [],
-            mainProgramNode: this.nodeFactory.buildMainProgramNode(this.cct)
+            mainProgramNode: this.nodeFactory.buildMainProgramNode(this.cct),
+            collectedTypeNodes: []
         }
 
     }
@@ -245,7 +246,7 @@ export class Parser extends StatementParser {
 
         } while (foundModifier);
 
-        if (visibilityModifiers.length > 0) {
+        if (visibilityModifiers.length > 1) {
             this.pushError(`Es ist nicht zulässig, mehrere visibility-modifiers gleichzeitig zu setzen (hier: ${visibilityModifiers.map(vm => vm.value).join(", ")})`, "warning", Range.lift(visibilityModifiers[0].range).plusRange(visibilityModifiers.pop()!.range));
         }
 

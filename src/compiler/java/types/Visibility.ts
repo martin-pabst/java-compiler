@@ -1,4 +1,4 @@
 import { TokenType } from "../TokenType";
 
-export type VisibilityType = TokenType.keywordPrivate | TokenType.keywordProtected | TokenType.keywordPublic;
+export type Visibility = TokenType.keywordPrivate | TokenType.keywordProtected | TokenType.keywordPublic;
 

@@ -1,5 +1,5 @@
-import { IRange } from "../common/range/Range";
-import { TokenType } from "./TokenType";
+import { IRange } from "../../common/range/Range";
+import { TokenType } from "../TokenType";
 
 export type Token = {
     tt: TokenType,

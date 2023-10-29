@@ -1,3 +1,7 @@
+import { UsagePosition } from "../../common/UsagePosition";
+import { File } from "../../common/module/File";
+import { IRange } from "../../common/range/Range";
+import { JavaModule } from "../module/JavaModule";
 import { Field } from "./Field";
 import { JavaClass } from "./JavaClass";
 import { JavaClassOrInterface } from "./JavaClassOrInterface";
@@ -14,6 +18,7 @@ export class GenericTypeParameter implements NonPrimitiveType {
 
     private fieldCache?: Field[];
     private methodCache?: Method[];
+    public usagePositions: UsagePosition[] = [];
 
     /**
      * 
@@ -21,10 +26,15 @@ export class GenericTypeParameter implements NonPrimitiveType {
      * @param upperBounds: ? extends B1 & B2 & B3...  B1 can be class or interface, B2, ... only interfaces; The type is SUBtype of B1, B2, ...
      * @param lowerBound : ? super B: the given type has B as its subtype
      */
-    constructor(public identifier: string, public upperBounds: JavaClassOrInterface[] = [], public lowerBound?: JavaClass){
+    constructor(public identifier: string, public module: JavaModule, public identifierRange: IRange, 
+        public upperBounds: JavaClassOrInterface[] = [], public lowerBound?: JavaClass){
         this.isPrimitive = false;
         this.isGenericTypeParameter = true;
         this.isWildcard = (this.identifier == '?');
+    }
+
+    getFile(): File {
+        return this.module.file;
     }
 
     getFields(): Field[]{

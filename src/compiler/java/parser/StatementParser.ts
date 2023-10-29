@@ -1,12 +1,12 @@
-import { Module } from "../../common/module/module.ts";
-import { Token } from "../Token.ts";
+import { Token } from "../lexer/Token.ts";
 import { TokenType } from "../TokenType.ts";
+import { JavaModule } from "../module/JavaModule.ts";
 import { ASTForLoopNode, ASTIfNode, ASTReturnNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode } from "./AST.ts";
 import { TermParser } from "./TermParser.ts";
 
 export class StatementParser extends TermParser {
 
-    constructor(protected module: Module) {
+    constructor(protected module: JavaModule) {
         super(module);
     }
 
@@ -150,6 +150,7 @@ export class StatementParser extends TermParser {
         let firstStatement = this.parseStatementOrExpression(false);
         this.expect(TokenType.semicolon, true);
         let condition = this.parseTerm();
+        if(!condition) this.skipTokensTillEndOfLineOr(TokenType.semicolon)
         this.expect(TokenType.semicolon, true);
         let lastStatement = this.parseTerm();
         this.expect(TokenType.rightBracket, true);

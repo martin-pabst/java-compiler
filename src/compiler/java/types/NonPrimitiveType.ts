@@ -11,6 +11,7 @@ import { Method } from "./Method";
  */
 export interface NonPrimitiveType extends JavaType {
     isPrimitive: false;
+
     getFields: () => Field[];
     getMethods: () => Method[];
 

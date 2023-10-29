@@ -1,9 +1,9 @@
-import { TokenList, Token } from "../Token.js";
+import { TokenList, Token } from "./Token.js";
 import { ColorLexer } from "./ColorLexer.js";
 import { ColorHelper } from "./ColorHelper.js";
 import { Error, ErrorLevel } from "../../common/Error.js";
 import { EscapeSequenceList, TokenType, TokenTypeReadable, keywordList as KeywordList, specialCharList } from "../TokenType.js";
-import { Module } from "../../common/module/module.js";
+import { JavaModule } from "../module/JavaModule.js";
 
 
 
@@ -48,9 +48,9 @@ export class Lexer {
 
     private input: string;
 
-    constructor(private module: Module) {
+    constructor(private module: JavaModule) {
 
-        this.input = module.text;
+        this.input = module.file.getText();
         this.tokenList = [];
         this.errorList = [];
         this.bracketError = undefined;
@@ -66,7 +66,12 @@ export class Lexer {
     lex() {
 
         if (this.input.length == 0) {
-            return { tokens: this.tokenList, errors: this.errorList, bracketError: undefined, colorInformation: [] };
+            this.module.tokens = this.tokenList;
+            this.module.errors = this.errorList;
+            this.module.bracketError = this.bracketError;
+            this.module.colorInformation = this.colorInformation;
+
+            return;
         }
 
         this.currentChar = this.input.charAt(0);

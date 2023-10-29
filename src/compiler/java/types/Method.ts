@@ -1,3 +1,4 @@
+import { TokenType } from "../TokenType";
 import { GenericTypeParameter } from "./GenericInformation";
 import { JavaType } from "./JavaType";
 import { NonPrimitiveType } from "./NonPrimitiveType";
@@ -13,7 +14,7 @@ export class Method {
      */
     returnParameter?: JavaType;
 
-    constructor(public identifier: string, public visibility: Visibility = Visibility.public){
+    constructor(public identifier: string, public visibility: Visibility = TokenType.keywordPublic){
 
     }
 

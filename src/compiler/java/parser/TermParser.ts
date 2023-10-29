@@ -1,5 +1,5 @@
-import { Module } from "../../common/module/module.ts";
 import { TokenType } from "../TokenType.ts";
+import { JavaModule } from "../module/JavaModule.ts";
 import { ASTBinaryNode, ASTCastNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTVariableNode, BinaryOperator } from "./AST.ts";
 import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator.ts";
@@ -35,7 +35,7 @@ export abstract class TermParser extends TokenIterator {
 
     nodeFactory: ASTNodeFactory;
 
-    constructor(protected module: Module) {
+    constructor(protected module: JavaModule) {
         super(module.tokens!);
         this.nodeFactory = new ASTNodeFactory(this);
 
@@ -304,6 +304,7 @@ export abstract class TermParser extends TokenIterator {
         // general Syntax: <identifier><genericParameterInvocation><ArrayDimension[]>
 
         let type = this.nodeFactory.buildTypeNode();
+        this.module.ast!.collectedTypeNodes.push(type);
 
         if (this.tt == TokenType.keywordVoid) {
             type.isVoidType = true;

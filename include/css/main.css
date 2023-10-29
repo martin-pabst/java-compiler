@@ -44,4 +44,17 @@ body, html, #main {
     grid-area: 2/2;
 }
 
+.errorDiv {
+    display: flex;
+    flex-direction: column;
+}
+
+.errorPosition {
+    color: red;
+}
+
+.errorText {
+    margin-left: 5px;    
+}
+
 

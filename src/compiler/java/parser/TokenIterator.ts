@@ -1,12 +1,12 @@
 import { Error, ErrorLevel, QuickFix } from "../../common/Error";
 import { IRange } from "../../common/range/Range";
-import { Token, TokenList } from "../Token";
+import { Token, TokenList } from "../lexer/Token";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { ASTNode } from "./AST";
 
 export class TokenIterator {
 
-    static possibleTokensInsideVariableDeclaration:TokenType[] = [
+    static possibleTokensInsideVariableDeclaration: TokenType[] = [
         TokenType.identifier, TokenType.linefeed, TokenType.newline,
         TokenType.space, TokenType.comment,
         TokenType.lower, TokenType.greater, TokenType.dot,
@@ -69,7 +69,7 @@ export class TokenIterator {
 
         let token: Token;
 
-        if(this.pos >= this.tokenList.length) return;
+        if (this.pos >= this.tokenList.length) return;
 
         this.lastToken = this.cct;
 
@@ -110,10 +110,10 @@ export class TokenIterator {
         let pos = this.pos;
         let token = this.cct;
 
-        while(k > 0 && pos < this.tokenList.length){
+        while (k > 0 && pos < this.tokenList.length) {
             pos++;
             let t: Token = this.tokenList[pos];
-            if(TokenIterator.spaceTokenTypes.indexOf(t.tt) < 0){
+            if (TokenIterator.spaceTokenTypes.indexOf(t.tt) < 0) {
                 k--;
                 token = t;
             }
@@ -122,22 +122,22 @@ export class TokenIterator {
         return token;
     }
 
-    pushErrorAndSkipToken(){
+    pushErrorAndSkipToken() {
         this.pushError("Das Token '" + this.cct.value + "' wird hier nicht erwartet.", "error");
         this.nextToken();
     }
 
-    skipTokensTillEndOfLineOr(skippedTokens: TokenType | TokenType[]){
-        if(!Array.isArray(skippedTokens)) skippedTokens = [skippedTokens];
+    skipTokensTillEndOfLineOr(skippedTokens: TokenType | TokenType[]) {
+        if (!Array.isArray(skippedTokens)) skippedTokens = [skippedTokens];
         skippedTokens.push(TokenType.linefeed, TokenType.newline);
-        while(this.pos < this.tokenList.length && skippedTokens.indexOf(this.tokenList[this.pos].tt) < 0){
+        while (this.pos < this.tokenList.length && skippedTokens.indexOf(this.tokenList[this.pos].tt) < 0) {
             this.pos++;
         }
-        if(this.pos < this.tokenList.length){
-            this.pos++;
-        } 
+        if (this.pos < this.tokenList.length) {
+            this.nextToken();
+        }
 
-}
+    }
 
 
     pushError(message: string, errorLevel: ErrorLevel = "error", range?: IRange, quickFix?: QuickFix) {
@@ -152,15 +152,15 @@ export class TokenIterator {
 
     expect(tt: TokenType | TokenType[], skipIfTrue: boolean = true): boolean {
 
-        if (!Array.isArray(tt)){
-            if(this.tt == tt){
-                if(skipIfTrue) this.nextToken();
+        if (!Array.isArray(tt)) {
+            if (this.tt == tt) {
+                if (skipIfTrue) this.nextToken();
                 return true;
             }
             this.pushError("Erwartet wird: " + TokenTypeReadable[tt] + " - Gefunden wurde: " + this.cct.value, "error");
             return false;
         }
-        
+
         if (tt.indexOf(this.tt) >= 0) {
             if (skipIfTrue) this.nextToken();
             return true;
@@ -238,16 +238,16 @@ export class TokenIterator {
 
     }
 
-    skipTillNextTokenAfter(tt: TokenType[]){
-        
-        while(this.pos < this.tokenList.length - 1){
+    skipTillNextTokenAfter(tt: TokenType[]) {
+
+        while (this.pos < this.tokenList.length - 1) {
             this.pos++;
             let token = this.tokenList[this.pos];
-            if(TokenIterator.spaceTokenTypes.indexOf(token.tt) < 0){
+            if (TokenIterator.spaceTokenTypes.indexOf(token.tt) < 0) {
                 this.lastToken = this.cct;
                 this.cct = token;
             }
-            if(tt.indexOf(token.tt) >= 0){
+            if (tt.indexOf(token.tt) >= 0) {
                 this.nextToken();
                 return;
             }
@@ -255,7 +255,7 @@ export class TokenIterator {
     }
 
     expectAndSkipIdentifierAsString(): string {
-        if(this.tt == TokenType.identifier){
+        if (this.tt == TokenType.identifier) {
             let identifier: string = <string>this.cct.value;
             this.nextToken();
             return identifier;
@@ -266,7 +266,7 @@ export class TokenIterator {
     }
 
     expectAndSkipIdentifierAsToken(): Token {
-        if(this.tt == TokenType.identifier){
+        if (this.tt == TokenType.identifier) {
             let t = this.cct;
             this.nextToken();
             return t;
@@ -297,18 +297,18 @@ export class TokenIterator {
 
         // comestoken is called very often, so we try to implement this in a performant way:
         if (!Array.isArray(token)) {
-            if(!skipIfTrue) return this.tt == token;
-            if(this.tt == token){
+            if (!skipIfTrue) return this.tt == token;
+            if (this.tt == token) {
                 this.nextToken();
                 return true;
-            }            
+            }
             return false;
         }
 
         // token is of type TokenType[]
-        if(!skipIfTrue) return token.indexOf(this.tt) >= 0;
+        if (!skipIfTrue) return token.indexOf(this.tt) >= 0;
 
-        if(token.indexOf(this.tt) >= 0){
+        if (token.indexOf(this.tt) >= 0) {
             this.nextToken();
             return true;
         }
@@ -335,7 +335,7 @@ export class TokenIterator {
         return node;
     }
 
-    comesIdentifier(identifier: string){
+    comesIdentifier(identifier: string) {
         return this.tt == TokenType.identifier && this.cct.value == identifier;
     }
 
@@ -343,20 +343,20 @@ export class TokenIterator {
     findTokenTypeAfterCorrespondingRightBracket(): TokenType {
         let p = this.pos + 1; // skip left bracket
         let depth = 1;
-        while(p < this.tokenList.length && depth > 0){
-            switch(this.tokenList[p++].tt){
+        while (p < this.tokenList.length && depth > 0) {
+            switch (this.tokenList[p++].tt) {
                 case TokenType.leftBracket: depth++;
-                break;
+                    break;
                 case TokenType.rightBracket: depth--;
             }
         }
 
-        if(depth == 0){
-            while(p < this.tokenList.length && TokenIterator.spaceTokenTypes.indexOf(this.tokenList[p].tt) >= 0){
+        if (depth == 0) {
+            while (p < this.tokenList.length && TokenIterator.spaceTokenTypes.indexOf(this.tokenList[p].tt) >= 0) {
                 p++;
             }
 
-            if(p < this.tokenList.length){
+            if (p < this.tokenList.length) {
                 return this.tokenList[p].tt;
             }
         }
@@ -365,14 +365,14 @@ export class TokenIterator {
 
     }
 
-    lookForTokenTillOtherToken(tokensToLookFor: TokenType | TokenType[], tillToken: TokenType | TokenType[] ): TokenType | null {
-        if(!Array.isArray(tokensToLookFor)) tokensToLookFor = [tokensToLookFor];
-        if(!Array.isArray(tillToken)) tillToken = [tillToken];
+    lookForTokenTillOtherToken(tokensToLookFor: TokenType | TokenType[], tillToken: TokenType | TokenType[]): TokenType | null {
+        if (!Array.isArray(tokensToLookFor)) tokensToLookFor = [tokensToLookFor];
+        if (!Array.isArray(tillToken)) tillToken = [tillToken];
 
         let pos1: number = this.pos;
-        while(pos1 < this.tokenList.length){
+        while (pos1 < this.tokenList.length) {
             let tt = this.tokenList[pos1].tt;
-            if(tokensToLookFor.indexOf(tt) >= 0) return tt; 
+            if (tokensToLookFor.indexOf(tt) >= 0) return tt;
             pos1++;
         }
 
@@ -384,21 +384,21 @@ export class TokenIterator {
         let pos = this.pos;
         let nonSpaceTokenTypesFound: TokenType[] = [];
 
-        while(pos < this.tokenList.length){
+        while (pos < this.tokenList.length) {
             let token = this.tokenList[pos];
             let tt = token.tt;
-            if(tt == TokenType.semicolon || tt == TokenType.assignment) break;
-            if(TokenIterator.possibleTokensInsideVariableDeclaration.indexOf(tt) < 0) return false;
-            if(TokenIterator.spaceTokenTypes.indexOf(tt) < 0) nonSpaceTokenTypesFound.push(tt);
+            if (tt == TokenType.semicolon || tt == TokenType.assignment) break;
+            if (TokenIterator.possibleTokensInsideVariableDeclaration.indexOf(tt) < 0) return false;
+            if (TokenIterator.spaceTokenTypes.indexOf(tt) < 0) nonSpaceTokenTypesFound.push(tt);
             pos++;
         }
 
         let length = nonSpaceTokenTypesFound.length;
-        if(length < 2) return false;
+        if (length < 2) return false;
 
-        if(nonSpaceTokenTypesFound[length - 1] != TokenType.identifier) return false;
+        if (nonSpaceTokenTypesFound[length - 1] != TokenType.identifier) return false;
 
-        if([TokenType.identifier, TokenType.greater, TokenType.leftRightSquareBracket, TokenType.keywordVar].indexOf(nonSpaceTokenTypesFound[length - 2]) < 0){
+        if ([TokenType.identifier, TokenType.greater, TokenType.leftRightSquareBracket, TokenType.keywordVar].indexOf(nonSpaceTokenTypesFound[length - 2]) < 0) {
             return false;
         }
 

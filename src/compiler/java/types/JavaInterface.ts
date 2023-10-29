@@ -1,17 +1,30 @@
+import { UsagePosition } from "../../common/UsagePosition";
+import { File } from "../../common/module/File";
+import { IRange } from "../../common/range/Range";
+import { TokenType } from "../TokenType";
+import { JavaModule } from "../module/JavaModule";
 import { Field } from "./Field";
 import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
+import { JavaClass } from "./JavaClass";
 import { JavaClassOrInterface } from "./JavaClassOrInterface";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
 import { NonPrimitiveType } from "./NonPrimitiveType";
+import { Visibility } from "./Visibility";
 
 export abstract class IJavaInterface implements JavaClassOrInterface {
     isPrimitive: false;
     isGenericTypeParameter: false;
+    public usagePositions: UsagePosition[] = [];
+
     
-    constructor(public identifier: string){
+    constructor(public identifier: string, public module: JavaModule, public identifierRange: IRange){
         this.isPrimitive = false;
         this.isGenericTypeParameter = false;
+    }
+
+    getFile(): File {
+        return this.module.file;
     }
 
     abstract getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, NonPrimitiveType>): NonPrimitiveType;
@@ -31,8 +44,11 @@ export class JavaInterface extends IJavaInterface {
 
     private extends: JavaInterface[] = [];
 
-    constructor(public identifier: string) {
-        super(identifier);
+    visibility: Visibility = TokenType.keywordPublic;
+    enclosingParent: JavaClass | undefined = undefined;
+
+    constructor(identifier: string, module: JavaModule, declarationRange: IRange) {
+        super(identifier, module, declarationRange);
     }
 
     getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, NonPrimitiveType>): IJavaInterface {
@@ -70,7 +86,7 @@ export class GenericVariantOfJavaInteface extends IJavaInterface {
     private cachedExtends?: IJavaInterface[];
 
     constructor(public isGenericVariantOf: JavaInterface, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
-        super(isGenericVariantOf.identifier);
+        super(isGenericVariantOf.identifier, isGenericVariantOf.module, isGenericVariantOf.identifierRange);
     }
 
     getCopyWithConcreteType(otherTypeMap: Map<GenericTypeParameter, NonPrimitiveType>): IJavaInterface {
