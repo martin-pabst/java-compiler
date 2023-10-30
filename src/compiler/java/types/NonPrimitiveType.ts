@@ -1,5 +1,6 @@
+import { IRange } from "../../common/range/Range";
+import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
-import { GenericTypeParameter } from "./GenericInformation";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
 
@@ -9,12 +10,17 @@ import { Method } from "./Method";
  *  - may have fields (de: "Attribute")
  *  - may have methods
  */
-export interface NonPrimitiveType extends JavaType {
-    isPrimitive: false;
+export abstract class NonPrimitiveType extends JavaType {
 
-    getFields: () => Field[];
-    getMethods: () => Method[];
+    abstract isGenericVariant(): boolean;
+    abstract isGenericTypeParameter(): boolean;
 
-    getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, JavaType>): JavaType;
+    abstract getFields(): Field[];
+    abstract getMethods(): Method[];
+
+    constructor(identifier: string, identifierRange: IRange, module: JavaBaseModule){
+        super(identifier, identifierRange, module);
+        this.isPrimitive = false;
+    }
 
 }

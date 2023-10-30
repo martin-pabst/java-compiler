@@ -9,14 +9,9 @@ import { JavaType } from "./JavaType";
 import { Method } from "./Method";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 
-export class GenericTypeParameter implements NonPrimitiveType {
-
-    isPrimitive: false;
-    isGenericTypeParameter: true;
+export class GenericTypeParameter extends NonPrimitiveType {
 
     isWildcard: boolean;
-
-    genericInformation: GenericInformation | undefined = undefined;
 
     private fieldCache?: Field[];
     private methodCache?: Method[];
@@ -28,11 +23,18 @@ export class GenericTypeParameter implements NonPrimitiveType {
      * @param upperBounds: ? extends B1 & B2 & B3...  B1 can be class or interface, B2, ... only interfaces; The type is SUBtype of B1, B2, ...
      * @param lowerBound : ? super B: the given type has B as its subtype
      */
-    constructor(public identifier: string, public module: JavaBaseModule, public identifierRange: IRange, 
+    constructor(identifier: string, module: JavaBaseModule, identifierRange: IRange, 
         public upperBounds: (JavaClass | JavaInterface)[] = [], public lowerBound?: JavaClass){
-        this.isPrimitive = false;
-        this.isGenericTypeParameter = true;
+        super(identifier, identifierRange, module);
         this.isWildcard = (this.identifier == '?');
+    }
+
+    isGenericVariant(): boolean {
+        return false;
+    }
+
+    isGenericTypeParameter(): boolean {
+        return true;
     }
 
     getFile(): File {

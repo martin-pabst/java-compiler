@@ -1,5 +1,4 @@
 import { UsagePosition } from "../../common/UsagePosition";
-import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
@@ -13,31 +12,21 @@ import { Visibility } from "./Visibility";
 
 
 
-export abstract class IJavaClass implements NonPrimitiveType {
+export abstract class IJavaClass extends NonPrimitiveType {
     isPrimitive: false;
-    isGenericTypeParameter: false;
     genericInformation: GenericInformation | undefined = undefined;
 
     public usagePositions: UsagePosition[] = [];
 
     
-    constructor(public identifier: string, public module: JavaBaseModule, public identifierRange: IRange){
+    constructor(identifier: string, module: JavaBaseModule, identifierRange: IRange){
+        super(identifier, identifierRange, module);        
         this.isPrimitive = false;
-        this.isGenericTypeParameter = false;
     }
 
-    abstract getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, JavaType>): JavaType;
     abstract getFields(): Field[];
     abstract getMethods(): Method[];
-    abstract getExtends(): IJavaClass | undefined;
-    abstract getImplements(): IJavaInterface[];
-    abstract canCastTo(otherType: JavaType): boolean;
-    abstract clearUsagePositions(): void;
     
-    getFile(): File {
-        return this.module.file;
-    }
-
 }
 
 
@@ -61,6 +50,14 @@ export class JavaClass extends IJavaClass {
         super(identifier, module, declarationRange);
     }
 
+    isGenericVariant(): boolean {
+        return false;
+    }
+
+    isGenericTypeParameter(): boolean {
+        return false;
+    }
+
     setExtends(ext: JavaClass){
         this.extends = ext;
     }
@@ -74,11 +71,11 @@ export class JavaClass extends IJavaClass {
         return new GenericVariantOfJavaClass(this, typeMap);
     }
 
-    getExtends(): JavaClass | undefined{
+    getExtends(): JavaClass | undefined {
         return this.extends;
     }
 
-    getImplements(): JavaInterface[]{
+    getImplements(): JavaInterface[] {
         return this.implements;
     }
 
@@ -133,6 +130,14 @@ export class GenericVariantOfJavaClass extends IJavaClass {
 
     constructor(public isGenericVariantOf: JavaClass, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
         super(isGenericVariantOf.identifier, isGenericVariantOf.module, isGenericVariantOf.identifierRange);
+    }
+
+    isGenericVariant(): boolean {
+        return true;
+    }
+
+    isGenericTypeParameter(): boolean {
+        return false;
     }
 
     getCopyWithConcreteType(otherTypeMap: Map<GenericTypeParameter, NonPrimitiveType>): IJavaClass {

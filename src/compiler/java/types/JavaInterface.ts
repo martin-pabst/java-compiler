@@ -11,30 +11,18 @@ import { Method } from "./Method";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility";
 
-export abstract class IJavaInterface implements NonPrimitiveType {
-    isPrimitive: false;
-    isGenericTypeParameter: false;
-    genericInformation: GenericInformation | undefined;
-
-    public usagePositions: UsagePosition[] = [];
-
+export abstract class IJavaInterface extends NonPrimitiveType {
     
     constructor(public identifier: string, public module: JavaBaseModule, public identifierRange: IRange){
-        this.isPrimitive = false;
-        this.isGenericTypeParameter = false;
+        super(identifier, identifierRange, module);
     }
 
     getFile(): File {
         return this.module.file;
     }
 
-    abstract getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, NonPrimitiveType>): NonPrimitiveType;
     getFields(): Field[] {return []};
     abstract getMethods(): Method[];
-    abstract getExtends(): IJavaInterface[];
-
-    abstract canCastTo(otherType: JavaType): boolean;
-    abstract clearUsagePositions(): void;
 
 }
 
@@ -53,6 +41,14 @@ export class JavaInterface extends IJavaInterface {
 
     constructor(identifier: string, module: JavaBaseModule, declarationRange: IRange) {
         super(identifier, module, declarationRange);
+    }
+
+    isGenericVariant(): boolean {
+        return false;
+    }
+
+    isGenericTypeParameter(): boolean {
+        return false;
     }
 
     addExtends(ext: JavaInterface | JavaInterface[]){
@@ -103,6 +99,14 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
 
     constructor(public isGenericVariantOf: JavaInterface, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
         super(isGenericVariantOf.identifier, isGenericVariantOf.module, isGenericVariantOf.identifierRange);
+    }
+
+    isGenericVariant(): boolean {
+        return true;
+    }
+
+    isGenericTypeParameter(): boolean {
+        return false;
     }
 
     getCopyWithConcreteType(otherTypeMap: Map<GenericTypeParameter, NonPrimitiveType>): IJavaInterface {

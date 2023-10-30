@@ -28,8 +28,8 @@ export class JavaCompiler {
         this.moduleManager.setupModulesBeforeCompiliation(files);
         this.moduleManager.setDirtyFlags();
 
-        let cleanModules = this.moduleManager.getCleanModules();
-        cleanModules.forEach(cm => cm.registerUsagePositionsAtLibraryTypes());
+        let cleanModules = this.moduleManager.getUnChangedModules();
+        cleanModules.forEach(cm => cm.registerUsagePositions());
 
         let dirtyModules = this.moduleManager.getDirtyModules();
         

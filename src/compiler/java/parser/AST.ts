@@ -1,6 +1,7 @@
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaType } from "../types/JavaType.ts";
+import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { Visibility } from "../types/Visibility.ts";
 
 export type ASTNodes = ASTNode[];
@@ -35,6 +36,10 @@ export interface ASTGlobalNode extends ASTNode, TypeScope {
 /**
  * Building blocks for nodes...
  */
+
+export interface ASTTypeDefiningNode {
+    resolvedType?: NonPrimitiveType;    
+}
 
 export interface ASTNodeWithIdentifier {
     identifier: string;
@@ -119,7 +124,8 @@ ASTNodeWithIdentifier, AnnotatedNode {
 
 export interface ASTClassDefinitionNode 
 extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers,
-    ASTTypeDefinitionWithAttributes, TypeScope, ASTNodeWithIdentifier, AnnotatedNode
+    ASTTypeDefinitionWithAttributes, TypeScope, ASTNodeWithIdentifier, AnnotatedNode,
+    ASTTypeDefiningNode
 {
     kind: TokenType.keywordClass;
     parent: TypeScope;
@@ -130,7 +136,7 @@ extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNo
 
 export interface ASTInterfaceDefinitionNode 
 extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers, 
-ASTNodeWithIdentifier, AnnotatedNode
+ASTNodeWithIdentifier, AnnotatedNode, ASTTypeDefiningNode
 {
     kind: TokenType.keywordInterface;
     parent: TypeScope ;
@@ -146,7 +152,8 @@ export interface ASTEnumValueNode extends ASTNode {
 
 export interface ASTEnumDefinitionNode 
 extends ASTNode, TypeDefinitionWithMethods, ASTNodeWithModifiers,
-    ASTTypeDefinitionWithAttributes, ASTNodeWithIdentifier, AnnotatedNode
+    ASTTypeDefinitionWithAttributes, ASTNodeWithIdentifier, 
+    AnnotatedNode, ASTTypeDefiningNode
 {
     kind: TokenType.keywordEnum;
     parent: TypeScope;

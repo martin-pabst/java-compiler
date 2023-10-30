@@ -5,11 +5,14 @@ import { IRange } from "./range/Range";
 /**
  * encapsultes methods for debugger
  */
-export interface BaseType {
-    identifier: string;
-    identifierRange: IRange;
-    usagePositions: UsagePosition[];
+export class BaseType {
+    usagePositions: UsagePosition[] = [];
 
-    getFile(): File;
+    constructor(public identifier: string, public identifierRange: IRange, public file: File){
 
+    }
+
+    clearUsagePositions(): void {
+        this.usagePositions = [];
+    }
 }

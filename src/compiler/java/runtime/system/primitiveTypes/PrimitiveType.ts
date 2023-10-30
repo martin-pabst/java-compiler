@@ -1,20 +1,14 @@
-import { UsagePosition } from "../../../../common/UsagePosition";
 import { File } from "../../../../common/module/File";
-import { IRange } from "../../../../common/range/Range";
+import { EmptyRange, IRange } from "../../../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../../../TokenType";
 import { FunctionTemplate } from "../../../codegenerator/FunctionTemplate";
 import { JavaBaseModule } from "../../../module/JavaBaseModule";
 import { JavaTypeStore } from "../../../module/JavaTypeStore";
 import { BinaryOperator } from "../../../parser/AST";
-import { GenericInformation, GenericTypeParameter } from "../../../types/GenericInformation";
+import { GenericTypeParameter } from "../../../types/GenericInformation";
 import { JavaType } from "../../../types/JavaType";
 
-export abstract class PrimitiveType implements JavaType {
-    isPrimitive: boolean;
-    isGenericTypeParameter: boolean;
-    usagePositions: UsagePosition[] = [];
-    genericInformation: GenericInformation | undefined = undefined; 
-
+export abstract class PrimitiveType extends JavaType {
     myIndex: number;
 
     defaultValue: any = 0;
@@ -39,8 +33,8 @@ export abstract class PrimitiveType implements JavaType {
     public identifierRange: IRange = {startLineNumber: 0, startColumn: 0, endLineNumber: 0, endColumn: 0};
 
     constructor(public identifier: string, public module: JavaBaseModule){
+        super(identifier, EmptyRange.instance, module)
         this.isPrimitive = true;
-        this.isGenericTypeParameter = false;
         this.myIndex = PrimitiveType.typeIdentifiers.indexOf(this.identifier);
     }
 

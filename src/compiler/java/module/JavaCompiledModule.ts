@@ -2,9 +2,9 @@ import { File } from "../../common/module/File";
 import { TokenList } from "../lexer/Token";
 import { ASTGlobalNode } from "../parser/AST";
 import { JavaType } from "../types/JavaType";
+import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { JavaBaseModule } from "./JavaBaseModule";
 import { JavaModuleManager } from "./JavaModuleManager";
-import { JavaTypeStore } from "./JavaTypeStore";
 
 /**
  * A JavaModule represents a compiled Java Sourcecode File.
@@ -33,6 +33,30 @@ export class JavaModule extends JavaBaseModule {
         this.dirty = this.lastCompiledProgramText != this.file.getText();
         this.lastCompiledProgramText = this.file.getText();
     }
+
+
+    clearTypeUsagePositions(): void {
+        if(this.ast?.classOrInterfaceOrEnumDefinitions){
+            for(let def of this.ast?.classOrInterfaceOrEnumDefinitions){
+                if(def.resolvedType) def.resolvedType?.clearUsagePositions();
+            }
+        }        
+    }
+
+    registerUsagePositions(): void {
+        if(this.ast?.collectedTypeNodes){
+            for(let typeNode of this.ast!.collectedTypeNodes){
+                let resolvedType = typeNode.resolvedType;
+                if(resolvedType && resolvedType instanceof NonPrimitiveType){                    
+                    resolvedType.usagePositions.push({
+                        file: this.file,
+                        range: typeNode.range
+                    })
+                }
+            }
+        }
+    }
+
 
 
 }
