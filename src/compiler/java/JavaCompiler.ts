@@ -29,12 +29,14 @@ export class JavaCompiler {
         this.moduleManager.setDirtyFlags();
 
         let cleanModules = this.moduleManager.getUnChangedModules();
-        cleanModules.forEach(cm => cm.registerUsagePositions());
+        cleanModules.forEach(cm => cm.clearAndRegisterTypeUsagePositions());
 
         let dirtyModules = this.moduleManager.getDirtyModules();
         
         for(let module of dirtyModules){
             
+            module.resetBeforeCompilation();
+
             let lexer = new Lexer(module);
             lexer.lex();
             

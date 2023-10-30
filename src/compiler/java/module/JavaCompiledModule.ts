@@ -35,6 +35,11 @@ export class JavaModule extends JavaBaseModule {
     }
 
 
+    clearAndRegisterTypeUsagePositions(): void {
+        this.clearTypeUsagePositions();
+        this.registerTypeUsagePositions();
+    }
+
     clearTypeUsagePositions(): void {
         if(this.ast?.classOrInterfaceOrEnumDefinitions){
             for(let def of this.ast?.classOrInterfaceOrEnumDefinitions){
@@ -43,11 +48,11 @@ export class JavaModule extends JavaBaseModule {
         }        
     }
 
-    registerUsagePositions(): void {
+    registerTypeUsagePositions(): void {
         if(this.ast?.collectedTypeNodes){
             for(let typeNode of this.ast!.collectedTypeNodes){
                 let resolvedType = typeNode.resolvedType;
-                if(resolvedType && resolvedType instanceof NonPrimitiveType){                    
+                if(resolvedType && resolvedType instanceof NonPrimitiveType && !resolvedType.isGenericVariant()){                    
                     resolvedType.usagePositions.push({
                         file: this.file,
                         range: typeNode.range
