@@ -25,8 +25,8 @@ Leads to this object structure:
     age: number,
 
     prototype: {    // class-Object of class Test1
-        _m$getName$$string: (t: Thread) => void,       // overwrites _m$getName() of prototype; return value is pushed to current stackframe t.sf
-        _m$setName$$String: (t: Thread, n: string) => void,
+        _m$getName$String: (t: Thread) => void,       // overwrites _m$getName() of prototype; return value is pushed to current stackframe t.sf
+        _m$setName$void$String: (t: Thread, n: string) => void,
         _mo1249: { ... }  // method-objects, see later
         _mo1250: { ... }
 

@@ -11,6 +11,10 @@ export class ArrayType implements JavaType {
     usagePositions: UsagePosition[] = [];
     genericInformation: GenericInformation | undefined = undefined;
 
+    clearUsagePositions(): void {
+        
+    }
+
     constructor(public identifier: string, public elementType: JavaType, public dimenstion: number,
          public module: JavaBaseModule, public identifierRange: IRange){
         this.isPrimitive = true;

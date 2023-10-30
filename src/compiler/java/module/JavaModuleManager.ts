@@ -1,8 +1,8 @@
 import { File } from "../../common/module/File";
-import { JavaModule } from "./JavaModule";
-import { JavaLibraryModule } from "./JavaLibraryModule";
+import { JavaLibraryModule } from "./libraries/JavaLibraryModule";
 import { JavaTypeStore } from "./JavaTypeStore";
 import { SystemModule } from "../runtime/system/SystemModule";
+import { JavaModule as JavaCompiledModule } from "./JavaCompiledModule";
 
 
 /**
@@ -11,7 +11,7 @@ import { SystemModule } from "../runtime/system/SystemModule";
  */
 export class JavaModuleManager {
 
-    modules: JavaModule[] = [];
+    modules: JavaCompiledModule[] = [];
     libraryModules: JavaLibraryModule[] = [];
     typestore: JavaTypeStore;
 
@@ -24,7 +24,7 @@ export class JavaModuleManager {
         this.libraryModules.push(new SystemModule());
     }
 
-    addModule(module: JavaModule){
+    addModule(module: JavaCompiledModule){
         this.modules.push(module);
     }
 
@@ -77,7 +77,7 @@ export class JavaModuleManager {
     createNewModules(files: File[]){
         for(let file of files){
             if(!this.getModuleFromFile(file)){
-                let newModule = new JavaModule(file, this);
+                let newModule = new JavaCompiledModule(file, this);
                 this.addModule(newModule);
             }
         }
@@ -87,7 +87,7 @@ export class JavaModuleManager {
         this.modules = this.modules.filter(m => files.indexOf(m.file) >= 0);
     }
 
-    getDirtyModules(): JavaModule[] {
+    getDirtyModules(): JavaCompiledModule[] {
         return this.modules.filter(m => m.dirty);
     }
 

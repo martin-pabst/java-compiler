@@ -1,5 +1,4 @@
 import { UsagePosition } from "../../../../common/UsagePosition";
-import { Program } from "../../../../common/interpreter/Program";
 import { File } from "../../../../common/module/File";
 import { IRange } from "../../../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../../../TokenType";
@@ -220,6 +219,8 @@ export abstract class PrimitiveType implements JavaType {
         return index >= 0 ? index : undefined;
     }
 
-
+    clearUsagePositions(): void {
+        this.usagePositions = [];
+    }
 
 }

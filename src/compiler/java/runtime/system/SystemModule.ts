@@ -1,5 +1,5 @@
 import { Program } from "../../../common/interpreter/Program";
-import { JavaLibraryModule } from "../../module/JavaLibraryModule";
+import { JavaLibraryModule } from "../../module/libraries/JavaLibraryModule";
 import { ObjectClass } from "./javalang/ObjectClass";
 import { StringClass } from "./javalang/StringClass";
 import { BooleanPrimitiveType } from "./primitiveTypes/BooleanPrimitiveType";
@@ -30,7 +30,6 @@ export class SystemModule extends JavaLibraryModule {
             ObjectClass, StringClass
         )
 
-        this.compileClassesToTypes();
     }
 
     getMainProgram(): Program | undefined {

@@ -8,7 +8,7 @@ export class TypeResolver {
     }
 
     resolve(){
-                
+        this.moduleManager.modules        
         
         
 

@@ -6,6 +6,7 @@ import { Module } from "./compiler/common/module/Module";
 import { JavaCompiler } from "./compiler/java/JavaCompiler";
 import { JavaLanguage } from "./compiler/java/JavaLanguage";
 import { TokenPrinter } from "./compiler/java/lexer/TokenPrinter";
+import { JavaLibraryModuleManager } from "./compiler/java/module/libraries/JavaLibraryModuleManager";
 import { Editor } from "./editor/Editor";
 import { Button } from "./tools/Button";
 import { DOM } from "./tools/DOM";
@@ -31,14 +32,16 @@ export class Main {
 
   compiler: JavaCompiler;
 
+  libraryModuleManager: JavaLibraryModuleManager;
+
   constructor() {
     this.language = new JavaLanguage();
     this.language.registerLanguageAtMonacoEditor();
 
     this.editor = new Editor(this, document.getElementById('editor')!);
 
-    this.tabManager = new TabManager(document.getElementById('tabs')!, 
-    ['token', 'ast', 'code', 'errors']);
+    this.tabManager = new TabManager(document.getElementById('tabs')!,
+      ['token', 'ast', 'code', 'errors']);
 
     this.tabManager.setBodyElementClass('tabBodyElement');
     this.tokenDiv = this.tabManager.getBodyElement(0);
@@ -53,46 +56,51 @@ export class Main {
     this.file = new File();
     this.file.monacoModel = this.editor.editor.getModel()!;
 
-    this.compiler = new JavaCompiler();
+    this.libraryModuleManager = new JavaLibraryModuleManager();
+    this.libraryModuleManager.compileClassesToTypes();
+
+    this.compiler = new JavaCompiler(this.libraryModuleManager);
+
   }
 
-  initButtons(){
+  initButtons() {
     let buttonDiv = document.getElementById('buttons')!;
     new Button(buttonDiv, 'compile', '#30c030', () => {
+      
       setInterval(() => {
         this.compile()
       }, 500)
-    
-    
+
+
     }, 'myButton');
 
 
   }
 
-  compile(){
+  compile() {
 
-      this.compiler.compile([this.file]);
+    this.compiler.compile([this.file]);
 
-      let module = this.compiler.moduleManager.getModuleFromFile(this.file)!;
+    let module = this.compiler.moduleManager.getModuleFromFile(this.file)!;
 
-      TokenPrinter.print(module.tokens!, this.tokenDiv);
-      this.astComponent.buildTreeView(module.ast);
+    TokenPrinter.print(module.tokens!, this.tokenDiv);
+    this.astComponent.buildTreeView(module.ast);
 
-      this.markErrors(module);  
-      this.printErrors(module);
+    this.markErrors(module);
+    this.printErrors(module);
   }
 
-  markErrors(module: Module){
+  markErrors(module: Module) {
 
     let markers: monaco.editor.IMarkerData[] = module.errors.map((error) => {
-       return {
+      return {
         startLineNumber: error.range.startLineNumber,
         startColumn: error.range.startColumn,
         endLineNumber: error.range.endLineNumber,
         endColumn: error.range.endColumn,
         message: error.message,
         severity: this.errorLevelToMarkerSeverity(error.level)
-       }
+      }
     })
 
     monaco.editor.setModelMarkers(this.editor.editor.getModel()!, "martin", markers);
@@ -100,18 +108,18 @@ export class Main {
   }
 
   errorLevelToMarkerSeverity(errorlevel: ErrorLevel): monaco.MarkerSeverity {
-    switch(errorlevel){
+    switch (errorlevel) {
       case "info": return monaco.MarkerSeverity.Info;
       case "warning": return monaco.MarkerSeverity.Warning;
       case "error": return monaco.MarkerSeverity.Error;
     }
   }
 
-  printErrors(module: Module){
+  printErrors(module: Module) {
     DOM.clear(this.errorDiv);
     this.errorDiv.classList.add('errorDiv');
 
-    for(let error of module.errors){
+    for (let error of module.errors) {
       let errorLine = DOM.makeDiv(this.errorDiv, 'errorLine');
       let errorPos = DOM.makeSpan(errorLine, 'errorPosition');
       errorPos.textContent = `[${error.range.startLineNumber}:${error.range.startColumn}]`;

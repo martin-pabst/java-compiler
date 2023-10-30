@@ -1,7 +1,11 @@
+import { UsagePosition } from "../../common/UsagePosition";
 import { GenericTypeParameter } from "./GenericInformation";
 import { JavaType } from "./JavaType";
 
 export class Parameter {
+
+    usagePositions: UsagePosition[] = [];
+
     constructor(public identifier: string, public type: JavaType){}
 
     getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, JavaType>): Parameter {

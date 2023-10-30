@@ -14,7 +14,7 @@ export type TextPositionWithModule = {
 
 export type HelperRegistry = {[identifier: string]: any};
 
-export type Klass = new (...args: any[]) => any;
+export type Klass = {new (...args: any[]): any, [index: string]: any};
 export type KlassObjectRegistry = { [identifier: string]: Klass };
 
 export type HelperObject = {

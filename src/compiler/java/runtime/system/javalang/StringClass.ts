@@ -7,7 +7,7 @@ export class StringClass extends ObjectClass {
     static __declareType(): string[] {
         return [
             "class String extends Object",
-            "public String toString() native _toString"
+            "public String toString(): _toString"
         ]
     }
 

@@ -5,7 +5,7 @@ import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
-import { GenericVariantOfJavaInteface, IJavaInterface, JavaInterface } from "./JavaInterface";
+import { GenericVariantOfJavaInterface, IJavaInterface, JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
 import { NonPrimitiveType } from "./NonPrimitiveType";
@@ -17,6 +17,7 @@ export abstract class IJavaClass implements NonPrimitiveType {
     isPrimitive: false;
     isGenericTypeParameter: false;
     genericInformation: GenericInformation | undefined = undefined;
+
     public usagePositions: UsagePosition[] = [];
 
     
@@ -31,6 +32,7 @@ export abstract class IJavaClass implements NonPrimitiveType {
     abstract getExtends(): IJavaClass | undefined;
     abstract getImplements(): IJavaInterface[];
     abstract canCastTo(otherType: JavaType): boolean;
+    abstract clearUsagePositions(): void;
     
     getFile(): File {
         return this.module.file;
@@ -41,6 +43,10 @@ export abstract class IJavaClass implements NonPrimitiveType {
 
 export class JavaClass extends IJavaClass {
     genericInformation: GenericInformation = [];
+
+    isStatic: boolean = false;
+    isFinal: boolean = false;
+    isAbstract: boolean = false;
 
     fields: Field[] = [];
     methods: Method[] = [];
@@ -106,7 +112,12 @@ export class JavaClass extends IJavaClass {
         return false;
     }
 
-
+    clearUsagePositions(): void {
+        this.usagePositions = [];
+        this.genericInformation.forEach(gi => gi.usagePositions = []);
+        this.methods.forEach(m => m.clearUsagePositions());
+        this.fields.forEach(f => f.usagePositions = []);
+    }
 }
 
 export class GenericVariantOfJavaClass extends IJavaClass {
@@ -117,6 +128,8 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     private cachedExtends?: IJavaClass;
 
     private cachedImplements?: IJavaInterface[];
+
+    public usagePositions: UsagePosition[] = [];
 
     constructor(public isGenericVariantOf: JavaClass, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
         super(isGenericVariantOf.identifier, isGenericVariantOf.module, isGenericVariantOf.identifierRange);
@@ -183,11 +196,11 @@ export class GenericVariantOfJavaClass extends IJavaClass {
             return false;
         } 
 
-        if(otherType instanceof GenericVariantOfJavaInteface){
+        if(otherType instanceof GenericVariantOfJavaInterface){
 
             // Now otherType instanceof GenericVariantOfJavaInterface
             // ArrayList<Integer> can cast to Collection<Integer> or Collection<? extends Number>
-            let ot1 = <GenericVariantOfJavaInteface>otherType;
+            let ot1 = <GenericVariantOfJavaInterface>otherType;
     
             if(!this.isGenericVariantOf.canCastTo(ot1.isGenericVariantOf)) return false;
     
@@ -252,10 +265,10 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         return false;
     }
 
-    findInterfaceImplementedByMeWhichIsGenericVariantOf(otherType: GenericVariantOfJavaInteface): GenericVariantOfJavaInteface | null {
+    findInterfaceImplementedByMeWhichIsGenericVariantOf(otherType: GenericVariantOfJavaInterface): GenericVariantOfJavaInterface | null {
 
         for(let st of this.getImplements()){
-            if(st instanceof GenericVariantOfJavaInteface){
+            if(st instanceof GenericVariantOfJavaInterface){
                 let found = st.findSuperTypeOfMeWhichIsGenericVariantOf(otherType);
                 if(found != null) return found;
             }
@@ -279,5 +292,9 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         return null;
     } 
 
+    clearUsagePositions(): void {
+        this.usagePositions = [];
+
+    }
 
 }

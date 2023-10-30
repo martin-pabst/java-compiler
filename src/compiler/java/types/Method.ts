@@ -1,5 +1,10 @@
+import { UsagePosition } from "../../common/UsagePosition";
+import { Program } from "../../common/interpreter/Program";
 import { TokenType } from "../TokenType";
 import { GenericTypeParameter } from "./GenericInformation";
+import { JavaClass } from "./JavaClass";
+import { JavaEnum } from "./JavaEnum";
+import { JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Parameter } from "./Parameter";
@@ -7,12 +12,24 @@ import { Visibility } from "./Visibility";
 
 export class Method {
 
+    isStatic: boolean = false;
+    isFinal: boolean = false;
+    isAbstract: boolean = false;
+
+    program?: Program;
+
     parameters: Parameter[] = [];
 
     /**
      * undefined, if null
      */
     returnParameter?: JavaType;
+
+    private internalName?: string;
+
+    classEnumInterface!: JavaClass | JavaEnum | JavaInterface;
+
+    usagePositions: UsagePosition[] = [];
 
     constructor(public identifier: string, public visibility: Visibility = TokenType.keywordPublic){
 
@@ -41,5 +58,17 @@ export class Method {
 
     }
 
+    getInternalName(): string {
+        if(!this.internalName){
+            this.internalName = `_m$${this.identifier}$${this.returnParameter ? this.returnParameter.identifier : 'void'}$`;
+            this.internalName += this.parameters.map(p => p.type.identifier).join("$");
+        }
+        return this.internalName;
+    }
+
+    clearUsagePositions(): void {
+        this.usagePositions = [];
+        this.parameters.forEach(p => p.usagePositions = []);
+    }
 
 }

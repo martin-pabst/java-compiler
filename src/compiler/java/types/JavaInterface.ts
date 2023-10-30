@@ -34,6 +34,7 @@ export abstract class IJavaInterface implements NonPrimitiveType {
     abstract getExtends(): IJavaInterface[];
 
     abstract canCastTo(otherType: JavaType): boolean;
+    abstract clearUsagePositions(): void;
 
 }
 
@@ -48,6 +49,8 @@ export class JavaInterface extends IJavaInterface {
     visibility: Visibility = TokenType.keywordPublic;
     enclosingParent: JavaClass | undefined = undefined;
 
+    public usagePositions: UsagePosition[] = [];
+
     constructor(identifier: string, module: JavaBaseModule, declarationRange: IRange) {
         super(identifier, module, declarationRange);
     }
@@ -59,7 +62,7 @@ export class JavaInterface extends IJavaInterface {
 
 
     getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, NonPrimitiveType>): IJavaInterface {
-        return new GenericVariantOfJavaInteface(this, typeMap);
+        return new GenericVariantOfJavaInterface(this, typeMap);
     }
 
     getExtends(): JavaInterface[] {
@@ -82,15 +85,21 @@ export class JavaInterface extends IJavaInterface {
         return false;
     }
 
-
+    clearUsagePositions(): void {
+        this.usagePositions = [];
+        this.genericInformation.forEach(gi => gi.usagePositions = []);
+        this.methods.forEach( m => m.clearUsagePositions());
+    }
 }
 
 
-export class GenericVariantOfJavaInteface extends IJavaInterface {
+export class GenericVariantOfJavaInterface extends IJavaInterface {
 
     private cachedMethods?: Method[];
 
     private cachedExtends?: IJavaInterface[];
+
+    public usagePositions:UsagePosition[] = []; 
 
     constructor(public isGenericVariantOf: JavaInterface, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
         super(isGenericVariantOf.identifier, isGenericVariantOf.module, isGenericVariantOf.identifierRange);
@@ -107,7 +116,7 @@ export class GenericVariantOfJavaInteface extends IJavaInterface {
 
         if(!copyNeeded) return this;
 
-        return new GenericVariantOfJavaInteface(this.isGenericVariantOf, newTypeMap);
+        return new GenericVariantOfJavaInterface(this.isGenericVariantOf, newTypeMap);
     }
 
     public getMethods(): Method[] {
@@ -140,7 +149,7 @@ export class GenericVariantOfJavaInteface extends IJavaInterface {
 
         // Now otherType instanceof GenericVariantFromJavaInteface
         // Collection<Integer> can cast to Collection<Integer> or List<? extends Number>
-        let ot1 = <GenericVariantOfJavaInteface>otherType;
+        let ot1 = <GenericVariantOfJavaInterface><any>otherType;
 
         if(!this.isGenericVariantOf.canCastTo(ot1.isGenericVariantOf)) return false;
 
@@ -169,12 +178,12 @@ export class GenericVariantOfJavaInteface extends IJavaInterface {
         return true;
     }
 
-    findSuperTypeOfMeWhichIsGenericVariantOf(otherType: GenericVariantOfJavaInteface): GenericVariantOfJavaInteface | null {
+    findSuperTypeOfMeWhichIsGenericVariantOf(otherType: GenericVariantOfJavaInterface): GenericVariantOfJavaInterface | null {
         let otherTypeIsGenericVariantOf = otherType.isGenericVariantOf;
         if(otherTypeIsGenericVariantOf == this.isGenericVariantOf) return this;
 
         for(let st of this.getExtends()){
-            if(st instanceof GenericVariantOfJavaInteface){
+            if(st instanceof GenericVariantOfJavaInterface){
                 let found = st.findSuperTypeOfMeWhichIsGenericVariantOf(otherType);
                 if(found != null) return found;
             }
@@ -183,5 +192,8 @@ export class GenericVariantOfJavaInteface extends IJavaInterface {
         return null;
     } 
 
+    clearUsagePositions(): void {
+        this.usagePositions = [];
+    }
 
 }

@@ -10,23 +10,30 @@ import { File } from "../common/module/File";
 import { TypeResolver } from "./TypeResolver/TypeResolver";
 import { Lexer } from "./lexer/Lexer";
 import { JavaModuleManager } from "./module/JavaModuleManager";
+import { JavaLibraryModuleManager } from "./module/libraries/JavaLibraryModuleManager";
 import { Parser } from "./parser/Parser";
 
 export class JavaCompiler {
 
     moduleManager: JavaModuleManager;
 
-    constructor(){
+    constructor(private libraryModuleManager: JavaLibraryModuleManager){
         this.moduleManager = new JavaModuleManager();
     }
 
     compile(files: File[]){
+
+        this.libraryModuleManager.clearUsagePositions();
+
         this.moduleManager.setupModulesBeforeCompiliation(files);
         this.moduleManager.setDirtyFlags();
 
-        let modules = this.moduleManager.getDirtyModules();
+        let cleanModules = this.moduleManager.getCleanModules();
+        cleanModules.forEach(cm => cm.registerUsagePositionsAtLibraryTypes());
+
+        let dirtyModules = this.moduleManager.getDirtyModules();
         
-        for(let module of modules){
+        for(let module of dirtyModules){
             
             let lexer = new Lexer(module);
             lexer.lex();
