@@ -2,10 +2,9 @@ import { UsagePosition } from "../../common/UsagePosition";
 import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
-import { JavaModule } from "../module/JavaModule";
+import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
-import { JavaClassOrInterface } from "./JavaClassOrInterface";
 import { GenericVariantOfJavaInteface, IJavaInterface, JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
@@ -14,13 +13,14 @@ import { Visibility } from "./Visibility";
 
 
 
-export abstract class IJavaClass implements JavaClassOrInterface {
+export abstract class IJavaClass implements NonPrimitiveType {
     isPrimitive: false;
     isGenericTypeParameter: false;
+    genericInformation: GenericInformation | undefined = undefined;
     public usagePositions: UsagePosition[] = [];
 
     
-    constructor(public identifier: string, public module: JavaModule, public identifierRange: IRange){
+    constructor(public identifier: string, public module: JavaBaseModule, public identifierRange: IRange){
         this.isPrimitive = false;
         this.isGenericTypeParameter = false;
     }
@@ -51,10 +51,19 @@ export class JavaClass extends IJavaClass {
     private extends?: JavaClass;
     private implements: JavaInterface[] = [];
 
-    constructor(identifier: string, module: JavaModule, declarationRange: IRange) {
+    constructor(identifier: string, module: JavaBaseModule, declarationRange: IRange) {
         super(identifier, module, declarationRange);
     }
 
+    setExtends(ext: JavaClass){
+        this.extends = ext;
+    }
+
+    addImplements(impl: JavaInterface | JavaInterface[]){
+        if(!Array.isArray(impl)) impl = [impl];
+        this.implements = this.implements.concat(impl);
+    }
+ 
     getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, NonPrimitiveType>): IJavaClass {
         return new GenericVariantOfJavaClass(this, typeMap);
     }

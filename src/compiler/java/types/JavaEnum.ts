@@ -2,7 +2,7 @@ import { UsagePosition } from "../../common/UsagePosition";
 import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
-import { JavaModule } from "../module/JavaModule";
+import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
 import { JavaClass } from "./JavaClass";
@@ -27,7 +27,7 @@ export class JavaEnum implements NonPrimitiveType {
 
     private implements: JavaInterface[] = [];
 
-    constructor(public identifier: string, public module: JavaModule, public identifierRange: IRange) {
+    constructor(public identifier: string, public module: JavaBaseModule, public identifierRange: IRange) {
         this.isPrimitive = false;
     }
 

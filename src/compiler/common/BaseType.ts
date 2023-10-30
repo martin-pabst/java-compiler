@@ -1,4 +1,5 @@
 import { UsagePosition } from "./UsagePosition";
+import { Program } from "./interpreter/Program";
 import { File } from "./module/File";
 import { IRange } from "./range/Range";
 

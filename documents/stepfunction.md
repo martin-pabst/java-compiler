@@ -26,4 +26,5 @@ type step = {
 }
 ```
 
-
+## Array ho
+  * `ho[0]: {[classIdentifier: string]: class}`

@@ -2,23 +2,24 @@ import { UsagePosition } from "../../common/UsagePosition";
 import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
-import { JavaModule } from "../module/JavaModule";
+import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
 import { JavaClass } from "./JavaClass";
-import { JavaClassOrInterface } from "./JavaClassOrInterface";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility";
 
-export abstract class IJavaInterface implements JavaClassOrInterface {
+export abstract class IJavaInterface implements NonPrimitiveType {
     isPrimitive: false;
     isGenericTypeParameter: false;
+    genericInformation: GenericInformation | undefined;
+
     public usagePositions: UsagePosition[] = [];
 
     
-    constructor(public identifier: string, public module: JavaModule, public identifierRange: IRange){
+    constructor(public identifier: string, public module: JavaBaseModule, public identifierRange: IRange){
         this.isPrimitive = false;
         this.isGenericTypeParameter = false;
     }
@@ -47,9 +48,15 @@ export class JavaInterface extends IJavaInterface {
     visibility: Visibility = TokenType.keywordPublic;
     enclosingParent: JavaClass | undefined = undefined;
 
-    constructor(identifier: string, module: JavaModule, declarationRange: IRange) {
+    constructor(identifier: string, module: JavaBaseModule, declarationRange: IRange) {
         super(identifier, module, declarationRange);
     }
+
+    addExtends(ext: JavaInterface | JavaInterface[]){
+        if(!Array.isArray(ext)) ext = [ext];
+        this.extends = this.extends.concat(ext);
+    }
+
 
     getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, NonPrimitiveType>): IJavaInterface {
         return new GenericVariantOfJavaInteface(this, typeMap);

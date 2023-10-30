@@ -1,10 +1,10 @@
 import { UsagePosition } from "../../common/UsagePosition";
 import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
-import { JavaModule } from "../module/JavaModule";
+import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { JavaClass } from "./JavaClass";
-import { JavaClassOrInterface } from "./JavaClassOrInterface";
+import { JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
 import { NonPrimitiveType } from "./NonPrimitiveType";
@@ -16,6 +16,8 @@ export class GenericTypeParameter implements NonPrimitiveType {
 
     isWildcard: boolean;
 
+    genericInformation: GenericInformation | undefined = undefined;
+
     private fieldCache?: Field[];
     private methodCache?: Method[];
     public usagePositions: UsagePosition[] = [];
@@ -26,8 +28,8 @@ export class GenericTypeParameter implements NonPrimitiveType {
      * @param upperBounds: ? extends B1 & B2 & B3...  B1 can be class or interface, B2, ... only interfaces; The type is SUBtype of B1, B2, ...
      * @param lowerBound : ? super B: the given type has B as its subtype
      */
-    constructor(public identifier: string, public module: JavaModule, public identifierRange: IRange, 
-        public upperBounds: JavaClassOrInterface[] = [], public lowerBound?: JavaClass){
+    constructor(public identifier: string, public module: JavaBaseModule, public identifierRange: IRange, 
+        public upperBounds: (JavaClass | JavaInterface)[] = [], public lowerBound?: JavaClass){
         this.isPrimitive = false;
         this.isGenericTypeParameter = true;
         this.isWildcard = (this.identifier == '?');

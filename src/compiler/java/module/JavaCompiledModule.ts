@@ -1,30 +1,25 @@
 import { File } from "../../common/module/File";
-import { Module } from "../../common/module/module";
 import { TokenList } from "../lexer/Token";
 import { ASTGlobalNode } from "../parser/AST";
 import { JavaType } from "../types/JavaType";
+import { JavaBaseModule } from "./JavaBaseModule";
 import { JavaModuleManager } from "./JavaModuleManager";
+import { JavaTypeStore } from "./JavaTypeStore";
 
 /**
  * A JavaModule represents a compiled Java Sourcecode File.
  */
-export class JavaModule extends Module {
+export class JavaModule extends JavaBaseModule {
 
     tokens?: TokenList;
     ast?: ASTGlobalNode;
 
-    /**
-     * This is used if module is reused later without recompiliation.
-     * It contains only pure types (no generic variants) declared in this module.
-     */
-    types: JavaType[] = [];     
     usedTypesFromOtherModules: Map<JavaType, boolean> = new Map();
 
     lastCompiledProgramText: string = "";
-    dirty: boolean = true;
 
     constructor(file: File, public moduleManager: JavaModuleManager){
-        super(file);
+        super(file, false);
     }
 
     resetBeforeCompilation(){
@@ -38,5 +33,6 @@ export class JavaModule extends Module {
         this.dirty = this.lastCompiledProgramText != this.file.getText();
         this.lastCompiledProgramText = this.file.getText();
     }
+
 
 }

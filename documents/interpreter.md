@@ -1,4 +1,4 @@
-## Interpreter
+# Interpreter
   * states (stopped, running, paused)
   * scheduler to facilitate concurrent threads
   * threads have states: ready, running, suspended, finished
@@ -28,3 +28,54 @@
     * each 1/30 s: 
       * foreach object with active act-method: if not currently running start thread for it and add it to list of currently running act-methods
       * each thread has a list of events which get called after thread is finished. Use this to ensure that act-method is deleted from set of currently running act-methods if finished.    
+
+
+## call methods:
+```javascript
+// call final library function inside step-function:
+stack.push(object.method(thread, a, b));
+
+// call non-final function (maybe library-function, maybe java function) where library function doesn't 
+// call java-functions:
+object.method(thread, a, b);
+return;
+
+// Java-function is a javascript-stub which does this:
+
+class JavaTestClass {
+  __programs: Program[] = ...;
+
+   testMethod(thread: Thread, a, b){
+      thread.stack.push(a, b);
+      thread.pushProgram(this.__programs[123]);
+    }
+}
+
+// Thread's pushProgram-method:
+
+
+
+// IMPORTANT: Any non-final library-function which calls java function HAS TO PUSH RETURN VALUE to stack:
+class Test {
+
+  example(thread: Thread, a, b){
+    ...
+    thread.stack.push(ret);
+  }
+
+}
+
+
+// if library function calls java/javascript-method and wants to do something thereafter:
+  thread.lastDepositedCallback = () => {              // pushes callback on program stack
+    let ret = thread.stack.pop();
+    ... go on ...
+  };
+  obj.method(thread, a, b);
+  return;
+
+```
+
+## static attributes
+  * **Beware:** Static attributes in library classes are global over all instances of Online-IDE in current browser tab, so DONT USE THEM.
+  * Static attributes in Java classes are local for given Interpreter and resetted on program start.

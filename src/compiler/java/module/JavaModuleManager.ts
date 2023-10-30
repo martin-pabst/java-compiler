@@ -1,7 +1,8 @@
 import { File } from "../../common/module/File";
 import { JavaModule } from "./JavaModule";
-import { JavaSystemModule } from "./JavaSystemModule";
+import { JavaLibraryModule } from "./JavaLibraryModule";
 import { JavaTypeStore } from "./JavaTypeStore";
+import { SystemModule } from "../runtime/system/SystemModule";
 
 
 /**
@@ -11,11 +12,16 @@ import { JavaTypeStore } from "./JavaTypeStore";
 export class JavaModuleManager {
 
     modules: JavaModule[] = [];
-    systemModules: JavaSystemModule[] = [];
+    libraryModules: JavaLibraryModule[] = [];
     typestore: JavaTypeStore;
 
     constructor(){
         this.typestore = new JavaTypeStore(this);
+        this.addJavaLibraryModules();
+    }
+
+    addJavaLibraryModules(){
+        this.libraryModules.push(new SystemModule());
     }
 
     addModule(module: JavaModule){
@@ -30,6 +36,14 @@ export class JavaModuleManager {
         this.removeUnusedModules(files);
         this.createNewModules(files);
         this.typestore.empty();
+
+        for(let m of this.libraryModules){
+            m.registerTypesAtTypestore(this.typestore);
+        }
+
+        for(let m of this.modules){
+            m.registerTypesAtTypestore(this.typestore);
+        }
     }
 
     setDirtyFlags(){
@@ -76,5 +90,6 @@ export class JavaModuleManager {
     getDirtyModules(): JavaModule[] {
         return this.modules.filter(m => m.dirty);
     }
+
 
 }

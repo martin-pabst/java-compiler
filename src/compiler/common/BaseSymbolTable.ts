@@ -1,8 +1,12 @@
 import { BaseType } from "./BaseType";
+import { UsagePosition } from "./UsagePosition";
 import { IRange } from "./range/Range";
 
 
 export class BaseSymbol {
+
+    usagePositions: UsagePosition[] = [];
+
     constructor(public identifier: string, public type: BaseType, public stackOffset: number){
 
     }
