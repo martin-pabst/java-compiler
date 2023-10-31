@@ -1,5 +1,7 @@
 import { UsagePosition } from "../../common/UsagePosition";
+import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
+import { JavaBaseModule } from "../module/JavaBaseModule";
 import { GenericTypeParameter } from "./GenericInformation";
 import { JavaClass } from "./JavaClass";
 import { JavaEnum } from "./JavaEnum";
@@ -17,7 +19,8 @@ export class Field {
 
     usagePositions: UsagePosition[] = [];
 
-    constructor(public identifier: string, public type: JavaType, public visibility: Visibility = TokenType.keywordPublic){
+    constructor(public identifier: string, public identifierRange: IRange, public module: JavaBaseModule,
+         public type: JavaType, public visibility: Visibility = TokenType.keywordPublic){
 
     }
 
@@ -25,7 +28,8 @@ export class Field {
         let newType: JavaType = this.type.getCopyWithConcreteType(typeMap);
         if(newType == this.type) return this;
         
-        let copy = new Field(this.identifier, newType, this.visibility);
+        let copy = new Field(this.identifier, this.identifierRange, this.module,
+             newType, this.visibility);
 
         return copy;
     }

@@ -1,5 +1,5 @@
 import { Klass } from "../../../common/interpreter/ThreadPool";
-import { IRange } from "../../../common/range/Range";
+import { EmptyRange, IRange } from "../../../common/range/Range";
 import { TokenType } from "../../TokenType";
 import { ArrayType } from "../../types/ArrayType";
 import { Field } from "../../types/Field";
@@ -368,13 +368,13 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         if(this.comesToken(TokenType.leftBracket, true)){
             // method
-            let m = new Method(identifier, modifiers.visibility);
+            let m = new Method(identifier, EmptyRange.instance, module, modifiers.visibility);
             m.returnParameter = type;
 
             do{
                 let type = this.parseType(module);
                 let id = this.expectIdentifier();
-                m.parameters.push(new Parameter(id, type));            
+                m.parameters.push(new Parameter(id, EmptyRange.instance, module, type));            
             } while(this.comesToken(TokenType.comma, true));
 
             m.isStatic = modifiers.static;
@@ -390,7 +390,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             }                        
         } else {
             // attribute
-            let a = new Field(identifier, type, modifiers.visibility);
+            let a = new Field(identifier, EmptyRange.instance, module, type, modifiers.visibility);
             a.isStatic = modifiers.static;
             a.isFinal = modifiers.final;
             a.classEnum = klassType;

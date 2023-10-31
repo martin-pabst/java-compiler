@@ -1,12 +1,21 @@
+
 export class FunctionTemplate {
-    
-    static identity: FunctionTemplate = new FunctionTemplate('$1');
 
-    constructor(private template: string){
+    static identity: FunctionTemplate = new FunctionTemplate('$1', '$1');
+    variables: string[];
 
+    constructor(public template: string, ...variables: string[]) {
+        this.variables = variables;
     }
 
-    static getNewObjectTemplate(classIdentifier: string, parameters: string){
-        return new FunctionTemplate(`new h[0]["${classIdentifier}"](${parameters})`);
+    apply(values: string[]): string {
+        let s: string = this.template;
+        for (let i = 0; i < this.variables.length; i++) {
+            var regex = new RegExp(this.variables[i], 'g');
+            s = s.replace(regex, values[i]);
+        }
+        return s;
     }
+
+
 }

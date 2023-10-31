@@ -35,7 +35,7 @@ export class ThreadPool {
 
         helperObject!: HelperObject;
     
-        constructor(private interpreter: Interpreter, private helperRegistry: HelperRegistry) {
+        constructor(public interpreter: Interpreter, private helperRegistry: HelperRegistry) {
             this.setState(ThreadPoolLstate.not_initialized);
             this.buildHelperObject();
         }

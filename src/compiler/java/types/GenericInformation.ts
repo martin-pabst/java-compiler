@@ -3,8 +3,8 @@ import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
-import { JavaClass } from "./JavaClass";
-import { JavaInterface } from "./JavaInterface";
+import { IJavaClass, JavaClass } from "./JavaClass";
+import { IJavaInterface, JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
 import { NonPrimitiveType } from "./NonPrimitiveType";
@@ -24,7 +24,7 @@ export class GenericTypeParameter extends NonPrimitiveType {
      * @param lowerBound : ? super B: the given type has B as its subtype
      */
     constructor(identifier: string, module: JavaBaseModule, identifierRange: IRange, 
-        public upperBounds: (JavaClass | JavaInterface)[] = [], public lowerBound?: JavaClass){
+        public upperBounds: (IJavaClass | IJavaInterface)[] = [], public lowerBound?: IJavaClass){
         super(identifier, identifierRange, module);
         this.isWildcard = (this.identifier == '?');
     }

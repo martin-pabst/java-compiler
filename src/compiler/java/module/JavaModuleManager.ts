@@ -1,8 +1,6 @@
 import { File } from "../../common/module/File";
-import { JavaLibraryModule } from "./libraries/JavaLibraryModule";
 import { JavaTypeStore } from "./JavaTypeStore";
-import { SystemModule } from "../runtime/system/SystemModule";
-import { JavaModule as JavaCompiledModule } from "./JavaCompiledModule";
+import { JavaCompiledModule as JavaCompiledModule } from "./JavaCompiledModule";
 
 
 /**
@@ -12,16 +10,10 @@ import { JavaModule as JavaCompiledModule } from "./JavaCompiledModule";
 export class JavaModuleManager {
 
     modules: JavaCompiledModule[] = [];
-    libraryModules: JavaLibraryModule[] = [];
     typestore: JavaTypeStore;
 
     constructor(){
         this.typestore = new JavaTypeStore(this);
-        this.addJavaLibraryModules();
-    }
-
-    addJavaLibraryModules(){
-        this.libraryModules.push(new SystemModule());
     }
 
     addModule(module: JavaCompiledModule){
@@ -37,11 +29,7 @@ export class JavaModuleManager {
         this.createNewModules(files);
         this.typestore.empty();
 
-        for(let m of this.libraryModules){
-            m.registerTypesAtTypestore(this.typestore);
-        }
-
-        for(let m of this.modules){
+        for(let m of this.getUnChangedModules()){
             m.registerTypesAtTypestore(this.typestore);
         }
     }

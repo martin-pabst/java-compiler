@@ -16,4 +16,9 @@ export abstract class JavaType extends BaseType {
         this.isPrimitive = false;
     }
 
+    hasGenericParameters(): boolean {
+        if(!this.isPrimitive) return false;
+        if(!this.genericInformation) return false;
+        return this.genericInformation.length > 0;
+    }
 }

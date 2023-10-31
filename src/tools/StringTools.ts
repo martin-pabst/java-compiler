@@ -32,9 +32,11 @@ function twoDez(z: number):string {
   return "" + z;
 }
 
-export function stringToDate(text: string): Date {
+export function stringToDate(text: string): Date | undefined {
 
   let match = text.match(/^(\d{2})\.(\d{2})\.(\d{4}), (\d{2}):(\d{2})$/);
+
+  if(!match) return undefined;
 
   let date: Date = new Date(Number.parseInt(match[3]), Number.parseInt(match[2]) - 1, Number.parseInt(match[1]), Number.parseInt(match[4]), Number.parseInt(match[5]) );
 
@@ -62,4 +64,33 @@ export function formatAsJavadocComment(s: string, indent: number|string = ""): s
   if(s.length > 0) s = "\n" + s;
   s = indentString + "/**" + s.replace(/\n/g, "\n" + indentString + " * ") + "\n" + indentString + " */";
   return s;
+}
+
+/** Function that count occurrences of a substring in a string;
+ * @param {String} text               The string
+ * @param {String} subString            The sub string to search for
+ * @param {Boolean} [allowOverlapping]  Optional. (Default:false)
+ *
+ * @author Vitim.us https://gist.github.com/victornpb/7736865
+ * @see Unit Test https://jsfiddle.net/Victornpb/5axuh96u/
+ * @see https://stackoverflow.com/a/7924240/938822
+ */
+export function countSubstrings(text: string, subString: string, allowOverlapping: boolean): number {
+
+  text += "";
+  subString += "";
+  if (subString.length <= 0) return (text.length + 1);
+
+  var n = 0,
+      pos = 0,
+      step = allowOverlapping ? 1 : subString.length;
+
+  while (true) {
+      pos = text.indexOf(subString, pos);
+      if (pos >= 0) {
+          ++n;
+          pos += step;
+      } else break;
+  }
+  return n;
 }

@@ -1,6 +1,8 @@
 import { UsagePosition } from "../../common/UsagePosition";
 import { Program } from "../../common/interpreter/Program";
+import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
+import { JavaBaseModule } from "../module/JavaBaseModule";
 import { GenericTypeParameter } from "./GenericInformation";
 import { JavaClass } from "./JavaClass";
 import { JavaEnum } from "./JavaEnum";
@@ -31,7 +33,8 @@ export class Method {
 
     usagePositions: UsagePosition[] = [];
 
-    constructor(public identifier: string, public visibility: Visibility = TokenType.keywordPublic){
+    constructor(public identifier: string, public identifierRange: IRange, public module: JavaBaseModule,
+          public visibility: Visibility = TokenType.keywordPublic){
 
     }
 
@@ -54,7 +57,7 @@ export class Method {
 
         if(!copyNeeded) return this;
 
-        return new Method(this.identifier, this.visibility);
+        return new Method(this.identifier, this.identifierRange, this.module, this.visibility);
 
     }
 

@@ -1,6 +1,7 @@
 import { Error, ErrorLevel, QuickFix } from "../../common/Error";
 import { IRange } from "../../common/range/Range";
 import { Token, TokenList } from "../lexer/Token";
+import { JavaBaseModule } from "../module/JavaBaseModule";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { ASTNode } from "./AST";
 
@@ -34,8 +35,6 @@ export class TokenIterator {
 
     endToken: Token;
 
-    errorList: Error[] = [];
-
     static operators = [
         TokenType.assignment, TokenType.plusAssignment, TokenType.minusAssignment,
         TokenType.multiplicationAssignment, TokenType.divisionAssignment, TokenType.moduloAssignment,
@@ -53,7 +52,7 @@ export class TokenIterator {
 
 
 
-    constructor(private tokenList: TokenList) {
+    constructor(private tokenList: TokenList, protected module: JavaBaseModule) {
         this.endToken = tokenList[tokenList.length - 1];
         this.pos = -1;
         this.nextToken(); // fetch first non-space token
@@ -142,7 +141,7 @@ export class TokenIterator {
 
     pushError(message: string, errorLevel: ErrorLevel = "error", range?: IRange, quickFix?: QuickFix) {
         if (range == null) range = Object.assign({}, this.cct.range);
-        this.errorList.push({
+        this.module.errors.push({
             message: message,
             range: range,
             quickFix: quickFix,
@@ -219,7 +218,7 @@ export class TokenIterator {
                             }
                         }
 
-                        if (invokeSemicolonAngel && this.errorList.length < 3) {
+                        if (invokeSemicolonAngel && this.module.errors.length < 3) {
                             //this.module.main.getSemicolonAngel().register(range, this.module);
                         }
                     }

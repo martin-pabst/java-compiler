@@ -1,3 +1,4 @@
+import { Error } from "../../common/Error";
 import { File } from "../../common/module/File";
 import { TokenList } from "../lexer/Token";
 import { ASTGlobalNode } from "../parser/AST";
@@ -9,7 +10,7 @@ import { JavaModuleManager } from "./JavaModuleManager";
 /**
  * A JavaModule represents a compiled Java Sourcecode File.
  */
-export class JavaModule extends JavaBaseModule {
+export class JavaCompiledModule extends JavaBaseModule {
 
     tokens?: TokenList;
     ast?: ASTGlobalNode;
@@ -17,6 +18,8 @@ export class JavaModule extends JavaBaseModule {
     usedTypesFromOtherModules: Map<JavaType, boolean> = new Map();
 
     lastCompiledProgramText: string = "";
+
+    errors: Error[] = [];
 
     constructor(file: File, public moduleManager: JavaModuleManager){
         super(file, false);
@@ -27,6 +30,7 @@ export class JavaModule extends JavaBaseModule {
         this.ast = undefined;
         this.types = [];
         this.usedTypesFromOtherModules = new Map();
+        this.errors = [];
     }
 
     setDirtyIfProgramCodeChanged(){

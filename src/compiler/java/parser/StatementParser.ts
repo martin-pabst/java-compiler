@@ -1,12 +1,12 @@
 import { Token } from "../lexer/Token.ts";
+import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType.ts";
-import { JavaModule } from "../module/JavaModule.ts";
 import { ASTForLoopNode, ASTIfNode, ASTReturnNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode } from "./AST.ts";
 import { TermParser } from "./TermParser.ts";
 
 export class StatementParser extends TermParser {
 
-    constructor(protected module: JavaModule) {
+    constructor(module: JavaCompiledModule) {
         super(module);
     }
 

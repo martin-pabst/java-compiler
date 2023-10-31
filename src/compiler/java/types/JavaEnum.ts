@@ -1,34 +1,37 @@
 import { UsagePosition } from "../../common/UsagePosition";
 import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
-import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
-import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
+import { GenericTypeParameter } from "./GenericInformation";
 import { JavaClass } from "./JavaClass";
 import { JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
 import { NonPrimitiveType } from "./NonPrimitiveType";
-import { Visibility } from "./Visibility";
 
 
-export class JavaEnum implements NonPrimitiveType {
-    isPrimitive: false;
-    genericInformation: GenericInformation = [];
+export class JavaEnum extends NonPrimitiveType {
 
     fields: Field[] = [];
     methods: Method[] = [];
 
-    visibility: Visibility = TokenType.keywordPublic;
     enclosingParent: JavaClass | undefined = undefined;
 
     public usagePositions: UsagePosition[] = [];
 
     private implements: JavaInterface[] = [];
 
-    constructor(public identifier: string, public module: JavaBaseModule, public identifierRange: IRange) {
-        this.isPrimitive = false;
+    constructor(identifier: string, module: JavaBaseModule, identifierRange: IRange) {
+        super(identifier, identifierRange, module);
+    }
+
+    isGenericTypeParameter(): boolean {
+        return false;
+    }
+
+    isGenericVariant(): boolean {
+        return false;
     }
 
     getFile(): File {
@@ -39,7 +42,7 @@ export class JavaEnum implements NonPrimitiveType {
         return this;
     }
 
-    getImplements(): JavaInterface[]{
+    getImplements(): JavaInterface[] {
         return this.implements;
     }
 
@@ -54,21 +57,21 @@ export class JavaEnum implements NonPrimitiveType {
     }
 
     canCastTo(otherType: JavaType): boolean {
-        if(otherType.isPrimitive) return false;
-        if(otherType instanceof JavaInterface){
-            for(let intf of this.implements){
-                if(intf.canCastTo(otherType)) return true;
+        if (otherType.isPrimitive) return false;
+        if (otherType instanceof JavaInterface) {
+            for (let intf of this.implements) {
+                if (intf.canCastTo(otherType)) return true;
             }
             return false;
         }
 
-        if(otherType instanceof JavaEnum){
-            if(otherType == this) return true;
+        if (otherType instanceof JavaEnum) {
+            if (otherType == this) return true;
             return false;
         }
 
-        if(otherType instanceof JavaClass){
-            if(otherType.identifier == 'Object') return true;
+        if (otherType instanceof JavaClass) {
+            if (otherType.identifier == 'Object') return true;
             return false;
         }
 

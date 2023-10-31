@@ -1,5 +1,6 @@
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
+import { GenericTypeParameter } from "../types/GenericInformation.ts";
 import { JavaType } from "../types/JavaType.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { Visibility } from "../types/Visibility.ts";
@@ -77,6 +78,7 @@ export interface ASTGenericParameterDeclarationNode extends ASTNodeWithIdentifie
     kind: TokenType.genericParameterDefinition;
     extends?: ASTTypeNode[];
     super?: ASTTypeNode;
+    resolvedType?: GenericTypeParameter;
 }
 
 // e.g. class List<E extends Comparable<E>>
@@ -95,6 +97,7 @@ export interface ASTTypeNode extends ASTNode {
     arrayDimensions: number;
     isVoidType: boolean;
     isVarKeyword: boolean;  // type inference...
+    enclosingClassOrInterface?: ASTClassDefinitionNode | ASTInterfaceDefinitionNode
 
     resolvedType?: JavaType;
 }

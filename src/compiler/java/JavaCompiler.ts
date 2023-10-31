@@ -45,7 +45,7 @@ export class JavaCompiler {
             
         }
 
-        let typeResolver = new TypeResolver(this.moduleManager);
+        let typeResolver = new TypeResolver(this.moduleManager, this.libraryModuleManager);
         typeResolver.resolve();
 
     }

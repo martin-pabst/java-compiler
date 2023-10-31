@@ -1,6 +1,6 @@
 import { IRange } from "../../common/range/Range";
-import { Token } from "../Token.ts";
 import { TokenType } from "../TokenType";
+import { Token } from "../lexer/Token.ts";
 import { ASTAnnotationNode, ASTAttributeDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTConstantNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTVariableNode, ASTWhileNode, TypeScope } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
@@ -10,7 +10,7 @@ export class ASTNodeFactory {
 
     }
 
-    buildTypeNode(startRange?: IRange): ASTTypeNode {
+    buildTypeNode(enclosingClassOrInterface: ASTClassDefinitionNode | ASTInterfaceDefinitionNode | undefined, startRange?: IRange): ASTTypeNode {
 
         if (!startRange) startRange = this.parser.cct.range;
 
@@ -21,7 +21,8 @@ export class ASTNodeFactory {
             arrayDimensions: 0,
             genericParameterInvocations: [],
             isVoidType: false,
-            isVarKeyword: false
+            isVarKeyword: false,
+            enclosingClassOrInterface: enclosingClassOrInterface
         }
 
     }
@@ -59,7 +60,7 @@ export class ASTNodeFactory {
 
     }
 
-    buildEnumNode(modifiers: ASTNodeWithModifiers, identifier: Token, 
+    buildEnumNode(modifiers: ASTNodeWithModifiers, identifier: Token , 
         parent: TypeScope, annotations: ASTAnnotationNode[]): ASTEnumDefinitionNode {
 
         let node: ASTEnumDefinitionNode = {

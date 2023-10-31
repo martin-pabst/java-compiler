@@ -1,7 +1,7 @@
 import { Range } from "../../common/range/Range.ts";
 import { Token } from "../lexer/Token.ts";
+import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType";
-import { JavaModule } from "../module/JavaModule.ts";
 import {
     ASTAnnotationNode,
     ASTClassDefinitionNode,
@@ -27,7 +27,7 @@ export class Parser extends StatementParser {
 
     collectedAnnotations: ASTAnnotationNode[] = [];
 
-    constructor(module: JavaModule) {
+    constructor(module: JavaCompiledModule) {
         super(module);
         this.initializeAST();
     }
@@ -54,6 +54,7 @@ export class Parser extends StatementParser {
 
             if (this.comesToken(Parser.visibilityModifiersOrTopLevelTypeDeclaration, false)) {
                 this.parseClassOrInterfaceOrEnum(this.module.ast!);
+                this.currentClassOrInterface = undefined;
             } else if (this.tt == TokenType.at) {
                 this.parseAnnotation();
             } else {
@@ -65,8 +66,6 @@ export class Parser extends StatementParser {
                 this.nextToken();   // last safety net to prevent getting stuck in an endless loop
             }
         }
-
-        this.module.errors = this.errorList;
 
     }
 
@@ -98,7 +97,10 @@ export class Parser extends StatementParser {
 
     parseClassDeclaration(modifiers: ASTNodeWithModifiers, identifier: Token, parent: TypeScope) {
         let classASTNode = this.nodeFactory.buildClassNode(modifiers, identifier, parent, this.collectedAnnotations);
+        this.currentClassOrInterface = classASTNode;
+
         classASTNode.genericParameterDefinitions = this.parseGenericParameterDefinition();
+
 
         while (this.comesToken([TokenType.keywordExtends, TokenType.keywordImplements], false)) {
             switch (this.tt) {
@@ -120,7 +122,8 @@ export class Parser extends StatementParser {
                     case TokenType.keywordClass:
                     case TokenType.keywordEnum:
                     case TokenType.keywordInterface:
-                        this.parseClassOrInterfaceOrEnum(classASTNode, modifiers);
+                        this.pushError("Private classes/enums/interfaces kann dieser Compiler leider nicht verarbeiten.");
+                        // this.parseClassOrInterfaceOrEnum(classASTNode, modifiers);
                         break;
                     case TokenType.at:
                         this.parseAnnotation();
@@ -307,6 +310,8 @@ export class Parser extends StatementParser {
 
     parseInterfaceDeclaration(modifiers: ASTNodeWithModifiers, identifier: Token, parent: TypeScope) {
         let interfaceNode = this.nodeFactory.buildInterfaceNode(modifiers, identifier, parent, this.collectedAnnotations);
+        this.currentClassOrInterface = interfaceNode;
+
         interfaceNode.genericParameterDefinitions = this.parseGenericParameterDefinition();
 
         if (this.comesToken(TokenType.keywordExtends, true)) this.parseImplements(interfaceNode);

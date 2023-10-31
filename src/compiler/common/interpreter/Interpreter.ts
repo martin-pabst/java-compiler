@@ -91,7 +91,8 @@ export class Interpreter {
     executeOneStep(stepInto: boolean) {
 
         if (this.threadPool.state != ThreadPoolLstate.paused) {
-            this.init();
+            // TODO!
+            // this.init();
             if (this.threadPool.state == ThreadPoolLstate.not_initialized) {
                 return;
             }
@@ -106,7 +107,7 @@ export class Interpreter {
         }
     }
 
-    showProgramPointer(textPositionWithModule: TextPositionWithModule) {
+    showProgramPointer(_textPositionWithModule: TextPositionWithModule) {
         // TODO: Show program pointer
     }
 
@@ -146,7 +147,8 @@ export class Interpreter {
         // this.main.getBottomDiv()?.console?.clearErrors();
 
         if (this.threadPool.state != ThreadPoolLstate.paused) {
-            this.init(this.mainModule);
+            // TODO!
+            // this.init(this.mainModule);
             this.resetRuntime();
         }
 

@@ -32,7 +32,7 @@ export class JavaInterface extends IJavaInterface {
 
     methods: Method[] = [];
 
-    private extends: JavaInterface[] = [];
+    private extends: IJavaInterface[] = [];
 
     visibility: Visibility = TokenType.keywordPublic;
     enclosingParent: JavaClass | undefined = undefined;
@@ -51,7 +51,7 @@ export class JavaInterface extends IJavaInterface {
         return false;
     }
 
-    addExtends(ext: JavaInterface | JavaInterface[]){
+    addExtends(ext: IJavaInterface | IJavaInterface[]){
         if(!Array.isArray(ext)) ext = [ext];
         this.extends = this.extends.concat(ext);
     }
@@ -61,7 +61,7 @@ export class JavaInterface extends IJavaInterface {
         return new GenericVariantOfJavaInterface(this, typeMap);
     }
 
-    getExtends(): JavaInterface[] {
+    getExtends(): IJavaInterface[] {
         return this.extends;
     }
 
@@ -136,7 +136,7 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
 
     getExtends(): IJavaInterface[]{
         if(!this.cachedExtends){
-            this.cachedExtends = this.isGenericVariantOf.getExtends().map(impl => impl.getCopyWithConcreteType(this.typeMap));
+            this.cachedExtends = this.isGenericVariantOf.getExtends().map(impl => <IJavaInterface>impl.getCopyWithConcreteType(this.typeMap));
         }   
         
         return this.cachedExtends;

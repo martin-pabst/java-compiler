@@ -1,6 +1,6 @@
 import { DOM } from "../../../tools/DOM";
-import { TokenList } from "../Token";
-import { TokenType, TokenTypeReadable } from "../TokenType";
+import { TokenType } from "../TokenType";
+import { TokenList } from "./Token";
 
 import '/include/css/tokenprinter.css';
 

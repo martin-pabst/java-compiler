@@ -3,7 +3,7 @@ import { ColorLexer } from "./ColorLexer.js";
 import { ColorHelper } from "./ColorHelper.js";
 import { Error, ErrorLevel } from "../../common/Error.js";
 import { EscapeSequenceList, TokenType, TokenTypeReadable, keywordList as KeywordList, specialCharList } from "../TokenType.js";
-import { JavaModule } from "../module/JavaModule.js";
+import { JavaCompiledModule } from "../module/JavaCompiledModule.js";
 
 
 
@@ -16,7 +16,6 @@ export class Lexer {
     tokenList: TokenList;
     nonSpaceLastTokenType?: TokenType;
 
-    errorList: Error[];
     colorInformation: monaco.languages.IColorInformation[];
     colorLexer: ColorLexer = new ColorLexer();
 
@@ -48,11 +47,10 @@ export class Lexer {
 
     private input: string;
 
-    constructor(private module: JavaModule) {
+    constructor(private module: JavaCompiledModule) {
 
         this.input = module.file.getText();
         this.tokenList = [];
-        this.errorList = [];
         this.bracketError = undefined;
         this.bracketStack = [];
         this.pos = 0;
@@ -67,7 +65,6 @@ export class Lexer {
 
         if (this.input.length == 0) {
             this.module.tokens = this.tokenList;
-            this.module.errors = this.errorList;
             this.module.bracketError = this.bracketError;
             this.module.colorInformation = this.colorInformation;
 
@@ -99,7 +96,6 @@ export class Lexer {
         })
 
         this.module.tokens = this.tokenList;
-        this.module.errors = this.errorList;
         this.module.bracketError = this.bracketError;
         this.module.colorInformation = this.colorInformation;
 
@@ -576,7 +572,7 @@ export class Lexer {
             if(!endLineNumber) endLineNumber = startLineNumber;
             if(!endColumn) endColumn = startColumn + length ;
 
-        this.errorList.push({
+        this.module.errors.push({
             message: text,
             range: {
                 startLineNumber: startLineNumber,

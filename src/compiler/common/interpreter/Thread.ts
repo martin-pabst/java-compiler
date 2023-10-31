@@ -77,7 +77,7 @@ export class Thread {
                         /**
                          * Behold, hier the steps run!
                          */
-                        stepIndex = step.run!(this, stack, stackBase);
+                        stepIndex = step.run!(this, stack, stackBase, helperObject);
                         
                         this.currentProgramState.stepIndex = stepIndex;
                         numberOfSteps++;
@@ -94,7 +94,7 @@ export class Thread {
                         /**
                          * Behold, hier the steps run!
                          */
-                        stepIndex = step.run!(this, stack, stackBase);
+                        stepIndex = step.run!(this, stack, stackBase, helperObject);
 
                         numberOfSteps++;
                     }

@@ -15,7 +15,7 @@ class Test {
 
     method2(): Promise<string> {
 
-        let p = new Promise<string>((resolve: (value: string) => void, reject: (reason: any) => void) => {
+        let p = new Promise<string>((_resolve: (value: string) => void, _reject: (reason: any) => void) => {
 
         });
 

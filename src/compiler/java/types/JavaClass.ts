@@ -43,11 +43,11 @@ export class JavaClass extends IJavaClass {
     visibility: Visibility = TokenType.keywordPublic;
     enclosingParent: JavaClass | undefined = undefined;
 
-    private extends?: JavaClass;
-    private implements: JavaInterface[] = [];
+    private extends?: IJavaClass;
+    private implements: IJavaInterface[] = [];
 
-    constructor(identifier: string, module: JavaBaseModule, declarationRange: IRange) {
-        super(identifier, module, declarationRange);
+    constructor(identifier: string, module: JavaBaseModule, identifierRange: IRange) {
+        super(identifier, module, identifierRange);
     }
 
     isGenericVariant(): boolean {
@@ -58,11 +58,11 @@ export class JavaClass extends IJavaClass {
         return false;
     }
 
-    setExtends(ext: JavaClass){
+    setExtends(ext: IJavaClass){
         this.extends = ext;
     }
 
-    addImplements(impl: JavaInterface | JavaInterface[]){
+    addImplements(impl: IJavaInterface | IJavaInterface[]){
         if(!Array.isArray(impl)) impl = [impl];
         this.implements = this.implements.concat(impl);
     }
@@ -71,11 +71,11 @@ export class JavaClass extends IJavaClass {
         return new GenericVariantOfJavaClass(this, typeMap);
     }
 
-    getExtends(): JavaClass | undefined {
+    getExtends(): IJavaClass | undefined {
         return this.extends;
     }
 
-    getImplements(): JavaInterface[] {
+    getImplements(): IJavaInterface[] {
         return this.implements;
     }
 
@@ -179,14 +179,14 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     getExtends(): IJavaClass | undefined{
         let originalExtends = this.isGenericVariantOf.getExtends();
         if(!this.cachedExtends && originalExtends){
-            this.cachedExtends = originalExtends.getCopyWithConcreteType(this.typeMap);
+            this.cachedExtends = <IJavaClass>originalExtends.getCopyWithConcreteType(this.typeMap);
         }
         return this.cachedExtends;
     }
 
     getImplements(): IJavaInterface[]{
         if(!this.cachedImplements){
-            this.cachedImplements = this.isGenericVariantOf.getImplements().map(impl => impl.getCopyWithConcreteType(this.typeMap));
+            this.cachedImplements = this.isGenericVariantOf.getImplements().map(impl => <IJavaInterface>impl.getCopyWithConcreteType(this.typeMap));
         }   
         
         return this.cachedImplements;

@@ -2,10 +2,11 @@ import { BaseSymbolTable } from "../BaseSymbolTable";
 import { Module } from "../module/Module";
 import { IRange } from "../range/Range";
 import { Thread } from "./Thread";
+import { HelperObject } from "./ThreadPool";
 
 export class Step {
     // compiled function returns new programposition
-    run?: (thread: Thread, stack: any[], stackBase: number) => number;
+    run?: (thread: Thread, stack: any[], stackBase: number, helperObject: HelperObject) => number;
 
     isBreakpoint: boolean = false;
 
