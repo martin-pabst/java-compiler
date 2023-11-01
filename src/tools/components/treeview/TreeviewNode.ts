@@ -49,6 +49,7 @@ export class TreeviewNode<E> {
     private captionDiv!: HTMLDivElement;
     private errorsDiv!: HTMLDivElement;
     private buttonsDiv!: HTMLDivElement;
+    //@ts-ignore
     private expandCollapseComponent!: ExpandCollapseComponent;
     private childrenLineDiv!: HTMLDivElement;
 

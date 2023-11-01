@@ -18,6 +18,8 @@ export class Method {
     isFinal: boolean = false;
     isAbstract: boolean = false;
 
+    isConstructor: boolean = false;
+
     program?: Program;
 
     parameters: Parameter[] = [];
@@ -62,8 +64,9 @@ export class Method {
     }
 
     getInternalName(): string {
+        let shorthand = this.isConstructor ? 'c' : 'm';
         if(!this.internalName){
-            this.internalName = `_m$${this.identifier}$${this.returnParameter ? this.returnParameter.identifier : 'void'}$`;
+            this.internalName = `_${shorthand}$${this.identifier}$${this.returnParameter ? this.returnParameter.identifier : 'void'}$`;
             this.internalName += this.parameters.map(p => p.type.identifier).join("$");
         }
         return this.internalName;

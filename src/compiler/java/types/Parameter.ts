@@ -1,15 +1,20 @@
+import { BaseSymbol, BaseSymbolOnStackframe } from "../../common/BaseSymbolTable";
 import { UsagePosition } from "../../common/UsagePosition";
 import { IRange } from "../../common/range/Range";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { GenericTypeParameter } from "./GenericInformation";
 import { JavaType } from "./JavaType";
 
-export class Parameter {
-
+export class Parameter extends BaseSymbolOnStackframe {
+    
     usagePositions: UsagePosition[] = [];
 
-    constructor(public identifier: string, public identifierRange: IRange,
-         public module: JavaBaseModule, public type: JavaType){}
+    declare type: JavaType;
+
+    constructor(identifier: string, identifierRange: IRange,
+         public module: JavaBaseModule, type: JavaType){
+            super(identifier, identifierRange, type);
+         }
 
     getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, JavaType>): Parameter {
         let newType: JavaType = this.type.getCopyWithConcreteType(typeMap);
@@ -20,6 +25,9 @@ export class Parameter {
         return copy;
     }
 
+    getValue(stack: any, stackframeStart: number) {
+        throw new Error("Method not implemented.");
+    }
 
 
 }

@@ -1,32 +1,34 @@
 import { SystemModule } from "../../runtime/system/SystemModule";
 import { JavaType } from "../../types/JavaType";
+import { JavaTypeStore } from "../JavaTypeStore";
 import { JavaLibraryModule, JavaTypeMap } from "./JavaLibraryModule";
 import { LibraryDeclarationParser } from "./LibraryDeclarationParser";
 
 export class JavaLibraryModuleManager {
 
     libraryModules: JavaLibraryModule[] = [];
-    javaTypeMap: JavaTypeMap = {};
     javaTypes: JavaType[] = [];
+    typestore: JavaTypeStore;
 
     constructor(){
         this.libraryModules.push(new SystemModule())
+        this.typestore = new JavaTypeStore();
     }
 
     compileClassesToTypes(){
         let ldp: LibraryDeclarationParser = new LibraryDeclarationParser();
-        this.javaTypeMap = {};
+        this.typestore.empty;
         this.javaTypes = [];
     
         for(let module of this.libraryModules){
             for (let klass of module.classes) {
                 let npt = ldp.parseClassOrEnumOrInterfaceDeclarationWithoutGenerics(klass, module);
-                this.javaTypeMap[npt.identifier] = npt;
+                this.typestore.addType(npt);
                 this.javaTypes.push(npt);        
             }
 
             for(let type of module.types){
-                this.javaTypeMap[type.identifier] = type;
+                this.typestore.addType(type);
                 this.javaTypes.push(type);
             }
 
@@ -34,7 +36,8 @@ export class JavaLibraryModuleManager {
 
         for(let module of this.libraryModules){
             for(let klass of module.classes){
-                ldp.parseClassOrInterfaceDeclarationGenericsAndExtendsImplements(klass, this.javaTypeMap, module);
+                ldp.parseClassOrInterfaceDeclarationGenericsAndExtendsImplements(klass, this.typestore, module);
+                ldp.parseAttributesAndMethods(klass, this.typestore, module);
             }
         }        
     }

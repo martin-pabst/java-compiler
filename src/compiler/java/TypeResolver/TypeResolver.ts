@@ -111,7 +111,7 @@ export class TypeResolver {
             primaryType = new ArrayType(typeNode.identifier, primaryType, typeNode.arrayDimensions, module, typeNode.range);
         }
 
-        return primaryType;
+        return typeNode.resolvedType = primaryType;;
     }
 
     findPrimaryTypeByIdentifier(typeNode: ASTTypeNode, module: JavaBaseModule): JavaType | undefined {
@@ -128,7 +128,7 @@ export class TypeResolver {
         let type = this.moduleManager.typestore.getType(identifer);
 
         if (!type) {
-            type = this.libraryModuleManager.javaTypeMap[identifer];
+            type = this.libraryModuleManager.typestore.getType(identifer);
         }
 
         if (!type) {

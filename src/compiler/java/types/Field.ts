@@ -1,3 +1,4 @@
+import { BaseSymbol } from "../../common/BaseSymbolTable";
 import { UsagePosition } from "../../common/UsagePosition";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
@@ -8,7 +9,7 @@ import { JavaEnum } from "./JavaEnum";
 import { JavaType } from "./JavaType";
 import { Visibility } from "./Visibility";
 
-export class Field {
+export class Field extends BaseSymbol {
 
     isStatic: boolean = false;
     isFinal: boolean = false;
@@ -19,9 +20,11 @@ export class Field {
 
     usagePositions: UsagePosition[] = [];
 
-    constructor(public identifier: string, public identifierRange: IRange, public module: JavaBaseModule,
-         public type: JavaType, public visibility: Visibility = TokenType.keywordPublic){
+    declare type: JavaType;
 
+    constructor(identifier: string, identifierRange: IRange, public module: JavaBaseModule,
+         type: JavaType, public visibility: Visibility = TokenType.keywordPublic){
+            super(identifier, identifierRange, type);
     }
 
     getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, JavaType>): Field {
@@ -49,4 +52,9 @@ export class Field {
 
         return this.internalName;
     }
+
+    getValue(stack: any, stackframeStart: number) {
+        throw new Error("Method not implemented.");
+    }
+
 }

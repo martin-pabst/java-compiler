@@ -13,6 +13,7 @@ import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { Parameter } from "../../types/Parameter";
 import { Visibility } from "../../types/Visibility";
 import { JavaBaseModule } from "../JavaBaseModule";
+import { JavaTypeStore } from "../JavaTypeStore";
 import { LibraryKlassType, JavaTypeMap } from "./JavaLibraryModule";
 import { LdToken, LibraryDeclarationLexer } from "./LibraryDeclarationLexer";
 
@@ -37,7 +38,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     tt: TokenType = TokenType.endofSourcecode;
     currentDeclaration: string = "";
 
-    currentTypeMap: JavaTypeMap = {}; 
+    currentTypeStore: JavaTypeStore = new JavaTypeStore(); 
     currentGenericParameterMap: JavaTypeMap = {};
 
     constructor(){
@@ -45,7 +46,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     }
 
     parseClassOrEnumOrInterfaceDeclarationWithoutGenerics(klass: Klass & LibraryKlassType, module: JavaBaseModule): NonPrimitiveType {
-        this.tokenList = this.lex(klass.__declareType()[0]);
+        this.initTokens(klass.__declareType()[0]);
 
         let modifiersAndType = this.parseModifiersAndType(true);
 
@@ -79,10 +80,10 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     }
 
 
-    parseClassOrInterfaceDeclarationGenericsAndExtendsImplements(klass: Klass & LibraryKlassType, nptMap: JavaTypeMap, module: JavaBaseModule){
+    parseClassOrInterfaceDeclarationGenericsAndExtendsImplements(klass: Klass & LibraryKlassType, typestore: JavaTypeStore, module: JavaBaseModule){
 
         this.currentGenericParameterMap = {};
-        this.currentTypeMap = nptMap;        
+        this.currentTypeStore = typestore;        
 
         this.initTokens(klass.__declareType()[0]);
         this.skipTill([TokenType.lower, TokenType.keywordExtends, TokenType.keywordImplements], false);
@@ -181,7 +182,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
      */
     parseType(module: JavaBaseModule): JavaType {
         let id = this.expectIdentifier();
-        if(id == "") return this.currentTypeMap["void"];
+        if(id == "") return this.currentTypeStore.getType("void")!;
 
         let type = this.findType(id);
 
@@ -213,14 +214,14 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     }
 
     findType(id: string): JavaType {
-        let type = this.currentTypeMap[id];
+        let type = this.currentTypeStore.getType(id);
         if(type) return type;
         type = this.currentGenericParameterMap[id];
         if(type) return type;
 
         this.pushError("Konnte den Typ " + id + " nicht finden.");
 
-        return this.currentTypeMap["void"];
+        return this.currentTypeStore.getType("void")!;
     }
 
     expectIdentifier(): string {
@@ -272,6 +273,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                     return m;
                 }
             }
+            this.nextToken();
         }    
 
         return m;
@@ -309,12 +311,12 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     }
 
     nextToken(){
+        this.pos++;
         if(this.pos >= this.tokenList.length){
             this.cct = LibraryDeclarationParser.endOfSourcecodeToken;
             this.tt = this.cct.tt;
             return;
         }
-        this.pos++;
         this.cct = this.tokenList[this.pos];
         this.tt = this.cct.tt;
     }
@@ -328,7 +330,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     }
 
     expect(tt: TokenType, skip: boolean): boolean {
-        if(tt != this.tt){
+        if(tt == this.tt){
             if(skip) this.nextToken();
             return true;
         }
@@ -341,10 +343,10 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
      * Parse Attributes and Methods
      */
 
-    parseAttributesAndMethods(klass: Klass & LibraryKlassType, nptMap: JavaTypeMap, module: JavaBaseModule){
+    parseAttributesAndMethods(klass: Klass & LibraryKlassType, typestore: JavaTypeStore, module: JavaBaseModule){
 
         this.currentGenericParameterMap = {};
-        this.currentTypeMap = nptMap;        
+        this.currentTypeStore = typestore;        
 
         let typeDeclarations = klass.__declareType();
         for(let i = 1; i < typeDeclarations.length; i++){
@@ -364,18 +366,22 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         let type = this.parseType(module);
 
-        let identifier = this.expectIdentifier();
+        let isConstructor: boolean = type == klassType && this.comesToken(TokenType.leftBracket, false);
+
+        let identifier = isConstructor ? klassType.identifier : this.expectIdentifier();
 
         if(this.comesToken(TokenType.leftBracket, true)){
             // method
             let m = new Method(identifier, EmptyRange.instance, module, modifiers.visibility);
             m.returnParameter = type;
-
-            do{
-                let type = this.parseType(module);
-                let id = this.expectIdentifier();
-                m.parameters.push(new Parameter(id, EmptyRange.instance, module, type));            
-            } while(this.comesToken(TokenType.comma, true));
+            m.isConstructor = isConstructor;
+            if(!this.comesToken(TokenType.rightBracket, false)){
+                do{
+                    let type = this.parseType(module);
+                    let id = this.expectIdentifier();
+                    m.parameters.push(new Parameter(id, EmptyRange.instance, module, type));            
+                } while(this.comesToken(TokenType.comma, true));
+            }
 
             m.isStatic = modifiers.static;
             m.isFinal = modifiers.final;

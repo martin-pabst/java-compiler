@@ -4,7 +4,8 @@ export enum TokenType {
     integerConstant,
     longConstant,
     shortConstant,
-    floatingPointConstant,
+    floatConstant,
+    doubleConstant,
     booleanConstant,
     stringConstant,
     charConstant,
@@ -191,7 +192,7 @@ export enum TokenType {
     multiNode,  // used for debugging output
     plusPlusMinusMinusSuffix,
     genericParameterDefinition,
-    variable,
+    symbol,
     annotation,
 
     type, // e.g. int[][]
@@ -219,7 +220,7 @@ export var TokenTypeReadable: { [tt: number]: string } = {
     [TokenType.identifier]: "Bezeichner",
     // constants
     [TokenType.integerConstant]: "Integer-Konstante",
-    [TokenType.floatingPointConstant]: "Fließkomma-Konstante",
+    [TokenType.floatConstant]: "Fließkomma-Konstante",
     [TokenType.booleanConstant]: "boolesche Konstante",
     [TokenType.stringConstant]: "Zeichenketten-Konstante",
     [TokenType.charConstant]: "char-Konstante",

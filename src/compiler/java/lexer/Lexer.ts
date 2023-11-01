@@ -355,7 +355,7 @@ export class Lexer {
                         this.next();
                         return;
                     } else if (this.isDigit(this.nextChar, 10) && !
-                        ([TokenType.identifier, TokenType.integerConstant, TokenType.floatingPointConstant, TokenType.charConstant, TokenType.rightBracket, TokenType.rightSquareBracket].indexOf(this.nonSpaceLastTokenType!) >= 0)
+                        ([TokenType.identifier, TokenType.integerConstant, TokenType.floatConstant, TokenType.charConstant, TokenType.rightBracket, TokenType.rightSquareBracket].indexOf(this.nonSpaceLastTokenType!) >= 0)
                     ) {
                         this.lexNumber();
                         return;
@@ -435,7 +435,7 @@ export class Lexer {
                         return;
                     }
                     else if (this.isDigit(this.nextChar, 10) && !
-                        ([TokenType.identifier, TokenType.integerConstant, TokenType.floatingPointConstant, TokenType.stringConstant, TokenType.rightBracket, TokenType.rightSquareBracket].indexOf(this.nonSpaceLastTokenType!) >= 0)
+                        ([TokenType.identifier, TokenType.integerConstant, TokenType.floatConstant, TokenType.stringConstant, TokenType.rightBracket, TokenType.rightSquareBracket].indexOf(this.nonSpaceLastTokenType!) >= 0)
                     ) {
                         this.lexNumber();
                         return;
@@ -896,7 +896,7 @@ export class Lexer {
         } else {
 
             if (this.currentChar == ".") {
-                tt = TokenType.floatingPointConstant;
+                tt = TokenType.floatConstant;
 
                 this.next();
                 while (this.isDigit(this.currentChar, 10)) {
@@ -935,7 +935,8 @@ export class Lexer {
             }
 
             if (this.currentChar == 'd' || this.currentChar == 'f') {
-                tt = TokenType.floatingPointConstant;
+                tt = TokenType.floatConstant;
+                if(this.currentChar == 'd') tt = TokenType.doubleConstant;
                 this.next();
                 if (radix != 10) {
                     this.pushError("Eine float/double-Konstante darf nicht mit 0, 0b oder 0x beginnen.", this.pos - posStart, "error", this.line, this.column - (this.pos - posStart));

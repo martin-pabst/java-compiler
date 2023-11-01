@@ -93,6 +93,8 @@ export class Thread {
 
                         /**
                          * Behold, hier the steps run!
+                         * parameter identifers inside function: 
+                         *                    t, s, sb, h
                          */
                         stepIndex = step.run!(this, stack, stackBase, helperObject);
 
@@ -253,7 +255,7 @@ export class Thread {
         this.currentProgramState = state;
     }
 
-    pushCallback(callback: () => {}){
+    pushCallback(callback: () => void){
         this.lastDepositedCallback = callback;
     }
 

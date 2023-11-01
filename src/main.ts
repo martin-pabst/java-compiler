@@ -5,6 +5,7 @@ import { File } from "./compiler/common/module/File";
 import { Module } from "./compiler/common/module/Module";
 import { JavaCompiler } from "./compiler/java/JavaCompiler";
 import { JavaLanguage } from "./compiler/java/JavaLanguage";
+import { CodePrinter } from "./compiler/java/codegenerator/CodePrinter";
 import { TokenPrinter } from "./compiler/java/lexer/TokenPrinter";
 import { JavaLibraryModuleManager } from "./compiler/java/module/libraries/JavaLibraryModuleManager";
 import { Editor } from "./editor/Editor";
@@ -17,13 +18,14 @@ import '/include/css/main.css';
 export class Main {
 
   language: Language;
-  editor: Editor;
+  inputEditor: Editor;
+  codeOutputEditor: monaco.editor.IStandaloneCodeEditor;
 
   tabManager: TabManager;
 
   tokenDiv: HTMLDivElement;
   astDiv: HTMLDivElement;
-  codeDiv: HTMLDivElement;
+  codeOutputDiv: HTMLDivElement;
   errorDiv: HTMLDivElement;
 
   astComponent: AstComponent;
@@ -38,23 +40,29 @@ export class Main {
     this.language = new JavaLanguage();
     this.language.registerLanguageAtMonacoEditor();
 
-    this.editor = new Editor(this, document.getElementById('editor')!);
-
+    this.inputEditor = new Editor(this, document.getElementById('editor')!);
+    
     this.tabManager = new TabManager(document.getElementById('tabs')!,
-      ['token', 'ast', 'code', 'errors']);
-
+    ['token', 'ast', 'code', 'errors']);
+    
     this.tabManager.setBodyElementClass('tabBodyElement');
     this.tokenDiv = this.tabManager.getBodyElement(0);
     this.astDiv = this.tabManager.getBodyElement(1);
-    this.codeDiv = this.tabManager.getBodyElement(2);
+    this.codeOutputDiv = this.tabManager.getBodyElement(2);
     this.errorDiv = this.tabManager.getBodyElement(3);
+    
+    this.codeOutputEditor = monaco.editor.create(this.codeOutputDiv, {
+      value: "/** Awaiting compilation... */",
+      language: "javascript",
+      automaticLayout: true,
+    });
 
     this.astComponent = new AstComponent(this.astDiv);
 
     this.initButtons();
 
     this.file = new File();
-    this.file.monacoModel = this.editor.editor.getModel()!;
+    this.file.monacoModel = this.inputEditor.editor.getModel()!;
 
     this.libraryModuleManager = new JavaLibraryModuleManager();
     this.libraryModuleManager.compileClassesToTypes();
@@ -66,9 +74,9 @@ export class Main {
   initButtons() {
     let buttonDiv = document.getElementById('buttons')!;
     new Button(buttonDiv, 'compile', '#30c030', () => {
+      this.compile()
       
       setInterval(() => {
-        this.compile()
       }, 500)
 
 
@@ -88,6 +96,12 @@ export class Main {
 
     this.markErrors(module);
     this.printErrors(module);
+
+    let codePrinter = new CodePrinter();
+    let output = codePrinter.formatCode(module);
+
+    this.codeOutputEditor.getModel()?.setValue(output);
+
   }
 
   markErrors(module: Module) {
@@ -103,7 +117,7 @@ export class Main {
       }
     })
 
-    monaco.editor.setModelMarkers(this.editor.editor.getModel()!, "martin", markers);
+    monaco.editor.setModelMarkers(this.inputEditor.editor.getModel()!, "martin", markers);
 
   }
 

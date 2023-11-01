@@ -1,5 +1,6 @@
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
+import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable.ts";
 import { GenericTypeParameter } from "../types/GenericInformation.ts";
 import { JavaType } from "../types/JavaType.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
@@ -20,7 +21,8 @@ export type ConstantType = TokenType.shortConstant | TokenType.integerConstant |
 
 export interface ASTNode {
     kind: TokenType;
-    range: IRange;    
+    range: IRange;
+    symbolTable?: JavaSymbolTable;    
 }
 
 export interface TypeScope {
@@ -195,8 +197,8 @@ export interface ASTCastNode extends ASTTermNode {
     objectToCast: ASTTermNode;
 }
 
-export interface ASTVariableNode extends ASTTermNode {
-    kind: TokenType.variable;
+export interface ASTSymbolNode extends ASTTermNode {
+    kind: TokenType.symbol;
     identifier: string;
 }
 

@@ -8,7 +8,7 @@ export class TokenPrinter {
 
     static typesWithContent: TokenType[] = [
         TokenType.identifier, TokenType.stringConstant,
-        TokenType.floatingPointConstant, TokenType.integerConstant,
+        TokenType.floatConstant, TokenType.integerConstant,
         TokenType.charConstant
     ]
 

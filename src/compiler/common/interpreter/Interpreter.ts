@@ -1,6 +1,7 @@
 import { Module } from "../module/Module";
 import { EventManager } from "./EventManager";
 import { LoadController } from "./LoadController";
+import { PrintManager } from "./PrintManager";
 import { HelperRegistry, KlassObjectRegistry, TextPositionWithModule, ThreadPool, ThreadPoolLstate } from "./ThreadPool";
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
@@ -17,7 +18,6 @@ export class Interpreter {
     mainModule?: Module;
     moduleStoreVersion: number = -100;
 
-    // printManager: PrintManager;
     // inputManager: InputManager;
 
     // keyboardTool: KeyboardTool;
@@ -44,7 +44,7 @@ export class Interpreter {
 
 
 
-    constructor() {
+    constructor(public printManager: PrintManager) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {
 
         // this.printManager = new PrintManager($runDiv, this.main);

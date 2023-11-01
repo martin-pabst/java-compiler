@@ -10,22 +10,38 @@ export type LdToken = {
 export class LibraryDeclarationLexer {
 
 
-    static keywordToTokenTypeMap: {[keyword: string]: TokenType} = {
-        "class": TokenType.keywordClass,
-        "enum": TokenType.keywordEnum,
-        "interface": TokenType.keywordInterface,
-        "extends": TokenType.keywordExtends,
-        "implements": TokenType.keywordImplements,
-        "public": TokenType.keywordPublic,
-        "protected": TokenType.keywordProtected,
-        "private": TokenType.keywordPrivate,
-        "static": TokenType.keywordStatic            
+    static keywordToTokenTypeMap: Map<string, TokenType> = 
+    new Map(
+        [
+            ["class", TokenType.keywordClass],
+            ["enum", TokenType.keywordEnum],
+            ["interface", TokenType.keywordInterface],
+            ["extends", TokenType.keywordExtends],
+            ["implements", TokenType.keywordImplements],
+            ["public", TokenType.keywordPublic],
+            ["protected", TokenType.keywordProtected],
+            ["private", TokenType.keywordPrivate],
+            ["static", TokenType.keywordStatic]
+        ]
+
+    );
+
+    static specialTokenMap: { [character: string]: TokenType } = {
+        "(": TokenType.leftBracket,
+        ")": TokenType.rightBracket,
+        "<": TokenType.lower,
+        ">": TokenType.greater,
+        ",": TokenType.comma,
+        "&": TokenType.ampersand,
+        ":": TokenType.colon,
+        " ": TokenType.space,
+        "\n": TokenType.space,
+        "\r": TokenType.space
     }
 
-    
     constructor() {
     }
-    
+
     lex(declaration: string): LdToken[] {
         let tokens: LdToken[] = [];
         let cpos: number = 0;
@@ -33,24 +49,18 @@ export class LibraryDeclarationLexer {
         let currentIdentifier: string = '';
         while (cpos < declaration.length) {
             let c = declaration.charAt(cpos);
-            switch (c) {
-                case '(': tokens.push({ tt: TokenType.leftBracket, value: '(' }); break;
-                case ')': tokens.push({ tt: TokenType.rightBracket, value: ')' }); break;
-                case '<': tokens.push({ tt: TokenType.lower, value: '<' }); break;
-                case '>': tokens.push({ tt: TokenType.greater, value: '>' }); break;
-                case ',': tokens.push({ tt: TokenType.comma, value: ',' }); break;
-                case '&': tokens.push({tt: TokenType.ampersand, value: '&'}); break;
-                case ' ':
-                case '\n':
-                case '\r':
-                    if (currentIdentifier != '') {
-                        this.pushIdentifierOrKeyword(currentIdentifier, tokens);                        
-                        currentIdentifier = '';
-                    }
-                    break;
-                default: currentIdentifier += c;
+            let tt = LibraryDeclarationLexer.specialTokenMap[c];
+            if (tt) {
+                if (currentIdentifier != '') {
+                    this.pushIdentifierOrKeyword(currentIdentifier, tokens);
+                    currentIdentifier = '';
+                }
+                if (tt != TokenType.space) {
+                    tokens.push({ tt: tt, value: c });
+                }
+            } else {
+                currentIdentifier += c;
             }
-            
             cpos++;
         }
 
@@ -61,12 +71,12 @@ export class LibraryDeclarationLexer {
         return tokens;
     }
 
-    pushIdentifierOrKeyword(id: string, tokens: LdToken[]){
-        let tt = LibraryDeclarationLexer.keywordToTokenTypeMap[id];
-        if(tt){
-            tokens.push({tt: tt, value: id});
+    pushIdentifierOrKeyword(id: string, tokens: LdToken[]) {
+        let tt = LibraryDeclarationLexer.keywordToTokenTypeMap.get(id);
+        if (tt) {
+            tokens.push({ tt: tt, value: id });
         } else {
-            tokens.push({tt: TokenType.identifier, value: id});
+            tokens.push({ tt: TokenType.identifier, value: id });
         }
     }
 

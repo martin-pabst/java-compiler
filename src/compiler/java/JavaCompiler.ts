@@ -8,6 +8,7 @@
 
 import { File } from "../common/module/File";
 import { TypeResolver } from "./TypeResolver/TypeResolver";
+import { CodeGenerator } from "./codegenerator/CodeGenerator";
 import { Lexer } from "./lexer/Lexer";
 import { JavaModuleManager } from "./module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "./module/libraries/JavaLibraryModuleManager";
@@ -47,6 +48,11 @@ export class JavaCompiler {
 
         let typeResolver = new TypeResolver(this.moduleManager, this.libraryModuleManager);
         typeResolver.resolve();
+
+        for(let module of dirtyModules){
+            let codegenerator = new CodeGenerator(module, this.libraryModuleManager.typestore);
+            codegenerator.start();
+        }
 
     }
 

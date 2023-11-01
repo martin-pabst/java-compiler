@@ -1,4 +1,4 @@
-import { Error, ErrorLevel, QuickFix } from "../../common/Error";
+import { ErrorLevel, QuickFix } from "../../common/Error";
 import { IRange } from "../../common/range/Range";
 import { Token, TokenList } from "../lexer/Token";
 import { JavaBaseModule } from "../module/JavaBaseModule";

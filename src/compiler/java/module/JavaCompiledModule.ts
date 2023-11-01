@@ -1,4 +1,5 @@
 import { Error } from "../../common/Error";
+import { Program } from "../../common/interpreter/Program";
 import { File } from "../../common/module/File";
 import { TokenList } from "../lexer/Token";
 import { ASTGlobalNode } from "../parser/AST";
@@ -14,6 +15,7 @@ export class JavaCompiledModule extends JavaBaseModule {
 
     tokens?: TokenList;
     ast?: ASTGlobalNode;
+    mainProgram?: Program;
 
     usedTypesFromOtherModules: Map<JavaType, boolean> = new Map();
 
@@ -66,6 +68,9 @@ export class JavaCompiledModule extends JavaBaseModule {
         }
     }
 
+    getMainProgram(): Program | undefined {
+        return this.mainProgram;
+    }
 
 
 }

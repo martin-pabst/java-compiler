@@ -13,7 +13,7 @@ export class JavaModuleManager {
     typestore: JavaTypeStore;
 
     constructor(){
-        this.typestore = new JavaTypeStore(this);
+        this.typestore = new JavaTypeStore();
     }
 
     addModule(module: JavaCompiledModule){

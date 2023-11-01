@@ -1,11 +1,10 @@
 import { JavaType } from "../types/JavaType";
-import { JavaModuleManager } from "./JavaModuleManager";
 
 export class JavaTypeStore {
  
     private typeMap: Map<string, JavaType> = new Map();
     
-    constructor(private moduleManager: JavaModuleManager){
+    constructor(){
 
     }
 

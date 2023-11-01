@@ -21,5 +21,22 @@ export class StringClass extends ObjectClass {
         t.stack.push(this.text);        
     }
 
+    plusOtherString(s: StringClass): StringClass {
+        return new StringClass(this.text + s.text);
+    }
+
+    plusObject(t: Thread, o: ObjectClass){
+        t.pushCallback(() => {
+            t.stack.push(new StringClass(this.text + t.stack.pop().text))
+        });
+        o._m$toString$String$(t);
+    }
+
+    plusObjectFromLeft(t: Thread, o: ObjectClass){
+        t.pushCallback(() => {
+            t.stack.push(new StringClass(t.stack.pop().text + this.text))
+        });
+        o._m$toString$String$(t);
+    }
 
 }
