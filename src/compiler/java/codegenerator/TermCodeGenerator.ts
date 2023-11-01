@@ -13,6 +13,7 @@ import { Parameter } from "../types/Parameter";
 import { CodeSnippet } from "./CodeSnippet";
 import { JavaLocalVariable } from "./JavaLocalVariable";
 import { JavaSymbolTable } from "./JavaSymbolTable";
+import { SnippetFramer } from "./SnippetTools";
 
 export class TermCodeGenerator {
 
@@ -35,14 +36,26 @@ export class TermCodeGenerator {
 
         if(!ast) return undefined;
 
+        let snippet: CodeSnippet | undefined;
+
         switch(ast.kind){
-            case TokenType.binaryOp: return this.compileBinaryOperator(<ASTBinaryNode>ast);
-            case TokenType.unaryPrefixOp: return this.compileUnaryPrefixOperator(<ASTUnaryPrefixNode>ast);
-            case TokenType.plusPlusMinusMinusSuffix: return this.compilePlusPlusMinusMinusSuffixOperator(<ASTPlusPlusMinusMinusSuffixNode>ast);
-            case TokenType.pushConstant: return this.compileConstantNode(<ASTConstantNode>ast);
-            case TokenType.symbol: return this.compileVariableNode(<ASTSymbolNode>ast);
+            case TokenType.binaryOp: 
+                snippet = this.compileBinaryOperator(<ASTBinaryNode>ast);break;
+            case TokenType.unaryPrefixOp: 
+                snippet = this.compileUnaryPrefixOperator(<ASTUnaryPrefixNode>ast);break;
+            case TokenType.plusPlusMinusMinusSuffix: 
+                snippet = this.compilePlusPlusMinusMinusSuffixOperator(<ASTPlusPlusMinusMinusSuffixNode>ast);break;
+            case TokenType.pushConstant: 
+                snippet = this.compileConstantNode(<ASTConstantNode>ast);break;
+            case TokenType.symbol: 
+                snippet = this.compileVariableNode(<ASTSymbolNode>ast);break;
         }
 
+        if(snippet && ast.parenthesisNeeded){
+            snippet = SnippetFramer.frame(snippet, '($1)');
+        }
+
+        return snippet;
     }
 
     compileVariableNode(node: ASTSymbolNode): CodeSnippet | undefined {

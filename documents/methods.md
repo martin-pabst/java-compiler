@@ -4,15 +4,15 @@ Each object contains its attributes as members. It's prototype is the correspond
 ### Example:
 ```java
 class Test1 extends Test {
-    String name;
-    String getName(){...},
+    String name;                  // Problem1: Test.name and Test1.name are ONE field in Javascript due to prototype inheritance
+    String getName(){...},        // Problem2: in Javascript getName() overrides getName(int x) although it has a different signature. In Java we have method-overloading...
     void setName(String n){...}
 }
 
 class Test {
     String name;
     String toString(){...},
-    String getName(){...}
+    String getName(int x){...}
 }
 ```
 
@@ -25,14 +25,14 @@ Leads to this object structure:
     age: number,
 
     prototype: {    // class-Object of class Test1
-        _m$getName$String: (t: Thread) => void,       // overwrites _m$getName() of prototype; return value is pushed to current stackframe t.sf
+        _m$getName$String: (t: Thread) => void,       // return value is pushed to current stackframe t.sf
         _m$setName$void$String: (t: Thread, n: string) => void,
         _mo1249: { ... }  // method-objects, see later
         _mo1250: { ... }
 
         protoype: {  // class-object of class Test
             _m$toString$string: (t: Thread) => void, // return value is pushed to current stackframe t.sf
-            _m$getName$String: (t: Thread) => void,  // return value is pushed to current stackframe t.sf
+            _m$getName$String$int: (t: Thread) => void,  // return value is pushed to current stackframe t.sf
             _mo1248: { ... }
             _mo1247: { ... }
         }

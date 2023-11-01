@@ -15,6 +15,7 @@ export abstract class TermParser extends TokenIterator {
     ];
 
     static operatorPrecedence: TokenType[][] = [
+        // Lambda-Operator: -1
         TermParser.assignmentOperators, // 0
         [TokenType.ternaryOperator],    // 1
         [TokenType.colon],              // 2
@@ -28,6 +29,12 @@ export abstract class TermParser extends TokenIterator {
         [TokenType.shiftLeft, TokenType.shiftRight, TokenType.shiftRightUnsigned],  // 10
         [TokenType.plus, TokenType.minus],                                          // 11
         [TokenType.multiplication, TokenType.division, TokenType.modulo]           // 12
+
+        // cast: 20
+        // unary (pre): 21
+        // unary (post): 22
+        // array access: 23
+        // member access: 24
     ];
 
 
@@ -167,6 +174,7 @@ export abstract class TermParser extends TokenIterator {
                     default:
                         this.nextToken();
                         node = this.parseTerm();
+                        if(node) node.parenthesisNeeded = true;
                         this.expect(TokenType.rightBracket, true);
                 }
                 break;

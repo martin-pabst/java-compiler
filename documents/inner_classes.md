@@ -1,4 +1,8 @@
 # Inner classes
+
+## 01.11.2023: low priority, implement later if needed
+
+
   * Each class type has a list of inner class types
   * A inner class has Access to members of outer classes.
     * -> each inner class has a member _$outer which points to instance of outer class. It gets initialized when calling the constructor (additional invisible argument)

@@ -189,6 +189,7 @@ export interface ASTStatementNode extends ASTNode {
  */
 
 export interface ASTTermNode extends ASTStatementNode {
+    parenthesisNeeded?: boolean;
 }
 
 export interface ASTCastNode extends ASTTermNode {

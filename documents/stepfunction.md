@@ -13,18 +13,16 @@ type step = {
     fText: string,    // function of text before compiling to javascript
     hoText: string[] // helper objects as string before resolving to real objects
 
-    f: (t: Thread, sf: any[], ho: any[]) => {
+    f: (t: Thread, s: any[], sb: number, ho: {}) => {
 
         t.nextStepIndex = 21;
         t.callMethod(ho[3]);       // calls other Method after returning
-        return 0;
-      },
-    ho: any[],
+        return 1;                  // next stepIndex
+      }
+    
 
+    // 01.11.2023: Only generate one set of steps... second (faster) set later...
     correspondingStepIndex: number,  // if slow version: corresponding stepIndex in fast version and 
                                      // vice versa
 }
 ```
-
-## Array ho
-  * `ho[0]: {[classIdentifier: string]: class}`

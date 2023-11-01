@@ -1,5 +1,5 @@
 # Variable adressing
-## local variables
+## local variables, parameters
 ```java
 int a = 12;
 println(a);
@@ -7,12 +7,12 @@ println(a);
 The value of a lies on the stack at position p relative to current stackframe:
 ### compiled code:
 ```javascript
-   sf[7] = 12;
-   t.methods.print(sf[7]);
+   s[sb + 7] = 12;
+   t.methods.print(s[sb + 7]);
 ```
 
 ## member variable
-`sf[0]` holds `this`-object, so 
+`s[sb + 0]` holds `this`-object, so 
 ```java
 class Test {
     name: String;
@@ -24,7 +24,7 @@ class Test {
 ```
 compiles to
 ```javascript
-sf.push(sf[0].name);
+sf.push(s[sb + 0].name);
 return;
 ```
 
@@ -37,17 +37,17 @@ If base class Test1 contains member `name` and child class Test2 contains member
     ___name: string; // member of Test3
 }
 ```
-So for example `super.name` in class Test3 is compiled to `sf[0]._name`;
+So for example `super.name` in class Test3 is compiled to `sf[0].__name`;
 
-## use member of outer class in inner class
+## use member of outer class in inner class -> 01.11.2023: later!
 Inner object has member `_$outer` which references outer object, so accessing member `x` of outer class is achieved with
 ```javascript
 sf[0]._$outer.x
 ``` 
 
 ## static variables
-If static member `name` of `class Test` is used anywhere then class-object for class `Test` is put into array `ho` by compiler, e.g. in position 3. `name` is then used this way:
+If static member `name` of `class Test` is used anywhere then class-object for class `Test` is put into map `ho.classes` by compiler. `name` is then used this way:
 ```javascript
-ho[3].name
+ho.classes["Test"].name
 ```
 

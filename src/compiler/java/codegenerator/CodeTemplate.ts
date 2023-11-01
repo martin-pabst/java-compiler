@@ -131,7 +131,7 @@ export class UnarySuffixTemplate extends CodeTemplate {
         if(primitiveTypeIndex > 1) return SnippetFramer.frame(snippet, '$1' + operatorString);
 
         // char
-        return SnippetFramer.frame(snippet, '($1 = String.fromCharCode(($1.charCodeAt(0) + 1)))')
+        return SnippetFramer.frame(snippet, 'String.fromCharCode(($1 = String.fromCharCode(($1.charCodeAt(0) + 1))).charCodeAt(0) - 1)')
 
     }
 }
@@ -155,7 +155,7 @@ export class BinaryOperatorTemplate extends CodeTemplate {
 
         if (snippet0IsPure && snippet1IsPure) {
             return new CodeSnippet(range, false, false, resultType,
-                new StringCodeSnippet("(" + snippets[0].parts[0].emit() + " " + this.operator + " " + snippets[1].parts[0].emit() + ")", range));
+                new StringCodeSnippet(snippets[0].parts[0].emit() + " " + this.operator + " " + snippets[1].parts[0].emit(), range));
         }
 
         if (this.operator == '&&') return lazyEvaluationAND(resultType, snippets, range);
@@ -169,7 +169,7 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         if (this.isCommutative || snippet0IsPure || snippet1IsPure) {
             snippet.addParts(snippets[0].allButLastPart());
             snippet.addParts(snippets[1].allButLastPart());
-            snippet.addStringPart(`(${snippets[0].lastPartOrPop()} ${this.operator} ${snippets[1].lastPartOrPop()})`, range)
+            snippet.addStringPart(`${snippets[0].lastPartOrPop()} ${this.operator} ${snippets[1].lastPartOrPop()}`, range)
             return snippet;
         }
 
@@ -178,19 +178,19 @@ export class BinaryOperatorTemplate extends CodeTemplate {
             snippet.addParts(snippets[1].allButLastPart());
 
             switch (this.operator) {
-                case '-': snippet.addStringPart(`(-s.pop() + s.pop())`, range); break;
-                case '/': snippet.addStringPart(`(1/s.pop() * s.pop())`, range); break;
-                case '<': snippet.addStringPart(`(pop() > pop())`, range); break;
-                case '>': snippet.addStringPart(`(pop() < pop())`, range); break;
-                case '<=': snippet.addStringPart(`(pop() >= pop())`, range); break;
-                case '>=': snippet.addStringPart(`(pop() <= pop())`, range); break;
+                case '-': snippet.addStringPart(`-s.pop() + s.pop()`, range); break;
+                case '/': snippet.addStringPart(`1/s.pop() * s.pop()`, range); break;
+                case '<': snippet.addStringPart(`pop() > pop()`, range); break;
+                case '>': snippet.addStringPart(`pop() < pop()`, range); break;
+                case '<=': snippet.addStringPart(`pop() >= pop()`, range); break;
+                case '>=': snippet.addStringPart(`pop() <= pop()`, range); break;
             }
             return snippet;
         }
 
         snippet.addParts(snippets[1].allButLastPart());
         snippet.addParts(snippets[0].allButLastPart());
-        snippet.addStringPart(`(pop() ${this.operator} pop())`, range);
+        snippet.addStringPart(`pop() ${this.operator} pop()`, range);
 
         return snippet;
     }
