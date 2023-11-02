@@ -2,7 +2,7 @@ import { Module } from "../module/Module";
 import { EventManager } from "./EventManager";
 import { LoadController } from "./LoadController";
 import { PrintManager } from "./PrintManager";
-import { HelperRegistry, KlassObjectRegistry, TextPositionWithModule, Scheduler, SchedulerLstate } from "./Scheduler";
+import { HelperRegistry, KlassObjectRegistry, TextPositionWithModule, Scheduler, SchedulerState } from "./Scheduler";
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
 
@@ -90,10 +90,10 @@ export class Interpreter {
 
     executeOneStep(stepInto: boolean) {
 
-        if (this.scheduler.state != SchedulerLstate.paused) {
+        if (this.scheduler.state != SchedulerState.paused) {
             // TODO!
             // this.init();
-            if (this.scheduler.state == SchedulerLstate.not_initialized) {
+            if (this.scheduler.state == SchedulerState.not_initialized) {
                 return;
             }
             this.resetRuntime();
@@ -103,7 +103,7 @@ export class Interpreter {
             this.pause();
         });
         if (!stepInto) {
-            this.scheduler.setState(SchedulerLstate.running);
+            this.scheduler.setState(SchedulerState.running);
         }
     }
 
@@ -112,7 +112,7 @@ export class Interpreter {
     }
 
     pause() {
-        this.scheduler.setState(SchedulerLstate.paused);
+        this.scheduler.setState(SchedulerState.paused);
         this.scheduler.unmarkStep();
         this.showProgramPointer(this.scheduler.getNextStepPosition());
     }
@@ -120,7 +120,7 @@ export class Interpreter {
     stop(restart: boolean) {
 
         // this.inputManager.hide();
-        this.scheduler.setState(SchedulerLstate.stopped);
+        this.scheduler.setState(SchedulerState.stopped);
         this.scheduler.unmarkStep();
 
         this.eventManager.fire("stop");
@@ -146,7 +146,7 @@ export class Interpreter {
 
         // this.main.getBottomDiv()?.console?.clearErrors();
 
-        if (this.scheduler.state != SchedulerLstate.paused) {
+        if (this.scheduler.state != SchedulerState.paused) {
             // TODO!
             // this.init(this.mainModule);
             this.resetRuntime();
@@ -154,7 +154,7 @@ export class Interpreter {
 
         this.hideProgrampointerPosition();
 
-        this.scheduler.setState(SchedulerLstate.running);
+        this.scheduler.setState(SchedulerState.running);
 
         // this.getTimerClass().startTimer();
 
@@ -217,9 +217,9 @@ export class Interpreter {
 
     }
 
-    setState(state: SchedulerLstate) {
+    setState(state: SchedulerState) {
 
-        if (state == SchedulerLstate.stopped) {
+        if (state == SchedulerState.stopped) {
             // TODO
             // this.closeAllWebsockets();
         }
@@ -300,7 +300,7 @@ export class Interpreter {
         this.mainModule = newMainModule;
 
         this.scheduler.init(this.mainModule, classes);
-        this.scheduler.setState(SchedulerLstate.stopped);
+        this.scheduler.setState(SchedulerState.stopped);
 
     }
 

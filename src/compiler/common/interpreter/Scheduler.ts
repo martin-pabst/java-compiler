@@ -5,7 +5,7 @@ import { Program } from "./Program";
 import { Semaphor } from "./Semaphor";
 import { Thread, ThreadState } from "./Thread";
 
-export enum SchedulerLstate { not_initialized, running, paused, stopped }
+export enum SchedulerState { not_initialized, running, paused, stopped }
 
 export type TextPositionWithModule = {
     module: Module,
@@ -28,7 +28,7 @@ export class Scheduler {
     runningThreads: Thread[] = [];
     currentThreadIndex: number = 0;
     semaphors: Semaphor[] = [];
-    state!: SchedulerLstate;
+    state!: SchedulerState;
 
     keepThread: boolean = false;    // for single step mode
 
@@ -37,7 +37,7 @@ export class Scheduler {
     helperObject!: HelperObject;
 
     constructor(public interpreter: Interpreter, private helperRegistry: HelperRegistry) {
-        this.setState(SchedulerLstate.not_initialized);
+        this.setState(SchedulerState.not_initialized);
         this.buildHelperObject();
     }
 
@@ -77,13 +77,13 @@ export class Scheduler {
                     this.runningThreads.splice(this.currentThreadIndex, 1);
 
                     if (this.runningThreads.length == 0) {
-                        this.setState(SchedulerLstate.stopped);
+                        this.setState(SchedulerState.stopped);
                         return;
                     }
 
                     return;
                 case ThreadState.paused:
-                    this.setState(SchedulerLstate.paused);
+                    this.setState(SchedulerState.paused);
                     return;
             }
 
@@ -98,14 +98,14 @@ export class Scheduler {
 
     }
 
-    setState(newState: SchedulerLstate) {
+    setState(newState: SchedulerState) {
         this.state = newState;
     }
 
     runSingleStepKeepingThread(stepInto: boolean, callback: () => void) {
         this.keepThread = true;
         if (stepInto) {
-            if (this.state <= SchedulerLstate.paused) {
+            if (this.state <= SchedulerState.paused) {
                 this.run(1);
             }
             this.keepThread = false;

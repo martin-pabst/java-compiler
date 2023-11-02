@@ -1,5 +1,5 @@
 import { Interpreter } from "./Interpreter";
-import { Scheduler, SchedulerLstate as SchedulerState } from "./Scheduler";
+import { Scheduler, SchedulerState as SchedulerState } from "./Scheduler";
 
 export class LoadController {
 
