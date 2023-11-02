@@ -1,9 +1,9 @@
 export enum TokenType {
     identifier,
     // constants
+    shortConstant,
     integerConstant,
     longConstant,
-    shortConstant,
     floatConstant,
     doubleConstant,
     booleanConstant,

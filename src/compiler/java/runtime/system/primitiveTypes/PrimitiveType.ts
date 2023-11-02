@@ -13,8 +13,8 @@ export abstract class PrimitiveType extends JavaType {
 
     defaultValue: any = 0;
 
-    static boxedTypeIdentifiers: string[] = ["Boolean", "Character", "Byte", "Integer", "Long", "Float", "Double"];
-    static typeIdentifiers: string[] = ['boolean', 'char', 'byte', 'int', 'long', 'float', 'double'];
+    static boxedTypeIdentifiers: string[] = ["Boolean", "Character", "Byte", "Short", "Integer", "Long", "Float", "Double"];
+    static typeIdentifiers: string[] = ['boolean', 'char', 'byte', 'short', 'int', 'long', 'float', 'double'];
     static plusMinusMultDivOperators: TokenType[] = [TokenType.plus, TokenType.minus, TokenType.multiplication, TokenType.division, TokenType.modulo];
     static shiftOperators: TokenType[] = [TokenType.shiftLeft, TokenType.shiftRight, TokenType.shiftRightUnsigned];
     static logicOperators: TokenType[] = [TokenType.and, TokenType.or, TokenType.XOR];
@@ -44,8 +44,8 @@ export abstract class PrimitiveType extends JavaType {
     }
 
     /**
-     *                    0          1       2       3      4       5        6
-     * @param destType ['boolean', 'char', 'byte', 'int', 'long', 'float', 'double']
+     *                    0          1       2       3       4       5        6       7
+     * @param destType ['boolean', 'char', 'byte', 'short', 'int', 'long', 'float', 'double']
      * @returns 
      */
     getCastFunction(destType: JavaType): CodeTemplate | undefined {
@@ -57,10 +57,11 @@ export abstract class PrimitiveType extends JavaType {
             if (this.myIndex >= 2 && destIndex >= 2) {
                 if (destIndex >= this.myIndex) return new IdentityTemplate();
                 switch (destIndex) {
-                    case 2: return this.myIndex <= 4 ? new OneParameterOnceTemplate('(($1 + 128) % 256 - 128)') : new OneParameterOnceTemplate('((Math.trunc($1) + 128) % 256 - 128)');
-                    case 3: return this.myIndex <= 4 ? new OneParameterOnceTemplate('(($1 + 0x80000000) % 0x100000000 - 0x80000000)') : new OneParameterOnceTemplate('((Math.trunc($1) + 0x80000000) % 0x100000000 - 0x80000000)');
-                    case 4: return new OneParameterOnceTemplate('Math.trunc($1)');
-                    case 5: return new OneParameterOnceTemplate('Math.fround($1)');
+                    case 2: return this.myIndex <= 5 ? new OneParameterOnceTemplate('(($1 + 128) % 256 - 128)') : new OneParameterOnceTemplate('((Math.trunc($1) + 128) % 256 - 128)');
+                    case 3: return this.myIndex <= 5 ? new OneParameterOnceTemplate('(($1 + 0x8000) % 0x10000 - 0x8000)') : new OneParameterOnceTemplate('((Math.trunc($1) + 0x80000000) % 0x100000000 - 0x80000000)');
+                    case 4: return this.myIndex <= 5 ? new OneParameterOnceTemplate('(($1 + 0x80000000) % 0x100000000 - 0x80000000)') : new OneParameterOnceTemplate('((Math.trunc($1) + 0x80000000) % 0x100000000 - 0x80000000)');
+                    case 5: return new OneParameterOnceTemplate('Math.trunc($1)');
+                    case 6: return new OneParameterOnceTemplate('Math.fround($1)');
                     default: return new IdentityTemplate();
                 }
             }
@@ -83,8 +84,8 @@ export abstract class PrimitiveType extends JavaType {
     }
 
     /**
-     *                    0          1       2       3      4       5        6
-     * @param destType ['boolean', 'char', 'byte', 'int', 'long', 'float', 'double']
+     *                    0          1       2       3       4       5        6       7
+     * @param destType ['boolean', 'char', 'byte', 'short', 'int', 'long', 'float', 'double']
      * @returns 
      */
     getBinaryOperation(destType: JavaType, operator: BinaryOperator): CodeTemplate | undefined {
@@ -116,7 +117,7 @@ export abstract class PrimitiveType extends JavaType {
         }
 
         if (PrimitiveType.shiftOperators.indexOf(operator) >= 0) {
-            if (this.myIndex >= 2 && this.myIndex <= 4 && destIndex >= 2 && destIndex <= 4) {
+            if (this.myIndex >= 2 && this.myIndex <= 5 && destIndex >= 2 && destIndex <= 5) {
                 return new BinaryOperatorTemplate(operatorString, isCommutative)
             }
 
@@ -136,8 +137,8 @@ export abstract class PrimitiveType extends JavaType {
     }
 
     /**
-     *                    0          1       2       3      4       5        6
-     * @param destType ['boolean', 'char', 'byte', 'int', 'long', 'float', 'double']
+     *                    0          1       2       3       4       5        6       7
+     * @param destType ['boolean', 'char', 'byte', 'short', 'int', 'long', 'float', 'double']
      * @returns 
      */
     getBinaryResultType(destType: JavaType, operator: BinaryOperator, typeStore: JavaTypeStore): JavaType | undefined {
@@ -177,7 +178,7 @@ export abstract class PrimitiveType extends JavaType {
         if (PrimitiveType.shiftOperators.indexOf(operator) >= 0) {
             let destIndex: number = PrimitiveType.typeIdentifiers.indexOf(destType.identifier.toLowerCase());
             if (!destIndex) return undefined;
-            if (this.myIndex >= 2 && this.myIndex <= 4 && destIndex >= 2 && destIndex <= 4) {
+            if (this.myIndex >= 2 && this.myIndex <= 5 && destIndex >= 2 && destIndex <= 5) {
                 return this;
             }
             return undefined;
@@ -209,8 +210,8 @@ export abstract class PrimitiveType extends JavaType {
     }
 
      /**
-     *                    0          1       2       3      4       5        6
-     *               ['boolean', 'char', 'byte', 'int', 'long', 'float', 'double']
+     *                    0          1       2       3       4       5        6       7
+     * @param destType ['boolean', 'char', 'byte', 'short', 'int', 'long', 'float', 'double']
      * @returns 
      */
      getUnaryResultType(operator: UnaryPrefixOperator): JavaType | undefined {
@@ -224,7 +225,7 @@ export abstract class PrimitiveType extends JavaType {
             case TokenType.minusMinus:
                 return myIndex >= 2 ? this : undefined;
             case TokenType.tilde: 
-                return myIndex >= 2 && myIndex <= 4 ? this : undefined;
+                return myIndex >= 2 && myIndex <= 5 ? this : undefined;
         }
 
         return undefined;
