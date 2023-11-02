@@ -13,13 +13,14 @@ import { JavaModuleManager } from "./JavaModuleManager";
  */
 export class JavaCompiledModule extends JavaBaseModule {
 
+    sourceCode: string = "";
+
     tokens?: TokenList;
     ast?: ASTGlobalNode;
     mainProgram?: Program;
 
     usedTypesFromOtherModules: Map<JavaType, boolean> = new Map();
 
-    lastCompiledProgramText: string = "";
 
     errors: Error[] = [];
 
@@ -36,8 +37,8 @@ export class JavaCompiledModule extends JavaBaseModule {
     }
 
     setDirtyIfProgramCodeChanged(){
-        this.dirty = this.lastCompiledProgramText != this.file.getText();
-        this.lastCompiledProgramText = this.file.getText();
+        this.dirty = this.sourceCode != this.file.getText();
+        this.sourceCode = this.file.getText();
     }
 
 
