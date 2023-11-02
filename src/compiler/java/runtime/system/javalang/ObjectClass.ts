@@ -20,7 +20,7 @@ export class ObjectClass {
     }
 
     toString(t: Thread) {
-        t.stack.push(new t.threadPool.helperObject.classes["String"]("Object"));
+        t.stack.push(new t.scheduler.helperObject.classes["String"]("Object"));
     }
 
 

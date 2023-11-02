@@ -1,5 +1,5 @@
 import { Interpreter } from "./Interpreter";
-import { ThreadPool, ThreadPoolLstate as ThreadPoolState } from "./ThreadPool";
+import { Scheduler, SchedulerLstate as SchedulerState } from "./Scheduler";
 
 export class LoadController {
 
@@ -10,7 +10,7 @@ export class LoadController {
     private stepsPerSecondGoal!: number;
     private timeBetweenStepsGoal!: number;
 
-    constructor(private threadPool: ThreadPool, private interpreter: Interpreter) {
+    constructor(private scheduler: Scheduler, private interpreter: Interpreter) {
         this.setStepsPerSecond(100);
     }
 
@@ -21,10 +21,10 @@ export class LoadController {
         if (deltaTime < this.timeBetweenStepsGoal) return;
         this.lastTickTime = t0;
 
-        if (this.timeBetweenStepsGoal >= deltaUntilNextTick && this.threadPool.state == ThreadPoolState.running) {
-            this.threadPool.run(1);
+        if (this.timeBetweenStepsGoal >= deltaUntilNextTick && this.scheduler.state == SchedulerState.running) {
+            this.scheduler.run(1);
             if(this.stepsPerSecondGoal <= 12){
-                this.interpreter.showProgramPointer(this.threadPool.getNextStepPosition());
+                this.interpreter.showProgramPointer(this.scheduler.getNextStepPosition());
             }
             return;
         }
@@ -35,9 +35,9 @@ export class LoadController {
         let i: number = 0;
         while (i < stepsPerTickGoal &&
             (performance.now() - t0) / deltaUntilNextTick < this.maxLoadFactor &&
-            this.threadPool.state == ThreadPoolState.running) {
+            this.scheduler.state == SchedulerState.running) {
 
-            this.threadPool.run(Math.max(batch, stepsPerTickGoal - i));
+            this.scheduler.run(Math.max(batch, stepsPerTickGoal - i));
             i += batch;
 
         }

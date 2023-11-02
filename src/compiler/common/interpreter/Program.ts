@@ -2,7 +2,7 @@ import { BaseSymbolTable } from "../BaseSymbolTable";
 import { Module } from "../module/Module";
 import { IRange } from "../range/Range";
 import { Thread } from "./Thread";
-import { HelperObject } from "./ThreadPool";
+import { HelperObject } from "./Scheduler";
 
 
 

@@ -1,6 +1,6 @@
 import { Program, Step } from "./Program";
 import { Semaphor } from "./Semaphor";
-import { ThreadPool } from "./ThreadPool";
+import { Scheduler } from "./Scheduler";
 
 type ExceptionInfo = {
     types: string[],
@@ -45,7 +45,7 @@ export class Thread {
 
     lastDepositedCallback: (() => void) | undefined = undefined;
 
-    constructor(public threadPool: ThreadPool, initialStack: any[]) {
+    constructor(public scheduler: Scheduler, initialStack: any[]) {
         this.stack = initialStack;
     }
 
@@ -66,7 +66,7 @@ export class Thread {
                 let currentStepList = currentProgramState.currentStepList;
                 let stackBase = currentProgramState.stackBase;
 
-                let helperObject = this.threadPool.helperObject;
+                let helperObject = this.scheduler.helperObject;
 
                 if (this.stepEndsWhenProgramstackLengthLowerOrEqual >= 0) {
                     // singlestep-mode (slower...)
@@ -223,7 +223,7 @@ export class Thread {
 
         if (this.programStack.length > 0) {
             this.currentProgramState = this.programStack[this.programStack.length - 1];
-            // if (this.threadPool.executeMode == ExecuteMode.singleSteps && 
+            // if (this.scheduler.executeMode == ExecuteMode.singleSteps && 
             //     this.currentProgramState.currentStepList == this.currentProgramState.program.stepsMultiple) {
             //     this.switchFromMultipleToSingleStep(this.currentProgramState);
             // }
@@ -238,7 +238,7 @@ export class Thread {
         let state: ProgramState = {
             program: program,
             currentStepList: program.stepsSingle,
-            // currentStepList: this.threadPool.executeMode == NExecuteMode.singleSteps ? program.stepsSingle : program.stepsMultiple,
+            // currentStepList: this.scheduler.executeMode == NExecuteMode.singleSteps ? program.stepsSingle : program.stepsMultiple,
             stackBase: this.stack.length - program.numberOfParameters - 1,  // 1 because of [this, parameter 1, ..., parameter n]
             stepIndex: 0,
             callbackAfterFinished: this.lastDepositedCallback,

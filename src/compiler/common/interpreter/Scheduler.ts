@@ -5,7 +5,7 @@ import { Program } from "./Program";
 import { Semaphor } from "./Semaphor";
 import { Thread, ThreadState } from "./Thread";
 
-export enum ThreadPoolLstate { not_initialized, running, paused, stopped }
+export enum SchedulerLstate { not_initialized, running, paused, stopped }
 
 export type TextPositionWithModule = {
     module: Module,
@@ -24,11 +24,11 @@ export type HelperObject = {
 }
 
 
-export class ThreadPool {
+export class Scheduler {
     runningThreads: Thread[] = [];
     currentThreadIndex: number = 0;
     semaphors: Semaphor[] = [];
-    state!: ThreadPoolLstate;
+    state!: SchedulerLstate;
 
     keepThread: boolean = false;    // for single step mode
 
@@ -37,7 +37,7 @@ export class ThreadPool {
     helperObject!: HelperObject;
 
     constructor(public interpreter: Interpreter, private helperRegistry: HelperRegistry) {
-        this.setState(ThreadPoolLstate.not_initialized);
+        this.setState(SchedulerLstate.not_initialized);
         this.buildHelperObject();
     }
 
@@ -77,13 +77,13 @@ export class ThreadPool {
                     this.runningThreads.splice(this.currentThreadIndex, 1);
 
                     if (this.runningThreads.length == 0) {
-                        this.setState(ThreadPoolLstate.stopped);
+                        this.setState(SchedulerLstate.stopped);
                         return;
                     }
 
                     return;
                 case ThreadState.paused:
-                    this.setState(ThreadPoolLstate.paused);
+                    this.setState(SchedulerLstate.paused);
                     return;
             }
 
@@ -98,14 +98,14 @@ export class ThreadPool {
 
     }
 
-    setState(newState: ThreadPoolLstate) {
+    setState(newState: SchedulerLstate) {
         this.state = newState;
     }
 
     runSingleStepKeepingThread(stepInto: boolean, callback: () => void) {
         this.keepThread = true;
         if (stepInto) {
-            if (this.state <= ThreadPoolLstate.paused) {
+            if (this.state <= SchedulerLstate.paused) {
                 this.run(1);
             }
             this.keepThread = false;

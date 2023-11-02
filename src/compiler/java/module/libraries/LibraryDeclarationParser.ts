@@ -1,4 +1,4 @@
-import { Klass } from "../../../common/interpreter/ThreadPool";
+import { Klass } from "../../../common/interpreter/Scheduler";
 import { EmptyRange, IRange } from "../../../common/range/Range";
 import { TokenType } from "../../TokenType";
 import { ArrayType } from "../../types/ArrayType";

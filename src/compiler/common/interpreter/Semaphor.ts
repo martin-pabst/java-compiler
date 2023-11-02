@@ -1,5 +1,5 @@
 import { Thread } from "./Thread";
-import { ThreadPool } from "./ThreadPool";
+import { Scheduler } from "./Scheduler";
 
 export class Semaphor {
     counter: number;        // Number of currently available tokens
@@ -7,9 +7,9 @@ export class Semaphor {
     runningThreads: Thread[] = [];
     waitingThreads: Thread[] = [];
 
-    constructor(private threadPool: ThreadPool, private _capacity: number) {
+    constructor(private scheduler: Scheduler, private _capacity: number) {
         this.counter = this._capacity;
-        threadPool.semaphors.push(this);
+        scheduler.semaphors.push(this);
     }
 
     aquire(thread: Thread): boolean {
@@ -19,7 +19,7 @@ export class Semaphor {
             thread.currentlyHeldSemaphors.push(this);
             return true;
         } else {
-            this.threadPool.suspendThread(thread);
+            this.scheduler.suspendThread(thread);
             this.waitingThreads.push(thread);
             return false;
         }
@@ -30,7 +30,7 @@ export class Semaphor {
         if (index >= 0) {
             this.runningThreads.splice(index, 1);
             if (this.waitingThreads.length > 0) {
-                this.threadPool.restoreThread(this.waitingThreads.shift()!);
+                this.scheduler.restoreThread(this.waitingThreads.shift()!);
             } else {
                 this.counter++;
             }

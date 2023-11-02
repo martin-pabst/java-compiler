@@ -1,4 +1,4 @@
-import { Klass } from "../../../common/interpreter/ThreadPool";
+import { Klass } from "../../../common/interpreter/Scheduler";
 import { File } from "../../../common/module/File";
 import { JavaType } from "../../types/JavaType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";

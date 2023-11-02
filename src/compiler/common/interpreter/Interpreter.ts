@@ -2,14 +2,14 @@ import { Module } from "../module/Module";
 import { EventManager } from "./EventManager";
 import { LoadController } from "./LoadController";
 import { PrintManager } from "./PrintManager";
-import { HelperRegistry, KlassObjectRegistry, TextPositionWithModule, ThreadPool, ThreadPoolLstate } from "./ThreadPool";
+import { HelperRegistry, KlassObjectRegistry, TextPositionWithModule, Scheduler, SchedulerLstate } from "./Scheduler";
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
 
 export class Interpreter {
 
     loadController: LoadController;
-    threadPool: ThreadPool;
+    scheduler: Scheduler;
 
     isExternalTimer: boolean = false;
     timerId: any;
@@ -28,7 +28,7 @@ export class Interpreter {
 
     actions: string[] = ["start", "pause", "stop", "stepOver",
         "stepInto", "stepOut", "restart"];
-    //ThreadPoolLstatus { done, running, paused, not_initialized }
+    //SchedulerLstatus { done, running, paused, not_initialized }
 
     // buttonActiveMatrix[button][i] tells if button is active at 
     // InterpreterState i
@@ -60,8 +60,8 @@ export class Interpreter {
         // TODO: This wires up speedcontrol with interpreter
         // controlButtons.setInterpreter(this);
 
-        this.threadPool = new ThreadPool(this, this.helperRegistry);
-        this.loadController = new LoadController(this.threadPool, this);
+        this.scheduler = new Scheduler(this, this.helperRegistry);
+        this.loadController = new LoadController(this.scheduler, this);
         this.initTimer();
     }
 
@@ -90,20 +90,20 @@ export class Interpreter {
 
     executeOneStep(stepInto: boolean) {
 
-        if (this.threadPool.state != ThreadPoolLstate.paused) {
+        if (this.scheduler.state != SchedulerLstate.paused) {
             // TODO!
             // this.init();
-            if (this.threadPool.state == ThreadPoolLstate.not_initialized) {
+            if (this.scheduler.state == SchedulerLstate.not_initialized) {
                 return;
             }
             this.resetRuntime();
         }
 
-        this.threadPool.runSingleStepKeepingThread(stepInto, () => {
+        this.scheduler.runSingleStepKeepingThread(stepInto, () => {
             this.pause();
         });
         if (!stepInto) {
-            this.threadPool.setState(ThreadPoolLstate.running);
+            this.scheduler.setState(SchedulerLstate.running);
         }
     }
 
@@ -112,16 +112,16 @@ export class Interpreter {
     }
 
     pause() {
-        this.threadPool.setState(ThreadPoolLstate.paused);
-        this.threadPool.unmarkStep();
-        this.showProgramPointer(this.threadPool.getNextStepPosition());
+        this.scheduler.setState(SchedulerLstate.paused);
+        this.scheduler.unmarkStep();
+        this.showProgramPointer(this.scheduler.getNextStepPosition());
     }
 
     stop(restart: boolean) {
 
         // this.inputManager.hide();
-        this.threadPool.setState(ThreadPoolLstate.stopped);
-        this.threadPool.unmarkStep();
+        this.scheduler.setState(SchedulerLstate.stopped);
+        this.scheduler.unmarkStep();
 
         this.eventManager.fire("stop");
 
@@ -146,7 +146,7 @@ export class Interpreter {
 
         // this.main.getBottomDiv()?.console?.clearErrors();
 
-        if (this.threadPool.state != ThreadPoolLstate.paused) {
+        if (this.scheduler.state != SchedulerLstate.paused) {
             // TODO!
             // this.init(this.mainModule);
             this.resetRuntime();
@@ -154,14 +154,14 @@ export class Interpreter {
 
         this.hideProgrampointerPosition();
 
-        this.threadPool.setState(ThreadPoolLstate.running);
+        this.scheduler.setState(SchedulerLstate.running);
 
         // this.getTimerClass().startTimer();
 
     }
 
     stepOut() {
-        this.threadPool.stepOut(() => {
+        this.scheduler.stepOut(() => {
             this.pause();
         })
     }
@@ -217,9 +217,9 @@ export class Interpreter {
 
     }
 
-    setState(state: ThreadPoolLstate) {
+    setState(state: SchedulerLstate) {
 
-        if (state == ThreadPoolLstate.stopped) {
+        if (state == SchedulerLstate.stopped) {
             // TODO
             // this.closeAllWebsockets();
         }
@@ -242,7 +242,7 @@ export class Interpreter {
 
         // let buttonStopActive = this.buttonActiveMatrix['stop'][state];
 
-        // if (state == ThreadPoolLstate.stopped) {
+        // if (state == SchedulerLstate.stopped) {
         //     this.eventManager.fireEvent("done");
         //     if (this.worldHelper != null) {
         //         this.worldHelper.clearActorLists();
@@ -252,19 +252,19 @@ export class Interpreter {
 
         // }
 
-        // if (oldState != ThreadPoolLstate.stopped && state == ThreadPoolLstate.stopped) {
+        // if (oldState != SchedulerLstate.stopped && state == SchedulerLstate.stopped) {
         //     // TODO
         //     // this.debugger.disable();
         //     this.keyboardTool.unsubscribeAllListeners();
         // }
 
-        // if ([ThreadPoolLstate.running, ThreadPoolLstate.paused].indexOf(oldState) < 0
-        //     && state == ThreadPoolLstate.running) {
+        // if ([SchedulerLstate.running, SchedulerLstate.paused].indexOf(oldState) < 0
+        //     && state == SchedulerLstate.running) {
         //     // TODO
         //     //   this.debugger.enable();
         // }
 
-        this.threadPool.setState(state);
+        this.scheduler.setState(state);
     }
 
     resetRuntime() {
@@ -299,8 +299,8 @@ export class Interpreter {
 
         this.mainModule = newMainModule;
 
-        this.threadPool.init(this.mainModule, classes);
-        this.threadPool.setState(ThreadPoolLstate.stopped);
+        this.scheduler.init(this.mainModule, classes);
+        this.scheduler.setState(SchedulerLstate.stopped);
 
     }
 
