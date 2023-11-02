@@ -6,6 +6,9 @@
   * CodeGenerator: casting
   * CodeGenerator: method-call
   * CodeGenerator: object instantiation
+  * CodeGenerator: class declaration
+
+  
 
 ## make fast library method calls possible
 In most cases library methods 

@@ -5,7 +5,7 @@ import { IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode } from "../parser/AST";
+import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { Field } from "../types/Field";
 import { JavaType } from "../types/JavaType";
@@ -49,6 +49,8 @@ export class TermCodeGenerator {
                 snippet = this.compileLiteralNode(<ASTLiteralNode>ast);break;
             case TokenType.symbol: 
                 snippet = this.compileVariableNode(<ASTSymbolNode>ast);break;
+            // Tobias new Array, z.B. new int[a][b][c]
+            // Zielcode: ho["newArray"](defaultValue, a, b, ...)
         }
 
         if(snippet && ast.parenthesisNeeded){
@@ -57,6 +59,7 @@ export class TermCodeGenerator {
 
         return snippet;
     }
+
 
     compileVariableNode(node: ASTSymbolNode): CodeSnippet | undefined {
         let symbol = this.currentSymbolTable.findSymbol(node.identifier);

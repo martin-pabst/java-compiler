@@ -193,6 +193,7 @@ export abstract class TermParser extends TokenIterator {
                 break;
             case TokenType.keywordNew:
                 node = this.parseObjectInstantiation();
+            // Tobias: new Array...
                 break;
             case TokenType.keywordPrint:
             case TokenType.keywordPrintln:

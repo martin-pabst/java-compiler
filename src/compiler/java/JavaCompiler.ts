@@ -9,6 +9,7 @@
 import { File } from "../common/module/File";
 import { TypeResolver } from "./TypeResolver/TypeResolver";
 import { CodeGenerator } from "./codegenerator/CodeGenerator";
+import { LabelCodeSnippet } from "./codegenerator/LabelManager.ts";
 import { Lexer } from "./lexer/Lexer";
 import { JavaModuleManager } from "./module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "./module/libraries/JavaLibraryModuleManager";
@@ -23,6 +24,8 @@ export class JavaCompiler {
     }
 
     compile(files: File[]){
+
+        LabelCodeSnippet.resetCount();
 
         this.libraryModuleManager.clearUsagePositions();
 

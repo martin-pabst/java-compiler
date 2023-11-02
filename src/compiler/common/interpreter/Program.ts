@@ -23,7 +23,7 @@ export class Step {
         return this.codeAsString.trim() == "";
     }
 
-    adaptRangeStart(range?: IRange){
+    setRangeStartIfUndefined(range?: IRange){
         if(!this.range.startLineNumber && range){
             this.range.startLineNumber = range.startLineNumber;
             this.range.startColumn = range.startColumn;

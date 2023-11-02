@@ -256,6 +256,7 @@ export interface ASTNewObjectNode extends ASTTermNode {
     parameterValues: ASTTermNode[];
 }
 
+// Tobias: new Array
 export interface ASTNewArrayNode extends ASTTermNode {
     kind: TokenType.newArray;
     arrayType: ASTTypeNode;

@@ -11,8 +11,6 @@ export class CodeSnippet extends CodeSnippetPart {
     type?: JavaType;  // undefined for for-loop, ...
     isLefty: boolean = false; // can you assign a value to it?
     
-    afterPartsJumpToLabel?: string;
-    isLabel?: string;
     stopStepOverBeforeStep: boolean = false;
 
     constructor(range: IRange | undefined, public finalValueIsOnStack: boolean, 
@@ -38,13 +36,13 @@ export class CodeSnippet extends CodeSnippetPart {
     emit(): string {
         let ret: string = "";
         for(let part of this.parts){
-            ret += part.emit + "\n";
+            ret += part.emit();
         }
         return ret;
     }
 
     emitToStep(currentStep: Step, steps: Step[]): Step {
-        currentStep.adaptRangeStart(this.range);
+        currentStep.setRangeStartIfUndefined(this.range);
         
         if(this.stopStepOverBeforeStep) currentStep.stopStepOverBeforeStep = true;
 
@@ -143,7 +141,7 @@ export class CodeSnippet extends CodeSnippetPart {
             i = part.index(i);
         }
 
-        return this.endStepAfterSnippet ? currentIndex + 1 : currentIndex;
+        return this.endStepAfterSnippet ? i + 1 : i;
     }
 
 

@@ -13,7 +13,7 @@ export class LabelCodeSnippet extends CodeSnippetPart {
     }
 
     emit(): string {
-        return "\n// Label \n" + this.id;
+        return "// Label " + this.id + "\n";
     }
 
     emitToStep(currentStep: Step, _steps: Step[]): Step {
@@ -25,9 +25,13 @@ export class LabelCodeSnippet extends CodeSnippetPart {
         return new JumpToLabelCodeSnippet(this);
     }
 
-    index(lastIndex: number): number {
-        this.stepIndex = lastIndex;
-        return lastIndex;
+    index(currentIndex: number): number {
+        this.stepIndex = currentIndex;
+        return currentIndex;
+    }
+
+    public static resetCount(){
+        LabelCodeSnippet.count = 0;
     }
 
 }
@@ -44,7 +48,7 @@ export class JumpToLabelCodeSnippet extends CodeSnippetPart {
     }
 
     emit(): string {
-        return "return " + this.label.stepIndex + "; // Jump to label " + this.label.id + "\n";    
+        return "return " + this.label.stepIndex + "; // Jump to label " + this.label.id + " in Step " + this.label.stepIndex + "\n";    
     }
 
     emitToStep(currentStep: Step, _steps: Step[]): Step {

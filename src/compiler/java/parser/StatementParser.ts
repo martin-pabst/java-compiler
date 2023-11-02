@@ -1,7 +1,7 @@
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType.ts";
-import { ASTForLoopNode, ASTIfNode, ASTReturnNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode } from "./AST.ts";
+import { ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTReturnNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode } from "./AST.ts";
 import { TermParser } from "./TermParser.ts";
 
 export class StatementParser extends TermParser {
@@ -15,6 +15,8 @@ export class StatementParser extends TermParser {
         switch (this.tt) {
             case TokenType.keywordWhile:
                 return this.parseWhile();
+            case TokenType.keywordDo:
+                return this.parseDo();
             case TokenType.keywordIf:
                 return this.parseIf();
             case TokenType.leftCurlyBracket:
@@ -79,6 +81,33 @@ export class StatementParser extends TermParser {
             if (condition && statementToRepeat) {
 
                 return this.nodeFactory.buildWhileNode(whileToken,
+                    this.cct, condition, statementToRepeat);
+
+            }
+
+        } else {
+            this.skipTokensTillEndOfLineOr([TokenType.rightBracket]);
+        }
+
+        return undefined;
+
+    }
+
+    parseDo(): ASTDoWhileNode | undefined {
+
+        let doToken = this.getAndSkipToken();
+
+        let statementToRepeat = this.parseStatementOrExpression();
+        this.expect(TokenType.keywordWhile, true);
+
+        if (this.comesToken(TokenType.leftBracket, true)) {
+            let condition = this.parseTerm();
+            this.expect(TokenType.rightBracket);
+
+
+            if (condition && statementToRepeat) {
+
+                return this.nodeFactory.buildDoWhileNode(doToken,
                     this.cct, condition, statementToRepeat);
 
             }

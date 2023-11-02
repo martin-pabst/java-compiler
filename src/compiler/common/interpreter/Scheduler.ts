@@ -45,6 +45,7 @@ export class Scheduler {
         this.helperObject = {
             classes: this.classObjectRegistry,
             helpers: this.helperRegistry,
+            // Tobias: new Array...
             print: this.print
         }
     }
