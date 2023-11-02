@@ -22,7 +22,7 @@ export class Main {
   codeOutputEditor: monaco.editor.IStandaloneCodeEditor;
 
   tabManager: TabManager;
-
+ 
   tokenDiv: HTMLDivElement;
   astDiv: HTMLDivElement;
   codeOutputDiv: HTMLDivElement;
