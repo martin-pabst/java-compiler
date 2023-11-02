@@ -5,8 +5,9 @@ import { IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode } from "../parser/AST";
+import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTNewArrayNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
+import { ArrayType } from "../types/ArrayType";
 import { Field } from "../types/Field";
 import { JavaType } from "../types/JavaType";
 import { Parameter } from "../types/Parameter";
@@ -49,6 +50,8 @@ export class TermCodeGenerator {
                 snippet = this.compileLiteralNode(<ASTLiteralNode>ast);break;
             case TokenType.symbol: 
                 snippet = this.compileVariableNode(<ASTSymbolNode>ast);break;
+            case TokenType.newArray:
+                snippet = this.compileNewArrayNode(<ASTNewArrayNode>ast);break;
             // Tobias new Array, z.B. new int[a][b][c]
             // Zielcode: ho["newArray"](defaultValue, a, b, ...)
         }
@@ -58,6 +61,42 @@ export class TermCodeGenerator {
         }
 
         return snippet;
+    }
+
+    /*
+     * Helper function for compileNewArrayNode
+     *
+     */ 
+    private compileDimension(dimensionNode: ASTTermNode): CodeSnippet | undefined{
+        let dimensionTerm = this.compileTerm(dimensionNode);
+        if (dimensionTerm?.type?.identifier != "int") {
+            this.pushError("Hier wird eine Ganzzahl (int) erwartet.","error", dimensionNode);
+            return undefined;
+        }
+        return dimensionTerm;
+    }
+
+    compileNewArrayNode(node: ASTNewArrayNode): CodeSnippet | undefined {
+        let type = this.libraryTypestore.getType(node.arrayType.identifier);
+        if (type == undefined) {
+            return undefined;
+        }
+        let defaultValue = type.isPrimitive ? (<PrimitiveType>type).defaultValue : null;
+       
+        let dimensionTerms = node.dimensions.map(d => this.compileDimension(d));
+        
+        if (dimensionTerms.includes(undefined)) return undefined;
+
+        let newArraySnippet = new CodeSnippet(node.range, false, false, undefined);
+        newArraySnippet.addStringPart("ho[\"newArray\"](" + defaultValue, undefined);
+
+        dimensionTerms.forEach(d => newArraySnippet.addPart(SnippetFramer.frame(d, ",$1", undefined)));
+        
+        newArraySnippet.addStringPart(");", undefined);
+
+        // TODO: Set type of snippet
+
+        return newArraySnippet;
     }
 
 
@@ -112,7 +151,7 @@ export class TermCodeGenerator {
     compileBinaryOperator(ast: ASTBinaryNode): CodeSnippet | undefined {
         let leftOperand = this.compileTerm(ast.leftSide);
         let rightOperand = this.compileTerm(ast.rightSide);
-        
+
         if(leftOperand && rightOperand && leftOperand.type && rightOperand.type){
             let valueType = leftOperand.type.getBinaryResultType(rightOperand.type, ast.operator, this.libraryTypestore);
             if(!valueType){

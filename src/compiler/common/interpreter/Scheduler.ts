@@ -20,6 +20,7 @@ export type KlassObjectRegistry = { [identifier: string]: Klass };
 export type HelperObject = {
     classes: KlassObjectRegistry,
     helpers: HelperRegistry,
+    newArray : (defaultValue: any, ...dimensions : number []) => Array<any>
     print: (text: string | undefined, printNewline: boolean, color: number | undefined) => void
 }
 
@@ -45,7 +46,7 @@ export class Scheduler {
         this.helperObject = {
             classes: this.classObjectRegistry,
             helpers: this.helperRegistry,
-            // Tobias: new Array...
+            newArray: Scheduler.newArray,
             print: this.print
         }
     }
@@ -217,4 +218,20 @@ export class Scheduler {
         this.interpreter.printManager.print(text, printNewline, color);
     }
 
+    static newArray(defaultValue: any, ...dimensions : number[]) : Array<any> {
+        let n0 = dimensions[0];
+
+        if (dimensions.length == 1) {
+            return Array(n0).fill(defaultValue);
+        }
+        else {
+            // Recursive call
+            let entry = this.newArray(defaultValue, ...dimensions.slice(1));
+            return Array(n0).fill(null).map(e => [...entry]);
+
+        }
+
+    }
+
+    
 }

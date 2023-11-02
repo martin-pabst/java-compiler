@@ -1,7 +1,7 @@
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { Token } from "../lexer/Token.ts";
-import { ASTAnnotationNode, ASTAttributeDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope } from "./AST";
+import { ASTAnnotationNode, ASTAttributeDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope, ASTNewArrayNode } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
 export class ASTNodeFactory {
@@ -273,6 +273,15 @@ export class ASTNodeFactory {
             range: startToken.range,
             parameterValues: [],
             type: type
+        }
+    }
+
+    buildNewArrayNode(startToken: Token, arrayType: ASTTypeNode, dimensions: ASTTermNode[]): ASTNewArrayNode {
+        return {
+            kind: TokenType.newArray,
+            range: startToken.range,
+            arrayType: arrayType,
+            dimensions: dimensions
         }
     }
 

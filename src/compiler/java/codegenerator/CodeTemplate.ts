@@ -165,7 +165,7 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         snippet.type = resultType;
         snippet.finalValueIsOnStack = false;
 
-
+        // @Martin: Something goes wrong here
         if (this.isCommutative || snippet0IsPure || snippet1IsPure) {
             snippet.addParts(snippets[0].allButLastPart());
             snippet.addParts(snippets[1].allButLastPart());
