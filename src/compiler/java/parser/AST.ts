@@ -60,6 +60,7 @@ export interface ASTNodeWithModifiers {
 
 // e.g. ..., int count, ...
 export interface ASTParameterNode extends ASTNode, ASTNodeWithIdentifier {
+    kind: TokenType.parameterDeclaration;
     type: ASTTypeNode | undefined;    // lambda functions may have parameters without type declaration
     isEllipsis: boolean;
 }
@@ -94,6 +95,7 @@ export interface ASTTypeDefinitionWithGenerics {
  */
 // e.g. HashMap<String, Integer>
 export interface ASTTypeNode extends ASTNode {
+    kind: TokenType.type,
     identifier: string;
     genericParameterInvocations: ASTTypeNode[];
     arrayDimensions: number;
@@ -123,6 +125,7 @@ export interface ASTLambdaFunctionDeclarationNode extends ASTNode {
 
 export interface ASTAttributeDeclarationNode extends ASTNodeWithModifiers, ASTNode, 
 ASTNodeWithIdentifier, AnnotatedNode {
+    kind: TokenType.attributeDeclaration;
     type: ASTTypeNode;
     initialization: ASTTermNode | undefined;
 }            
@@ -243,7 +246,7 @@ export interface ASTMethodCallNode extends ASTNodeWithIdentifier, ASTTermNode {
 }
 
 export interface ASTAttributeDereferencingNode extends ASTTermNode {
-    kind: TokenType.pushAttribute;
+    kind: TokenType.dereferenceAttribute;
     attributeIdentifier: string;
 }
 
@@ -273,8 +276,8 @@ export interface ASTPrintStatementNode extends ASTTermNode {
     secondParameter: ASTTermNode | undefined
 }
 
-export interface ASTConstantNode extends ASTTermNode {
-    kind: TokenType.pushConstant,
+export interface ASTLiteralNode extends ASTTermNode {
+    kind: TokenType.literal,
     constantType: TokenType,
     value: string | boolean | number
 }

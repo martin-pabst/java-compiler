@@ -5,7 +5,7 @@ import { IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBinaryNode, ASTConstantNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode } from "../parser/AST";
+import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { Field } from "../types/Field";
 import { JavaType } from "../types/JavaType";
@@ -45,8 +45,8 @@ export class TermCodeGenerator {
                 snippet = this.compileUnaryPrefixOperator(<ASTUnaryPrefixNode>ast);break;
             case TokenType.plusPlusMinusMinusSuffix: 
                 snippet = this.compilePlusPlusMinusMinusSuffixOperator(<ASTPlusPlusMinusMinusSuffixNode>ast);break;
-            case TokenType.pushConstant: 
-                snippet = this.compileConstantNode(<ASTConstantNode>ast);break;
+            case TokenType.literal: 
+                snippet = this.compileLiteralNode(<ASTLiteralNode>ast);break;
             case TokenType.symbol: 
                 snippet = this.compileVariableNode(<ASTSymbolNode>ast);break;
         }
@@ -87,7 +87,7 @@ export class TermCodeGenerator {
     }
 
 
-    compileConstantNode(node: ASTConstantNode): CodeSnippet | undefined {
+    compileLiteralNode(node: ASTLiteralNode): CodeSnippet | undefined {
         let type = this.constantTypeToTypeMap[node.constantType];
         if(!type) return undefined;
         let valueAsString: string;

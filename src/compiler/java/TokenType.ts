@@ -137,54 +137,19 @@ export enum TokenType {
     // Comment
     comment,
 
-    referenceElement, // for arrays
-
     endofSourcecode, // will be generated after sourcecode end
 
     // Program statement types:
     binaryOp, // +, -, *, <=, ...
     unaryPrefixOp, // ! and - 
     localVariableDeclaration,
-    heapVariableDeclaration,
-    pushLocalVariableToStack, // push value of a local variable to stack
-    popAndStoreIntoVariable,
-    pushFromHeapToStack, // push value from heap to stack
-    pushAttribute, // value of a attribute to stack
-    pushArrayLength,
-    pushConstant, // literal
-    pushStaticClassObject, // push class-Object to stack (which holds static attributes)
-    pushStaticAttribute, // push static attribute to stack
-    pushStaticAttributeIntrinsic, // push static attribute to stack
-    checkCast, // check if object may get casted to class or interface
+    dereferenceAttribute, // dot-operator
+    literal, // literal
     castValue, // cast value on top of stack to other type
     selectArrayElement, // select Element from Array (e.g. a[20])
     callMethod,
-    callMainMethod,
-    processPostConstructorCallbacks,
-    callInputMethod, // Methods of Input class
-    makeEllipsisArray,
-    decreaseStackpointer, // decrease stack-pointer, nothing else
-    initStackframe,
-    closeStackframe,
-    increaseSpaceForLocalVariables,
-    return,
     newObject,
-    jumpIfFalse,
-    jumpIfTrue,
-    jumpIfFalseAndLeaveOnStack,
-    jumpIfTrueAndLeaveOnStack,
-    jumpAlways,
-    noOp, // acts as jump destination
-    incrementDecrementBefore, // ++i, --i
-    incrementDecrementAfter, // i++, i--
-    incrementDecrementCharBefore, // ++i, --i
-    incrementDecrementCharAfter, // i++, i--
-    programEnd,
-    beginArray, // push empty array to stack
-    addToArray, // pop element form stack and add it to array (on second stack position)
-    pushEmptyArray, // push multidimensional empty array to stack
-    forLoopOverCollection,
-
+    
     // additional AST node types
     global,
     program,
@@ -194,26 +159,16 @@ export enum TokenType {
     genericParameterDefinition,
     symbol,
     annotation,
+    forLoopOverCollection,
 
     type, // e.g. int[][]
-    typeParameter, // e.g. <E extends String implements Comparable<E>>
     attributeDeclaration,
     methodDeclaration,
     parameterDeclaration,
-    superConstructorCall,
-    constructorCall,       // call constructor with this() inside another constructor
     newArray,
-    arrayInitialization,
     print,
     println,
-    pushEnumValue,
     initializeEnumValue,
-    scopeNode,
-    returnIfDestroyed,
-    extendedForLoopInit,
-    extendedForLoopCheckCounterAndGetElement,
-    setPauseDuration,
-    pause
 }
 
 export var TokenTypeReadable: { [tt: number]: string } = {
