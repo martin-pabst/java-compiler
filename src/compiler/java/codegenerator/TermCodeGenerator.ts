@@ -13,7 +13,7 @@ import { Parameter } from "../types/Parameter";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { JavaLocalVariable } from "./JavaLocalVariable";
 import { JavaSymbolTable } from "./JavaSymbolTable";
-import { SnippetFramer } from "./SnippetTools";
+import { SnippetFramer } from "./CodeSnippetTools";
 
 export class TermCodeGenerator {
 

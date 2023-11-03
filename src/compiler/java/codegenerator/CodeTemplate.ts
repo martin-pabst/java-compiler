@@ -6,7 +6,7 @@ import { JavaType } from "../types/JavaType";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { LabelCodeSnippet } from "./LabelManager";
-import { CharToNumberConverter, SnippetFramer, Unboxer } from "./SnippetTools";
+import { CharToNumberConverter, SnippetFramer, Unboxer } from "./CodeSnippetTools";
 
 
 export abstract class CodeTemplate {

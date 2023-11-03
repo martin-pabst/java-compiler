@@ -10,7 +10,7 @@ import { CodeSnippet as CodeSnippet, StringCodeSnippet } from "./CodeSnippet.ts"
 import { BinaryOperatorTemplate, OneParameterOnceTemplate, TwoParameterTemplate } from "./CodeTemplate";
 import { JavaLocalVariable } from "./JavaLocalVariable";
 import { JumpToLabelCodeSnippet, LabelCodeSnippet } from "./LabelManager.ts";
-import { SnippetFramer } from "./SnippetTools.ts";
+import { SnippetFramer } from "./CodeSnippetTools.ts";
 import { TermCodeGenerator } from "./TermCodeGenerator";
 
 export class StatementCodeGenerator extends TermCodeGenerator {
