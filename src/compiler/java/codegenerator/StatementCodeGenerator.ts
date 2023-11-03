@@ -2,7 +2,7 @@ import { StepParams } from "../../common/interpreter/StepFunction";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBlockNode, ASTDoWhileNode, ASTIfNode, ASTLocalVariableDeclaration, ASTNode, ASTPrintStatementNode, ASTStatementNode, ASTWhileNode } from "../parser/AST";
+import { ASTBlockNode, ASTDoWhileNode, ASTIfNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTStatementNode, ASTWhileNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippetContainer, EmptyPart } from "./CodeSnippetKinds.ts";
@@ -59,6 +59,8 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         return snippet;
 
     }
+
+
     compileDoStatement(node: ASTDoWhileNode): CodeSnippetContainer | undefined {
         let condition = this.compileTerm(node.condition);
 
@@ -70,12 +72,12 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         if (!condition || !statementToRepeat) return undefined;
 
         let label1 = new LabelCodeSnippet();
-        doWhileSnippet.addPart(label1);
-        doWhileSnippet.addPart(statementToRepeat);
+        doWhileSnippet.addParts(label1);
+        doWhileSnippet.addParts(statementToRepeat);
         doWhileSnippet.addNextStepMark();
         let sn1 = SnippetFramer.frame(condition, "if($1){\n", this.voidType);
-        doWhileSnippet.addPart(sn1);
-        doWhileSnippet.addPart(new JumpToLabelCodeSnippet(label1));
+        doWhileSnippet.addParts(sn1);
+        doWhileSnippet.addParts(new JumpToLabelCodeSnippet(label1));
         doWhileSnippet.addStringPart("}", undefined);
         doWhileSnippet.addNextStepMark();
 
@@ -86,7 +88,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         let snippet = new CodeSnippetContainer([], node.range);
         for (let statementNode of node.statements) {
             let statementSnippet = this.compileStatementOrTerm(statementNode);
-            if(statementSnippet) snippet.addPart(statementSnippet);
+            if(statementSnippet) snippet.addParts(statementSnippet);
         }
         return snippet;
     }
@@ -110,16 +112,16 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
         let label1 = new LabelCodeSnippet();
         let label2 = new LabelCodeSnippet();
-        whileSnippet.addPart(label1);
+        whileSnippet.addParts(label1);
         let sn1 = SnippetFramer.frame(condition, "if(!($1)){\n", this.voidType);
-        whileSnippet.addPart(sn1);
-        whileSnippet.addPart(new JumpToLabelCodeSnippet(label2));
+        whileSnippet.addParts(sn1);
+        whileSnippet.addParts(new JumpToLabelCodeSnippet(label2));
         whileSnippet.addStringPart("}", undefined);
         whileSnippet.addNextStepMark();
-        whileSnippet.addPart(statementToRepeat);
-        whileSnippet.addPart(new JumpToLabelCodeSnippet(label1));
+        whileSnippet.addParts(statementToRepeat);
+        whileSnippet.addParts(new JumpToLabelCodeSnippet(label1));
         whileSnippet.addNextStepMark();
-        whileSnippet.addPart(label2);
+        whileSnippet.addParts(label2);
 
         return whileSnippet;
     }
@@ -140,9 +142,9 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
         let sn1 = SnippetFramer.frame(condition, "if(!($1)){\n", this.voidType);
         let label1 = new LabelCodeSnippet();
-        ifSnippet.addPart(sn1);
+        ifSnippet.addParts(sn1);
         let jumpToLabel1 = new JumpToLabelCodeSnippet(label1);
-        ifSnippet.addPart(jumpToLabel1);
+        ifSnippet.addParts(jumpToLabel1);
         ifSnippet.addStringPart("}\n", undefined);
         
         ifSnippet.addNextStepMark();
@@ -151,22 +153,22 @@ export class StatementCodeGenerator extends TermCodeGenerator {
             let label2 = new LabelCodeSnippet();
             let jumpToLabel2 = new JumpToLabelCodeSnippet(label2);
 
-            ifSnippet.addPart(statementIfTrue);
+            ifSnippet.addParts(statementIfTrue);
             
-            ifSnippet.addPart(jumpToLabel2);
+            ifSnippet.addParts(jumpToLabel2);
             ifSnippet.addNextStepMark();
             
-            ifSnippet.addPart(label1);
-            ifSnippet.addPart(statementIfFalse);
+            ifSnippet.addParts(label1);
+            ifSnippet.addParts(statementIfFalse);
             
             ifSnippet.addNextStepMark();
-            ifSnippet.addPart(label2);
+            ifSnippet.addParts(label2);
             
         } else {
-            ifSnippet.addPart(statementIfTrue);
+            ifSnippet.addParts(statementIfTrue);
             ifSnippet.addNextStepMark();
             // without else case:
-            ifSnippet.addPart(label1);
+            ifSnippet.addParts(label1);
         }
 
         return ifSnippet;

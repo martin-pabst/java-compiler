@@ -232,7 +232,7 @@ export class ASTNodeFactory {
 
     buildMethodCallNode(identifier: Token, nodeToGetObject: ASTTermNode | undefined): ASTMethodCallNode {
         return {
-            kind: TokenType.callMethod,
+            kind: TokenType.methodCall,
             identifier: <string>identifier.value,
             identifierRange: identifier.range,
             range: identifier.range,

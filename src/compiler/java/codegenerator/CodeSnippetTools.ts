@@ -36,9 +36,8 @@ export class SnippetFramer {
         }
 
         let framedSnippet = new CodeSnippetContainer(snippet.allButLastPart(), snippet.range);
-        framedSnippet.type = type;
-        framedSnippet.addStringPart(template.replace(new RegExp('\\$1', 'g'), snippet.lastPartOrPop().emit()), snippet.range);
-
+        framedSnippet.addStringPart(template.replace(new RegExp('\\$1', 'g'), snippet.lastPartOrPop().emit()), snippet.range, type);
+        
         return framedSnippet;
     }
 

@@ -147,7 +147,7 @@ export enum TokenType {
     literal, // literal
     castValue, // cast value on top of stack to other type
     selectArrayElement, // select Element from Array (e.g. a[20])
-    callMethod,
+    methodCall,
     newObject,
     
     // additional AST node types

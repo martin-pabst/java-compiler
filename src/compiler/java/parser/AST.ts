@@ -240,7 +240,7 @@ export interface ASTPlusPlusMinusMinusSuffixNode extends ASTTermNode {
 }
 
 export interface ASTMethodCallNode extends ASTNodeWithIdentifier, ASTTermNode {
-    kind: TokenType.callMethod;
+    kind: TokenType.methodCall;
     nodeToGetObject: ASTTermNode | undefined; // undefined if method is called inside class
     parameterValues: ASTTermNode[];
 }

@@ -88,4 +88,12 @@ export class StringCodeSnippet extends CodeSnippet {
         return this.text;
     }
 
+    allButLastPart(): CodeSnippet[] {
+        return this.finalValueIsOnStack ? [this] : [];
+    }
+
+    lastPartOrPop(): CodeSnippet {
+        return this.finalValueIsOnStack ? new StringCodeSnippet("s.pop()", this.range) : this;
+    }
+
 }

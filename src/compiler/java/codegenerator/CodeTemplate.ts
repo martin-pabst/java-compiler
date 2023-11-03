@@ -57,9 +57,9 @@ export class OneParameterTemplate extends CodeTemplate {
             return new StringCodeSnippet(this.templateString.replace(new RegExp('\\$1', 'g'), snippets[0].getPureTerm()), range, resultType);
         }
 
-        let snippet = new CodeSnippetContainer(snippets[0].allButLastPart(), range, resultType);
-        snippet.addStringPart(this.templateString.replace(new RegExp('\\$1', 'g'), snippets[0].lastPartOrPop().emit()), range);
-        return snippet;
+        let snippetContainer = new CodeSnippetContainer(snippets[0].allButLastPart(), range, resultType);
+        snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\$1', 'g'), snippets[0].lastPartOrPop().emit()), range);
+        return snippetContainer;
     }
 
 }
@@ -82,28 +82,28 @@ export class TwoParameterTemplate extends CodeTemplate {
             return new StringCodeSnippet(code, range, resultType);
         }
 
-        let snippet = new CodeSnippetContainer([], range, resultType);
+        let snippetContainer = new CodeSnippetContainer([], range, resultType);
         if (snippet0Pure || snippet1Pure) {
-            snippet.addParts(snippets[0].allButLastPart());
-            snippet.addParts(snippets[1].allButLastPart());
+            snippetContainer.addParts(snippets[0].allButLastPart());
+            snippetContainer.addParts(snippets[1].allButLastPart());
 
-            snippet.addStringPart(this.templateString.replace(new RegExp('\\$1', 'g'), snippets[0].lastPartOrPop().emit())
+            snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\$1', 'g'), snippets[0].lastPartOrPop().emit())
                 .replace(new RegExp('\\$2', 'g'), snippets[1].lastPartOrPop().emit()), range);
-            return snippet;
+            return snippetContainer;
         }
 
         // Not good: we have to evaluate operands in wrong order to get pop() right...
         if (this.templateString.indexOf('$1') < this.templateString.indexOf('$2')) {
-            snippet.addParts(snippets[1].allButLastPart());
-            snippet.addParts(snippets[0].allButLastPart());
+            snippetContainer.addParts(snippets[1].allButLastPart());
+            snippetContainer.addParts(snippets[0].allButLastPart());
         } else {
-            snippet.addParts(snippets[0].allButLastPart());
-            snippet.addParts(snippets[1].allButLastPart()); 0
+            snippetContainer.addParts(snippets[0].allButLastPart());
+            snippetContainer.addParts(snippets[1].allButLastPart()); 0
         }
 
-        snippet.addStringPart(this.templateString.replace(new RegExp('\\$1', 'g'), 's.pop()')
+        snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\$1', 'g'), 's.pop()')
             .replace(new RegExp('\\$2', 'g'), 's.pop()'), range);
-        return snippet;
+        return snippetContainer;
 
     }
 
@@ -159,37 +159,41 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         if (this.operator == '&&') return lazyEvaluationAND(_resultType, snippets, _range);
         if (this.operator == '||') return lazyEvaluationOR(_resultType, snippets, _range);
 
-        let snippet = new CodeSnippetContainer([], _range, _resultType);
-        snippet.finalValueIsOnStack = false;
-
-
-        if (this.isCommutative || snippet0IsPure || snippet1IsPure) {
-            snippet.addParts(snippets[0].allButLastPart());
-            snippet.addParts(snippets[1].allButLastPart());
-            snippet.addStringPart(`${snippets[0].lastPartOrPop()} ${this.operator} ${snippets[1].lastPartOrPop()}`)
-            return snippet;
+        let snippetContainer = new CodeSnippetContainer([], _range, _resultType);
+        
+        
+        if (snippet0IsPure || snippet1IsPure) {
+            snippetContainer.addParts(snippets[0].allButLastPart());
+            snippetContainer.addParts(snippets[1].allButLastPart());
+            snippetContainer.addStringPart(`${snippets[0].lastPartOrPop().emit()} ${this.operator} ${snippets[1].lastPartOrPop().emit()}`)
+            snippetContainer.finalValueIsOnStack = false;
+            return snippetContainer;
         }
 
         if (['-', '/', '<', '>', '<=', '>='].indexOf(this.operator) >= 0) {
-            snippet.addParts(snippets[0].allButLastPart());
-            snippet.addParts(snippets[1].allButLastPart());
+            snippetContainer.addParts(snippets[0].allButLastPart());
+            snippetContainer.addParts(snippets[1].allButLastPart());
 
             switch (this.operator) {
-                case '-': snippet.addStringPart(`-s.pop() + s.pop()`, _range); break;
-                case '/': snippet.addStringPart(`1/s.pop() * s.pop()`, _range); break;
-                case '<': snippet.addStringPart(`pop() > pop()`, _range); break;
-                case '>': snippet.addStringPart(`pop() < pop()`, _range); break;
-                case '<=': snippet.addStringPart(`pop() >= pop()`, _range); break;
-                case '>=': snippet.addStringPart(`pop() <= pop()`, _range); break;
+                case '-': snippetContainer.addStringPart(`-s.pop() + s.pop()`, _range); break;
+                case '/': snippetContainer.addStringPart(`1/s.pop() * s.pop()`, _range); break;
+                case '<': snippetContainer.addStringPart(`pop() > pop()`, _range); break;
+                case '>': snippetContainer.addStringPart(`pop() < pop()`, _range); break;
+                case '<=': snippetContainer.addStringPart(`pop() >= pop()`, _range); break;
+                case '>=': snippetContainer.addStringPart(`pop() <= pop()`, _range); break;
             }
-            return snippet;
+            snippetContainer.finalValueIsOnStack = false;
+            return snippetContainer;
         }
 
-        snippet.addParts(snippets[1].allButLastPart());
-        snippet.addParts(snippets[0].allButLastPart());
-        snippet.addStringPart(`pop() ${this.operator} pop()`, _range);
+        snippets[0].ensureFinalValueIsOnStack();
+        snippets[1].ensureFinalValueIsOnStack();
+        snippetContainer.addParts(snippets[1]);
+        snippetContainer.addParts(snippets[0]);
+        snippetContainer.addStringPart(`pop() ${this.operator} pop()`, _range);
 
-        return snippet;
+        snippetContainer.finalValueIsOnStack = false;
+        return snippetContainer;
     }
 
 
@@ -198,45 +202,45 @@ export class BinaryOperatorTemplate extends CodeTemplate {
 
 function lazyEvaluationAND(resultType: JavaType, snippets: CodeSnippet[], range: IRange): CodeSnippetContainer {
 
-    let snippet = new CodeSnippetContainer([], range, resultType);
-    snippet.type = resultType;
+    let snippetContainer = new CodeSnippetContainer([], range, resultType);
+    snippetContainer.type = resultType;
 
-    snippet.addParts(snippets[0].allButLastPart());
+    snippetContainer.addParts(snippets[0].allButLastPart());
 
     let label = new LabelCodeSnippet();
-    snippet.addStringPart(`if(!s.pop()){s.push(false);`, range);
-    snippet.addPart(label.getJumpToSnippet());
-    snippet.addStringPart('\n}', range);
+    snippetContainer.addStringPart(`if(!s.pop()){s.push(false);`, range);
+    snippetContainer.addParts(label.getJumpToSnippet());
+    snippetContainer.addStringPart('\n}', range);
 
-    snippet.addNextStepMark();
+    snippetContainer.addNextStepMark();
 
     snippets[1].ensureFinalValueIsOnStack();
-    snippet.addPart(snippets[1]);
+    snippetContainer.addParts(snippets[1]);
 
-    snippet.addPart(label);
+    snippetContainer.addParts(label);
 
-    return snippet;
+    return snippetContainer;
 }
 
 function lazyEvaluationOR(resultType: JavaType, snippets: CodeSnippet[], range: IRange): CodeSnippetContainer {
 
-    let snippet = new CodeSnippetContainer([], range, resultType);
-    snippet.type = resultType;
+    let snippetContainer = new CodeSnippetContainer([], range, resultType);
+    snippetContainer.type = resultType;
 
-    snippet.addParts(snippets[0].allButLastPart());
+    snippetContainer.addParts(snippets[0].allButLastPart());
 
     let label = new LabelCodeSnippet();
-    snippet.addStringPart(`if(s.pop()){s.push(true);`, range);
-    snippet.addPart(label.getJumpToSnippet());
-    snippet.addStringPart('\n}', range);
+    snippetContainer.addStringPart(`if(s.pop()){s.push(true);`, range);
+    snippetContainer.addParts(label.getJumpToSnippet());
+    snippetContainer.addStringPart('\n}', range);
 
-    snippet.addNextStepMark();
+    snippetContainer.addNextStepMark();
 
     snippets[1].ensureFinalValueIsOnStack();
-    snippet.addPart(snippets[1]);
+    snippetContainer.addParts(snippets[1]);
 
-    snippet.addPart(label);
+    snippetContainer.addParts(label);
 
-    return snippet;
+    return snippetContainer;
 }
 

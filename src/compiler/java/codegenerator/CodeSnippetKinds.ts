@@ -15,21 +15,20 @@ export class CodeSnippetContainer extends CodeSnippet {
 
     constructor(parts: CodeSnippet | CodeSnippet[], range?: IRange, type?: JavaType) {
         super();
-        this.type = type;
-        if (Array.isArray(parts)) {
-            this.parts = parts;
-        } else {
-            this.parts = [parts];
-        }
+
         if (range) {
             this.range = { startLineNumber: range.startLineNumber, startColumn: range.startColumn, endLineNumber: range.endLineNumber, endColumn: range.endColumn };
         } else {
             this.range = { startLineNumber: -1, startColumn: -1, endLineNumber: -1, endColumn: -1 }
-            if(this.parts.length > 0){
-                this.setRangeStartIfUndefined(this.parts[0].range);
-                this.adaptRangeEnd(this.parts[this.parts.length - 1].range)
-            }
         }
+
+        this.addParts(parts);
+
+        if (type) {
+            this.type = type;
+        }
+
+
     }
 
     setRangeStartIfUndefined(range?: IRange) {
@@ -53,7 +52,7 @@ export class CodeSnippetContainer extends CodeSnippet {
         }
     }
 
-    enforceNewStepBeforeSnippet(){
+    enforceNewStepBeforeSnippet() {
         this.parts.unshift(new NextStepMark());
     }
 
@@ -78,26 +77,32 @@ export class CodeSnippetContainer extends CodeSnippet {
     }
 
     flattenInto(flatList: CodeSnippet[]): void {
-        if(this.parts.length == 0) return;
+        if (this.parts.length == 0) return;
 
-        if(this.parts[0] instanceof NextStepMark){
-            if(flatList.length == 0 || flatList[flatList.length - 1] instanceof NextStepMark){
+        if (this.parts[0] instanceof NextStepMark) {
+            if (flatList.length == 0 || flatList[flatList.length - 1] instanceof NextStepMark) {
                 this.parts.shift();
-            } 
+            }
         }
 
-        if(!this.parts[0].range) this.parts[0].range = this.range;
-//        flatList.push(new StartPositionMark(this.range));
+        if (!this.parts[0].range) this.parts[0].range = this.range;
+        //        flatList.push(new StartPositionMark(this.range));
 
         for (let part of this.parts) {
             part.flattenInto(flatList);
         }
 
-        if(!this.parts[this.parts.length - 1].range) this.parts[this.parts.length - 1].range = this.range;
+        if (!this.parts[this.parts.length - 1].range) this.parts[this.parts.length - 1].range = this.range;
         // flatList.push(new EndPositionMark(this.range));
 
     }
 
+    /**
+     * not used
+     * @param currentStep 
+     * @param steps 
+     * @returns 
+     */
     emitToStep(currentStep: Step, steps: Step[]): Step {
 
         currentStep.setRangeStartIfUndefined(this.range);
@@ -115,10 +120,6 @@ export class CodeSnippetContainer extends CodeSnippet {
         return currentStep;
     }
 
-
-    public static newStringPart(s: string, range: IRange) {
-        return new StringCodeSnippet(s, range);
-    }
 
     public static applyMethod(object: CodeSnippetContainer, methodIdentifier: string, parameters: CodeSnippetContainer[], range: IRange, type: JavaType) {
         let snipp = new CodeSnippetContainer([], range);
@@ -144,27 +145,30 @@ export class CodeSnippetContainer extends CodeSnippet {
         return snipp;
     }
 
-    addNextStepMark(){
+    addNextStepMark() {
         this.parts.push(new NextStepMark());
     }
 
-    addStringPart(part: string, range?: IRange) {
-        this.parts.push(new StringCodeSnippet(part, range!));
-        if(this.parts.length == 0) this.setRangeStartIfUndefined(range)
-        this.adaptRangeEnd(range);
+    addStringPart(part: string, range?: IRange, type?: JavaType) {
+        this.addParts([new StringCodeSnippet(part, range, type)]);
     }
 
-    addPart(part: CodeSnippet) {
-        this.parts.push(part);
-        if(this.parts.length == 0) this.setRangeStartIfUndefined(part.range)
-        this.adaptRangeEnd(part.range);
-    }
+    addParts(parts: CodeSnippet | CodeSnippet[]) {
+        if(!Array.isArray(parts)) parts = [parts];
 
-    addParts(parts: CodeSnippet[]) {
-        if(parts.length == 0) return;
-        if(this.parts.length == 0) this.setRangeStartIfUndefined(parts[0].range)
-        this.adaptRangeEnd(parts[parts.length - 1].range);
+        if (parts.length == 0) return;
+        if (this.parts.length == 0) this.setRangeStartIfUndefined(parts[0].range)
+        let lastPart = parts[parts.length - 1];
+        this.adaptRangeEnd(lastPart.range);
         this.parts = this.parts.concat(parts);
+
+        for(let part of parts){
+            if(part.type){
+                this.type = part.type;
+                this.finalValueIsOnStack = part.finalValueIsOnStack;
+            }
+        }
+
     }
 
     allButLastPart(): CodeSnippet[] {
@@ -181,7 +185,25 @@ export class CodeSnippetContainer extends CodeSnippet {
     ensureFinalValueIsOnStack() {
         if (this.finalValueIsOnStack) return;
         if (this.parts.length == 0) return;
-        this.addStringPart(`s.push(${this.parts.pop()!.emit()})`)
+        let part = this.getLastPartWithType();
+
+        if(part instanceof StringCodeSnippet){
+            part.text = `s.push(${part.text});\n`;
+            return;
+        }
+
+        if(part instanceof CodeSnippetContainer){
+            part.ensureFinalValueIsOnStack();
+        }
+
+    }
+
+    getLastPartWithType(): CodeSnippet | undefined {
+        for(let i = this.parts.length - 1; i >= 0; i++){
+            let part = this.parts[i];
+            if(part.type) return part;
+        }
+        return undefined;
     }
 
     index(currentIndex: number): number {
@@ -218,7 +240,7 @@ class NextStepMark extends CodeSnippet {
     flattenInto(flatList: CodeSnippet[]): void {
         if (flatList.length > 0 && flatList[flatList.length - 1] instanceof NextStepMark) return;
 
-        if (flatList.length > 1 && flatList[flatList.length - 1] instanceof LabelCodeSnippet 
+        if (flatList.length > 1 && flatList[flatList.length - 1] instanceof LabelCodeSnippet
             && flatList[flatList.length - 2] instanceof NextStepMark) return;
         flatList.push(this);
     }

@@ -243,7 +243,7 @@ export abstract class TermParser extends TokenIterator {
             return undefined;
         } else {
             if (this.lookahead(1).tt == TokenType.leftBracket) {
-                this.parseMethodCall(node);
+                return this.parseMethodCall(node);
             } else {
                 let identifier = this.expectAndSkipIdentifierAsToken();
                 if (identifier.value == "") return node;
