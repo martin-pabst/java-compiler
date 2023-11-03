@@ -1,7 +1,7 @@
 import { Step } from "../../common/interpreter/Program";
-import { CodeSnippetPart } from "./CodeSnippetPart";
+import { CodeSnippet as CodeSnippet } from "./CodeSnippet";
 
-export class LabelCodeSnippet extends CodeSnippetPart {
+export class LabelCodeSnippet extends CodeSnippet {
 
     static count: number = 0;
 
@@ -10,6 +10,10 @@ export class LabelCodeSnippet extends CodeSnippetPart {
     constructor(){
         super();
         this.id = LabelCodeSnippet.count++;
+    }
+
+    flattenInto(flatList: CodeSnippet[]): void {
+        flatList.push(this);
     }
 
     emit(): string {
@@ -36,19 +40,23 @@ export class LabelCodeSnippet extends CodeSnippetPart {
 
 }
 
-export class JumpToLabelCodeSnippet extends CodeSnippetPart {
+export class JumpToLabelCodeSnippet extends CodeSnippet {
 
     constructor(private label: LabelCodeSnippet){
         super();
     }
     
+    flattenInto(flatList: CodeSnippet[]): void {
+        flatList.push(this);
+    }
+
     index(lastIndex: number): number {
         this.stepIndex = lastIndex;
         return lastIndex;
     }
 
     emit(): string {
-        return "return " + this.label.stepIndex + "; // Jump to label " + this.label.id + " in Step " + this.label.stepIndex + "\n";    
+        return "return " + this.label.stepIndex + "; // Jump to step " + this.label.stepIndex + "\n";    
     }
 
     emitToStep(currentStep: Step, _steps: Step[]): Step {

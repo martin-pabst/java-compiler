@@ -10,7 +10,7 @@ import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { Field } from "../types/Field";
 import { JavaType } from "../types/JavaType";
 import { Parameter } from "../types/Parameter";
-import { CodeSnippet } from "./CodeSnippet";
+import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { JavaLocalVariable } from "./JavaLocalVariable";
 import { JavaSymbolTable } from "./JavaSymbolTable";
 import { SnippetFramer } from "./SnippetTools";
@@ -74,18 +74,17 @@ export class TermCodeGenerator {
     }
     
     compileSymbolOnStackframeAccess(symbol: BaseSymbolOnStackframe, range: IRange): CodeSnippet | undefined {
-        let snippet = new CodeSnippet(range, false, false, <JavaType>symbol.type);
-        snippet.type = (<JavaLocalVariable | Parameter>symbol).type;
-        snippet.addStringPart(`${StepParams.stack}[${StepParams.stackBase} + ${symbol.stackframePosition}]`, range); 
+        let type = (<JavaLocalVariable | Parameter>symbol).type;
+        let snippet = new StringCodeSnippet(`${StepParams.stack}[${StepParams.stackBase} + ${symbol.stackframePosition}]`, range, type); 
         snippet.isLefty = true;
         return snippet;      
     }
 
     compileFieldAccess(symbol: BaseSymbol, range: IRange): CodeSnippet | undefined {
-        let snippet = new CodeSnippet(range, false, false, <JavaType>symbol.type);
-        snippet.type = (<Field>symbol).type;
+        let type = (<Field>symbol).type;
         let fieldName = (<Field>symbol).getInternalName();
-        snippet.addStringPart(`${StepParams.stack}[${StepParams.stackBase}].${fieldName}`, range); 
+        let snippet = new StringCodeSnippet(`${StepParams.stack}[${StepParams.stackBase}].${fieldName}`, range, type); 
+        snippet.isLefty = true;
         return snippet;      
     }
 
@@ -103,7 +102,7 @@ export class TermCodeGenerator {
             default: valueAsString = "" + node.value;
         }
 
-        let snippet = new CodeSnippet(node.range, false, false, type, CodeSnippet.newStringPart(valueAsString, node.range));
+        let snippet = new StringCodeSnippet(valueAsString, node.range);
         snippet.type = type;
 
         return snippet;
@@ -122,7 +121,7 @@ export class TermCodeGenerator {
 
             let template = leftOperand.type.getBinaryOperation(rightOperand.type, ast.operator)!;
 
-            return template?.applyToSnippets(valueType, ast.range, this.libraryTypestore, leftOperand, rightOperand);
+            return template?.applyToSnippet(valueType, ast.range, this.libraryTypestore, leftOperand, rightOperand);
         }
         
         return undefined;
@@ -147,7 +146,7 @@ export class TermCodeGenerator {
 
             let template = operand.type.getUnaryOperation(ast.operator)!;
 
-            return template?.applyToSnippets(valueType, ast.range, this.libraryTypestore, operand);
+            return template?.applyToSnippet(valueType, ast.range, this.libraryTypestore, operand);
         }
 
         return undefined;
@@ -170,7 +169,7 @@ export class TermCodeGenerator {
                 return undefined;
             }
 
-            return template?.applyToSnippets(operand.type, ast.range, this.libraryTypestore, operand);
+            return template?.applyToSnippet(operand.type, ast.range, this.libraryTypestore, operand);
         }
 
         return undefined;

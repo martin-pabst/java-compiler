@@ -1,5 +1,6 @@
 import { JavaTypeStore } from "../module/JavaTypeStore";
 import { JavaType } from "../types/JavaType";
+import { CodeSnippetContainer } from "./CodeSnippetKinds";
 import { CodeSnippet } from "./CodeSnippet";
 
 export class Unboxer {
@@ -34,8 +35,8 @@ export class SnippetFramer {
                 return snippet;
         }
 
-        let framedSnippet = new CodeSnippet(snippet.range, false, snippet.endStepAfterSnippet, type);
-        framedSnippet.addParts(snippet.allButLastPart());
+        let framedSnippet = new CodeSnippetContainer(snippet.allButLastPart(), snippet.range);
+        framedSnippet.type = type;
         framedSnippet.addStringPart(template.replace(new RegExp('\\$1', 'g'), snippet.lastPartOrPop().emit()), snippet.range);
 
         return framedSnippet;

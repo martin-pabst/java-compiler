@@ -1,7 +1,7 @@
 import { Program } from "../../common/interpreter/Program";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { CodeSnippet } from "./CodeSnippet";
+import { CodeSnippetContainer, CodeSnippet } from "./CodeSnippet";
 import { JavaSymbolTable } from "./JavaSymbolTable";
 import { SnippetLinker } from "./SnippetLinker";
 import { StatementCodeGenerator } from "./StatementCodeGenerator";

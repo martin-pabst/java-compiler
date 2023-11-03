@@ -48,11 +48,11 @@ export abstract class NonPrimitiveType extends JavaType {
             if(destType.identifier == 'String') {
                 return new TwoParameterTemplate('$1.plusOtherString($2)');
             } else {
-                return new TwoParameterTemplate('$1.plusObject(thread, $2)', true);
+                return new TwoParameterTemplate('$1.plusObject(thread, $2)');
             }
         } 
         if(destType.identifier == 'String' ){
-            return new TwoParameterTemplate('$2.plusObjectFromLeft($1)', true);
+            return new TwoParameterTemplate('$2.plusObjectFromLeft($1)');
         }        
         return undefined;
     }
