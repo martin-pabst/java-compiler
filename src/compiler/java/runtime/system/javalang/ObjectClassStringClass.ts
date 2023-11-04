@@ -1,6 +1,31 @@
 import { Thread } from "../../../../common/interpreter/Thread";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
-import { ObjectClass } from "./ObjectClass";
+
+export class ObjectClass {
+    
+    declare _m$toString$String$: (t: Thread) => void;
+
+    static __declareType(): string[] {
+        return [
+            "class Object",
+            "public Object()",
+            "public String toString(): toString"
+        ]
+    }
+
+    static type: NonPrimitiveType;
+
+    constructor(){
+
+    }
+
+    toString() {
+        return new StringClass("Object");
+        // t.stack.push(new t.scheduler.helperObject.classes["String"]("Object"));
+    }
+
+
+}
 
 export class StringClass extends ObjectClass {
 

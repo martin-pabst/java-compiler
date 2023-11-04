@@ -34,14 +34,6 @@ export abstract class JavaType extends BaseType {
         return this.genericInformation.length > 0;
     }
 
-    /**
-     * Overwrite this for boxed types!
-     * @returns 
-     */
-    getUnboxedType(): JavaType {
-        return this;
-    }
-
     isUsableAsIndex(): boolean {
         return this.isPrimitive && (<PrimitiveType><any>this).isUsableAsIndex();
     }

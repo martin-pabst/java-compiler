@@ -1,7 +1,6 @@
 import { Program } from "../../../common/interpreter/Program";
 import { JavaLibraryModule } from "../../module/libraries/JavaLibraryModule";
-import { ObjectClass } from "./javalang/ObjectClass";
-import { StringClass } from "./javalang/StringClass";
+import { ObjectClass, StringClass } from "./javalang/ObjectClassStringClass";
 import { BooleanPrimitiveType } from "./primitiveTypes/BooleanPrimitiveType";
 import { BytePrimitiveType } from "./primitiveTypes/BytePrimitiveType";
 import { CharPrimitiveType } from "./primitiveTypes/CharPrimitiveType";
@@ -10,6 +9,8 @@ import { FloatPrimitiveType } from "./primitiveTypes/FloatPrimitiveType";
 import { IntPrimitiveType } from "./primitiveTypes/IntPrimitiveType";
 import { LongPrimitiveType } from "./primitiveTypes/LongPrimitiveType";
 import { VoidPrimitiveType } from "./primitiveTypes/VoidPrimitiveType";
+import { IntegerClass } from "./primitiveTypes/wrappers/IntegerClass";
+import { NumberClass } from "./primitiveTypes/wrappers/NumberClass";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -27,7 +28,7 @@ export class SystemModule extends JavaLibraryModule {
         )
 
         this.classes.push(
-            ObjectClass, StringClass
+            ObjectClass, StringClass, NumberClass, IntegerClass
         )
 
     }

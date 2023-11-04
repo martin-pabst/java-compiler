@@ -95,7 +95,7 @@ export class TermCodeGenerator {
         let type = dimensionTerm?.type;
         if (!type) return new StringCodeSnippet('1', dimensionNode.range, this.intType);
 
-        let unboxedDimesionTerm = Unboxer.doUnboxing(dimensionTerm!);       // type != undefined => dimensionTerm != undefined
+        let unboxedDimesionTerm = Unboxer.unbox(dimensionTerm!, this.libraryTypestore);       // type != undefined => dimensionTerm != undefined
         if(unboxedDimesionTerm.type?.isPrimitive){
             if(unboxedDimesionTerm.type.isUsableAsIndex()){
                 return unboxedDimesionTerm;

@@ -5,24 +5,47 @@ import { CodeSnippet } from "./CodeSnippet";
 
 export class Unboxer {
 
-    static unboxingMethods: { [boxedTypeidentifier: string]: string } = {
-        "Character": "charValue",
-        "Byte": "byteValue",
-        "Integer": "intValue",
-        "Float": "floatValue",
-        "Double": "doubleValue",
-    
+    static boxedTypeToUnboxedTypeMap: {[boxedIdentifier: string]: string} = {
+        "Character": "char",
+        "Byte": "byte",
+        "Short": "short",
+        "Integer": "int",
+        "Float": "float",
+        "Double": "double"
     }
     
-    static doUnboxing(snippet: CodeSnippet): CodeSnippet {
+    static unboxedTypeToboxedTypeMap: {[boxedIdentifier: string]: string} = {
+        "char": "Character",
+        "byte": "Byte",
+        "short": "Short",
+        "int": "Integer",
+        "float": "Float",
+        "double": "Double"
+    }
+    
+    static unbox(snippet: CodeSnippet, typestore: JavaTypeStore): CodeSnippet {
         if(!snippet.type) return snippet;
-        let unboxingMethod = Unboxer.unboxingMethods[snippet.type.identifier];
-        if(!unboxingMethod) return snippet;
-    
-        snippet.type = snippet.type.getUnboxedType();
+        let unboxedIdentifier: string | undefined = Unboxer.boxedTypeToUnboxedTypeMap[snippet.type.identifier];
 
-        return SnippetFramer.frame(snippet, '($1).' + unboxingMethod + '()');
+        if(!unboxedIdentifier) return snippet;
+
+        let unboxedType = typestore.getType(unboxedIdentifier);
+
+        return SnippetFramer.frame(snippet, '($1).value', unboxedType);
     }
+
+    static box(snippet: CodeSnippet, typestore: JavaTypeStore): CodeSnippet {
+        if(!snippet.type) return snippet;
+        let boxedIdentifier: string | undefined = Unboxer.unboxedTypeToboxedTypeMap[snippet.type.identifier];
+
+        if(!boxedIdentifier) return snippet;
+
+        let boxedType = typestore.getType(boxedIdentifier);
+
+        return SnippetFramer.frame(snippet, `ho.classes["${boxedIdentifier}"].valueOf($1)`, boxedType);
+    }
+
+
 }
 
 export class SnippetFramer {

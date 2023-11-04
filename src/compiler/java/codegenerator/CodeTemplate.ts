@@ -227,10 +227,10 @@ export class UnarySuffixTemplate extends CodeTemplate {
         super();
     }
 
-    applyToSnippet(_resultType: JavaType, _range: IRange, _typestore: JavaTypeStore,
+    applyToSnippet(_resultType: JavaType, _range: IRange, typestore: JavaTypeStore,
         ...snippets: CodeSnippet[]): CodeSnippet {
         let snippet = snippets[0];
-        snippet = Unboxer.doUnboxing(snippet);
+        snippet = Unboxer.unbox(snippet, typestore);
         if (!snippet.type) return snippet;
 
         let primitiveTypeIndex = PrimitiveType.getTypeIndex(snippet.type);
@@ -252,14 +252,14 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         super();
     }
 
-    applyToSnippet(_resultType: JavaType, _range: IRange, _typestore: JavaTypeStore,
+    applyToSnippet(_resultType: JavaType, _range: IRange, typestore: JavaTypeStore,
         ...snippets: CodeSnippet[]): CodeSnippet {
 
-        snippets[0] = Unboxer.doUnboxing(snippets[0]);
-        snippets[1] = Unboxer.doUnboxing(snippets[1]);
+        snippets[0] = Unboxer.unbox(snippets[0], typestore);
+        snippets[1] = Unboxer.unbox(snippets[1], typestore);
 
-        snippets[0] = CharToNumberConverter.convertCharToNumber(snippets[0], _typestore);
-        snippets[1] = CharToNumberConverter.convertCharToNumber(snippets[1], _typestore);
+        snippets[0] = CharToNumberConverter.convertCharToNumber(snippets[0], typestore);
+        snippets[1] = CharToNumberConverter.convertCharToNumber(snippets[1], typestore);
 
         let snippet0IsPure = snippets[0].isPureTerm();
         let snippet1IsPure = snippets[1].isPureTerm();
