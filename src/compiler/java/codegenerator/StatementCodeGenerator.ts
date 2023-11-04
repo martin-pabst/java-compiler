@@ -7,7 +7,7 @@ import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippetContainer, EmptyPart } from "./CodeSnippetKinds.ts";
 import { CodeSnippet as CodeSnippet, StringCodeSnippet } from "./CodeSnippet.ts";
-import { BinaryOperatorTemplate, OneParameterOnceTemplate, TwoParameterTemplate } from "./CodeTemplate";
+import { BinaryOperatorTemplate, OneParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
 import { JavaLocalVariable } from "./JavaLocalVariable";
 import { JumpToLabelCodeSnippet, LabelCodeSnippet } from "./LabelManager.ts";
 import { SnippetFramer } from "./CodeSnippetTools.ts";
@@ -145,7 +145,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         ifSnippet.addParts(sn1);
         let jumpToLabel1 = new JumpToLabelCodeSnippet(label1);
         ifSnippet.addParts(jumpToLabel1);
-        ifSnippet.addStringPart("}\n", undefined);
+        ifSnippet.addStringPart("}\n");
         
         ifSnippet.addNextStepMark();
         
@@ -183,7 +183,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
                 return new TwoParameterTemplate(`${StepParams.helperObject}.print($1, ${node.isPrintln}, $2);\n`)
                     .applyToSnippet(this.voidType, node.range, this.libraryTypestore, firstParameter, secondParameter)
             }
-            return new OneParameterOnceTemplate(`${StepParams.helperObject}.print($1, ${node.isPrintln}, undefined);\n`)
+            return new OneParameterTemplate(`${StepParams.helperObject}.print($1, ${node.isPrintln}, undefined);\n`)
                 .applyToSnippet(this.voidType, node.range, this.libraryTypestore, firstParameter);
         }
         return new StringCodeSnippet(`${StepParams.helperObject}.print(undefined, ${node.isPrintln}, undefined);\n`, node.range);

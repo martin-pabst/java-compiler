@@ -1,7 +1,7 @@
 import { File } from "../../../../common/module/File";
 import { EmptyRange, IRange } from "../../../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../../../TokenType";
-import { BinaryOperatorTemplate, CodeTemplate, IdentityTemplate, OneParameterOnceTemplate, UnarySuffixTemplate } from "../../../codegenerator/CodeTemplate";
+import { BinaryOperatorTemplate, CodeTemplate, IdentityTemplate, OneParameterTemplate, OneParameterTemplate, UnarySuffixTemplate } from "../../../codegenerator/CodeTemplate";
 import { JavaBaseModule } from "../../../module/JavaBaseModule";
 import { JavaTypeStore } from "../../../module/JavaTypeStore";
 import { BinaryOperator, UnaryPrefixOperator } from "../../../parser/AST";
@@ -67,7 +67,7 @@ export abstract class PrimitiveType extends JavaType {
      * @returns 
      */
     getCastFunction(destType: JavaType): CodeTemplate | undefined {
-        if (destType.identifier == 'String') return new OneParameterOnceTemplate("new ho.classes['String']('' + $1)");
+        if (destType.identifier == 'String') return new OneParameterTemplate("new ho.classes['String']('' + $1)");
 
         if (destType.isPrimitive) {
             let destIndex: number = PrimitiveType.typeIdentifiers.indexOf(destType.identifier);
@@ -75,15 +75,15 @@ export abstract class PrimitiveType extends JavaType {
             if (this.myIndex >= 2 && destIndex >= 2) {
                 if (destIndex >= this.myIndex) return new IdentityTemplate();
                 switch (destIndex) {
-                    case 2: return this.myIndex <= 5 ? new OneParameterOnceTemplate('(($1 + 128) % 256 - 128)') : new OneParameterOnceTemplate('((Math.trunc($1) + 128) % 256 - 128)');
-                    case 3: return this.myIndex <= 5 ? new OneParameterOnceTemplate('(($1 + 0x8000) % 0x10000 - 0x8000)') : new OneParameterOnceTemplate('((Math.trunc($1) + 0x80000000) % 0x100000000 - 0x80000000)');
-                    case 4: return this.myIndex <= 5 ? new OneParameterOnceTemplate('(($1 + 0x80000000) % 0x100000000 - 0x80000000)') : new OneParameterOnceTemplate('((Math.trunc($1) + 0x80000000) % 0x100000000 - 0x80000000)');
-                    case 5: return new OneParameterOnceTemplate('Math.trunc($1)');
-                    case 6: return new OneParameterOnceTemplate('Math.fround($1)');
+                    case 2: return this.myIndex <= 5 ? new OneParameterTemplate('(($1 + 128) % 256 - 128)') : new OneParameterTemplate('((Math.trunc($1) + 128) % 256 - 128)');
+                    case 3: return this.myIndex <= 5 ? new OneParameterTemplate('(($1 + 0x8000) % 0x10000 - 0x8000)') : new OneParameterTemplate('((Math.trunc($1) + 0x80000000) % 0x100000000 - 0x80000000)');
+                    case 4: return this.myIndex <= 5 ? new OneParameterTemplate('(($1 + 0x80000000) % 0x100000000 - 0x80000000)') : new OneParameterTemplate('((Math.trunc($1) + 0x80000000) % 0x100000000 - 0x80000000)');
+                    case 5: return new OneParameterTemplate('Math.trunc($1)');
+                    case 6: return new OneParameterTemplate('Math.fround($1)');
                     default: return new IdentityTemplate();
                 }
             }
-            if (destIndex == 1 && this.myIndex > 1) return new OneParameterOnceTemplate('String.fromCharCode($1)');
+            if (destIndex == 1 && this.myIndex > 1) return new OneParameterTemplate('String.fromCharCode($1)');
 
             return undefined;
 
@@ -93,7 +93,7 @@ export abstract class PrimitiveType extends JavaType {
             if (!unboxedDestTypeIndex) return undefined;
 
             if (unboxedDestTypeIndex == this.myIndex || this.myIndex >= 2 && unboxedDestTypeIndex >= this.myIndex) {
-                return new OneParameterOnceTemplate(`new ho.classes['${destType.identifier}']('' + $1)`);
+                return new OneParameterTemplate(`new ho.classes['${destType.identifier}']('' + $1)`);
             }
 
             return undefined;
@@ -252,7 +252,7 @@ export abstract class PrimitiveType extends JavaType {
     getUnaryOperation(operator: UnaryPrefixOperator): CodeTemplate | undefined {
         switch(operator){
             case TokenType.plus: return new IdentityTemplate();
-            default: return new OneParameterOnceTemplate( TokenTypeReadable[operator] + '($1)');
+            default: return new OneParameterTemplate( TokenTypeReadable[operator] + '($1)');
         }
     }
 

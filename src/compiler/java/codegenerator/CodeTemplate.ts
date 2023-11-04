@@ -24,26 +24,6 @@ export class IdentityTemplate extends CodeTemplate {
     }
 }
 
-export class OneParameterOnceTemplate extends CodeTemplate {
-
-    constructor(private templateString: string) {
-        super();
-    }
-
-    applyToSnippet(resultType: JavaType, range: IRange, _typestore: JavaTypeStore,
-        ...snippets: CodeSnippet[]): CodeSnippet {
-
-        if (snippets[0].isPureTerm()) {
-            return new StringCodeSnippet(this.templateString.replace('$1', snippets[0].getPureTerm()), range, resultType);
-        }
-
-        let snippet = new CodeSnippetContainer(snippets[0].allButLastPart(), range, resultType);
-        snippet.addStringPart(this.templateString.replace('$1', snippets[0].lastPartOrPop().emit()), range);
-        return snippet;
-    }
-
-}
-
 export class OneParameterTemplate extends CodeTemplate {
 
     constructor(private templateString: string) {
