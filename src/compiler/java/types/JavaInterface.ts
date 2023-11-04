@@ -12,8 +12,8 @@ import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility";
 
 export abstract class IJavaInterface extends NonPrimitiveType {
-    
-    constructor(public identifier: string, public module: JavaBaseModule, public identifierRange: IRange){
+
+    constructor(public identifier: string, public module: JavaBaseModule, public identifierRange: IRange) {
         super(identifier, identifierRange, module);
     }
 
@@ -21,7 +21,7 @@ export abstract class IJavaInterface extends NonPrimitiveType {
         return this.module.file;
     }
 
-    getFields(): Field[] {return []};
+    getFields(): Field[] { return [] };
     abstract getMethods(): Method[];
 
 }
@@ -51,8 +51,8 @@ export class JavaInterface extends IJavaInterface {
         return false;
     }
 
-    addExtends(ext: IJavaInterface | IJavaInterface[]){
-        if(!Array.isArray(ext)) ext = [ext];
+    addExtends(ext: IJavaInterface | IJavaInterface[]) {
+        if (!Array.isArray(ext)) ext = [ext];
         this.extends = this.extends.concat(ext);
     }
 
@@ -69,22 +69,27 @@ export class JavaInterface extends IJavaInterface {
         return this.methods;
     }
 
-    canCastTo(otherType: JavaType): boolean {
-        if(!(otherType instanceof JavaInterface)) return false;
+    canImplicitlyCastTo(otherType: JavaType): boolean {
+        if (!(otherType instanceof JavaInterface)) return false;
 
-        if(otherType == this) return true;
+        if (otherType == this) return true;
 
-        for(let intf of this.extends){
-            if(intf.canCastTo(otherType)) return true;
+        for (let intf of this.extends) {
+            if (intf.canExplicitlyCastTo(otherType)) return true;
         }
 
         return false;
     }
 
+    canExplicitlyCastTo(otherType: JavaType): boolean {
+        if (this.canImplicitlyCastTo(otherType)) return true;
+        return otherType.canImplicitlyCastTo(this);
+    }
+
     clearUsagePositions(): void {
         this.usagePositions = [];
         this.genericInformation.forEach(gi => gi.usagePositions = []);
-        this.methods.forEach( m => m.clearUsagePositions());
+        this.methods.forEach(m => m.clearUsagePositions());
     }
 }
 
@@ -95,7 +100,7 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
 
     private cachedExtends?: IJavaInterface[];
 
-    public usagePositions:UsagePosition[] = []; 
+    public usagePositions: UsagePosition[] = [];
 
     constructor(public isGenericVariantOf: JavaInterface, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
         super(isGenericVariantOf.identifier, isGenericVariantOf.module, isGenericVariantOf.identifierRange);
@@ -114,11 +119,11 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
         let copyNeeded = false;
         this.typeMap.forEach((jt, gt) => {
             let jtCopy = jt.getCopyWithConcreteType(otherTypeMap);
-            if(jt != jtCopy) copyNeeded = true;
+            if (jt != jtCopy) copyNeeded = true;
             newTypeMap.set(gt, jt);
         })
 
-        if(!copyNeeded) return this;
+        if (!copyNeeded) return this;
 
         return new GenericVariantOfJavaInterface(this.isGenericVariantOf, newTypeMap);
     }
@@ -134,46 +139,51 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
         return this.cachedMethods;
     }
 
-    getExtends(): IJavaInterface[]{
-        if(!this.cachedExtends){
+    getExtends(): IJavaInterface[] {
+        if (!this.cachedExtends) {
             this.cachedExtends = this.isGenericVariantOf.getExtends().map(impl => <IJavaInterface>impl.getCopyWithConcreteType(this.typeMap));
-        }   
-        
+        }
+
         return this.cachedExtends;
     }
 
-    canCastTo(otherType: JavaType): boolean {
-        if(!(otherType instanceof IJavaInterface)) return false;
+    canExplicitlyCastTo(otherType: JavaType): boolean {
+        if (this.canImplicitlyCastTo(otherType)) return true;
+        return otherType.canImplicitlyCastTo(this);
+    }
+
+    canImplicitlyCastTo(otherType: JavaType): boolean {
+        if (!(otherType instanceof IJavaInterface)) return false;
 
         // List<Integer> or ArrayList<Integer> can cast to List
-        if(otherType instanceof JavaInterface){
-            if(this.isGenericVariantOf.canCastTo(otherType)) return true;
+        if (otherType instanceof JavaInterface) {
+            if (this.isGenericVariantOf.canExplicitlyCastTo(otherType)) return true;
             return false;
-        } 
+        }
 
         // Now otherType instanceof GenericVariantFromJavaInteface
         // Collection<Integer> can cast to Collection<Integer> or List<? extends Number>
         let ot1 = <GenericVariantOfJavaInterface><any>otherType;
 
-        if(!this.isGenericVariantOf.canCastTo(ot1.isGenericVariantOf)) return false;
+        if (!this.isGenericVariantOf.canExplicitlyCastTo(ot1.isGenericVariantOf)) return false;
 
         // Find concrete parameterized supertype of this.isGenericVariantFrom which is generic variant from otherType
         // ... Find concrete parameterized supertype of ArrayList<Integer> which is generic variant from List (so: find List<Integer>)
- 
+
         // superTypeOfMeWhichIsGenericVariantOfOtherType ==> smgvo
         let smgvo = this.findSuperTypeOfMeWhichIsGenericVariantOf(ot1);
 
-        if(smgvo == null) return false;
-        
-        for(let genericParameter of smgvo.isGenericVariantOf.genericInformation){
+        if (smgvo == null) return false;
+
+        for (let genericParameter of smgvo.isGenericVariantOf.genericInformation) {
             let myType = smgvo.typeMap.get(genericParameter);
             let othersType = ot1.typeMap.get(genericParameter);
 
-            if(myType?.toString() == othersType?.toString()) continue;
+            if (myType?.toString() == othersType?.toString()) continue;
 
-            if(othersType instanceof GenericTypeParameter && othersType.isWildcard){
-                for(let ext of othersType.upperBounds){
-                    if(myType?.canCastTo(ext)) return true;
+            if (othersType instanceof GenericTypeParameter && othersType.isWildcard) {
+                for (let ext of othersType.upperBounds) {
+                    if (myType?.canExplicitlyCastTo(ext)) return true;
                 }
             }
 
@@ -184,17 +194,17 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
 
     findSuperTypeOfMeWhichIsGenericVariantOf(otherType: GenericVariantOfJavaInterface): GenericVariantOfJavaInterface | null {
         let otherTypeIsGenericVariantOf = otherType.isGenericVariantOf;
-        if(otherTypeIsGenericVariantOf == this.isGenericVariantOf) return this;
+        if (otherTypeIsGenericVariantOf == this.isGenericVariantOf) return this;
 
-        for(let st of this.getExtends()){
-            if(st instanceof GenericVariantOfJavaInterface){
+        for (let st of this.getExtends()) {
+            if (st instanceof GenericVariantOfJavaInterface) {
                 let found = st.findSuperTypeOfMeWhichIsGenericVariantOf(otherType);
-                if(found != null) return found;
+                if (found != null) return found;
             }
         }
 
         return null;
-    } 
+    }
 
     clearUsagePositions(): void {
         this.usagePositions = [];

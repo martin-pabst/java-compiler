@@ -126,13 +126,13 @@ export class TokenIterator {
         this.nextToken();
     }
 
-    skipTokensTillEndOfLineOr(skippedTokens: TokenType | TokenType[]) {
+    skipTokensTillEndOfLineOr(skippedTokens: TokenType | TokenType[], skipFoundToken: boolean = true) {
         if (!Array.isArray(skippedTokens)) skippedTokens = [skippedTokens];
         skippedTokens.push(TokenType.linefeed, TokenType.newline);
         while (this.pos < this.tokenList.length && skippedTokens.indexOf(this.tokenList[this.pos].tt) < 0) {
             this.pos++;
         }
-        if (this.pos < this.tokenList.length) {
+        if (this.pos < this.tokenList.length && skipFoundToken) {
             this.nextToken();
         }
 

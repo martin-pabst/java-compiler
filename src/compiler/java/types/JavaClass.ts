@@ -91,11 +91,11 @@ export class JavaClass extends IJavaClass {
         return this.methods;
     }
 
-    canCastTo(otherType: JavaType): boolean {
-        if(otherType.isPrimitive) return false;
+
+    canImplicitlyCastTo(otherType: JavaType): boolean {
         if(otherType instanceof JavaInterface){
             for(let intf of this.implements){
-                if(intf.canCastTo(otherType)) return true;
+                if(intf.canExplicitlyCastTo(otherType)) return true;
             }
             return false;
         }
@@ -103,10 +103,20 @@ export class JavaClass extends IJavaClass {
         if(otherType instanceof JavaClass){
             if(otherType == this) return true;
             if(!this.extends) return false;
-            return this.extends.canCastTo(otherType);
+            return this.extends.canExplicitlyCastTo(otherType);
         }
 
         return false;
+
+    }
+
+    canExplicitlyCastTo(otherType: JavaType): boolean {
+        if(otherType.isPrimitive) return false;
+
+        if(this.canImplicitlyCastTo(otherType)) return true;
+
+        return otherType.canImplicitlyCastTo(this);
+
     }
 
     clearUsagePositions(): void {
@@ -192,12 +202,12 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         return this.cachedImplements;
     }
 
-    canCastTo(otherType: JavaType): boolean {
+    canImplicitlyCastTo(otherType: JavaType): boolean {
         if(!(otherType instanceof IJavaInterface)) return false;
 
         // ArrayList<Integer> can cast to List or to ArrayList
         if(otherType instanceof JavaInterface || otherType instanceof JavaClass){
-            if(this.isGenericVariantOf.canCastTo(otherType)) return true;
+            if(this.isGenericVariantOf.canExplicitlyCastTo(otherType)) return true;
             return false;
         } 
 
@@ -207,7 +217,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
             // ArrayList<Integer> can cast to Collection<Integer> or Collection<? extends Number>
             let ot1 = <GenericVariantOfJavaInterface>otherType;
     
-            if(!this.isGenericVariantOf.canCastTo(ot1.isGenericVariantOf)) return false;
+            if(!this.isGenericVariantOf.canExplicitlyCastTo(ot1.isGenericVariantOf)) return false;
     
             // Find concrete parameterized supertype of this.isGenericVariantFrom which is generic variant from otherType
             // ... Find concrete parameterized supertype of ArrayList<Integer> which is generic variant from List (so: find List<Integer>)
@@ -225,7 +235,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     
                 if(othersType instanceof GenericTypeParameter && othersType.isWildcard){
                     for(let ext of othersType.upperBounds){
-                        if(myType?.canCastTo(ext)) return true;
+                        if(myType?.canExplicitlyCastTo(ext)) return true;
                     }
                 }
     
@@ -239,7 +249,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
             // MyArrayList<Integer> can cast to ArrayList<Integer> or ArrayList<? extends Number>
             let ot1 = <GenericVariantOfJavaClass>otherType;
     
-            if(!this.isGenericVariantOf.canCastTo(ot1.isGenericVariantOf)) return false;
+            if(!this.isGenericVariantOf.canExplicitlyCastTo(ot1.isGenericVariantOf)) return false;
     
             // Find concrete parameterized supertype of this.isGenericVariantFrom which is generic variant from otherType
             // ... Find concrete parameterized supertype of MyArrayList<Integer> which is generic variant from ArrayList (so: find ArrayList<Integer>)
@@ -257,7 +267,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     
                 if(othersType instanceof GenericTypeParameter && othersType.isWildcard){
                     for(let ext of othersType.upperBounds){
-                        if(myType?.canCastTo(ext)) return true;
+                        if(myType?.canExplicitlyCastTo(ext)) return true;
                     }
                 }
     
@@ -268,6 +278,12 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         }
 
         return false;
+    }
+
+    canExplicitlyCastTo(otherType: JavaType): boolean {
+        if(this.canImplicitlyCastTo(otherType)) return true;
+
+        return otherType.canImplicitlyCastTo(this);
     }
 
     findInterfaceImplementedByMeWhichIsGenericVariantOf(otherType: GenericVariantOfJavaInterface): GenericVariantOfJavaInterface | null {

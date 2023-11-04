@@ -5,7 +5,7 @@ export class BytePrimitiveType extends PrimitiveType {
     
     constructor(module: JavaBaseModule){
         super('byte', module);
-        this.defaultValue = 0;
+        this.defaultValue = "0";
     }
     
     isUsableAsIndex(): boolean {

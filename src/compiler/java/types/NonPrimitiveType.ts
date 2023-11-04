@@ -1,6 +1,6 @@
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
-import { CodeTemplate, TwoParameterTemplate } from "../codegenerator/CodeTemplate";
+import { CodeTemplate, IdentityTemplate, TwoParameterTemplate } from "../codegenerator/CodeTemplate";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
 import { BinaryOperator, UnaryPrefixOperator } from "../parser/AST";
@@ -55,6 +55,10 @@ export abstract class NonPrimitiveType extends JavaType {
             return new TwoParameterTemplate('$2.plusObjectFromLeft($1)');
         }        
         return undefined;
+    }
+
+    getCastFunction(destType: JavaType): CodeTemplate | undefined {
+        return new IdentityTemplate();  // casting objects doesn't alter them in any way
     }
 
 }

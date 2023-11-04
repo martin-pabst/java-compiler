@@ -1,4 +1,4 @@
-import { AstComponent } from "./AstComponent";
+import { AstComponent } from "./testgui/AstComponent";
 import { ErrorLevel } from "./compiler/common/Error";
 import { Language } from "./compiler/common/Language";
 import { File } from "./compiler/common/module/File";
@@ -8,7 +8,7 @@ import { JavaLanguage } from "./compiler/java/JavaLanguage";
 import { CodePrinter } from "./compiler/java/codegenerator/CodePrinter";
 import { TokenPrinter } from "./compiler/java/lexer/TokenPrinter";
 import { JavaLibraryModuleManager } from "./compiler/java/module/libraries/JavaLibraryModuleManager";
-import { Editor } from "./editor/Editor";
+import { Editor } from "./testgui/editor/Editor";
 import { Button } from "./tools/Button";
 import { DOM } from "./tools/DOM";
 import { TabManager } from "./tools/TabManager";

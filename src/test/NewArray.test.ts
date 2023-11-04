@@ -15,10 +15,10 @@ test('create a 3-dimensional array of dimensions 3x2x4 filled with nulls', () =>
   expect(Scheduler.newArray(null,3,2,4)).toStrictEqual(expectedResult);
 })
 
-
 test('entries are independent, i.e. do not point to the same element', () => {
-  let array = Scheduler.newArray(0,3,4);
-  array[0][2] = 1;
+  let array = Scheduler.newArray(0,3,4,5);
+  array[0][2][3] = 1;
 
-  expect(array[1][2]).toStrictEqual(0);
+  expect(array[1][2][3]).toStrictEqual(0);
 })
+

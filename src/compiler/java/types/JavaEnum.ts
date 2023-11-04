@@ -56,11 +56,12 @@ export class JavaEnum extends NonPrimitiveType {
         return this.methods;
     }
 
-    canCastTo(otherType: JavaType): boolean {
+    canImplicitlyCastTo(otherType: JavaType): boolean {
         if (otherType.isPrimitive) return false;
+
         if (otherType instanceof JavaInterface) {
             for (let intf of this.implements) {
-                if (intf.canCastTo(otherType)) return true;
+                if (intf.canExplicitlyCastTo(otherType)) return true;
             }
             return false;
         }
@@ -76,6 +77,11 @@ export class JavaEnum extends NonPrimitiveType {
         }
 
         return false;
+        
+    }
+
+    canExplicitlyCastTo(otherType: JavaType): boolean {
+        return this.canImplicitlyCastTo(otherType);
     }
 
 }

@@ -192,11 +192,9 @@ export abstract class TermParser extends TokenIterator {
                 }
                 break;
             case TokenType.keywordNew:
-                // TODO: This breaks for new ArrayList<String>()
-                // Use 
-                // this.lookForTokenTillOtherToken([TokenType.leftSquareBracket, TokenType.leftBracket],TokenType.semicolon)
-                // instead ?
-                switch (this.lookahead(2).tt) {
+                // parse new ArrayList<String>(), new int[10][20], new ArrayList<Integer>[20], ...
+                let leftBracketOrLeftSquareBracket = this.lookForTokenTillOtherToken([TokenType.leftBracket, TokenType.leftSquareBracket], [TokenType.semicolon, TokenType.leftCurlyBracket])
+                switch (leftBracketOrLeftSquareBracket) {
                     case TokenType.leftBracket:
                         node = this.parseObjectInstantiation();
                         break;
@@ -204,7 +202,8 @@ export abstract class TermParser extends TokenIterator {
                         node = this.parseNewArray();
                         break;
                     default:
-                        // TODO: Error handling?
+                        this.pushError("Es wird die Syntax new Klasse(Parameter...) oder new Typ[ArrayLänge]... erwartet.", "error");
+                        this.skipTokensTillEndOfLineOr([TokenType.semicolon, TokenType.comma, TokenType.rightBracket], false);
                         break;
                 }
                 break;

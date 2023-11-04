@@ -204,9 +204,9 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         while(this.comesToken(TokenType.leftRightSquareBracket, true)){
             if(type instanceof ArrayType){
-                type.dimenstion++;
+                type.dimension++;
             } else {
-                type = new ArrayType(type.identifier, type, 1, module, LibraryDeclarationParser.nullRange);
+                type = new ArrayType(type, 1, module, LibraryDeclarationParser.nullRange);
             }
         }
 

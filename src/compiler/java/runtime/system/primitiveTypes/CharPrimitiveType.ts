@@ -5,7 +5,7 @@ export class CharPrimitiveType extends PrimitiveType {
     
     constructor(module: JavaBaseModule){
         super('char', module);
-        this.defaultValue = String.fromCharCode(0);
+        this.defaultValue = `"${String.fromCharCode(0)}"`;
     }
     
     isUsableAsIndex(): boolean {

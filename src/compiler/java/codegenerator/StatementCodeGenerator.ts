@@ -193,19 +193,26 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         let variable = new JavaLocalVariable(node.identifier, node.identifierRange, node.type.resolvedType!);
         this.currentSymbolTable.addSymbol(variable);    // sets stackOffset
 
-        if (!(node.initialization || variable.type.isPrimitive)) {
-            return new EmptyPart();
-        }
-
         let accesLocalVariableSnippet = this.compileSymbolOnStackframeAccess(variable, node.identifierRange);
         let initValueSnippet: CodeSnippet | undefined;
 
-
         if (node.initialization) {
             initValueSnippet = this.compileTerm(node.initialization);
+
+            if(!initValueSnippet?.type) return undefined;
+
+            if(node.type.isVarKeyword){
+                variable.type = initValueSnippet.type;
+            } else {
+                let type = node.type.resolvedType;
+                if(type && !initValueSnippet.type.canImplicitlyCastTo(type)){
+                    this.pushError("Der Term auf der rechten Seite des Zuweisungsoperators hat den Datentyp " + initValueSnippet.type.identifier + " und kann daher der Variablen auf der linken Seite (Datentyp " + type.identifier + ") nicht zugewiesen werden.", "error", node);
+                    return new EmptyPart();
+                }
+            }
+
         } else {
-            let defaultValue: string = (<PrimitiveType>variable.type).defaultValue;
-            if (typeof defaultValue == "string") defaultValue = '""';
+            let defaultValue: string = variable.type.isPrimitive ? (<PrimitiveType>variable.type).defaultValue : "null";
             initValueSnippet = new StringCodeSnippet(defaultValue, node.range, variable.type);
         }
 

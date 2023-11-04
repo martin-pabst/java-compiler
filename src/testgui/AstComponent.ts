@@ -1,7 +1,8 @@
-import { TokenType } from './compiler/java/TokenType';
-import { ASTGlobalNode, ASTNode } from './compiler/java/parser/AST';
-import { DOM } from './tools/DOM';
-import { Treeview } from './tools/components/treeview/Treeview';
+
+import { TokenType } from '../compiler/java/TokenType';
+import { ASTNode, ASTGlobalNode } from '../compiler/java/parser/AST';
+import { DOM } from '../tools/DOM';
+import { Treeview } from '../tools/components/treeview/Treeview';
 import '/include/css/astcomponent.css';
 
 type NodePropertyInfo = {

@@ -109,6 +109,118 @@ export class TwoParameterTemplate extends CodeTemplate {
 
 }
 
+/**
+ * In template "let $2 = $1 + $4" we have three parameters:
+ * "$2" has n == 2 and order == 0
+ * "$1" has n == 1 and order == 1
+ * "$4" has n == 4 and order == 2
+ */
+type OrderedParameter = { parameter: string, n: number, order: number };
+
+
+export class ParametersCommaSeparatedTemplate {
+    static applyToSnippet(resultType: JavaType, range: IRange, prefix: string, suffix: string,
+        ...snippets: CodeSnippet[]): CodeSnippet {
+    
+            // only pure Terms? => faster variant
+            let onlyPureTerms = true;
+            for(let snippet of snippets){
+                if(!snippet.isPureTerm()){
+                    onlyPureTerms = false;
+                    break;
+                }
+            }
+    
+            if(onlyPureTerms){
+                return new StringCodeSnippet(prefix + snippets.map(s => s.emit()).join(", ") + suffix, range, resultType);
+            }
+    
+            let snippetContainer = new CodeSnippetContainer([], range, resultType);
+            
+            for (let i = snippets.length - 1; i >= 0; i--) {
+                snippetContainer.addParts(snippets[i].allButLastPart());
+            }
+
+            let term = prefix + snippets.map( s => s.lastPartOrPop().emit()).join(", ") + suffix;
+
+            snippetContainer.addStringPart(term, range, resultType);
+    
+            return snippetContainer;
+    
+        }    
+}
+
+/**
+ * Usage:
+ * new SeveralParameterTemplate("MethodCall($1, $4, $2)") or
+ * new SeveralParameterTemplate("MethodCall($, $, $)", 3)
+ */
+export class SeveralParameterTemplate extends CodeTemplate {
+
+    private orderedParameters: OrderedParameter[] = [];
+    private maxN: number = -1;
+
+    constructor(private templateString: string) {
+        super();
+        let parameterStrings = templateString.match(/\$\d*/g);  // is undefined if none where found
+
+        if (parameterStrings) {
+            for (let i = 0; i < parameterStrings.length; i++) {
+                let parameter = parameterStrings[i];
+                let n = Number.parseInt(parameter.substring(1));
+                if (n > this.maxN) this.maxN = n;
+                this.orderedParameters.push({ parameter: parameterStrings[i], n: n, order: i });
+            }
+        }
+    }
+
+    applyToSnippet(resultType: JavaType, range: IRange, _typestore: JavaTypeStore,
+        ...snippets: CodeSnippet[]): CodeSnippet {
+
+        if (snippets.length < this.maxN) {
+            console.log("SeveralParameterTemplate.applyToSnippet: too few parameters!");
+            return new StringCodeSnippet("Error, see console log.", range);
+        }
+
+        let appliedTemplate = this.templateString;
+
+        // only pure Terms? => faster variant
+        let onlyPureTerms = true;
+        for(let snippet of snippets){
+            if(!snippet.isPureTerm()){
+                onlyPureTerms = false;
+                break;
+            }
+        }
+
+        if(onlyPureTerms){
+            for(let parameter of this.orderedParameters){
+                appliedTemplate = appliedTemplate.replace(new RegExp('//' + parameter.parameter, 'g'), snippets[parameter.n - 1].emit());
+            }            
+            return new StringCodeSnippet(appliedTemplate, range, resultType);
+        }
+
+        let snippetContainer = new CodeSnippetContainer([], range, resultType);
+        
+        /*
+        * Some snippets may push values to stack. We have to ensure they do this in reversed parameter order so that
+        * values get popped in unreversed order.
+        */
+        let parametersInDescendingOrder = this.orderedParameters.sort((p1, p2) => p2.order - p1.order);
+        for (let i = parametersInDescendingOrder.length - 1; i >= 0; i--) {
+            let parameter = parametersInDescendingOrder[i];
+            snippetContainer.addParts(snippets[parameter.n - 1].allButLastPart());
+            appliedTemplate = appliedTemplate.replace(new RegExp('//' + parameter.parameter, 'g'), snippets[parameter.n - 1].lastPartOrPop().emit());
+        }
+
+        snippetContainer.addStringPart(appliedTemplate, range, resultType);
+
+        return snippetContainer;
+
+    }
+
+}
+
 
 export class UnarySuffixTemplate extends CodeTemplate {
     constructor(private operator: TokenType.plusPlus | TokenType.minusMinus) {
@@ -160,8 +272,8 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         if (this.operator == '||') return lazyEvaluationOR(_resultType, snippets, _range);
 
         let snippetContainer = new CodeSnippetContainer([], _range, _resultType);
-        
-        
+
+
         if (snippet0IsPure || snippet1IsPure) {
             snippetContainer.addParts(snippets[0].allButLastPart());
             snippetContainer.addParts(snippets[1].allButLastPart());

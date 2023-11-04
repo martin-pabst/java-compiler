@@ -5,7 +5,7 @@ export class DoublePrimitiveType extends PrimitiveType {
     
     constructor(module: JavaBaseModule){
         super('double', module);
-        this.defaultValue = 0.0;
+        this.defaultValue = "0.0";
     }
     
     isUsableAsIndex(): boolean {

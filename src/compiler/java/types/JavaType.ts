@@ -4,6 +4,7 @@ import { CodeTemplate } from "../codegenerator/CodeTemplate";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
 import { BinaryOperator, UnaryPrefixOperator } from "../parser/AST";
+import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
 
 export abstract class JavaType extends BaseType {
@@ -12,7 +13,10 @@ export abstract class JavaType extends BaseType {
 
     abstract getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, JavaType>): JavaType;
 
-    abstract canCastTo(otherType: JavaType): boolean;
+    abstract canExplicitlyCastTo(otherType: JavaType): boolean;  // you can cast long to int or Number to Integer EXPLICITLY, e.g. int c = (int)10L
+    abstract canImplicitlyCastTo(otherType: JavaType): boolean; // int gets casted to long implicitly; Integer gets casted to Number implicitly e.g. in: Number n = new Integer(10);
+    abstract getCastFunction(destType: JavaType): CodeTemplate | undefined;
+
     abstract getBinaryResultType(destType: JavaType, operator: BinaryOperator, typeStore: JavaTypeStore): JavaType | undefined;
     abstract getBinaryOperation(destType: JavaType, operator: BinaryOperator): CodeTemplate | undefined;
     
@@ -37,5 +41,10 @@ export abstract class JavaType extends BaseType {
     getUnboxedType(): JavaType {
         return this;
     }
+
+    isUsableAsIndex(): boolean {
+        return this.isPrimitive && (<PrimitiveType><any>this).isUsableAsIndex();
+    }
+
 
 }

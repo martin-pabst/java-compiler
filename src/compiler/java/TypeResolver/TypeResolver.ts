@@ -108,7 +108,7 @@ export class TypeResolver {
         }
 
         if (typeNode.arrayDimensions > 0) {
-            primaryType = new ArrayType(typeNode.identifier, primaryType, typeNode.arrayDimensions, module, typeNode.range);
+            primaryType = new ArrayType(primaryType, typeNode.arrayDimensions, module, typeNode.range);
         }
 
         return typeNode.resolvedType = primaryType;;

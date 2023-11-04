@@ -5,7 +5,7 @@ export class LongPrimitiveType extends PrimitiveType {
     
     constructor(module: JavaBaseModule){
         super('long', module);
-        this.defaultValue = 0;
+        this.defaultValue = "0";
     }
     
     isUsableAsIndex(): boolean {

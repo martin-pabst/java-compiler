@@ -11,10 +11,11 @@ import { JavaType } from "../../../types/JavaType";
 export abstract class PrimitiveType extends JavaType {
     myIndex: number;
 
-    defaultValue: any = 0;
+    defaultValue: string = "0";
 
     static boxedTypeIdentifiers: string[] = ["Boolean", "Character", "Byte", "Short", "Integer", "Long", "Float", "Double"];
     static typeIdentifiers: string[] = ['boolean', 'char', 'byte', 'short', 'int', 'long', 'float', 'double'];
+
     static plusMinusMultDivOperators: TokenType[] = [TokenType.plus, TokenType.minus, TokenType.multiplication, TokenType.division, TokenType.modulo];
     static shiftOperators: TokenType[] = [TokenType.shiftLeft, TokenType.shiftRight, TokenType.shiftRightUnsigned];
     static logicOperators: TokenType[] = [TokenType.and, TokenType.or, TokenType.XOR];
@@ -39,8 +40,25 @@ export abstract class PrimitiveType extends JavaType {
         return this;
     }
 
-    canCastTo(otherType: JavaType): boolean {
+    canExplicitlyCastTo(otherType: JavaType): boolean {
         return this.getCastFunction(otherType) != null;
+    }
+
+    canImplicitlyCastTo(otherType: JavaType): boolean {
+        if(otherType.identifier == 'String') return true;
+        let otherTypeIdentifier = otherType.identifier;
+
+        if(!otherType.isPrimitive){
+            let boxedTypeIndex = PrimitiveType.boxedTypeIdentifiers.indexOf(otherType.identifier);
+            if(boxedTypeIndex < 0) return false;
+            otherTypeIdentifier = PrimitiveType.typeIdentifiers[boxedTypeIndex];
+        }
+        
+        let myIndex = PrimitiveType.typeIdentifiers.indexOf(this.identifier);
+        let otherIndex = PrimitiveType.typeIdentifiers.indexOf(otherTypeIdentifier);
+
+        return myIndex > 1 && otherIndex >= myIndex;
+
     }
 
     /**

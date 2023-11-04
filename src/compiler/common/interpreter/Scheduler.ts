@@ -225,10 +225,13 @@ export class Scheduler {
             return Array(n0).fill(defaultValue);
         }
         else {
+            let array = [];
+            let subdimensions = dimensions.slice(1);
             // Recursive call
-            let entry = this.newArray(defaultValue, ...dimensions.slice(1));
-            return Array(n0).fill(null).map(e => [...entry]);
-
+            for(let i = 0; i < n0; i++){
+                array.push(this.newArray(defaultValue, ...subdimensions));
+            }
+            return array;
         }
 
     }

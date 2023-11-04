@@ -14,8 +14,8 @@ import { Parameter } from "../types/Parameter";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { JavaLocalVariable } from "./JavaLocalVariable";
 import { JavaSymbolTable } from "./JavaSymbolTable";
-import { SnippetFramer } from "./CodeSnippetTools";
-import { TwoParameterTemplate } from "./CodeTemplate";
+import { SnippetFramer, Unboxer } from "./CodeSnippetTools";
+import { ParametersCommaSeparatedTemplate, SeveralParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";
 
 export class TermCodeGenerator {
@@ -59,9 +59,7 @@ export class TermCodeGenerator {
                 snippet = this.compileMethodCall(<ASTMethodCallNode>ast); break;
 
             case TokenType.newArray:
-                snippet = this.compileNewArrayNode(<ASTNewArrayNode>ast);break;
-            // Tobias new Array, z.B. new int[a][b][c]
-            // Zielcode: ho["newArray"](defaultValue, a, b, ...)
+                snippet = this.compileNewArrayNode(<ASTNewArrayNode>ast); break;
         }
 
         if (snippet && ast.parenthesisNeeded) {
@@ -71,40 +69,67 @@ export class TermCodeGenerator {
         return snippet;
     }
 
+    wrapWithCastTo(snippet: CodeSnippet, destinationType: JavaType, nodeToGetErrorRange: ASTNode) {
+        // if error occured before, then exit:
+        if (!snippet.type || !destinationType) return undefined;
+        if (!snippet.type.canExplicitlyCastTo(destinationType)) {
+            this.pushError("Der Term vom Datentyp " + snippet.type.identifier + " kann nicht zum Datentyp " + destinationType + " gecastet werden.", "error", nodeToGetErrorRange);
+            return snippet;  // good dummy to continue compiling
+        }
+
+        let castTemplate =  snippet.type.getCastFunction(destinationType);
+        if(!castTemplate) return snippet.type;
+        return castTemplate.applyToSnippet(destinationType, nodeToGetErrorRange.range, this.libraryTypestore, snippet);
+    }
+
+
+
     /*
      * Helper function for compileNewArrayNode
      *
-     */ 
-    private compileDimension(dimensionNode: ASTTermNode): CodeSnippet | undefined{
+     */
+    private compileDimension(dimensionNode: ASTTermNode): CodeSnippet | undefined {
         let dimensionTerm = this.compileTerm(dimensionNode);
-        if (dimensionTerm?.type?.identifier != "int") {
-            this.pushError("Hier wird eine Ganzzahl (int) erwartet.","error", dimensionNode);
-            return undefined;
+
+        // if compileTerm failed: insert plausible dummy value to enable further compilation
+        let type = dimensionTerm?.type;
+        if (!type) return new StringCodeSnippet('1', dimensionNode.range, this.intType);
+
+        let unboxedDimesionTerm = Unboxer.doUnboxing(dimensionTerm!);       // type != undefined => dimensionTerm != undefined
+        if(unboxedDimesionTerm.type?.isPrimitive){
+            if(unboxedDimesionTerm.type.isUsableAsIndex()){
+                return unboxedDimesionTerm;
+            }
         }
-        return dimensionTerm;
+
+        this.pushError("Hier wird eine Ganzzahl erwartet (Datentypen byte, short, int, long). Gefunden wurde " + dimensionTerm?.type?.identifier, "error", dimensionNode);
+        return new StringCodeSnippet('1', dimensionNode.range, this.intType);   // return plausible dummy to get on compiling...
+
     }
 
     compileNewArrayNode(node: ASTNewArrayNode): CodeSnippet | undefined {
-        let type = this.libraryTypestore.getType(node.arrayType.identifier);
-        if (type == undefined) {
+        let elementType = node.arrayType.resolvedType;
+        if (elementType == undefined) {
             return undefined;
         }
-        let defaultValue = type.isPrimitive ? (<PrimitiveType>type).defaultValue : null;
-       
-        let dimensionTerms = node.dimensions.map(d => this.compileDimension(d));
-        
-        if (dimensionTerms.includes(undefined)) return undefined;
 
-        let newArraySnippet = new CodeSnippet(node.range, false, false, undefined);
-        newArraySnippet.addStringPart("ho[\"newArray\"](" + defaultValue, undefined);
+        let defaultValue = elementType.isPrimitive ? (<PrimitiveType>elementType).defaultValue : "null";
 
-        dimensionTerms.forEach(d => newArraySnippet.addPart(SnippetFramer.frame(d, ",$1", undefined)));
-        
-        newArraySnippet.addStringPart(");", undefined);
+        let maybeUndefinedDimensionTerms: (CodeSnippet | undefined)[] = node.dimensions.map(d => this.compileDimension(d));
 
-        // TODO: Set type of snippet
+        if (maybeUndefinedDimensionTerms.includes(undefined)) return undefined;
 
-        return newArraySnippet;
+        //@ts-ignore
+        let dimensionTerms: CodeSnippet[] = maybeUndefinedDimensionTerms;
+
+        let arrayType = new ArrayType(elementType, dimensionTerms.length, this.module, node.range);
+
+
+        let prefix = `ho["newArray"](${defaultValue}, `;
+        let suffix = ")";
+
+        return ParametersCommaSeparatedTemplate.applyToSnippet(arrayType, node.range, prefix, suffix, ...dimensionTerms);
+
     }
 
 
