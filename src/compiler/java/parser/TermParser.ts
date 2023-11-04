@@ -192,8 +192,21 @@ export abstract class TermParser extends TokenIterator {
                 }
                 break;
             case TokenType.keywordNew:
-                node = this.parseObjectInstantiation();
-            // Tobias: new Array...
+                // TODO: This breaks for new ArrayList<String>()
+                // Use 
+                // this.lookForTokenTillOtherToken([TokenType.leftSquareBracket, TokenType.leftBracket],TokenType.semicolon)
+                // instead ?
+                switch (this.lookahead(2).tt) {
+                    case TokenType.leftBracket:
+                        node = this.parseObjectInstantiation();
+                        break;
+                    case TokenType.leftSquareBracket:
+                        node = this.parseNewArray();
+                        break;
+                    default:
+                        // TODO: Error handling?
+                        break;
+                }
                 break;
             case TokenType.keywordPrint:
             case TokenType.keywordPrintln:
@@ -375,6 +388,31 @@ export abstract class TermParser extends TokenIterator {
         return undefined;
     }
 
+
+    parseNewArray(): ASTTermNode | undefined {
+        let startToken = this.cct;
+        this.nextToken(); // skip new keyword
+        let type = this.parseType();
+
+        if (!type) return undefined;
+
+        let newArrayNode = this.nodeFactory.buildNewArrayNode(startToken, type, []);
+
+
+        if (this.expect(TokenType.leftSquareBracket), true) {
+            do {
+                let termNode = this.parseTerm();
+                if (termNode) newArrayNode.dimensions.push(termNode);
+                this.expect(TokenType.rightSquareBracket);
+            } while (this.comesToken(TokenType.leftSquareBracket, true));
+            
+
+        }
+
+        this.setEndOfRange(newArrayNode);
+        return newArrayNode;
+    }
+
     parseObjectInstantiation(): ASTNewObjectNode | undefined {
         let startToken = this.cct;
         this.nextToken(); // skip new keyword
@@ -397,6 +435,7 @@ export abstract class TermParser extends TokenIterator {
         }
 
         this.setEndOfRange(newObjectNode);
+        return newObjectNode;
     }
 
     parseSelectArrayElement(array: ASTTermNode | undefined): ASTSelectArrayElementNode | undefined {
