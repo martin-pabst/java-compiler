@@ -1,7 +1,7 @@
 import { File } from "../../../../common/module/File";
 import { EmptyRange, IRange } from "../../../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../../../TokenType";
-import { BinaryOperatorTemplate, CodeTemplate, IdentityTemplate, OneParameterTemplate, OneParameterTemplate, UnarySuffixTemplate } from "../../../codegenerator/CodeTemplate";
+import { BinaryOperatorTemplate, CodeTemplate, IdentityTemplate, OneParameterTemplate, UnarySuffixTemplate } from "../../../codegenerator/CodeTemplate";
 import { JavaBaseModule } from "../../../module/JavaBaseModule";
 import { JavaTypeStore } from "../../../module/JavaTypeStore";
 import { BinaryOperator, UnaryPrefixOperator } from "../../../parser/AST";
@@ -219,7 +219,7 @@ export abstract class PrimitiveType extends JavaType {
     static getTypeIndex(type: JavaType): number | undefined {
         if(!type) return undefined;
         let index = PrimitiveType.boxedTypeIdentifiers.indexOf(type.identifier);
-        if(index) return index;
+        if(index >= 0) return index;
         return this.typeIdentifiers.indexOf(type.identifier);        
     }
 

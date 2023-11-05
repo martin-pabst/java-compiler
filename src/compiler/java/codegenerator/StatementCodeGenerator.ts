@@ -42,7 +42,11 @@ export class StatementCodeGenerator extends TermCodeGenerator {
                 snippet = this.compileDoStatement(<ASTDoWhileNode>ast); break;
 
 
-            default: snippet = this.compileTerm(ast);
+            default: 
+            snippet = this.compileTerm(ast);
+            if(snippet){
+                snippet = SnippetFramer.frame(snippet, "$1;\n");
+            }
         }
 
         // enforce new step before snippet

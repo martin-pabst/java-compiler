@@ -49,6 +49,9 @@ export class LoadController {
         this.timeBetweenStepsGoal = 1000 / value;
     }
 
+    getStepsPerSecond(): number {
+        return this.stepsPerSecondGoal;
+    }
 
 
 }

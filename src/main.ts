@@ -82,7 +82,6 @@ export class Main {
 
     }, 'myButton');
 
-
   }
 
   compile() {

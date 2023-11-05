@@ -8,6 +8,8 @@ type InterpreterEvents = "stop" | "done" | "resetRuntime";
 
 export class Interpreter {
 
+    maxStepsPerSecond = 1e6;
+
     loadController: LoadController;
     scheduler: Scheduler;
 
