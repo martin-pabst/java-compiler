@@ -1,3 +1,4 @@
+import { ActionManager } from "../../../testgui/ActionManager.ts";
 import { Module } from "../module/Module";
 import { EventManager } from "./EventManager";
 import { LoadController } from "./LoadController";
@@ -46,7 +47,7 @@ export class Interpreter {
 
 
 
-    constructor(public printManager: PrintManager) {
+    constructor(public printManager: PrintManager, private actionManager: ActionManager) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {
 
         // this.printManager = new PrintManager($runDiv, this.main);
@@ -61,6 +62,8 @@ export class Interpreter {
 
         // TODO: This wires up speedcontrol with interpreter
         // controlButtons.setInterpreter(this);
+
+        this.registerActions();
 
         this.scheduler = new Scheduler(this, this.helperRegistry);
         this.loadController = new LoadController(this.scheduler, this);
@@ -168,54 +171,52 @@ export class Interpreter {
         })
     }
 
-    initGUI() {
+    registerActions() {
 
-        // let am = this.main.getActionManager();
+        this.actionManager.registerAction("interpreter.start", ['F4'],
+            () => {
+                if (this.actionManager.isActive("interpreter.start")) {
+                    this.start();
+                } else {
+                    this.pause();
+                }
 
-        // am.registerAction("interpreter.start", ['F4'],
-        //     () => {
-        //         if (am.isActive("interpreter.start")) {
-        //             this.start();
-        //         } else {
-        //             this.pause();
-        //         }
+            }, "Programm starten");
 
-        //     }, "Programm starten", this.controlButtons.$buttonStart);
+        this.actionManager.registerAction("interpreter.pause", ['F4'],
+            () => {
+                if (this.actionManager.isActive("interpreter.start")) {
+                    this.start();
+                } else {
+                    this.pause();
+                }
 
-        // am.registerAction("interpreter.pause", ['F4'],
-        //     () => {
-        //         if (am.isActive("interpreter.start")) {
-        //             this.start();
-        //         } else {
-        //             this.pause();
-        //         }
+            }, "Pause");
 
-        //     }, "Pause", this.controlButtons.$buttonPause);
+        this.actionManager.registerAction("interpreter.stop", [],
+            () => {
+                this.stop(false);
+            }, "Programm anhalten");
 
-        // am.registerAction("interpreter.stop", [],
-        //     () => {
-        //         this.stop(false);
-        //     }, "Programm anhalten", this.controlButtons.$buttonStop);
+        this.actionManager.registerAction("interpreter.stepOver", ['F6'],
+            () => {
+                this.executeOneStep(false);
+            }, "Einzelschritt (Step over)");
 
-        // am.registerAction("interpreter.stepOver", ['F6'],
-        //     () => {
-        //         this.executeOneStep(false);
-        //     }, "Einzelschritt (Step over)", this.controlButtons.$buttonStepOver);
+        this.actionManager.registerAction("interpreter.stepInto", ['F7'],
+            () => {
+                this.executeOneStep(true);
+            }, "Einzelschritt (Step into)");
 
-        // am.registerAction("interpreter.stepInto", ['F7'],
-        //     () => {
-        //         this.executeOneStep(true);
-        //     }, "Einzelschritt (Step into)", this.controlButtons.$buttonStepInto);
+        this.actionManager.registerAction("interpreter.stepOut", [],
+            () => {
+                this.stepOut();
+            }, "Step out");
 
-        // am.registerAction("interpreter.stepOut", [],
-        //     () => {
-        //         this.stepOut();
-        //     }, "Step out", this.controlButtons.$buttonStepOut);
-
-        // am.registerAction("interpreter.restart", [],
-        //     () => {
-        //         this.stop(true);
-        //     }, "Neu starten", this.controlButtons.$buttonRestart);
+        this.actionManager.registerAction("interpreter.restart", [],
+            () => {
+                this.stop(true);
+            }, "Neu starten");
 
     }
 
@@ -226,33 +227,31 @@ export class Interpreter {
             // this.closeAllWebsockets();
         }
 
-        // let am = this.main.getActionManager();
+        for (let actionId of this.actions) {
+            this.actionManager.setActive("interpreter." + actionId, this.buttonActiveMatrix[actionId][state]);
+        }
 
-        // for (let actionId of this.actions) {
-        //     am.setActive("interpreter." + actionId, this.buttonActiveMatrix[actionId][state]);
-        // }
+        let buttonStartActive = this.buttonActiveMatrix['start'][state];
 
-        // let buttonStartActive = this.buttonActiveMatrix['start'][state];
+        if (buttonStartActive) {
+            this.actionManager.showButtons("start");
+            this.actionManager.hideButtons("pause");
+        } else {
+            this.actionManager.showButtons("pause");
+            this.actionManager.hideButtons("start");
+        }
 
-        // if (buttonStartActive) {
-        //     this.controlButtons.$buttonStart.show();
-        //     this.controlButtons.$buttonPause.hide();
-        // } else {
-        //     this.controlButtons.$buttonStart.hide();
-        //     this.controlButtons.$buttonPause.show();
-        // }
+        let buttonStopActive = this.buttonActiveMatrix['stop'][state];
 
-        // let buttonStopActive = this.buttonActiveMatrix['stop'][state];
+        if (state == SchedulerState.stopped) {
+            this.eventManager.fire("done");
+            // if (this.worldHelper != null) {
+            //     this.worldHelper.clearActorLists();
+            // }
+            // this.gngEreignisbehandlungHelper?.detachEvents();
+            // this.gngEreignisbehandlungHelper = null;
 
-        // if (state == SchedulerLstate.stopped) {
-        //     this.eventManager.fireEvent("done");
-        //     if (this.worldHelper != null) {
-        //         this.worldHelper.clearActorLists();
-        //     }
-        //     this.gngEreignisbehandlungHelper?.detachEvents();
-        //     this.gngEreignisbehandlungHelper = null;
-
-        // }
+        }
 
         // if (oldState != SchedulerLstate.stopped && state == SchedulerLstate.stopped) {
         //     // TODO

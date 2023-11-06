@@ -18,23 +18,19 @@ import jQuery from 'jquery';
 
 import { SpeedControl } from "./SpeedControl.js";
 import { Interpreter } from '../compiler/common/interpreter/Interpreter.js';
+import { ActionManager } from './ActionManager.js';
 
 
-
+type ButtonData = {
+    actionIdentifier: string,
+    title: string,
+    iconClass: string,
+}
 
 export class ProgramControlButtons {
 
     speedControl: SpeedControl;
 
-    $buttonStart: JQuery<HTMLElement>;
-    $buttonPause: JQuery<HTMLElement>;
-    $buttonStop: JQuery<HTMLElement>;
-    $buttonStepOver: JQuery<HTMLElement>;
-    $buttonStepInto: JQuery<HTMLElement>;
-    $buttonStepOut: JQuery<HTMLElement>;
-    $buttonRestart: JQuery<HTMLElement>;
-
-    // $buttonEdit: JQuery<HTMLElement>;
 
     buttonActiveMatrix: { [buttonName: string]: boolean[] } = {
         "start": [false, false, true, true, true, false],
@@ -46,25 +42,38 @@ export class ProgramControlButtons {
         "restart": [false, true, true, true, true, true]
     }
 
+    buttonData: ButtonData[] = [
+        { actionIdentifier: "start", title: "Start", iconClass: "img_start-dark jo_button"},
+        { actionIdentifier: "pause", title: "Pause", iconClass: "img_pause-dark jo_button"},
+        { actionIdentifier: "stop", title: "Stop", iconClass: "img_stop-dark jo_button"},
+        { actionIdentifier: "stepOver", title: "Step Over", iconClass: "img_step-over-dark jo_button"},
+        { actionIdentifier: "stepInto", title: "Step Into", iconClass: "img_step-into-dark jo_button"},
+        { actionIdentifier: "stepOut", title: "Step Out", iconClass: "img_step-out-dark jo_button"},
+        { actionIdentifier: "restart", title: "Restart", iconClass: "img_restart-dark jo_button"},
+    ]
 
-    constructor(private $buttonsContainer: JQuery<HTMLElement>, interpreter: Interpreter){
+    constructor($buttonsContainer: JQuery<HTMLElement>, interpreter: Interpreter, actionManager: ActionManager){
 
         this.speedControl = new SpeedControl($buttonsContainer, interpreter);
         this.speedControl.initGUI();
 
-        this.$buttonStart = jQuery('<div title="Start" class="img_start-dark jo_button"></div>');
-        this.$buttonPause = jQuery('<div title="Pause" class="img_pause-dark jo_button"></div>');
-        this.$buttonStop = jQuery('<div title="Stop" class="img_stop-dark jo_button"></div>');
-        this.$buttonStepOver = jQuery('<div title="Step over" class="img_step-over-dark jo_button"></div>');
-        this.$buttonStepInto = jQuery('<div title="Step into" class="img_step-into-dark jo_button"></div>');
-        this.$buttonStepOut = jQuery('<div title="Step out" class="img_step-out-dark jo_button"></div>');
-        this.$buttonRestart = jQuery('<div title="Restart" class="img_restart-dark jo_button"></div>');
+        for(let bd of this.buttonData){
+            let $button = jQuery(`<div title="${bd.title}" class="${bd.iconClass}"></div>`);
+            $buttonsContainer.append($button);
+            actionManager.registerButton(bd.actionIdentifier, $button);
+        }
 
-        // this.$buttonEdit = jQuery('<div class="jo_editButton" title="Programm anhalten damit der Programmtext bearbeitbar wird"></div>')
-        // $editorContainer.append(this.$buttonEdit);
 
-        $buttonsContainer.append(this.$buttonStart, this.$buttonPause, this.$buttonStop,
-            this.$buttonStepOver, this.$buttonStepInto, this.$buttonStepOut, this.$buttonRestart);
+        // this.$buttonStart = jQuery('<div title="Start" class="img_start-dark jo_button"></div>');
+        // this.$buttonPause = jQuery('<div title="Pause" class="img_pause-dark jo_button"></div>');
+        // this.$buttonStop = jQuery('<div title="Stop" class="img_stop-dark jo_button"></div>');
+        // this.$buttonStepOver = jQuery('<div title="Step over" class="img_step-over-dark jo_button"></div>');
+        // this.$buttonStepInto = jQuery('<div title="Step into" class="img_step-into-dark jo_button"></div>');
+        // this.$buttonStepOut = jQuery('<div title="Step out" class="img_step-out-dark jo_button"></div>');
+        // this.$buttonRestart = jQuery('<div title="Restart" class="img_restart-dark jo_button"></div>');
+
+
+        
 
 // <!-- <img id="buttonStart" title="Start" src="assets/projectexplorer/start-dark.svg"> -->
 // <div id="buttonStart" title="Start" class="img_start-dark button"></div>

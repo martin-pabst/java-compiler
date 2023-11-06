@@ -20,15 +20,15 @@ export class ActionManager {
 
     buttons: { [actionIdentifier: string]: JQuery<HTMLElement>[] } = {};
 
-    constructor(private $mainElement: JQuery<HTMLElement>){
+    constructor(private $mainElement?: JQuery<HTMLElement> | undefined){
 
     }
 
     public init(){
 
-        let $element:JQuery<any> = this.$mainElement;
+        let $element:JQuery<any> | undefined = this.$mainElement;
         
-        if($element == null) $element = jQuery(document);
+        if(!$element) $element = jQuery(document);
 
         let that = this;
         $element.on("keydown", function (event: JQuery.KeyDownEvent) { 
@@ -47,8 +47,8 @@ export class ActionManager {
     }
 
 
-    public registerAction(identifier: string, keys: string[], action: Action, text: string = "", button?: JQuery<HTMLElement>){
-        let ae: ActionEntry = {
+    public registerAction(identifier: string, keys: string[], action: Action, text: string = ""){
+        let actionEntry: ActionEntry = {
             action: action,
             identifier: identifier,
             keys: keys,
@@ -56,39 +56,62 @@ export class ActionManager {
             active: true
         };
 
-        this.actions[identifier] = ae;
+        this.actions[identifier] = actionEntry;
 
         for(let key of keys){
             if(this.keyEntries[key.toLowerCase()] == null){
                 this.keyEntries[key.toLowerCase()] = [];
             }
-            this.keyEntries[key.toLowerCase()].push(ae);
+            this.keyEntries[key.toLowerCase()].push(actionEntry);
         }
 
-        if(button != null){
-            if(this.buttons[identifier] == null){
-                this.buttons[identifier] = [];
+        let buttons = this.buttons[identifier];
+
+        if(buttons != null){
+            for(let $button of buttons){
+                this.setButtonTitle($button, actionEntry);
             }
-            this.buttons[identifier].push(button);
-
-            let t = text;
-            if(keys.length > 0){
-                t += " [" + keys.join(", ") + "]";
-            }
-
-            button.attr("title", t);
-
-            let mousePointer = window.PointerEvent ? "pointer" : "mouse";
-
-            button.on(mousePointer + 'down', () => {
-                if(ae.active){
-                    action(identifier, undefined, "mousedown");
-                }
-            });
-
         }
 
     }
+
+    public registerButton(actionIdentifier: string, $button: JQuery<HTMLElement>){
+        if(this.buttons[actionIdentifier] == null){
+            this.buttons[actionIdentifier] = [];
+        }
+        this.buttons[actionIdentifier].push($button);
+
+        let actionEntry: ActionEntry = this.actions[actionIdentifier];
+        if(actionEntry){
+            this.setButtonTitle($button, actionEntry);
+        }
+
+        let mousePointer = window.PointerEvent ? "pointer" : "mouse";
+
+        $button.on(mousePointer + 'down', () => {
+            let actionEntry = this.actions[actionIdentifier];
+            if(!actionEntry) return;
+            if(actionEntry.active){
+                actionEntry.action(actionIdentifier, undefined, "mousedown");
+            }
+        });
+
+
+    }
+
+    setButtonTitle($button: JQuery<HTMLElement>, actionEntry: ActionEntry) {
+        let t = actionEntry.text;
+        if(!t) t = "";
+        if(actionEntry.keys.length > 0){
+            t += " [" + actionEntry.keys.join(", ") + "]";
+        }
+
+        $button.attr("title", t);
+
+    }
+
+    
+
 
     public isActive(actionIdentifier: string): boolean {
 
@@ -164,5 +187,18 @@ export class ActionManager {
 
     }
 
+    hideButtons(actionIdentifier: string){
+        let buttons = this.buttons[actionIdentifier];
+        if(buttons){
+            buttons.forEach(b => b.hide());
+        }
+    }
+
+    showButtons(actionIdentifier: string){
+        let buttons = this.buttons[actionIdentifier];
+        if(buttons){
+            buttons.forEach(b => b.show());
+        }
+    }
 
 }

@@ -1,17 +1,17 @@
-import { AstComponent } from "./testgui/AstComponent";
-import { ErrorLevel } from "./compiler/common/Error";
-import { Language } from "./compiler/common/Language";
-import { File } from "./compiler/common/module/File";
-import { Module } from "./compiler/common/module/Module";
-import { JavaCompiler } from "./compiler/java/JavaCompiler";
-import { JavaLanguage } from "./compiler/java/JavaLanguage";
-import { CodePrinter } from "./compiler/java/codegenerator/CodePrinter";
-import { TokenPrinter } from "./compiler/java/lexer/TokenPrinter";
-import { JavaLibraryModuleManager } from "./compiler/java/module/libraries/JavaLibraryModuleManager";
-import { Editor } from "./testgui/editor/Editor";
-import { Button } from "./tools/Button";
-import { DOM } from "./tools/DOM";
-import { TabManager } from "./tools/TabManager";
+import { AstComponent } from "./testgui/AstComponent.ts";
+import { ErrorLevel } from "./compiler/common/Error.ts";
+import { Language } from "./compiler/common/Language.ts";
+import { File } from "./compiler/common/module/File.ts";
+import { Module } from "./compiler/common/module/Module.ts";
+import { JavaCompiler } from "./compiler/java/JavaCompiler.ts";
+import { JavaLanguage } from "./compiler/java/JavaLanguage.ts";
+import { CodePrinter } from "./compiler/java/codegenerator/CodePrinter.ts";
+import { TokenPrinter } from "./compiler/java/lexer/TokenPrinter.ts";
+import { JavaLibraryModuleManager } from "./compiler/java/module/libraries/JavaLibraryModuleManager.ts";
+import { Editor } from "./testgui/editor/Editor.ts";
+import { Button } from "./tools/Button.ts";
+import { DOM } from "./tools/DOM.ts";
+import { TabManager } from "./tools/TabManager.ts";
 
 import '/include/css/main.css';
 import { ProgramControlButtons } from "./testgui/ProgramControlButtons.ts";
@@ -19,6 +19,7 @@ import { Interpreter } from "./compiler/common/interpreter/Interpreter.ts";
 import { TestPrintManager } from "./testgui/TestPrintManager.ts";
 
 import jQuery from "jquery";
+import { ActionManager } from "./testgui/ActionManager.ts";
 
 export class Main {
 
@@ -34,6 +35,7 @@ export class Main {
   errorDiv: HTMLDivElement;
 
   programControlButtons!: ProgramControlButtons;
+  actionManager: ActionManager;
 
   astComponent: AstComponent;
 
@@ -76,7 +78,9 @@ export class Main {
     
     this.compiler = new JavaCompiler(this.libraryModuleManager);
     
-    this.interpreter = new Interpreter(new TestPrintManager());
+    this.actionManager = new ActionManager();
+    
+    this.interpreter = new Interpreter(new TestPrintManager(), this.actionManager);
 
 
     this.initButtons();
@@ -96,7 +100,7 @@ export class Main {
 
     let programControlButtonDiv = DOM.makeDiv(buttonDiv, "programControlbuttons");
 
-    this.programControlButtons = new ProgramControlButtons(jQuery(programControlButtonDiv), this.interpreter);
+    this.programControlButtons = new ProgramControlButtons(jQuery(programControlButtonDiv), this.interpreter, this.actionManager);
 
   }
 
