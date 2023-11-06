@@ -7,3 +7,12 @@
 .jo_button:hover {
     filter: brightness(150%);
 }
+
+.jo_button.jo_active:active {
+    transform: scale(1.2);
+}
+
+.jo_button:not(.jo_active) {
+    filter: grayscale();
+}
+

@@ -1,0 +1,57 @@
+:root {
+    --speedcontrol-bar: #9d9d9d;
+    --speedcontrol-grip: #588555;
+    --speedcontrol-grip-hover: #89d185;
+    --speedcontrol-display-background: #383838;
+    --speedcontrol-display-border: #9d9d9d;
+    --editorTooltip-background: #252526;
+    --editorTooltip-border: #454545;
+    --renameInput-color: #ffffff;
+}   
+
+/* Speed control */
+.jo_speedcontrol-outer {
+    position: relative;
+    width: 100px;
+    height: 20px;
+    margin-right: 8px !important;
+}
+
+.jo_speedcontrol-bar {
+    position: absolute;
+    height: 6px;
+    top:7px;
+    width: 100%;
+    background-color: var(--speedcontrol-bar);
+}
+
+.jo_speedcontrol-grip {
+    position: absolute;
+    cursor: pointer;
+    height: 20px;
+    top:0px;
+    width: 8px;
+    left: 0px;
+    background-color: var(--speedcontrol-grip);
+}
+
+.jo_speedcontrol-grip:hover {
+    background-color: var(--speedcontrol-grip-hover);
+}
+
+.jo_speedcontrol-grip:active {
+    transform: scale(1.2);
+}
+
+.jo_speedcontrol-display {
+    display: none;
+    position: absolute;
+    font-size: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 150%;
+    padding: 5px;
+    white-space: nowrap;
+    background-color: var(--speedcontrol-display-background);
+    border: 1px solid var(--speedcontrol-display-border);
+}

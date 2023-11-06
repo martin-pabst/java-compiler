@@ -14,6 +14,11 @@ import { DOM } from "./tools/DOM";
 import { TabManager } from "./tools/TabManager";
 
 import '/include/css/main.css';
+import { ProgramControlButtons } from "./testgui/ProgramControlButtons.ts";
+import { Interpreter } from "./compiler/common/interpreter/Interpreter.ts";
+import { TestPrintManager } from "./testgui/TestPrintManager.ts";
+
+import jQuery from "jquery";
 
 export class Main {
 
@@ -28,11 +33,14 @@ export class Main {
   codeOutputDiv: HTMLDivElement;
   errorDiv: HTMLDivElement;
 
+  programControlButtons!: ProgramControlButtons;
+
   astComponent: AstComponent;
 
   file: File;
 
   compiler: JavaCompiler;
+  interpreter: Interpreter;
 
   libraryModuleManager: JavaLibraryModuleManager;
 
@@ -59,21 +67,25 @@ export class Main {
 
     this.astComponent = new AstComponent(this.astDiv);
 
-    this.initButtons();
-
+    
     this.file = new File();
     this.file.monacoModel = this.inputEditor.editor.getModel()!;
-
+    
     this.libraryModuleManager = new JavaLibraryModuleManager();
     this.libraryModuleManager.compileClassesToTypes();
-
+    
     this.compiler = new JavaCompiler(this.libraryModuleManager);
+    
+    this.interpreter = new Interpreter(new TestPrintManager());
 
+
+    this.initButtons();
   }
 
   initButtons() {
     let buttonDiv = document.getElementById('buttons')!;
-    new Button(buttonDiv, 'compile', '#30c030', () => {
+    let firstRow = DOM.makeDiv(buttonDiv);
+    new Button(firstRow, 'compile', '#30c030', () => {
       this.compile()
       
       setInterval(() => {
@@ -81,6 +93,10 @@ export class Main {
 
 
     }, 'myButton');
+
+    let programControlButtonDiv = DOM.makeDiv(buttonDiv, "programControlbuttons");
+
+    this.programControlButtons = new ProgramControlButtons(jQuery(programControlButtonDiv), this.interpreter);
 
   }
 

@@ -1,7 +1,7 @@
 import jQuery from 'jquery';
 import { convertPxToNumber } from '../tools/HtmlTools';
 import { Interpreter } from '../compiler/common/interpreter/Interpreter';
-
+import '/include/css/speedcontrol.css'; 
 
 
 export class SpeedControl {

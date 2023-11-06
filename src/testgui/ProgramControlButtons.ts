@@ -21,6 +21,7 @@ import { Interpreter } from '../compiler/common/interpreter/Interpreter.js';
 
 
 
+
 export class ProgramControlButtons {
 
     speedControl: SpeedControl;
@@ -46,7 +47,7 @@ export class ProgramControlButtons {
     }
 
 
-    constructor(private $buttonsContainer: JQuery<HTMLElement>, private $editorContainer: JQuery<HTMLElement>, interpreter: Interpreter){
+    constructor(private $buttonsContainer: JQuery<HTMLElement>, interpreter: Interpreter){
 
         this.speedControl = new SpeedControl($buttonsContainer, interpreter);
         this.speedControl.initGUI();

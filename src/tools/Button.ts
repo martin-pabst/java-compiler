@@ -6,7 +6,7 @@ export class Button {
 
     constructor(parent: HTMLElement, caption: string, color: string, onClick: () => void, klass?: string){
         this.buttonDiv = document.createElement('div');
-        this.buttonDiv.classList.add('jo_button');
+        this.buttonDiv.classList.add('jo_button', 'jo_active');
         if(klass) this.buttonDiv.classList.add(klass);
         this.buttonDiv.textContent = caption;
         this.buttonDiv.style.backgroundColor = color;

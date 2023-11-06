@@ -57,4 +57,8 @@ body, html, #main {
     margin-left: 5px;    
 }
 
-
+.programControlbuttons {
+    display: flex;
+    flex-direction: row;
+    margin-left: 4px;
+}
