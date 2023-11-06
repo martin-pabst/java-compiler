@@ -59,7 +59,7 @@ export class Thread {
 
         try {
             //@ts-ignore
-            while (numberOfSteps < maxNumberOfSteps && this.state != NThreadState.exited) {
+            while (numberOfSteps < maxNumberOfSteps && this.state != ThreadState.exited) {
                 // For performance reasons: store all necessary data in local variables
                 let currentProgramState = this.currentProgramState;
                 let stepIndex = currentProgramState.stepIndex;
@@ -90,7 +90,6 @@ export class Thread {
                     // not in singlestep-mode (faster!)
                     while (numberOfSteps < maxNumberOfSteps && this.state == ThreadState.running) {
                         let step = currentStepList[stepIndex];
-
                         /**
                          * Behold, hier the steps run!
                          * parameter identifers inside function: 
@@ -115,8 +114,9 @@ export class Thread {
                 allExtendedImplementedTypes: ["Throwable", "Exception"],
                 message: "Runtime-Exception:" + exception
             };
-
-            this.throwException(exceptionObject);
+            console.log(exception);
+            // this.throwException(exceptionObject);
+            this.state = ThreadState.exitedWithException; // TODO
         }
 
         return this.state;
@@ -239,7 +239,7 @@ export class Thread {
             program: program,
             currentStepList: program.stepsSingle,
             // currentStepList: this.scheduler.executeMode == NExecuteMode.singleSteps ? program.stepsSingle : program.stepsMultiple,
-            stackBase: this.stack.length - program.numberOfParameters - 1,  // 1 because of [this, parameter 1, ..., parameter n]
+            stackBase: this.stack.length - program.numberOfParameters - program.numberOfThisObjects,  // 1 because of [this, parameter 1, ..., parameter n]
             stepIndex: 0,
             callbackAfterFinished: this.lastDepositedCallback,
             exceptionInfoList: []

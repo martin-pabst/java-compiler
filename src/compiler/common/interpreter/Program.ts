@@ -3,6 +3,7 @@ import { Module } from "../module/Module";
 import { IRange } from "../range/Range";
 import { Thread } from "./Thread";
 import { HelperObject } from "./Scheduler";
+import { StepParams } from "./StepFunction.ts";
 
 
 
@@ -44,6 +45,11 @@ export class Step {
         }
     }
 
+    compileToJavascriptFunction(){
+        // @ts-ignore
+        this.run = new Function(StepParams.thread, StepParams.stack, StepParams.stackBase, StepParams.helperObject, this.codeAsString);    
+    }
+
 }
 
 export class Program {
@@ -61,5 +67,10 @@ export class Program {
             this.numberOfParameters = stackFrame.numberOfParameters;
             this.numberOfLocalVariables = stackFrame.numberOfLocalVariables;
         }
+    }
+
+    compileToJavascriptFunctions(){
+        this.stepsSingle.forEach(step => step.compileToJavascriptFunction());
+        this.stepsMultiple.forEach(step => step.compileToJavascriptFunction());
     }
 }

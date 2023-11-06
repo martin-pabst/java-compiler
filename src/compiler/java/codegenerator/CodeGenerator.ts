@@ -1,7 +1,7 @@
 import { Program } from "../../common/interpreter/Program";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { CodeSnippetContainer, CodeSnippet } from "./CodeSnippet";
+import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { JavaSymbolTable } from "./JavaSymbolTable";
 import { SnippetLinker } from "./SnippetLinker";
 import { StatementCodeGenerator } from "./StatementCodeGenerator";
@@ -29,6 +29,8 @@ export class CodeGenerator extends StatementCodeGenerator {
             let snippet = this.compileStatementOrTerm(statement);
             if(snippet) snippets.push(snippet);
         }
+
+        snippets.push(new StringCodeSnippet("t.state = 4;"));
 
         let steps = this.linker.link(snippets);
 

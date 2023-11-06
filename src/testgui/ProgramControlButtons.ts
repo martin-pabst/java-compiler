@@ -43,13 +43,13 @@ export class ProgramControlButtons {
     }
 
     buttonData: ButtonData[] = [
-        { actionIdentifier: "start", title: "Start", iconClass: "img_start-dark jo_button"},
-        { actionIdentifier: "pause", title: "Pause", iconClass: "img_pause-dark jo_button"},
-        { actionIdentifier: "stop", title: "Stop", iconClass: "img_stop-dark jo_button"},
-        { actionIdentifier: "stepOver", title: "Step Over", iconClass: "img_step-over-dark jo_button"},
-        { actionIdentifier: "stepInto", title: "Step Into", iconClass: "img_step-into-dark jo_button"},
-        { actionIdentifier: "stepOut", title: "Step Out", iconClass: "img_step-out-dark jo_button"},
-        { actionIdentifier: "restart", title: "Restart", iconClass: "img_restart-dark jo_button"},
+        { actionIdentifier: "interpreter.start", title: "Start", iconClass: "img_start-dark jo_button"},
+        { actionIdentifier: "interpreter.pause", title: "Pause", iconClass: "img_pause-dark jo_button"},
+        { actionIdentifier: "interpreter.stop", title: "Stop", iconClass: "img_stop-dark jo_button"},
+        { actionIdentifier: "interpreter.stepOver", title: "Step Over", iconClass: "img_step-over-dark jo_button"},
+        { actionIdentifier: "interpreter.stepInto", title: "Step Into", iconClass: "img_step-into-dark jo_button"},
+        { actionIdentifier: "interpreter.stepOut", title: "Step Out", iconClass: "img_step-out-dark jo_button"},
+        { actionIdentifier: "interpreter.restart", title: "Restart", iconClass: "img_restart-dark jo_button"},
     ]
 
     constructor($buttonsContainer: JQuery<HTMLElement>, interpreter: Interpreter, actionManager: ActionManager){

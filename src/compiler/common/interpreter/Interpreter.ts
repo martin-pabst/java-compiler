@@ -34,15 +34,17 @@ export class Interpreter {
     //SchedulerLstatus { done, running, paused, not_initialized }
 
     // buttonActiveMatrix[button][i] tells if button is active at 
-    // InterpreterState i
+    // SchedulerState i
+    // export enum SchedulerState { not_initialized, running, paused, stopped }
+
     buttonActiveMatrix: { [buttonName: string]: boolean[] } = {
-        "start": [true, false, true, false],
+        "start": [false, false, true, true],
         "pause": [false, true, false, false],
         "stop": [false, true, true, false],
-        "stepOver": [true, false, true, false],
-        "stepInto": [true, false, true, false],
+        "stepOver": [false, false, true, true],
+        "stepInto": [false, false, true, true],
         "stepOut": [false, false, true, false],
-        "restart": [true, true, true, false]
+        "restart": [false, true, true, true]
     }
 
 
@@ -233,15 +235,11 @@ export class Interpreter {
 
         let buttonStartActive = this.buttonActiveMatrix['start'][state];
 
-        if (buttonStartActive) {
-            this.actionManager.showButtons("start");
-            this.actionManager.hideButtons("pause");
-        } else {
-            this.actionManager.showButtons("pause");
-            this.actionManager.hideButtons("start");
-        }
+            this.actionManager.showHideButtons("interpreter.start", buttonStartActive);
+            this.actionManager.showHideButtons("interpreter.pause", !buttonStartActive);
 
         let buttonStopActive = this.buttonActiveMatrix['stop'][state];
+        this.actionManager.showHideButtons("interpreter.stop", buttonStopActive);
 
         if (state == SchedulerState.stopped) {
             this.eventManager.fire("done");
@@ -301,7 +299,7 @@ export class Interpreter {
         this.mainModule = newMainModule;
 
         this.scheduler.init(this.mainModule, classes);
-        this.scheduler.setState(SchedulerState.stopped);
+        this.setState(SchedulerState.stopped);
 
     }
 

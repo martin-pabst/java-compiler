@@ -43,11 +43,14 @@ export class Scheduler {
     }
 
     buildHelperObject() {
+        let that = this;
         this.helperObject = {
             classes: this.classObjectRegistry,
             helpers: this.helperRegistry,
             newArray: Scheduler.newArray,
-            print: this.print
+            print: (text: string | undefined, printNewline: boolean, color: number | undefined) => {
+                that.interpreter.printManager.print(text, printNewline, color);
+            }
         }
     }
 
@@ -214,9 +217,6 @@ export class Scheduler {
         this.currentThreadIndex = 0;
     }
 
-    print(text: string | undefined, printNewline: boolean, color: number | undefined){
-        this.interpreter.printManager.print(text, printNewline, color);
-    }
 
     static newArray(defaultValue: any, ...dimensions : number[]) : Array<any> {
         let n0 = dimensions[0];

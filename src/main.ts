@@ -121,6 +121,10 @@ export class Main {
 
     this.codeOutputEditor.getModel()?.setValue(output);
 
+    module.mainProgram?.compileToJavascriptFunctions();
+
+    this.interpreter.init(module, {});
+
   }
 
   markErrors(module: Module) {

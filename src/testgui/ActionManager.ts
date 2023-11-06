@@ -194,10 +194,16 @@ export class ActionManager {
         }
     }
 
-    showButtons(actionIdentifier: string){
+    showHideButtons(actionIdentifier: string, show: boolean){
         let buttons = this.buttons[actionIdentifier];
         if(buttons){
-            buttons.forEach(b => b.show());
+            buttons.forEach(b => {
+                if(show){
+                    b.show();
+                } else {
+                    b.hide();
+                }
+            });
         }
     }
 
