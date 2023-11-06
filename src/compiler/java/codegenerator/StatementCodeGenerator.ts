@@ -182,6 +182,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
     compilePrintStatement(node: ASTPrintStatementNode): CodeSnippet | undefined {
         let firstParameter = this.compileTerm(node.firstParameter);
         let secondParameter = this.compileTerm(node.secondParameter);
+        
         if (firstParameter) {
             if (secondParameter) {
                 return new TwoParameterTemplate(`${StepParams.helperObject}.print($1, ${node.isPrintln}, $2);\n`)

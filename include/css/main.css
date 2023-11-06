@@ -42,6 +42,7 @@ body, html, #main {
 
 #output {
     grid-area: 2/2;
+    overflow: auto;
 }
 
 .errorDiv {
@@ -61,4 +62,9 @@ body, html, #main {
     display: flex;
     flex-direction: row;
     margin-left: 4px;
+}
+
+.output {
+    font-family: Consolas;
+    color: white;
 }

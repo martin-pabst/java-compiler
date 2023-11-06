@@ -37,6 +37,10 @@ export class Scheduler {
 
     helperObject!: HelperObject;
 
+    timeStampProgramStarted: number = 0;
+    stepCount: number = 0;
+
+
     constructor(public interpreter: Interpreter, private helperRegistry: HelperRegistry) {
         this.setState(SchedulerState.not_initialized);
         this.buildHelperObject();
@@ -82,7 +86,7 @@ export class Scheduler {
                     this.runningThreads.splice(this.currentThreadIndex, 1);
 
                     if (this.runningThreads.length == 0) {
-                        this.setState(SchedulerState.stopped);
+                        this.interpreter.setState(SchedulerState.stopped);
                         return;
                     }
 
@@ -100,11 +104,22 @@ export class Scheduler {
             }
         }
 
+        this.stepCount += numberOfSteps;
 
     }
-
+    
     setState(newState: SchedulerState) {
         this.state = newState;
+        switch(newState){
+            case SchedulerState.running: 
+                this.timeStampProgramStarted = performance.now();
+                this.stepCount = 0;
+                break;
+            case SchedulerState.stopped:
+                let dt = performance.now() - this.timeStampProgramStarted;
+                let stepsPerSecond = Math.round(this.stepCount/dt*1000);
+                this.interpreter.printManager.print("Duration: " + dt + " ms, " + this.stepCount + " Steps, " + stepsPerSecond + " steps/s", true, undefined);
+        }
     }
 
     runSingleStepKeepingThread(stepInto: boolean, callback: () => void) {

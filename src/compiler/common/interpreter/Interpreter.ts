@@ -153,6 +153,8 @@ export class Interpreter {
 
         // this.main.getBottomDiv()?.console?.clearErrors();
 
+        this.printManager.clear();
+
         if (this.scheduler.state != SchedulerState.paused) {
             // TODO!
             // this.init(this.mainModule);

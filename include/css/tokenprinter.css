@@ -6,6 +6,7 @@
 .jo_tokenprinter_tokenline {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .jo_tokenprinter_linenumber {

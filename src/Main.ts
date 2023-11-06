@@ -57,6 +57,7 @@ export class Main {
     
     this.tabManager.setBodyElementClass('tabBodyElement');
     this.tokenDiv = this.tabManager.getBodyElement(0);
+    this.tokenDiv.style.overflow = 'auto';
     this.astDiv = this.tabManager.getBodyElement(1);
     this.codeOutputDiv = this.tabManager.getBodyElement(2);
     this.errorDiv = this.tabManager.getBodyElement(3);

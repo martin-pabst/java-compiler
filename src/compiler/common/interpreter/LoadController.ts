@@ -7,21 +7,24 @@ export class LoadController {
 
     private lastTickTime: number = 0;
 
-    private stepsPerSecondGoal!: number;
+    private stepsPerSecondGoal: number = 1e6;
     private timeBetweenStepsGoal!: number;
 
     constructor(private scheduler: Scheduler, private interpreter: Interpreter) {
-        this.setStepsPerSecond(100);
+        this.setStepsPerSecond(1e8);
     }
 
-    tick(deltaUntilNextTick: number) {
+    tick(timerIntervalInMs: number) {
+
         let t0 = performance.now();
         let deltaTime = t0 - this.lastTickTime;
+        
+        // if(deltaTime > timerIntervalInMs * 1.5) console.log("Timer Interval instable: " + deltaTime);
 
         if (deltaTime < this.timeBetweenStepsGoal) return;
         this.lastTickTime = t0;
 
-        if (this.timeBetweenStepsGoal >= deltaUntilNextTick && this.scheduler.state == SchedulerState.running) {
+        if (this.timeBetweenStepsGoal >= timerIntervalInMs && this.scheduler.state == SchedulerState.running) {
             this.scheduler.run(1);
             if(this.stepsPerSecondGoal <= 12){
                 this.interpreter.showProgramPointer(this.scheduler.getNextStepPosition());
@@ -29,16 +32,16 @@ export class LoadController {
             return;
         }
 
-        let stepsPerTickGoal = this.stepsPerSecondGoal / 1000 * deltaUntilNextTick;
-        let batch = Math.max(stepsPerTickGoal, 1000);
-
+        let stepsPerTickGoal = this.stepsPerSecondGoal / 1000 * timerIntervalInMs;
+        let batch = Math.max(stepsPerTickGoal, 10000);
         let i: number = 0;
         while (i < stepsPerTickGoal &&
-            (performance.now() - t0) / deltaUntilNextTick < this.maxLoadFactor &&
+            (performance.now() - t0) / timerIntervalInMs < this.maxLoadFactor &&
             this.scheduler.state == SchedulerState.running) {
 
-            this.scheduler.run(Math.max(batch, stepsPerTickGoal - i));
-            i += batch;
+            let n = Math.min(batch, stepsPerTickGoal - i);
+            this.scheduler.run(n);
+            i += n;
 
         }
 

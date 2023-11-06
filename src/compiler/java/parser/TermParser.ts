@@ -458,7 +458,7 @@ export abstract class TermParser extends TokenIterator {
     }
 
     parsePrintStatement() {
-        let printlnStatement = this.nodeFactory.buildPrintStatement(this.cct, this.tt == TokenType.println);
+        let printlnStatement = this.nodeFactory.buildPrintStatement(this.cct, this.tt == TokenType.keywordPrintln);
 
         this.nextToken();
 
