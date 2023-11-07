@@ -1,11 +1,11 @@
 import { BaseSymbol, BaseSymbolOnStackframe } from "../../common/BaseSymbolTable";
 import { ErrorLevel, QuickFix } from "../../common/Error";
 import { StepParams } from "../../common/interpreter/StepFunction";
-import { IRange } from "../../common/range/Range";
+import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode } from "../parser/AST";
+import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { ArrayType } from "../types/ArrayType";
 import { Field } from "../types/Field";
@@ -15,7 +15,7 @@ import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { JavaLocalVariable } from "./JavaLocalVariable";
 import { JavaSymbolTable } from "./JavaSymbolTable";
 import { SnippetFramer, Unboxer } from "./CodeSnippetTools";
-import { ParametersCommaSeparatedTemplate, SeveralParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
+import { ParametersJoinedTemplate, SeveralParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";
 
 export class TermCodeGenerator {
@@ -57,9 +57,11 @@ export class TermCodeGenerator {
                 snippet = this.compileVariableNode(<ASTSymbolNode>ast); break;
             case TokenType.methodCall:
                 snippet = this.compileMethodCall(<ASTMethodCallNode>ast); break;
-
             case TokenType.newArray:
                 snippet = this.compileNewArrayNode(<ASTNewArrayNode>ast); break;
+            case TokenType.selectArrayElement:
+                snippet = this.compileSelectArrayElement(<ASTSelectArrayElementNode>ast); break;
+            
         }
 
         if (snippet && ast.parenthesisNeeded) {
@@ -67,6 +69,47 @@ export class TermCodeGenerator {
         }
 
         return snippet;
+    }
+
+    compileSelectArrayElement(node: ASTSelectArrayElementNode): CodeSnippet | undefined {
+        let arraySnippet = this.compileTerm(node.array);
+        let arrayType = arraySnippet?.type;
+        if(!arrayType || !(arrayType instanceof ArrayType)){
+            let t = arrayType ? "Dieser Term hat aber den Typ " + arrayType.identifier + "." : "";
+            this.pushError("Vor [ muss ein Array stehen." + t, "error", node.array);
+            return undefined;
+        }
+
+        if(arrayType.dimension < node.indices.length){
+            this.pushError("Das Array hat die Dimension " + arrayType.dimension + ", hier stehen aber " + node.indices.length + " [...].", "error", node);
+            return undefined;
+        }
+
+        let remainingDimensions = arrayType.dimension - node.indices.length;
+        let remainingType = remainingDimensions > 0 ? (new ArrayType(arrayType.elementType, remainingDimensions, arrayType.module, EmptyRange.instance))
+                                           : arrayType.elementType;
+
+        let indexSnippets: CodeSnippet[] = [];
+        for(let index of node.indices){
+            let indsnip = this.compileTerm(index);
+            
+            if(!(indsnip?.type?.isUsableAsIndex())){
+                if(indsnip) this.pushError("Als Array-Index wird ein ganzzahliger Wert erwartet.", "error", index);
+                indsnip = new StringCodeSnippet('0', index.range, this.intType);
+            }
+            
+            indexSnippets.push(indsnip);            
+            
+        }
+
+        let  returnSnippet = ParametersJoinedTemplate.applyToSnippet(remainingType, node.range, '[', '][', ']', ...indexSnippets);
+        if(node.parenthesisNeeded){
+            returnSnippet = SnippetFramer.frame(returnSnippet, '($)');
+        }
+        
+        returnSnippet.isLefty = true;
+
+        return returnSnippet;
     }
 
     wrapWithCastTo(snippet: CodeSnippet, destinationType: JavaType, nodeToGetErrorRange: ASTNode) {
@@ -128,7 +171,7 @@ export class TermCodeGenerator {
         let prefix = `ho["newArray"](${defaultValue}, `;
         let suffix = ")";
 
-        return ParametersCommaSeparatedTemplate.applyToSnippet(arrayType, node.range, prefix, suffix, ...dimensionTerms);
+        return ParametersJoinedTemplate.applyToSnippet(arrayType, node.range, prefix, ', ', suffix, ...dimensionTerms);
 
     }
 

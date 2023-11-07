@@ -46,7 +46,16 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     }
 
     parseClassOrEnumOrInterfaceDeclarationWithoutGenerics(klass: Klass & LibraryKlassType, module: JavaBaseModule): NonPrimitiveType {
-        this.initTokens(klass.__declareType()[0]);
+        
+        let javaClassDeclaration = klass.__javaDeclarations?.find(decl => decl.type == "c");
+
+        if(!javaClassDeclaration){
+            console.log("Error parsing library class " + klass.name + ": missing java class declaration.");
+        }
+
+        let signature = javaClassDeclaration ? javaClassDeclaration.signature : "public class " + klass.name + " extends Object";
+
+        this.initTokens(signature);
 
         let modifiersAndType = this.parseModifiersAndType(true);
 
@@ -85,7 +94,16 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         this.currentGenericParameterMap = {};
         this.currentTypeStore = typestore;        
 
-        this.initTokens(klass.__declareType()[0]);
+        let javaClassDeclaration = klass.__javaDeclarations?.find(decl => decl.type == "c");
+
+        if(!javaClassDeclaration){
+            console.log("Error parsing library class " + klass.name + ": missing java class declaration.");
+        }
+
+        let signature = javaClassDeclaration ? javaClassDeclaration.signature : "public class " + klass.name + " extends Object";
+
+        this.initTokens(signature);
+
         this.skipTill([TokenType.lower, TokenType.keywordExtends, TokenType.keywordImplements], false);
 
         let npt = klass.type;
@@ -348,17 +366,20 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         this.currentGenericParameterMap = {};
         this.currentTypeStore = typestore;        
 
-        let typeDeclarations = klass.__declareType();
-        for(let i = 1; i < typeDeclarations.length; i++){
-            let decl = typeDeclarations[i];
-            this.initTokens(decl);
+        let javaClassDeclaration = klass.__javaDeclarations;
 
-            this.parseAttributeOrMethod(klass, module);
-
+        if(!javaClassDeclaration){
+            return;
         }
+
+        for(let decl of javaClassDeclaration.filter( cd => cd.type == "a" || cd.type == "m")){
+            this.initTokens(decl.signature);
+            this.parseAttributeOrMethod(klass, module, decl);
+        }
+
     }
 
-    parseAttributeOrMethod(klass: Klass & LibraryKlassType, module: JavaBaseModule){
+    parseAttributeOrMethod(klass: Klass & LibraryKlassType, module: JavaBaseModule, decl: LibraryMethodOrAttributeDeclaration){
         
         let klassType = <JavaClass>klass.type;
         
@@ -370,7 +391,8 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         let identifier = isConstructor ? klassType.identifier : this.expectIdentifier();
 
-        if(this.comesToken(TokenType.leftBracket, true)){
+        if(decl.type == "m"){
+            this.comesToken(TokenType.leftBracket, true);
             // method
             let m = new Method(identifier, EmptyRange.instance, module, modifiers.visibility);
             m.returnParameter = type;
@@ -390,11 +412,34 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
             this.expect(TokenType.rightBracket, true);
             klassType.methods.push(m);
-            if(this.comesToken(TokenType.colon, true)){
-                let realName = this.expectIdentifier();
-                klass[m.getInternalName()] = klass[realName];
-            }                        
+
+            let mdecl = <LibraryMethodDeclaration> decl;
+            let hasReturnValue: boolean = m.returnParameter?.identifier != 'void';
+
+            if(mdecl.native){
+                let realName: string = mdecl.native.name;
+                klass[m.getInternalName("native")] = mdecl.native;
+                if(!mdecl.java){
+                    let parameterNames = m.parameters.map(p => p.identifier);
+
+                    let body: string = `
+                        ${hasReturnValue? 'let __returnValue =':''}${realName}(${parameterNames.join(", ")});
+                        ${hasReturnValue? '__t.push(__returnValue);':''} 
+                    `
+                    parameterNames.unshift('__t');
+                    parameterNames.push(body);
+
+                    klass[m.getInternalName("java")] = new Function(...parameterNames);
+                }
+                m.hasImplementationWithNativeCallingConvention = true;
+            } 
+
+            if(mdecl.java){
+                klass[m.getInternalName("java")] = mdecl.java;
+            }
+
         } else {
+            // let adecl = <LibraryAttributeDeclaration> decl;
             // attribute
             let a = new Field(identifier, EmptyRange.instance, module, type, modifiers.visibility);
             a.isStatic = modifiers.static;

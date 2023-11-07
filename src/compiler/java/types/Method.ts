@@ -29,7 +29,9 @@ export class Method {
      */
     returnParameter?: JavaType;
 
-    private internalName?: string;
+    private internalNames: {[callingConvention: string]: string} = {}
+
+    public hasImplementationWithNativeCallingConvention: boolean = false;
 
     classEnumInterface!: JavaClass | JavaEnum | JavaInterface;
 
@@ -63,13 +65,16 @@ export class Method {
 
     }
 
-    getInternalName(): string {
-        let shorthand = this.isConstructor ? 'c' : 'm';
-        if(!this.internalName){
-            this.internalName = `_${shorthand}$${this.identifier}$${this.returnParameter ? this.returnParameter.identifier : 'void'}$`;
-            this.internalName += this.parameters.map(p => p.type.identifier).join("$");
+    getInternalName(callingConvention: CallingConvention): string {
+        if(!this.internalNames[callingConvention]){
+            let cc = callingConvention == "java" ? "j" : "n";
+    
+            let shorthand = this.isConstructor ? 'c' : 'm';
+            let s = `_${shorthand}${cc}$${this.identifier}$${this.returnParameter ? this.returnParameter.identifier : 'void'}$`;
+            s += this.parameters.map(p => p.type.identifier).join("$");
+            this.internalNames[callingConvention] = s;
         }
-        return this.internalName;
+        return this.internalNames[callingConvention];
     }
 
     clearUsagePositions(): void {
