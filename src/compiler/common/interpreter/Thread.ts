@@ -1,6 +1,7 @@
 import { Program, Step } from "./Program";
 import { Semaphor } from "./Semaphor";
 import { Scheduler } from "./Scheduler";
+import { IRange } from "../range/Range.ts";
 
 type ExceptionInfo = {
     types: string[],

@@ -8,6 +8,21 @@ import { NumberClass } from "./NumberClass";
  */
 export class IntegerClass extends NumberClass {
 
+    static __javaDeclarations: LibraryDeclarations = [
+        {type: "c", signature: "class Integer extends Number"},
+        {type: "m", signature: "public double doubleValue()"},
+        {type: "m", signature: "public float floatValue()"},
+        {type: "m", signature: "public int intValue()"},
+        {type: "m", signature: "public long longValue()"},
+        {type: "m", signature: "public int compareTo(Integer anotherInteger)", native: IntegerClass.prototype._compareTo},
+        {type: "m", signature: "public int parseInt(String s)", native: IntegerClass.prototype.parseInt},
+        {type: "m", signature: "public int parseInt(String sr, int radix)", native: IntegerClass.prototype.parseInt},
+        {type: "m", signature: "public static Integer valueOf(int i)", native: IntegerClass.valueOf},
+        {type: "m", signature: "public static Integer valueOf(String s)", native: IntegerClass.valueOfString},
+        {type: "m", signature: "public static Integer valueOf(String s, int radix)", native: IntegerClass.valueOfString},
+    ]
+
+
     static __declareType(): string[] {
         return [
             "class Integer extends Number",
@@ -30,7 +45,7 @@ export class IntegerClass extends NumberClass {
         super(i);
     }
 
-    compareTo(otherInteger: IntegerClass){
+    _compareTo(otherInteger: IntegerClass){
         return this.value - otherInteger.value;
     }
 

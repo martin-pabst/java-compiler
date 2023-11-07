@@ -8,6 +8,7 @@ import { DoublePrimitiveType } from "./primitiveTypes/DoublePrimitiveType";
 import { FloatPrimitiveType } from "./primitiveTypes/FloatPrimitiveType";
 import { IntPrimitiveType } from "./primitiveTypes/IntPrimitiveType";
 import { LongPrimitiveType } from "./primitiveTypes/LongPrimitiveType";
+import { ShortPrimitiveType } from "./primitiveTypes/ShortPrimitiveType.ts";
 import { VoidPrimitiveType } from "./primitiveTypes/VoidPrimitiveType";
 import { IntegerClass } from "./primitiveTypes/wrappers/IntegerClass";
 import { NumberClass } from "./primitiveTypes/wrappers/NumberClass";
@@ -20,6 +21,7 @@ export class SystemModule extends JavaLibraryModule {
             new BooleanPrimitiveType(this),
             new CharPrimitiveType(this),
             new BytePrimitiveType(this),
+            new ShortPrimitiveType(this),
             new IntPrimitiveType(this),
             new LongPrimitiveType(this),
             new FloatPrimitiveType(this),

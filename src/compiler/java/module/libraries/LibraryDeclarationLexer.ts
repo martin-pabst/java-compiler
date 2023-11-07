@@ -21,7 +21,8 @@ export class LibraryDeclarationLexer {
             ["public", TokenType.keywordPublic],
             ["protected", TokenType.keywordProtected],
             ["private", TokenType.keywordPrivate],
-            ["static", TokenType.keywordStatic]
+            ["static", TokenType.keywordStatic],
+            ["abstract", TokenType.keywordAbstract],
         ]
 
     );

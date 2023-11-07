@@ -141,6 +141,8 @@ export class TermCodeGenerator {
             return undefined;
         }
 
+        symbol.usagePositions.push({file: this.module.file, range: node.range});
+
         if (symbol instanceof BaseSymbolOnStackframe) return this.compileSymbolOnStackframeAccess(symbol, node.range);
         if (symbol instanceof Field) return this.compileFieldAccess(symbol, node.range);
     }
