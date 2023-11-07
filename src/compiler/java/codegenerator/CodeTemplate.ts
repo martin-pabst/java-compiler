@@ -98,8 +98,9 @@ export class TwoParameterTemplate extends CodeTemplate {
 type OrderedParameter = { parameter: string, n: number, order: number };
 
 
-export class ParametersCommaSeparatedTemplate {
-    static applyToSnippet(resultType: JavaType, range: IRange, prefix: string, suffix: string,
+export class ParametersJoinedTemplate {
+    static applyToSnippet(resultType: JavaType, range: IRange, 
+        prefix: string, separator: string, suffix: string,
         ...snippets: CodeSnippet[]): CodeSnippet {
     
             // only pure Terms? => faster variant
@@ -112,7 +113,7 @@ export class ParametersCommaSeparatedTemplate {
             }
     
             if(onlyPureTerms){
-                return new StringCodeSnippet(prefix + snippets.map(s => s.emit()).join(", ") + suffix, range, resultType);
+                return new StringCodeSnippet(prefix + snippets.map(s => s.emit()).join(separator) + suffix, range, resultType);
             }
     
             let snippetContainer = new CodeSnippetContainer([], range, resultType);
@@ -121,7 +122,7 @@ export class ParametersCommaSeparatedTemplate {
                 snippetContainer.addParts(snippets[i].allButLastPart());
             }
 
-            let term = prefix + snippets.map( s => s.lastPartOrPop().emit()).join(", ") + suffix;
+            let term = prefix + snippets.map( s => s.lastPartOrPop().emit()).join(separator) + suffix;
 
             snippetContainer.addStringPart(term, range, resultType);
     
