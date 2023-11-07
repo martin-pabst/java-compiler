@@ -5,6 +5,7 @@ body, html, #main {
     height: 100%;
     background-color: #202020;
     font-family: sans-serif;
+    color: #eee;
 }
 
 #main {
@@ -67,4 +68,8 @@ body, html, #main {
 .output {
     font-family: Consolas;
     color: white;
+}
+
+.jo_speedcontrol-outer {
+    margin-left: 10px;
 }

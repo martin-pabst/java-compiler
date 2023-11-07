@@ -17,6 +17,11 @@ type ProgramState = {
     exceptionInfoList: ExceptionInfo[];
 }
 
+type ThreadStateInfoAfterRun = {
+    state: ThreadState,
+    stepsExecuted: number;
+}
+
 export enum ThreadState { beforeRunning, running, paused, waiting, exited, exitedWithException }
 
 interface Exception {
@@ -52,7 +57,7 @@ export class Thread {
     /**
      * returns true if Thread exits
      */
-    run(maxNumberOfSteps: number): ThreadState {
+    run(maxNumberOfSteps: number): ThreadStateInfoAfterRun {
         let numberOfSteps = 0;
         let stack = this.stack; // for performance reasons
         this.state = ThreadState.running;
@@ -119,7 +124,7 @@ export class Thread {
             this.state = ThreadState.exitedWithException; // TODO
         }
 
-        return this.state;
+        return { state: this.state, stepsExecuted: numberOfSteps }
     }
 
 

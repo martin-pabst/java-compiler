@@ -46,6 +46,7 @@
 .jo_speedcontrol-display {
     display: none;
     position: absolute;
+    user-select: none;
     font-size: 12px;
     left: 50%;
     transform: translateX(-50%);

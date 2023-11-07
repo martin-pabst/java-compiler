@@ -54,15 +54,16 @@ export class ProgramControlButtons {
 
     constructor($buttonsContainer: JQuery<HTMLElement>, interpreter: Interpreter, actionManager: ActionManager){
 
-        this.speedControl = new SpeedControl($buttonsContainer, interpreter);
-        this.speedControl.initGUI();
-
+        
         for(let bd of this.buttonData){
             let $button = jQuery(`<div title="${bd.title}" class="${bd.iconClass}"></div>`);
             $buttonsContainer.append($button);
             actionManager.registerButton(bd.actionIdentifier, $button);
             if(bd.actionIdentifier == 'interpreter.pause') $button.hide();
         }
+
+        this.speedControl = new SpeedControl($buttonsContainer, interpreter);
+        this.speedControl.initGUI();
 
 
         // this.$buttonStart = jQuery('<div title="Start" class="img_start-dark jo_button"></div>');

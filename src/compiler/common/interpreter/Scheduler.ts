@@ -38,7 +38,7 @@ export class Scheduler {
     helperObject!: HelperObject;
 
     timeStampProgramStarted: number = 0;
-    stepCount: number = 0;
+    stepCountSinceStartOfProgram: number = 0;
 
 
     constructor(public interpreter: Interpreter, private helperRegistry: HelperRegistry) {
@@ -60,10 +60,11 @@ export class Scheduler {
 
     run(numberOfStepsMax: number) {
         let stepsPerThread = Math.ceil(numberOfStepsMax / this.runningThreads.length);
-        let numberOfSteps = 0;
+        let numberOfStepsInThisRun = 0;
         if (this.runningThreads.length == 0) return;
 
-        while (numberOfSteps < numberOfStepsMax) {
+
+        while (numberOfStepsInThisRun < numberOfStepsMax) {
             let currentThread = this.runningThreads[this.currentThreadIndex];
 
             /**
@@ -71,9 +72,9 @@ export class Scheduler {
              */
             let threadState = currentThread.run(stepsPerThread);
 
-            numberOfSteps += stepsPerThread;
+            numberOfStepsInThisRun += Math.max(threadState.stepsExecuted, 1);  // to avoid endless loop
 
-            switch (threadState) {
+            switch (threadState.state) {
                 case ThreadState.exited:
                 case ThreadState.exitedWithException:
 
@@ -86,6 +87,7 @@ export class Scheduler {
                     this.runningThreads.splice(this.currentThreadIndex, 1);
 
                     if (this.runningThreads.length == 0) {
+                        this.stepCountSinceStartOfProgram += numberOfStepsInThisRun;
                         this.interpreter.setState(SchedulerState.stopped);
                         return;
                     }
@@ -104,7 +106,7 @@ export class Scheduler {
             }
         }
 
-        this.stepCount += numberOfSteps;
+        this.stepCountSinceStartOfProgram += numberOfStepsInThisRun;
 
     }
     
@@ -112,13 +114,13 @@ export class Scheduler {
         switch(newState){
             case SchedulerState.running: 
             this.timeStampProgramStarted = performance.now();
-            this.stepCount = 0;
+            this.stepCountSinceStartOfProgram = 0;
             break;
             case SchedulerState.stopped:
                 if(this.state == SchedulerState.running){
                     let dt = performance.now() - this.timeStampProgramStarted;
-                    let stepsPerSecond = Math.round(this.stepCount/dt*1000);
-                    this.interpreter.printManager.print("Duration: " + Math.round(dt * 100)/100 + " ms, " + this.stepCount + " Steps, " + stepsPerSecond + " steps/s", true, undefined);
+                    let stepsPerSecond = Math.round(this.stepCountSinceStartOfProgram/dt*1000);
+                    this.interpreter.printManager.print("Duration: " + Math.round(dt * 100)/100 + " ms, " + this.stepCountSinceStartOfProgram + " Steps, " + stepsPerSecond + " steps/s", true, undefined);
                 }
             }
             this.state = newState;

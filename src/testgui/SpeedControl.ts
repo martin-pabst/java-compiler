@@ -18,6 +18,7 @@ export class SpeedControl {
 
     intervalBorders = [1, 10, 100, 1000, 10000, 100000, 1e6];
     maxSpeed = 1e10;
+    initialSpeed = this.maxSpeed;
 
 // <div id="speedcontrol-outer" title="Geschwindigkeitsregler" draggable="false">
 //     <div id="speedcontrol-bar" draggable="false"></div>
@@ -57,8 +58,6 @@ export class SpeedControl {
         let mousePointer = window.PointerEvent ? "pointer" : "mouse";
         
         that.$outer.on(mousePointer + 'down', (e) => {
-            
-            
 
             let x = e.pageX! - that.$outer.offset()!.left - 4;
             that.setSpeed(x);
@@ -97,6 +96,8 @@ export class SpeedControl {
             e.stopPropagation();
 
         });
+
+        this.setSpeed(this.initialSpeed);
 
     }
 

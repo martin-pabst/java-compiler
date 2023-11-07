@@ -111,7 +111,7 @@ export class Interpreter {
             this.pause();
         });
         if (!stepInto) {
-            this.scheduler.setState(SchedulerState.running);
+            this.setState(SchedulerState.running);
         }
     }
 
@@ -120,7 +120,7 @@ export class Interpreter {
     }
 
     pause() {
-        this.scheduler.setState(SchedulerState.paused);
+        this.setState(SchedulerState.paused);
         this.scheduler.unmarkStep();
         this.showProgramPointer(this.scheduler.getNextStepPosition());
     }
@@ -128,7 +128,7 @@ export class Interpreter {
     stop(restart: boolean) {
 
         // this.inputManager.hide();
-        this.scheduler.setState(SchedulerState.stopped);
+        this.setState(SchedulerState.stopped);
         this.scheduler.unmarkStep();
 
         this.eventManager.fire("stop");
@@ -154,16 +154,16 @@ export class Interpreter {
 
         // this.main.getBottomDiv()?.console?.clearErrors();
 
-        this.printManager.clear();
-
+        
         if (this.scheduler.state != SchedulerState.paused && this.mainModule) {
+            this.printManager.clear();
             this.init(this.mainModule);
             this.resetRuntime();
         }
 
         this.hideProgrampointerPosition();
 
-        this.scheduler.setState(SchedulerState.running);
+        this.setState(SchedulerState.running);
 
         // this.getTimerClass().startTimer();
 
@@ -240,9 +240,6 @@ export class Interpreter {
             this.actionManager.showHideButtons("interpreter.start", buttonStartActive);
             this.actionManager.showHideButtons("interpreter.pause", !buttonStartActive);
 
-        let buttonStopActive = this.buttonActiveMatrix['stop'][state];
-        this.actionManager.showHideButtons("interpreter.stop", buttonStopActive);
-
         if (state == SchedulerState.stopped) {
             this.eventManager.fire("done");
             // if (this.worldHelper != null) {
@@ -266,6 +263,7 @@ export class Interpreter {
         // }
 
         this.scheduler.setState(state);
+
     }
 
     resetRuntime() {
