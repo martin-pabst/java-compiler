@@ -74,7 +74,7 @@ export class TermCodeGenerator {
     compileSelectArrayElement(node: ASTSelectArrayElementNode): CodeSnippet | undefined {
         let arraySnippet = this.compileTerm(node.array);
         let arrayType = arraySnippet?.type;
-        if(!arrayType || !(arrayType instanceof ArrayType)){
+        if(!arraySnippet || !arrayType || !(arrayType instanceof ArrayType)){
             let t = arrayType ? "Dieser Term hat aber den Typ " + arrayType.identifier + "." : "";
             this.pushError("Vor [ muss ein Array stehen." + t, "error", node.array);
             return undefined;
@@ -102,11 +102,15 @@ export class TermCodeGenerator {
             
         }
 
-        let  returnSnippet = ParametersJoinedTemplate.applyToSnippet(remainingType, node.range, '[', '][', ']', ...indexSnippets);
+        let  squareBracketSnippet = ParametersJoinedTemplate.applyToSnippet(this.voidType, node.range, '[', '][', ']', ...indexSnippets);
+        
+        let returnSnippet = new TwoParameterTemplate("$1$2").applyToSnippet(remainingType, node.range, this.libraryTypestore, arraySnippet, squareBracketSnippet);
+        
+        
         if(node.parenthesisNeeded){
             returnSnippet = SnippetFramer.frame(returnSnippet, '($)');
         }
-        
+
         returnSnippet.isLefty = true;
 
         return returnSnippet;
@@ -168,7 +172,7 @@ export class TermCodeGenerator {
         let arrayType = new ArrayType(elementType, dimensionTerms.length, this.module, node.range);
 
 
-        let prefix = `ho["newArray"](${defaultValue}, `;
+        let prefix = `${StepParams.helperObject}["newArray"](${defaultValue}, `;
         let suffix = ")";
 
         return ParametersJoinedTemplate.applyToSnippet(arrayType, node.range, prefix, ', ', suffix, ...dimensionTerms);

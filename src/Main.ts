@@ -52,7 +52,7 @@ export class Main {
     this.language.registerLanguageAtMonacoEditor();
 
     this.inputEditor = new Editor(this, document.getElementById('editor')!);
-    this.inputEditor.setValue(testPrograms.simpleWhileLoops);
+    this.inputEditor.setValue(testPrograms.forLoop);
     
     this.tabManager = new TabManager(document.getElementById('tabs')!,
     ['token', 'ast', 'code', 'errors']);

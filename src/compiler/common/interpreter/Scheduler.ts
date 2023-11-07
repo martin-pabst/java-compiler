@@ -53,7 +53,7 @@ export class Scheduler {
             helpers: this.helperRegistry,
             newArray: Scheduler.newArray,
             print: (text: string | undefined, printNewline: boolean, color: number | undefined) => {
-                that.interpreter.printManager.print(text, printNewline, color);
+                that.interpreter.printManager.print("" + text, printNewline, color);
             }
         }
     }

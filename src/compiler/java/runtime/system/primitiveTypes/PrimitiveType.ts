@@ -48,6 +48,8 @@ export abstract class PrimitiveType extends JavaType {
         if(otherType.identifier == 'String') return true;
         let otherTypeIdentifier = otherType.identifier;
 
+        if(otherTypeIdentifier == this.identifier) return true;
+
         if(!otherType.isPrimitive){
             let boxedTypeIndex = PrimitiveType.boxedTypeIdentifiers.indexOf(otherType.identifier);
             if(boxedTypeIndex < 0) return false;
@@ -57,7 +59,7 @@ export abstract class PrimitiveType extends JavaType {
         let myIndex = PrimitiveType.typeIdentifiers.indexOf(this.identifier);
         let otherIndex = PrimitiveType.typeIdentifiers.indexOf(otherTypeIdentifier);
 
-        return myIndex > 1 && otherIndex >= myIndex;
+        return myIndex == otherIndex || myIndex > 1 && otherIndex >= myIndex;
 
     }
 

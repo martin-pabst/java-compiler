@@ -2,7 +2,7 @@ import { StepParams } from "../../common/interpreter/StepFunction";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBlockNode, ASTDoWhileNode, ASTIfNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTStatementNode, ASTWhileNode } from "../parser/AST";
+import { ASTBlockNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTStatementNode, ASTWhileNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippetContainer, EmptyPart } from "./CodeSnippetKinds.ts";
@@ -40,6 +40,8 @@ export class StatementCodeGenerator extends TermCodeGenerator {
                 snippet = this.compileWhileStatement(<ASTWhileNode>ast); break;
             case TokenType.keywordDo:
                 snippet = this.compileDoStatement(<ASTDoWhileNode>ast); break;
+            case TokenType.keywordFor:
+                snippet = this.compileForStatement(<ASTForLoopNode>ast); break;
 
 
             default: 
@@ -62,6 +64,41 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
         return snippet;
 
+    }
+
+
+    compileForStatement(node: ASTForLoopNode): CodeSnippet | undefined {
+        let firstStatement = this.compileStatementOrTerm(node.firstStatement);
+        let condition = this.compileTerm(node.condition);
+        let lastStatement = this.compileStatementOrTerm(node.lastStatement);
+
+        let statementsToRepeat = this.compileStatementOrTerm(node.statementToRepeat);
+
+        if(!(firstStatement && condition && lastStatement && statementsToRepeat)) return undefined;
+        let forSnippet = new CodeSnippetContainer([], node.range, this.voidType);
+
+        let label1 = new LabelCodeSnippet();
+        let jumpToLabel1 = new JumpToLabelCodeSnippet(label1);
+
+        let label2 = new LabelCodeSnippet();
+        let jumpToLabel2 = new JumpToLabelCodeSnippet(label2);
+
+
+        forSnippet.addParts(firstStatement);
+        forSnippet.addNextStepMark();
+        forSnippet.addParts(label1);
+        forSnippet.addParts(new OneParameterTemplate('if(!($1)){\n').applyToSnippet(this.voidType, node.condition!.range, this.libraryTypestore, condition));
+        forSnippet.addParts(jumpToLabel2);
+        forSnippet.addStringPart("}\n");
+        forSnippet.addNextStepMark();
+
+        forSnippet.addParts(statementsToRepeat);
+        forSnippet.addParts(lastStatement);
+        forSnippet.addParts(jumpToLabel1);
+        forSnippet.addNextStepMark();
+        forSnippet.addParts(label2);        
+        
+        return forSnippet;
     }
 
 

@@ -445,10 +445,11 @@ export abstract class TermParser extends TokenIterator {
 
         let saeNode = this.nodeFactory.buildSelectArrayElement(array);
 
-        while (this.tt == TokenType.rightSquareBracket) {
+        while (this.tt == TokenType.leftSquareBracket) {
             this.nextToken();
             let term = this.parseTerm();
             if (term) saeNode.indices.push(term)
+            this.expect(TokenType.rightSquareBracket, true);
         }
 
         this.setEndOfRange(saeNode);

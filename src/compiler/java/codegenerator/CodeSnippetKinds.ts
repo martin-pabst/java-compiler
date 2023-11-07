@@ -78,12 +78,14 @@ export class CodeSnippetContainer extends CodeSnippet {
 
     flattenInto(flatList: CodeSnippet[]): void {
         if (this.parts.length == 0) return;
-
+        
         if (this.parts[0] instanceof NextStepMark) {
             if (flatList.length == 0 || flatList[flatList.length - 1] instanceof NextStepMark) {
                 this.parts.shift();
             }
         }
+        
+        if (this.parts.length == 0) return;
 
         if (!this.parts[0].range) this.parts[0].range = this.range;
         //        flatList.push(new StartPositionMark(this.range));

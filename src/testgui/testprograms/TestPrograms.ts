@@ -11,5 +11,15 @@ while(i < 10000){
     print(i + "; ");
     }
 }
+`,
+arrayIndices: `
+int[] test = new int[10];
+test[5] = 2;
+println(test[5]);
+`,
+forLoop:`
+for(int i = 0; i < 10; i++){
+    print(i + ", ");
+}
 `
 }
