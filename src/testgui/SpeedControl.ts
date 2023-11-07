@@ -16,6 +16,8 @@ export class SpeedControl {
     gripWidth: number = 10;
     overallWidth: number = 100;
 
+    intervalBorders = [1, 10, 100, 1000, 10000, 100000, 1e6];
+    maxSpeed = 1e10;
 
 // <div id="speedcontrol-outer" title="Geschwindigkeitsregler" draggable="false">
 //     <div id="speedcontrol-bar" draggable="false"></div>
@@ -103,17 +105,23 @@ export class SpeedControl {
     }
 
     setSpeedInStepsPerSecond(stepsPerSecond: number | "max"){
-        let intervalBorders = [1, 10, 100, 1000, 10000, 100000, this.interpreter.maxStepsPerSecond];
 
-        if(stepsPerSecond == "max") stepsPerSecond = this.interpreter.maxStepsPerSecond;
-        stepsPerSecond = Math.min(stepsPerSecond, this.interpreter.maxStepsPerSecond);
+        if(stepsPerSecond == "max"){
+            stepsPerSecond = this.maxSpeed;;
+        } 
+
+        if(stepsPerSecond > this.intervalBorders[this.intervalBorders.length - 1]){
+            this.$grip.css('left', this.xMax + 'px');
+            return;
+        }
+
         stepsPerSecond = Math.max(stepsPerSecond, 1);
 
-        for(let i = 0; i < intervalBorders.length - 1; i++){
-            let left = intervalBorders[i];
-            let right = intervalBorders[i+1];
+        for(let i = 0; i < this.intervalBorders.length - 1; i++){
+            let left = this.intervalBorders[i];
+            let right = this.intervalBorders[i+1];
             if(stepsPerSecond >= left && stepsPerSecond <= right){
-                let gripIntervalLength = this.xMax/(intervalBorders.length - 1);
+                let gripIntervalLength = this.xMax/(this.intervalBorders.length - 1);
                 let gripPosition = Math.round(gripIntervalLength * i + gripIntervalLength * (stepsPerSecond - left)/(right - left));
                 this.$grip.css('left', gripPosition + 'px');
                 this.position = gripPosition;
@@ -139,18 +147,19 @@ export class SpeedControl {
 
         this.$grip.css('left', newPosition + "px");
 
-        // in steps/s
-        let intervalBorders = [1, 10, 100, 1000, 10000, 100000, this.interpreter.maxStepsPerSecond];
-
-        let intervalDelta = this.xMax / (intervalBorders.length - 1);
+        let intervalDelta = this.xMax / (this.intervalBorders.length - 1);
         let intervalIndex = Math.floor(newPosition/intervalDelta);
-        if(intervalIndex == intervalBorders.length - 1) intervalIndex--;
+        if(intervalIndex == this.intervalBorders.length - 1) intervalIndex--;
         let factorInsideInterval = (newPosition - intervalIndex*intervalDelta)/intervalDelta;
 
-        let intervalMin = intervalBorders[intervalIndex];
-        let intervalMax = intervalBorders[intervalIndex + 1];
+        let intervalMin = this.intervalBorders[intervalIndex];
+        let intervalMax = this.intervalBorders[intervalIndex + 1];
 
         let speed = intervalMin + (intervalMax - intervalMin) * factorInsideInterval;
+
+        if(speed >= this.interpreter.maxStepsPerSecond - 10){
+            speed = this.maxSpeed;
+        }
 
         this.setInterpreterSpeed(speed);
         

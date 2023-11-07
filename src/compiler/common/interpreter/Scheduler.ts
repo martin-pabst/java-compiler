@@ -109,17 +109,19 @@ export class Scheduler {
     }
     
     setState(newState: SchedulerState) {
-        this.state = newState;
         switch(newState){
             case SchedulerState.running: 
-                this.timeStampProgramStarted = performance.now();
-                this.stepCount = 0;
-                break;
+            this.timeStampProgramStarted = performance.now();
+            this.stepCount = 0;
+            break;
             case SchedulerState.stopped:
-                let dt = performance.now() - this.timeStampProgramStarted;
-                let stepsPerSecond = Math.round(this.stepCount/dt*1000);
-                this.interpreter.printManager.print("Duration: " + dt + " ms, " + this.stepCount + " Steps, " + stepsPerSecond + " steps/s", true, undefined);
-        }
+                if(this.state == SchedulerState.running){
+                    let dt = performance.now() - this.timeStampProgramStarted;
+                    let stepsPerSecond = Math.round(this.stepCount/dt*1000);
+                    this.interpreter.printManager.print("Duration: " + Math.round(dt * 100)/100 + " ms, " + this.stepCount + " Steps, " + stepsPerSecond + " steps/s", true, undefined);
+                }
+            }
+            this.state = newState;
     }
 
     runSingleStepKeepingThread(stepInto: boolean, callback: () => void) {
@@ -194,10 +196,15 @@ export class Scheduler {
         }
     }
 
-    init(mainModule: Module, classObjects: { [identifier: string]: Klass }) {
+    init(mainModule: Module, runtimeClassObjects: { [identifier: string]: Klass }) {
 
-        this.classObjectRegistry = classObjects;
+        this.classObjectRegistry = runtimeClassObjects;
         this.buildHelperObject();
+
+        this.runningThreads = [];
+        this.semaphors = [];
+        this.currentThreadIndex = 0;
+        this.keepThread = false;
 
         let mainThread = new Thread(this, []);
 

@@ -100,4 +100,8 @@ export class Editor {
     
     }
 
+    setValue(text: string){
+        this.editor.getModel()?.setValue(text);
+    }
+
 }

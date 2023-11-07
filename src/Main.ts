@@ -20,6 +20,7 @@ import { TestPrintManager } from "./testgui/TestPrintManager.ts";
 
 import jQuery from "jquery";
 import { ActionManager } from "./testgui/ActionManager.ts";
+import { testPrograms } from "./testgui/testprograms/TestPrograms.ts";
 
 export class Main {
 
@@ -51,6 +52,7 @@ export class Main {
     this.language.registerLanguageAtMonacoEditor();
 
     this.inputEditor = new Editor(this, document.getElementById('editor')!);
+    this.inputEditor.setValue(testPrograms.simpleWhileLoops);
     
     this.tabManager = new TabManager(document.getElementById('tabs')!,
     ['token', 'ast', 'code', 'errors']);
@@ -81,7 +83,7 @@ export class Main {
     
     this.actionManager = new ActionManager();
     
-    this.interpreter = new Interpreter(new TestPrintManager(), this.actionManager);
+    this.interpreter = new Interpreter(new TestPrintManager(), this.actionManager, {});
 
 
     this.initButtons();
@@ -124,7 +126,7 @@ export class Main {
 
     module.mainProgram?.compileToJavascriptFunctions();
 
-    this.interpreter.init(module, {});
+    this.interpreter.init(module);
 
   }
 

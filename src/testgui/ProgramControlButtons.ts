@@ -61,6 +61,7 @@ export class ProgramControlButtons {
             let $button = jQuery(`<div title="${bd.title}" class="${bd.iconClass}"></div>`);
             $buttonsContainer.append($button);
             actionManager.registerButton(bd.actionIdentifier, $button);
+            if(bd.actionIdentifier == 'interpreter.pause') $button.hide();
         }
 
 

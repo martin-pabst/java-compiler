@@ -49,7 +49,7 @@ export class Interpreter {
 
 
 
-    constructor(public printManager: PrintManager, private actionManager: ActionManager) {
+    constructor(public printManager: PrintManager, private actionManager: ActionManager, private runtimeClassObjects: KlassObjectRegistry) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {
 
         // this.printManager = new PrintManager($runDiv, this.main);
@@ -70,6 +70,7 @@ export class Interpreter {
         this.scheduler = new Scheduler(this, this.helperRegistry);
         this.loadController = new LoadController(this.scheduler, this);
         this.initTimer();
+        this.setState(SchedulerState.not_initialized);
     }
 
     registerHelper(identifier: string, helper: Object) {
@@ -155,9 +156,8 @@ export class Interpreter {
 
         this.printManager.clear();
 
-        if (this.scheduler.state != SchedulerState.paused) {
-            // TODO!
-            // this.init(this.mainModule);
+        if (this.scheduler.state != SchedulerState.paused && this.mainModule) {
+            this.init(this.mainModule);
             this.resetRuntime();
         }
 
@@ -278,7 +278,7 @@ export class Interpreter {
         // this.gngEreignisbehandlungHelper = null;
     }
 
-    init(newMainModule: Module, classes: KlassObjectRegistry) {
+    init(newMainModule: Module) {
 
         // this.main.getBottomDiv()?.console?.clearErrors();
 
@@ -300,7 +300,7 @@ export class Interpreter {
 
         this.mainModule = newMainModule;
 
-        this.scheduler.init(this.mainModule, classes);
+        this.scheduler.init(this.mainModule, this.runtimeClassObjects);
         this.setState(SchedulerState.stopped);
 
     }
