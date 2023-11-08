@@ -4,7 +4,7 @@ import { TokenType, TokenTypeReadable } from "../../../TokenType";
 import { BinaryOperatorTemplate, CodeTemplate, IdentityTemplate, OneParameterTemplate, UnarySuffixTemplate } from "../../../codegenerator/CodeTemplate";
 import { JavaBaseModule } from "../../../module/JavaBaseModule";
 import { JavaTypeStore } from "../../../module/JavaTypeStore";
-import { BinaryOperator, UnaryPrefixOperator } from "../../../parser/AST";
+import { AssignmentOperator, BinaryOperator, UnaryPrefixOperator } from "../../../parser/AST";
 import { GenericTypeParameter } from "../../../types/GenericInformation";
 import { JavaType } from "../../../types/JavaType";
 
@@ -94,7 +94,7 @@ export abstract class PrimitiveType extends JavaType {
         } else {
             // boxing
             let unboxedDestTypeIndex = PrimitiveType.getUnboxedTypeIndex(destType);
-            if (!unboxedDestTypeIndex) return undefined;
+            if (unboxedDestTypeIndex < 0) return undefined;
 
             if (unboxedDestTypeIndex == this.myIndex || this.myIndex >= 2 && unboxedDestTypeIndex >= this.myIndex) {
                 return new OneParameterTemplate(`new ho.classes['${destType.identifier}']('' + $1)`);
@@ -110,51 +110,53 @@ export abstract class PrimitiveType extends JavaType {
      * @param destType ['boolean', 'char', 'byte', 'short', 'int', 'long', 'float', 'double']
      * @returns 
      */
-    getBinaryOperation(destType: JavaType, operator: BinaryOperator): CodeTemplate | undefined {
+    getBinaryOperation(destType: JavaType, operator: BinaryOperator | AssignmentOperator): CodeTemplate | undefined {
 
-        let destIndex = destType.isPrimitive ? PrimitiveType.typeIdentifiers.indexOf(destType.identifier) : PrimitiveType.getUnboxedTypeIndex(destType);
+        // let destIndex: number = destType.isPrimitive ? PrimitiveType.typeIdentifiers.indexOf(destType.identifier) : PrimitiveType.getUnboxedTypeIndex(destType);
 
         let operatorString = TokenTypeReadable[operator];
         let isCommutative = [TokenType.plus, TokenType.multiplication, TokenType.equal].indexOf(operator) >= 0;
 
-        if (PrimitiveType.plusMinusMultDivOperators.indexOf(operator) >= 0) {
-            if (!destType.isPrimitive) {
-                if (destType.identifier == 'String') {
-                    return operator == TokenType.plus ? new BinaryOperatorTemplate('+', true) : undefined;
-                }
+        return new BinaryOperatorTemplate(operatorString, isCommutative)
 
-                if (!destIndex) return undefined;
-            }
+        // if (PrimitiveType.plusMinusMultDivOperators.indexOf(operator) >= 0) {
+        //     if (!destType.isPrimitive) {
+        //         if (destType.identifier == 'String') {
+        //             return operator == TokenType.plus ? new BinaryOperatorTemplate('+', true) : undefined;
+        //         }
 
-            if (this.myIndex >= 1 && destIndex! >= 1) return new BinaryOperatorTemplate(operatorString, isCommutative);
+        //         if (destIndex < 0) return undefined;
+        //     }
 
-            return undefined;
-        }
+        //     if (this.myIndex >= 1 && destIndex! >= 1) ;
 
-        if (!destIndex) return undefined; // in subsequent
+        //     return undefined;
+        // }
 
-        if (PrimitiveType.comparisonOperators.indexOf(operator) >= 0) {
-            if (this.myIndex >= 1 && destIndex >= 1) return new BinaryOperatorTemplate(operatorString, isCommutative);
-            return undefined;
-        }
+        // if (destIndex < 0) return undefined; // in subsequent
 
-        if (PrimitiveType.shiftOperators.indexOf(operator) >= 0) {
-            if (this.myIndex >= 2 && this.myIndex <= 5 && destIndex >= 2 && destIndex <= 5) {
-                return new BinaryOperatorTemplate(operatorString, isCommutative)
-            }
+        // if (PrimitiveType.comparisonOperators.indexOf(operator) >= 0) {
+        //     if (this.myIndex >= 1 && destIndex >= 1) return new BinaryOperatorTemplate(operatorString, isCommutative);
+        //     return undefined;
+        // }
 
-            return undefined;
-        }
+        // if (PrimitiveType.shiftOperators.indexOf(operator) >= 0) {
+        //     if (this.myIndex >= 2 && this.myIndex <= 5 && destIndex >= 2 && destIndex <= 5) {
+        //         return new BinaryOperatorTemplate(operatorString, isCommutative)
+        //     }
 
-        if (PrimitiveType.plusMinusMultDivAssignmentOperators.indexOf(operator) >= 0) {
-            if (this.myIndex >= 2) {
-                return new BinaryOperatorTemplate(operatorString, isCommutative)
-            } else {
-                return undefined;
-            }
-        }
+        //     return undefined;
+        // }
 
-        return undefined;
+        // if (operator == TokenType.assignment) {
+        //     return new BinaryOperatorTemplate(operatorString, isCommutative)
+        // }
+
+        // if (PrimitiveType.plusMinusMultDivAssignmentOperators.indexOf(operator) >= 0) {
+        //     return new BinaryOperatorTemplate(operatorString, isCommutative)
+        // } else {
+        //     return undefined;
+        // }
 
     }
 
@@ -165,16 +167,16 @@ export abstract class PrimitiveType extends JavaType {
      */
     getBinaryResultType(destType: JavaType, operator: BinaryOperator, typeStore: JavaTypeStore): JavaType | undefined {
 
-        let unboxedDestTypeIndex: number| undefined = PrimitiveType.typeIdentifiers.indexOf(destType.identifier);
-        if(unboxedDestTypeIndex < 0) unboxedDestTypeIndex = PrimitiveType.getUnboxedTypeIndex(destType);
-        
+        let unboxedDestTypeIndex: number | undefined = PrimitiveType.typeIdentifiers.indexOf(destType.identifier);
+        if (unboxedDestTypeIndex < 0) unboxedDestTypeIndex = PrimitiveType.getUnboxedTypeIndex(destType);
+
         if (PrimitiveType.plusMinusMultDivOperators.indexOf(operator) >= 0) {
             if (!destType.isPrimitive) {
                 if (destType.identifier == 'String' && operator == TokenType.plus) {
                     return destType;
                 }
 
-                if (!unboxedDestTypeIndex) return undefined;
+                if (unboxedDestTypeIndex < 0) return undefined;
 
                 let unboxedDestType = typeStore.getType(PrimitiveType.typeIdentifiers[unboxedDestTypeIndex])!;
 
@@ -214,15 +216,14 @@ export abstract class PrimitiveType extends JavaType {
         }
 
         if (PrimitiveType.logicOperators.indexOf(operator) >= 0) {
-            return (this.myIndex == 0 && unboxedDestTypeIndex == 0)? this : undefined;
+            return (this.myIndex == 0 && unboxedDestTypeIndex == 0) ? this : undefined;
         }
 
         return undefined;
     }
 
-    static getUnboxedTypeIndex(type: JavaType): number | undefined {
-        let index = PrimitiveType.boxedTypeIdentifiers.indexOf(type.identifier);
-        return index >= 0 ? index : undefined;
+    static getUnboxedTypeIndex(type: JavaType): number {
+        return PrimitiveType.boxedTypeIdentifiers.indexOf(type.identifier);
     }
 
     static getTypeIndex(type: JavaType): number | undefined {

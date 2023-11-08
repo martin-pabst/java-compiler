@@ -68,13 +68,24 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
 
     compileForStatement(node: ASTForLoopNode): CodeSnippet | undefined {
+
+        /*
+         * Local variables declared in head of for statement are valid inside whole for statement, 
+         * so we need a symbol table that encompasses the whole for statement:
+         */
+        this.pushAndGetNewSymbolTable(node.range, false);
+
         let firstStatement = this.compileStatementOrTerm(node.firstStatement);
         let condition = this.compileTerm(node.condition);
         let lastStatement = this.compileStatementOrTerm(node.lastStatement);
 
         let statementsToRepeat = this.compileStatementOrTerm(node.statementToRepeat);
 
-        if(!(firstStatement && condition && lastStatement && statementsToRepeat)) return undefined;
+        if(!(firstStatement && condition && lastStatement && statementsToRepeat)) 
+        {
+            this.popSymbolTable();
+            return undefined;
+        }
         let forSnippet = new CodeSnippetContainer([], node.range, this.voidType);
 
         let label1 = new LabelCodeSnippet();
@@ -98,6 +109,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         forSnippet.addNextStepMark();
         forSnippet.addParts(label2);        
         
+        this.popSymbolTable();
         return forSnippet;
     }
 
@@ -126,11 +138,15 @@ export class StatementCodeGenerator extends TermCodeGenerator {
     }
 
     compileBlockNode(node: ASTBlockNode): CodeSnippetContainer | undefined {
+        this.pushAndGetNewSymbolTable(node.range, false);
+
         let snippet = new CodeSnippetContainer([], node.range);
         for (let statementNode of node.statements) {
             let statementSnippet = this.compileStatementOrTerm(statementNode);
             if(statementSnippet) snippet.addParts(statementSnippet);
         }
+
+        this.popSymbolTable();
         return snippet;
     }
 

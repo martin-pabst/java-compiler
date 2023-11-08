@@ -17,6 +17,8 @@ import { JavaSymbolTable } from "./JavaSymbolTable";
 import { SnippetFramer, Unboxer } from "./CodeSnippetTools";
 import { ParametersJoinedTemplate, SeveralParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";
+import { JavaClass } from "../types/JavaClass.ts";
+import { JavaEnum } from "../types/JavaEnum.ts";
 
 export class TermCodeGenerator {
 
@@ -25,18 +27,19 @@ export class TermCodeGenerator {
     voidType: JavaType;
     intType: JavaType;
 
-    currentSymbolTable: JavaSymbolTable;
+    currentSymbolTable!: JavaSymbolTable;
+
+    symbolTableStack: JavaSymbolTable[] = [];
 
 
     constructor(protected module: JavaCompiledModule, protected libraryTypestore: JavaTypeStore) {
         this.initConstantTypeToTypeMap();
-        this.currentSymbolTable = new JavaSymbolTable(module, module.ast!.range, true);
-        module.ast!.symbolTable = this.currentSymbolTable;
+
+        module.ast!.symbolTable = this.pushAndGetNewSymbolTable(module.ast!.range, true);
 
         this.voidType = this.libraryTypestore.getType("void")!;
         this.intType = this.libraryTypestore.getType("int")!;
     }
-
 
     compileTerm(ast: ASTTermNode | undefined): CodeSnippet | undefined {
 
@@ -69,6 +72,18 @@ export class TermCodeGenerator {
         }
 
         return snippet;
+    }
+
+    pushAndGetNewSymbolTable(range: IRange, withStackframe: boolean, classContext?: JavaClass | JavaEnum | undefined ): JavaSymbolTable {
+        let newSymbolTable = new JavaSymbolTable(this.module, range, withStackframe, classContext);
+        if(this.currentSymbolTable) this.currentSymbolTable.addChildTable(newSymbolTable);
+        this.symbolTableStack.push(newSymbolTable);
+        this.currentSymbolTable = newSymbolTable;    
+        return newSymbolTable;
+    }
+
+    popSymbolTable(){
+        return this.symbolTableStack.pop();
     }
 
     compileSelectArrayElement(node: ASTSelectArrayElementNode): CodeSnippet | undefined {
@@ -241,6 +256,9 @@ export class TermCodeGenerator {
             }
 
             let template = leftOperand.type.getBinaryOperation(rightOperand.type, ast.operator)!;
+            if(!template){
+                this.pushError("Interner Fehler: Template für die Operation " + TokenTypeReadable[ast.operator] + " konnte nicht gefunden werden.", "error", ast);
+            }
 
             return template?.applyToSnippet(valueType, ast.range, this.libraryTypestore, leftOperand, rightOperand);
         }

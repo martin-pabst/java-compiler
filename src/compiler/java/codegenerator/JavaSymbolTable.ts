@@ -28,6 +28,11 @@ export class JavaSymbolTable extends BaseSymbolTable {
         childTable.parent = this;
     }
 
+    addChildTable(childTable: JavaSymbolTable) {
+        this.childTables.push(childTable);
+        childTable.parent = this;
+    }
+
     findSymbol(identifier: string): BaseSymbol | undefined {
         return this.findSymbolIntern(identifier, this.classContext);
     }
