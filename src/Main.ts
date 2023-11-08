@@ -29,7 +29,7 @@ export class Main {
   codeOutputEditor: monaco.editor.IStandaloneCodeEditor;
 
   tabManager: TabManager;
- 
+
   tokenDiv: HTMLDivElement;
   astDiv: HTMLDivElement;
   codeOutputDiv: HTMLDivElement;
@@ -52,18 +52,24 @@ export class Main {
     this.language.registerLanguageAtMonacoEditor();
 
     this.inputEditor = new Editor(this, document.getElementById('editor')!);
-    this.inputEditor.setValue(testPrograms.forLoop);
-    
+
+    /*
+     * Test program:
+     */
+    this.inputEditor.setValue(testPrograms.primzahlzwillinge);
+
     this.tabManager = new TabManager(document.getElementById('tabs')!,
-    ['token', 'ast', 'code', 'errors']);
-    
+      ['token', 'ast', 'code', 'errors']);
+
     this.tabManager.setBodyElementClass('tabBodyElement');
     this.tokenDiv = this.tabManager.getBodyElement(0);
     this.tokenDiv.style.overflow = 'auto';
     this.astDiv = this.tabManager.getBodyElement(1);
     this.codeOutputDiv = this.tabManager.getBodyElement(2);
+    this.codeOutputDiv.classList.add('codeOutput');
+    this.astDiv.classList.add('astOutput');
     this.errorDiv = this.tabManager.getBodyElement(3);
-    
+
     this.codeOutputEditor = monaco.editor.create(this.codeOutputDiv, {
       value: "/** Awaiting compilation... */",
       language: "javascript",
@@ -72,17 +78,17 @@ export class Main {
 
     this.astComponent = new AstComponent(this.astDiv);
 
-    
+
     this.file = new File();
     this.file.monacoModel = this.inputEditor.editor.getModel()!;
-    
+
     this.libraryModuleManager = new JavaLibraryModuleManager();
     this.libraryModuleManager.compileClassesToTypes();
-    
+
     this.compiler = new JavaCompiler(this.libraryModuleManager);
-    
+
     this.actionManager = new ActionManager();
-    
+
     this.interpreter = new Interpreter(new TestPrintManager(), this.actionManager, {});
 
 
@@ -94,7 +100,7 @@ export class Main {
     let firstRow = DOM.makeDiv(buttonDiv);
     new Button(firstRow, 'compile', '#30c030', () => {
       this.compile()
-      
+
       setInterval(() => {
       }, 500)
 

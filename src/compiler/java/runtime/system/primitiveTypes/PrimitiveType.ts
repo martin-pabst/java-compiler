@@ -19,8 +19,10 @@ export abstract class PrimitiveType extends JavaType {
     static plusMinusMultDivOperators: TokenType[] = [TokenType.plus, TokenType.minus, TokenType.multiplication, TokenType.division, TokenType.modulo];
     static shiftOperators: TokenType[] = [TokenType.shiftLeft, TokenType.shiftRight, TokenType.shiftRightUnsigned];
     static logicOperators: TokenType[] = [TokenType.and, TokenType.or, TokenType.XOR];
-    static plusMinusMultDivAssignmentOperators: TokenType[] = [TokenType.assignment, TokenType.plusAssignment, TokenType.minusAssignment, TokenType.multiplicationAssignment, TokenType.divisionAssignment, TokenType.moduloAssignment];
+    static plusMinusMultDivAssignmentOperators: TokenType[] = [TokenType.plusAssignment, TokenType.minusAssignment, TokenType.multiplicationAssignment, TokenType.divisionAssignment, TokenType.moduloAssignment, TokenType.assignment];
     static comparisonOperators: TokenType[] = [TokenType.lower, TokenType.greater, TokenType.lowerOrEqual, TokenType.greaterOrEqual, TokenType.notEqual, TokenType.equal];
+
+
 
     public identifierRange: IRange = { startLineNumber: 0, startColumn: 0, endLineNumber: 0, endColumn: 0 };
 
@@ -45,17 +47,17 @@ export abstract class PrimitiveType extends JavaType {
     }
 
     canImplicitlyCastTo(otherType: JavaType): boolean {
-        if(otherType.identifier == 'String') return true;
+        if (otherType.identifier == 'String') return true;
         let otherTypeIdentifier = otherType.identifier;
 
-        if(otherTypeIdentifier == this.identifier) return true;
+        if (otherTypeIdentifier == this.identifier) return true;
 
-        if(!otherType.isPrimitive){
+        if (!otherType.isPrimitive) {
             let boxedTypeIndex = PrimitiveType.boxedTypeIdentifiers.indexOf(otherType.identifier);
-            if(boxedTypeIndex < 0) return false;
+            if (boxedTypeIndex < 0) return false;
             otherTypeIdentifier = PrimitiveType.typeIdentifiers[boxedTypeIndex];
         }
-        
+
         let myIndex = PrimitiveType.typeIdentifiers.indexOf(this.identifier);
         let otherIndex = PrimitiveType.typeIdentifiers.indexOf(otherTypeIdentifier);
 
@@ -163,13 +165,15 @@ export abstract class PrimitiveType extends JavaType {
      */
     getBinaryResultType(destType: JavaType, operator: BinaryOperator, typeStore: JavaTypeStore): JavaType | undefined {
 
+        let unboxedDestTypeIndex: number| undefined = PrimitiveType.typeIdentifiers.indexOf(destType.identifier);
+        if(unboxedDestTypeIndex < 0) unboxedDestTypeIndex = PrimitiveType.getUnboxedTypeIndex(destType);
+        
         if (PrimitiveType.plusMinusMultDivOperators.indexOf(operator) >= 0) {
             if (!destType.isPrimitive) {
                 if (destType.identifier == 'String' && operator == TokenType.plus) {
                     return destType;
                 }
 
-                let unboxedDestTypeIndex = PrimitiveType.getUnboxedTypeIndex(destType);
                 if (!unboxedDestTypeIndex) return undefined;
 
                 let unboxedDestType = typeStore.getType(PrimitiveType.typeIdentifiers[unboxedDestTypeIndex])!;
@@ -188,17 +192,15 @@ export abstract class PrimitiveType extends JavaType {
 
         if (PrimitiveType.comparisonOperators.indexOf(operator) >= 0) {
             let booleanType = typeStore.getType('boolean')!;
-            let destIndex: number = PrimitiveType.typeIdentifiers.indexOf(destType.identifier.toLowerCase());
-            if (!destIndex) return undefined;
-            if (this.myIndex == destIndex) return booleanType;
-            if (this.myIndex >= 1 && destIndex >= 1) return booleanType;
+            if (!unboxedDestTypeIndex) return undefined;
+            if (this.myIndex == unboxedDestTypeIndex) return booleanType;
+            if (this.myIndex >= 1 && unboxedDestTypeIndex >= 1) return booleanType;
             return undefined;
         }
 
         if (PrimitiveType.shiftOperators.indexOf(operator) >= 0) {
-            let destIndex: number = PrimitiveType.typeIdentifiers.indexOf(destType.identifier.toLowerCase());
-            if (!destIndex) return undefined;
-            if (this.myIndex >= 2 && this.myIndex <= 5 && destIndex >= 2 && destIndex <= 5) {
+            if (!unboxedDestTypeIndex) return undefined;
+            if (this.myIndex >= 2 && this.myIndex <= 5 && unboxedDestTypeIndex >= 2 && unboxedDestTypeIndex <= 5) {
                 return this;
             }
             return undefined;
@@ -207,7 +209,12 @@ export abstract class PrimitiveType extends JavaType {
         if (PrimitiveType.plusMinusMultDivAssignmentOperators.indexOf(operator) >= 0) {
             let assignmentOperatorIndex = PrimitiveType.plusMinusMultDivAssignmentOperators.indexOf(operator);
             let normalOperator = PrimitiveType.plusMinusMultDivOperators[assignmentOperatorIndex];
-            return this.getBinaryResultType(destType, <BinaryOperator>normalOperator, typeStore);
+
+            return normalOperator ? this.getBinaryResultType(destType, <BinaryOperator>normalOperator, typeStore) : destType;
+        }
+
+        if (PrimitiveType.logicOperators.indexOf(operator) >= 0) {
+            return (this.myIndex == 0 && unboxedDestTypeIndex == 0)? this : undefined;
         }
 
         return undefined;
@@ -219,32 +226,32 @@ export abstract class PrimitiveType extends JavaType {
     }
 
     static getTypeIndex(type: JavaType): number | undefined {
-        if(!type) return undefined;
+        if (!type) return undefined;
         let index = PrimitiveType.boxedTypeIdentifiers.indexOf(type.identifier);
-        if(index >= 0) return index;
-        return this.typeIdentifiers.indexOf(type.identifier);        
+        if (index >= 0) return index;
+        return this.typeIdentifiers.indexOf(type.identifier);
     }
 
     clearUsagePositions(): void {
         this.usagePositions = [];
     }
 
-     /**
-     *                    0          1       2       3       4       5        6       7
-     * @param destType ['boolean', 'char', 'byte', 'short', 'int', 'long', 'float', 'double']
-     * @returns 
-     */
-     getUnaryResultType(operator: UnaryPrefixOperator): JavaType | undefined {
+    /**
+    *                    0          1       2       3       4       5        6       7
+    * @param destType ['boolean', 'char', 'byte', 'short', 'int', 'long', 'float', 'double']
+    * @returns 
+    */
+    getUnaryResultType(operator: UnaryPrefixOperator): JavaType | undefined {
         let myIndex = PrimitiveType.typeIdentifiers.indexOf(this.identifier);
 
-        switch(operator){
+        switch (operator) {
             case TokenType.not: return myIndex == 0 ? this : undefined;
             case TokenType.plus:
             case TokenType.negation:
             case TokenType.plusPlus:
             case TokenType.minusMinus:
                 return myIndex >= 2 ? this : undefined;
-            case TokenType.tilde: 
+            case TokenType.tilde:
                 return myIndex >= 2 && myIndex <= 5 ? this : undefined;
         }
 
@@ -252,20 +259,20 @@ export abstract class PrimitiveType extends JavaType {
     }
 
     getUnaryOperation(operator: UnaryPrefixOperator): CodeTemplate | undefined {
-        switch(operator){
+        switch (operator) {
             case TokenType.plus: return new IdentityTemplate();
-            default: return new OneParameterTemplate( TokenTypeReadable[operator] + '($1)');
+            default: return new OneParameterTemplate(TokenTypeReadable[operator] + '($1)');
         }
     }
 
 
     static getPlusPlusMinusMinusSuffixOperation(type: JavaType, operator: TokenType.plusPlus | TokenType.minusMinus): CodeTemplate | undefined {
         let typeIndex = PrimitiveType.getTypeIndex(type);
-        if(typeIndex && typeIndex >= 1) return new UnarySuffixTemplate(operator);
+        if (typeIndex && typeIndex >= 1) return new UnarySuffixTemplate(operator);
         return undefined;
     }
 
-    toString() : string {
+    toString(): string {
         return this.identifier;
     }
 
