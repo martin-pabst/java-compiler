@@ -11,7 +11,7 @@ body, html, #main {
 #main {
     display:grid;
     grid-template-columns: 1fr 2fr;
-    grid-template-rows: 3fr 1fr;
+    grid-template-rows: minmax(0,3fr) minmax(0,1fr);
     width: 100%;
     height: 100%;
 }
@@ -27,6 +27,15 @@ body, html, #main {
 #tabs {
     grid-area: 1/2;
 
+}
+
+.jo_tabs_tabbodies {
+    height: calc(100% - 40px);
+    position: relative;
+}
+
+.jo_tabs_tabbodies>div {
+    height: 100%;
 }
 
 .tabBodyElement {
