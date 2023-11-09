@@ -41,7 +41,7 @@ export class Lexer {
         [TokenType.rightSquareBracket]: TokenType.leftSquareBracket
     };
 
-    static spaceCharacters: string[] = [" ", "\t", "\uc2a0", "\u00a0"];
+    static spaceCharacters: string[] = [" ", "\t", "\uc2a0", "\u00a0",];
 
     colorIndices: number[];
 
@@ -603,7 +603,6 @@ export class Lexer {
         let posStart = this.pos;
         while (Lexer.spaceCharacters.indexOf(this.currentChar) >= 0) {
             this.next();
-            if(this.currentChar == '\n') this.line++;
         }
 
         let posEnd = this.pos;

@@ -1,6 +1,8 @@
 import { Program } from "../../common/interpreter/Program";
+import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
+import { ASTClassDefinitionNode } from "../parser/AST";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { JavaSymbolTable } from "./JavaSymbolTable";
 import { SnippetLinker } from "./SnippetLinker";
@@ -17,6 +19,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     start() {
         this.compileMainProgram();
+        this.compileClasses();
     }
 
     compileMainProgram() {
@@ -40,7 +43,28 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     }
 
+    compileClasses(){
+        if(!this.module.ast?.classOrInterfaceOrEnumDefinitions) return;
 
+        for(let cdef of this.module.ast?.classOrInterfaceOrEnumDefinitions){
+            switch(cdef.kind){
+                case TokenType.keywordClass:
+                    this.compileClass(cdef);
+                    break;
+                case TokenType.keywordEnum:
+                    break;
+                case TokenType.keywordInterface:
+                    break;
+            }
+        }
+    }
+
+    compileClass(cdef: ASTClassDefinitionNode) {
+        let type = cdef.resolvedType;
+        if(!type) return;
+
+        
+    }
 
 
 
