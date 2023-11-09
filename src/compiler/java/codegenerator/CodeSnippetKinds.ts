@@ -56,6 +56,10 @@ export class CodeSnippetContainer extends CodeSnippet {
         this.parts.unshift(new NextStepMark());
     }
 
+    isPureTermWithoutPop(){
+        return this.isPureTerm() && (<StringCodeSnippet>this.parts[0]).text.indexOf('pop()') < 0;
+    }
+
     isPureTerm(): boolean {
         return !this.finalValueIsOnStack && this.parts.length == 1 && (this.parts[0] instanceof StringCodeSnippet);
     }

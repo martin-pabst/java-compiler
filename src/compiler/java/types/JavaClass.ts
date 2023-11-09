@@ -115,7 +115,11 @@ export class JavaClass extends IJavaClass {
 
         if(this.canImplicitlyCastTo(otherType)) return true;
 
-        return otherType.canImplicitlyCastTo(this);
+        if(otherType instanceof NonPrimitiveType){
+            return otherType.canImplicitlyCastTo(this);
+        }
+
+        return false;
 
     }
 
@@ -283,7 +287,12 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     canExplicitlyCastTo(otherType: JavaType): boolean {
         if(this.canImplicitlyCastTo(otherType)) return true;
 
-        return otherType.canImplicitlyCastTo(this);
+        if(otherType instanceof NonPrimitiveType){
+            return otherType.canImplicitlyCastTo(this);
+        }
+
+        return false;
+
     }
 
     findInterfaceImplementedByMeWhichIsGenericVariantOf(otherType: GenericVariantOfJavaInterface): GenericVariantOfJavaInterface | null {

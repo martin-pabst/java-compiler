@@ -5,21 +5,18 @@ import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
-import { LabelCodeSnippet } from "./LabelManager";
-import { CharToNumberConverter, SnippetFramer, Unboxer } from "./CodeSnippetTools";
+import { SnippetFramer } from "./CodeSnippetTools";
 
 
 export abstract class CodeTemplate {
 
-    abstract applyToSnippet(resultType: JavaType, range: IRange, typestore: JavaTypeStore,
-        ...snippets: CodeSnippet[]): CodeSnippet;
+    abstract applyToSnippet(resultType: JavaType, range: IRange, ...snippets: CodeSnippet[]): CodeSnippet;
 
 }
 
 export class IdentityTemplate extends CodeTemplate {
 
-    applyToSnippet(_resultType: JavaType, _range: IRange, _typestore: JavaTypeStore,
-        ...snippets: CodeSnippet[]): CodeSnippet {
+    applyToSnippet(_resultType: JavaType, _range: IRange, ...snippets: CodeSnippet[]): CodeSnippet {
         return snippets[0];
     }
 }
@@ -30,8 +27,7 @@ export class OneParameterTemplate extends CodeTemplate {
         super();
     }
 
-    applyToSnippet(resultType: JavaType, range: IRange, _typestore: JavaTypeStore,
-        ...snippets: CodeSnippet[]): CodeSnippet {
+    applyToSnippet(resultType: JavaType, range: IRange, ...snippets: CodeSnippet[]): CodeSnippet {
 
         if (snippets[0].isPureTerm()) {
             return new StringCodeSnippet(this.templateString.replace(new RegExp('\\$1', 'g'), snippets[0].getPureTerm()), range, resultType);
@@ -50,8 +46,7 @@ export class TwoParameterTemplate extends CodeTemplate {
         super();
     }
 
-    applyToSnippet(resultType: JavaType, range: IRange, _typestore: JavaTypeStore,
-        ...snippets: CodeSnippet[]): CodeSnippet {
+    applyToSnippet(resultType: JavaType, range: IRange, ...snippets: CodeSnippet[]): CodeSnippet {
 
         let snippet0Pure = snippets[0].isPureTerm();
         let snippet1Pure = snippets[1].isPureTerm();
@@ -155,8 +150,7 @@ export class SeveralParameterTemplate extends CodeTemplate {
         }
     }
 
-    applyToSnippet(resultType: JavaType, range: IRange, _typestore: JavaTypeStore,
-        ...snippets: CodeSnippet[]): CodeSnippet {
+    applyToSnippet(resultType: JavaType, range: IRange, ...snippets: CodeSnippet[]): CodeSnippet {
 
         if (snippets.length < this.maxN) {
             console.log("SeveralParameterTemplate.applyToSnippet: too few parameters!");
@@ -203,29 +197,6 @@ export class SeveralParameterTemplate extends CodeTemplate {
 }
 
 
-export class UnarySuffixTemplate extends CodeTemplate {
-    constructor(private operator: TokenType.plusPlus | TokenType.minusMinus) {
-        super();
-    }
-
-    applyToSnippet(_resultType: JavaType, _range: IRange, typestore: JavaTypeStore,
-        ...snippets: CodeSnippet[]): CodeSnippet {
-        let snippet = snippets[0];
-        snippet = Unboxer.unbox(snippet, typestore);
-        if (!snippet.type) return snippet;
-
-        let primitiveTypeIndex = PrimitiveType.getTypeIndex(snippet.type);
-        if (!primitiveTypeIndex || primitiveTypeIndex === 0) return snippet; // boolean
-
-        let operatorString = TokenTypeReadable[this.operator];
-
-        if (primitiveTypeIndex > 1) return SnippetFramer.frame(snippet, '$1' + operatorString);
-
-        // char
-        return SnippetFramer.frame(snippet, 'String.fromCharCode(($1 = String.fromCharCode(($1.charCodeAt(0) + 1))).charCodeAt(0) - 1)')
-
-    }
-}
 
 export class BinaryOperatorTemplate extends CodeTemplate {
 
@@ -233,14 +204,7 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         super();
     }
 
-    applyToSnippet(_resultType: JavaType, _range: IRange, typestore: JavaTypeStore,
-        ...snippets: CodeSnippet[]): CodeSnippet {
-
-        snippets[0] = Unboxer.unbox(snippets[0], typestore);
-        snippets[1] = Unboxer.unbox(snippets[1], typestore);
-
-        snippets[0] = CharToNumberConverter.convertCharToNumber(snippets[0], typestore);
-        snippets[1] = CharToNumberConverter.convertCharToNumber(snippets[1], typestore);
+    applyToSnippet(_resultType: JavaType, _range: IRange, ...snippets: CodeSnippet[]): CodeSnippet {
 
         let snippet0IsPure = snippets[0].isPureTerm();
         let snippet1IsPure = snippets[1].isPureTerm();
@@ -248,9 +212,6 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         if (snippet0IsPure && snippet1IsPure) {
             return new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm(), _range, _resultType);
         }
-
-        if (this.operator == '&&') return lazyEvaluationAND(_resultType, snippets, _range);
-        if (this.operator == '||') return lazyEvaluationOR(_resultType, snippets, _range);
 
         let snippetContainer = new CodeSnippetContainer([], _range, _resultType);
 
@@ -293,47 +254,4 @@ export class BinaryOperatorTemplate extends CodeTemplate {
 
 }
 
-function lazyEvaluationAND(resultType: JavaType, snippets: CodeSnippet[], range: IRange): CodeSnippetContainer {
-
-    let snippetContainer = new CodeSnippetContainer([], range, resultType);
-    snippetContainer.type = resultType;
-
-    snippetContainer.addParts(snippets[0].allButLastPart());
-
-    let label = new LabelCodeSnippet();
-    snippetContainer.addStringPart(`if(!s.pop()){s.push(false);`, range);
-    snippetContainer.addParts(label.getJumpToSnippet());
-    snippetContainer.addStringPart('\n}', range);
-
-    snippetContainer.addNextStepMark();
-
-    snippets[1].ensureFinalValueIsOnStack();
-    snippetContainer.addParts(snippets[1]);
-
-    snippetContainer.addParts(label);
-
-    return snippetContainer;
-}
-
-function lazyEvaluationOR(resultType: JavaType, snippets: CodeSnippet[], range: IRange): CodeSnippetContainer {
-
-    let snippetContainer = new CodeSnippetContainer([], range, resultType);
-    snippetContainer.type = resultType;
-
-    snippetContainer.addParts(snippets[0].allButLastPart());
-
-    let label = new LabelCodeSnippet();
-    snippetContainer.addStringPart(`if(s.pop()){s.push(true);`, range);
-    snippetContainer.addParts(label.getJumpToSnippet());
-    snippetContainer.addStringPart('\n}', range);
-
-    snippetContainer.addNextStepMark();
-
-    snippets[1].ensureFinalValueIsOnStack();
-    snippetContainer.addParts(snippets[1]);
-
-    snippetContainer.addParts(label);
-
-    return snippetContainer;
-}
 

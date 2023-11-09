@@ -83,7 +83,11 @@ export class JavaInterface extends IJavaInterface {
 
     canExplicitlyCastTo(otherType: JavaType): boolean {
         if (this.canImplicitlyCastTo(otherType)) return true;
-        return otherType.canImplicitlyCastTo(this);
+        if(otherType instanceof NonPrimitiveType){
+            return otherType.canImplicitlyCastTo(this);
+        }
+
+        return false;
     }
 
     clearUsagePositions(): void {
@@ -149,7 +153,12 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
 
     canExplicitlyCastTo(otherType: JavaType): boolean {
         if (this.canImplicitlyCastTo(otherType)) return true;
-        return otherType.canImplicitlyCastTo(this);
+
+        if(otherType instanceof NonPrimitiveType){
+            return otherType.canImplicitlyCastTo(this);
+        }
+
+        return false;
     }
 
     canImplicitlyCastTo(otherType: JavaType): boolean {

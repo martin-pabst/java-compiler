@@ -1,27 +1,15 @@
 import { BaseType } from "../../common/BaseType";
 import { IRange } from "../../common/range/Range";
-import { CodeTemplate } from "../codegenerator/CodeTemplate";
 import { JavaBaseModule } from "../module/JavaBaseModule";
-import { JavaTypeStore } from "../module/JavaTypeStore";
-import { BinaryOperator, UnaryPrefixOperator } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
 
 export abstract class JavaType extends BaseType {
+
     isPrimitive: boolean;
     genericInformation: GenericInformation | undefined;
 
     abstract getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, JavaType>): JavaType;
-
-    abstract canExplicitlyCastTo(otherType: JavaType): boolean;  // you can cast long to int or Number to Integer EXPLICITLY, e.g. int c = (int)10L
-    abstract canImplicitlyCastTo(otherType: JavaType): boolean; // int gets casted to long implicitly; Integer gets casted to Number implicitly e.g. in: Number n = new Integer(10);
-    abstract getCastFunction(destType: JavaType): CodeTemplate | undefined;
-
-    abstract getBinaryResultType(destType: JavaType, operator: BinaryOperator, typeStore: JavaTypeStore): JavaType | undefined;
-    abstract getBinaryOperation(destType: JavaType, operator: BinaryOperator): CodeTemplate | undefined;
-    
-    abstract getUnaryResultType(operator: UnaryPrefixOperator): JavaType | undefined;
-    abstract getUnaryOperation(operator: UnaryPrefixOperator): CodeTemplate | undefined;
 
     constructor(identifier: string, identifierRange: IRange, public module: JavaBaseModule){
         super(identifier, identifierRange, module.file);
@@ -37,6 +25,5 @@ export abstract class JavaType extends BaseType {
     isUsableAsIndex(): boolean {
         return this.isPrimitive && (<PrimitiveType><any>this).isUsableAsIndex();
     }
-
 
 }

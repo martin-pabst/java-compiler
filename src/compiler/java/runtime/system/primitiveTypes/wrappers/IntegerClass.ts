@@ -50,7 +50,7 @@ export class IntegerClass extends NumberClass {
     }
 
     parseInt(s: StringClass, radix: number = 10){
-        return Number.parseInt(s.text, radix);
+        return Number.parseInt(s.value, radix);
     }
 
     intValue(){

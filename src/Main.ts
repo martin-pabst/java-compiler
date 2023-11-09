@@ -56,7 +56,7 @@ export class Main {
     /*
      * Test program:
      */
-    this.inputEditor.setValue(testPrograms.simplePrimzahlzwillinge);
+    this.inputEditor.setValue(testPrograms.primzahlzwillinge);
 
     this.tabManager = new TabManager(document.getElementById('tabs')!,
       ['token', 'ast', 'code', 'errors']);

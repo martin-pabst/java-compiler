@@ -1,6 +1,6 @@
 import { BaseSymbolTable } from "../BaseSymbolTable";
 import { Module } from "../module/Module";
-import { IRange } from "../range/Range";
+import { EmptyRange, IRange } from "../range/Range";
 import { Thread } from "./Thread";
 import { HelperObject } from "./Scheduler";
 import { StepParams } from "./StepFunction.ts";
@@ -25,14 +25,14 @@ export class Step {
     }
 
     setRangeStartIfUndefined(range?: IRange){
-        if(!this.range.startLineNumber && range){
+        if(!this.range.startLineNumber && range && range != EmptyRange.instance){
             this.range.startLineNumber = range.startLineNumber;
             this.range.startColumn = range.startColumn;
         }
     }
 
     adaptRangeEnd(range?: IRange){
-        if(range){
+        if(range && range != EmptyRange.instance){
             if(!this.range.endLineNumber){
                 this.range.endLineNumber = range.endLineNumber;
                 this.range.endColumn = range.endColumn;

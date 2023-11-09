@@ -65,13 +65,13 @@ export class StringClass extends ObjectClass {
         ]
     }
 
-    public text: string;
+    public value: string;
 
     static type: NonPrimitiveType;
 
-    constructor(text?: string){
+    constructor(value?: string){
         super();
-        this.text = text || "";
+        this.value = value || "";
     }
 
     _emptyConstructor(){
@@ -79,27 +79,27 @@ export class StringClass extends ObjectClass {
     }
 
     _constructor2(original: string){
-        this.text = original;
+        this.value = original;
     }
 
     _toString(t: Thread) {
-        t.stack.push(this.text);        
+        t.stack.push(this.value);        
     }
 
     plusOtherString(s: StringClass): StringClass {
-        return new StringClass(this.text + s.text);
+        return new StringClass(this.value + s.value);
     }
 
     plusObject(t: Thread, o: ObjectClass){
         t.pushCallback(() => {
-            t.stack.push(new StringClass(this.text + t.stack.pop().text))
+            t.stack.push(new StringClass(this.value + t.stack.pop().text))
         });
         o._m$toString$String$(t);
     }
 
     plusObjectFromLeft(t: Thread, o: ObjectClass){
         t.pushCallback(() => {
-            t.stack.push(new StringClass(t.stack.pop().text + this.text))
+            t.stack.push(new StringClass(t.stack.pop().text + this.value))
         });
         o._m$toString$String$(t);
     }

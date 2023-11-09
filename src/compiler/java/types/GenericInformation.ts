@@ -69,6 +69,25 @@ export class GenericTypeParameter extends NonPrimitiveType {
         return this;
     }
 
+    canImplicitlyCastTo(otherType: JavaType): boolean {
+        if(otherType.isPrimitive) return false;
+        if(otherType == this) return true;
+
+        if(otherType instanceof GenericTypeParameter){
+            if(!otherType.lowerBound) return false;
+            for(let ub of this.upperBounds){
+                if(ub.canImplicitlyCastTo(otherType.lowerBound)) return true;
+            }
+            return false;
+        }
+
+        for(let ub of this.upperBounds){
+            if(ub.canImplicitlyCastTo(otherType)) return true;
+        }
+
+        return false;
+    }
+
     canExplicitlyCastTo(otherType: JavaType): boolean {
         if(otherType.isPrimitive) return false;
         if(otherType == this) return true;

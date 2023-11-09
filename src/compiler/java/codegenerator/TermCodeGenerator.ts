@@ -14,31 +14,29 @@ import { Parameter } from "../types/Parameter";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { JavaLocalVariable } from "./JavaLocalVariable";
 import { JavaSymbolTable } from "./JavaSymbolTable";
-import { SnippetFramer, Unboxer } from "./CodeSnippetTools";
-import { ParametersJoinedTemplate, SeveralParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
+import { SnippetFramer } from "./CodeSnippetTools";
+import { CodeTemplate, OneParameterTemplate, ParametersJoinedTemplate, SeveralParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";
 import { JavaClass } from "../types/JavaClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
+import { BinopCastCodeGenerator } from "./BinopCastCodeGenerator.ts";
 
-export class TermCodeGenerator {
+export class TermCodeGenerator extends BinopCastCodeGenerator {
 
     constantTypeToTypeMap: { [key: number]: JavaType } = {}
-
-    voidType: JavaType;
-    intType: JavaType;
 
     currentSymbolTable!: JavaSymbolTable;
 
     symbolTableStack: JavaSymbolTable[] = [];
 
 
-    constructor(protected module: JavaCompiledModule, protected libraryTypestore: JavaTypeStore) {
+    constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore) {
+        super(module, libraryTypestore);
+
         this.initConstantTypeToTypeMap();
 
         module.ast!.symbolTable = this.pushAndGetNewSymbolTable(module.ast!.range, true);
 
-        this.voidType = this.libraryTypestore.getType("void")!;
-        this.intType = this.libraryTypestore.getType("int")!;
     }
 
     compileTerm(ast: ASTTermNode | undefined): CodeSnippet | undefined {
@@ -64,7 +62,7 @@ export class TermCodeGenerator {
                 snippet = this.compileNewArrayNode(<ASTNewArrayNode>ast); break;
             case TokenType.selectArrayElement:
                 snippet = this.compileSelectArrayElement(<ASTSelectArrayElementNode>ast); break;
-            
+
         }
 
         if (snippet && ast.parenthesisNeeded) {
@@ -74,55 +72,55 @@ export class TermCodeGenerator {
         return snippet;
     }
 
-    pushAndGetNewSymbolTable(range: IRange, withStackframe: boolean, classContext?: JavaClass | JavaEnum | undefined ): JavaSymbolTable {
+    pushAndGetNewSymbolTable(range: IRange, withStackframe: boolean, classContext?: JavaClass | JavaEnum | undefined): JavaSymbolTable {
         let newSymbolTable = new JavaSymbolTable(this.module, range, withStackframe, classContext);
-        if(this.currentSymbolTable) this.currentSymbolTable.addChildTable(newSymbolTable);
+        if (this.currentSymbolTable) this.currentSymbolTable.addChildTable(newSymbolTable);
         this.symbolTableStack.push(newSymbolTable);
-        this.currentSymbolTable = newSymbolTable;    
+        this.currentSymbolTable = newSymbolTable;
         return newSymbolTable;
     }
 
-    popSymbolTable(){
+    popSymbolTable() {
         return this.symbolTableStack.pop();
     }
 
     compileSelectArrayElement(node: ASTSelectArrayElementNode): CodeSnippet | undefined {
         let arraySnippet = this.compileTerm(node.array);
         let arrayType = arraySnippet?.type;
-        if(!arraySnippet || !arrayType || !(arrayType instanceof ArrayType)){
+        if (!arraySnippet || !arrayType || !(arrayType instanceof ArrayType)) {
             let t = arrayType ? "Dieser Term hat aber den Typ " + arrayType.identifier + "." : "";
             this.pushError("Vor [ muss ein Array stehen." + t, "error", node.array);
             return undefined;
         }
 
-        if(arrayType.dimension < node.indices.length){
+        if (arrayType.dimension < node.indices.length) {
             this.pushError("Das Array hat die Dimension " + arrayType.dimension + ", hier stehen aber " + node.indices.length + " [...].", "error", node);
             return undefined;
         }
 
         let remainingDimensions = arrayType.dimension - node.indices.length;
         let remainingType = remainingDimensions > 0 ? (new ArrayType(arrayType.elementType, remainingDimensions, arrayType.module, EmptyRange.instance))
-                                           : arrayType.elementType;
+            : arrayType.elementType;
 
         let indexSnippets: CodeSnippet[] = [];
-        for(let index of node.indices){
+        for (let index of node.indices) {
             let indsnip = this.compileTerm(index);
-            
-            if(!(indsnip?.type?.isUsableAsIndex())){
-                if(indsnip) this.pushError("Als Array-Index wird ein ganzzahliger Wert erwartet.", "error", index);
+
+            if (!(indsnip?.type?.isUsableAsIndex())) {
+                if (indsnip) this.pushError("Als Array-Index wird ein ganzzahliger Wert erwartet.", "error", index);
                 indsnip = new StringCodeSnippet('0', index.range, this.intType);
             }
-            
-            indexSnippets.push(indsnip);            
-            
+
+            indexSnippets.push(indsnip);
+
         }
 
-        let  squareBracketSnippet = ParametersJoinedTemplate.applyToSnippet(this.voidType, node.range, '[', '][', ']', ...indexSnippets);
-        
-        let returnSnippet = new TwoParameterTemplate("$1$2").applyToSnippet(remainingType, node.range, this.libraryTypestore, arraySnippet, squareBracketSnippet);
-        
-        
-        if(node.parenthesisNeeded){
+        let squareBracketSnippet = ParametersJoinedTemplate.applyToSnippet(this.voidType, node.range, '[', '][', ']', ...indexSnippets);
+
+        let returnSnippet = new TwoParameterTemplate("$1$2").applyToSnippet(remainingType, node.range, arraySnippet, squareBracketSnippet);
+
+
+        if (node.parenthesisNeeded) {
             returnSnippet = SnippetFramer.frame(returnSnippet, '($)');
         }
 
@@ -130,20 +128,6 @@ export class TermCodeGenerator {
 
         return returnSnippet;
     }
-
-    wrapWithCastTo(snippet: CodeSnippet, destinationType: JavaType, nodeToGetErrorRange: ASTNode) {
-        // if error occured before, then exit:
-        if (!snippet.type || !destinationType) return undefined;
-        if (!snippet.type.canExplicitlyCastTo(destinationType)) {
-            this.pushError("Der Term vom Datentyp " + snippet.type.identifier + " kann nicht zum Datentyp " + destinationType + " gecastet werden.", "error", nodeToGetErrorRange);
-            return snippet;  // good dummy to continue compiling
-        }
-
-        let castTemplate =  snippet.type.getCastFunction(destinationType);
-        if(!castTemplate) return snippet.type;
-        return castTemplate.applyToSnippet(destinationType, nodeToGetErrorRange.range, this.libraryTypestore, snippet);
-    }
-
 
 
     /*
@@ -157,9 +141,9 @@ export class TermCodeGenerator {
         let type = dimensionTerm?.type;
         if (!type) return new StringCodeSnippet('1', dimensionNode.range, this.intType);
 
-        let unboxedDimesionTerm = Unboxer.unbox(dimensionTerm!, this.libraryTypestore);       // type != undefined => dimensionTerm != undefined
-        if(unboxedDimesionTerm.type?.isPrimitive){
-            if(unboxedDimesionTerm.type.isUsableAsIndex()){
+        let unboxedDimesionTerm = this.unbox(dimensionTerm!);       // type != undefined => dimensionTerm != undefined
+        if (unboxedDimesionTerm.type?.isPrimitive) {
+            if (unboxedDimesionTerm.type.isUsableAsIndex()) {
                 return unboxedDimesionTerm;
             }
         }
@@ -203,7 +187,7 @@ export class TermCodeGenerator {
             return undefined;
         }
 
-        symbol.usagePositions.push({file: this.module.file, range: node.range});
+        symbol.usagePositions.push({ file: this.module.file, range: node.range });
 
         if (symbol instanceof BaseSymbolOnStackframe) return this.compileSymbolOnStackframeAccess(symbol, node.range);
         if (symbol instanceof Field) return this.compileFieldAccess(symbol, node.range);
@@ -249,18 +233,7 @@ export class TermCodeGenerator {
         let rightOperand = this.compileTerm(ast.rightSide);
 
         if (leftOperand && rightOperand && leftOperand.type && rightOperand.type) {
-            let valueType = leftOperand.type.getBinaryResultType(rightOperand.type, ast.operator, this.libraryTypestore);
-            if (!valueType) {
-                this.pushError("Der binäre Operator " + TokenTypeReadable[ast.operator] + " ist für Operanden der Typen " + leftOperand.type.toString() + " und " + rightOperand.type.toString() + " nicht definiert.", "error", ast);
-                return undefined;
-            }
-
-            let template = leftOperand.type.getBinaryOperation(rightOperand.type, ast.operator)!;
-            if(!template){
-                this.pushError("Interner Fehler: Template für die Operation " + TokenTypeReadable[ast.operator] + " konnte nicht gefunden werden.", "error", ast);
-            }
-
-            return template?.applyToSnippet(valueType, ast.range, this.libraryTypestore, leftOperand, rightOperand);
+            return this.compileBinaryOperation(leftOperand, rightOperand, ast.operator, ast.operatorRange, ast.range);
         }
 
         return undefined;
@@ -269,26 +242,8 @@ export class TermCodeGenerator {
     compileUnaryPrefixOperator(ast: ASTUnaryPrefixNode): CodeSnippet | undefined {
         let operand = this.compileTerm(ast.term);
 
-        if (operand && operand.type) {
-            let valueType = operand.type.getUnaryResultType(ast.operator);
-            if (!valueType) {
-                this.pushError("Der Unäre Operator " + TokenTypeReadable[ast.operator] + " ist für den Datentyp " + operand.type.toString() + " nicht definiert.", "error", ast);
-                return undefined;
-            }
+        return this.compileUnaryOperator(operand, ast.operator);
 
-            if ([TokenType.plusPlus, TokenType.minusMinus].indexOf(ast.operator) >= 0) {
-                if (!operand.isLefty) {
-                    this.pushError("Die Operatoren ++ und -- können nur bei Variablen benutzt werden, die veränderbar sind.", "error", ast);
-                    return undefined;
-                }
-            }
-
-            let template = operand.type.getUnaryOperation(ast.operator)!;
-
-            return template?.applyToSnippet(valueType, ast.range, this.libraryTypestore, operand);
-        }
-
-        return undefined;
     }
 
     compilePlusPlusMinusMinusSuffixOperator(ast: ASTPlusPlusMinusMinusSuffixNode): CodeSnippet | undefined {
@@ -300,15 +255,14 @@ export class TermCodeGenerator {
                 this.pushError("Die Operatoren ++ und -- können nur bei Variablen benutzt werden, die veränderbar sind.", "error", ast);
                 return undefined;
             }
-
-            let template = PrimitiveType.getPlusPlusMinusMinusSuffixOperation(operand.type, ast.operator);
-
-            if (!template) {
-                this.pushError("Der Unäre Operator " + TokenTypeReadable[ast.operator] + " ist für den Datentyp " + operand.type.toString() + " nicht definiert.", "error", ast);
-                return undefined;
+            
+            if(!this.isNumberPrimitiveType(operand.type)){
+                this.pushError("Die Operatoren ++ und -- können nur bei Variablen mit den Datentypen byte, short, int, long, float und double benutzt werden.", "error", ast);
             }
 
-            return template?.applyToSnippet(operand.type, ast.range, this.libraryTypestore, operand);
+            let template: CodeTemplate = new OneParameterTemplate("$1++");
+
+            return template.applyToSnippet(operand.type, ast.range, operand);
         }
 
         return undefined;
@@ -322,24 +276,16 @@ export class TermCodeGenerator {
         this.constantTypeToTypeMap[TokenType.longConstant] = this.libraryTypestore.getType("long")!;
         this.constantTypeToTypeMap[TokenType.floatConstant] = this.libraryTypestore.getType("float")!;
         this.constantTypeToTypeMap[TokenType.doubleConstant] = this.libraryTypestore.getType("double")!;
-        this.constantTypeToTypeMap[TokenType.stringConstant] = this.libraryTypestore.getType("String")!;
+        this.constantTypeToTypeMap[TokenType.stringConstant] = this.libraryTypestore.getType("string")!;
     }
 
 
-    pushError(message: string, errorLevel: ErrorLevel = "error", node: ASTNode, quickFix?: QuickFix) {
-        this.module.errors.push({
-            message: message,
-            range: node.range,
-            quickFix: quickFix,
-            level: errorLevel
-        });
-    }
 
 
     compileMethodCall(node: ASTMethodCallNode): CodeSnippet | undefined {
         let parameters = node.parameterValues.map(p => this.compileTerm(p));
 
-        let snippet1 = new TwoParameterTemplate("method($1, $2)").applyToSnippet(this.intType, node.range, this.libraryTypestore, parameters[0]!, parameters[1]!);
+        let snippet1 = new TwoParameterTemplate("method($1, $2)").applyToSnippet(this.intType, node.range, parameters[0]!, parameters[1]!);
         snippet1.finalValueIsOnStack = true;
 
         let snippet = new CodeSnippetContainer(snippet1);

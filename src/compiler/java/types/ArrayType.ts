@@ -15,7 +15,7 @@ export class ArrayType extends JavaType {
     constructor(public elementType: JavaType, public dimension: number,
         public module: JavaBaseModule, public identifierRange: IRange) {
         super(elementType.identifier + "[]".repeat(dimension), identifierRange, module);
-        this.isPrimitive = true;
+        this.isPrimitive = false;
 
     }
 
@@ -29,16 +29,6 @@ export class ArrayType extends JavaType {
 
     getCopyWithConcreteType(_typeMap: Map<GenericTypeParameter, JavaType>): JavaType {
         return this;
-    }
-
-    canImplicitlyCastTo(otherType: JavaType): boolean {
-        if(!(otherType instanceof ArrayType)) return false;
-        if(otherType.dimension != this.dimension) return false;
-        return this.elementType.canImplicitlyCastTo(otherType.elementType);
-    }
-
-    canExplicitlyCastTo(_otherType: JavaType): boolean {
-        return this.canImplicitlyCastTo(_otherType);
     }
 
     getFile(): File {

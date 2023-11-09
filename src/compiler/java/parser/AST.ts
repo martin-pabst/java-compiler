@@ -10,10 +10,15 @@ export type ASTNodes = ASTNode[];
 
 export type AssignmentOperator = TokenType.assignment | TokenType.minusAssignment | TokenType.plusAssignment | TokenType.multiplicationAssignment | TokenType.divisionAssignment | TokenType.moduloAssignment;
 
-export type BinaryOperator = TokenType.plus | TokenType.minus | TokenType.multiplication | TokenType.division | 
-                             TokenType.shiftLeft | TokenType.shiftRight | TokenType.shiftRightUnsigned | 
-                             TokenType.and | TokenType.or | TokenType.XOR | 
-                             TokenType.lower | TokenType.greater | TokenType.lowerOrEqual | TokenType.greaterOrEqual | TokenType.notEqual;
+export type LogicOperator = TokenType.and | TokenType.or | TokenType.XOR;
+
+export type ShiftOperator = TokenType.shiftLeft | TokenType.shiftRight | TokenType.shiftRightUnsigned;
+
+export type ComparisonOperator = TokenType.lower | TokenType.greater | TokenType.lowerOrEqual | TokenType.greaterOrEqual | TokenType.notEqual | TokenType.equal;
+
+export type BinaryOperator = AssignmentOperator |
+    TokenType.plus | TokenType.minus | TokenType.multiplication | TokenType.division | TokenType.modulo |
+    ShiftOperator | LogicOperator | ComparisonOperator;
 
 export type UnaryPrefixOperator = TokenType.negation | TokenType.not | TokenType.tilde | TokenType.plus | TokenType.plusPlus | TokenType.minusMinus;
 
@@ -22,7 +27,7 @@ export type ConstantType = TokenType.shortConstant | TokenType.integerConstant |
 export interface ASTNode {
     kind: TokenType;
     range: IRange;
-    symbolTable?: JavaSymbolTable;    
+    symbolTable?: JavaSymbolTable;
 }
 
 export interface TypeScope {
@@ -41,7 +46,7 @@ export interface ASTGlobalNode extends ASTNode, TypeScope {
  */
 
 export interface ASTTypeDefiningNode {
-    resolvedType?: NonPrimitiveType;    
+    resolvedType?: NonPrimitiveType;
 }
 
 export interface ASTNodeWithIdentifier {
@@ -108,14 +113,14 @@ export interface ASTTypeNode extends ASTNode {
 
 // e.g. public int getValue(String key)
 export interface ASTMethodDeclarationNode extends ASTNode, ASTNodeWithModifiers,
- ASTNodeWithIdentifier, AnnotatedNode {
+    ASTNodeWithIdentifier, AnnotatedNode {
     kind: TokenType.methodDeclaration;
     parameters: ASTParameterNode[];
     returnParameterType: ASTTypeNode | undefined;  // undefined in case of constructor
     isContructor: boolean;
     isAbstract: boolean;
     statement: ASTStatementNode | undefined;  // undefined in case of abstract method and methoddeclaration in interface
-}    
+}
 
 export interface ASTLambdaFunctionDeclarationNode extends ASTNode {
     kind: TokenType.lambda,
@@ -123,18 +128,17 @@ export interface ASTLambdaFunctionDeclarationNode extends ASTNode {
     statement: ASTStatementNode | undefined
 }
 
-export interface ASTAttributeDeclarationNode extends ASTNodeWithModifiers, ASTNode, 
-ASTNodeWithIdentifier, AnnotatedNode {
+export interface ASTAttributeDeclarationNode extends ASTNodeWithModifiers, ASTNode,
+    ASTNodeWithIdentifier, AnnotatedNode {
     kind: TokenType.attributeDeclaration;
     type: ASTTypeNode;
     initialization: ASTTermNode | undefined;
-}            
+}
 
-export interface ASTClassDefinitionNode 
-extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers,
+export interface ASTClassDefinitionNode
+    extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers,
     ASTTypeDefinitionWithAttributes, TypeScope, ASTNodeWithIdentifier, AnnotatedNode,
-    ASTTypeDefiningNode
-{
+    ASTTypeDefiningNode {
     kind: TokenType.keywordClass;
     parent: TypeScope;
     innerClasses: ASTClassDefinitionNode[],
@@ -142,12 +146,11 @@ extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNo
     implements: ASTTypeNode[]
 }
 
-export interface ASTInterfaceDefinitionNode 
-extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers, 
-ASTNodeWithIdentifier, AnnotatedNode, ASTTypeDefiningNode
-{
+export interface ASTInterfaceDefinitionNode
+    extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers,
+    ASTNodeWithIdentifier, AnnotatedNode, ASTTypeDefiningNode {
     kind: TokenType.keywordInterface;
-    parent: TypeScope ;
+    parent: TypeScope;
     implements: ASTTypeNode[];
 }
 
@@ -158,11 +161,10 @@ export interface ASTEnumValueNode extends ASTNode {
     parameterValues: ASTTermNode[];
 }
 
-export interface ASTEnumDefinitionNode 
-extends ASTNode, TypeDefinitionWithMethods, ASTNodeWithModifiers,
-    ASTTypeDefinitionWithAttributes, ASTNodeWithIdentifier, 
-    AnnotatedNode, ASTTypeDefiningNode
-{
+export interface ASTEnumDefinitionNode
+    extends ASTNode, TypeDefinitionWithMethods, ASTNodeWithModifiers,
+    ASTTypeDefinitionWithAttributes, ASTNodeWithIdentifier,
+    AnnotatedNode, ASTTypeDefiningNode {
     kind: TokenType.keywordEnum;
     parent: TypeScope;
     valueNodes: ASTEnumValueNode[];
@@ -206,11 +208,11 @@ export interface ASTSymbolNode extends ASTTermNode {
     identifier: string;
 }
 
-export interface ASTAssignmentNode extends ASTTermNode {
-    kind: AssignmentOperator;
-    leftSide: ASTTermNode;
-    rightSide: ASTTermNode;
-}
+// export interface ASTAssignmentNode extends ASTTermNode {
+//     kind: AssignmentOperator;
+//     leftSide: ASTTermNode;
+//     rightSide: ASTTermNode;
+// }
 
 export interface ASTTernaryNode extends ASTTermNode {
     kind: TokenType.ternaryOperator;
@@ -223,6 +225,7 @@ export interface ASTBinaryNode extends ASTTermNode {
     kind: TokenType.binaryOp;
     precedence?: number;
     operator: BinaryOperator;
+    operatorRange: IRange,
     leftSide: ASTTermNode;
     rightSide: ASTTermNode;
 }

@@ -25,6 +25,10 @@ export abstract class CodeSnippet {
         return this.finalValueIsOnStack ? new StringCodeSnippet("s.pop()", this.range) : this;
     }
 
+    isPureTermWithoutPop(){
+        return true;
+    }
+
     isPureTerm() {
         return true;
     }

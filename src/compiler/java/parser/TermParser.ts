@@ -89,6 +89,7 @@ export abstract class TermParser extends TokenIterator {
         while ((precedence = this.operatorToPrecedenceMap[this.tt]) != null) {
 
             let operator = this.tt;
+            let operatorRange = this.cct.range;
             this.nextToken();
             let newRightNode: ASTTermNode | undefined = this.parsePraefixSuffix();
             if (newRightNode == null) return node;
@@ -111,6 +112,7 @@ export abstract class TermParser extends TokenIterator {
                 },
                 precedence: precedence,
                 operator: <BinaryOperator>operator,
+                operatorRange: operatorRange,
                 leftSide: newLeftNode,
                 rightSide: newRightNode
             }

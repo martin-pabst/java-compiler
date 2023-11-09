@@ -98,7 +98,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         forSnippet.addParts(firstStatement);
         forSnippet.addNextStepMark();
         forSnippet.addParts(label1);
-        forSnippet.addParts(new OneParameterTemplate('if(!($1)){\n').applyToSnippet(this.voidType, node.condition!.range, this.libraryTypestore, condition));
+        forSnippet.addParts(new OneParameterTemplate('if(!($1)){\n').applyToSnippet(this.voidType, node.condition!.range, condition));
         forSnippet.addParts(jumpToLabel2);
         forSnippet.addStringPart("}\n");
         forSnippet.addNextStepMark();
@@ -239,10 +239,10 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         if (firstParameter) {
             if (secondParameter) {
                 return new TwoParameterTemplate(`${StepParams.helperObject}.print($1, ${node.isPrintln}, $2);\n`)
-                    .applyToSnippet(this.voidType, node.range, this.libraryTypestore, firstParameter, secondParameter)
+                    .applyToSnippet(this.voidType, node.range, firstParameter, secondParameter)
             }
             return new OneParameterTemplate(`${StepParams.helperObject}.print($1, ${node.isPrintln}, undefined);\n`)
-                .applyToSnippet(this.voidType, node.range, this.libraryTypestore, firstParameter);
+                .applyToSnippet(this.voidType, node.range, firstParameter);
         }
         return new StringCodeSnippet(`${StepParams.helperObject}.print(undefined, ${node.isPrintln}, undefined);\n`, node.range);
     }
@@ -263,7 +263,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
                 variable.type = initValueSnippet.type;
             } else {
                 let type = node.type.resolvedType;
-                if(type && !initValueSnippet.type.canImplicitlyCastTo(type)){
+                if(type && !this.canCastTo(initValueSnippet.type, type, "implicit")){
                     this.pushError("Der Term auf der rechten Seite des Zuweisungsoperators hat den Datentyp " + initValueSnippet.type.identifier + " und kann daher der Variablen auf der linken Seite (Datentyp " + type.identifier + ") nicht zugewiesen werden.", "error", node);
                     return new EmptyPart();
                 }
@@ -276,7 +276,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
         if (initValueSnippet && accesLocalVariableSnippet) {
             let snippet = new BinaryOperatorTemplate('=', false)
-                .applyToSnippet(variable.type, node.range, this.libraryTypestore, accesLocalVariableSnippet, initValueSnippet);
+                .applyToSnippet(variable.type, node.range, accesLocalVariableSnippet, initValueSnippet);
             return SnippetFramer.frame(snippet, '$1;');
         }
 
