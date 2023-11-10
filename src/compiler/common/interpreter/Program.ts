@@ -2,13 +2,13 @@ import { BaseSymbolTable } from "../BaseSymbolTable";
 import { Module } from "../module/Module";
 import { EmptyRange, IRange } from "../range/Range";
 import { Thread } from "./Thread";
-import { StepParams } from "./StepFunction.ts";
+import { StepFunction, StepParams } from "./StepFunction.ts";
 
 
 
 export class Step {
     // compiled function returns new programposition
-    run?: (thread: Thread, stack: any[], stackBase: number) => number;
+    run?: StepFunction;
 
     isBreakpoint: boolean = false;
     range!: {startLineNumber?:number, startColumn?: number, endLineNumber?: number, endColumn?: number};

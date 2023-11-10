@@ -1,3 +1,7 @@
+import { Thread } from "./Thread.ts";
+
+export type StepFunction = (thread: Thread, stack: any[], stackBase: number) => number;
+
 export class StepParams {
     static thread = "t";            // type Thread
     static stack = "s";             // type any[]
