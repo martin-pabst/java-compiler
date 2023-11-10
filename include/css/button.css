@@ -2,6 +2,7 @@
     padding: 5px;
     cursor: pointer;
     user-select: none;
+    box-sizing: border-box;
 }
 
 .jo_button:hover {
@@ -9,7 +10,7 @@
 }
 
 .jo_button.jo_active:active {
-    transform: scale(1.2);
+    filter: brightness(80%);
 }
 
 .jo_button:not(.jo_active) {
