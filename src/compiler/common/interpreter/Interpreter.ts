@@ -3,7 +3,8 @@ import { Module } from "../module/Module";
 import { EventManager } from "./EventManager";
 import { LoadController } from "./LoadController";
 import { PrintManager } from "./PrintManager";
-import { HelperRegistry, KlassObjectRegistry, TextPositionWithModule, Scheduler, SchedulerState } from "./Scheduler";
+import { TextPositionWithModule, Scheduler, SchedulerState } from "./Scheduler";
+import { KlassObjectRegistry } from "./StepFunction.ts";
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
 
@@ -16,7 +17,7 @@ export class Interpreter {
 
     isExternalTimer: boolean = false;
     timerId: any;
-    timerIntervalMs: number = 16;
+    timerIntervalMs: number = 10;
 
     mainModule?: Module;
     moduleStoreVersion: number = -100;
@@ -27,7 +28,6 @@ export class Interpreter {
     // gamepadTool: GamepadTool;
 
     eventManager: EventManager<InterpreterEvents> = new EventManager();
-    private helperRegistry: HelperRegistry = {};
 
     actions: string[] = ["start", "pause", "stop", "stepOver",
         "stepInto", "stepOut", "restart"];
@@ -67,15 +67,13 @@ export class Interpreter {
 
         this.registerActions();
 
-        this.scheduler = new Scheduler(this, this.helperRegistry);
+        this.scheduler = new Scheduler(this);
         this.loadController = new LoadController(this.scheduler, this);
         this.initTimer();
         this.setState(SchedulerState.not_initialized);
     }
 
-    registerHelper(identifier: string, helper: Object) {
-        this.helperRegistry.set(identifier, helper);
-    }
+    
 
     initTimer() {
 

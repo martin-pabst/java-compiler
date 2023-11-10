@@ -2,6 +2,7 @@ import { Program, Step } from "./Program";
 import { Semaphor } from "./Semaphor";
 import { Scheduler } from "./Scheduler";
 import { IRange } from "../range/Range.ts";
+import { KlassObjectRegistry } from "./StepFunction.ts";
 
 type ExceptionInfo = {
     types: string[],
@@ -51,8 +52,11 @@ export class Thread {
 
     lastDepositedCallback: (() => void) | undefined = undefined;
 
+    classes: KlassObjectRegistry;
+
     constructor(public scheduler: Scheduler, initialStack: any[]) {
         this.stack = initialStack;
+        this.classes = scheduler.classObjectRegistry;
     }
 
     /**
@@ -72,8 +76,6 @@ export class Thread {
                 let currentStepList = currentProgramState.currentStepList;
                 let stackBase = currentProgramState.stackBase;
 
-                let helperObject = this.scheduler.helperObject;
-
                 if (this.stepEndsWhenProgramstackLengthLowerOrEqual >= 0) {
                     // singlestep-mode (slower...)
                     while (numberOfSteps < maxNumberOfSteps &&
@@ -83,7 +85,7 @@ export class Thread {
                         /**
                          * Behold, hier the steps run!
                          */
-                        stepIndex = step.run!(this, stack, stackBase, helperObject);
+                        stepIndex = step.run!(this, stack, stackBase);
                         
                         this.currentProgramState.stepIndex = stepIndex;
                         numberOfSteps++;
@@ -101,7 +103,7 @@ export class Thread {
                          * parameter identifers inside function: 
                          *                    t, s, sb, h
                          */
-                        stepIndex = step.run!(this, stack, stackBase, helperObject);
+                        stepIndex = step.run!(this, stack, stackBase);
 
                         numberOfSteps++;
                     }
@@ -266,5 +268,30 @@ export class Thread {
     }
 
 
+    newArray(defaultValue: any, ...dimensions : number[]) : Array<any> {
+        let n0 = dimensions[0];
 
+        if (dimensions.length == 1) {
+            return Array(n0).fill(defaultValue);
+        }
+        else {
+            let array = [];
+            let subdimensions = dimensions.slice(1);
+            // Recursive call
+            for(let i = 0; i < n0; i++){
+                array.push(this.newArray(defaultValue, ...subdimensions));
+            }
+            return array;
+        }
+
+    }
+
+
+    print (text: string | undefined, color: number | undefined) {
+        this.scheduler.interpreter.printManager.print(text, false, color);
+    }
+
+    println (text: string | undefined, color: number | undefined) {
+        this.scheduler.interpreter.printManager.print(text, true, color);
+    }
 }

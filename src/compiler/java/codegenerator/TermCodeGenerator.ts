@@ -1,6 +1,6 @@
-import { BaseSymbol, BaseSymbolOnStackframe } from "../../common/BaseSymbolTable";
+import { BaseSymbol, SymbolKind } from "../../common/BaseSymbolTable";
 import { ErrorLevel, QuickFix } from "../../common/Error";
-import { StepParams } from "../../common/interpreter/StepFunction";
+import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
@@ -171,7 +171,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         let arrayType = new ArrayType(elementType, dimensionTerms.length, this.module, node.range);
 
 
-        let prefix = `${StepParams.helperObject}["newArray"](${defaultValue}, `;
+        let prefix = `${Helpers.newArray}(${defaultValue}, `;
         let suffix = ")";
 
         return ParametersJoinedTemplate.applyToSnippet(arrayType, node.range, prefix, ', ', suffix, ...dimensionTerms);
@@ -189,11 +189,11 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
         symbol.usagePositions.push({ file: this.module.file, range: node.range });
 
-        if (symbol instanceof BaseSymbolOnStackframe) return this.compileSymbolOnStackframeAccess(symbol, node.range);
-        if (symbol instanceof Field) return this.compileFieldAccess(symbol, node.range);
+        if (symbol.onStackframe()) return this.compileSymbolOnStackframeAccess(symbol, node.range);
+        if (symbol.kind == SymbolKind.field) return this.compileFieldAccess(symbol, node.range);
     }
 
-    compileSymbolOnStackframeAccess(symbol: BaseSymbolOnStackframe, range: IRange): CodeSnippet | undefined {
+    compileSymbolOnStackframeAccess(symbol: BaseSymbol, range: IRange): CodeSnippet | undefined {
         let type = (<JavaLocalVariable | Parameter>symbol).type;
         let snippet = new StringCodeSnippet(`${StepParams.stack}[${StepParams.stackBase} + ${symbol.stackframePosition}]`, range, type);
         snippet.isLefty = true;

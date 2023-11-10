@@ -41,7 +41,7 @@ export class ObjectClass {
 
     toString() {
         return new StringClass("Object");
-        // t.stack.push(new t.scheduler.helperObject.classes["String"]("Object"));
+        // `t.stack.push(new ${Helpers.classes}["String"]("Object"));`
     }
 
 

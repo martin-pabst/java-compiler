@@ -1,8 +1,9 @@
 import { Module } from "../module/Module";
 import { IRange } from "../range/Range";
 import { Interpreter } from "./Interpreter";
-import { Program } from "./Program";
+import { Program, Step } from "./Program";
 import { Semaphor } from "./Semaphor";
+import { KlassObjectRegistry, Klass } from "./StepFunction.ts";
 import { Thread, ThreadState } from "./Thread";
 
 export enum SchedulerState { not_initialized, running, paused, stopped }
@@ -10,18 +11,6 @@ export enum SchedulerState { not_initialized, running, paused, stopped }
 export type TextPositionWithModule = {
     module: Module,
     range: IRange
-}
-
-export type HelperRegistry = { [identifier: string]: any };
-
-export type Klass = { new(...args: any[]): any, [index: string]: any };
-export type KlassObjectRegistry = { [identifier: string]: Klass };
-
-export type HelperObject = {
-    classes: KlassObjectRegistry,
-    helpers: HelperRegistry,
-    newArray : (defaultValue: any, ...dimensions : number []) => Array<any>
-    print: (text: string | undefined, printNewline: boolean, color: number | undefined) => void
 }
 
 
@@ -35,28 +24,14 @@ export class Scheduler {
 
     classObjectRegistry: KlassObjectRegistry = {};
 
-    helperObject!: HelperObject;
-
     timeStampProgramStarted: number = 0;
     stepCountSinceStartOfProgram: number = 0;
 
 
-    constructor(public interpreter: Interpreter, private helperRegistry: HelperRegistry) {
+    constructor(public interpreter: Interpreter) {
         this.setState(SchedulerState.not_initialized);
-        this.buildHelperObject();
     }
 
-    buildHelperObject() {
-        let that = this;
-        this.helperObject = {
-            classes: this.classObjectRegistry,
-            helpers: this.helperRegistry,
-            newArray: Scheduler.newArray,
-            print: (text: string | undefined, printNewline: boolean, color: number | undefined) => {
-                that.interpreter.printManager.print(text, printNewline, color);
-            }
-        }
-    }
 
     run(numberOfStepsMax: number) {
         let stepsPerThread = Math.ceil(numberOfStepsMax / this.runningThreads.length);
@@ -201,7 +176,6 @@ export class Scheduler {
     init(mainModule: Module, runtimeClassObjects: { [identifier: string]: Klass }) {
 
         this.classObjectRegistry = runtimeClassObjects;
-        this.buildHelperObject();
 
         this.runningThreads = [];
         this.semaphors = [];
@@ -240,25 +214,5 @@ export class Scheduler {
         this.runningThreads.push(mainThread);
         this.currentThreadIndex = 0;
     }
-
-
-    static newArray(defaultValue: any, ...dimensions : number[]) : Array<any> {
-        let n0 = dimensions[0];
-
-        if (dimensions.length == 1) {
-            return Array(n0).fill(defaultValue);
-        }
-        else {
-            let array = [];
-            let subdimensions = dimensions.slice(1);
-            // Recursive call
-            for(let i = 0; i < n0; i++){
-                array.push(this.newArray(defaultValue, ...subdimensions));
-            }
-            return array;
-        }
-
-    }
-
     
 }

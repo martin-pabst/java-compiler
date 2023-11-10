@@ -1,5 +1,5 @@
 import { ErrorLevel, QuickFix } from "../../common/Error";
-import { StepParams } from "../../common/interpreter/StepFunction";
+import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
@@ -467,7 +467,7 @@ export class BinopCastCodeGenerator {
 
         let boxedType = this.libraryTypestore.getType(boxedIdentifier);
 
-        return SnippetFramer.frame(snippet, `new ${StepParams.helperObject}.classes["${boxedIdentifier}"]($1)`, boxedType);
+        return SnippetFramer.frame(snippet, `new ${Helpers.classes}["${boxedIdentifier}"]($1)`, boxedType);
     }
 
     convertCharToNumber(snippet: CodeSnippet): CodeSnippet {

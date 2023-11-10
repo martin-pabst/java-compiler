@@ -2,14 +2,13 @@ import { BaseSymbolTable } from "../BaseSymbolTable";
 import { Module } from "../module/Module";
 import { EmptyRange, IRange } from "../range/Range";
 import { Thread } from "./Thread";
-import { HelperObject } from "./Scheduler";
 import { StepParams } from "./StepFunction.ts";
 
 
 
 export class Step {
     // compiled function returns new programposition
-    run?: (thread: Thread, stack: any[], stackBase: number, helperObject: HelperObject) => number;
+    run?: (thread: Thread, stack: any[], stackBase: number) => number;
 
     isBreakpoint: boolean = false;
     range!: {startLineNumber?:number, startColumn?: number, endLineNumber?: number, endColumn?: number};
@@ -47,7 +46,7 @@ export class Step {
 
     compileToJavascriptFunction(){
         // @ts-ignore
-        this.run = new Function(StepParams.thread, StepParams.stack, StepParams.stackBase, StepParams.helperObject, this.codeAsString);    
+        this.run = new Function(StepParams.thread, StepParams.stack, StepParams.stackBase, this.codeAsString);    
     }
 
 }
