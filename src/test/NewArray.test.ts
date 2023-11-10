@@ -1,4 +1,5 @@
 import { expect, test } from 'vitest'
+
 import { Scheduler } from '../compiler/common/interpreter/Scheduler'
 
 test('create a 1-dimensional array of length 3 filled with different default values', () => {
