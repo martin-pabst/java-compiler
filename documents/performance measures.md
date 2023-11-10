@@ -8,16 +8,20 @@ String s = "Test"; // => internal type of s is String; "Test" gets casted from s
                    // compiled code: s[sb + 0] = new String("Test");
 
 void doIt(String s){...}; // => internal type of s is String
+String s;
 int i = 12;
-s = "Test" + i;            // "Test" + i has type string and gets casted to String before assignment. compiled: s = new String("Test" + s[sb + 7]);
+s = "Test" + i;            // "Test" has type string. "Test + i has also type string and gets casted to String before assignment. Compiled: s = new String("Test" + s[sb + 7]);
 
 println("Test" + i);       // all library functions expect string, not String, so this compiles to h["..."].println("Test" + s[sb + 7]);
 
 
 doIt("Test");              // "Test" is cast to String before assignment, so this compiles to doIt(new String("Test"));
 
-String s = "a";
-s += "x";                  // is compiled to (s[sb + 7]||npe(...)).value += "x";
+String s = new DecimalFormat("###.00").format(7.23943);   // library functions return string. This gets casted to String before assignment to s
+
+String s = "a";             // is compiled to s[sb + 7] = new t.classes["String"]("a")
+s += "x";                  // is compiled to (s[sb + 7]||t.npe(...)).value += "x";
+                           // n.B..: t.npe(...) handles NullPointerException, see below
 
 s = "x";                    // compiles to s[sb + 7].value = "x";
 s.length;                  // length is public attribute of s => no problem
@@ -40,7 +44,7 @@ It stores information about a (later to happen...) NullpointerException outside 
 ```javascript
 a.doIt(b, c);
 // compiles to:
-(a||h.npe(1249)).doIt(b, c);
+(a||t.npe(1249)).doIt(b, c);
 
 ```
 Each program has a Map which maps Exception codes to detailed information (range, term: string, ...).
@@ -59,18 +63,18 @@ int a = ...;
 int b = 12/a;
 // compiles to:
 int a = ...;
-s[sb + 7] = 12/(s[sb + 8]||h.ae(1249));
+s[sb + 7] = 12/(s[sb + 8]||t.ae(1249));
 
 ```
 Each program has a Map which maps Exception codes to detailed information (range, term: string, ...).
 Function ae stores information about the Exception and then throws javascript exception to halt program execution...
 
-# Indexing arrays
+# Indexing arrays with correct OutOfBoundsException
 ```javascript
 int b, x;
 int a = v[b + 3][x];
 // compiles to: (v lies on pos 7, b on pos 12, x on pos 13)
-s[sb + 2] = h.arr(s[sb + 7], 1370, s[sb + 12] + 3, s[sb + 13])
+s[sb + 2] = t.arr(s[sb + 7], 1370, s[sb + 12] + 3, s[sb + 13])
 ```
 
 
