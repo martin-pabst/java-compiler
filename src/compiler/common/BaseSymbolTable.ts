@@ -3,6 +3,7 @@ import { UsagePosition } from "./UsagePosition";
 import { File } from "./module/File";
 import { IRange } from "./range/Range";
 
+export enum SymbolKind { localVariable, parameter, field, staticField }
 
 /**
  * Fields, parameters and local variables
@@ -11,27 +12,21 @@ export abstract class BaseSymbol {
 
     usagePositions: UsagePosition[] = [];
 
-    constructor(public identifier: string, public identifierRange: IRange, public type: BaseType) {
+    public stackframePosition?: number;
+
+    constructor(public identifier: string, public identifierRange: IRange, public type: BaseType, public kind: SymbolKind) {
 
     }
 
     // mouseover in debugger-mode => show value ...
     abstract getValue(stack: any, stackframeStart: number): any;
 
-}
-
-/**
- * Parameters and local variables
- */
-export abstract class BaseSymbolOnStackframe extends BaseSymbol {
-
-    public stackframePosition = -1;
-
-    constructor(identifier: string, identifierRange: IRange, type: BaseType) {
-        super(identifier, identifierRange, type);        
+    onStackframe(): boolean {
+        return this.kind == SymbolKind.localVariable || this.kind == SymbolKind.parameter;
     }
 
 }
+
 
 /**
  * For a given program position the debugger has to know what to expect on the current stackframe
@@ -73,11 +68,14 @@ export class BaseStackframe {
         this.numberOfThisObjects = firstFreePosition;
     }
 
-    addSymbol(symbol: BaseSymbolOnStackframe, parameterOrVariable: "parameter" | "variable"){
-        if(parameterOrVariable == "parameter"){
-            this.numberOfParameters++;
-        } else {
-            this.numberOfLocalVariables++;
+    addSymbol(symbol: BaseSymbol){
+        switch(symbol.kind){
+            case SymbolKind.parameter:
+                this.numberOfParameters++;
+                break;
+            case SymbolKind.localVariable:
+                this.numberOfLocalVariables++;
+                break;
         }
 
         let position: number = this.nextFreePosition++;

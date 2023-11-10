@@ -5,13 +5,14 @@ import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { GenericTypeParameter } from "./GenericInformation";
 import { JavaClass } from "./JavaClass";
+import { JavaClassOrEnum } from "./JavaClassOrEnum.ts";
 import { JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 
 
-export class JavaEnum extends NonPrimitiveType {
+export class JavaEnum extends JavaClassOrEnum {
 
     fields: Field[] = [];
     methods: Method[] = [];

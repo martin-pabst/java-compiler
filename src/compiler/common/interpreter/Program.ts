@@ -53,6 +53,7 @@ export class Step {
 }
 
 export class Program {
+    
     numberOfThisObjects: number = 0;
     numberOfParameters: number = 0;         // without "this"
     numberOfLocalVariables: number = 0;
@@ -60,8 +61,8 @@ export class Program {
     stepsSingle: Step[] = [];
     stepsMultiple: Step[] = [];
 
-    constructor(public module: Module, public symbolTable: BaseSymbolTable, public methodIdentifierWithClass: string) {
-        let stackFrame = symbolTable.stackframe;
+    constructor(public module: Module, public symbolTable: BaseSymbolTable | undefined, public methodIdentifierWithClass: string) {
+        let stackFrame = symbolTable?.stackframe;
         if(stackFrame){
             this.numberOfThisObjects = stackFrame.numberOfThisObjects;
             this.numberOfParameters = stackFrame.numberOfParameters;

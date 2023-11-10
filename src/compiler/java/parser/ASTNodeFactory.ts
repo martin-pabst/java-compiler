@@ -1,7 +1,7 @@
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { Token } from "../lexer/Token.ts";
-import { ASTAnnotationNode, ASTAttributeDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope, ASTNewArrayNode } from "./AST";
+import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope, ASTNewArrayNode } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
 export class ASTNodeFactory {
@@ -43,7 +43,7 @@ export class ASTNodeFactory {
             isStatic: modifiers.isStatic,
             isAbstract: modifiers.isAbstract,
             genericParameterDefinitions: [],
-            attributes: [],
+            fields: [],
             methods: [],
             innerClasses: [],
             classOrInterfaceOrEnumDefinitions: [],
@@ -70,7 +70,7 @@ export class ASTNodeFactory {
             identifier: <string>identifier.value,
             identifierRange: identifier.range,
             visibility: modifiers.visibility,
-            attributes: [],
+            fields: [],
             methods: [],
             annotations: [],
             valueNodes: [],
@@ -158,9 +158,9 @@ export class ASTNodeFactory {
 
     buildAttributeNode(rangeStart: IRange, identifier: Token, type: ASTTypeNode, 
         initialization: ASTTermNode | undefined, modifiers: ASTNodeWithModifiers,
-        annotations: ASTAnnotationNode[]): ASTAttributeDeclarationNode {
+        annotations: ASTAnnotationNode[]): ASTFieldDeclarationNode {
 
-        let node: ASTAttributeDeclarationNode = {
+        let node: ASTFieldDeclarationNode = {
             kind: TokenType.attributeDeclaration,
             range: rangeStart,
             identifier: <string>identifier.value,

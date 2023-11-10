@@ -78,8 +78,8 @@ export interface TypeDefinitionWithMethods {
     methods: ASTMethodDeclarationNode[]
 }
 
-export interface ASTTypeDefinitionWithAttributes {
-    attributes: ASTAttributeDeclarationNode[]
+export interface ASTTypeDefinitionWithFields {
+    fields: ASTFieldDeclarationNode[]
 }
 
 export interface ASTGenericParameterDeclarationNode extends ASTNodeWithIdentifier, ASTNode {
@@ -128,7 +128,7 @@ export interface ASTLambdaFunctionDeclarationNode extends ASTNode {
     statement: ASTStatementNode | undefined
 }
 
-export interface ASTAttributeDeclarationNode extends ASTNodeWithModifiers, ASTNode,
+export interface ASTFieldDeclarationNode extends ASTNodeWithModifiers, ASTNode,
     ASTNodeWithIdentifier, AnnotatedNode {
     kind: TokenType.attributeDeclaration;
     type: ASTTypeNode;
@@ -137,7 +137,7 @@ export interface ASTAttributeDeclarationNode extends ASTNodeWithModifiers, ASTNo
 
 export interface ASTClassDefinitionNode
     extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers,
-    ASTTypeDefinitionWithAttributes, TypeScope, ASTNodeWithIdentifier, AnnotatedNode,
+    ASTTypeDefinitionWithFields, TypeScope, ASTNodeWithIdentifier, AnnotatedNode,
     ASTTypeDefiningNode {
     kind: TokenType.keywordClass;
     parent: TypeScope;
@@ -163,7 +163,7 @@ export interface ASTEnumValueNode extends ASTNode {
 
 export interface ASTEnumDefinitionNode
     extends ASTNode, TypeDefinitionWithMethods, ASTNodeWithModifiers,
-    ASTTypeDefinitionWithAttributes, ASTNodeWithIdentifier,
+    ASTTypeDefinitionWithFields, ASTNodeWithIdentifier,
     AnnotatedNode, ASTTypeDefiningNode {
     kind: TokenType.keywordEnum;
     parent: TypeScope;

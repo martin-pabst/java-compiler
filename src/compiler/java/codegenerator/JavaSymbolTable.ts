@@ -1,13 +1,14 @@
-import { BaseStackframe, BaseSymbol, BaseSymbolOnStackframe, BaseSymbolTable } from "../../common/BaseSymbolTable";
+import { BaseStackframe, BaseSymbol, BaseSymbolTable, SymbolKind } from "../../common/BaseSymbolTable";
 import { IRange } from "../../common/range/Range";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaClass } from "../types/JavaClass";
 import { JavaEnum } from "../types/JavaEnum";
+import { JavaType } from "../types/JavaType.ts";
 import { JavaLocalVariable } from "./JavaLocalVariable";
+
 
 export class JavaSymbolTable extends BaseSymbolTable {
 
-    declare symbols: JavaLocalVariable[];
     declare childTables: JavaSymbolTable[];
 
     declare parent?: JavaSymbolTable;
@@ -51,12 +52,8 @@ export class JavaSymbolTable extends BaseSymbolTable {
 
     public addSymbol(symbol: BaseSymbol): void {
         super.addSymbol(symbol);
-        if(symbol instanceof BaseSymbolOnStackframe){
-            let parameterOrVariable: "parameter" | "variable" = "parameter";
-            if(symbol instanceof JavaLocalVariable){
-                parameterOrVariable = "variable";
-            }
-            this.getStackFrame()?.addSymbol(symbol, parameterOrVariable);
+        if(symbol.onStackframe()){
+            this.getStackFrame()?.addSymbol(symbol);
         }
     }
 

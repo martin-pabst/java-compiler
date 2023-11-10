@@ -272,7 +272,7 @@ export class TypeResolver {
     }
 
     buildFields(node: ASTClassDefinitionNode | ASTEnumDefinitionNode, type: JavaClass | JavaEnum, module: JavaCompiledModule) {
-        for(let fieldNode of node.attributes){
+        for(let fieldNode of node.fields){
             if(fieldNode.type.resolvedType){
                 let field = new Field(fieldNode.identifier, fieldNode.identifierRange, module,
                       fieldNode.type.resolvedType, fieldNode.visibility);

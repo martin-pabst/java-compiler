@@ -1,3 +1,4 @@
+import { Program } from "../../common/interpreter/Program.ts";
 import { IRange } from "../../common/range/Range";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";

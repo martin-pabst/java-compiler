@@ -210,7 +210,7 @@ export class Parser extends StatementParser {
         if (identifier.value != "" && type != null) {
             let node = this.nodeFactory.buildAttributeNode(rangeStart, identifier, type, initialization,
                 modifiers, this.collectedAnnotations);
-            classASTNode.attributes.push(node);
+            classASTNode.fields.push(node);
             this.setEndOfRange(node);
         }
 

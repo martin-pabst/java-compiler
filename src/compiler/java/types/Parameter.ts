@@ -1,11 +1,11 @@
-import { BaseSymbol, BaseSymbolOnStackframe } from "../../common/BaseSymbolTable";
+import { BaseSymbol, SymbolKind } from "../../common/BaseSymbolTable";
 import { UsagePosition } from "../../common/UsagePosition";
 import { IRange } from "../../common/range/Range";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { GenericTypeParameter } from "./GenericInformation";
 import { JavaType } from "./JavaType";
 
-export class Parameter extends BaseSymbolOnStackframe {
+export class Parameter extends BaseSymbol {
     
     usagePositions: UsagePosition[] = [];
 
@@ -13,7 +13,7 @@ export class Parameter extends BaseSymbolOnStackframe {
 
     constructor(identifier: string, identifierRange: IRange,
          public module: JavaBaseModule, type: JavaType){
-            super(identifier, identifierRange, type);
+            super(identifier, identifierRange, type, SymbolKind.parameter);
          }
 
     getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, JavaType>): Parameter {

@@ -2,7 +2,9 @@ import { Program } from "../../common/interpreter/Program";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTClassDefinitionNode } from "../parser/AST";
+import { ASTClassDefinitionNode, ASTFieldDeclarationNode, ASTMethodDeclarationNode } from "../parser/AST";
+import { Field } from "../types/Field.ts";
+import { JavaClass } from "../types/JavaClass.ts";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { JavaSymbolTable } from "./JavaSymbolTable";
 import { SnippetLinker } from "./SnippetLinker";
@@ -61,11 +63,41 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     compileClass(cdef: ASTClassDefinitionNode) {
         let type = cdef.resolvedType;
-        if(!type) return;
+        if(!type || !cdef.resolvedType) return;
+        let classContext = <JavaClass>cdef.resolvedType;
+        
+        let symbolTable = this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
+    
+        classContext.fieldConstructor.symbolTable = symbolTable;
+        classContext.staticFieldConstructor.symbolTable = symbolTable;
+        
+        for(let field of cdef.fields){
+            this.compileField(field, classContext);
+        }
 
+        for(let method of cdef.methods){
+            this.compileMethod(method, classContext);
+        }
+
+        this.popSymbolTable();
+
+    }
+    compileField(field: ASTFieldDeclarationNode, classContext: JavaClass) {
+        
+        if(!field.type.resolvedType) return;
+        
+        let f: Field = new Field(field.identifier, field.identifierRange, this.module, field.type.resolvedType, field.visibility);
+
+        classContext.fields.push(f);
         
     }
 
+    compileMethod(method: ASTMethodDeclarationNode, classContext: JavaClass) {
+        throw new Error("Method not implemented.");
+    }
+
+    
+    
 
 
 }
