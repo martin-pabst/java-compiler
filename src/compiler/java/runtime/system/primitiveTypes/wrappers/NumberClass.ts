@@ -20,20 +20,6 @@ export class NumberClass extends ObjectClass {
         {type: "m", signature: "public String toString()", native: NumberClass.prototype.toString},
     ]
 
-
-    static __declareType(): string[] {
-        return [
-            "class Number extends Object",
-            "byte byteValue(): byteValue",
-            "short shortValue(): shortValue",
-            "abstract double doubleValue()",
-            "abstract float floatValue()",
-            "abstract int intValue()",
-            "abstract long longValue()",
-            "String toString(): toString"
-        ]
-    }
-
     static type: NonPrimitiveType;
 
     constructor(n: number){

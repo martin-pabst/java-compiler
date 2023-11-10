@@ -11,15 +11,6 @@ export class ObjectClass {
         {type: "m", signature: "public String toString()", native: ObjectClass.prototype.toString}
     ]
 
-
-    static __declareType(): string[] {
-        return [
-            "class Object",
-            "public Object(): _constructor",
-            "public String toString(): toString"
-        ]
-    }
-
     static type: NonPrimitiveType;
 
     constructor(){
@@ -55,15 +46,6 @@ export class StringClass extends ObjectClass {
         {type: "m", signature: "public String(String original)", native: StringClass.prototype._constructor2},
         {type: "m", signature: "public String toString()", native: StringClass.prototype._toString}
     ]
-
-    static __declareType(): string[] {
-        return [
-            "class String extends Object",
-            "public String(): _emptyConstructor",
-            "public String(String original): _constructor2",
-            "public String toString(): _toString"
-        ]
-    }
 
     public value: string;
 

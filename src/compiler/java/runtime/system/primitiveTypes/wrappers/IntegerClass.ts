@@ -22,23 +22,6 @@ export class IntegerClass extends NumberClass {
         {type: "m", signature: "public static Integer valueOf(String s, int radix)", native: IntegerClass.valueOfString},
     ]
 
-
-    static __declareType(): string[] {
-        return [
-            "class Integer extends Number",
-            "double doubleValue()",
-            "float floatValue()",
-            "int intValue()",
-            "long longValue()",
-            "int compareTo(Integer anotherInteger): compareTo",
-            "int parseInt(String s): parseInt",
-            "int parseInt(String s, int radix): parseInt",
-            "static Integer valueOf(int i): valueOf",
-            "static Integer valueOf(String s): valueOfString",
-            "static Integer valueOf(String s, int radix): valueOfString",
-        ]
-    }
-
     static type: NonPrimitiveType;
 
     constructor(i: number){

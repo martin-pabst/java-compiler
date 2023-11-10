@@ -16,18 +16,6 @@ export class ThrowableClass extends ObjectClass implements IThrowable {
     ]
 
 
-    
-    static __declareType(): string[] {
-        return [
-            "class Throwable extends Object",
-            "public Throwable()",
-            "public Throwable(String message)",
-            "public Throwable(String message, Throwable cause)",
-            "public Throwable(Throwable cause)",
-            "public String toString(): _toString"
-        ]
-    }
-
     static type: NonPrimitiveType;
 
     constructor(public message?: string, public cause?: ThrowableClass){

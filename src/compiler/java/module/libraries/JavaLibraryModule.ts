@@ -1,4 +1,4 @@
-import { Klass } from "../../../common/interpreter/Scheduler";
+import { Klass } from "../../../common/interpreter/StepFunction.ts";
 import { File } from "../../../common/module/File";
 import { JavaType } from "../../types/JavaType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
@@ -6,7 +6,6 @@ import { JavaBaseModule } from "../JavaBaseModule";
 
 export type LibraryKlassType = {
 
-    __declareType(): string[];
     __javaDeclarations: LibraryDeclarations;
     type: NonPrimitiveType;
 
