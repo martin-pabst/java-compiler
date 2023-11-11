@@ -16,4 +16,13 @@ export abstract class Module {
 
     abstract getMainProgram(): Program | undefined;
 
+    isStartable(): boolean {
+        let hasError: boolean = this.errors.find(error => error.level == "error") ? true : false;
+        if(this.getMainProgram()){ 
+            return !hasError;
+        }
+
+        return false;
+    }
+
 }

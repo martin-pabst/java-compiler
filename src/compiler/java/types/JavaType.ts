@@ -26,4 +26,6 @@ export abstract class JavaType extends BaseType {
         return this.isPrimitive && (<PrimitiveType><any>this).isUsableAsIndex();
     }
 
+    abstract getDefaultValue(): any;
+
 }

@@ -1,4 +1,6 @@
+import { KlassObjectRegistry } from "../../common/interpreter/StepFunction";
 import { JavaType } from "../types/JavaType";
+import { NonPrimitiveType } from "../types/NonPrimitiveType";
 
 export class JavaTypeStore {
  
@@ -20,5 +22,12 @@ export class JavaTypeStore {
         return this.typeMap.get(identifier);
     }
 
+    populateClassObjectRegistry(klassObjectRegistry: KlassObjectRegistry){
+        this.typeMap.forEach((type, key) => {
+            if(type instanceof NonPrimitiveType && type.runtimeClass){
+                klassObjectRegistry[type.identifier] = type.runtimeClass;
+            }
+        })
+    }
 
 }

@@ -5,10 +5,14 @@ export class BooleanPrimitiveType extends PrimitiveType {
     
     constructor(module: JavaBaseModule){
         super('boolean', module);
-        this.defaultValue = "false";
+        this.defaultValueAsString = "false";
     }
     
     isUsableAsIndex(): boolean {
+        return false;
+    }
+
+    getDefaultValue() {
         return false;
     }
 

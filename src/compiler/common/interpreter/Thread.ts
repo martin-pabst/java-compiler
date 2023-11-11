@@ -33,7 +33,7 @@ interface Exception {
 }
 
 export class Thread {
-    stack: any[] = [];
+    s: any[] = [];  // stack
     programStack: ProgramState[] = [];
 
     currentProgramState!: ProgramState;  // also lies on top of programStack
@@ -55,7 +55,7 @@ export class Thread {
     classes: KlassObjectRegistry;
 
     constructor(public scheduler: Scheduler, initialStack: any[]) {
-        this.stack = initialStack;
+        this.s = initialStack;
         this.classes = scheduler.classObjectRegistry;
     }
 
@@ -64,7 +64,7 @@ export class Thread {
      */
     run(maxNumberOfSteps: number): ThreadStateInfoAfterRun {
         let numberOfSteps = 0;
-        let stack = this.stack; // for performance reasons
+        let stack = this.s; // for performance reasons
         this.state = ThreadState.running;
 
         try {
@@ -184,8 +184,8 @@ export class Thread {
                 if (found) {
                     stackTrace.push(Object.assign(ps));
                     ps.stepIndex = exInfo.stepIndex;
-                    this.stack.splice(exInfo.stackSize, this.stack.length - exInfo.stackSize);
-                    this.stack.push(exception);
+                    this.s.splice(exInfo.stackSize, this.s.length - exInfo.stackSize);
+                    this.s.push(exception);
                     break;
                 } else {
                     stackTrace.push(ps);
@@ -203,7 +203,7 @@ export class Thread {
     }
 
     beginCatchExceptions(exceptionInfo: ExceptionInfo) {
-        exceptionInfo.stackSize = this.stack.length;
+        exceptionInfo.stackSize = this.s.length;
         this.currentProgramState.exceptionInfoList.push(exceptionInfo);
     }
 
@@ -217,16 +217,19 @@ export class Thread {
         }
     }
 
-    returnFromMethod(returnValue: any) {
-        while (this.stack.length > this.currentProgramState.stackBase) {
-            this.stack.pop();
+    /**
+     * return is called from within the step function
+     */
+    return(returnValue: any) {
+        while (this.s.length > this.currentProgramState.stackBase) {
+            this.s.pop();
         }
 
         let callback = this.programStack.pop()?.callbackAfterFinished;
         if (callback != null) {
             callback(returnValue);
         } else {
-            if (returnValue != null) this.stack.push(returnValue);
+            if (returnValue != null) this.s.push(returnValue);
         }
 
         if (this.programStack.length > 0) {
@@ -240,6 +243,10 @@ export class Thread {
         }
     }
 
+    /**
+     * call a java method which is executed by this thread
+     * @param program 
+     */
     pushProgram(program: Program) {
         // Object creation is faster than Object.assign, see
         // https://measurethat.net/Benchmarks/Show/18401/0/objectassign-vs-creating-new-objects3
@@ -247,7 +254,7 @@ export class Thread {
             program: program,
             currentStepList: program.stepsSingle,
             // currentStepList: this.scheduler.executeMode == NExecuteMode.singleSteps ? program.stepsSingle : program.stepsMultiple,
-            stackBase: this.stack.length - program.numberOfParameters - program.numberOfThisObjects,  // 1 because of [this, parameter 1, ..., parameter n]
+            stackBase: this.s.length - program.numberOfParameters - program.numberOfThisObjects,  // 1 because of [this, parameter 1, ..., parameter n]
             stepIndex: 0,
             callbackAfterFinished: this.lastDepositedCallback,
             exceptionInfoList: []
@@ -256,7 +263,7 @@ export class Thread {
         this.lastDepositedCallback = undefined;
 
         for (let i = 0; i < program.numberOfLocalVariables; i++) {
-            this.stack.push(null);
+            this.s.push(null);
         }
 
         this.programStack.push(state);

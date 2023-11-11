@@ -5,11 +5,15 @@ export class CharPrimitiveType extends PrimitiveType {
     
     constructor(module: JavaBaseModule){
         super('char', module);
-        this.defaultValue = `"${String.fromCharCode(0)}"`;
+        this.defaultValueAsString = `"\\u0000"`;
     }
     
     isUsableAsIndex(): boolean {
         return true;
+    }
+
+    getDefaultValue() {
+        return '\u0000';
     }
 
 }

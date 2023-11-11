@@ -73,5 +73,4 @@ export class JavaCompiledModule extends JavaBaseModule {
         return this.mainProgram;
     }
 
-
 }

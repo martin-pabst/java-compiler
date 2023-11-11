@@ -10,9 +10,14 @@ export class JavaLibraryModuleManager {
     javaTypes: JavaType[] = [];
     typestore: JavaTypeStore;
 
-    constructor(){
+    constructor(...additionalModules: JavaLibraryModule[]){
         this.libraryModules.push(new SystemModule())
+        if(additionalModules){
+            this.libraryModules.push(...additionalModules);
+        }
+
         this.typestore = new JavaTypeStore();
+        this.compileClassesToTypes();
     }
 
     compileClassesToTypes(){

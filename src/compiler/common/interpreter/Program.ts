@@ -73,4 +73,10 @@ export class Program {
         this.stepsSingle.forEach(step => step.compileToJavascriptFunction());
         this.stepsMultiple.forEach(step => step.compileToJavascriptFunction());
     }
+
+    addStep(statement: string){
+        let step = new Step(this.stepsSingle.length);
+        step.codeAsString = statement;
+        this.stepsSingle.push(step);
+    }
 }

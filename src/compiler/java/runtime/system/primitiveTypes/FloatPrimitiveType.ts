@@ -5,11 +5,15 @@ export class FloatPrimitiveType extends PrimitiveType {
     
     constructor(module: JavaBaseModule){
         super('float', module);
-        this.defaultValue = "0.0";
+        this.defaultValueAsString = "0.0";
     }
     
     isUsableAsIndex(): boolean {
         return false;
+    }
+
+    getDefaultValue() {
+        return 0.0;
     }
 
 }

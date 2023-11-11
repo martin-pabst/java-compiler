@@ -1,6 +1,8 @@
 import { File } from "../../common/module/File";
 import { JavaTypeStore } from "./JavaTypeStore";
 import { JavaCompiledModule as JavaCompiledModule } from "./JavaCompiledModule";
+import { NonPrimitiveType } from "../types/NonPrimitiveType";
+import { JavaClassOrEnum } from "../types/JavaClassOrEnum";
 
 
 /**
@@ -75,12 +77,34 @@ export class JavaModuleManager {
         this.modules = this.modules.filter(m => files.indexOf(m.file) >= 0);
     }
 
-    getDirtyModules(): JavaCompiledModule[] {
+    getNewOrDirtyModules(): JavaCompiledModule[] {
         return this.modules.filter(m => m.dirty);
     }
 
     getUnChangedModules(): JavaCompiledModule[] {
         return this.modules.filter(m => !m.dirty);
+    }
+
+    compileModulesToJavascript(){
+        for(let module of this.modules){
+            module.mainProgram?.compileToJavascriptFunctions();
+            if(!module.ast) continue;
+            for(let cdef of module.ast.classOrInterfaceOrEnumDefinitions){
+                if(cdef instanceof NonPrimitiveType){
+                    if(!cdef.runtimeClass) continue;
+                    for(let method of cdef.runtimeClass.__programs){
+                        method.compileToJavascriptFunctions();
+                    }
+                }
+
+                if(cdef instanceof JavaClassOrEnum){
+                    cdef.staticConstructor?.compileToJavascriptFunctions();
+                    cdef.staticFieldConstructor?.compileToJavascriptFunctions();
+                    cdef.fieldConstructor?.compileToJavascriptFunctions();
+                }
+            }
+        }
+
     }
 
 }

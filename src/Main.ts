@@ -21,6 +21,8 @@ import { TestPrintManager } from "./testgui/TestPrintManager.ts";
 import jQuery from "jquery";
 import { ActionManager } from "./testgui/ActionManager.ts";
 import { testPrograms } from "./testgui/testprograms/TestPrograms.ts";
+import { JavaBaseModule } from "./compiler/java/module/JavaBaseModule.ts";
+import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts";
 
 export class Main {
 
@@ -83,7 +85,6 @@ export class Main {
     this.file.monacoModel = this.inputEditor.editor.getModel()!;
 
     this.libraryModuleManager = new JavaLibraryModuleManager();
-    this.libraryModuleManager.compileClassesToTypes();
 
     this.compiler = new JavaCompiler(this.libraryModuleManager);
 
@@ -115,22 +116,23 @@ export class Main {
 
   compile() {
 
-    this.compiler.compile([this.file]);
+    let executable = this.compiler.compile([this.file], this.file);
 
-    let module = this.compiler.moduleManager.getModuleFromFile(this.file)!;
+    let module = <JavaCompiledModule>executable.mainModule;
 
-    TokenPrinter.print(module.tokens!, this.tokenDiv);
-    this.astComponent.buildTreeView(module.ast);
+    if(module){
+      TokenPrinter.print(module.tokens!, this.tokenDiv);
+      this.astComponent.buildTreeView(module.ast);
+  
+      this.markErrors(module);
+      this.printErrors(module);
+  
+      let codePrinter = new CodePrinter();
+      let output = codePrinter.formatCode(module);
+  
+      this.codeOutputEditor.getModel()?.setValue(output);
 
-    this.markErrors(module);
-    this.printErrors(module);
-
-    let codePrinter = new CodePrinter();
-    let output = codePrinter.formatCode(module);
-
-    this.codeOutputEditor.getModel()?.setValue(output);
-
-    module.mainProgram?.compileToJavascriptFunctions();
+    }
 
     this.interpreter.init(module);
 

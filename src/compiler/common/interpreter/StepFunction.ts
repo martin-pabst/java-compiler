@@ -1,3 +1,4 @@
+import { Program } from "./Program.ts";
 import { Thread } from "./Thread.ts";
 
 export type StepFunction = (thread: Thread, stack: any[], stackBase: number) => number;
@@ -14,6 +15,9 @@ export class Helpers {
     static newArray = StepParams.thread + ".newArray"; 
     static print = StepParams.thread + ".print"; 
     static println = StepParams.thread + ".println"; 
+    static return = StepParams.thread + ".return";
+    static threadStack = StepParams.thread + ".s";
+    static pushProgram = StepParams.thread + ".pushProgram";
 }
 
 /**
@@ -26,6 +30,6 @@ export class Helpers {
 // Thread function returns new stepIndex
 
 export type Klass = { new(...args: any[]): any, [index: string]: any };
-export type KlassObjectRegistry = { [identifier: string]: Klass };
+export type KlassObjectRegistry = Record<string, Klass>;
 
     

@@ -27,7 +27,8 @@ export abstract class IJavaClass extends JavaClassOrEnum {
 
     abstract getFields(): Field[];
     abstract getMethods(): Method[];
-    
+
+    abstract getExtends(): IJavaClass | undefined;    
 }
 
 

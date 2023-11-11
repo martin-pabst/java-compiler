@@ -3,6 +3,7 @@ import { TokenType } from "../TokenType";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable.ts";
 import { GenericTypeParameter } from "../types/GenericInformation.ts";
 import { JavaType } from "../types/JavaType.ts";
+import { Method } from "../types/Method.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { Visibility } from "../types/Visibility.ts";
 
@@ -120,6 +121,7 @@ export interface ASTMethodDeclarationNode extends ASTNode, ASTNodeWithModifiers,
     isContructor: boolean;
     isAbstract: boolean;
     statement: ASTStatementNode | undefined;  // undefined in case of abstract method and methoddeclaration in interface
+    method?: Method;
 }
 
 export interface ASTLambdaFunctionDeclarationNode extends ASTNode {

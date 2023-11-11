@@ -1,4 +1,5 @@
 import { ErrorLevel } from "../../common/Error";
+import { Klass } from "../../common/interpreter/StepFunction";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
@@ -22,7 +23,7 @@ export class TypeResolver {
     dirtyModules: JavaCompiledModule[];
 
     constructor(private moduleManager: JavaModuleManager, private libraryModuleManager: JavaLibraryModuleManager) {
-        this.dirtyModules = this.moduleManager.getDirtyModules();
+        this.dirtyModules = this.moduleManager.getNewOrDirtyModules();
     }
 
     resolve() {
@@ -34,6 +35,8 @@ export class TypeResolver {
         this.resolveGenericParameterTypesAndExtendsImplements();
 
         this.buildFieldsAndMethods();
+
+        this.buildRuntimeClassesAndTheirFields();
     }
 
     generateNewTypesWithGenericsButWithoutFieldsAndMethods() {
@@ -250,32 +253,33 @@ export class TypeResolver {
     }
 
     buildMethods(node: ASTInterfaceDefinitionNode | ASTClassDefinitionNode | ASTEnumDefinitionNode,
-         type: JavaInterface | JavaClass | JavaEnum, module: JavaCompiledModule) {
-            for(let methodNode of node.methods){
-                let method = new Method(methodNode.identifier, methodNode.identifierRange,
-                    module, methodNode.visibility);
-                method.isAbstract = methodNode.isAbstract;
-                method.isFinal = methodNode.isFinal;
-                method.isStatic = methodNode.isStatic;
+        type: JavaInterface | JavaClass | JavaEnum, module: JavaCompiledModule) {
+        for (let methodNode of node.methods) {
+            let method = new Method(methodNode.identifier, methodNode.identifierRange,
+                module, methodNode.visibility);
+            methodNode.method = method;
+            method.isAbstract = methodNode.isAbstract;
+            method.isFinal = methodNode.isFinal;
+            method.isStatic = methodNode.isStatic;
 
-                method.returnParameter = methodNode.returnParameterType?.resolvedType;
-                for(let p of methodNode.parameters){
-                    if(p.type?.resolvedType){
-                        let parameter = new Parameter(p.identifier, p.identifierRange, 
-                            module, p.type?.resolvedType);
-                        method.parameters.push(parameter);
-                    }
+            method.returnParameter = methodNode.returnParameterType?.resolvedType;
+            for (let p of methodNode.parameters) {
+                if (p.type?.resolvedType) {
+                    let parameter = new Parameter(p.identifier, p.identifierRange,
+                        module, p.type?.resolvedType);
+                    method.parameters.push(parameter);
                 }
-
-                type.methods.push(method);
             }
+
+            type.methods.push(method);
+        }
     }
 
     buildFields(node: ASTClassDefinitionNode | ASTEnumDefinitionNode, type: JavaClass | JavaEnum, module: JavaCompiledModule) {
-        for(let fieldNode of node.fields){
-            if(fieldNode.type.resolvedType){
+        for (let fieldNode of node.fields) {
+            if (fieldNode.type.resolvedType) {
                 let field = new Field(fieldNode.identifier, fieldNode.identifierRange, module,
-                      fieldNode.type.resolvedType, fieldNode.visibility);
+                    fieldNode.type.resolvedType, fieldNode.visibility);
                 field.isFinal = fieldNode.isFinal;
                 field.isStatic = fieldNode.isStatic;
                 type.fields.push(field);
@@ -283,6 +287,49 @@ export class TypeResolver {
         }
     }
 
+
+    buildRuntimeClassesAndTheirFields() {
+
+        let enumRuntimeClass: Klass = (<JavaEnum>this.libraryModuleManager.typestore.getType("Enum")!).runtimeClass!;
+
+        for (let module of this.dirtyModules) {
+            for (let decl of module.ast!.classOrInterfaceOrEnumDefinitions) {
+                if (decl.kind == TokenType.keywordEnum) {
+                    let javaEnum = <JavaEnum>decl.resolvedType;
+                    if (javaEnum) javaEnum.initRuntimeClass(enumRuntimeClass);
+                    for (let field of decl.fields) {
+                        javaEnum.fields.push(new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility));
+                    }
+                }
+            }
+        }
+
+        let objectClass = <JavaClass>this.libraryModuleManager.typestore.getType("Object");
+
+        let done: boolean = false;
+        while (!done) {
+            done = true;
+            for (let module of this.dirtyModules) {
+                for (let decl of module.ast!.classOrInterfaceOrEnumDefinitions) {
+                    if (decl.kind == TokenType.keywordClass) {
+                        let javaClass = <JavaClass>decl.resolvedType;
+                        if (!javaClass.runtimeClass) {
+                            let baseClass = javaClass.getExtends();
+                            if (!baseClass) baseClass = objectClass;
+                            if (baseClass.runtimeClass) {
+                                javaClass.initRuntimeClass(baseClass.runtimeClass);
+                                for (let field of decl.fields) {
+                                    javaClass.fields.push(new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility));
+                                }
+                                done = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 
 
 

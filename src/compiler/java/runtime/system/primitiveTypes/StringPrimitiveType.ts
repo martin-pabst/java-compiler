@@ -5,12 +5,16 @@ export class StringPrimitiveType extends PrimitiveType {
     
     constructor(module: JavaBaseModule){
         super('string', module);
-        this.defaultValue = `""`;
+        this.defaultValueAsString = `""`;
     }
     
     isUsableAsIndex(): boolean {
         return false;
     }
     
+    getDefaultValue() {
+        return 0;
+    }
+
 
 }

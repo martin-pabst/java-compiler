@@ -1,5 +1,6 @@
 import { Program } from "../../../common/interpreter/Program";
 import { JavaLibraryModule } from "../../module/libraries/JavaLibraryModule";
+import { EnumClass } from "./javalang/EnumClass.ts";
 import { ObjectClass, StringClass } from "./javalang/ObjectClassStringClass";
 import { BooleanPrimitiveType } from "./primitiveTypes/BooleanPrimitiveType";
 import { BytePrimitiveType } from "./primitiveTypes/BytePrimitiveType";
@@ -32,7 +33,7 @@ export class SystemModule extends JavaLibraryModule {
         )
 
         this.classes.push(
-            ObjectClass, StringClass, NumberClass, IntegerClass
+            ObjectClass, StringClass, NumberClass, IntegerClass, EnumClass
         )
 
     }

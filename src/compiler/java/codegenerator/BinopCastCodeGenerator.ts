@@ -62,7 +62,9 @@ export class BinopCastCodeGenerator {
     primitiveTypes: JavaType[] = [];
 
 
-    constructor(protected module: JavaCompiledModule, protected libraryTypestore: JavaTypeStore) {
+    constructor(protected module: JavaCompiledModule, 
+        protected libraryTypestore: JavaTypeStore,
+        protected compiledTypesTypestore: JavaTypeStore) {
 
         this.voidType = this.libraryTypestore.getType("void")!;
         this.charType = this.libraryTypestore.getType("char")!;

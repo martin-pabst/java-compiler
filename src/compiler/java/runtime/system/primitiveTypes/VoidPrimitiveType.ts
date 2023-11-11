@@ -5,11 +5,15 @@ export class VoidPrimitiveType extends PrimitiveType {
     
     constructor(module: JavaBaseModule){
         super('void', module);
-        this.defaultValue = "";
+        this.defaultValueAsString = "null";
     }
     
     isUsableAsIndex(): boolean {
         return false;
+    }
+
+    getDefaultValue() {
+        return null;
     }
 
 }

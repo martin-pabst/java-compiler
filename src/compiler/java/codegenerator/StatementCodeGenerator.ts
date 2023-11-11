@@ -2,7 +2,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBlockNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTStatementNode, ASTWhileNode } from "../parser/AST";
+import { ASTBlockNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTWhileNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippetContainer, EmptyPart } from "./CodeSnippetKinds.ts";
@@ -12,12 +12,13 @@ import { JavaLocalVariable } from "./JavaLocalVariable";
 import { JumpToLabelCodeSnippet, LabelCodeSnippet } from "./LabelManager.ts";
 import { SnippetFramer } from "./CodeSnippetTools.ts";
 import { TermCodeGenerator } from "./TermCodeGenerator";
+import { Method } from "../types/Method.ts";
 
 export class StatementCodeGenerator extends TermCodeGenerator {
 
 
-    constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore) {
-        super(module, libraryTypestore);
+    constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore) {
+        super(module, libraryTypestore, compiledTypesTypestore);
     }
 
 
@@ -42,6 +43,8 @@ export class StatementCodeGenerator extends TermCodeGenerator {
                 snippet = this.compileDoStatement(<ASTDoWhileNode>ast); break;
             case TokenType.keywordFor:
                 snippet = this.compileForStatement(<ASTForLoopNode>ast); break;
+            case TokenType.keywordReturn:
+                snippet = this.compileReturnStatement(<ASTReturnNode>ast); break;
 
 
             default:
@@ -64,6 +67,47 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
         return snippet;
 
+    }
+
+    compileReturnStatement(node: ASTReturnNode): CodeSnippet | undefined {
+        let snippet = new CodeSnippetContainer([], node.range);
+
+        let method: Method | undefined = this.currentSymbolTable.getMethodContext();
+        if(!method){
+            this.pushError("Eine return-Anweisung ist nur innerhalb einer Methode sinnvoll.", "error", node.range);
+            return undefined;
+        }
+
+        if(node.term){
+
+            if(!method.returnParameter || method.returnParameter == this.voidType){
+                this.pushError("Die Methode erwartet keinen Rückgabewert, hier ist aber einer angegeben.", "error", node.range);
+                return undefined;
+            }
+
+            let termSnippet = this.compileTerm(node.term);
+            if(!termSnippet) return undefined;
+
+            if(!this.canCastTo(termSnippet.type, method.returnParameter, "implicit")){
+                this.pushError("Die Methode erwartet einen Rückgabewert vom Typ " + method.returnParameter.identifier + ", der Wert des Terms hat aber den Datentyp " + termSnippet.type?.identifier  + ".", "error", node.range);
+                return undefined;
+            }
+
+            termSnippet = this.compileCast(termSnippet, method.returnParameter, "explicit");
+
+            snippet.addParts(new OneParameterTemplate(`${Helpers.return}($1);`).applyToSnippet(this.voidType, node.range, termSnippet));
+
+        } else {
+            if(method.returnParameter && method.returnParameter != this.voidType){
+                this.pushError("Die Methode erwartet einen Rückgabewert vom Typ " + method.returnParameter.identifier + ", hier wird aber keiner übergeben.", "error", node.range);
+                return undefined;
+            }            
+            snippet.addStringPart(`${Helpers.return}();`);
+        } 
+
+        snippet.addNextStepMark();
+
+        return snippet;
     }
 
 
@@ -271,7 +315,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
             }
 
         } else {
-            let defaultValue: string = variable.type.isPrimitive ? (<PrimitiveType>variable.type).defaultValue : "null";
+            let defaultValue: string = variable.type.isPrimitive ? (<PrimitiveType>variable.type).defaultValueAsString : "null";
             initValueSnippet = new StringCodeSnippet(defaultValue, node.range, variable.type);
         }
 

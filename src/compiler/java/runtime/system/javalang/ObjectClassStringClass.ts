@@ -1,3 +1,4 @@
+import { Program } from "../../../../common/interpreter/Program";
 import { Thread } from "../../../../common/interpreter/Thread";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
 
@@ -10,6 +11,8 @@ export class ObjectClass {
         {type: "m", signature: "public Object()", native: ObjectClass.prototype._constructor},
         {type: "m", signature: "public String toString()", native: ObjectClass.prototype.toString}
     ]
+
+    declare __programs: Program[]; // only for compatibility with java classes; not used in library classes
 
     static type: NonPrimitiveType;
 
@@ -65,7 +68,7 @@ export class StringClass extends ObjectClass {
     }
 
     _toString(t: Thread) {
-        t.stack.push(this.value);        
+        t.s.push(this.value);        
     }
 
     plusOtherString(s: StringClass): StringClass {
@@ -74,14 +77,14 @@ export class StringClass extends ObjectClass {
 
     plusObject(t: Thread, o: ObjectClass){
         t.pushCallback(() => {
-            t.stack.push(new StringClass(this.value + t.stack.pop().text))
+            t.s.push(new StringClass(this.value + t.s.pop().text))
         });
         o._m$toString$String$(t);
     }
 
     plusObjectFromLeft(t: Thread, o: ObjectClass){
         t.pushCallback(() => {
-            t.stack.push(new StringClass(t.stack.pop().text + this.value))
+            t.s.push(new StringClass(t.s.pop().text + this.value))
         });
         o._m$toString$String$(t);
     }

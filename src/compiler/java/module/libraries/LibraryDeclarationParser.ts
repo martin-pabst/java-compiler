@@ -1,4 +1,4 @@
-import { Klass } from "../../../common/interpreter/Scheduler";
+import { Klass } from "../../../common/interpreter/StepFunction";
 import { EmptyRange, IRange } from "../../../common/range/Range";
 import { TokenType } from "../../TokenType";
 import { ArrayType } from "../../types/ArrayType";
@@ -74,12 +74,15 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 npt1.isStatic = modifiersAndType.static;
                 npt1.isFinal = modifiersAndType.final;
                 npt1.isAbstract = modifiersAndType.abstract;
+                npt1.runtimeClass = klass;
                 break;
             case TokenType.keywordInterface:
                 npt = new JavaInterface(identifier, module, LibraryDeclarationParser.nullRange);
                 break;
             case TokenType.keywordEnum:
                 npt = new JavaEnum(identifier, module, LibraryDeclarationParser.nullRange);
+                let npt2 = <JavaEnum> npt;
+                npt2.runtimeClass = klass;
                 break;
         }
         

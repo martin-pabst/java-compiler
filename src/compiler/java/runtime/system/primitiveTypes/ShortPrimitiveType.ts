@@ -5,11 +5,15 @@ export class ShortPrimitiveType extends PrimitiveType {
     
     constructor(module: JavaBaseModule){
         super('short', module);
-        this.defaultValue = "0";
+        this.defaultValueAsString = "0";
     }
     
     isUsableAsIndex(): boolean {
         return true;
+    }
+
+    getDefaultValue() {
+        return 0;
     }
 
 }

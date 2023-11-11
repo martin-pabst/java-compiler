@@ -4,6 +4,7 @@ import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaClass } from "../types/JavaClass";
 import { JavaEnum } from "../types/JavaEnum";
 import { JavaType } from "../types/JavaType.ts";
+import { Method } from "../types/Method.ts";
 import { JavaLocalVariable } from "./JavaLocalVariable";
 
 
@@ -16,7 +17,8 @@ export class JavaSymbolTable extends BaseSymbolTable {
     declare identifierToSymbolMap: Map<string, JavaLocalVariable>;
 
     constructor(public module: JavaCompiledModule, range: IRange, withStackFrame: boolean,
-        public classContext?: JavaClass | JavaEnum | undefined){
+        public classContext?: JavaClass | JavaEnum | undefined,
+        public methodContext?: Method){
         super(range, module.file);
         if(withStackFrame){
             this.stackframe = new BaseStackframe(classContext ? 1 : 0);
@@ -64,6 +66,23 @@ export class JavaSymbolTable extends BaseSymbolTable {
         }
         return st.stackframe;
     }
+
+    getClassContext(): JavaType | undefined {
+        let st: JavaSymbolTable = this;
+        while(!st.classContext && st.parent){
+            st = st.parent;
+        }
+        return st.classContext;
+    }
+
+    getMethodContext(): Method | undefined {
+        let st: JavaSymbolTable = this;
+        while(!st.methodContext && st.parent){
+            st = st.parent;
+        }
+        return st.methodContext;
+    }
+
 
 }
 

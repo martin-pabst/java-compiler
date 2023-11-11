@@ -8,7 +8,7 @@ import { JavaType } from "../../../types/JavaType";
 export abstract class PrimitiveType extends JavaType {
     myIndex: number;
 
-    defaultValue: string = "0";
+    defaultValueAsString: string = "0";
 
     static boxedTypeIdentifiers: string[] = ["Boolean", "Character", "Byte", "Short", "Integer", "Long", "Float", "Double"];
     static typeIdentifiers: string[] = ['boolean', 'char', 'byte', 'short', 'int', 'long', 'float', 'double'];
@@ -34,6 +34,8 @@ export abstract class PrimitiveType extends JavaType {
     getFile(): File {
         return this.module.file;
     }
+
+    abstract getDefaultValue(): any;
 
     getCopyWithConcreteType(_typeMap: Map<GenericTypeParameter, JavaType>): JavaType {
         return this;

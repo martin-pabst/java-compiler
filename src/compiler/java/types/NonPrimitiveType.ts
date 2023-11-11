@@ -1,4 +1,5 @@
 import { Program } from "../../common/interpreter/Program.ts";
+import { Klass } from "../../common/interpreter/StepFunction.ts";
 import { IRange } from "../../common/range/Range";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
@@ -22,9 +23,49 @@ export abstract class NonPrimitiveType extends JavaType {
     abstract getFields(): Field[];
     abstract getMethods(): Method[];
 
+    runtimeClass?: Klass;
+
+
     constructor(identifier: string, identifierRange: IRange, module: JavaBaseModule){
         super(identifier, identifierRange, module);
         this.isPrimitive = false;
     }
+
+    getDefaultValue() {
+        return null;
+    }
+
+    initRuntimeClass(baseClass: Klass) {
+        this.runtimeClass = class extends baseClass { };
+        this.runtimeClass.__programs = [];
+    }
+
+    getPossibleMethods(identifier: string, length: number, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
+        let methods: Method[] = [];
+
+        if (isConstructor) {
+            let type: NonPrimitiveType | undefined = this;
+            while (type) {
+                methods = methods.concat(type.getMethods().filter(m => {
+                    m.parameters.length == length && m.isConstructor
+                }));
+                //@ts-ignore
+                if (type["getExtends"]) type = type.getExtends();
+            }
+        } else {
+            let type: NonPrimitiveType | undefined = this;
+            while (type) {
+                methods = methods.concat(type.getMethods().filter(m => {
+                    m.parameters.length == length && !m.isConstructor && m.identifier == identifier
+                    && (!hasToBeStatic || m.isStatic)
+                }));
+                //@ts-ignore
+                if (type["getExtends"]) type = type.getExtends();
+            }
+        }
+
+        return methods;
+    }
+
 
 }

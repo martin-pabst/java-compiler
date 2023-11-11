@@ -19,6 +19,10 @@ export class ArrayType extends JavaType {
 
     }
 
+    getDefaultValue(){
+        return null;
+    }
+
     getCastFunction(_destType: JavaType): CodeTemplate | undefined {
         return undefined;  // you can't cast arrays in java (to my knowledge...).
     }
