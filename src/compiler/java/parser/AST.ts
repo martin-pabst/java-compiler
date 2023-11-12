@@ -1,3 +1,4 @@
+import { Program } from "../../common/interpreter/Program.ts";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable.ts";
@@ -31,6 +32,11 @@ export interface ASTNode {
     symbolTable?: JavaSymbolTable;
 }
 
+export interface ASTDebugProgram extends ASTNode {
+    kind: TokenType.astProgram,
+    program: Program;
+}
+
 export interface TypeScope {
     classOrInterfaceOrEnumDefinitions: (ASTClassDefinitionNode | ASTInterfaceDefinitionNode | ASTEnumDefinitionNode)[];
 }
@@ -40,6 +46,9 @@ export interface ASTGlobalNode extends ASTNode, TypeScope {
     mainProgramNode: ASTProgramNode;
 
     collectedTypeNodes: ASTTypeNode[];
+
+    program?: Program;  // only for debugging purposes
+
 }
 
 /**
@@ -122,6 +131,7 @@ export interface ASTMethodDeclarationNode extends ASTNode, ASTNodeWithModifiers,
     isAbstract: boolean;
     statement: ASTStatementNode | undefined;  // undefined in case of abstract method and methoddeclaration in interface
     method?: Method;
+    program?: Program,       // only for debugging purposes
 }
 
 export interface ASTLambdaFunctionDeclarationNode extends ASTNode {
@@ -145,7 +155,11 @@ export interface ASTClassDefinitionNode
     parent: TypeScope;
     innerClasses: ASTClassDefinitionNode[],
     extends: ASTTypeNode | undefined,
-    implements: ASTTypeNode[]
+    implements: ASTTypeNode[],
+
+    staticFieldConstructorProgram?: Program,       // only for debugging purposes,
+    staticConstructorProgram?: Program,       // only for debugging purposes,
+    fieldConstructorProgram?: Program,       // only for debugging purposes
 }
 
 export interface ASTInterfaceDefinitionNode

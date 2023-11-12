@@ -3,6 +3,7 @@ import { Module } from "../module/Module";
 import { EmptyRange, IRange } from "../range/Range";
 import { Thread } from "./Thread";
 import { StepFunction, StepParams } from "./StepFunction.ts";
+import { CodePrinter } from "../../java/codegenerator/CodePrinter.ts";
 
 
 
@@ -79,4 +80,9 @@ export class Program {
         step.codeAsString = statement;
         this.stepsSingle.push(step);
     }
+
+    getSourcecode(): string {
+        return new CodePrinter().printProgram(this);
+    }
+
 }

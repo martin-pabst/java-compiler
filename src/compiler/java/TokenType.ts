@@ -160,6 +160,7 @@ export enum TokenType {
     symbol,
     annotation,
     forLoopOverCollection,
+    astProgram,
 
     type, // e.g. int[][]
     attributeDeclaration,

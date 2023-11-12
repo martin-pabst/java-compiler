@@ -1,6 +1,8 @@
 
+import { Program } from '../compiler/common/interpreter/Program';
+import { EmptyRange } from '../compiler/common/range/Range';
 import { TokenType } from '../compiler/java/TokenType';
-import { ASTNode, ASTGlobalNode } from '../compiler/java/parser/AST';
+import { ASTNode, ASTGlobalNode, ASTDebugProgram } from '../compiler/java/parser/AST';
 import { DOM } from '../tools/DOM';
 import { Treeview } from '../tools/components/treeview/Treeview';
 import '/include/css/astcomponent.css';
@@ -24,6 +26,8 @@ export class AstComponent {
     treeviewDiv: HTMLDivElement;
     detailsDiv: HTMLDivElement;
 
+    editor: monaco.editor.IStandaloneCodeEditor;
+
     astTreeview: Treeview<ASTNode>;
 
     constructor(parentDiv: HTMLDivElement) {
@@ -31,6 +35,12 @@ export class AstComponent {
         parentDiv.classList.add('jo_ast_main');
         this.treeviewDiv = DOM.makeDiv(parentDiv, 'jo_ast_treeview');
         this.detailsDiv = DOM.makeDiv(parentDiv, 'jo_ast_details');
+
+        this.editor = monaco.editor.create(this.detailsDiv, {
+            value: "/** Awaiting compilation... */",
+            language: "javascript",
+            automaticLayout: true,
+              });
 
         this.astTreeview = new Treeview<ASTNode>(this.treeviewDiv, {
             captionLine: {
@@ -60,6 +70,21 @@ export class AstComponent {
         
         this.astTreeview.addNode(childNodeInfo.length > 0, (role ? role + ": " : "") +
             TokenType[node.kind], undefined, node, node, parent);
+
+            for(const [field, value] of Object.entries(node)){
+                if(value instanceof Program){
+                    let node1: ASTDebugProgram = {
+                        kind: TokenType.astProgram, 
+                        range: EmptyRange.instance, 
+                        program: value
+                    }
+
+                    this.astTreeview.addNode(false, field, "img_start-dark", 
+                        node1, 
+                        value, node);
+                }
+            }
+        
 
         for(let cni of childNodeInfo){
 
@@ -96,6 +121,7 @@ export class AstComponent {
         for(const [field, value] of Object.entries(node)){
 
             if(field == 'parent') continue;
+            if(field == 'enclosingClassOrInterface') continue;
             if(!value) continue;
 
             if(value['kind'] != null && value['range'] != null){
@@ -133,42 +159,53 @@ export class AstComponent {
     }
 
     showDetails(node: ASTNode){
-        DOM.clear(this.detailsDiv);
-        DOM.makeDiv(this.detailsDiv, 'jo_ast_details_heading').textContent = "Kind: " + TokenType[node.kind];
-        
-        let childNodeInfoList = this.getChildNodeInfo(node);
-        for(let cni of childNodeInfoList){
-            if(cni.key == 'kind') continue;
-            if(cni.key == 'range'){
 
-                continue;
-            } 
-            let line = DOM.makeDiv(this.detailsDiv, 'jo_ast_details_line');
-            
-            DOM.makeSpan(line, '.jo_st_details_key').textContent = cni.key + ": ";
-            if(cni.isChildNode){
-                
-                let value: string = "";
-                if(Array.isArray(cni.childNodes)){
-                    let type: string = "";
-                    if(cni.childNodes.length > 0) type = TokenType[cni.childNodes[0].kind];
-                    value = type + "[" + cni.childNodes.length + "]";
+
+        let text = '';
+        let language: string = "";
+        if(node.kind == TokenType.astProgram){
+            let program = (<ASTDebugProgram><any>node).program;
+            text = program.getSourcecode();
+            language = 'javascript';
+        } else {
+            language = 'text';
+            let childNodeInfoList = this.getChildNodeInfo(node);
+            for(let cni of childNodeInfoList){
+                if(cni.key == 'kind') continue;
+                if(cni.key == 'range'){
+    
+                    continue;
+                } 
+
+                text += cni.key + ": ";
+                if(cni.isChildNode){
+                    
+                    let value: string = "";
+                    if(Array.isArray(cni.childNodes)){
+                        let type: string = "";
+                        if(cni.childNodes.length > 0) type = TokenType[cni.childNodes[0].kind];
+                        value = type + "[" + cni.childNodes.length + "]";
+                    } else {
+                        let type1: string = "";
+                        //@ts-ignore
+                        if(value != null) type1 = TokenType[value.type];
+                        value = type1;
+                    }
+                    text += value + "\n";
                 } else {
-                    let type1: string = "";
-                    //@ts-ignore
-                    if(value != null) type1 = TokenType[value.type];
-                    value = type1;
+                    let value: string = "" + cni.value;
+                    if(cni.key == "operator") value = TokenType[cni.value];
+                    if(Array.isArray(cni.value)) value = "[" + value.length + "]";
+                    text += value + "\n";
                 }
-                
-                DOM.makeSpan(line, '.jo_st_details_value').textContent =  value;
-            } else {
-                let value: string = "" + cni.value;
-                if(cni.key == "operator") value = TokenType[cni.value];
-                if(Array.isArray(cni.value)) value = "[" + value.length + "]";
-                DOM.makeSpan(line, '.jo_st_details_value').textContent =  value;
+    
             }
 
         }
+
+        let model = monaco.editor.createModel(text, language);
+
+        this.editor.setModel(model);        
         
     }
 

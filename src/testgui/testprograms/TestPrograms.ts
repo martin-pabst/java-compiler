@@ -1,4 +1,9 @@
 export var testPrograms = {
+simpleClass:`
+class Test {
+   int i = 12;
+}
+`,
 simpleWhileLoops: `
 int i = 0;
 while(i < 10000){
