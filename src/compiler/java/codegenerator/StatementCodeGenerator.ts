@@ -2,7 +2,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTAnonymousClassNode, ASTBinaryNode, ASTBlockNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTWhileNode } from "../parser/AST";
+import { ASTAnonymousClassNode, ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ConstantType } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippetContainer, EmptyPart } from "./CodeSnippetKinds.ts";
@@ -13,8 +13,7 @@ import { JumpToLabelCodeSnippet, LabelCodeSnippet } from "./LabelManager.ts";
 import { SnippetFramer } from "./CodeSnippetTools.ts";
 import { TermCodeGenerator } from "./TermCodeGenerator";
 import { Method } from "../types/Method.ts";
-import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
-import { CatchBlockInfo } from "../../common/interpreter/ExceptionInfo.ts";
+import { IntPrimitiveType } from "../runtime/system/primitiveTypes/IntPrimitiveType.ts";
 
 export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
@@ -35,8 +34,12 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
                 snippet = this.compileLocaleVariableDeclaration(<ASTLocalVariableDeclaration>ast); break;
             case TokenType.print:
                 snippet = this.compilePrintStatement(<ASTPrintStatementNode>ast); break;
+            case TokenType.keywordBreak:
+                snippet = this.compileBreakStatement(<ASTBreakNode>ast); break;
             case TokenType.keywordIf:
                 snippet = this.compileIfStatement(<ASTIfNode>ast); break;
+            case TokenType.keywordSwitch:
+                snippet = this.compileSwitchCaseStatement(<ASTSwitchCaseNode> ast); break;
             case TokenType.block:
                 snippet = this.compileBlockNode(<ASTBlockNode>ast); break;
             case TokenType.keywordWhile:
@@ -47,16 +50,12 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
                 snippet = this.compileForStatement(<ASTForLoopNode>ast); break;
             case TokenType.keywordReturn:
                 snippet = this.compileReturnStatement(<ASTReturnNode>ast); break;
-            case TokenType.keywordTry:
-                snippet = this.compileTryCatchStatement(<ASTTryCatchNode>ast); break;
-            case TokenType.keywordThrow:
-                snippet = this.compileThrowStatement(<ASTThrowNode>ast); break;
 
 
             default:
                 snippet = this.compileTerm(ast);
                 if (snippet) {
-                    if(!snippet.endsWith(";\n")) snippet = new CodeSnippetContainer(SnippetFramer.frame(snippet, '§1;\n'));
+                    snippet = SnippetFramer.frame(snippet, "§1;\n");
                 }
         }
 
@@ -74,7 +73,15 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         return snippet;
 
     }
-
+    compileBreakStatement(node: ASTBreakNode): CodeSnippet | undefined {
+        let label = this.breakStack.pop();
+        if (!label) {
+            this.pushError("An dieser Stelle kann kein break stehen, da der Ausdruck nicht innerhalb einer Schleife (for, while, do) oder switch-case Anweisung steht.", "error",node);
+            return undefined;
+        }
+        this.breakStack.push(label);
+        return new JumpToLabelCodeSnippet(label);
+    }
     compileReturnStatement(node: ASTReturnNode): CodeSnippet | undefined {
 
         this.missingStatementManager.onReturnHappened();
@@ -104,19 +111,14 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
             termSnippet = this.compileCast(termSnippet, method.returnParameterType, "implicit");
 
-            snippet.addParts(new OneParameterTemplate(`${Helpers.return}(§1);\n`).applyToSnippet(this.voidType, node.range, termSnippet));
+            snippet.addParts(new OneParameterTemplate(`${Helpers.return}(§1);`).applyToSnippet(this.voidType, node.range, termSnippet));
 
         } else {
             if(method.returnParameterType && method.returnParameterType != this.voidType){
                 this.pushError("Die Methode erwartet einen Rückgabewert vom Typ " + method.returnParameterType.identifier + ", hier wird aber keiner übergeben.", "error", node.range);
                 return undefined;
             }            
-
-            if(method.isConstructor){
-                snippet.addStringPart(`${Helpers.return}(${Helpers.elementRelativeToStackbase(0)});\n`);
-            } else {
-                snippet.addStringPart(`${Helpers.return}();\n`);
-            }
+            snippet.addStringPart(`${Helpers.return}();`);
         } 
 
         snippet.addNextStepMark();
@@ -134,18 +136,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         this.pushAndGetNewSymbolTable(node.range, false);
 
         let firstStatement = this.compileStatementOrTerm(node.firstStatement);
-
-
-        let conditionNode = node.condition;
-        if(!conditionNode) return undefined;
-
-        let negationResult = this.negateConditionIfPossible(conditionNode);
-
-        conditionNode = negationResult.newNode;
-
-        let condition = this.compileTerm(conditionNode);
-
-
+        let condition = this.compileTerm(node.condition);
         let lastStatement = this.compileStatementOrTerm(node.lastStatement);
 
         let statementsToRepeat = this.compileStatementOrTerm(node.statementToRepeat);
@@ -166,7 +157,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         forSnippet.addParts(firstStatement);
         forSnippet.addNextStepMark();
         forSnippet.addParts(label1);
-        forSnippet.addParts(new OneParameterTemplate(negationResult.negationHappened ? 'if(§1){\n' : 'if(!(§1)){\n').applyToSnippet(this.voidType, node.condition!.range, condition));
+        forSnippet.addParts(new OneParameterTemplate('if(!(§1)){\n').applyToSnippet(this.voidType, node.condition!.range, condition));
         forSnippet.addParts(jumpToLabel2);
         forSnippet.addStringPart("}\n");
         forSnippet.addNextStepMark();
@@ -226,14 +217,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
     }
 
     compileWhileStatement(node: ASTWhileNode): CodeSnippetContainer | undefined {
-        let conditionNode = node.condition;
-        if(!conditionNode) return undefined;
-
-        let negationResult = this.negateConditionIfPossible(conditionNode);
-
-        conditionNode = negationResult.newNode;
-
-        let condition = this.compileTerm(conditionNode);
+        let condition = this.compileTerm(node.condition);
 
         this.printErrorifValueNotBoolean(condition?.type, node.condition);
 
@@ -245,7 +229,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         let label1 = new LabelCodeSnippet();
         let label2 = new LabelCodeSnippet();
         whileSnippet.addParts(label1);
-        let sn1 = SnippetFramer.frame(condition, negationResult.negationHappened ? "if(§1){\n" : "if(!(§1)){\n", this.voidType);
+        let sn1 = SnippetFramer.frame(condition, "if(!(§1)){\n", this.voidType);
         whileSnippet.addParts(sn1);
         whileSnippet.addParts(new JumpToLabelCodeSnippet(label2));
         whileSnippet.addStringPart("}", undefined);
@@ -259,42 +243,9 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
     }
 
 
-    negateConditionIfPossible(node: ASTTermNode): {newNode: ASTTermNode, negationHappened: boolean} {
-        if(node.kind == TokenType.binaryOp){
-            let node1 = <ASTBinaryNode> node;
-            switch(node1.operator){
-                case TokenType.lower: node1.operator = TokenType.greaterOrEqual; break;
-                case TokenType.lowerOrEqual: node1.operator = TokenType.greater; break;
-                case TokenType.greater: node1.operator = TokenType.lowerOrEqual; break;
-                case TokenType.greaterOrEqual: node1.operator = TokenType.lower; break;
-                case TokenType.notEqual: node1.operator = TokenType.equal; break;
-                case TokenType.equal: node1.operator = TokenType.notEqual; break;
-                default: 
-                    return {newNode: node1, negationHappened: false};
-            }
-            return {newNode: node1, negationHappened: true};
-        }
-
-        if(node.kind == TokenType.unaryPrefixOp){
-            let node1 = <ASTUnaryPrefixNode>node;
-            if(node1.operator == TokenType.not){
-                return {newNode: node1.term, negationHappened: true}
-            }
-        }
-
-        return {newNode: node, negationHappened: false}
-    }
 
     compileIfStatement(node: ASTIfNode): CodeSnippetContainer | undefined {
-
-        let conditionNode = node.condition;
-        if(!conditionNode) return undefined;
-
-        let negationResult = this.negateConditionIfPossible(conditionNode);
-
-        conditionNode = negationResult.newNode;
-
-        let condition = this.compileTerm(conditionNode);
+        let condition = this.compileTerm(node.condition);
 
         this.printErrorifValueNotBoolean(condition?.type, node.condition);
 
@@ -312,7 +263,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
         let ifSnippet = new CodeSnippetContainer([], node.range);
 
-        let sn1 = SnippetFramer.frame(condition, negationResult.negationHappened ? "if(§1){\n" : "if(!(§1)){\n", this.voidType);
+        let sn1 = SnippetFramer.frame(condition, "if(!(§1)){\n", this.voidType);
         let label1 = new LabelCodeSnippet();
         ifSnippet.addParts(sn1);
         let jumpToLabel1 = new JumpToLabelCodeSnippet(label1);
@@ -347,15 +298,135 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
     }
 
+    // General helper function
+    // -> where to go?
+    isDefined<A>(x: A | undefined) : x is A {
+        return x != undefined;
+    }
+    
+    // General helper function
+    // -> where to go?
+    listHasNoUndefined<A>(x:(A | undefined)[]): x is A[] {
+        return !x.includes(undefined);
+    }
+
+    compileCaseStatement(node: ASTCaseNode, index: number, labelArray : Array<LabelCodeSnippet>, typeId: string | undefined) : [CodeSnippet,CodeSnippet] | undefined{
+        if(!node.constant) return undefined;
+        let constant = this.compileTerm(node.constant);git 
+        let caseSnippet = new CodeSnippetContainer([], node.range);
+        let caseStatementSnippet = new CodeSnippetContainer([], node.range);
+        
+        if (!constant) {
+            this.pushError("Der Ausdruck konnte nicht ausgewertet werden.", "error", node.constant);
+            return undefined;
+        }
+        if (!constant.isConstant()) {
+            this.pushError("Nach case dürfen nur konstante Ausdrücke stehen.", "error", node.constant.range);
+        }
+
+        let constantValue = constant.getConstantValue();
+        
+        switch(typeId) {
+            case 'String':
+                caseSnippet.addStringPart(`case "${constantValue}": \n`, node.range); break;
+            default:
+                caseSnippet.addStringPart(`case ${constantValue}: \n`, node.range);
+        }
+        
+        caseSnippet.addParts(new JumpToLabelCodeSnippet(labelArray[index]));
+
+        let statementCode = node.statements.map((statementNode) => this.compileStatementOrTerm(statementNode));
+
+        if (!this.listHasNoUndefined(statementCode)) return undefined;
+      
+        caseStatementSnippet.addParts(labelArray[index]);
+        caseStatementSnippet.addParts(statementCode);
+        caseStatementSnippet.addNextStepMark();
+
+        return [caseSnippet, caseStatementSnippet];
+    }
+
+    /*
+        Preliminary implementation 
+        For TODOs -> switch-case.md
+    */
+
+
+    compileSwitchCaseStatement(node: ASTSwitchCaseNode): CodeSnippet | undefined {
+        let term = this.compileTerm(node.term);
+        if (!this.isDefined(term)) return undefined;
+        if(!term.type?.identifier || !["int","char", "String"].includes(term.type?.identifier)) {
+            this.pushError("Die Anweisung switch(x) ist nur möglich, wenn x den Typ int, String, oder enum hat.", "error", node.term.range);
+        }
+        let type = term.type;
+
+        if (!type) return undefined;
+
+        // TODO: Check type
+
+        // Contains one label for every case
+        // plus one label for default if it exists
+        // plus one label to break out of the switch-case expression
+        
+        
+        let labelArray = [...node.caseNodes].map((_) => new LabelCodeSnippet() );
+        let defaultLabel;
+        if (node.defaultNode) {
+            defaultLabel = new LabelCodeSnippet();
+            labelArray.push(defaultLabel);
+        }
+        let breakLabel = new LabelCodeSnippet();
+        this.breakStack.push(breakLabel);
+
+        labelArray.push(breakLabel);
+
+        let caseSnippets = node.caseNodes.map((node,i) => this.compileCaseStatement(node, i, labelArray, type?.identifier) );
+
+        if (!this.listHasNoUndefined(caseSnippets)) return undefined;
+        
+        let switchSnippet = new CodeSnippetContainer([], node.range);
+        
+        switchSnippet.addParts(SnippetFramer.frame(term, "switch(§1){\n", this.voidType));
+        
+        caseSnippets.forEach(([a,_]) =>  switchSnippet.addParts(a));
+        if (node.defaultNode) {
+            switchSnippet.addStringPart("default: \n", node.range);
+            switchSnippet.addParts(new JumpToLabelCodeSnippet(defaultLabel!));
+        }
+
+        switchSnippet.addStringPart("\n }", undefined);
+        switchSnippet.addNextStepMark();
+        caseSnippets.forEach(([_,b]) =>  switchSnippet.addParts(b));
+        
+        if(node.defaultNode) {
+            let defaultSnippet = new CodeSnippetContainer([], node.defaultNode.range);
+            defaultSnippet.addParts(defaultLabel!);
+
+            let statementCode = node.defaultNode.statements.map((statementNode) => this.compileStatementOrTerm(statementNode));
+
+            if (!this.listHasNoUndefined(statementCode)) return undefined;
+
+            defaultSnippet.addParts(statementCode);
+            defaultSnippet.addNextStepMark();
+            
+            switchSnippet.addParts(defaultSnippet);
+
+        }
+        
+        
+        switchSnippet.addParts(breakLabel);
+        this.breakStack.pop();
+        
+        return switchSnippet;
+    }
+
     compilePrintStatement(node: ASTPrintStatementNode): CodeSnippet | undefined {
         let firstParameter = this.compileTerm(node.firstParameter);
         let secondParameter = this.compileTerm(node.secondParameter);
 
-        
         let statement = node.isPrintln ? Helpers.println : Helpers.print;
-        
-        if (firstParameter && firstParameter.type != this.voidType) {
-            firstParameter = this.compileCast(firstParameter, this.stringType, "implicit");
+
+        if (firstParameter) {
             if (secondParameter) {
                 return new TwoParameterTemplate(`${statement}(§1, §2);\n`)
                     .applyToSnippet(this.voidType, node.range, firstParameter, secondParameter)
@@ -386,14 +457,10 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
                 variable.type = initValueSnippet.type;
             } else {
                 let type = node.type.resolvedType;
-                if(!type) return undefined;
-
-                if (!this.canCastTo(initValueSnippet.type, type, "implicit")) {
+                if (type && !this.canCastTo(initValueSnippet.type, type, "implicit")) {
                     this.pushError("Der Term auf der rechten Seite des Zuweisungsoperators hat den Datentyp " + initValueSnippet.type.identifier + " und kann daher der Variablen auf der linken Seite (Datentyp " + type.identifier + ") nicht zugewiesen werden.", "error", node);
                     return new EmptyPart();
                 }
-                
-                initValueSnippet = this.compileCast(initValueSnippet, type, "implicit");
             }
 
         } else {
@@ -404,7 +471,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         if (initValueSnippet && accesLocalVariableSnippet) {
             let snippet = new BinaryOperatorTemplate('=', false)
                 .applyToSnippet(variable.type, node.range, accesLocalVariableSnippet, initValueSnippet);
-            return SnippetFramer.frame(snippet, '§1;\n');
+            return SnippetFramer.frame(snippet, '§1;');
         }
 
         return undefined;
@@ -471,7 +538,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             if(catchCase.exceptionTypes.length > 0) exceptionType = this.throwableType;
             
             // exception lies on top of stack
-            let exceptionVariable = new JavaLocalVariable(catchCase.exceptionIdentifier, catchCase.exceptionIdentifierPosition, exceptionType, this.currentSymbolTable);
+            let exceptionVariable = new JavaLocalVariable(catchCase.exceptionIdentifier, catchCase.exceptionIdentifierPosition, exceptionType);
             exceptionVariable.isFinal = true;
             this.currentSymbolTable.addSymbol(exceptionVariable);
             

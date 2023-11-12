@@ -29,6 +29,8 @@ import { JavaInterface } from "../types/JavaInterface.ts";
 import { UsagePosition } from "../../common/UsagePosition.ts";
 import { OuterClassFieldAccessTracker } from "./OuterClassFieldAccessTracker.ts";
 
+import { LabelCodeSnippet } from "./LabelManager.ts";
+
 export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
     constantTypeToTypeMap: { [key: number]: JavaType } = {}
@@ -38,6 +40,9 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     symbolTableStack: JavaSymbolTable[] = [];
 
     classOfCurrentlyCompiledStaticInitialization?: NonPrimitiveType;
+  
+    breakStack: LabelCodeSnippet[] = [];
+
 
     missingStatementManager: MissingStatementManager = new MissingStatementManager();
 

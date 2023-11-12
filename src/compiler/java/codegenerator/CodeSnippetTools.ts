@@ -1,7 +1,7 @@
 import { JavaTypeStore } from "../module/JavaTypeStore";
 import { JavaType } from "../types/JavaType";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";
-import { CodeSnippet } from "./CodeSnippet";
+import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 
 export class SnippetFramer {
     static frame(snippet: CodeSnippet, template: string, newType?: JavaType): CodeSnippet {
