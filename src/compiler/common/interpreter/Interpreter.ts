@@ -1,4 +1,5 @@
 import { ActionManager } from "../../../testgui/ActionManager.ts";
+import { Executable } from "../Executable.ts";
 import { Module } from "../module/Module";
 import { EventManager } from "./EventManager";
 import { LoadController } from "./LoadController";
@@ -14,6 +15,8 @@ export class Interpreter {
 
     loadController: LoadController;
     scheduler: Scheduler;
+
+    private classObjectRegistry: KlassObjectRegistry = {};
 
     isExternalTimer: boolean = false;
     timerId: any;
@@ -49,7 +52,7 @@ export class Interpreter {
 
 
 
-    constructor(public printManager: PrintManager, private actionManager: ActionManager, private runtimeClassObjects: KlassObjectRegistry) {
+    constructor(public printManager: PrintManager, private actionManager?: ActionManager) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {
 
         // this.printManager = new PrintManager($runDiv, this.main);
@@ -73,7 +76,16 @@ export class Interpreter {
         this.setState(SchedulerState.not_initialized);
     }
 
-    
+    setExecutable(executable: Executable){
+        this.classObjectRegistry = executable.classObjectRegistry;
+        if(executable.mainModule){
+            this.init(executable.mainModule);
+            this.setState(SchedulerState.stopped);
+        } else {
+            this.setState(SchedulerState.not_initialized);
+        }
+    }
+
 
     initTimer() {
 
@@ -152,7 +164,7 @@ export class Interpreter {
 
         // this.main.getBottomDiv()?.console?.clearErrors();
 
-        
+
         if (this.scheduler.state != SchedulerState.paused && this.mainModule) {
             this.printManager.clear();
             this.init(this.mainModule);
@@ -175,9 +187,11 @@ export class Interpreter {
 
     registerActions() {
 
+        if (!this.actionManager) return;
+
         this.actionManager.registerAction("interpreter.start", ['F4'],
             () => {
-                if (this.actionManager.isActive("interpreter.start")) {
+                if (this.actionManager!.isActive("interpreter.start")) {
                     this.start();
                 } else {
                     this.pause();
@@ -187,7 +201,7 @@ export class Interpreter {
 
         this.actionManager.registerAction("interpreter.pause", ['F4'],
             () => {
-                if (this.actionManager.isActive("interpreter.start")) {
+                if (this.actionManager!.isActive("interpreter.start")) {
                     this.start();
                 } else {
                     this.pause();
@@ -229,14 +243,16 @@ export class Interpreter {
             // this.closeAllWebsockets();
         }
 
-        for (let actionId of this.actions) {
-            this.actionManager.setActive("interpreter." + actionId, this.buttonActiveMatrix[actionId][state]);
-        }
-
-        let buttonStartActive = this.buttonActiveMatrix['start'][state];
-
+        if(this.actionManager){
+            for (let actionId of this.actions) {
+                this.actionManager.setActive("interpreter." + actionId, this.buttonActiveMatrix[actionId][state]);
+            }
+    
+            let buttonStartActive = this.buttonActiveMatrix['start'][state];
+    
             this.actionManager.showHideButtons("interpreter.start", buttonStartActive);
             this.actionManager.showHideButtons("interpreter.pause", !buttonStartActive);
+        }
 
         if (state == SchedulerState.stopped) {
             this.eventManager.fire("done");
@@ -266,7 +282,7 @@ export class Interpreter {
 
     resetRuntime() {
         this.eventManager.fire("resetRuntime");
-        
+
         // this.printManager.clear();
         // this.worldHelper?.destroyWorld();
         // this.processingHelper?.destroyWorld();
@@ -296,7 +312,7 @@ export class Interpreter {
 
         this.mainModule = newMainModule;
 
-        this.scheduler.init(this.mainModule, this.runtimeClassObjects);
+        this.scheduler.init(this.mainModule, this.classObjectRegistry);
         this.setState(SchedulerState.stopped);
 
     }

@@ -22,12 +22,16 @@ export class JavaCompiler {
 
     moduleManager: JavaModuleManager;
     lastOpenedFile?: File;
+    private libraryModuleManager: JavaLibraryModuleManager;
 
-    constructor(private libraryModuleManager: JavaLibraryModuleManager){
+    constructor(){
+        this.libraryModuleManager = new JavaLibraryModuleManager();
         this.moduleManager = new JavaModuleManager();
     }
 
-    compile(files: File[], currentlyOpenFile?: File): Executable {
+    compile(files: File | File[], currentlyOpenFile?: File): Executable {
+
+        if(!Array.isArray(files)) files = [files];
 
         LabelCodeSnippet.resetCount();
 

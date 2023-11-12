@@ -20,12 +20,7 @@ test('test if simple program with for-loop compiles and runs as expected', () =>
     
     file.setText(code);
 
-    let libraryModuleManager = new JavaLibraryModuleManager();
-    libraryModuleManager.compileClassesToTypes();
-
-    let compiler = new JavaCompiler(libraryModuleManager);
-
-    let actionManager = new ActionManager();
+    let compiler = new JavaCompiler();
 
     // Mock TestPrintManager
     // Method calls have no effect
@@ -42,13 +37,12 @@ test('test if simple program with for-loop compiles and runs as expected', () =>
     let clearSpy = vi.spyOn(testPrintManager, 'clear');
     let printSpy = vi.spyOn(testPrintManager, 'print');
 
-    let interpreter = new Interpreter(testPrintManager, actionManager, {});
+    let executable = compiler.compile(file);
+    
+    let interpreter = new Interpreter(testPrintManager);
+    
+    interpreter.setExecutable(executable);
 
-    compiler.compile([file]);
-
-    let module = compiler.moduleManager.getModuleFromFile(file)!;
-    module.mainProgram?.compileToJavascriptFunctions();
-    interpreter.init(module);
     interpreter.start();
 
     let scheduler = interpreter.scheduler;
@@ -74,12 +68,7 @@ test('test if program with simple if-else block compiles and runs as expected', 
     
     file.setText(code);
 
-    let libraryModuleManager = new JavaLibraryModuleManager();
-    libraryModuleManager.compileClassesToTypes();
-
-    let compiler = new JavaCompiler(libraryModuleManager);
-
-    let actionManager = new ActionManager();
+    let compiler = new JavaCompiler();
 
     // Mock TestPrintManager
     // Method calls have no effect
@@ -97,13 +86,12 @@ test('test if program with simple if-else block compiles and runs as expected', 
     let clearSpy = vi.spyOn(tpm, 'clear');
     let printSpy = vi.spyOn(tpm, 'print');  
 
-    let interpreter = new Interpreter(tpm, actionManager, {});
+    let executable = compiler.compile(file);
 
-    compiler.compile([file]);
+    let interpreter = new Interpreter(tpm);
 
-    let module = compiler.moduleManager.getModuleFromFile(file)!;
-    module.mainProgram?.compileToJavascriptFunctions();
-    interpreter.init(module);
+    interpreter.setExecutable(executable);
+
     interpreter.start();
 
     let scheduler = interpreter.scheduler;

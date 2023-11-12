@@ -47,8 +47,6 @@ export class Main {
   compiler: JavaCompiler;
   interpreter: Interpreter;
 
-  libraryModuleManager: JavaLibraryModuleManager;
-
   constructor() {
     this.language = new JavaLanguage();
     this.language.registerLanguageAtMonacoEditor();
@@ -84,14 +82,11 @@ export class Main {
     this.file = new File();
     this.file.monacoModel = this.inputEditor.editor.getModel()!;
 
-    this.libraryModuleManager = new JavaLibraryModuleManager();
-
-    this.compiler = new JavaCompiler(this.libraryModuleManager);
+    this.compiler = new JavaCompiler();
 
     this.actionManager = new ActionManager();
 
-    this.interpreter = new Interpreter(new TestPrintManager(), this.actionManager, {});
-
+    this.interpreter = new Interpreter(new TestPrintManager(), this.actionManager);
 
     this.initButtons();
   }
@@ -134,7 +129,7 @@ export class Main {
 
     }
 
-    this.interpreter.init(module);
+    this.interpreter.setExecutable(executable);
 
   }
 
