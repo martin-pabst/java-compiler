@@ -47,6 +47,8 @@ export class CodeGenerator extends StatementCodeGenerator {
             "main program");
         this.module.mainProgram.stepsSingle = steps;
 
+        ast.program = this.module.mainProgram;  // only for debugging
+
     }
 
     compileClasses() {
@@ -72,13 +74,25 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
 
-        for (let field of cdef.fields) {
-            this.compileField(field, classContext);
-        }
+        let fieldSnippets: CodeSnippet[] = [];
+        let staticFieldSnippets: CodeSnippet[] = [new StringCodeSnippet(`let __Klass = ${Helpers.classes}[${classContext.identifier}];\n`)];
 
-        if (classContext.fieldConstructor) {
-            classContext.fieldConstructor.addStep(`${Helpers.return}();`);
+        for (let field of cdef.fields) {
+            let snippet = this.compileField(field, classContext);
+            if(snippet){
+                if(field.isStatic){
+                    staticFieldSnippets.push(snippet);
+                } else {
+                    fieldSnippets.push(snippet);
+                }
+            } 
         }
+        
+        classContext.fieldConstructor = this.buildFieldConstructor(fieldSnippets, "fieldInitializer");
+        cdef.fieldConstructorProgram = classContext.fieldConstructor;
+
+        classContext.staticFieldConstructor = this.buildFieldConstructor(staticFieldSnippets, "staticFieldInitializer");
+        cdef.staticFieldConstructorProgram = classContext.staticFieldConstructor;
 
         for (let method of cdef.methods) {
             this.compileMethod(method, classContext);
@@ -88,17 +102,26 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     }
 
+
+    buildFieldConstructor(snippets: CodeSnippet[], identifier: string): Program {
+        let program = new Program(this.module, this.currentSymbolTable, identifier);
+        snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
+        program.stepsSingle = this.linker.link(snippets);
+        return program;
+    }
+
+
     /**
      * All fields inside types are already built by 
      * @see TypeResolver#buildRuntimeClassesAndTheirFields
      * @returns 
      */
-    compileField(fieldNode: ASTFieldDeclarationNode, classContext: JavaClass) {
+    compileField(fieldNode: ASTFieldDeclarationNode, classContext: JavaClass): CodeSnippet | undefined {
 
-        if (!fieldNode.type.resolvedType) return;
+        if (!fieldNode.type.resolvedType) return undefined;
 
         let field = classContext.fields.find(f => f.identifier == fieldNode.identifier);
-        if (!field) return;
+        if (!field) return undefined;
 
         this.currentSymbolTable.addSymbol(field);
 
@@ -111,10 +134,6 @@ export class CodeGenerator extends StatementCodeGenerator {
                     this.currentlyCompiledStaticConstructor = undefined;
 
                     if(snippet){
-                        if (!classContext.staticFieldConstructor) {
-                            classContext.staticFieldConstructor = new Program(this.module, this.currentSymbolTable, classContext.identifier + ".staticFieldConstructor");
-                            classContext.staticFieldConstructor.addStep(`let __Klass = ${Helpers.classes}[${classContext.identifier}];`);
-                        }
     
                         snippet = this.compileCast(snippet, field.type, "implicit");
     
@@ -125,10 +144,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                         let snippet1 = new CodeSnippetContainer(snippet);
                         snippet1.addNextStepMark();
     
-                        let steps = this.linker.link([snippet1]);
-                        
-                        classContext.staticFieldConstructor.stepsSingle = classContext.staticFieldConstructor.stepsSingle.concat(steps);
-                        
+                        return snippet1;                        
                     }
                     
                 } else {
@@ -145,10 +161,7 @@ export class CodeGenerator extends StatementCodeGenerator {
     
                         let snippet1 = new CodeSnippetContainer(snippet);
                         snippet1.addNextStepMark();
-    
-                        let steps = this.linker.link([snippet1]);
-    
-                        classContext.fieldConstructor.stepsSingle = classContext.fieldConstructor.stepsSingle.concat(steps);
+                        return snippet1;
                     }
                 }
         } else {
@@ -183,6 +196,8 @@ export class CodeGenerator extends StatementCodeGenerator {
                 method.program.stepsSingle = this.linker.link([snippet]);
 
                 method.program.addStep(`${Helpers.return}();`)
+
+                methodNode.program = method.program;    // only for debugging purposes
 
                 let runtimeClass = classContext.runtimeClass;
 
