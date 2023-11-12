@@ -1,7 +1,7 @@
 import { JavaTypeStore } from "../module/JavaTypeStore";
 import { JavaType } from "../types/JavaType";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";
-import { CodeSnippet } from "./CodeSnippet";
+import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 
 export class SnippetFramer {
     static frame(snippet: CodeSnippet, template: string, newType?: JavaType): CodeSnippet {
@@ -9,8 +9,8 @@ export class SnippetFramer {
         let type = newType ? newType : snippet.type;
 
         if(snippet.isPureTerm()){
-                snippet.alterPureTerm(template.replace(new RegExp('\\$1', 'g'), snippet.getPureTerm()));
-                return snippet;
+                let framedSnippet = new StringCodeSnippet(template.replace(new RegExp('\\$1', 'g'), snippet.getPureTerm()), snippet.range, type)
+                return framedSnippet;
         }
 
         let framedSnippet = new CodeSnippetContainer(snippet.allButLastPart(), snippet.range);

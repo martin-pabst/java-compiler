@@ -64,6 +64,13 @@ export class TokenIterator {
         return this.lastToken;
     }
 
+    getAndSkipTokenWithSemicolon(): Token {
+        let token = this.cct;
+        this.nextToken();
+        this.expectSemicolon();
+        return token;
+    }
+
     nextToken() {
 
         let token: Token;

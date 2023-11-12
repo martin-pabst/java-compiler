@@ -24,6 +24,7 @@ import { Method } from "../types/Method.ts";
 import { JavaClassOrEnum } from "../types/JavaClassOrEnum.ts";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
+import { LabelCodeSnippet } from "./LabelManager.ts";
 
 export class TermCodeGenerator extends BinopCastCodeGenerator {
 
@@ -34,6 +35,8 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
     symbolTableStack: JavaSymbolTable[] = [];
 
     currentlyCompiledStaticConstructor?: JavaClassOrEnum;
+    breakStack: LabelCodeSnippet[] = [];
+
 
 
     constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore) {

@@ -2,7 +2,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBlockNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTWhileNode } from "../parser/AST";
+import { ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLiteralNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTSwitchCaseNode, ASTWhileNode, ConstantType } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippetContainer, EmptyPart } from "./CodeSnippetKinds.ts";
@@ -33,8 +33,12 @@ export class StatementCodeGenerator extends TermCodeGenerator {
                 snippet = this.compileLocaleVariableDeclaration(<ASTLocalVariableDeclaration>ast); break;
             case TokenType.print:
                 snippet = this.compilePrintStatement(<ASTPrintStatementNode>ast); break;
+            case TokenType.keywordBreak:
+                snippet = this.compileBreakStatement(<ASTBreakNode>ast); break;
             case TokenType.keywordIf:
                 snippet = this.compileIfStatement(<ASTIfNode>ast); break;
+            case TokenType.keywordSwitch:
+                snippet = this.compileSwitchCaseStatement(<ASTSwitchCaseNode> ast); break;
             case TokenType.block:
                 snippet = this.compileBlockNode(<ASTBlockNode>ast); break;
             case TokenType.keywordWhile:
@@ -68,7 +72,15 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         return snippet;
 
     }
-
+    compileBreakStatement(node: ASTBreakNode): CodeSnippet | undefined {
+        let label = this.breakStack.pop();
+        if (!label) {
+            this.pushError("An dieser Stelle kann kein break stehen, da der Ausdruck nicht innerhalb einer Schleife (for, while, do) oder switch-case Anweisung steht.", "error",node);
+            return undefined;
+        }
+        this.breakStack.push(label);
+        return new JumpToLabelCodeSnippet(label);
+    }
     compileReturnStatement(node: ASTReturnNode): CodeSnippet | undefined {
         let snippet = new CodeSnippetContainer([], node.range);
 
@@ -273,6 +285,95 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
         return ifSnippet;
 
+    }
+
+    // General helper function
+    // -> where to go?
+    isDefined<A>(x: A | undefined) : x is A {
+        return x != undefined;
+    }
+    
+    // General helper function
+    // -> where to go?
+    listHasNoUndefined<A>(x:(A | undefined)[]): x is A[] {
+        return !x.includes(undefined);
+    }
+
+    compileCaseStatement(term: CodeSnippet, node: ASTCaseNode, index: number, labelArray : Array<LabelCodeSnippet>) : CodeSnippet | undefined{
+        let constant = <ASTLiteralNode>node.constant;
+        let caseSnippet = new CodeSnippetContainer([], node.range);
+        if (index > 0) {
+            caseSnippet.addParts(labelArray[index-1]);
+        }
+        let condition = SnippetFramer.frame(term, "($1) == "+ constant.value, this.booleanType);
+        caseSnippet.addParts(SnippetFramer.frame(condition, "if(!($1)){\n", this.voidType));
+        caseSnippet.addParts(new JumpToLabelCodeSnippet(labelArray[index]));
+        caseSnippet.addStringPart("}\n");
+
+        let statementCode = node.statements.map((statementNode) => this.compileStatementOrTerm(statementNode));
+
+        if (!this.listHasNoUndefined(statementCode)) return undefined;
+      
+        caseSnippet.addParts(statementCode);
+        caseSnippet.addNextStepMark();
+
+        return caseSnippet;
+    }
+
+    /*
+        Preliminary implementation 
+        For TODOs -> switch-case.md
+    */
+
+
+    compileSwitchCaseStatement(node: ASTSwitchCaseNode): CodeSnippet | undefined {
+        let term = this.compileTerm(node.term);
+        if (!this.isDefined(term)) return undefined;
+        let type = term.type;
+
+        if (!type) return undefined;
+
+        // TODO: Check type
+
+        // Contains one label for every case
+        // plus one label for default if it exists
+        // plus one label to break out of the switch-case expression
+        let labelArray = [...node.caseNodes].splice(1).map((_) => new LabelCodeSnippet() );
+        let defaultLabel;
+        if (node.defaultNode) {
+            defaultLabel = new LabelCodeSnippet();
+            labelArray.push(defaultLabel);
+        }
+        let breakLabel = new LabelCodeSnippet();
+        this.breakStack.push(breakLabel);
+
+        labelArray.push(breakLabel);
+
+        let caseSnippets = node.caseNodes.map((node,i) => this.compileCaseStatement(term!, node, i, labelArray) );
+
+        if (!this.listHasNoUndefined(caseSnippets)) return undefined;
+
+        let switchSnippet = new CodeSnippetContainer([], node.range);
+        switchSnippet.addParts(caseSnippets);
+
+        if(node.defaultNode) {
+            let defaultSnippet = new CodeSnippetContainer([], node.defaultNode.range);
+            defaultSnippet.addParts(defaultLabel!);
+
+            let statementCode = node.defaultNode.statements.map((statementNode) => this.compileStatementOrTerm(statementNode));
+
+            if (!this.listHasNoUndefined(statementCode)) return undefined;
+
+            defaultSnippet.addParts(statementCode);
+            defaultSnippet.addNextStepMark();
+            
+            switchSnippet.addParts(defaultSnippet);
+
+        }
+
+        switchSnippet.addParts(breakLabel);
+        this.breakStack.pop();
+        return switchSnippet;
     }
 
     compilePrintStatement(node: ASTPrintStatementNode): CodeSnippet | undefined {
