@@ -20,34 +20,29 @@ test('test if simple program with for-loop compiles and runs as expected', () =>
     
     file.setText(code);
 
-    let compiler = new JavaCompiler();
-
+    
     // Mock TestPrintManager
     // Method calls have no effect
     // but can be spied on
     vi.mock('../testgui/TestPrintManager', () => {
-        const TestPrintManager = vi.fn(() => ({
-          clear: vi.fn(),
-          print: vi.fn()
-        }))
-        return { TestPrintManager }
-      });
-
+      const TestPrintManager = vi.fn(() => ({
+        clear: vi.fn(),
+        print: vi.fn()
+      }))
+      return { TestPrintManager }
+    });
+    
     let testPrintManager = new TestPrintManager();
     let clearSpy = vi.spyOn(testPrintManager, 'clear');
     let printSpy = vi.spyOn(testPrintManager, 'print');
-
+    
+    let compiler = new JavaCompiler();
     let executable = compiler.compile(file);
     
     let interpreter = new Interpreter(testPrintManager);
-    
     interpreter.setExecutable(executable);
 
-    interpreter.start();
-
-    let scheduler = interpreter.scheduler;
-
-    scheduler.run(500);
+    interpreter.runMainProgramSynchronously();
 
     expect(clearSpy).toHaveBeenCalled();
     expect(printSpy).toHaveBeenCalledWith(5050, false, undefined);
@@ -68,35 +63,30 @@ test('test if program with simple if-else block compiles and runs as expected', 
     
     file.setText(code);
 
-    let compiler = new JavaCompiler();
-
+    
     // Mock TestPrintManager
     // Method calls have no effect
     // but can be spied on
     vi.mock('../testgui/TestPrintManager', () => {
-        const TestPrintManager = vi.fn(() => ({
-          clear: vi.fn(),
-          print: vi.fn()
-        }))
-        return { TestPrintManager }
-      })
-
-
+      const TestPrintManager = vi.fn(() => ({
+        clear: vi.fn(),
+        print: vi.fn()
+      }))
+      return { TestPrintManager }
+    })
+    
+    
     let tpm = new TestPrintManager();
     let clearSpy = vi.spyOn(tpm, 'clear');
     let printSpy = vi.spyOn(tpm, 'print');  
-
+    
+    let compiler = new JavaCompiler();
     let executable = compiler.compile(file);
 
     let interpreter = new Interpreter(tpm);
-
     interpreter.setExecutable(executable);
 
-    interpreter.start();
-
-    let scheduler = interpreter.scheduler;
-
-    scheduler.run(10);
+    interpreter.runMainProgramSynchronously();
 
     expect(clearSpy).toHaveBeenCalled();
     expect(printSpy).toHaveBeenCalledWith("B", false, undefined);

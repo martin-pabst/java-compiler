@@ -179,6 +179,13 @@ export class Interpreter {
 
     }
 
+    runMainProgramSynchronously(){
+        this.start();
+        while(this.scheduler.state != SchedulerState.stopped){
+            this.scheduler.run(100);
+        }
+    }
+
     stepOut() {
         this.scheduler.stepOut(() => {
             this.pause();
