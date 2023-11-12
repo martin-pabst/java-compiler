@@ -30,6 +30,15 @@ export class AstComponent {
 
     astTreeview: Treeview<ASTNode>;
 
+    tokenTypeToIconClass: Map<TokenType, string> = new Map([
+        [TokenType.keywordClass, "img_classdeclaration-dark"],
+        [TokenType.keywordEnum, "img_enumdeclaration-dark"],
+        [TokenType.keywordInterface, "img_interfacedeclaration-dark"],
+        [TokenType.methodDeclaration, "img_methoddeclaration-dark"],
+        [TokenType.attributeDeclaration, "img_attributedeclaration-dark"],
+        
+    ]);
+
     constructor(parentDiv: HTMLDivElement) {
 
         parentDiv.classList.add('jo_ast_main');
@@ -69,7 +78,7 @@ export class AstComponent {
         let childNodeInfo = this.getChildNodeInfo(node).filter(cni => cni.isChildNode);
         
         this.astTreeview.addNode(childNodeInfo.length > 0, (role ? role + ": " : "") +
-            TokenType[node.kind], undefined, node, node, parent);
+            TokenType[node.kind], this.tokenTypeToIconClass.get(node.kind), node, node, parent);
 
             for(const [field, value] of Object.entries(node)){
                 if(value instanceof Program){
@@ -103,7 +112,7 @@ export class AstComponent {
                     childNodes: cni.childNodes!,
                     role: cni.isArray ? undefined : cni.key
                 }
-                this.astTreeview.addNode(true, cni.key, undefined,
+                this.astTreeview.addNode(true, cni.key, this.tokenTypeToIconClass.get(node.kind),
                     multiNode, multiNode, node);
                 cni.childNodes!.forEach( cn => {
                     this.addNode(multiNode, cn, undefined);
