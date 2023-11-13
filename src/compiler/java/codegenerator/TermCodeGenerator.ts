@@ -72,7 +72,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         if (snippet && ast.parenthesisNeeded) {
-            snippet = SnippetFramer.frame(snippet, '($1)');
+            snippet = SnippetFramer.frame(snippet, '(§1)');
         }
 
         return snippet;
@@ -80,7 +80,11 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
     pushAndGetNewSymbolTable(range: IRange, withStackframe: boolean, classContext?: JavaClass | JavaEnum | undefined, methodContext?: Method): JavaSymbolTable {
         let newSymbolTable = new JavaSymbolTable(this.module, range, withStackframe, classContext, methodContext);
-        if (this.currentSymbolTable) this.currentSymbolTable.addChildTable(newSymbolTable);
+        if (this.currentSymbolTable){
+            this.currentSymbolTable.addChildTable(newSymbolTable);
+            if(!classContext) newSymbolTable.classContext = this.currentSymbolTable.classContext;
+            if(!methodContext) newSymbolTable.methodContext = this.currentSymbolTable.methodContext;
+        } 
         this.symbolTableStack.push(newSymbolTable);
         this.currentSymbolTable = newSymbolTable;
         return newSymbolTable;
@@ -123,7 +127,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
         let squareBracketSnippet = ParametersJoinedTemplate.applyToSnippet(this.voidType, node.range, '[', '][', ']', ...indexSnippets);
 
-        let returnSnippet = new TwoParameterTemplate("$1$2").applyToSnippet(remainingType, node.range, arraySnippet, squareBracketSnippet);
+        let returnSnippet = new TwoParameterTemplate("§1§2").applyToSnippet(remainingType, node.range, arraySnippet, squareBracketSnippet);
 
 
         if (node.parenthesisNeeded) {
@@ -291,7 +295,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
                 this.pushError("Die Operatoren ++ und -- können nur bei Variablen mit den Datentypen byte, short, int, long, float und double benutzt werden.", "error", ast);
             }
 
-            let template: CodeTemplate = new OneParameterTemplate("$1++");
+            let template: CodeTemplate = new OneParameterTemplate("§1++");
 
             return template.applyToSnippet(operand.type, ast.range, operand);
         }
@@ -353,11 +357,11 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
         let objectTemplate: string;
         if(objectSnippet.type instanceof StaticNonPrimitiveType){
-            objectTemplate = `$1.${method.getInternalName(callingConvention)}}](`
+            objectTemplate = `§1.${method.getInternalName(callingConvention)}(`
         } else if(method.isStatic){
-            objectTemplate = `$1.constructor.${method.getInternalName(callingConvention)}}](`
+            objectTemplate = `§1.constructor.${method.getInternalName(callingConvention)}(`
         } else {
-            objectTemplate = `$1.${method.getInternalName(callingConvention)}}](`
+            objectTemplate = `§1.${method.getInternalName(callingConvention)}(`
         }
 
         if(callingConvention == "java"){
@@ -365,7 +369,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         } 
 
         let i = 2;
-        objectTemplate += parameterValues.map(_p => "$" + (i++)).join(", ") + ");";
+        objectTemplate += parameterValues.map(_p => "§" + (i++)).join(", ") + ")";
 
         parameterValues.unshift(objectSnippet);
 

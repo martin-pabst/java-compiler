@@ -137,7 +137,7 @@ export class CodeGenerator extends StatementCodeGenerator {
     
                         snippet = this.compileCast(snippet, field.type, "implicit");
     
-                        let assignmentTemplate = `__Klass.${field.getInternalName()} = $1;\n`;
+                        let assignmentTemplate = `__Klass.${field.getInternalName()} = §1;\n`;
     
                         snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, fieldNode.initialization.range, snippet);
     
@@ -155,7 +155,7 @@ export class CodeGenerator extends StatementCodeGenerator {
     
                         snippet = this.compileCast(snippet, field.type, "implicit");
     
-                        let assignmentTemplate = `${StepParams.stack}[${StepParams.stackBase}].${field.getInternalName()} = $1;\n`;
+                        let assignmentTemplate = `${StepParams.stack}[${StepParams.stackBase}].${field.getInternalName()} = §1;\n`;
                         
                         snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, fieldNode.initialization.range, snippet);
     

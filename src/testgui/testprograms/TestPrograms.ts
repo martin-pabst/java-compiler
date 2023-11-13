@@ -1,7 +1,13 @@
 export var testPrograms = {
 simpleClass:`
+Test m;
+m.doIt("Hier!");
+
 class Test {
    int i = 12;
+   public void doIt(String s){
+      println(s);
+   }
 }
 `,
 simpleWhileLoops: `

@@ -55,10 +55,10 @@ export abstract class NonPrimitiveType extends JavaType {
         } else {
             let type: NonPrimitiveType | undefined = this;
             while (type) {
-                methods = methods.concat(type.getMethods().filter(m => {
+                methods = methods.concat(type.getMethods().filter(m => 
                     m.parameters.length == length && !m.isConstructor && m.identifier == identifier
                     && (!hasToBeStatic || m.isStatic)
-                }));
+                ));
                 //@ts-ignore
                 if (type["getExtends"]) type = type.getExtends();
             }

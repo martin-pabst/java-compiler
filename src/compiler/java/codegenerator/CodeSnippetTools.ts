@@ -9,12 +9,12 @@ export class SnippetFramer {
         let type = newType ? newType : snippet.type;
 
         if(snippet.isPureTerm()){
-                snippet.alterPureTerm(template.replace(new RegExp('\\$1', 'g'), snippet.getPureTerm()));
+                snippet.alterPureTerm(template.replace(new RegExp('\\§1', 'g'), snippet.getPureTerm()));
                 return snippet;
         }
 
         let framedSnippet = new CodeSnippetContainer(snippet.allButLastPart(), snippet.range);
-        framedSnippet.addStringPart(template.replace(new RegExp('\\$1', 'g'), snippet.lastPartOrPop().emit()), snippet.range, type);
+        framedSnippet.addStringPart(template.replace(new RegExp('\\§1', 'g'), snippet.lastPartOrPop().emit()), snippet.range, type);
         
         return framedSnippet;
     }

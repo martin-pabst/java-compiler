@@ -222,7 +222,7 @@ export class BinopCastCodeGenerator {
     }
 
     wrapWithToStringCall(leftSnippet: CodeSnippet): CodeSnippet {
-        let newSnippet = SnippetFramer.frame(leftSnippet, '($1?._mj$toString$string$()||"null")');
+        let newSnippet = SnippetFramer.frame(leftSnippet, '(§1?._mj$toString$string$()||"null")');
         newSnippet.finalValueIsOnStack = true;
         return newSnippet;
     }
@@ -348,7 +348,7 @@ export class BinopCastCodeGenerator {
         }
 
         if(castToTypeIndex == nString){
-            return new OneParameterTemplate('("" + $1)').applyToSnippet(this.intType, snippet.range!, snippet);
+            return new OneParameterTemplate('("" + §1)').applyToSnippet(this.intType, snippet.range!, snippet);
         }
 
         // no cast from string, no cast from/to void, boolean
@@ -369,15 +369,15 @@ export class BinopCastCodeGenerator {
         let template: OneParameterTemplate | undefined;
 
         switch (castToTypeIndex) {
-            case nByte: template = snippetTypeIndex <= nLong ? new OneParameterTemplate('(($1 + 128) % 256 - 128)') : new OneParameterTemplate('((Math.trunc($1) + 128) % 256 - 128)'); 
+            case nByte: template = snippetTypeIndex <= nLong ? new OneParameterTemplate('((§1 + 128) % 256 - 128)') : new OneParameterTemplate('((Math.trunc(§1) + 128) % 256 - 128)'); 
             break;
-            case nShort: template = snippetTypeIndex <= nLong ? new OneParameterTemplate('(($1 + 0x8000) % 0x10000 - 0x8000)') : new OneParameterTemplate('((Math.trunc($1) + 0x80000000) % 0x100000000 - 0x80000000)');
+            case nShort: template = snippetTypeIndex <= nLong ? new OneParameterTemplate('((§1 + 0x8000) % 0x10000 - 0x8000)') : new OneParameterTemplate('((Math.trunc(§1) + 0x80000000) % 0x100000000 - 0x80000000)');
             break;
-            case nInteger: template = snippetTypeIndex <= nLong ? new OneParameterTemplate('(($1 + 0x80000000) % 0x100000000 - 0x80000000)') : new OneParameterTemplate('((Math.trunc($1) + 0x80000000) % 0x100000000 - 0x80000000)');
+            case nInteger: template = snippetTypeIndex <= nLong ? new OneParameterTemplate('((§1 + 0x80000000) % 0x100000000 - 0x80000000)') : new OneParameterTemplate('((Math.trunc(§1) + 0x80000000) % 0x100000000 - 0x80000000)');
             break;
-            case nLong: template = new OneParameterTemplate('Math.trunc($1)');
+            case nLong: template = new OneParameterTemplate('Math.trunc(§1)');
             break;
-            case nFloat: template = new OneParameterTemplate('Math.fround($1)');
+            case nFloat: template = new OneParameterTemplate('Math.fround(§1)');
             break;
         }
 
@@ -456,7 +456,7 @@ export class BinopCastCodeGenerator {
 
         let unboxedType = this.primitiveTypes[boxedTypeIndex];
 
-        return SnippetFramer.frame(snippet, '($1).value', unboxedType);
+        return SnippetFramer.frame(snippet, '(§1).value', unboxedType);
     }
 
     box(snippet: CodeSnippet): CodeSnippet {
@@ -469,20 +469,20 @@ export class BinopCastCodeGenerator {
 
         let boxedType = this.libraryTypestore.getType(boxedIdentifier);
 
-        return SnippetFramer.frame(snippet, `new ${Helpers.classes}["${boxedIdentifier}"]($1)`, boxedType);
+        return SnippetFramer.frame(snippet, `new ${Helpers.classes}["${boxedIdentifier}"](§1)`, boxedType);
     }
 
     convertCharToNumber(snippet: CodeSnippet): CodeSnippet {
         if (!snippet.type) return snippet;
         if (snippet.type.identifier != 'char') return snippet;
 
-        return SnippetFramer.frame(snippet, 'String.charCodeAt($1)', this.intType);
+        return SnippetFramer.frame(snippet, 'String.charCodeAt(§1)', this.intType);
     }
 
     convertNumberToChar(snippet: CodeSnippet): CodeSnippet {
         if (!snippet.type) return snippet;
 
-        return SnippetFramer.frame(snippet, 'String.fromCharCode($1)', this.charType);
+        return SnippetFramer.frame(snippet, 'String.fromCharCode(§1)', this.charType);
     }
 
     isNumberPrimitiveType(type: JavaType): boolean {
@@ -510,7 +510,7 @@ export class BinopCastCodeGenerator {
         
         if(operator == TokenType.not){
             if(primitiveIndex = nBoolean){
-                return new OneParameterTemplate("!$1").applyToSnippet(this.booleanType, operand.range!, operand);
+                return new OneParameterTemplate("!§1").applyToSnippet(this.booleanType, operand.range!, operand);
             }
             this.pushError("Der Operator ! (not) ist nur für boolesche Operanden geeignet, nicht für Operanden des Typs " + operand.type!.identifier + ".", "error", operand.range!);
             return operand;
@@ -524,7 +524,7 @@ export class BinopCastCodeGenerator {
 
         if([TokenType.negation, TokenType.plus, TokenType.plusPlus, TokenType.minusMinus].indexOf(operator) >= 0){
             if(primitiveIndex >= nByte && primitiveIndex <= nDouble){
-                return new OneParameterTemplate(operatorAsString + "$1").applyToSnippet(operand.type!, operand.range!, operand);
+                return new OneParameterTemplate(operatorAsString + "§1").applyToSnippet(operand.type!, operand.range!, operand);
             }
             this.pushError("Der Operator " + operatorAsString + " ist nicht für den Operanden des Typs " + operand.type!.identifier + "geeignet.", "error", operand.range!);
             return;
@@ -532,7 +532,7 @@ export class BinopCastCodeGenerator {
         
         // Tilde-Operator
         if(primitiveIndex >= nByte && primitiveIndex <= nLong){
-            return new OneParameterTemplate(operatorAsString + "$1").applyToSnippet(operand.type!, operand.range!, operand);
+            return new OneParameterTemplate(operatorAsString + "§1").applyToSnippet(operand.type!, operand.range!, operand);
         }
  
         this.pushError("Der Operator " + operatorAsString + " ist nicht für den Operanden des Typs " + operand.type!.identifier + "geeignet.", "error", operand.range!);

@@ -113,8 +113,9 @@ export class Main {
 
     let executable = this.compiler.compile([this.file], this.file);
 
-    let module = <JavaCompiledModule>executable.mainModule;
+    let module = this.compiler.moduleManager.getModuleFromFile(this.file)!;
 
+    
     if(module){
       TokenPrinter.print(module.tokens!, this.tokenDiv);
       this.astComponent.buildTreeView(module.ast);

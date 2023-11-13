@@ -50,7 +50,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
             default:
                 snippet = this.compileTerm(ast);
                 if (snippet) {
-                    snippet = SnippetFramer.frame(snippet, "$1;\n");
+                    snippet = SnippetFramer.frame(snippet, "§1;\n");
                 }
         }
 
@@ -95,7 +95,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
             termSnippet = this.compileCast(termSnippet, method.returnParameter, "explicit");
 
-            snippet.addParts(new OneParameterTemplate(`${Helpers.return}($1);`).applyToSnippet(this.voidType, node.range, termSnippet));
+            snippet.addParts(new OneParameterTemplate(`${Helpers.return}(§1);`).applyToSnippet(this.voidType, node.range, termSnippet));
 
         } else {
             if(method.returnParameter && method.returnParameter != this.voidType){
@@ -141,7 +141,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         forSnippet.addParts(firstStatement);
         forSnippet.addNextStepMark();
         forSnippet.addParts(label1);
-        forSnippet.addParts(new OneParameterTemplate('if(!($1)){\n').applyToSnippet(this.voidType, node.condition!.range, condition));
+        forSnippet.addParts(new OneParameterTemplate('if(!(§1)){\n').applyToSnippet(this.voidType, node.condition!.range, condition));
         forSnippet.addParts(jumpToLabel2);
         forSnippet.addStringPart("}\n");
         forSnippet.addNextStepMark();
@@ -171,7 +171,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         doWhileSnippet.addParts(label1);
         doWhileSnippet.addParts(statementToRepeat);
         doWhileSnippet.addNextStepMark();
-        let sn1 = SnippetFramer.frame(condition, "if($1){\n", this.voidType);
+        let sn1 = SnippetFramer.frame(condition, "if(§1){\n", this.voidType);
         doWhileSnippet.addParts(sn1);
         doWhileSnippet.addParts(new JumpToLabelCodeSnippet(label1));
         doWhileSnippet.addStringPart("}", undefined);
@@ -213,7 +213,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         let label1 = new LabelCodeSnippet();
         let label2 = new LabelCodeSnippet();
         whileSnippet.addParts(label1);
-        let sn1 = SnippetFramer.frame(condition, "if(!($1)){\n", this.voidType);
+        let sn1 = SnippetFramer.frame(condition, "if(!(§1)){\n", this.voidType);
         whileSnippet.addParts(sn1);
         whileSnippet.addParts(new JumpToLabelCodeSnippet(label2));
         whileSnippet.addStringPart("}", undefined);
@@ -240,7 +240,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
         let ifSnippet = new CodeSnippetContainer([], node.range);
 
-        let sn1 = SnippetFramer.frame(condition, "if(!($1)){\n", this.voidType);
+        let sn1 = SnippetFramer.frame(condition, "if(!(§1)){\n", this.voidType);
         let label1 = new LabelCodeSnippet();
         ifSnippet.addParts(sn1);
         let jumpToLabel1 = new JumpToLabelCodeSnippet(label1);
@@ -283,10 +283,10 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
         if (firstParameter) {
             if (secondParameter) {
-                return new TwoParameterTemplate(`${statement}($1, $2);\n`)
+                return new TwoParameterTemplate(`${statement}(§1, §2);\n`)
                     .applyToSnippet(this.voidType, node.range, firstParameter, secondParameter)
             }
-            return new OneParameterTemplate(`${statement}($1, undefined);\n`)
+            return new OneParameterTemplate(`${statement}(§1, undefined);\n`)
                 .applyToSnippet(this.voidType, node.range, firstParameter);
         }
         return new StringCodeSnippet(`${statement}(undefined, undefined);\n`, node.range);
@@ -322,7 +322,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         if (initValueSnippet && accesLocalVariableSnippet) {
             let snippet = new BinaryOperatorTemplate('=', false)
                 .applyToSnippet(variable.type, node.range, accesLocalVariableSnippet, initValueSnippet);
-            return SnippetFramer.frame(snippet, '$1;');
+            return SnippetFramer.frame(snippet, '§1;');
         }
 
         return undefined;
