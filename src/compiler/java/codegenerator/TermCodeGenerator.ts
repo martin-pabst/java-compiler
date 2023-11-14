@@ -257,8 +257,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
             default: valueAsString = "" + node.value;
         }
 
-        let snippet = new StringCodeSnippet(valueAsString, node.range);
-        snippet.type = type;
+        let snippet = new StringCodeSnippet(valueAsString, node.range, type, node.value);
 
         return snippet;
     }

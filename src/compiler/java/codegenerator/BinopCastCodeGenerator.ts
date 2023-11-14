@@ -4,11 +4,11 @@ import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTNode, AssignmentOperator, BinaryOperator, LogicOperator } from "../parser/AST";
+import { ASTNode, AssignmentOperator, BinaryOperator, ConstantType, LogicOperator } from "../parser/AST";
 import { ArrayType } from "../types/ArrayType";
 import { JavaType } from "../types/JavaType";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
-import { CodeSnippet } from "./CodeSnippet";
+import { CodeSnippet, ConstantValue, StringCodeSnippet } from "./CodeSnippet";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";
 import { SnippetFramer } from "./CodeSnippetTools";
 import { BinaryOperatorTemplate, OneParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
@@ -170,7 +170,9 @@ export class BinopCastCodeGenerator {
             return undefined;
         }
 
-        if (operator == TokenType.XOR) return new BinaryOperatorTemplate("^", false).applyToSnippet(this.booleanType, wholeRange, leftSnippet, rightSnippet);
+        let bothSnippetsAreConstant = leftSnippet.isConstant() && rightSnippet.isConstant();
+
+        if (operator == TokenType.XOR || bothSnippetsAreConstant) return new BinaryOperatorTemplate("^", false).applyToSnippet(this.booleanType, wholeRange, leftSnippet, rightSnippet);
 
         /*
         * lazy and/or
@@ -348,7 +350,8 @@ export class BinopCastCodeGenerator {
         }
 
         if(castToTypeIndex == nString){
-            return new OneParameterTemplate('("" + §1)').applyToSnippet(this.intType, snippet.range!, snippet);
+            if(snippet.isConstant()) return new StringCodeSnippet(`"${snippet.getConstantValue()}"`, snippet.range, this.stringType, "" + snippet.getConstantValue);
+            return new OneParameterTemplate('("" + §1)').applyToSnippet(this.stringType, snippet.range!, snippet);
         }
 
         // no cast from string, no cast from/to void, boolean
@@ -366,26 +369,50 @@ export class BinopCastCodeGenerator {
             return snippet;
         }
 
-        let template: OneParameterTemplate | undefined;
 
-        switch (castToTypeIndex) {
-            case nByte: template = snippetTypeIndex <= nLong ? new OneParameterTemplate('((§1 + 128) % 256 - 128)') : new OneParameterTemplate('((Math.trunc(§1) + 128) % 256 - 128)'); 
-            break;
-            case nShort: template = snippetTypeIndex <= nLong ? new OneParameterTemplate('((§1 + 0x8000) % 0x10000 - 0x8000)') : new OneParameterTemplate('((Math.trunc(§1) + 0x80000000) % 0x100000000 - 0x80000000)');
-            break;
-            case nInteger: template = snippetTypeIndex <= nLong ? new OneParameterTemplate('((§1 + 0x80000000) % 0x100000000 - 0x80000000)') : new OneParameterTemplate('((Math.trunc(§1) + 0x80000000) % 0x100000000 - 0x80000000)');
-            break;
-            case nLong: template = new OneParameterTemplate('Math.trunc(§1)');
-            break;
-            case nFloat: template = new OneParameterTemplate('Math.fround(§1)');
-            break;
+        if(snippet.isConstant()){
+            let value: number = <number>snippet.getConstantValue();
+            let result: number;
+
+            switch (castToTypeIndex) {
+                case nByte: result = snippetTypeIndex <= nLong ? ((value + 128) % 256 - 128): ((Math.trunc(value) + 128) % 256 - 128); 
+                break;
+                case nShort: result = snippetTypeIndex <= nLong ? ((value + 0x8000) % 0x10000 - 0x8000): ((Math.trunc(value) + 0x8000) % 0x10000 - 0x8000); 
+                break;
+                case nInteger: result = snippetTypeIndex <= nLong ? ((value + 0x80000000) % 0x100000000 - 0x80000000): ((Math.trunc(value) + 0x80000000) % 0x100000000 - 0x80000000); 
+                break;
+                case nLong: result = Math.trunc(value);
+                break;
+                case nFloat: result = Math.fround(value);
+                break;
+            }
+
+            return new StringCodeSnippet("" + value, snippet.range!, castTo, value);
+
+        } else {
+            let template: OneParameterTemplate | undefined;
+    
+            switch (castToTypeIndex) {
+                case nByte: template = snippetTypeIndex <= nLong ? new OneParameterTemplate('((§1 + 128) % 256 - 128)') : new OneParameterTemplate('((Math.trunc(§1) + 128) % 256 - 128)'); 
+                break;
+                case nShort: template = snippetTypeIndex <= nLong ? new OneParameterTemplate('((§1 + 0x8000) % 0x10000 - 0x8000)') : new OneParameterTemplate('((Math.trunc(§1) + 0x80000000) % 0x100000000 - 0x80000000)');
+                break;
+                case nInteger: template = snippetTypeIndex <= nLong ? new OneParameterTemplate('((§1 + 0x80000000) % 0x100000000 - 0x80000000)') : new OneParameterTemplate('((Math.trunc(§1) + 0x80000000) % 0x100000000 - 0x80000000)');
+                break;
+                case nLong: template = new OneParameterTemplate('Math.trunc(§1)');
+                break;
+                case nFloat: template = new OneParameterTemplate('Math.fround(§1)');
+                break;
+            }
+    
+            if(template) return template.applyToSnippet(castTo, snippet.range!, snippet);
+            return snippet;
         }
 
-        if(template) return template.applyToSnippet(castTo, snippet.range!, snippet);
 
-        return snippet;
 
     }
+
 
     canCastTo(typeFrom: JavaType | undefined, typeTo: JavaType | undefined, castType: "explicit" | "implicit"): boolean {
 
@@ -476,11 +503,21 @@ export class BinopCastCodeGenerator {
         if (!snippet.type) return snippet;
         if (snippet.type.identifier != 'char') return snippet;
 
-        return SnippetFramer.frame(snippet, 'String.charCodeAt(§1)', this.intType);
+        if(snippet.isConstant()){
+            let result = (<string>snippet.getConstantValue()).charCodeAt(0);
+            return new StringCodeSnippet(result + "", snippet.range, this.intType, result);
+        }
+
+        return SnippetFramer.frame(snippet, '§1.charCodeAt(0)', this.intType);
     }
 
     convertNumberToChar(snippet: CodeSnippet): CodeSnippet {
         if (!snippet.type) return snippet;
+
+        if(snippet.isConstant()){
+            let result = String.fromCharCode(<number>snippet.getConstantValue());
+            return new StringCodeSnippet(`"${result}"`, snippet.range, this.charType, result);
+        }
 
         return SnippetFramer.frame(snippet, 'String.fromCharCode(§1)', this.charType);
     }
@@ -509,22 +546,28 @@ export class BinopCastCodeGenerator {
         }
         
         if(operator == TokenType.not){
-            if(primitiveIndex = nBoolean){
-                return new OneParameterTemplate("!§1").applyToSnippet(this.booleanType, operand.range!, operand);
+            if(primitiveIndex == nBoolean){
+                return this.applyUnaryOperatorConsideringConstantFolding("!", this.booleanType, operand.range!, operand);
             }
             this.pushError("Der Operator ! (not) ist nur für boolesche Operanden geeignet, nicht für Operanden des Typs " + operand.type!.identifier + ".", "error", operand.range!);
             return operand;
         }
+
         if([TokenType.plusPlus, TokenType.minusMinus].indexOf(operator) >= 0){
             if(!operand.isLefty){
                 this.pushError("Der Operator " + operatorAsString + " ist nur für Variablen/Attribute geeignet, deren Wert verändert werden kann.", "error", operand.range!);
                 return;
             }
-        }
-
-        if([TokenType.negation, TokenType.plus, TokenType.plusPlus, TokenType.minusMinus].indexOf(operator) >= 0){
             if(primitiveIndex >= nByte && primitiveIndex <= nDouble){
                 return new OneParameterTemplate(operatorAsString + "§1").applyToSnippet(operand.type!, operand.range!, operand);
+            }
+            this.pushError("Der Operator " + operatorAsString + " ist nicht für den Operanden des Typs " + operand.type!.identifier + "geeignet.", "error", operand.range!);
+            return;
+        }
+
+        if([TokenType.negation, TokenType.plus].indexOf(operator) >= 0){
+            if(primitiveIndex >= nByte && primitiveIndex <= nDouble){
+                return this.applyUnaryOperatorConsideringConstantFolding(operatorAsString, operand.type!, operand.range!, operand);
             }
             this.pushError("Der Operator " + operatorAsString + " ist nicht für den Operanden des Typs " + operand.type!.identifier + "geeignet.", "error", operand.range!);
             return;
@@ -532,7 +575,7 @@ export class BinopCastCodeGenerator {
         
         // Tilde-Operator
         if(primitiveIndex >= nByte && primitiveIndex <= nLong){
-            return new OneParameterTemplate(operatorAsString + "§1").applyToSnippet(operand.type!, operand.range!, operand);
+            return this.applyUnaryOperatorConsideringConstantFolding(operatorAsString, operand.type!, operand.range!, operand);
         }
  
         this.pushError("Der Operator " + operatorAsString + " ist nicht für den Operanden des Typs " + operand.type!.identifier + "geeignet.", "error", operand.range!);
@@ -541,5 +584,25 @@ export class BinopCastCodeGenerator {
 
     }
 
+    applyUnaryOperatorConsideringConstantFolding(operator: string, resultType: JavaType, range: IRange, snippet: CodeSnippet): CodeSnippet {
+        if(snippet.isConstant()){
+            return new OneParameterTemplate(operator + "§1").applyToSnippet(resultType, range, snippet);
+        } else {
+
+            let operand = snippet.getConstantValue()!;
+            let result!: ConstantValue;
+            
+            switch(operator){
+                case "-": result = -operand; break;
+                case "+": return snippet;
+                case "~": result = ~operand; break;
+                case "!": result = !operand; break;
+            }
+
+            return new StringCodeSnippet("" + result, range, resultType, result); 
+
+        }
+
+    }
 
 }

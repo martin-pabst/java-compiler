@@ -1,7 +1,7 @@
 import { Step } from "../../common/interpreter/Program";
 import { EmptyRange, IRange } from "../../common/range/Range";
 import { JavaType } from "../types/JavaType";
-import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
+import { CodeSnippet, ConstantValue, StringCodeSnippet } from "./CodeSnippet";
 import { LabelCodeSnippet } from "./LabelManager";
 
 
@@ -54,6 +54,14 @@ export class CodeSnippetContainer extends CodeSnippet {
 
     enforceNewStepBeforeSnippet() {
         this.parts.unshift(new NextStepMark());
+    }
+
+    isConstant(): boolean {
+        return this.isPureTerm() && (<StringCodeSnippet> this.parts[0]).isConstant();
+    }
+
+    getConstantValue(): ConstantValue | undefined {
+        return (<StringCodeSnippet> this.parts[0]).getConstantValue();
     }
 
     isPureTermWithoutPop(){

@@ -2,6 +2,8 @@ import { Step } from "../../common/interpreter/Program";
 import { IRange } from "../../common/range/Range";
 import { JavaType } from "../types/JavaType";
 
+export type ConstantValue = number | boolean | string | null;
+
 export abstract class CodeSnippet {
     
     public stepIndex: number = -1;
@@ -45,14 +47,32 @@ export abstract class CodeSnippet {
         // standard implementation is empty
     }
 
+    isConstant() {
+        return false;
+    }
+
+    getConstantValue(): ConstantValue | undefined {
+        return undefined;
+    }
 }
 
 export class StringCodeSnippet extends CodeSnippet {
 
-    constructor(public text: string, range?: IRange, type?: JavaType) {
+    private constantValue: ConstantValue | undefined;
+
+    constructor(public text: string, range?: IRange, type?: JavaType, constantValue?: ConstantValue ) {
         super();
         this.range = range;
         this.type = type;
+        this.constantValue = constantValue;
+    }
+
+    getConstantValue(): ConstantValue | undefined {
+        return this.constantValue;
+    }
+
+    isConstant(): boolean {
+        return typeof this.constantValue !== "undefined";
     }
 
     ensureFinalValueIsOnStack(): void {

@@ -1,6 +1,6 @@
 import { IRange } from "../../common/range/Range";
 import { JavaType } from "../types/JavaType";
-import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
+import { CodeSnippet, ConstantValue, StringCodeSnippet } from "./CodeSnippet";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";
 
 
@@ -204,6 +204,13 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         let snippet0IsPure = snippets[0].isPureTerm();
         let snippet1IsPure = snippets[1].isPureTerm();
 
+        let snippet0IsConstant = snippets[0].isConstant();
+        let snippet1IsConstant = snippets[0].isConstant();
+
+        if(snippet0IsConstant && snippet1IsConstant){
+            return this.foldConstants(snippets[0], snippets[1], this.operator, _resultType, _range);
+        }
+
         if (snippet0IsPure && snippet1IsPure) {
             return new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm(), _range, _resultType);
         }
@@ -243,6 +250,62 @@ export class BinaryOperatorTemplate extends CodeTemplate {
 
         snippetContainer.finalValueIsOnStack = false;
         return snippetContainer;
+    }
+
+    foldConstants(snippet0: CodeSnippet, snippet1: CodeSnippet, operator: string, 
+        resultType: JavaType, range: IRange): CodeSnippet {
+        
+        let value0 = snippet0.getConstantValue()!;
+        let value1 = snippet1.getConstantValue()!; 
+
+        let result!: ConstantValue;
+
+        switch(operator){
+            //@ts-ignore
+            case "+": result = value0 + value1; break;
+            //@ts-ignore
+            case "-": result = value0 - value1; break;
+            //@ts-ignore
+            case "*": result = value0 * value1; break;
+            //@ts-ignore
+            case "/": result = value0 / value1; break;
+            //@ts-ignore
+            case "%": result = value0 % value1; break;
+            //@ts-ignore
+            case "<": result = value0 < value1; break;
+            //@ts-ignore
+            case ">": result = value0 > value1; break;
+            //@ts-ignore
+            case "<=": result = value0 <= value1; break;
+            //@ts-ignore
+            case ">=": result = value0 >= value1; break;
+            //@ts-ignore
+            case "!=": result = value0 != value1; break;
+            //@ts-ignore
+            case "==": result = value0 == value1; break;
+            //@ts-ignore
+            case "&&": result = value0 && value1; break;
+            //@ts-ignore
+            case "||": result = value0 || value1; break;
+            //@ts-ignore
+            case "&": result = value0 & value1; break;
+            //@ts-ignore
+            case "|": result = value0 | value1; break;
+            //@ts-ignore
+            case "^": result = value0 ^ value1; break;
+            //@ts-ignore
+            case "<<": result = value0 << value1; break;
+            //@ts-ignore
+            case ">>": result = value0 >> value1; break;
+            //@ts-ignore
+            case ">>>": result = value0 >>> value1; break;
+
+        }
+
+        let resultAsCode = typeof result == "string" ? `"${result}"` : result + "";
+
+        return new StringCodeSnippet(resultAsCode, range, resultType, result);
+
     }
 
 
