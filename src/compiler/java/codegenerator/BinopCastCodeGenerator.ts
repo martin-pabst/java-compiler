@@ -238,7 +238,7 @@ export class BinopCastCodeGenerator {
     compileAssignment(leftSnippet: CodeSnippet, rightSnippet: CodeSnippet, lTypeIndex: number, rTypeIndex: number, lIdentifier: string, rIdentifier: string, operator: BinaryOperator, operatorRange: IRange, wholeRange: IRange): CodeSnippet | undefined {
 
         if(!leftSnippet.isLefty){
-            this.pushError("Der Term auf der linken Seite des Zuweisungsoperators ist keine Variable/kein Attribut eines Objekts, daher kann ihm nichts zugewiesen werden.", "error", operatorRange);
+            this.pushError("Dem Term auf der linken Seite des Zuweisungsoperators kann nichts zugewiesen werden.", "error", operatorRange);
             return;
         }
 

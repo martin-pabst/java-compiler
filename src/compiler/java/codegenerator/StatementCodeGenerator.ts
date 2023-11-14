@@ -294,6 +294,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
     compileLocaleVariableDeclaration(node: ASTLocalVariableDeclaration): CodeSnippet | undefined {
         let variable = new JavaLocalVariable(node.identifier, node.identifierRange, node.type.resolvedType!);
+        variable.isFinal = node.isFinal;
         this.currentSymbolTable.addSymbol(variable);    // sets stackOffset
 
         let accesLocalVariableSnippet = this.compileSymbolOnStackframeAccess(variable, node.identifierRange);

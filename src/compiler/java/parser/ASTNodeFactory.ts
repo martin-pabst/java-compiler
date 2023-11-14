@@ -156,7 +156,7 @@ export class ASTNodeFactory {
 
     }
 
-    buildAttributeNode(rangeStart: IRange, identifier: Token, type: ASTTypeNode, 
+    buildFieldDeclarationNode(rangeStart: IRange, identifier: Token, type: ASTTypeNode, 
         initialization: ASTTermNode | undefined, modifiers: ASTNodeWithModifiers,
         annotations: ASTAnnotationNode[]): ASTFieldDeclarationNode {
 
@@ -193,14 +193,15 @@ export class ASTNodeFactory {
         }
     }
 
-    buildParameterNode(startRange: IRange, identifier: Token, type: ASTTypeNode | undefined, isEllipsis: boolean): ASTParameterNode {
+    buildParameterNode(startRange: IRange, identifier: Token, type: ASTTypeNode | undefined, isEllipsis: boolean, isFinal: boolean): ASTParameterNode {
         return {
             kind: TokenType.parameterDeclaration,
             range: startRange,
             identifier: <string>identifier.value,
             identifierRange: identifier.range,
             type: type,
-            isEllipsis: isEllipsis
+            isEllipsis: isEllipsis,
+            isFinal: isFinal
         }
     }
 
@@ -467,7 +468,7 @@ export class ASTNodeFactory {
         }
     }
 
-    buildLocalVariableDeclaration(type: ASTTypeNode, identifer: Token, initialization: ASTTermNode | undefined): ASTLocalVariableDeclaration | undefined {
+    buildLocalVariableDeclaration(type: ASTTypeNode, identifer: Token, initialization: ASTTermNode | undefined, isFinal: boolean): ASTLocalVariableDeclaration | undefined {
         let end = initialization? initialization : identifer;
 
         return {
@@ -476,7 +477,8 @@ export class ASTNodeFactory {
             identifierRange: identifer.range,
             range: {startLineNumber: type.range.startLineNumber, startColumn: type.range.startColumn, endLineNumber: end.range.endLineNumber, endColumn: end.range.endColumn},
             type: type,
-            initialization: initialization
+            initialization: initialization,
+            isFinal: isFinal
         }
     }
 }

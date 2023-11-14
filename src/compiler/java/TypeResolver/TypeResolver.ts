@@ -266,7 +266,7 @@ export class TypeResolver {
             for (let p of methodNode.parameters) {
                 if (p.type?.resolvedType) {
                     let parameter = new Parameter(p.identifier, p.identifierRange,
-                        module, p.type?.resolvedType);
+                        module, p.type?.resolvedType, p.isFinal);
                     method.parameters.push(parameter);
                 }
             }

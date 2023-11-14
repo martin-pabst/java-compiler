@@ -380,6 +380,9 @@ export class TokenIterator {
     }
 
     analyzeIfVariableDeclarationAhead(): boolean {
+
+        if(this.tt == TokenType.keywordFinal) return true;
+
         let pos = this.pos;
         let nonSpaceTokenTypesFound: TokenType[] = [];
 

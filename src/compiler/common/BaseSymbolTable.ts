@@ -14,6 +14,8 @@ export abstract class BaseSymbol {
 
     public stackframePosition?: number;
 
+    public isFinal: boolean = false;
+
     constructor(public identifier: string, public identifierRange: IRange, public type: BaseType, public kind: SymbolKind) {
 
     }

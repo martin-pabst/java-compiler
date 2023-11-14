@@ -54,6 +54,9 @@ export class StatementParser extends TermParser {
     }
 
     parseLocalVariableDeclaration(): ASTStatementNode | undefined {
+        
+        let isFinal = this.comesToken(TokenType.keywordFinal, true);
+        
         let type = this.parseType();
         let identifer = this.expectAndSkipIdentifierAsToken();
         let initialization: ASTTermNode | undefined = undefined;
@@ -62,7 +65,7 @@ export class StatementParser extends TermParser {
         }       
 
         if(type && identifer){
-            return this.nodeFactory.buildLocalVariableDeclaration(type, identifer, initialization);
+            return this.nodeFactory.buildLocalVariableDeclaration(type, identifer, initialization, isFinal);
         }
 
         return undefined;

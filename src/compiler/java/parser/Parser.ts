@@ -152,7 +152,7 @@ export class Parser extends StatementParser {
                 this.parseMethodDeclaration(classASTNode, modifiers, false, type);
             } else {
                 if (classASTNode.kind == TokenType.keywordClass || classASTNode.kind == TokenType.keywordEnum) {
-                    this.parseAttributeDeclaration(classASTNode, modifiers, type);
+                    this.parseFieldDeclaration(classASTNode, modifiers, type);
                 } else {
                     this.pushError("Ein Interface kann keine Attribute besitzen.", "error");
                 }
@@ -170,7 +170,7 @@ export class Parser extends StatementParser {
         classASTNode.methods.push(methodNode);
 
         if (this.expect(TokenType.leftBracket, true)) {
-            while (this.comesToken(TokenType.identifier, false)) {
+            while (this.comesToken([TokenType.identifier, TokenType.keywordFinal], false)) {
                 this.parseParameter(methodNode);
             }
             this.expect(TokenType.rightBracket, true);
@@ -188,27 +188,30 @@ export class Parser extends StatementParser {
 
     parseParameter(methodNode: ASTMethodDeclarationNode) {
         let startRange = this.cct.range;
+
+        let isFinal = this.comesToken(TokenType.keywordFinal, true);
+
         let type = this.parseType();
+        
+        let identifier = this.expectAndSkipIdentifierAsToken();
 
         let isEllipsis = this.comesToken(TokenType.ellipsis, true);
 
-        let identifier = this.expectAndSkipIdentifierAsToken();
-
         if (type != null && identifier.value != "") {
-            let parameterNode = this.nodeFactory.buildParameterNode(startRange, identifier, type, isEllipsis);
+            let parameterNode = this.nodeFactory.buildParameterNode(startRange, identifier, type, isEllipsis, isFinal);
             this.setEndOfRange(parameterNode);
             methodNode.parameters.push(parameterNode);
         }
     }
 
-    parseAttributeDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode, modifiers: ASTNodeWithModifiers, type: ASTTypeNode | undefined) {
+    parseFieldDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode, modifiers: ASTNodeWithModifiers, type: ASTTypeNode | undefined) {
         let rangeStart = this.cct.range;
         let identifier = this.expectAndSkipIdentifierAsToken();
 
         let initialization = this.comesToken(TokenType.assignment, true) ? this.parseTerm() : undefined;
 
         if (identifier.value != "" && type != null) {
-            let node = this.nodeFactory.buildAttributeNode(rangeStart, identifier, type, initialization,
+            let node = this.nodeFactory.buildFieldDeclarationNode(rangeStart, identifier, type, initialization,
                 modifiers, this.collectedAnnotations);
             classASTNode.fields.push(node);
             this.setEndOfRange(node);

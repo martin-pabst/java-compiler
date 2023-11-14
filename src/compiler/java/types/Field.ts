@@ -12,7 +12,6 @@ import { Visibility } from "./Visibility";
 export class Field extends BaseSymbol {
 
     isStatic: boolean = false;
-    isFinal: boolean = false;
 
     classEnum!: JavaClass | JavaEnum;
 

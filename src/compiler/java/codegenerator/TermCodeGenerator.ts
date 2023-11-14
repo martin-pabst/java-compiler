@@ -225,7 +225,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
     compileSymbolOnStackframeAccess(symbol: BaseSymbol, range: IRange): CodeSnippet | undefined {
         let type = (<JavaLocalVariable | Parameter>symbol).type;
         let snippet = new StringCodeSnippet(`${StepParams.stack}[${StepParams.stackBase} + ${symbol.stackframePosition}]`, range, type);
-        snippet.isLefty = true;
+        snippet.isLefty = !symbol.isFinal;
         return snippet;
     }
 
@@ -239,7 +239,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         let type = (field).type;
         let fieldName = (field).getInternalName();
         let snippet = new StringCodeSnippet(`${StepParams.stack}[${StepParams.stackBase}].${fieldName}`, range, type);
-        snippet.isLefty = true;
+        snippet.isLefty = !field.isFinal;
         return snippet;
     }
 

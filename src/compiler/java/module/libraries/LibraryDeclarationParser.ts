@@ -402,9 +402,10 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             m.isConstructor = isConstructor;
             if(!this.comesToken(TokenType.rightBracket, false)){
                 do{
+                    let isFinal = this.comesToken(TokenType.keywordFinal, true);
                     let type = this.parseType(module);
                     let id = this.expectIdentifier();
-                    m.parameters.push(new Parameter(id, EmptyRange.instance, module, type));            
+                    m.parameters.push(new Parameter(id, EmptyRange.instance, module, type, isFinal));            
                 } while(this.comesToken(TokenType.comma, true));
             }
 

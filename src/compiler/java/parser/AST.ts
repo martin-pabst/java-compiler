@@ -78,6 +78,7 @@ export interface ASTParameterNode extends ASTNode, ASTNodeWithIdentifier {
     kind: TokenType.parameterDeclaration;
     type: ASTTypeNode | undefined;    // lambda functions may have parameters without type declaration
     isEllipsis: boolean;
+    isFinal: boolean;
 }
 
 export interface AnnotatedNode {
@@ -314,6 +315,7 @@ export interface ASTLocalVariableDeclaration extends ASTStatementNode, ASTNodeWi
     kind: TokenType.localVariableDeclaration;
     type: ASTTypeNode;
     initialization: ASTTermNode | undefined;
+    isFinal: boolean;
 }
 
 /**
