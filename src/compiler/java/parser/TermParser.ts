@@ -306,7 +306,7 @@ export abstract class TermParser extends TokenIterator {
 
                     let identifier = this.expectAndSkipIdentifierAsToken();
                     if (identifier.value != "") {
-                        lambdaNode.parameters.push(this.nodeFactory.buildParameterNode(startRange, identifier, type, false));
+                        lambdaNode.parameters.push(this.nodeFactory.buildParameterNode(startRange, identifier, type, false, false));
                     }
 
                 } while (this.comesToken(TokenType.comma, true));
