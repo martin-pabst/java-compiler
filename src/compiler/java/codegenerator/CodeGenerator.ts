@@ -23,6 +23,13 @@ export class CodeGenerator extends StatementCodeGenerator {
         this.linker = new SnippetLinker();
     }
 
+    /**
+     * returns all field that could not be resolved to a constant value yet
+     */
+    compileStaticInitializers(): Field[] {
+        return []; // TODO
+    }
+
     start() {
         this.compileMainProgram();
         this.compileClasses();

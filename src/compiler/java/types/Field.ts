@@ -19,6 +19,8 @@ export class Field extends BaseSymbol {
 
     usagePositions: UsagePosition[] = [];
 
+    initialValue?: any;
+
     declare type: JavaType;
 
     constructor(identifier: string, identifierRange: IRange, public module: JavaBaseModule,

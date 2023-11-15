@@ -25,6 +25,14 @@ import { JavaClassOrEnum } from "../types/JavaClassOrEnum.ts";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 
+export enum fieldAccessMode {
+    atStaticFieldInitialization, // access to all static fields gets resolved as their initial value
+    atFieldInitialization,  // access to all non-static fields gets resolved as their initial value; access to final static fields gets resolved as their initial value
+                            // access to non-final static fields gets resolved as field-access at runtime
+    atCompilingMethods // only access to final fields or final static fields gets resolved as their initial value
+                       // access to non-final (static) fields gets resolved as field-access at runtime
+}
+
 export class TermCodeGenerator extends BinopCastCodeGenerator {
 
     constantTypeToTypeMap: { [key: number]: JavaType } = {}
