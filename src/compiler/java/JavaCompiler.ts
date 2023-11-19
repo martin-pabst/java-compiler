@@ -6,6 +6,7 @@
  * a former compilation run.
  */
 
+import { Error } from "../common/Error.ts";
 import { Executable } from "../common/Executable.ts";
 import { KlassObjectRegistry } from "../common/interpreter/StepFunction.ts";
 import { File } from "../common/module/File";
@@ -24,12 +25,16 @@ export class JavaCompiler {
     lastOpenedFile?: File;
     private libraryModuleManager: JavaLibraryModuleManager;
 
+    private errors: Error[] = [];
+
     constructor(){
         this.libraryModuleManager = new JavaLibraryModuleManager();
         this.moduleManager = new JavaModuleManager();
     }
 
     compile(files: File | File[], currentlyOpenFile?: File): Executable {
+
+        this.errors = [];
 
         if(!Array.isArray(files)) files = [files];
 
@@ -74,7 +79,7 @@ export class JavaCompiler {
 
         this.moduleManager.typestore.populateClassObjectRegistry(klassObjectRegistry);
 
-        let executable = new Executable(klassObjectRegistry, this.moduleManager, this.lastOpenedFile, currentlyOpenFile);
+        let executable = new Executable(klassObjectRegistry, this.moduleManager, this.errors, this.lastOpenedFile, currentlyOpenFile);
 
         if(executable.mainModule){
             this.lastOpenedFile = executable.mainModule.file;

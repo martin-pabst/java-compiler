@@ -3,20 +3,30 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTClassDefinitionNode, ASTFieldDeclarationNode, ASTMethodDeclarationNode } from "../parser/AST";
+import { ASTClassDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTMethodDeclarationNode, ASTStaticInitializerNode } from "../parser/AST";
 import { Field } from "../types/Field.ts";
-import { JavaClass } from "../types/JavaClass.ts";
+import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { CodeSnippetContainer } from "./CodeSnippetKinds.ts";
-import { OneParameterTemplate } from "./CodeTemplate.ts";
+import { CodeTemplate, OneParameterTemplate } from "./CodeTemplate.ts";
 import { JavaSymbolTable } from "./JavaSymbolTable";
 import { SnippetLinker } from "./SnippetLinker";
 import { StatementCodeGenerator } from "./StatementCodeGenerator";
 import { type TypeResolver } from "../TypeResolver/TypeResolver.ts"; // only for jsDoc below
+import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
+import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
+import { Method } from "../types/Method.ts";
 
 export class CodeGenerator extends StatementCodeGenerator {
 
     linker: SnippetLinker;
+
+
+    /*
+     * These fields describe state of code generation:
+     */
+    callingOtherConstructorInSameClassHappened: boolean = false;    // only relevant while compiling constructor
+    superConstructorHasBeenCalled: boolean = false;                 // only relevant while compiling constructor
 
     constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore) {
         super(module, libraryTypestore, compiledTypesTypestore);
@@ -31,13 +41,14 @@ export class CodeGenerator extends StatementCodeGenerator {
     }
 
     start() {
-        this.compileMainProgram();
         this.compileClasses();
+        this.compileMainProgram();
     }
 
     compileMainProgram() {
         let ast = this.module.ast!;
         this.currentSymbolTable = new JavaSymbolTable(this.module, ast.range, true);
+        this.missingStatementManager.beginMethodBody([]);
 
         let snippets: CodeSnippet[] = [];
 
@@ -46,7 +57,12 @@ export class CodeGenerator extends StatementCodeGenerator {
             if (snippet) snippets.push(snippet);
         }
 
-        snippets.push(new StringCodeSnippet("t.state = 4;"));
+        this.missingStatementManager.endMethodBody(undefined, this.module.errors);
+
+        let endOfProgramSnippet = new CodeSnippetContainer(new StringCodeSnippet("t.state = 4;"));
+        endOfProgramSnippet.enforceNewStepBeforeSnippet();
+
+        snippets.push(endOfProgramSnippet);
 
         let steps = this.linker.link(snippets);
 
@@ -82,35 +98,118 @@ export class CodeGenerator extends StatementCodeGenerator {
         this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
 
         let fieldSnippets: CodeSnippet[] = [];
-        let staticFieldSnippets: CodeSnippet[] = [new StringCodeSnippet(`let __Klass = ${Helpers.classes}[${classContext.identifier}];\n`)];
+        let staticFieldSnippets: CodeSnippet[] = [new StringCodeSnippet(`let __Klass = ${Helpers.classes}["${classContext.identifier}"];\n`)];
 
-        for (let field of cdef.fields) {
-            let snippet = this.compileField(field, classContext);
-            if(snippet){
-                if(field.isStatic){
-                    staticFieldSnippets.push(snippet);
-                } else {
-                    fieldSnippets.push(snippet);
-                }
-            } 
+        for (let fieldOrInitializer of cdef.fieldsOrInstanceInitializers) {
+
+            switch (fieldOrInitializer.kind) {
+                case TokenType.fieldDeclaration:
+                    let snippet = this.compileField(fieldOrInitializer, classContext);
+                    if (snippet) {
+                        if (fieldOrInitializer.isStatic) {
+                            staticFieldSnippets.push(snippet);
+                        } else {
+                            fieldSnippets.push(snippet);
+                        }
+                    }
+                    break;
+                case TokenType.instanceInitializerBlock:
+                    let snippet1 = this.compileInstanceInitializerBlock(fieldOrInitializer);
+                    if (snippet1) {
+                        fieldSnippets.push(snippet1);
+                    }
+                    break;
+                case TokenType.staticInitializerBlock:
+                    let snippet2 = this.compileStaticInitializerBlock(fieldOrInitializer);
+                    if (snippet2) {
+                        staticFieldSnippets.push(snippet2);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
         }
-        
-        classContext.fieldConstructor = this.buildFieldConstructor(fieldSnippets, "fieldInitializer");
-        cdef.fieldConstructorProgram = classContext.fieldConstructor;
 
-        classContext.staticFieldConstructor = this.buildFieldConstructor(staticFieldSnippets, "staticFieldInitializer");
-        cdef.staticFieldConstructorProgram = classContext.staticFieldConstructor;
+        classContext.instanceInitializer = fieldSnippets;
 
+        classContext.staticInitializer = this.buildInitializer(staticFieldSnippets, "staticInitializer");
+        cdef.staticInitializer = classContext.staticInitializer;
+
+        let constructorFound: boolean = false;
         for (let method of cdef.methods) {
-            this.compileMethod(method, classContext);
+            this.compileMethodDeclaration(method, classContext);
+            if (method.isContructor) constructorFound = true;
         }
+
+        if (!constructorFound) this.buildStandardConstructors(classContext);
 
         this.popSymbolTable();
 
     }
 
+    /**
+     * if a class has no explicitly declared constructor then foreach constructor of it's base class build
+     * a constructor with same signature 
+     */
+    buildStandardConstructors(classContext: JavaClass) {
 
-    buildFieldConstructor(snippets: CodeSnippet[], identifier: string): Program {
+        let baseClass: IJavaClass = classContext;
+        while (!baseClass.getMethods().find(m => m.isConstructor && m.visibility != TokenType.keywordPrivate)) baseClass = baseClass.getExtends()!;
+        // TypeResolver enforces base class to be at least Object
+        for (let baseConstructor of baseClass.getMethods().filter(m => m.isConstructor && m.visibility != TokenType.keywordPrivate)) {
+
+            let method = baseConstructor.getCopy();
+            
+            classContext.methods.push(method);
+            
+            if (classContext.instanceInitializer?.length == 0){
+                method.hasImplementationWithNativeCallingConvention = baseConstructor.hasImplementationWithNativeCallingConvention;
+                return; // unaltered implementation of base class constructor suffices for child class
+            } 
+            
+            method.hasImplementationWithNativeCallingConvention = false;
+
+            let parametersForSuperCall = baseConstructor.parameters.map(p => `${StepParams.stack}[${p.stackframePosition}]`).join(", ");
+
+            if (!baseConstructor.hasImplementationWithNativeCallingConvention) {
+                parametersForSuperCall += StepParams.thread + (parametersForSuperCall.length == 0 ? "" : ", ");
+            }
+
+            let steps = classContext.instanceInitializer.slice();
+
+            let superCall: string = `super.${baseConstructor.getInternalName(baseConstructor.hasImplementationWithNativeCallingConvention ? "native" : "java")}(${parametersForSuperCall});\n`;
+
+            steps.push(new StringCodeSnippet(superCall));
+
+            method.program = new Program(this.module, this.currentSymbolTable, classContext.identifier + method.identifier);
+            method.program.stepsSingle = this.linker.link(steps);
+
+            method.program.addStep(`${Helpers.return}(${StepParams.stack}[0]);`)
+            method.program.compileToJavascriptFunctions();
+
+            let runtimeClass = classContext.runtimeClass;
+
+            if (runtimeClass) {
+
+                runtimeClass.__programs.push(method.program);
+                let methodIndex = runtimeClass.__programs.length - 1;
+
+                let parameterIdentifiers = method.parameters.map(p => p.identifier);
+                let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
+
+                runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
+                    `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});
+                                 ${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`);
+
+            }
+
+        }
+
+    }
+
+
+    buildInitializer(snippets: CodeSnippet[], identifier: string): Program {
         let program = new Program(this.module, this.currentSymbolTable, identifier);
         snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
         program.stepsSingle = this.linker.link(snippets);
@@ -119,7 +218,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
 
     /**
-     * All fields inside types are already built by 
+     * All fields inside types are already built by TypeResolver
      * @see TypeResolver#buildRuntimeClassesAndTheirFields
      * @returns 
      */
@@ -132,61 +231,84 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         this.currentSymbolTable.addSymbol(field);
 
-        if (fieldNode.initialization) {
-                
-            if (fieldNode.isStatic) {
-                
-                    this.currentlyCompiledStaticConstructor = classContext;
-                    let snippet = this.compileTerm(fieldNode.initialization);
-                    this.currentlyCompiledStaticConstructor = undefined;
+        field.initialValue = field.type instanceof PrimitiveType ? field.type.getDefaultValue() : null;
 
-                    if(snippet){
-    
-                        snippet = this.compileCast(snippet, field.type, "implicit");
-    
-                        let assignmentTemplate = `__Klass.${field.getInternalName()} = §1;\n`;
-    
-                        snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, fieldNode.initialization.range, snippet);
-    
-                        let snippet1 = new CodeSnippetContainer(snippet);
-                        snippet1.addNextStepMark();
-    
-                        return snippet1;                        
-                    }
-                    
-                } else {
-                    // TODO: Optimize if field values are constant
-                    let snippet = this.compileTerm(fieldNode.initialization);
-                    if(snippet){
-                        if (!classContext.fieldConstructor) classContext.fieldConstructor = new Program(this.module, this.currentSymbolTable, classContext.identifier + ".fieldConstructor");
-    
-                        snippet = this.compileCast(snippet, field.type, "implicit");
-    
-                        let assignmentTemplate = `${StepParams.stack}[${StepParams.stackBase}].${field.getInternalName()} = §1;\n`;
-                        
-                        snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, fieldNode.initialization.range, snippet);
-    
-                        let snippet1 = new CodeSnippetContainer(snippet);
-                        snippet1.addNextStepMark();
-                        return snippet1;
-                    }
+        if (fieldNode.isStatic) {
+
+            this.classOfCurrentlyCompiledStaticInitialization = classContext;
+            let snippet = this.compileTerm(fieldNode.initialization);
+            this.classOfCurrentlyCompiledStaticInitialization = undefined;
+
+            if (snippet) {
+
+                snippet = this.compileCast(snippet, field.type, "implicit");
+
+                if (snippet.isConstant()) {
+                    field.initialValue = snippet.getConstantValue();
+                    field.initialValueIsConstant = true;
                 }
-        } else {
-            // no explicit field initialization => set default value
-            if (classContext.runtimeClass) {
-                if (fieldNode.isStatic) {
-                    classContext.runtimeClass[field.getInternalName()] = field.type.getDefaultValue();
-                } else {
-                    classContext.runtimeClass.prototype[field.getInternalName()] = field.type.getDefaultValue();
-                }
+
+                let assignmentTemplate = `__Klass.${field.getInternalName()} = §1;\n`;
+
+                snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, fieldNode.initialization!.range, snippet);
+
+                snippet = new CodeSnippetContainer(snippet);
+                (<CodeSnippetContainer>snippet).addNextStepMark();
+
+            } else {
+                field.initialValueIsConstant = true;
+                let initialValueAsString = field.type instanceof PrimitiveType ? field.type.defaultValueAsString : "null";
+                snippet = new StringCodeSnippet(`__Klass.${field.getInternalName()} = ${initialValueAsString};\n`);
             }
+
+            if (classContext.runtimeClass) {
+                classContext.runtimeClass[field.getInternalName()] = field.initialValue;
+            }
+
+            return snippet;
+        } else {
+            let snippet = this.compileTerm(fieldNode.initialization);
+            if (snippet) {
+
+                snippet = this.compileCast(snippet, field.type, "implicit");
+
+                if (snippet.isConstant()) {
+                    field.initialValue = snippet.getConstantValue();
+                    field.initialValueIsConstant = true;
+                    snippet = undefined;
+                } else {
+                    let assignmentTemplate = `${StepParams.stack}[${StepParams.stackBase}].${field.getInternalName()} = §1;\n`;
+
+                    snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, fieldNode.initialization!.range, snippet);
+
+                    snippet = new CodeSnippetContainer(snippet);
+                    (<CodeSnippetContainer>snippet).addNextStepMark();
+                }
+
+            } else {
+                field.initialValueIsConstant = true;
+            }
+
+            if (classContext.runtimeClass) {
+                classContext.runtimeClass.prototype[field.getInternalName()] = field.initialValue;
+            }
+
+            return snippet;
         }
+
     }
 
-    compileMethod(methodNode: ASTMethodDeclarationNode, classContext: JavaClass) {
+    compileMethodDeclaration(methodNode: ASTMethodDeclarationNode, classContext: JavaClass) {
 
         let method = methodNode.method;
         if (!method) return;
+
+        this.missingStatementManager.beginMethodBody(method.parameters);
+
+        if (methodNode.isContructor) {
+            this.callingOtherConstructorInSameClassHappened = false;
+            this.superConstructorHasBeenCalled = false;
+        }
 
         let symbolTable = this.pushAndGetNewSymbolTable(methodNode.range, true, classContext, method);
 
@@ -194,44 +316,88 @@ export class CodeGenerator extends StatementCodeGenerator {
             this.currentSymbolTable.addSymbol(parameter);
         }
 
-        if (methodNode.statement) {
-            let snippet = this.compileStatementOrTerm(methodNode.statement);
+        
+        let snippets: CodeSnippet[] = [];
+        
+        if (method.isConstructor) {
 
-            if (snippet) {
+            if (!this.callingOtherConstructorInSameClassHappened && classContext.instanceInitializer) {
+                snippets = snippets.concat(classContext.instanceInitializer);
+            }
 
-                method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
-                method.program.stepsSingle = this.linker.link([snippet]);
+            if (!this.superConstructorHasBeenCalled) {
+                // TODO: insert call to default super constructor
+            }
 
-                method.program.addStep(`${Helpers.return}();`)
+        }
+        
+        
+        let snippet = methodNode.statement ? this.compileStatementOrTerm(methodNode.statement) : undefined;
+        if (snippet) snippets.push(snippet);
 
-                methodNode.program = method.program;    // only for debugging purposes
+        if (methodNode.isContructor) {
+            snippets.push(new StringCodeSnippet(`${Helpers.return}(${StepParams.stack}[0]);\n`))
+        }
 
-                let runtimeClass = classContext.runtimeClass;
+        method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
 
-                if (runtimeClass) {
-                    runtimeClass.__programs.push(method.program);
-                    let methodIndex = runtimeClass.__programs.length - 1;
+        if(!this.missingStatementManager.hasReturnHappened()){
+            snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
+        }
+        
+        this.missingStatementManager.endMethodBody(method, this.module.errors);
+        
+        method.program.stepsSingle = this.linker.link(snippets);
 
-                    let parameterIdentifiers = method.parameters.map(p => p.identifier);
-                    let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
+        methodNode.program = method.program;    // only for debugging purposes
 
-                    if (method.isStatic) {
-                        runtimeClass[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
-                            `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});
+        let runtimeClass = classContext.runtimeClass;
+
+        if (runtimeClass) {
+            runtimeClass.__programs.push(method.program);
+            method.program.compileToJavascriptFunctions();
+            let methodIndex = runtimeClass.__programs.length - 1;
+
+            let parameterIdentifiers = method.parameters.map(p => p.identifier);
+            let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
+
+            if (method.isStatic) {
+                runtimeClass[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
+                    `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});
                              ${Helpers.pushProgram}(this.__programs[${methodIndex}]);`);
-                    } else {
-                        runtimeClass.prototype[method.getInternalName("java")] = new Function(...parameterIdentifiers,
-                            `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});
-                             ${Helpers.pushProgram}(this.constructor__programs[${methodIndex}]);`);
-                    }
-                }
+            } else {
+                runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
+                    `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});
+                             ${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`);
             }
         }
 
         this.popSymbolTable();
+
     }
 
 
+    compileInstanceInitializerBlock(node: ASTInstanceInitializerNode): CodeSnippetContainer | undefined {
+
+        let snippet = new CodeSnippetContainer([], node.range);
+        for (let statementNode of node.statements) {
+            let statementSnippet = this.compileStatementOrTerm(statementNode);
+            if (statementSnippet) snippet.addParts(statementSnippet);
+        }
+
+        return snippet;
+    }
+
+    compileStaticInitializerBlock(node: ASTStaticInitializerNode): CodeSnippetContainer | undefined {
+
+        let snippet = new CodeSnippetContainer([], node.range);
+        for (let statementNode of node.statements) {
+            let statementSnippet = this.compileStatementOrTerm(statementNode);
+            if (statementSnippet) snippet.addParts(statementSnippet);
+        }
+
+        return snippet;
+    }
 
 
 

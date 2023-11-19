@@ -128,6 +128,12 @@ export class Parser extends StatementParser {
                     case TokenType.at:
                         this.parseAnnotation();
                         break;
+                    case TokenType.leftCurlyBracket:
+                        this.parseInstanceInitializer(classASTNode);
+                        break;
+                    case TokenType.keywordStatic:
+                        this.parseStaticInitializer(classASTNode);
+                        break;
                     default: this.pushErrorAndSkipToken();
                 }
 
@@ -136,6 +142,36 @@ export class Parser extends StatementParser {
         }
 
         this.setEndOfRange(classASTNode);
+    }
+
+    parseInstanceInitializer(classASTNode: ASTClassDefinitionNode| ASTEnumDefinitionNode) {
+        let blockNode = this.nodeFactory.buildInstanceInitializerNode(this.cct);
+        this.nextToken(); // skip {
+
+        while (!this.isEnd() && this.tt != TokenType.rightCurlyBracket) {
+            let statement = this.parseStatementOrExpression();
+            if (statement) blockNode.statements.push(statement);
+        }
+
+        this.expect(TokenType.rightCurlyBracket, true);
+
+        classASTNode.fieldsOrInstanceInitializers.push(blockNode);
+
+    }
+
+    parseStaticInitializer(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode) {
+        let blockNode = this.nodeFactory.buildStaticInitializerNode(this.cct);
+        this.nextToken(); // skip {
+
+        while (!this.isEnd() && this.tt != TokenType.rightCurlyBracket) {
+            let statement = this.parseStatementOrExpression();
+            if (statement) blockNode.statements.push(statement);
+        }
+
+        this.expect(TokenType.rightCurlyBracket, true);
+
+        classASTNode.fieldsOrInstanceInitializers.push(blockNode);
+
     }
 
     parseAttributeOrMethodDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers) {
@@ -192,7 +228,7 @@ export class Parser extends StatementParser {
         let isFinal = this.comesToken(TokenType.keywordFinal, true);
 
         let type = this.parseType();
-        
+
         let identifier = this.expectAndSkipIdentifierAsToken();
 
         let isEllipsis = this.comesToken(TokenType.ellipsis, true);
@@ -213,7 +249,7 @@ export class Parser extends StatementParser {
         if (identifier.value != "" && type != null) {
             let node = this.nodeFactory.buildFieldDeclarationNode(rangeStart, identifier, type, initialization,
                 modifiers, this.collectedAnnotations);
-            classASTNode.fields.push(node);
+            classASTNode.fieldsOrInstanceInitializers.push(node);
             this.setEndOfRange(node);
         }
 
@@ -264,10 +300,10 @@ export class Parser extends StatementParser {
 
         if (this.expect(TokenType.leftCurlyBracket, true)) {
 
-            do{
+            do {
                 let enumValue: ASTEnumValueNode | undefined = this.parseEnumValue();
-                if(enumValue) enumNode.valueNodes.push(enumValue);
-            } while(this.comesToken(TokenType.comma, true));
+                if (enumValue) enumNode.valueNodes.push(enumValue);
+            } while (this.comesToken(TokenType.comma, true));
 
             this.comesToken(TokenType.semicolon, true); // skip if present
 
@@ -282,6 +318,13 @@ export class Parser extends StatementParser {
                     case TokenType.at:
                         this.parseAnnotation();
                         break;
+                    case TokenType.leftCurlyBracket:
+                        this.parseInstanceInitializer(enumNode);
+                        break;
+                    case TokenType.keywordStatic:
+                        this.parseStaticInitializer(enumNode);
+                        break;
+
                     default: this.pushErrorAndSkipToken();
                 }
 
@@ -294,21 +337,21 @@ export class Parser extends StatementParser {
 
     parseEnumValue(): ASTEnumValueNode | undefined {
         let identifier = this.expectAndSkipIdentifierAsToken();
-        if(!identifier) return undefined;
+        if (!identifier) return undefined;
 
         let node = this.nodeFactory.buildEnumValueNode(identifier);
-        if(this.comesToken(TokenType.leftBracket, true)){
-            if(!this.comesToken(TokenType.rightBracket, false)){
+        if (this.comesToken(TokenType.leftBracket, true)) {
+            if (!this.comesToken(TokenType.rightBracket, false)) {
                 do {
                     let term = this.parseTerm();
-                    if(term) node.parameterValues.push(term);
-                } while(this.comesToken(TokenType.comma, true))
+                    if (term) node.parameterValues.push(term);
+                } while (this.comesToken(TokenType.comma, true))
             }
             this.expect(TokenType.rightBracket, true);
         }
 
         return node;
-        
+
     }
 
     parseInterfaceDeclaration(modifiers: ASTNodeWithModifiers, identifier: Token, parent: TypeScope) {
@@ -333,8 +376,8 @@ export class Parser extends StatementParser {
                     case TokenType.at:
                         this.parseAnnotation();
                         break;
-                    default: 
-                    this.pushErrorAndSkipToken();
+                    default:
+                        this.pushErrorAndSkipToken();
                 }
 
             }

@@ -283,6 +283,8 @@ export class StatementParser extends TermParser {
         
         let term = this.tt == TokenType.semicolon ? undefined : this.parseTerm();
 
+        while(this.comesToken(TokenType.semicolon, true)){}
+
         return this.nodeFactory.buildReturnNode(returnToken, term);
 
     }

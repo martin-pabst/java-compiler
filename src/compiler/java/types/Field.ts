@@ -20,6 +20,7 @@ export class Field extends BaseSymbol {
     usagePositions: UsagePosition[] = [];
 
     initialValue?: any;
+    initialValueIsConstant: boolean = false;    // enables us to resolve values of final variables as constants
 
     declare type: JavaType;
 

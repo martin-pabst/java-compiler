@@ -1,12 +1,15 @@
 export var testPrograms = {
 simpleClass:`
-Test m;
-m.doIt("Hier!");
+Test m = new Test();
+int i = m.doIt("Hier!");
+
+println(i);
 
 class Test {
    int i = 12;
-   public void doIt(String s){
+   public int doIt(String s){
       println(s);
+      return 7;
    }
 }
 `,

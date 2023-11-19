@@ -8,6 +8,13 @@ export abstract class CodeTemplate {
 
     abstract applyToSnippet(resultType: JavaType, range: IRange, ...snippets: CodeSnippet[]): CodeSnippet;
 
+    static getCommaSeparatedParameterIdentifiers(from: number, to: number){
+        let s: string = "";
+        for(let i = from; i < to; i++) s += ("§" + i + ", ");
+        if(to >= from) s += "§" + to;
+        return s;
+    }
+
 }
 
 export class IdentityTemplate extends CodeTemplate {
@@ -221,7 +228,7 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         if (snippet0IsPure || snippet1IsPure) {
             snippetContainer.addParts(snippets[0].allButLastPart());
             snippetContainer.addParts(snippets[1].allButLastPart());
-            snippetContainer.addStringPart(`§{snippets[0].lastPartOrPop().emit()} §{this.operator} §{snippets[1].lastPartOrPop().emit()}`)
+            snippetContainer.addStringPart(`${snippets[0].lastPartOrPop().emit()} ${this.operator} ${snippets[1].lastPartOrPop().emit()}`)
             snippetContainer.finalValueIsOnStack = false;
             return snippetContainer;
         }
@@ -246,7 +253,7 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         snippets[1].ensureFinalValueIsOnStack();
         snippetContainer.addParts(snippets[1]);
         snippetContainer.addParts(snippets[0]);
-        snippetContainer.addStringPart(`pop() §{this.operator} pop()`, _range);
+        snippetContainer.addStringPart(`pop() ${this.operator} pop()`, _range);
 
         snippetContainer.finalValueIsOnStack = false;
         return snippetContainer;

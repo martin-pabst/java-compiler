@@ -1,15 +1,15 @@
 import { Program } from "../../common/interpreter/Program.ts";
 import { Klass } from "../../common/interpreter/StepFunction.ts";
 import { IRange } from "../../common/range/Range.ts";
+import { CodeSnippet } from "../codegenerator/CodeSnippet.ts";
 import { JavaBaseModule } from "../module/JavaBaseModule.ts";
 import { NonPrimitiveType } from "./NonPrimitiveType.ts";
 
 export abstract class JavaClassOrEnum extends NonPrimitiveType {
 
-    fieldConstructor?: Program;
+    instanceInitializer: CodeSnippet[] = [];
     
-    staticFieldConstructor?: Program;
-    staticConstructor?: Program;
+    staticInitializer?: Program;
 
     staticConstructorsDependOn: Map<JavaClassOrEnum, boolean> = new Map();
 

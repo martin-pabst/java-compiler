@@ -98,9 +98,7 @@ export class JavaModuleManager {
                 }
 
                 if(cdef instanceof JavaClassOrEnum){
-                    cdef.staticConstructor?.compileToJavascriptFunctions();
-                    cdef.staticFieldConstructor?.compileToJavascriptFunctions();
-                    cdef.fieldConstructor?.compileToJavascriptFunctions();
+                    cdef.staticInitializer?.compileToJavascriptFunctions();
                 }
             }
         }

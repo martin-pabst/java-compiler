@@ -90,7 +90,7 @@ export interface TypeDefinitionWithMethods {
 }
 
 export interface ASTTypeDefinitionWithFields {
-    fields: ASTFieldDeclarationNode[]
+    fieldsOrInstanceInitializers: (ASTFieldDeclarationNode | ASTInstanceInitializerNode | ASTStaticInitializerNode)[]
 }
 
 export interface ASTGenericParameterDeclarationNode extends ASTNodeWithIdentifier, ASTNode {
@@ -143,9 +143,19 @@ export interface ASTLambdaFunctionDeclarationNode extends ASTNode {
 
 export interface ASTFieldDeclarationNode extends ASTNodeWithModifiers, ASTNode,
     ASTNodeWithIdentifier, AnnotatedNode {
-    kind: TokenType.attributeDeclaration;
+    kind: TokenType.fieldDeclaration;
     type: ASTTypeNode;
     initialization: ASTTermNode | undefined;
+}
+
+export interface ASTInstanceInitializerNode extends ASTStatementNode {
+    kind: TokenType.instanceInitializerBlock,
+    statements: ASTStatementNode[]
+}
+
+export interface ASTStaticInitializerNode extends ASTStatementNode {
+    kind: TokenType.staticInitializerBlock,
+    statements: ASTStatementNode[]
 }
 
 export interface ASTClassDefinitionNode
@@ -158,14 +168,12 @@ export interface ASTClassDefinitionNode
     extends: ASTTypeNode | undefined,
     implements: ASTTypeNode[],
 
-    staticFieldConstructorProgram?: Program,       // only for debugging purposes,
-    staticConstructorProgram?: Program,       // only for debugging purposes,
-    fieldConstructorProgram?: Program,       // only for debugging purposes
+    staticInitializer?: Program,       // only for debugging purposes,
 }
 
 export interface ASTInterfaceDefinitionNode
     extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers,
-    ASTNodeWithIdentifier, AnnotatedNode, ASTTypeDefiningNode {
+    ASTNodeWithIdentifier, AnnotatedNode, ASTTypeDefiningNode, ASTTypeDefinitionWithFields {
     kind: TokenType.keywordInterface;
     parent: TypeScope;
     implements: ASTTypeNode[];

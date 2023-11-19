@@ -5,7 +5,7 @@ import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode } from "../parser/AST";
+import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { ArrayType } from "../types/ArrayType";
 import { Field } from "../types/Field";
@@ -17,21 +17,15 @@ import { JavaSymbolTable } from "./JavaSymbolTable";
 import { SnippetFramer } from "./CodeSnippetTools";
 import { CodeTemplate, OneParameterTemplate, ParametersJoinedTemplate, SeveralParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";
-import { JavaClass } from "../types/JavaClass.ts";
+import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { BinopCastCodeGenerator } from "./BinopCastCodeGenerator.ts";
 import { Method } from "../types/Method.ts";
 import { JavaClassOrEnum } from "../types/JavaClassOrEnum.ts";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
+import { MissingStatementManager } from "./MissingStatementsManager.ts";
 
-export enum fieldAccessMode {
-    atStaticFieldInitialization, // access to all static fields gets resolved as their initial value
-    atFieldInitialization,  // access to all non-static fields gets resolved as their initial value; access to final static fields gets resolved as their initial value
-                            // access to non-final static fields gets resolved as field-access at runtime
-    atCompilingMethods // only access to final fields or final static fields gets resolved as their initial value
-                       // access to non-final (static) fields gets resolved as field-access at runtime
-}
 
 export class TermCodeGenerator extends BinopCastCodeGenerator {
 
@@ -41,8 +35,9 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
     symbolTableStack: JavaSymbolTable[] = [];
 
-    currentlyCompiledStaticConstructor?: JavaClassOrEnum;
+    classOfCurrentlyCompiledStaticInitialization?: JavaClassOrEnum;
 
+    missingStatementManager: MissingStatementManager = new MissingStatementManager();
 
     constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore) {
         super(module, libraryTypestore, compiledTypesTypestore);
@@ -74,6 +69,8 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
                 snippet = this.compileMethodCall(<ASTMethodCallNode>ast); break;
             case TokenType.newArray:
                 snippet = this.compileNewArrayNode(<ASTNewArrayNode>ast); break;
+            case TokenType.newObject:
+                snippet = this.compileNewObjectNOde(<ASTNewObjectNode>ast); break;
             case TokenType.selectArrayElement:
                 snippet = this.compileSelectArrayElement(<ASTSelectArrayElementNode>ast); break;
 
@@ -86,13 +83,64 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         return snippet;
     }
 
+    compileNewObjectNOde(node: ASTNewObjectNode): CodeSnippet | undefined {
+        // new t.classes[<identifier>]().<constructorIdentifier>(param1, ..., paramN)
+        // constructor has to return this or push it to stack!
+
+        let untestedParameterValues = node.parameterValues.map(p => this.compileTerm(p));
+
+        for (let p of untestedParameterValues) {
+            if (!p || !p.type) return undefined;
+        }
+
+        //@ts-ignore
+        let parameterValues: CodeSnippet[] = untestedParameterValues;
+
+        let klassType = <IJavaClass>node.type.resolvedType;
+
+        let method = this.searchMethod(klassType.identifier, klassType, parameterValues.map(p => p!.type!), true, false);
+
+        if (!method) {
+            this.pushError("Es konnte kein passender Konstruktor mit dieser Signatur gefunden werden.", "error", node.range);
+            return undefined;
+        }
+
+        // cast parameter values
+        for (let i = 0; i < parameterValues.length; i++) {
+            let destinationType = method.parameters[i].type;
+            parameterValues[i] = this.compileCast(parameterValues[i]!, destinationType, "explicit");
+        }
+
+        let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention ? "native" : "java";
+
+        let template: string = `new ${Helpers.classes}["${klassType.identifier}"]().${method.getInternalName(callingConvention)}(`
+
+        if (callingConvention == "java") {
+            template += `${StepParams.thread}` + (parameterValues.length > 0 ? ", " : "");
+        }
+
+        let i = 1;
+        template += parameterValues.map(_p => "§" + (i++)).join(", ") + ")";
+
+        let snippet = new SeveralParameterTemplate(template).applyToSnippet(klassType, node.range, ...parameterValues);
+
+        if (callingConvention == "java") {
+            snippet = new CodeSnippetContainer(snippet);
+            (<CodeSnippetContainer>snippet).addNextStepMark();
+            snippet.finalValueIsOnStack = true;
+        }
+
+        return snippet;
+
+    }
+
     pushAndGetNewSymbolTable(range: IRange, withStackframe: boolean, classContext?: JavaClass | JavaEnum | undefined, methodContext?: Method): JavaSymbolTable {
         let newSymbolTable = new JavaSymbolTable(this.module, range, withStackframe, classContext, methodContext);
-        if (this.currentSymbolTable){
+        if (this.currentSymbolTable) {
             this.currentSymbolTable.addChildTable(newSymbolTable);
-            if(!classContext) newSymbolTable.classContext = this.currentSymbolTable.classContext;
-            if(!methodContext) newSymbolTable.methodContext = this.currentSymbolTable.methodContext;
-        } 
+            if (!classContext) newSymbolTable.classContext = this.currentSymbolTable.classContext;
+            if (!methodContext) newSymbolTable.methodContext = this.currentSymbolTable.methodContext;
+        }
         this.symbolTableStack.push(newSymbolTable);
         this.currentSymbolTable = newSymbolTable;
         return newSymbolTable;
@@ -198,31 +246,34 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
 
     compileVariableNode(node: ASTSymbolNode): CodeSnippet | undefined {
-        
+
         // first try: symbol table (parameters, local variables, fields)
         let symbol = this.currentSymbolTable.findSymbol(node.identifier);
 
-        if(symbol){
+        if (symbol) {
             symbol.usagePositions.push({ file: this.module.file, range: node.range });
-    
-            if (symbol.onStackframe()) return this.compileSymbolOnStackframeAccess(symbol, node.range);
-            if (symbol.kind == SymbolKind.field){
+
+            if (symbol.onStackframe()) {
+                this.missingStatementManager.onSymbolRead(symbol, node.range, this.module.errors);
+                return this.compileSymbolOnStackframeAccess(symbol, node.range);
+            }
+            if (symbol.kind == SymbolKind.field) {
                 return this.compileFieldAccess(symbol, node.range);
-            } 
+            }
 
             return undefined; // should be unreachable
-        }    
- 
+        }
+
         // second try: class identifier?
         let type = this.libraryTypestore.getType(node.identifier);
-        if(!type) type =this.compiledTypesTypestore.getType(node.identifier)
+        if (!type) type = this.compiledTypesTypestore.getType(node.identifier)
 
-        if(type != null && type instanceof NonPrimitiveType){
+        if (type != null && type instanceof NonPrimitiveType) {
 
             let staticType = new StaticNonPrimitiveType(type);
-            return new StringCodeSnippet(`${Helpers.classes}[${type.identifier}]`, node.range, staticType);
+            return new StringCodeSnippet(`${Helpers.classes}["${type.identifier}"]`, node.range, staticType);
         }
-  
+
         if (!symbol) {
             this.pushError("Der Compiler kennt den Bezeichner " + node.identifier + " an dieser Stelle nicht.", "error", node);
             return undefined;
@@ -240,13 +291,29 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
     compileFieldAccess(symbol: BaseSymbol, range: IRange): CodeSnippet | undefined {
         let field = <Field>symbol;
 
-        if(field.isStatic && this.currentlyCompiledStaticConstructor){
-            this.currentlyCompiledStaticConstructor.staticConstructorsDependOn.set(field.classEnum, true);
+        if (field.isStatic && this.classOfCurrentlyCompiledStaticInitialization) {
+            this.classOfCurrentlyCompiledStaticInitialization.staticConstructorsDependOn.set(field.classEnum, true);
         }
 
         let type = (field).type;
+
+        if (field.isFinal && field.initialValueIsConstant) {
+            let constantValue = field.initialValue!;
+            let constantValueAsString = typeof constantValue == "string" ? `"${constantValue}"` : "" + constantValue;
+            return new StringCodeSnippet(constantValueAsString, range, type, constantValue);
+        }
+
+
         let fieldName = (field).getInternalName();
-        let snippet = new StringCodeSnippet(`${StepParams.stack}[${StepParams.stackBase}].${fieldName}`, range, type);
+
+        let snippet: CodeSnippet;
+
+        if (field.isStatic) {
+            let classIdentifier = field.classEnum.identifier;
+            snippet = new StringCodeSnippet(`${Helpers.classes}["${classIdentifier}"].${fieldName}`, range, type);
+        } else {
+            snippet = new StringCodeSnippet(`${StepParams.stack}[${StepParams.stackBase}].${fieldName}`, range, type);
+        }
         snippet.isLefty = !field.isFinal;
         return snippet;
     }
@@ -297,8 +364,8 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
                 this.pushError("Die Operatoren ++ und -- können nur bei Variablen benutzt werden, die veränderbar sind.", "error", ast);
                 return undefined;
             }
-            
-            if(!this.isNumberPrimitiveType(operand.type)){
+
+            if (!this.isNumberPrimitiveType(operand.type)) {
                 this.pushError("Die Operatoren ++ und -- können nur bei Variablen mit den Datentypen byte, short, int, long, float und double benutzt werden.", "error", ast);
             }
 
@@ -324,38 +391,38 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
     compileMethodCall(node: ASTMethodCallNode): CodeSnippet | undefined {
         let untestedParameterValues = node.parameterValues.map(p => this.compileTerm(p));
 
-        for(let p of untestedParameterValues){
-            if(!p || !p.type) return undefined;
+        for (let p of untestedParameterValues) {
+            if (!p || !p.type) return undefined;
         }
 
         //@ts-ignore
         let parameterValues: CodeSnippet[] = untestedParameterValues;
 
         let objectSnippet: CodeSnippet | undefined;
-        if(node.nodeToGetObject){
+        if (node.nodeToGetObject) {
             objectSnippet = this.compileTerm(node.nodeToGetObject);
         } else {
             let classContext = this.currentSymbolTable.getClassContext();
-            if(!classContext){
+            if (!classContext) {
                 this.pushError("Außerhalb einer Klasse kann eine Methode nur mit Punktschreibweise (Object.Methode(...)) aufgerufen werden.", "error", node);
                 return undefined;
             }
             objectSnippet = new StringCodeSnippet('this', EmptyRange.instance, classContext);
         }
 
-        if(!objectSnippet || !objectSnippet.type){
+        if (!objectSnippet || !objectSnippet.type) {
             return undefined;
         }
 
         let method = this.searchMethod(node.identifier, objectSnippet.type, parameterValues.map(p => p!.type!), false, objectSnippet instanceof StaticNonPrimitiveType);
 
-        if(!method){
+        if (!method) {
             this.pushError("Es konnte keine passende Methode mit dieser Signatur gefunden werden.", "error", node.identifierRange);
             return undefined;
         }
 
         // cast parameter values
-        for(let i = 0; i < parameterValues.length; i++){
+        for (let i = 0; i < parameterValues.length; i++) {
             let destinationType = method.parameters[i].type;
             parameterValues[i] = this.compileCast(parameterValues[i]!, destinationType, "explicit");
         }
@@ -363,57 +430,60 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention ? "native" : "java";
 
         let objectTemplate: string;
-        if(objectSnippet.type instanceof StaticNonPrimitiveType){
+        if (objectSnippet.type instanceof StaticNonPrimitiveType) {
             objectTemplate = `§1.${method.getInternalName(callingConvention)}(`
-        } else if(method.isStatic){
+        } else if (method.isStatic) {
             objectTemplate = `§1.constructor.${method.getInternalName(callingConvention)}(`
         } else {
             objectTemplate = `§1.${method.getInternalName(callingConvention)}(`
         }
 
-        if(callingConvention == "java"){
+        if (callingConvention == "java") {
             objectTemplate += `${StepParams.thread}` + (parameterValues.length > 0 ? ", " : "");
-        } 
+        }
 
         let i = 2;
         objectTemplate += parameterValues.map(_p => "§" + (i++)).join(", ") + ")";
 
         parameterValues.unshift(objectSnippet);
 
-        let returnParameter = method.returnParameter || this.voidType;
+        let returnParameter = method.returnParameterType || this.voidType;
 
-        let snippet1 = new SeveralParameterTemplate(objectTemplate).applyToSnippet(returnParameter, node.range, ...parameterValues);
+        let snippet = new SeveralParameterTemplate(objectTemplate).applyToSnippet(returnParameter, node.range, ...parameterValues);
 
-        let snippet = new CodeSnippetContainer(snippet1);
-        snippet.addNextStepMark();
+        if (callingConvention == "java") {
+            snippet = new CodeSnippetContainer(snippet);
+            (<CodeSnippetContainer>snippet).addNextStepMark();
+            if (returnParameter != this.voidType) snippet.finalValueIsOnStack = true;
+        }
 
         return snippet;
     }
 
 
-    searchMethod(identifier: string, objectType: JavaType, parameterTypes: JavaType[], 
+    searchMethod(identifier: string, objectType: JavaType, parameterTypes: JavaType[],
         isConstructor: boolean, hasToBeStatic: boolean): Method | undefined {
         let possibleMethods: Method[];
-        
-        if(objectType instanceof StaticNonPrimitiveType){
+
+        if (objectType instanceof StaticNonPrimitiveType) {
             possibleMethods = objectType.getPossibleMethods(identifier, parameterTypes.length, isConstructor, hasToBeStatic);
-        } else if(objectType instanceof NonPrimitiveType){
+        } else if (objectType instanceof NonPrimitiveType) {
             possibleMethods = objectType.getPossibleMethods(identifier, parameterTypes.length, isConstructor, hasToBeStatic);
         } else {
             return undefined;
         }
-        
-        for(let method of possibleMethods){
+
+        for (let method of possibleMethods) {
             let suitable: boolean = true;
-            for(let i = 0; i < parameterTypes.length; i++){
+            for (let i = 0; i < parameterTypes.length; i++) {
                 let fromType = parameterTypes[i];
                 let toType = method.parameters[i].type;
-                if(!this.canCastTo(fromType, toType, "implicit")){
+                if (!this.canCastTo(fromType, toType, "implicit")) {
                     suitable = false;
                     break;
-                } 
+                }
             }
-            if(suitable) return method;
+            if (suitable) return method;
         }
 
         return undefined;

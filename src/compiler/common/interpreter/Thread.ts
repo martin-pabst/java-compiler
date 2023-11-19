@@ -86,7 +86,15 @@ export class Thread {
                          * Behold, hier the steps run!
                          */
                         stepIndex = step.run!(this, stack, stackBase);
-                        
+                        if (currentProgramState != this.currentProgramState) {
+                            currentProgramState.stepIndex = stepIndex;
+
+                            currentProgramState = this.currentProgramState;
+                            stepIndex = currentProgramState.stepIndex;
+                            currentStepList = currentProgramState.currentStepList;
+                            stackBase = currentProgramState.stackBase;
+                        }
+
                         this.currentProgramState.stepIndex = stepIndex;
                         numberOfSteps++;
                     }
@@ -104,6 +112,14 @@ export class Thread {
                          *                    t, s, sb, h
                          */
                         stepIndex = step.run!(this, stack, stackBase);
+                        if (currentProgramState != this.currentProgramState) {
+                            currentProgramState.stepIndex = stepIndex;
+
+                            currentProgramState = this.currentProgramState;
+                            stepIndex = currentProgramState.stepIndex;
+                            currentStepList = currentProgramState.currentStepList;
+                            stackBase = currentProgramState.stackBase;
+                        }
 
                         numberOfSteps++;
                     }
@@ -270,12 +286,12 @@ export class Thread {
         this.currentProgramState = state;
     }
 
-    pushCallback(callback: () => void){
+    pushCallback(callback: () => void) {
         this.lastDepositedCallback = callback;
     }
 
 
-    newArray(defaultValue: any, ...dimensions : number[]) : Array<any> {
+    newArray(defaultValue: any, ...dimensions: number[]): Array<any> {
         let n0 = dimensions[0];
 
         if (dimensions.length == 1) {
@@ -285,7 +301,7 @@ export class Thread {
             let array = [];
             let subdimensions = dimensions.slice(1);
             // Recursive call
-            for(let i = 0; i < n0; i++){
+            for (let i = 0; i < n0; i++) {
                 array.push(this.newArray(defaultValue, ...subdimensions));
             }
             return array;
@@ -294,11 +310,11 @@ export class Thread {
     }
 
 
-    print (text: string | undefined, color: number | undefined) {
+    print(text: string | undefined, color: number | undefined) {
         this.scheduler.interpreter.printManager.print(text, false, color);
     }
 
-    println (text: string | undefined, color: number | undefined) {
+    println(text: string | undefined, color: number | undefined) {
         this.scheduler.interpreter.printManager.print(text, true, color);
     }
 }

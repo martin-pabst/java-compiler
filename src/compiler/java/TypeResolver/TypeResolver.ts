@@ -166,12 +166,18 @@ export class TypeResolver {
     resolveClassExtendsImplements(declNode: ASTClassDefinitionNode, resolvedType1: JavaClass, module: JavaBaseModule) {
         if (declNode.extends) {
             let extType = this.resolveTypeNode(declNode.extends, module);
+            
             if (extType instanceof IJavaClass) {
                 resolvedType1.setExtends(extType);
             } else {
                 this.pushError("Hinter extends muss eine Klasse stehen.", declNode.extends.range, module);
             }
         }
+
+        if(!resolvedType1.getExtends()){
+            resolvedType1.setExtends(<JavaClass>this.libraryModuleManager.typestore.getType("Object")!);
+        }
+
         for (let implNode of declNode.implements) {
             let implType = this.resolveTypeNode(implNode, module);
             if (implType instanceof IJavaInterface) {
@@ -262,7 +268,7 @@ export class TypeResolver {
             method.isFinal = methodNode.isFinal;
             method.isStatic = methodNode.isStatic;
 
-            method.returnParameter = methodNode.returnParameterType?.resolvedType;
+            method.returnParameterType = methodNode.returnParameterType?.resolvedType;
             for (let p of methodNode.parameters) {
                 if (p.type?.resolvedType) {
                     let parameter = new Parameter(p.identifier, p.identifierRange,
@@ -276,13 +282,15 @@ export class TypeResolver {
     }
 
     buildFields(node: ASTClassDefinitionNode | ASTEnumDefinitionNode, type: JavaClass | JavaEnum, module: JavaCompiledModule) {
-        for (let fieldNode of node.fields) {
-            if (fieldNode.type.resolvedType) {
-                let field = new Field(fieldNode.identifier, fieldNode.identifierRange, module,
-                    fieldNode.type.resolvedType, fieldNode.visibility);
-                field.isFinal = fieldNode.isFinal;
-                field.isStatic = fieldNode.isStatic;
-                type.fields.push(field);
+        for (let fieldNode of node.fieldsOrInstanceInitializers) {
+            if (fieldNode.kind == TokenType.fieldDeclaration) {
+                if (fieldNode.type.resolvedType) {
+                    let field = new Field(fieldNode.identifier, fieldNode.identifierRange, module,
+                        fieldNode.type.resolvedType, fieldNode.visibility);
+                    field.isFinal = fieldNode.isFinal;
+                    field.isStatic = fieldNode.isStatic;
+                    type.fields.push(field);
+                }
             }
         }
     }
@@ -292,13 +300,16 @@ export class TypeResolver {
 
         let enumRuntimeClass: Klass = (<JavaEnum>this.libraryModuleManager.typestore.getType("Enum")!).runtimeClass!;
 
+        // initialize fields of enums
         for (let module of this.dirtyModules) {
             for (let decl of module.ast!.classOrInterfaceOrEnumDefinitions) {
                 if (decl.kind == TokenType.keywordEnum) {
                     let javaEnum = <JavaEnum>decl.resolvedType;
                     if (javaEnum) javaEnum.initRuntimeClass(enumRuntimeClass);
-                    for (let field of decl.fields) {
-                        javaEnum.fields.push(new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility));
+                    for (let field of decl.fieldsOrInstanceInitializers) {
+                        if (field.kind == TokenType.fieldDeclaration) {
+                            javaEnum.fields.push(new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility));
+                        }
                     }
                 }
             }
@@ -306,6 +317,7 @@ export class TypeResolver {
 
         let objectClass = <JavaClass>this.libraryModuleManager.typestore.getType("Object");
 
+        // initialize fields of classes
         let done: boolean = false;
         while (!done) {
             done = true;
@@ -317,9 +329,11 @@ export class TypeResolver {
                             let baseClass = javaClass.getExtends();
                             if (!baseClass) baseClass = objectClass;
                             if (baseClass.runtimeClass) {
-                                javaClass.initRuntimeClass(baseClass.runtimeClass);
-                                for (let field of decl.fields) {
-                                    javaClass.fields.push(new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility));
+                                javaClass.initRuntimeClass(baseClass.runtimeClass);  // first recursively initialize field of base classes
+                                for (let field of decl.fieldsOrInstanceInitializers) {
+                                    if (field.kind == TokenType.fieldDeclaration) {
+                                        javaClass.fields.push(new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility));
+                                    }
                                 }
                                 done = false;
                             }

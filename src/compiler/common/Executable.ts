@@ -5,6 +5,7 @@ import { Program } from "./interpreter/Program";
 import { Klass, KlassObjectRegistry } from "./interpreter/StepFunction";
 import { File } from "./module/File";
 import { Module } from "./module/Module";
+import { EmptyRange } from "./range/Range";
 
 type StaticInitializationStep = {
     klass: Klass,
@@ -19,16 +20,17 @@ export class Executable {
 
     mainModule?: Module;
 
-    constructor(public classObjectRegistry: KlassObjectRegistry, public moduleManager: JavaModuleManager, 
+    constructor(public classObjectRegistry: KlassObjectRegistry, public moduleManager: JavaModuleManager,
+        public globalErrors: Error[], 
         lastOpenedFile?: File, currentlyOpenedFile?: File){
 
         this.findMainModule(lastOpenedFile, currentlyOpenedFile);
 
-        this.setupStaticInitializationSequence();
+        this.setupStaticInitializationSequence(globalErrors);
 
     }
 
-    setupStaticInitializationSequence() {
+    setupStaticInitializationSequence(errors: Error[]) {
         let classesToInitialize: JavaClassOrEnum[] = [];
         
         this.staticInitializationSequence = [];
@@ -37,7 +39,7 @@ export class Executable {
             if(!module.ast) continue;
             for(let cdef of module.ast.classOrInterfaceOrEnumDefinitions){
                 if(cdef instanceof JavaClassOrEnum){
-                    if((cdef.staticConstructor || cdef.staticFieldConstructor) && cdef.runtimeClass){
+                    if(cdef.staticInitializer && cdef.runtimeClass){
                         classesToInitialize.push(cdef);
                     }
                 }
@@ -51,6 +53,7 @@ export class Executable {
             for(let i = 0; i < classesToInitialize.length; i++){
                 let cti = classesToInitialize[i];
 
+                // does class depend on other class whose static initializer hasn't run yet?
                 let dependsOnOthers: boolean = false;
                 for(let cti1 of classesToInitialize){
                     if(cti1 != cti && cti.staticConstructorsDependOn.get(cti1)){
@@ -60,26 +63,25 @@ export class Executable {
                 }
 
                 if(!dependsOnOthers){
-                    if(cti.staticFieldConstructor){
+                    if(cti.staticInitializer){
                         this.staticInitializationSequence.push({
                             klass: cti.runtimeClass!,
-                            program: cti.staticFieldConstructor
-                        })
-                    }
-                    if(cti.staticConstructor){
-                        this.staticInitializationSequence.push({
-                            klass: cti.runtimeClass!,
-                            program: cti.staticConstructor
+                            program: cti.staticInitializer
                         })
                     }
 
                     classesToInitialize.splice(classesToInitialize.indexOf(cti), 1);
-                    i--;
+                    i--;    // i++ follows immediately (end of for-loop)
                     done = false;
                 }
 
             }
 
+        }
+
+        if(classesToInitialize.length > 0){
+            // cyclic references! => stop with error message
+            errors.push({message: "Die Initialisierung mehrerer statischer Variablen aus verschiedenen Klassen ist zyklisch: " + classesToInitialize.map(c => c.identifier).join(", "), level: "error", range: EmptyRange.instance });
         }
 
 

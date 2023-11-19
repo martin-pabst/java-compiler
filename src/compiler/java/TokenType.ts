@@ -161,9 +161,11 @@ export enum TokenType {
     annotation,
     forLoopOverCollection,
     astProgram,
+    instanceInitializerBlock,
+    staticInitializerBlock,
 
     type, // e.g. int[][]
-    attributeDeclaration,
+    fieldDeclaration,
     methodDeclaration,
     parameterDeclaration,
     newArray,

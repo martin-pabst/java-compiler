@@ -21,7 +21,7 @@ export class ObjectClass {
     }
 
     _constructor() {
-
+        return this;
     }
 
     getType(): NonPrimitiveType {
@@ -60,11 +60,12 @@ export class StringClass extends ObjectClass {
     }
 
     _emptyConstructor(){
-
+        return this;
     }
 
     _constructor2(original: string){
         this.value = original;
+        return this;
     }
 
     _toString(t: Thread) {

@@ -398,7 +398,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             this.comesToken(TokenType.leftBracket, true);
             // method
             let m = new Method(identifier, EmptyRange.instance, module, modifiers.visibility);
-            m.returnParameter = type;
+            m.returnParameterType = type;
             m.isConstructor = isConstructor;
             if(!this.comesToken(TokenType.rightBracket, false)){
                 do{
@@ -418,28 +418,37 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             klassType.methods.push(m);
 
             let mdecl = <LibraryMethodDeclaration> decl;
-            let hasReturnValue: boolean = m.returnParameter?.identifier != 'void';
+            let hasReturnValue: boolean = m.returnParameterType?.identifier != 'void';
 
             if(mdecl.native){
                 let realName: string = mdecl.native.name;
-                klass[m.getInternalName("native")] = mdecl.native;
+                klass.prototype[m.getInternalName("native")] = mdecl.native;
                 if(!mdecl.java){
                     let parameterNames = m.parameters.map(p => p.identifier);
+                    
+                    let body: string;
+                    if(m.isConstructor){
+                        body = `
+                            this.${realName}(${parameterNames.join(", ")});
+                            __t.push(this); 
+                        `
+                    } else {
+                        body = `
+                            ${hasReturnValue? 'let __returnValue = ':''}this.${realName}(${parameterNames.join(", ")});
+                            ${hasReturnValue? '__t.push(__returnValue);':''} 
+                        `
+                    }
 
-                    let body: string = `
-                        ${hasReturnValue? 'let __returnValue =':''}${realName}(${parameterNames.join(", ")});
-                        ${hasReturnValue? '__t.push(__returnValue);':''} 
-                    `
                     parameterNames.unshift('__t');
                     parameterNames.push(body);
 
-                    klass[m.getInternalName("java")] = new Function(...parameterNames);
+                    klass.prototype[m.getInternalName("java")] = new Function(...parameterNames);
                 }
                 m.hasImplementationWithNativeCallingConvention = true;
             } 
 
             if(mdecl.java){
-                klass[m.getInternalName("java")] = mdecl.java;
+                klass.prototype[m.getInternalName("java")] = mdecl.java;
             }
 
         } else {

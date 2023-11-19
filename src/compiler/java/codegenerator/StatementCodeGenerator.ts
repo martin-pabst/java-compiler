@@ -70,6 +70,9 @@ export class StatementCodeGenerator extends TermCodeGenerator {
     }
 
     compileReturnStatement(node: ASTReturnNode): CodeSnippet | undefined {
+
+        this.missingStatementManager.onReturnHappened();
+
         let snippet = new CodeSnippetContainer([], node.range);
 
         let method: Method | undefined = this.currentSymbolTable.getMethodContext();
@@ -80,7 +83,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
         if(node.term){
 
-            if(!method.returnParameter || method.returnParameter == this.voidType){
+            if(!method.returnParameterType || method.returnParameterType == this.voidType){
                 this.pushError("Die Methode erwartet keinen Rückgabewert, hier ist aber einer angegeben.", "error", node.range);
                 return undefined;
             }
@@ -88,18 +91,18 @@ export class StatementCodeGenerator extends TermCodeGenerator {
             let termSnippet = this.compileTerm(node.term);
             if(!termSnippet) return undefined;
 
-            if(!this.canCastTo(termSnippet.type, method.returnParameter, "implicit")){
-                this.pushError("Die Methode erwartet einen Rückgabewert vom Typ " + method.returnParameter.identifier + ", der Wert des Terms hat aber den Datentyp " + termSnippet.type?.identifier  + ".", "error", node.range);
+            if(!this.canCastTo(termSnippet.type, method.returnParameterType, "implicit")){
+                this.pushError("Die Methode erwartet einen Rückgabewert vom Typ " + method.returnParameterType.identifier + ", der Wert des Terms hat aber den Datentyp " + termSnippet.type?.identifier  + ".", "error", node.range);
                 return undefined;
             }
 
-            termSnippet = this.compileCast(termSnippet, method.returnParameter, "explicit");
+            termSnippet = this.compileCast(termSnippet, method.returnParameterType, "implicit");
 
             snippet.addParts(new OneParameterTemplate(`${Helpers.return}(§1);`).applyToSnippet(this.voidType, node.range, termSnippet));
 
         } else {
-            if(method.returnParameter && method.returnParameter != this.voidType){
-                this.pushError("Die Methode erwartet einen Rückgabewert vom Typ " + method.returnParameter.identifier + ", hier wird aber keiner übergeben.", "error", node.range);
+            if(method.returnParameterType && method.returnParameterType != this.voidType){
+                this.pushError("Die Methode erwartet einen Rückgabewert vom Typ " + method.returnParameterType.identifier + ", hier wird aber keiner übergeben.", "error", node.range);
                 return undefined;
             }            
             snippet.addStringPart(`${Helpers.return}();`);
@@ -233,8 +236,15 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
         this.printErrorifValueNotBoolean(condition?.type, node.condition);
 
+        this.missingStatementManager.openBranch();
         let statementIfTrue = this.compileStatementOrTerm(node.statementIfTrue);
+        this.missingStatementManager.closeBranch(this.module.errors);
+        
+        this.missingStatementManager.openBranch();
         let statementIfFalse = this.compileStatementOrTerm(node.statementIfFalse);
+        this.missingStatementManager.closeBranch(this.module.errors);
+
+        this.missingStatementManager.endBranching();
 
         if (!condition || !statementIfTrue) return undefined;
 
@@ -296,6 +306,8 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         let variable = new JavaLocalVariable(node.identifier, node.identifierRange, node.type.resolvedType!);
         variable.isFinal = node.isFinal;
         this.currentSymbolTable.addSymbol(variable);    // sets stackOffset
+
+        this.missingStatementManager.addSymbolDeclaration(variable, node.initialization ? true: false);
 
         let accesLocalVariableSnippet = this.compileSymbolOnStackframeAccess(variable, node.identifierRange);
         let initValueSnippet: CodeSnippet | undefined;

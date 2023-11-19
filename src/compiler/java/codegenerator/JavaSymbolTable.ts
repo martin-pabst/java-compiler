@@ -21,7 +21,7 @@ export class JavaSymbolTable extends BaseSymbolTable {
         public methodContext?: Method){
         super(range, module.file);
         if(withStackFrame){
-            this.stackframe = new BaseStackframe(classContext ? 1 : 0);
+            this.stackframe = new BaseStackframe(classContext ? 1 : 0);    // if calling a method: 1st element on stack is this
         }
     }
 

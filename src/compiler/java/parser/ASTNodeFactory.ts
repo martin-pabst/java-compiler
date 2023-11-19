@@ -1,7 +1,7 @@
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { Token } from "../lexer/Token.ts";
-import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope, ASTNewArrayNode } from "./AST";
+import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope, ASTNewArrayNode, ASTInstanceInitializerNode, ASTStaticInitializerNode } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
 export class ASTNodeFactory {
@@ -43,7 +43,7 @@ export class ASTNodeFactory {
             isStatic: modifiers.isStatic,
             isAbstract: modifiers.isAbstract,
             genericParameterDefinitions: [],
-            fields: [],
+            fieldsOrInstanceInitializers: [],
             methods: [],
             innerClasses: [],
             classOrInterfaceOrEnumDefinitions: [],
@@ -70,7 +70,7 @@ export class ASTNodeFactory {
             identifier: <string>identifier.value,
             identifierRange: identifier.range,
             visibility: modifiers.visibility,
-            fields: [],
+            fieldsOrInstanceInitializers: [],
             methods: [],
             annotations: [],
             valueNodes: [],
@@ -115,7 +115,8 @@ export class ASTNodeFactory {
             isAbstract: modifiers.isAbstract,
             genericParameterDefinitions: [],
             methods: [],
-            annotations: []
+            annotations: [],
+            fieldsOrInstanceInitializers: [] // only static fields and static initializers...
         }
 
         if(annotations.length > 0){
@@ -161,7 +162,7 @@ export class ASTNodeFactory {
         annotations: ASTAnnotationNode[]): ASTFieldDeclarationNode {
 
         let node: ASTFieldDeclarationNode = {
-            kind: TokenType.attributeDeclaration,
+            kind: TokenType.fieldDeclaration,
             range: rangeStart,
             identifier: <string>identifier.value,
             identifierRange: identifier.range,
@@ -382,6 +383,22 @@ export class ASTNodeFactory {
     buildBlockNode(leftCurlyBrace: Token): ASTBlockNode {
         return {
             kind: TokenType.block,
+            range: leftCurlyBrace.range,
+            statements: []
+        }
+    }
+
+    buildInstanceInitializerNode(leftCurlyBrace: Token): ASTInstanceInitializerNode {
+        return {
+            kind: TokenType.instanceInitializerBlock,
+            range: leftCurlyBrace.range,
+            statements: []
+        }
+    }
+
+    buildStaticInitializerNode(leftCurlyBrace: Token): ASTStaticInitializerNode {
+        return {
+            kind: TokenType.staticInitializerBlock,
             range: leftCurlyBrace.range,
             statements: []
         }

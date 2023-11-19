@@ -198,7 +198,7 @@ export abstract class TermParser extends TokenIterator {
                 let leftBracketOrLeftSquareBracket = this.lookForTokenTillOtherToken([TokenType.leftBracket, TokenType.leftSquareBracket], [TokenType.semicolon, TokenType.leftCurlyBracket])
                 switch (leftBracketOrLeftSquareBracket) {
                     case TokenType.leftBracket:
-                        node = this.parseObjectInstantiation();
+                        node = this.parseNewObjectInstantiation();
                         break;
                     case TokenType.leftSquareBracket:
                         node = this.parseNewArray();
@@ -414,7 +414,7 @@ export abstract class TermParser extends TokenIterator {
         return newArrayNode;
     }
 
-    parseObjectInstantiation(): ASTNewObjectNode | undefined {
+    parseNewObjectInstantiation(): ASTNewObjectNode | undefined {
         let startToken = this.cct;
         this.nextToken(); // skip new keyword
         let type = this.parseType();

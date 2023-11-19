@@ -35,7 +35,7 @@ export class AstComponent {
         [TokenType.keywordEnum, "img_enumdeclaration-dark"],
         [TokenType.keywordInterface, "img_interfacedeclaration-dark"],
         [TokenType.methodDeclaration, "img_methoddeclaration-dark"],
-        [TokenType.attributeDeclaration, "img_attributedeclaration-dark"],
+        [TokenType.fieldDeclaration, "img_attributedeclaration-dark"],
         
     ]);
 

@@ -27,7 +27,7 @@ export class Method {
     /**
      * undefined, if null
      */
-    returnParameter?: JavaType;
+    returnParameterType?: JavaType;
 
     private internalNames: {[callingConvention: string]: string} = {}
 
@@ -52,16 +52,36 @@ export class Method {
             if(copy != p) copyNeeded = true;
         }
 
-        let newReturnParameter = this.returnParameter;
-        if(this.returnParameter && !this.returnParameter.isPrimitive){
-            newReturnParameter = (<NonPrimitiveType>this.returnParameter).getCopyWithConcreteType(typeMap);
+        let newReturnParameter = this.returnParameterType;
+        if(this.returnParameterType && !this.returnParameterType.isPrimitive){
+            newReturnParameter = (<NonPrimitiveType>this.returnParameterType).getCopyWithConcreteType(typeMap);
         }
 
-        if(newReturnParameter != this.returnParameter) copyNeeded = true;
+        if(newReturnParameter != this.returnParameterType) copyNeeded = true;
 
         if(!copyNeeded) return this;
 
-        return new Method(this.identifier, this.identifierRange, this.module, this.visibility);
+        let newMethod = new Method(this.identifier, this.identifierRange, this.module, this.visibility);
+        newMethod.isConstructor = this.isConstructor;
+        newMethod.isFinal = this.isFinal;
+        newMethod.isAbstract = this.isAbstract;
+
+        return newMethod;
+
+    }
+
+    getCopy(): Method {
+
+        let newParameters: Parameter[] = [];
+        for(let p of this.parameters) newParameters.push(p.getCopy());
+
+        let newMethod = new Method(this.identifier, this.identifierRange, this.module, this.visibility);
+        newMethod.isConstructor = this.isConstructor;
+        newMethod.isFinal = this.isFinal;
+        newMethod.isAbstract = this.isAbstract;
+        newMethod.returnParameterType = this.returnParameterType;
+        
+        return newMethod;
 
     }
 
@@ -70,7 +90,7 @@ export class Method {
             let cc = callingConvention == "java" ? "j" : "n";
     
             let shorthand = this.isConstructor ? 'c' : 'm';
-            let s = `_${shorthand}${cc}$${this.identifier}$${this.returnParameter ? this.returnParameter.identifier : 'void'}$`;
+            let s = `_${shorthand}${cc}$${this.identifier}$${this.returnParameterType ? this.returnParameterType.identifier : 'void'}$`;
             s += this.parameters.map(p => p.type.identifier).join("$");
             this.internalNames[callingConvention] = s;
         }

@@ -30,5 +30,8 @@ export class Parameter extends BaseSymbol {
         throw new Error("Method not implemented.");
     }
 
+    getCopy(): Parameter {
+        return new Parameter(this.identifier, this.identifierRange, this.module, this.type, this.isFinal);
+    }
 
 }
