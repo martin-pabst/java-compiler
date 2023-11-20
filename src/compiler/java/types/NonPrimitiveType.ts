@@ -50,7 +50,7 @@ export abstract class NonPrimitiveType extends JavaType {
                     m.parameters.length == length && m.isConstructor
                 ));
                 //@ts-ignore
-                if (type["getExtends"]) type = type.getExtends();
+                if (type["getExtends"] && type.getMethods().filter(m => m.isConstructor).length == 0) type = type.getExtends();
             }
         } else {
             let type: NonPrimitiveType | undefined = this;
