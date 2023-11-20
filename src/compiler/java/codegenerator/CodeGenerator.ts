@@ -177,12 +177,14 @@ export class CodeGenerator extends StatementCodeGenerator {
             }
 
             let steps = classContext.instanceInitializer.slice();
+            let getBaseClass: string = `let obj = ${StepParams.stack}[${StepParams.stackBase}];\n let baseKlass = Object.getPrototypeOf(Object.getPrototypeOf(obj));\n`
+            let superCall: string = `baseKlass.${baseConstructor.getInternalName(baseConstructor.hasImplementationWithNativeCallingConvention ? "native" : "java")}.call(obj, ${parametersForSuperCall});\n`;
+            let returnCall: string = `${Helpers.return}(obj);\n`;
 
-            let superCall: string = `super.${baseConstructor.getInternalName(baseConstructor.hasImplementationWithNativeCallingConvention ? "native" : "java")}(${parametersForSuperCall});\n`;
-
-            steps.push(new StringCodeSnippet(superCall));
+            steps.push(new StringCodeSnippet(getBaseClass + superCall + returnCall));
 
             method.program = new Program(this.module, this.currentSymbolTable, classContext.identifier + method.identifier);
+            method.program.numberOfThisObjects = 1;
             method.program.stepsSingle = this.linker.link(steps);
 
             method.program.addStep(`${Helpers.return}(${StepParams.stack}[0]);`)

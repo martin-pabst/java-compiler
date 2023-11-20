@@ -14,7 +14,7 @@ import { SnippetFramer } from "./CodeSnippetTools";
 import { BinaryOperatorTemplate, OneParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
 import { LabelCodeSnippet } from "./LabelManager";
 
-var nOtherClass = 1, nVoid = 2, nBoolean = 3, nChar = 4, nByte = 5, nShort = 6, nInteger = 7, nLong = 8, nFloat = 9, nDouble = 10, nString = 11;
+var nOtherClass = 0, nVoid = 1, nBoolean = 2, nChar = 3, nByte = 4, nShort = 5, nInteger = 6, nLong = 7, nFloat = 8, nDouble = 9, nString = 10;
 var primitiveTypeIdentifiers: string[] = ["", "void", "boolean", "char", "byte", "short", "int", "long", "float", "double", "string"];
 var boxedTypeIdentifiers: string[] = ["", "", "Boolean", "Character", "Byte", "Short", "Integer", "Long", "Float", "Double", "String"];
 
@@ -224,6 +224,8 @@ export class BinopCastCodeGenerator {
     }
 
     wrapWithToStringCall(leftSnippet: CodeSnippet): CodeSnippet {
+        if(leftSnippet.type?.identifier == "String") return leftSnippet;
+
         let newSnippet = SnippetFramer.frame(leftSnippet, '(§1?._mj$toString$string$()||"null")');
         newSnippet.finalValueIsOnStack = true;
         return newSnippet;
@@ -292,7 +294,13 @@ export class BinopCastCodeGenerator {
         let type: JavaType = snippet.type;
 
         if (!type.isPrimitive) {
-            if (castTo.identifier == "string" || castTo.identifier == "String") return this.wrapWithToStringCall(snippet);
+            if (castTo.identifier == "string" || castTo.identifier == "String"){
+                snippet = this.wrapWithToStringCall(snippet);
+                if(castTo.identifier == "string"){
+                    snippet = new OneParameterTemplate("§1.value").applyToSnippet(this.stringType, snippet.range!, snippet);
+                }
+                return snippet;
+            } 
             if (castTo.isPrimitive) {
                 let boxedIndex = boxedTypesMap[type.identifier];
                 if (boxedIndex) {

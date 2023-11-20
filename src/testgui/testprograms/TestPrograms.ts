@@ -7,9 +7,10 @@ println(i);
 
 class Test {
    int i = 12;
+   int j = i + 7;
    public int doIt(String s){
       println(s);
-      return 7;
+      return j;
    }
 }
 `,

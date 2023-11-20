@@ -289,9 +289,11 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         let firstParameter = this.compileTerm(node.firstParameter);
         let secondParameter = this.compileTerm(node.secondParameter);
 
+        
         let statement = node.isPrintln ? Helpers.println : Helpers.print;
-
+        
         if (firstParameter) {
+            firstParameter = this.compileCast(firstParameter, this.stringType, "implicit");
             if (secondParameter) {
                 return new TwoParameterTemplate(`${statement}(§1, §2);\n`)
                     .applyToSnippet(this.voidType, node.range, firstParameter, secondParameter)
