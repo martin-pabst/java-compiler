@@ -30,10 +30,6 @@ export class JavaModuleManager {
         this.removeUnusedModules(files);
         this.createNewModules(files);
         this.typestore.empty();
-
-        for(let m of this.getUnChangedModules()){
-            m.registerTypesAtTypestore(this.typestore);
-        }
     }
 
     setDirtyFlags(){

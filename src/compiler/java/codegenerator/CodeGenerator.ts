@@ -100,29 +100,44 @@ export class CodeGenerator extends StatementCodeGenerator {
         let fieldSnippets: CodeSnippet[] = [];
         let staticFieldSnippets: CodeSnippet[] = [new StringCodeSnippet(`let __Klass = ${Helpers.classes}["${classContext.identifier}"];\n`)];
 
+        // first step: static fields and static initializers
         for (let fieldOrInitializer of cdef.fieldsOrInstanceInitializers) {
 
             switch (fieldOrInitializer.kind) {
                 case TokenType.fieldDeclaration:
+                    if(!fieldOrInitializer.isStatic) continue;
                     let snippet = this.compileField(fieldOrInitializer, classContext);
                     if (snippet) {
-                        if (fieldOrInitializer.isStatic) {
                             staticFieldSnippets.push(snippet);
-                        } else {
-                            fieldSnippets.push(snippet);
-                        }
-                    }
-                    break;
-                case TokenType.instanceInitializerBlock:
-                    let snippet1 = this.compileInstanceInitializerBlock(fieldOrInitializer);
-                    if (snippet1) {
-                        fieldSnippets.push(snippet1);
                     }
                     break;
                 case TokenType.staticInitializerBlock:
                     let snippet2 = this.compileStaticInitializerBlock(fieldOrInitializer);
                     if (snippet2) {
                         staticFieldSnippets.push(snippet2);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        // second step: non-static fields and instance initializers
+        for (let fieldOrInitializer of cdef.fieldsOrInstanceInitializers) {
+
+            switch (fieldOrInitializer.kind) {
+                case TokenType.fieldDeclaration:
+                    if(fieldOrInitializer.isStatic) continue;
+                    let snippet = this.compileField(fieldOrInitializer, classContext);
+                    if (snippet) {
+                            fieldSnippets.push(snippet);
+                    }
+                    break;
+                case TokenType.instanceInitializerBlock:
+                    let snippet1 = this.compileInstanceInitializerBlock(fieldOrInitializer);
+                    if (snippet1) {
+                        fieldSnippets.push(snippet1);
                     }
                     break;
                 default:

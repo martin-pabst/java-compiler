@@ -258,6 +258,12 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
                 return this.compileSymbolOnStackframeAccess(symbol, node.range);
             }
             if (symbol.kind == SymbolKind.field) {
+                let field = <Field>symbol;
+
+                if(this.classOfCurrentlyCompiledStaticInitialization && !field.isStatic){
+                    this.pushError("Zum Initialisieren eines statischen Attributs können keine nichtstatischen Attribute benutzt werden.", "error", node);
+                }
+
                 return this.compileFieldAccess(symbol, node.range);
             }
 

@@ -47,6 +47,7 @@ export class JavaCompiler {
 
         let cleanModules = this.moduleManager.getUnChangedModules();
         cleanModules.forEach(cm => cm.clearAndRegisterTypeUsagePositions());
+        cleanModules.forEach(cm => cm.registerTypesAtTypestore(this.moduleManager.typestore))
 
         let newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
         

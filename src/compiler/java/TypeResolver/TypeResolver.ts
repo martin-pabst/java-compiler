@@ -61,6 +61,7 @@ export class TypeResolver {
                 if (resolvedType) {
                     declNode.resolvedType = resolvedType;
                     this.moduleManager.typestore.addType(resolvedType);
+                    module.types.push(declNode.resolvedType);
                 }
             }
         }
@@ -289,6 +290,7 @@ export class TypeResolver {
                         fieldNode.type.resolvedType, fieldNode.visibility);
                     field.isFinal = fieldNode.isFinal;
                     field.isStatic = fieldNode.isStatic;
+                    field.classEnum = type;
                     type.fields.push(field);
                 }
             }

@@ -48,6 +48,7 @@ export class Field extends BaseSymbol {
                     if(parent.getFields().filter(f => f.identifier == this.identifier)){
                         this.internalName = "_" + this.internalName;
                     }
+                    parent = parent.getExtends();
                 }
             }
         }

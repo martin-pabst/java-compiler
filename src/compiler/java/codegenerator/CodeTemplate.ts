@@ -212,7 +212,7 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         let snippet1IsPure = snippets[1].isPureTerm();
 
         let snippet0IsConstant = snippets[0].isConstant();
-        let snippet1IsConstant = snippets[0].isConstant();
+        let snippet1IsConstant = snippets[1].isConstant();
 
         if(snippet0IsConstant && snippet1IsConstant){
             return this.foldConstants(snippets[0], snippets[1], this.operator, _resultType, _range);
