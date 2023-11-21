@@ -12,7 +12,8 @@ export class ThrowableClass extends ObjectClass implements IThrowable {
         {type: "m", signature: "public Throwable(String message)", native: ThrowableClass.prototype._constructor_m},
         {type: "m", signature: "public Throwable(Throwable cause)", native: ThrowableClass.prototype._constructor_c},
         {type: "m", signature: "public Throwable(String message, Throwable cause)", native: ThrowableClass.prototype._constructor_m_c},
-        {type: "m", signature: "public String toString()", native: ThrowableClass.prototype._toString}
+        {type: "m", signature: "public String toString()", native: ThrowableClass.prototype._toString},
+        {type: "m", signature: "public String getMessage()", native: ThrowableClass.prototype._getMessage},
     ]
 
 
@@ -37,7 +38,11 @@ export class ThrowableClass extends ObjectClass implements IThrowable {
 
 
     _toString() {
-        return this.getClassName() + ": " + this.message ? this.message : "";        
+        return new StringClass(this.getClassName() + ": " + this.message ? this.message : "");        
+    }
+
+    _getMessage() {
+        return new StringClass(this.message ? this.message : "");        
     }
 
 

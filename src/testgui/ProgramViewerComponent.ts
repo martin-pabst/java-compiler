@@ -87,6 +87,8 @@ export class ProgramViewerComponent {
         let classNode: ProgramViewerNode = {
             iconClass: "img_classdeclaration-dark",
             program: this.dontIndent(`class ${type.identifier}
+            extendsImplements: ${type.getExtendedImplementedIdentifiers().join(", ")}
+            extendedImplementedBy: ${type.getExtendedImplementedByIdentifiers().join(", ")}
             \n/*Fields:*/\n${type.fields.map(field => field.type + " " + field.identifier).join("\n")}
             `)
         }

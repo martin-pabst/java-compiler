@@ -40,7 +40,7 @@ export class JavaCompiler {
 
         LabelCodeSnippet.resetCount();
 
-        this.libraryModuleManager.clearUsagePositions();
+        this.libraryModuleManager.clearUsagePositionsAndInheritanceInformation();
 
         this.moduleManager.setupModulesBeforeCompiliation(files);
         this.moduleManager.setDirtyFlags();
@@ -79,6 +79,9 @@ export class JavaCompiler {
         this.libraryModuleManager.typestore.populateClassObjectRegistry(klassObjectRegistry);
 
         this.moduleManager.typestore.populateClassObjectRegistry(klassObjectRegistry);
+
+        this.libraryModuleManager.typestore.registerExtendsImplements();
+        this.moduleManager.typestore.registerExtendsImplements();
 
         let executable = new Executable(klassObjectRegistry, this.moduleManager, this.errors, this.lastOpenedFile, currentlyOpenFile);
 

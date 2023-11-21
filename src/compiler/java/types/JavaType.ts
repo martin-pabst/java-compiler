@@ -28,4 +28,7 @@ export abstract class JavaType extends BaseType {
 
     abstract getDefaultValue(): any;
 
+    public registerExtendsImplementsOnAncestors(){
+    }
+
 }

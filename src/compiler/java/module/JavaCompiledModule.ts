@@ -50,7 +50,7 @@ export class JavaCompiledModule extends JavaBaseModule {
     clearTypeUsagePositions(): void {
         if(this.ast?.classOrInterfaceOrEnumDefinitions){
             for(let def of this.ast?.classOrInterfaceOrEnumDefinitions){
-                if(def.resolvedType) def.resolvedType?.clearUsagePositions();
+                if(def.resolvedType) def.resolvedType?.clearUsagePositionsAndInheritanceInformation();
             }
         }        
     }

@@ -30,4 +30,10 @@ export class JavaTypeStore {
         })
     }
 
+    registerExtendsImplements(){
+        this.typeMap.forEach((type, key) => {
+            type.registerExtendsImplementsOnAncestors();
+        })
+    }
+
 }

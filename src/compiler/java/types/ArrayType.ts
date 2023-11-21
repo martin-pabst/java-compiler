@@ -27,7 +27,7 @@ export class ArrayType extends JavaType {
         return undefined;  // you can't cast arrays in java (to my knowledge...).
     }
 
-    clearUsagePositions(): void {
+    clearUsagePositionsAndInheritanceInformation(): void {
         this.usagePositions = [];
     }
 

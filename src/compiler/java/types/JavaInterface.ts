@@ -56,6 +56,17 @@ export class JavaInterface extends IJavaInterface {
         this.extends = this.extends.concat(ext);
     }
 
+    public registerExtendsImplementsOnAncestors(type?: NonPrimitiveType){
+        if(type) this.registerChildType(type);
+
+        type = type || this;
+
+        for(let impl of this.extends){
+            (<JavaInterface>impl).registerExtendsImplementsOnAncestors(type);
+        }
+    
+    }
+
 
     getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, NonPrimitiveType>): IJavaInterface {
         return new GenericVariantOfJavaInterface(this, typeMap);
@@ -90,7 +101,7 @@ export class JavaInterface extends IJavaInterface {
         return false;
     }
 
-    clearUsagePositions(): void {
+    clearUsagePositionsAndInheritanceInformation(): void {
         this.usagePositions = [];
         this.genericInformation.forEach(gi => gi.usagePositions = []);
         this.methods.forEach(m => m.clearUsagePositions());
@@ -215,7 +226,7 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
         return null;
     }
 
-    clearUsagePositions(): void {
+    clearUsagePositionsAndInheritanceInformation(): void {
         this.usagePositions = [];
     }
 

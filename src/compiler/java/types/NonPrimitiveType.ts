@@ -25,10 +25,35 @@ export abstract class NonPrimitiveType extends JavaType {
 
     runtimeClass?: Klass;
 
+    private extendsImplements: Record<string, boolean> = {};
+    private isExtendedImplementedBy: string[] = []
 
     constructor(identifier: string, identifierRange: IRange, module: JavaBaseModule){
         super(identifier, identifierRange, module);
         this.isPrimitive = false;
+    }
+
+    clearUsagePositionsAndInheritanceInformation(){
+        super.clearUsagePositionsAndInheritanceInformation();
+        this.extendsImplements = {};
+        this.isExtendedImplementedBy = [];
+    }
+
+    getExtendedImplementedIdentifiers(): string[] {
+        return Object.getOwnPropertyNames(this.extendsImplements);
+    }
+
+    fastExtendsImplements(identifier: string){
+        return this.extendsImplements[identifier] ? true : false;
+    }
+
+    getExtendedImplementedByIdentifiers(): string[] {
+        return this.isExtendedImplementedBy;
+    }
+
+    registerChildType(childType: NonPrimitiveType){
+        if(this.isExtendedImplementedBy.indexOf(childType.identifier) < 0) this.isExtendedImplementedBy.push(childType.identifier);
+        childType.extendsImplements[this.identifier] = true;
     }
 
     getDefaultValue() {

@@ -93,6 +93,17 @@ export class JavaClass extends IJavaClass {
         return this.methods;
     }
 
+    public registerExtendsImplementsOnAncestors(type?: NonPrimitiveType){
+        if(type) this.registerChildType(type);
+
+        type = type || this;
+
+        (<JavaClass>this.extends)?.registerExtendsImplementsOnAncestors(type);
+        for(let impl of this.implements){
+            (<JavaInterface>impl).registerExtendsImplementsOnAncestors(type);
+        }
+    
+    }
 
     canImplicitlyCastTo(otherType: JavaType): boolean {
         if(otherType instanceof JavaInterface){
@@ -125,7 +136,7 @@ export class JavaClass extends IJavaClass {
 
     }
 
-    clearUsagePositions(): void {
+    clearUsagePositionsAndInheritanceInformation(): void {
         this.usagePositions = [];
         this.genericInformation.forEach(gi => gi.usagePositions = []);
         this.methods.forEach(m => m.clearUsagePositions());
@@ -324,7 +335,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         return null;
     } 
 
-    clearUsagePositions(): void {
+    clearUsagePositionsAndInheritanceInformation(): void {
         this.usagePositions = [];
 
     }
