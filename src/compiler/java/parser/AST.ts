@@ -169,6 +169,7 @@ export interface ASTClassDefinitionNode
     implements: ASTTypeNode[],
 
     staticInitializer?: Program,       // only for debugging purposes,
+    instanceInitializer?: Program,       // only for debugging purposes,
 }
 
 export interface ASTInterfaceDefinitionNode

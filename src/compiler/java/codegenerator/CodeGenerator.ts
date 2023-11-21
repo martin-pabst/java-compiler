@@ -150,6 +150,8 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         classContext.staticInitializer = this.buildInitializer(staticFieldSnippets, "staticInitializer");
         cdef.staticInitializer = classContext.staticInitializer;
+        cdef.instanceInitializer = this.buildInitializer(fieldSnippets, "instanceInitializer");  // only built for debugging purposes
+        
 
         let constructorFound: boolean = false;
         for (let method of cdef.methods) {
