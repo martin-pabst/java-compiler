@@ -9,7 +9,7 @@ export class ObjectClass {
     static __javaDeclarations: LibraryDeclarations = [
         {type: "c", signature: "class Object"},
         {type: "m", signature: "public Object()", native: ObjectClass.prototype._constructor},
-        {type: "m", signature: "public String toString()", native: ObjectClass.prototype.toString}
+        {type: "m", signature: "public String toString()", native: ObjectClass.prototype._nToString}
     ]
 
     declare __programs: Program[]; // only for compatibility with java classes; not used in library classes
@@ -33,7 +33,7 @@ export class ObjectClass {
     }
 
 
-    toString() {
+    _nToString(t: Thread) {
         return new StringClass("Object");
         // `t.stack.push(new ${Helpers.classes}["String"]("Object"));`
     }
@@ -47,7 +47,7 @@ export class StringClass extends ObjectClass {
         {type: "c", signature: "class String extends Object"},
         {type: "m", signature: "public String()", native: StringClass.prototype._emptyConstructor},
         {type: "m", signature: "public String(String original)", native: StringClass.prototype._constructor2},
-        {type: "m", signature: "public String toString()", native: StringClass.prototype._toString}
+        {type: "m", signature: "public String toString()", native: StringClass.prototype._nToString}
     ]
 
     public value: string;
@@ -68,26 +68,8 @@ export class StringClass extends ObjectClass {
         return this;
     }
 
-    _toString(t: Thread) {
-        t.s.push(this.value);        
-    }
-
-    plusOtherString(s: StringClass): StringClass {
-        return new StringClass(this.value + s.value);
-    }
-
-    plusObject(t: Thread, o: ObjectClass){
-        t.pushCallback(() => {
-            t.s.push(new StringClass(this.value + t.s.pop().text))
-        });
-        o._m$toString$String$(t);
-    }
-
-    plusObjectFromLeft(t: Thread, o: ObjectClass){
-        t.pushCallback(() => {
-            t.s.push(new StringClass(t.s.pop().text + this.value))
-        });
-        o._m$toString$String$(t);
+    _nToString(t: Thread) {
+        return this;        
     }
 
 }

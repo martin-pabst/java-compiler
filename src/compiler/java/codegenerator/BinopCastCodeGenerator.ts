@@ -96,7 +96,7 @@ export class BinopCastCodeGenerator {
         let lIdentifier = leftType.identifier;
         let rIdentifier = rightType.identifier;
         let lWrapperIndex = boxedTypesMap[lIdentifier];
-        let rWrapperIndex = boxedTypesMap[lIdentifier];
+        let rWrapperIndex = boxedTypesMap[rIdentifier];
         let lTypeIndex: number = lWrapperIndex || primitiveTypeMap[lIdentifier] || nOtherClass;
         let rTypeIndex: number = rWrapperIndex || primitiveTypeMap[rIdentifier] || nOtherClass;
 
@@ -217,7 +217,7 @@ export class BinopCastCodeGenerator {
         }
 
         if (lTypeIndex == nOtherClass) leftSnippet = this.wrapWithToStringCall(leftSnippet);
-        if (rTypeIndex == nOtherClass) rightSnippet = this.wrapWithToStringCall(leftSnippet);
+        if (rTypeIndex == nOtherClass) rightSnippet = this.wrapWithToStringCall(rightSnippet);
 
         return new BinaryOperatorTemplate("+", false).applyToSnippet(this.stringType, wholeRange, leftSnippet, rightSnippet);
 

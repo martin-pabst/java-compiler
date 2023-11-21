@@ -1,5 +1,22 @@
 export var testPrograms = {
-hanoi:`
+stringTest:`
+String s = "A";
+
+new StringTest().test(s);
+
+println("z" + s);
+
+
+
+class StringTest {
+   void test(String s1){
+      println("x" + s1);
+      s1 = "B";
+      println("y" + s1);
+   }
+} 
+`,
+   hanoi:`
 Hanoi h = new Hanoi();
 h.erkläreLösung(1, 3, 4);    // Erkläre, wie man 4 Scheiben von Turm 1 zu Turm 3 bringt.
 

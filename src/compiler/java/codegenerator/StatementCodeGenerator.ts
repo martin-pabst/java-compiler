@@ -323,10 +323,14 @@ export class StatementCodeGenerator extends TermCodeGenerator {
                 variable.type = initValueSnippet.type;
             } else {
                 let type = node.type.resolvedType;
-                if (type && !this.canCastTo(initValueSnippet.type, type, "implicit")) {
+                if(!type) return undefined;
+
+                if (!this.canCastTo(initValueSnippet.type, type, "implicit")) {
                     this.pushError("Der Term auf der rechten Seite des Zuweisungsoperators hat den Datentyp " + initValueSnippet.type.identifier + " und kann daher der Variablen auf der linken Seite (Datentyp " + type.identifier + ") nicht zugewiesen werden.", "error", node);
                     return new EmptyPart();
                 }
+                
+                initValueSnippet = this.compileCast(initValueSnippet, type, "implicit");
             }
 
         } else {
