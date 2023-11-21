@@ -247,7 +247,7 @@ class NextStepMark extends CodeSnippet {
     }
 
     emitToStep(currentStep: Step, steps: Step[]): Step {
-        currentStep.codeAsString += "\nreturn " + (this.stepIndex + 1) + ";";
+        currentStep.codeAsString += "return " + (this.stepIndex + 1) + ";";
         steps.push(currentStep);
         return new Step(this.stepIndex + 1);
     }

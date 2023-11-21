@@ -125,7 +125,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         let snippet = new SeveralParameterTemplate(template).applyToSnippet(klassType, node.range, ...parameterValues);
 
         if (callingConvention == "java") {
-            snippet = new CodeSnippetContainer(snippet);
+            snippet = new CodeSnippetContainer(SnippetFramer.frame(snippet, '§1;\n'));
             (<CodeSnippetContainer>snippet).addNextStepMark();
             snippet.finalValueIsOnStack = true;
         }
@@ -413,7 +413,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
                 this.pushError("Außerhalb einer Klasse kann eine Methode nur mit Punktschreibweise (Object.Methode(...)) aufgerufen werden.", "error", node);
                 return undefined;
             }
-            objectSnippet = new StringCodeSnippet('this', EmptyRange.instance, classContext);
+            objectSnippet = new StringCodeSnippet(`${StepParams.stack}[${StepParams.stackBase}]`, EmptyRange.instance, classContext);
         }
 
         if (!objectSnippet || !objectSnippet.type) {
@@ -430,7 +430,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         // cast parameter values
         for (let i = 0; i < parameterValues.length; i++) {
             let destinationType = method.parameters[i].type;
-            parameterValues[i] = this.compileCast(parameterValues[i]!, destinationType, "explicit");
+            parameterValues[i] = this.compileCast(parameterValues[i]!, destinationType, "implicit");
         }
 
         let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention ? "native" : "java";
@@ -458,7 +458,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         let snippet = new SeveralParameterTemplate(objectTemplate).applyToSnippet(returnParameter, node.range, ...parameterValues);
 
         if (callingConvention == "java") {
-            snippet = new CodeSnippetContainer(snippet);
+            snippet = new CodeSnippetContainer(SnippetFramer.frame(snippet, '§1;\n'));
             (<CodeSnippetContainer>snippet).addNextStepMark();
             if (returnParameter != this.voidType) snippet.finalValueIsOnStack = true;
         }

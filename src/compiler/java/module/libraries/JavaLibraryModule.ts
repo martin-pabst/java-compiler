@@ -18,7 +18,7 @@ export abstract class JavaLibraryModule extends JavaBaseModule {
     classes: (Klass & LibraryKlassType)[] = [];
     
     constructor() {
-        super(new File(), true);
+        super(new File("Library file"), true);
         this.dirty = false;
     }
     

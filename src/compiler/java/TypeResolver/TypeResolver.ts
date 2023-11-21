@@ -34,7 +34,7 @@ export class TypeResolver {
 
         this.resolveGenericParameterTypesAndExtendsImplements();
 
-        this.buildFieldsAndMethods();
+        this.buildAllMethods();
 
         this.buildRuntimeClassesAndTheirFields();
     }
@@ -167,7 +167,7 @@ export class TypeResolver {
     resolveClassExtendsImplements(declNode: ASTClassDefinitionNode, resolvedType1: JavaClass, module: JavaBaseModule) {
         if (declNode.extends) {
             let extType = this.resolveTypeNode(declNode.extends, module);
-            
+
             if (extType instanceof IJavaClass) {
                 resolvedType1.setExtends(extType);
             } else {
@@ -175,7 +175,7 @@ export class TypeResolver {
             }
         }
 
-        if(!resolvedType1.getExtends()){
+        if (!resolvedType1.getExtends()) {
             resolvedType1.setExtends(<JavaClass>this.libraryModuleManager.typestore.getType("Object")!);
         }
 
@@ -239,14 +239,14 @@ export class TypeResolver {
     }
 
 
-    buildFieldsAndMethods() {
+    buildAllMethods() {
         for (let module of this.dirtyModules) {
             for (let declNode of module.ast!.classOrInterfaceOrEnumDefinitions) {
                 switch (declNode.kind) {
                     case TokenType.keywordClass:
                     case TokenType.keywordEnum:
                         let resolvedType1 = <JavaClass | JavaEnum>declNode.resolvedType;
-                        this.buildFields(declNode, resolvedType1, module);
+                        // this.buildFields(declNode, resolvedType1, module);
                         this.buildMethods(declNode, resolvedType1, module);
                         break;
                     case TokenType.keywordInterface:
@@ -282,20 +282,20 @@ export class TypeResolver {
         }
     }
 
-    buildFields(node: ASTClassDefinitionNode | ASTEnumDefinitionNode, type: JavaClass | JavaEnum, module: JavaCompiledModule) {
-        for (let fieldNode of node.fieldsOrInstanceInitializers) {
-            if (fieldNode.kind == TokenType.fieldDeclaration) {
-                if (fieldNode.type.resolvedType) {
-                    let field = new Field(fieldNode.identifier, fieldNode.identifierRange, module,
-                        fieldNode.type.resolvedType, fieldNode.visibility);
-                    field.isFinal = fieldNode.isFinal;
-                    field.isStatic = fieldNode.isStatic;
-                    field.classEnum = type;
-                    type.fields.push(field);
-                }
-            }
-        }
-    }
+    // buildFields(node: ASTClassDefinitionNode | ASTEnumDefinitionNode, type: JavaClass | JavaEnum, module: JavaCompiledModule) {
+    //     for (let fieldNode of node.fieldsOrInstanceInitializers) {
+    //         if (fieldNode.kind == TokenType.fieldDeclaration) {
+    //             if (fieldNode.type.resolvedType) {
+    //                 let field = new Field(fieldNode.identifier, fieldNode.identifierRange, module,
+    //                     fieldNode.type.resolvedType, fieldNode.visibility);
+    //                 field.isFinal = fieldNode.isFinal;
+    //                 field.isStatic = fieldNode.isStatic;
+    //                 field.classEnum = type;
+    //                 type.fields.push(field);
+    //             }
+    //         }
+    //     }
+    // }
 
 
     buildRuntimeClassesAndTheirFields() {
@@ -310,7 +310,10 @@ export class TypeResolver {
                     if (javaEnum) javaEnum.initRuntimeClass(enumRuntimeClass);
                     for (let field of decl.fieldsOrInstanceInitializers) {
                         if (field.kind == TokenType.fieldDeclaration) {
-                            javaEnum.fields.push(new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility));
+                            let f: Field = new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility);
+                            f.isStatic = field.isStatic;
+                            f.isFinal = field.isFinal;
+                            javaEnum.fields.push(f);
                         }
                     }
                 }
@@ -334,7 +337,10 @@ export class TypeResolver {
                                 javaClass.initRuntimeClass(baseClass.runtimeClass);  // first recursively initialize field of base classes
                                 for (let field of decl.fieldsOrInstanceInitializers) {
                                     if (field.kind == TokenType.fieldDeclaration) {
-                                        javaClass.fields.push(new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility));
+                                        let f: Field = new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility);
+                                        f.isStatic = field.isStatic;
+                                        f.isFinal = field.isFinal;
+                                        javaClass.fields.push(f);
                                     }
                                 }
                                 done = false;

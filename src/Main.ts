@@ -23,12 +23,12 @@ import { ActionManager } from "./testgui/ActionManager.ts";
 import { testPrograms } from "./testgui/testprograms/TestPrograms.ts";
 import { JavaBaseModule } from "./compiler/java/module/JavaBaseModule.ts";
 import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts";
+import { ProgramViewerComponent } from "./testgui/ProgramViewerComponent.ts";
 
 export class Main {
 
   language: Language;
   inputEditor: Editor;
-  codeOutputEditor: monaco.editor.IStandaloneCodeEditor;
 
   tabManager: TabManager;
 
@@ -41,6 +41,8 @@ export class Main {
   actionManager: ActionManager;
 
   astComponent: AstComponent;
+
+  programViewerCompoment: ProgramViewerComponent;
 
   file: File;
 
@@ -56,7 +58,7 @@ export class Main {
     /*
      * Test program:
      */
-    this.inputEditor.setValue(testPrograms.simpleClass);
+    this.inputEditor.setValue(testPrograms.hanoi);
 
     this.tabManager = new TabManager(document.getElementById('tabs')!,
       ['token', 'ast', 'code', 'errors']);
@@ -70,16 +72,10 @@ export class Main {
     this.astDiv.classList.add('astOutput');
     this.errorDiv = this.tabManager.getBodyElement(3);
 
-    this.codeOutputEditor = monaco.editor.create(this.codeOutputDiv, {
-      value: "/** Awaiting compilation... */",
-      language: "javascript",
-      automaticLayout: true,
-    });
-
     this.astComponent = new AstComponent(this.astDiv);
+    this.programViewerCompoment = new ProgramViewerComponent(this.codeOutputDiv);
 
-
-    this.file = new File();
+    this.file = new File("Test");
     this.file.monacoModel = this.inputEditor.editor.getModel()!;
 
     this.compiler = new JavaCompiler();
@@ -124,13 +120,11 @@ export class Main {
       this.printErrors(module);
   
       let codePrinter = new CodePrinter();
-      let output = codePrinter.formatCode(module);
   
-      this.codeOutputEditor.getModel()?.setValue(output);
-
     }
 
     this.interpreter.setExecutable(executable);
+    this.programViewerCompoment.buildTreeView(this.compiler.moduleManager);
 
   }
 

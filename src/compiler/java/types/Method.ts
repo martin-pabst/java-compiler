@@ -37,6 +37,8 @@ export class Method {
 
     usagePositions: UsagePosition[] = [];
 
+    programStub?: string;       // only for debugging purposes
+
     constructor(public identifier: string, public identifierRange: IRange, public module: JavaBaseModule,
           public visibility: Visibility = TokenType.keywordPublic){
 

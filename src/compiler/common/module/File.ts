@@ -1,11 +1,12 @@
 export class File {
 
+    public filename: string;
     private _text: string = "";
     monacoModel?: monaco.editor.ITextModel;
 
 
-    constructor(){
-
+    constructor(filename?: string){
+        this.filename = filename || "";
     }
 
     getText(){

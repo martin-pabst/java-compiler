@@ -105,10 +105,10 @@ export class CodeGenerator extends StatementCodeGenerator {
 
             switch (fieldOrInitializer.kind) {
                 case TokenType.fieldDeclaration:
-                    if(!fieldOrInitializer.isStatic) continue;
+                    if (!fieldOrInitializer.isStatic) continue;
                     let snippet = this.compileField(fieldOrInitializer, classContext);
                     if (snippet) {
-                            staticFieldSnippets.push(snippet);
+                        staticFieldSnippets.push(snippet);
                     }
                     break;
                 case TokenType.staticInitializerBlock:
@@ -128,10 +128,10 @@ export class CodeGenerator extends StatementCodeGenerator {
 
             switch (fieldOrInitializer.kind) {
                 case TokenType.fieldDeclaration:
-                    if(fieldOrInitializer.isStatic) continue;
+                    if (fieldOrInitializer.isStatic) continue;
                     let snippet = this.compileField(fieldOrInitializer, classContext);
                     if (snippet) {
-                            fieldSnippets.push(snippet);
+                        fieldSnippets.push(snippet);
                     }
                     break;
                 case TokenType.instanceInitializerBlock:
@@ -150,8 +150,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         classContext.staticInitializer = this.buildInitializer(staticFieldSnippets, "staticInitializer");
         cdef.staticInitializer = classContext.staticInitializer;
-        cdef.instanceInitializer = this.buildInitializer(fieldSnippets, "instanceInitializer");  // only built for debugging purposes
-        
+
 
         let constructorFound: boolean = false;
         for (let method of cdef.methods) {
@@ -177,25 +176,27 @@ export class CodeGenerator extends StatementCodeGenerator {
         for (let baseConstructor of baseClass.getMethods().filter(m => m.isConstructor && m.visibility != TokenType.keywordPrivate)) {
 
             let method = baseConstructor.getCopy();
-            
+
             classContext.methods.push(method);
-            
-            if (classContext.instanceInitializer?.length == 0){
+
+            if (classContext.instanceInitializer?.length == 0) {
                 method.hasImplementationWithNativeCallingConvention = baseConstructor.hasImplementationWithNativeCallingConvention;
                 return; // unaltered implementation of base class constructor suffices for child class
-            } 
-            
+            }
+
             method.hasImplementationWithNativeCallingConvention = false;
 
             let parametersForSuperCall = baseConstructor.parameters.map(p => `${StepParams.stack}[${p.stackframePosition}]`).join(", ");
 
             if (!baseConstructor.hasImplementationWithNativeCallingConvention) {
-                parametersForSuperCall += StepParams.thread + (parametersForSuperCall.length == 0 ? "" : ", ");
+                parametersForSuperCall = StepParams.thread + (parametersForSuperCall.length == 0 ? "" : ", ") + parametersForSuperCall;
             }
 
+            if(parametersForSuperCall.length > 0 ) parametersForSuperCall = ", " + parametersForSuperCall;
+
             let steps = classContext.instanceInitializer.slice();
-            let getBaseClass: string = `let obj = ${StepParams.stack}[${StepParams.stackBase}];\n let baseKlass = Object.getPrototypeOf(Object.getPrototypeOf(obj));\n`
-            let superCall: string = `baseKlass.${baseConstructor.getInternalName(baseConstructor.hasImplementationWithNativeCallingConvention ? "native" : "java")}.call(obj, ${parametersForSuperCall});\n`;
+            let getBaseClass: string = `let obj = ${StepParams.stack}[${StepParams.stackBase}];\nlet baseKlass = Object.getPrototypeOf(Object.getPrototypeOf(obj));\n`
+            let superCall: string = `baseKlass.${baseConstructor.getInternalName(baseConstructor.hasImplementationWithNativeCallingConvention ? "native" : "java")}.call(obj${parametersForSuperCall});\n`;
             let returnCall: string = `${Helpers.return}(${StepParams.stack}[${StepParams.stackBase}]);\n`;
 
             steps.push(new StringCodeSnippet(getBaseClass + superCall));
@@ -207,7 +208,6 @@ export class CodeGenerator extends StatementCodeGenerator {
             method.program.numberOfThisObjects = 1;
             method.program.stepsSingle = this.linker.link(steps);
 
-            method.program.addStep(`${Helpers.return}(${StepParams.stack}[0]);`)
             method.program.compileToJavascriptFunctions();
 
             let runtimeClass = classContext.runtimeClass;
@@ -338,9 +338,9 @@ export class CodeGenerator extends StatementCodeGenerator {
             this.currentSymbolTable.addSymbol(parameter);
         }
 
-        
+
         let snippets: CodeSnippet[] = [];
-        
+
         if (method.isConstructor) {
 
             if (!this.callingOtherConstructorInSameClassHappened && classContext.instanceInitializer) {
@@ -352,8 +352,8 @@ export class CodeGenerator extends StatementCodeGenerator {
             }
 
         }
-        
-        
+
+
         let snippet = methodNode.statement ? this.compileStatementOrTerm(methodNode.statement) : undefined;
         if (snippet) snippets.push(snippet);
 
@@ -363,12 +363,12 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
 
-        if(!this.missingStatementManager.hasReturnHappened()){
+        if (!this.missingStatementManager.hasReturnHappened()) {
             snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
         }
-        
+
         this.missingStatementManager.endMethodBody(method, this.module.errors);
-        
+
         method.program.stepsSingle = this.linker.link(snippets);
 
         methodNode.program = method.program;    // only for debugging purposes
@@ -384,14 +384,16 @@ export class CodeGenerator extends StatementCodeGenerator {
             let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
 
             if (method.isStatic) {
-                runtimeClass[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
-                    `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});
-                             ${Helpers.pushProgram}(this.__programs[${methodIndex}]);`);
+                method.programStub =
+                    `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
+                    `${Helpers.pushProgram}(this.__programs[${methodIndex}]);`;
             } else {
-                runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
-                    `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});
-                             ${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`);
+                method.programStub =
+                    `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
+                    `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`;
             }
+            runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
+                method.programStub);
         }
 
         this.popSymbolTable();
@@ -401,23 +403,29 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     compileInstanceInitializerBlock(node: ASTInstanceInitializerNode): CodeSnippetContainer | undefined {
 
+        this.missingStatementManager.beginMethodBody([]);
+        
         let snippet = new CodeSnippetContainer([], node.range);
         for (let statementNode of node.statements) {
             let statementSnippet = this.compileStatementOrTerm(statementNode);
             if (statementSnippet) snippet.addParts(statementSnippet);
         }
-
+        
+        this.missingStatementManager.endMethodBody(undefined, this.module.errors);
+        
         return snippet;
     }
-
+    
     compileStaticInitializerBlock(node: ASTStaticInitializerNode): CodeSnippetContainer | undefined {
-
+        
+        this.missingStatementManager.beginMethodBody([]);
         let snippet = new CodeSnippetContainer([], node.range);
         for (let statementNode of node.statements) {
             let statementSnippet = this.compileStatementOrTerm(statementNode);
             if (statementSnippet) snippet.addParts(statementSnippet);
         }
-
+        this.missingStatementManager.endMethodBody(undefined, this.module.errors);
+        
         return snippet;
     }
 

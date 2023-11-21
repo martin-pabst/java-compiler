@@ -98,14 +98,14 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
             termSnippet = this.compileCast(termSnippet, method.returnParameterType, "implicit");
 
-            snippet.addParts(new OneParameterTemplate(`${Helpers.return}(§1);`).applyToSnippet(this.voidType, node.range, termSnippet));
+            snippet.addParts(new OneParameterTemplate(`${Helpers.return}(§1);\n`).applyToSnippet(this.voidType, node.range, termSnippet));
 
         } else {
             if(method.returnParameterType && method.returnParameterType != this.voidType){
                 this.pushError("Die Methode erwartet einen Rückgabewert vom Typ " + method.returnParameterType.identifier + ", hier wird aber keiner übergeben.", "error", node.range);
                 return undefined;
             }            
-            snippet.addStringPart(`${Helpers.return}();`);
+            snippet.addStringPart(`${Helpers.return}();\n`);
         } 
 
         snippet.addNextStepMark();
@@ -337,7 +337,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         if (initValueSnippet && accesLocalVariableSnippet) {
             let snippet = new BinaryOperatorTemplate('=', false)
                 .applyToSnippet(variable.type, node.range, accesLocalVariableSnippet, initValueSnippet);
-            return SnippetFramer.frame(snippet, '§1;');
+            return SnippetFramer.frame(snippet, '§1;\n');
         }
 
         return undefined;

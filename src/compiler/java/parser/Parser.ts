@@ -206,8 +206,10 @@ export class Parser extends StatementParser {
         classASTNode.methods.push(methodNode);
 
         if (this.expect(TokenType.leftBracket, true)) {
-            while (this.comesToken([TokenType.identifier, TokenType.keywordFinal], false)) {
-                this.parseParameter(methodNode);
+            if (this.comesToken([TokenType.identifier, TokenType.keywordFinal], false)) {
+                do {
+                    this.parseParameter(methodNode);
+                } while(this.comesToken(TokenType.comma, true));
             }
             this.expect(TokenType.rightBracket, true);
         }

@@ -16,7 +16,7 @@ export class CodePrinter{
         let s = "";
         for(let i = 0; i < p.stepsSingle.length; i++){
             let step = p.stepsSingle[i];
-            s += "\n// Step " + step.index + "\n";
+            s += "\n\n// Step " + step.index + "\n";
             s += this.printStep(step);
         }
         return s;
