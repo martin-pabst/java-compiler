@@ -111,6 +111,22 @@ export class CodeSnippetContainer extends CodeSnippet {
 
     }
 
+    endsWithNextStepMark(): boolean {
+        return this.parts.length > 0 && this.parts[this.parts.length - 1] instanceof NextStepMark;
+    }
+
+    endsWith(suffix: string){
+        for(let i = this.parts.length - 1; i >= 0; i--){
+            if(this.parts[i] instanceof StringCodeSnippet){
+                return this.parts[i].endsWith(suffix);
+            }
+        }
+
+        return false;
+    }
+
+
+
     /**
      * not used
      * @param currentStep 

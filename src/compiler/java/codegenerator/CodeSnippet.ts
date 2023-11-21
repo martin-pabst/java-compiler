@@ -54,6 +54,10 @@ export abstract class CodeSnippet {
     getConstantValue(): ConstantValue | undefined {
         return undefined;
     }
+
+    endsWith(suffix: string){
+        return false;
+    }
 }
 
 export class StringCodeSnippet extends CodeSnippet {
@@ -119,5 +123,10 @@ export class StringCodeSnippet extends CodeSnippet {
     lastPartOrPop(): CodeSnippet {
         return this.finalValueIsOnStack ? new StringCodeSnippet("s.pop()", this.range) : this;
     }
+
+    endsWith(suffix: string){
+        return this.text.endsWith(suffix);
+    }
+
 
 }

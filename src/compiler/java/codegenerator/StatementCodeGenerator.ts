@@ -50,7 +50,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
             default:
                 snippet = this.compileTerm(ast);
                 if (snippet) {
-                    snippet = SnippetFramer.frame(snippet, "§1;\n");
+                    if(!snippet.endsWith(";\n")) snippet = new CodeSnippetContainer(SnippetFramer.frame(snippet, '§1;\n'));
                 }
         }
 

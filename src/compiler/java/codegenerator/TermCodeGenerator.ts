@@ -458,7 +458,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         let snippet = new SeveralParameterTemplate(objectTemplate).applyToSnippet(returnParameter, node.range, ...parameterValues);
 
         if (callingConvention == "java") {
-            snippet = new CodeSnippetContainer(SnippetFramer.frame(snippet, '§1;\n'));
+            if(!snippet.endsWith(";\n")) snippet = new CodeSnippetContainer(SnippetFramer.frame(snippet, '§1;\n'));
             (<CodeSnippetContainer>snippet).addNextStepMark();
             if (returnParameter != this.voidType) snippet.finalValueIsOnStack = true;
         }

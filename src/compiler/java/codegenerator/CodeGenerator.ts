@@ -176,14 +176,15 @@ export class CodeGenerator extends StatementCodeGenerator {
         for (let baseConstructor of baseClass.getMethods().filter(m => m.isConstructor && m.visibility != TokenType.keywordPrivate)) {
 
             let method = baseConstructor.getCopy();
-
+            
             classContext.methods.push(method);
-
+            
             if (classContext.instanceInitializer?.length == 0) {
                 method.hasImplementationWithNativeCallingConvention = baseConstructor.hasImplementationWithNativeCallingConvention;
                 return; // unaltered implementation of base class constructor suffices for child class
             }
-
+            
+            method.identifier = classContext.identifier;
             method.hasImplementationWithNativeCallingConvention = false;
 
             let parametersForSuperCall = baseConstructor.parameters.map(p => `${StepParams.stack}[${p.stackframePosition}]`).join(", ");
