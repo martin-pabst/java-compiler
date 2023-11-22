@@ -276,6 +276,7 @@ export interface ASTMethodCallNode extends ASTNodeWithIdentifier, ASTTermNode {
 
 export interface ASTAttributeDereferencingNode extends ASTTermNode {
     kind: TokenType.dereferenceAttribute;
+    nodeToGetObject: ASTTermNode | undefined;
     attributeIdentifier: string;
 }
 

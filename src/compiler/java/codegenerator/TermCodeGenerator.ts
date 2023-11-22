@@ -5,7 +5,7 @@ import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode } from "../parser/AST";
+import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode, ASTAttributeDereferencingNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { ArrayType } from "../types/ArrayType";
 import { Field } from "../types/Field";
@@ -73,6 +73,8 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
                 snippet = this.compileNewObjectNOde(<ASTNewObjectNode>ast); break;
             case TokenType.selectArrayElement:
                 snippet = this.compileSelectArrayElement(<ASTSelectArrayElementNode>ast); break;
+            case TokenType.dereferenceAttribute:
+                snippet = this.compileDereferenceAttribute(<ASTAttributeDereferencingNode>ast); break;
 
         }
 
@@ -393,6 +395,17 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         this.constantTypeToTypeMap[TokenType.doubleConstant] = this.libraryTypestore.getType("double")!;
         this.constantTypeToTypeMap[TokenType.stringConstant] = this.libraryTypestore.getType("string")!;
     }
+
+    compileDereferenceAttribute(node: ASTAttributeDereferencingNode): CodeSnippet | undefined {
+
+        let objectSnippet = this.compileTerm(node.nodeToGetObject);
+        if(!objectSnippet || !objectSnippet.type) return undefined;
+
+        // TODO
+
+        return undefined;
+    }
+
 
     compileMethodCall(node: ASTMethodCallNode): CodeSnippet | undefined {
         let untestedParameterValues = node.parameterValues.map(p => this.compileTerm(p));
