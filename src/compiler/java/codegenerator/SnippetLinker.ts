@@ -1,4 +1,4 @@
-import { Step } from "../../common/interpreter/Program";
+import { Program, Step } from "../../common/interpreter/Program";
 import { CodeSnippet } from "./CodeSnippet";
 
 export class SnippetLinker {
@@ -7,7 +7,7 @@ export class SnippetLinker {
 
     }
 
-    link(snippets: CodeSnippet[]) {
+    link(snippets: CodeSnippet[], program: Program) {
 
         // unpack CodeSnippetContainer objects:
         let flatList: CodeSnippet[] = [];
@@ -23,7 +23,7 @@ export class SnippetLinker {
         
         if(!currentStep.isEmpty()) steps.push(currentStep);
 
-        return steps;
+        program.stepsSingle = steps;
 
     }
 

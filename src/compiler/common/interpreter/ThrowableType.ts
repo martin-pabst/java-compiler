@@ -2,8 +2,7 @@ import { IRange } from "../range/Range.ts";
 
 export type StacktraceElement = {
     range: IRange,
-    class: string,
-    method: string
+    methodIdentifierWithClass: string
 }
 
 export type Stacktrace = StacktraceElement[];
@@ -11,5 +10,6 @@ export type Stacktrace = StacktraceElement[];
 export interface IThrowable {
     message?: string;
     cause?: IThrowable;
+    range?: IRange;
     stacktrace: Stacktrace;
 }

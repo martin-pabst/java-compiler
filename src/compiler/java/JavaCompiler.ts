@@ -66,6 +66,9 @@ export class JavaCompiler {
         let typeResolver = new TypeResolver(this.moduleManager, this.libraryModuleManager);
         typeResolver.resolve();
 
+        this.libraryModuleManager.typestore.registerExtendsImplements();
+        this.moduleManager.typestore.registerExtendsImplements();
+
         for(let module of newOrDirtyModules){
             let codegenerator = new CodeGenerator(module, this.libraryModuleManager.typestore, 
                 this.moduleManager.typestore);
@@ -80,8 +83,6 @@ export class JavaCompiler {
 
         this.moduleManager.typestore.populateClassObjectRegistry(klassObjectRegistry);
 
-        this.libraryModuleManager.typestore.registerExtendsImplements();
-        this.moduleManager.typestore.registerExtendsImplements();
 
         let executable = new Executable(klassObjectRegistry, this.moduleManager, this.errors, this.lastOpenedFile, currentlyOpenFile);
 

@@ -58,7 +58,7 @@ export class Main {
     /*
      * Test program:
      */
-    this.inputEditor.setValue(testPrograms.hanoi);
+    this.inputEditor.setValue(testPrograms.tryCatchTest);
 
     this.tabManager = new TabManager(document.getElementById('tabs')!,
       ['token', 'ast', 'code', 'errors']);

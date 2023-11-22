@@ -11,13 +11,18 @@ export class StepParams {
 
 export class Helpers {
     static classes = StepParams.thread + ".classes";
-    static arrayRef = StepParams.thread + ".arr"; 
-    static newArray = StepParams.thread + ".newArray"; 
-    static print = StepParams.thread + ".print"; 
-    static println = StepParams.thread + ".println"; 
-    static return = StepParams.thread + ".return";
+    static newArray = StepParams.thread + "." + Thread.prototype.newArray.name; 
+    static print = StepParams.thread + "." + Thread.prototype.print.name; 
+    static println = StepParams.thread + "." + Thread.prototype.println.name; 
+    static return = StepParams.thread + "." + Thread.prototype.return.name;
     static threadStack = StepParams.thread + ".s";
-    static pushProgram = StepParams.thread + ".pushProgram";
+    static pushProgram = StepParams.thread + "." + Thread.prototype.pushProgram.name;
+    static getExceptionAndTrimStack = StepParams.thread + "." + Thread.prototype.getExceptionAndTrimStack.name;
+    static throwException = StepParams.thread + "." + Thread.prototype.throwException.name;
+    static beginTryBlock = StepParams.thread + "." + Thread.prototype.beginTryBlock.name;
+    static endTryBlock = StepParams.thread + "." + Thread.prototype.endCatchTryBlock.name;
+    static throwAE = StepParams.thread + "." + Thread.prototype.AE.name;
+    static throwNPE = StepParams.thread + "." + Thread.prototype.NPE.name;
 }
 
 /**

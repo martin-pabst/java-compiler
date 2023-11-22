@@ -2,6 +2,7 @@ import { Program } from "../../common/interpreter/Program.ts";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable.ts";
+import { LabelCodeSnippet } from "../codegenerator/LabelManager.ts";
 import { GenericTypeParameter } from "../types/GenericInformation.ts";
 import { JavaType } from "../types/JavaType.ts";
 import { Method } from "../types/Method.ts";
@@ -399,10 +400,16 @@ export interface ASTCatchNode extends ASTStatementNode {
     statement: ASTStatementNode
 }
 
+export interface ASTThrowNode extends ASTStatementNode {
+    kind: TokenType.keywordThrow;
+    exception: ASTTermNode;
+}
+
 export interface ASTTryCatchNode extends ASTStatementNode {
     kind: TokenType.keywordTry;
-    statement: ASTStatementNode;
-    catchCases: ASTCatchNode[]
+    tryStatement: ASTStatementNode;
+    catchCases: ASTCatchNode[];
+    finallyStatement?: ASTStatementNode;
 }
 
 export interface ASTAnnotationNode extends ASTStatementNode {

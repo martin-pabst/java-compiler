@@ -60,9 +60,12 @@ export abstract class CodeSnippet {
     }
 }
 
+export type EmitToStepListener = (step: Step) => void;
+
 export class StringCodeSnippet extends CodeSnippet {
 
     private constantValue: ConstantValue | undefined;
+    private emitToStepListeners: EmitToStepListener[] = [];
 
     constructor(public text: string, range?: IRange, type?: JavaType, constantValue?: ConstantValue ) {
         super();
@@ -92,10 +95,16 @@ export class StringCodeSnippet extends CodeSnippet {
         return this.text;
     }
 
+    addEmitToStepListener(emitToStepListener: EmitToStepListener){
+        this.emitToStepListeners.push(emitToStepListener);
+    }
+
     emitToStep(currentStep: Step, _steps: Step[]): Step {
         currentStep.codeAsString = currentStep.codeAsString + this.text;
 
         currentStep.adaptRangeEnd(this.range);
+
+        this.emitToStepListeners.forEach(esl => esl(currentStep));
 
         return currentStep;
     }

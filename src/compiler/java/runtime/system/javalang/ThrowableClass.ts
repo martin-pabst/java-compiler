@@ -1,10 +1,13 @@
+import { Exception } from "../../../../common/interpreter/ExceptionInfo.ts";
 import { IThrowable, Stacktrace } from "../../../../common/interpreter/ThrowableType.ts";
+import { IRange } from "../../../../common/range/Range.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { ObjectClass, StringClass } from "./ObjectClassStringClass.ts";
 
-export class ThrowableClass extends ObjectClass implements IThrowable {
+export class ThrowableClass extends ObjectClass implements IThrowable, Exception {
 
     stacktrace: Stacktrace = [];
+    range?: IRange;
 
     static __javaDeclarations: LibraryDeclarations = [
         {type: "c", signature: "class Throwable extends Object"},
@@ -21,19 +24,34 @@ export class ThrowableClass extends ObjectClass implements IThrowable {
 
     constructor(public message?: string, public cause?: ThrowableClass){
         super();
+        this.message = this.message || "";
     }
 
-    _constructor_m(message: string): void {
-        this.message = message;
+    getIdentifier(): string {
+        return this.getClassName();
+    }
+    getExtendedImplementedIdentifiers(): string[] {
+        return ThrowableClass.type.getExtendedImplementedIdentifiers();
     }
 
-    _constructor_c(cause: ThrowableClass): void {
+    getMessage(): string {
+        return this.message || "";
+    }
+
+    _constructor_m(message: StringClass): ThrowableClass {
+        this.message = message.value;
+        return this;
+    }
+
+    _constructor_c(cause: ThrowableClass): ThrowableClass {
         this.cause = cause;
+        return this;
     }
 
-    _constructor_m_c(message: string, cause: ThrowableClass): void {
-        this.message = message;
+    _constructor_m_c(message: StringClass, cause: ThrowableClass): ThrowableClass {
+        this.message = message.value;
         this.cause = cause;
+        return this;
     }
 
 

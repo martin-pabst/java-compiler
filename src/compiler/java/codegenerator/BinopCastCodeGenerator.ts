@@ -58,6 +58,7 @@ export class BinopCastCodeGenerator {
     intType: JavaType;
     booleanType: JavaType;
     stringType: JavaType;
+    throwableType: JavaType;
 
     primitiveTypes: JavaType[] = [];
 
@@ -71,6 +72,7 @@ export class BinopCastCodeGenerator {
         this.intType = this.libraryTypestore.getType("int")!;
         this.booleanType = this.libraryTypestore.getType("boolean")!;
         this.stringType = this.libraryTypestore.getType("string")!;
+        this.throwableType = this.libraryTypestore.getType("Throwable")!;
 
         this.primitiveTypes.push(this.voidType);  // dummy for "otherClass"
         for (let i = 1; i < primitiveTypeIdentifiers.length; i++) this.primitiveTypes.push(this.libraryTypestore.getType(primitiveTypeIdentifiers[i])!);

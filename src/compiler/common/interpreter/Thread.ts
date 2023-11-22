@@ -3,12 +3,12 @@ import { Semaphor } from "./Semaphor";
 import { Scheduler } from "./Scheduler";
 import { IRange } from "../range/Range.ts";
 import { KlassObjectRegistry } from "./StepFunction.ts";
+import { ExceptionInfo, CatchBlockInfo, Exception } from "./ExceptionInfo.ts";
+import { ThrowableClass } from "../../java/runtime/system/javalang/ThrowableClass.ts";
+import { SystemException } from "./SystemException.ts";
+import { IThrowable } from "./ThrowableType.ts";
+import { ArithmeticExceptionClass } from "../../java/runtime/system/javalang/ArithmeticExceptionClass.ts";
 
-type ExceptionInfo = {
-    types: string[],
-    stepIndex: number,
-    stackSize: number
-}
 
 type ProgramState = {
     program: Program;
@@ -17,6 +17,9 @@ type ProgramState = {
     stackBase: number;
     callbackAfterFinished?: (value: any) => void;
     exceptionInfoList: ExceptionInfo[];
+
+    recentlyThrownException?: Exception;
+    afterExceptionTrimStackToSize?: number;     // stack size when entering try {...} block
 }
 
 type ThreadStateInfoAfterRun = {
@@ -25,12 +28,6 @@ type ThreadStateInfoAfterRun = {
 }
 
 export enum ThreadState { beforeRunning, running, paused, waiting, exited, exitedWithException }
-
-interface Exception {
-    identifier: string;
-    allExtendedImplementedTypes: string[];
-    message: string;
-}
 
 export class Thread {
     s: any[] = [];  // stack
@@ -133,14 +130,13 @@ export class Thread {
             }
         } catch (exception) {
 
-            let exceptionObject: Exception = {
-                identifier: "RuntimeException",
-                allExtendedImplementedTypes: ["Throwable", "Exception"],
-                message: "Runtime-Exception:" + exception
-            };
-            console.log(exception);
-            // this.throwException(exceptionObject);
-            this.state = ThreadState.exitedWithException; // TODO
+            if (exception instanceof ThrowableClass) {
+                this.throwException(exception);
+            } else {
+                this.throwException(new SystemException("SystemException", "Systemfehler: " + exception));
+                console.log(exception);
+            }
+
         }
 
         return { state: this.state, stepsExecuted: numberOfSteps }
@@ -180,50 +176,87 @@ export class Thread {
     }
 
 
-    throwException(exception: Exception) {
-        let classNames = exception.allExtendedImplementedTypes.slice();
-        classNames.push(exception.identifier);
+    throwException(exception: Exception & IThrowable) {
+        let classNames = exception.getExtendedImplementedIdentifiers().slice();
+        classNames.push(exception.getIdentifier());
 
         let stackTrace: ProgramState[] = [];
+        let newProgramStates: ProgramState[] = [];
+        let foundCatchBlockInfo: CatchBlockInfo | undefined;
+
         do {
 
             let ps = this.programStack[this.programStack.length - 1];
-            for (let exInfo of ps.exceptionInfoList) {
-                let found = false;
+
+            while (ps.exceptionInfoList.length > 0) {
+                let exInfo = ps.exceptionInfoList.pop()!;
                 for (let cn of classNames) {
-                    if (exInfo.types.indexOf(cn) >= 0) {
-                        found = true;
-                        break;
+                    for (let catchBlockInfo of exInfo.catchBlockInfos) {
+                        if (catchBlockInfo.exceptionTypes[cn]) {
+                            foundCatchBlockInfo = catchBlockInfo;
+                            break;
+                        }
                     }
                 }
 
-                if (found) {
-                    stackTrace.push(Object.assign(ps));
-                    ps.stepIndex = exInfo.stepIndex;
-                    this.s.splice(exInfo.stackSize, this.s.length - exInfo.stackSize);
-                    this.s.push(exception);
+                if (foundCatchBlockInfo) {
+                    stackTrace.push(Object.assign({}, ps));
+                    exception.stacktrace = stackTrace.map(state => {
+                        return {
+                            methodIdentifierWithClass: state.program.methodIdentifierWithClass,
+                            range: <IRange>state.currentStepList[state.stepIndex].range
+                        }
+                    });
+
+                    // prepare stack and program stack for executing catch block:
+                    let ps1 = Object.assign({}, ps);
+                    ps1.stepIndex = foundCatchBlockInfo.catchBlockBeginsWithStepIndex;
+                    ps1.recentlyThrownException = exception;
+                    ps1.afterExceptionTrimStackToSize = exInfo.stackSize;
+                    newProgramStates.push(ps1);
+
                     break;
                 } else {
-                    stackTrace.push(ps);
-                    this.programStack.pop();
+                    if (exInfo.finallyBlockIndex) {
+                        let ps2 = Object.assign({}, ps);
+                        ps2.stepIndex = exInfo.finallyBlockIndex;
+                        ps2.recentlyThrownException = exception;
+                        ps2.afterExceptionTrimStackToSize = exInfo.stackSize;
+                        newProgramStates.push(ps2);
+                    }
                 }
             }
 
-        } while (this.programStack.length > 0)
+            stackTrace.push(ps);
+            this.programStack.pop();
+
+        } while (this.programStack.length > 0 && !foundCatchBlockInfo)
 
         if (this.programStack.length == 0) {
             this.stackTrace = stackTrace;
             this.exception = exception;
             this.state = ThreadState.exitedWithException;
+            console.log(exception);
+        } else {
+            while (newProgramStates.length > 0) this.programStack.push(newProgramStates.pop()!);
         }
+        this.currentProgramState = this.programStack[this.programStack.length - 1];
     }
 
-    beginCatchExceptions(exceptionInfo: ExceptionInfo) {
+    getExceptionAndTrimStack(removeException: boolean): Exception | undefined {
+        let exception = this.currentProgramState.recentlyThrownException;
+        if (!exception) return undefined;
+        if(removeException) this.currentProgramState.recentlyThrownException = undefined;
+        this.s.length = this.currentProgramState.afterExceptionTrimStackToSize!;
+        return exception;
+    }
+
+    beginTryBlock(exceptionInfo: ExceptionInfo) {
         exceptionInfo.stackSize = this.s.length;
         this.currentProgramState.exceptionInfoList.push(exceptionInfo);
     }
 
-    endCatchExceptions() {
+    endCatchTryBlock() {
         this.currentProgramState.exceptionInfoList.pop();
     }
 
@@ -317,4 +350,45 @@ export class Thread {
     println(text: string | undefined, color: number | undefined) {
         this.scheduler.interpreter.printManager.print(text, true, color);
     }
+
+    /**
+     * Runtime method to throw Arithmetic exception
+     * @param message 
+     * @param startLineNumber 
+     * @param startColumn 
+     * @param endLineNumber 
+     * @param endColumn 
+     */
+    AE(message: string, startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number){
+
+        let range: IRange = {
+            startLineNumber: startLineNumber,
+            startColumn: startColumn,
+            endLineNumber: endLineNumber,
+            endColumn: endColumn 
+        }
+
+        let exception = new ArithmeticExceptionClass(message);
+        exception.range = range;
+
+        throw exception;
+    }
+
+    NPE(identifier: string, startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number){
+
+        let range: IRange = {
+            startLineNumber: startLineNumber,
+            startColumn: startColumn,
+            endLineNumber: endLineNumber,
+            endColumn: endColumn 
+        }
+
+        let exception = new ArithmeticExceptionClass(identifier + " hat den Wert null, daher kann nicht auf Attribute/Methoden zugegriffen werden.");
+        exception.range = range;
+
+        throw exception;
+    }
+
+
+
 }

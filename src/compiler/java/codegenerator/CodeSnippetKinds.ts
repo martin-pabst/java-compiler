@@ -56,6 +56,13 @@ export class CodeSnippetContainer extends CodeSnippet {
         this.parts.unshift(new NextStepMark());
     }
 
+    removeNextStepBeforeSnippetMark(){
+        if(this.parts.length > 0 && this.parts[0] instanceof NextStepMark){
+            this.parts.shift();
+            if(this.parts.length > 0 && this.parts[0] instanceof CodeSnippetContainer) this.parts[0].removeNextStepBeforeSnippetMark();
+        }
+    }
+
     isConstant(): boolean {
         return this.isPureTerm() && (<StringCodeSnippet> this.parts[0]).isConstant();
     }
@@ -183,7 +190,8 @@ export class CodeSnippetContainer extends CodeSnippet {
         this.addParts([new StringCodeSnippet(part, range, type)]);
     }
 
-    addParts(parts: CodeSnippet | CodeSnippet[]) {
+    addParts(parts: CodeSnippet | CodeSnippet[] | undefined) {
+        if(!parts) return;
         if(!Array.isArray(parts)) parts = [parts];
 
         if (parts.length == 0) return;
@@ -193,7 +201,7 @@ export class CodeSnippetContainer extends CodeSnippet {
         this.parts = this.parts.concat(parts);
 
         for(let part of parts){
-            if(part.type){
+            if(part && part.type){
                 this.type = part.type;
                 this.finalValueIsOnStack = part.finalValueIsOnStack;
             }
@@ -263,7 +271,12 @@ class NextStepMark extends CodeSnippet {
     }
 
     emitToStep(currentStep: Step, steps: Step[]): Step {
-        currentStep.codeAsString += "return " + (this.stepIndex + 1) + ";";
+        // does current step already end with return statement?
+        let lastReturnIndex = currentStep.codeAsString.lastIndexOf("return");
+        let stringAfterReturn = currentStep.codeAsString.substring(lastReturnIndex);
+        if(lastReturnIndex < 0 ||  !stringAfterReturn.match(/return\ \d*;\n?$/) ){
+            currentStep.codeAsString += "return " + (this.stepIndex + 1) + ";";
+        }
         steps.push(currentStep);
         return new Step(this.stepIndex + 1);
     }

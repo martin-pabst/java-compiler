@@ -25,7 +25,8 @@ export class ObjectClass {
     }
 
     getType(): NonPrimitiveType {
-        return this.constructor.prototype.type;
+        //@ts-ignore
+        return this.constructor.type;
     }
 
     getClassName(): string {

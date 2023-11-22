@@ -1,4 +1,43 @@
 export var testPrograms = {
+tryCatchTest:`
+A a = new A();
+a.testA();
+println("Main program continues...");
+
+class A {
+   void testA(){
+      println("Before try");
+      try {
+         println("before Exception");
+         testB();
+         println("after Exception");
+      } catch(Exception ex){
+         println("catch " + ex.getMessage());
+      } finally{
+         println("finally...");
+      }
+      println("After try-block");
+   }
+
+   void testB(){
+      println("Method B begins");
+      try {
+         throw new Exception("TestException");
+         println("After Exception b");
+      } catch(MyException ex1){
+         println("catch-Block b:" + ex1.getMessage());
+      } finally {
+         println("finally b...");
+      }
+   }
+}
+
+
+class MyException extends Exception {
+
+}
+
+`,
 stringTest:`
 String s = "A";
 

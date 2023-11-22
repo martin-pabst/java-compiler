@@ -407,6 +407,9 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         let objectSnippet: CodeSnippet | undefined;
         if (node.nodeToGetObject) {
             objectSnippet = this.compileTerm(node.nodeToGetObject);
+            if(!objectSnippet) return undefined;
+            let range = node.nodeToGetObject.range;
+            objectSnippet = SnippetFramer.frame(objectSnippet, `(§1 || ${Helpers.throwNPE}(${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn}))`);
         } else {
             let classContext = this.currentSymbolTable.getClassContext();
             if (!classContext) {

@@ -1,3 +1,4 @@
+import { Helpers } from "../../common/interpreter/StepFunction";
 import { IRange } from "../../common/range/Range";
 import { JavaType } from "../types/JavaType";
 import { CodeSnippet, ConstantValue, StringCodeSnippet } from "./CodeSnippet";
@@ -219,7 +220,13 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         }
 
         if (snippet0IsPure && snippet1IsPure) {
-            return new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm(), _range, _resultType);
+            if(this.operator == "/" || this.operator == "%"){
+                return new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " (" + snippets[1].getPureTerm() + 
+                `|| ${Helpers.throwAE}("Teilen durch 0", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`,
+                 _range, _resultType);
+            } else {
+                return new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm(), _range, _resultType);
+            }
         }
 
         let snippetContainer = new CodeSnippetContainer([], _range, _resultType);
@@ -239,7 +246,7 @@ export class BinaryOperatorTemplate extends CodeTemplate {
 
             switch (this.operator) {
                 case '-': snippetContainer.addStringPart(`-s.pop() + s.pop()`, _range); break;
-                case '/': snippetContainer.addStringPart(`1/s.pop() * s.pop()`, _range); break;
+                case '/': snippetContainer.addStringPart(`1/(s.pop() || ${Helpers.throwAE}("Teilen durch 0", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn})) * s.pop()`, _range); break;
                 case '<': snippetContainer.addStringPart(`pop() > pop()`, _range); break;
                 case '>': snippetContainer.addStringPart(`pop() < pop()`, _range); break;
                 case '<=': snippetContainer.addStringPart(`pop() >= pop()`, _range); break;
@@ -253,7 +260,11 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         snippets[1].ensureFinalValueIsOnStack();
         snippetContainer.addParts(snippets[1]);
         snippetContainer.addParts(snippets[0]);
-        snippetContainer.addStringPart(`pop() ${this.operator} pop()`, _range);
+        if(this.operator == '%'){
+            snippetContainer.addStringPart(`pop() ${this.operator} (pop() || ${Helpers.throwAE}("Teilen durch 0", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`, _range);
+        } else {
+            snippetContainer.addStringPart(`pop() ${this.operator} pop()`, _range);
+        }
 
         snippetContainer.finalValueIsOnStack = false;
         return snippetContainer;

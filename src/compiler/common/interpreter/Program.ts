@@ -1,9 +1,9 @@
 import { BaseSymbolTable } from "../BaseSymbolTable";
 import { Module } from "../module/Module";
 import { EmptyRange, IRange } from "../range/Range";
-import { Thread } from "./Thread";
 import { StepFunction, StepParams } from "./StepFunction.ts";
 import { CodePrinter } from "../../java/codegenerator/CodePrinter.ts";
+import { CatchBlockInfo } from "./ExceptionInfo.ts";
 
 
 
@@ -15,6 +15,9 @@ export class Step {
     range!: {startLineNumber?:number, startColumn?: number, endLineNumber?: number, endColumn?: number};
     codeAsString: string = "";
     stopStepOverBeforeStep: boolean = false;
+
+    catchBlockInfoList?: CatchBlockInfo[];
+    finallyBlockIndex?: number;
 
     constructor(public index: number){
         this.range = {startLineNumber: undefined, startColumn: undefined, endLineNumber: undefined, endColumn: undefined};

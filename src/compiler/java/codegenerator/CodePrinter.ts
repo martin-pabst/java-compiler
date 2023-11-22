@@ -16,7 +16,11 @@ export class CodePrinter{
         let s = "";
         for(let i = 0; i < p.stepsSingle.length; i++){
             let step = p.stepsSingle[i];
-            s += "\n\n// Step " + step.index + "\n";
+
+            let catchBlockInfos = step.catchBlockInfoList ? " (with CatchBlockInfos: " + JSON.stringify(step.catchBlockInfoList) + ")" : "";
+            let finallyBlockIndex = step.finallyBlockIndex ? " (finallyBlockIndex: " + step.finallyBlockIndex + ")" : "";
+
+            s += "\n\n// Step " + step.index + catchBlockInfos + finallyBlockIndex + "\n";
             s += this.printStep(step);
         }
         return s;

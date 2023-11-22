@@ -26,7 +26,7 @@ export abstract class NonPrimitiveType extends JavaType {
     runtimeClass?: Klass;
 
     private extendsImplements: Record<string, boolean> = {};
-    private isExtendedImplementedBy: string[] = []
+    private isExtendedImplementedBy: Record<string, boolean> = {};
 
     constructor(identifier: string, identifierRange: IRange, module: JavaBaseModule){
         super(identifier, identifierRange, module);
@@ -36,7 +36,7 @@ export abstract class NonPrimitiveType extends JavaType {
     clearUsagePositionsAndInheritanceInformation(){
         super.clearUsagePositionsAndInheritanceInformation();
         this.extendsImplements = {};
-        this.isExtendedImplementedBy = [];
+        this.isExtendedImplementedBy = {};
     }
 
     getExtendedImplementedIdentifiers(): string[] {
@@ -47,12 +47,12 @@ export abstract class NonPrimitiveType extends JavaType {
         return this.extendsImplements[identifier] ? true : false;
     }
 
-    getExtendedImplementedByIdentifiers(): string[] {
+    getExtendedImplementedByIdentifiers(): Record<string, boolean> {
         return this.isExtendedImplementedBy;
     }
 
     registerChildType(childType: NonPrimitiveType){
-        if(this.isExtendedImplementedBy.indexOf(childType.identifier) < 0) this.isExtendedImplementedBy.push(childType.identifier);
+        if(!this.isExtendedImplementedBy[childType.identifier]) this.isExtendedImplementedBy[childType.identifier] = true;
         childType.extendsImplements[this.identifier] = true;
     }
 
@@ -61,7 +61,10 @@ export abstract class NonPrimitiveType extends JavaType {
     }
 
     initRuntimeClass(baseClass: Klass) {
-        this.runtimeClass = class extends baseClass { };
+        let that = this;
+        this.runtimeClass = class extends baseClass {
+            static type = that;
+         };
         this.runtimeClass.__programs = [];
     }
 

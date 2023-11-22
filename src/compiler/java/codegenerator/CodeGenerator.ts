@@ -64,11 +64,10 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         snippets.push(endOfProgramSnippet);
 
-        let steps = this.linker.link(snippets);
 
         this.module.mainProgram = new Program(this.module, this.currentSymbolTable,
             "main program");
-        this.module.mainProgram.stepsSingle = steps;
+        this.linker.link(snippets, this.module.mainProgram);
 
         ast.program = this.module.mainProgram;  // only for debugging
 
@@ -176,14 +175,14 @@ export class CodeGenerator extends StatementCodeGenerator {
         for (let baseConstructor of baseClass.getMethods().filter(m => m.isConstructor && m.visibility != TokenType.keywordPrivate)) {
 
             let method = baseConstructor.getCopy();
-            
+
             classContext.methods.push(method);
-            
+
             if (classContext.instanceInitializer?.length == 0) {
                 method.hasImplementationWithNativeCallingConvention = baseConstructor.hasImplementationWithNativeCallingConvention;
                 return; // unaltered implementation of base class constructor suffices for child class
             }
-            
+
             method.identifier = classContext.identifier;
             method.hasImplementationWithNativeCallingConvention = false;
 
@@ -193,7 +192,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                 parametersForSuperCall = StepParams.thread + (parametersForSuperCall.length == 0 ? "" : ", ") + parametersForSuperCall;
             }
 
-            if(parametersForSuperCall.length > 0 ) parametersForSuperCall = ", " + parametersForSuperCall;
+            if (parametersForSuperCall.length > 0) parametersForSuperCall = ", " + parametersForSuperCall;
 
             let steps = classContext.instanceInitializer.slice();
             let getBaseClass: string = `let obj = ${StepParams.stack}[${StepParams.stackBase}];\nlet baseKlass = Object.getPrototypeOf(Object.getPrototypeOf(obj));\n`
@@ -207,7 +206,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
             method.program = new Program(this.module, this.currentSymbolTable, classContext.identifier + method.identifier);
             method.program.numberOfThisObjects = 1;
-            method.program.stepsSingle = this.linker.link(steps);
+            this.linker.link(steps, method.program);
 
             method.program.compileToJavascriptFunctions();
 
@@ -235,7 +234,7 @@ export class CodeGenerator extends StatementCodeGenerator {
     buildInitializer(snippets: CodeSnippet[], identifier: string): Program {
         let program = new Program(this.module, this.currentSymbolTable, identifier);
         snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
-        program.stepsSingle = this.linker.link(snippets);
+        this.linker.link(snippets, program);
         return program;
     }
 
@@ -370,7 +369,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         this.missingStatementManager.endMethodBody(method, this.module.errors);
 
-        method.program.stepsSingle = this.linker.link(snippets);
+        this.linker.link(snippets, method.program);
 
         methodNode.program = method.program;    // only for debugging purposes
 
@@ -405,20 +404,20 @@ export class CodeGenerator extends StatementCodeGenerator {
     compileInstanceInitializerBlock(node: ASTInstanceInitializerNode): CodeSnippetContainer | undefined {
 
         this.missingStatementManager.beginMethodBody([]);
-        
+
         let snippet = new CodeSnippetContainer([], node.range);
         for (let statementNode of node.statements) {
             let statementSnippet = this.compileStatementOrTerm(statementNode);
             if (statementSnippet) snippet.addParts(statementSnippet);
         }
-        
+
         this.missingStatementManager.endMethodBody(undefined, this.module.errors);
-        
+
         return snippet;
     }
-    
+
     compileStaticInitializerBlock(node: ASTStaticInitializerNode): CodeSnippetContainer | undefined {
-        
+
         this.missingStatementManager.beginMethodBody([]);
         let snippet = new CodeSnippetContainer([], node.range);
         for (let statementNode of node.statements) {
@@ -426,7 +425,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             if (statementSnippet) snippet.addParts(statementSnippet);
         }
         this.missingStatementManager.endMethodBody(undefined, this.module.errors);
-        
+
         return snippet;
     }
 

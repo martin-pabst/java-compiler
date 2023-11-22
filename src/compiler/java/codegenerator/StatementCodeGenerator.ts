@@ -2,7 +2,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBlockNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTWhileNode } from "../parser/AST";
+import { ASTBlockNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTThrowNode, ASTTryCatchNode, ASTWhileNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippetContainer, EmptyPart } from "./CodeSnippetKinds.ts";
@@ -13,6 +13,8 @@ import { JumpToLabelCodeSnippet, LabelCodeSnippet } from "./LabelManager.ts";
 import { SnippetFramer } from "./CodeSnippetTools.ts";
 import { TermCodeGenerator } from "./TermCodeGenerator";
 import { Method } from "../types/Method.ts";
+import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
+import { CatchBlockInfo } from "../../common/interpreter/ExceptionInfo.ts";
 
 export class StatementCodeGenerator extends TermCodeGenerator {
 
@@ -45,6 +47,10 @@ export class StatementCodeGenerator extends TermCodeGenerator {
                 snippet = this.compileForStatement(<ASTForLoopNode>ast); break;
             case TokenType.keywordReturn:
                 snippet = this.compileReturnStatement(<ASTReturnNode>ast); break;
+            case TokenType.keywordTry:
+                snippet = this.compileTryCatchStatement(<ASTTryCatchNode>ast); break;
+            case TokenType.keywordThrow:
+                snippet = this.compileThrowStatement(<ASTThrowNode>ast); break;
 
 
             default:
@@ -346,6 +352,104 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
         return undefined;
     }
+
+    compileThrowStatement(node: ASTThrowNode): CodeSnippet | undefined {
+        let exceptionSnippet = this.compileTerm(node.exception);
+        if(!exceptionSnippet) return undefined;
+
+        return new OneParameterTemplate(`throw §1;\n`).applyToSnippet(this.voidType, node.range, exceptionSnippet);
+    }
+
+    compileTryCatchStatement(node: ASTTryCatchNode): CodeSnippet | undefined {
+        let catchCaseLabels: LabelCodeSnippet[] = [];
+        let catchBlockInfos: CatchBlockInfo[] = [];
+        
+        
+        for(let i = 0; i < node.catchCases.length; i++){
+            let catchCase = node.catchCases[i];
+            let label = new LabelCodeSnippet();
+            let exceptionTypes: Record<string, boolean> = {};
+            
+            for(let type of catchCase.exceptionTypes){
+                if(type.resolvedType instanceof NonPrimitiveType){
+                    Object.assign(exceptionTypes, type.resolvedType.getExtendedImplementedByIdentifiers())
+                    exceptionTypes[type.resolvedType.identifier] = true;
+                }
+            }
+            
+            let catchBlockInfo: CatchBlockInfo = {
+                exceptionTypes: exceptionTypes,
+                catchBlockBeginsWithStepIndex: -1
+            }
+            
+            catchCaseLabels[i] = label;
+            catchBlockInfos[i] = catchBlockInfo;
+            
+            label.addIndexingListener((index) => catchBlockInfo.catchBlockBeginsWithStepIndex = index);
+        }
+        
+        let finallyBlockLabel: LabelCodeSnippet | undefined;
+        
+        // this in context of Step.run-function points to Step-object
+        let beginTryBlockSnippet = new StringCodeSnippet(`${Helpers.beginTryBlock}({catchBlockInfos: this.catchBlockInfoList, finallyBlockIndex: this.finallyBlockIndex});\n`, node.range);
+        beginTryBlockSnippet.addEmitToStepListener((step) => {
+            step.catchBlockInfoList = catchBlockInfos;
+            step.finallyBlockIndex = finallyBlockLabel?.stepIndex;
+        });
+        
+        let tryBlockStatements = this.compileStatementOrTerm(node.tryStatement);
+        if(!tryBlockStatements) return undefined;
+        
+        if(tryBlockStatements instanceof CodeSnippetContainer) tryBlockStatements.removeNextStepBeforeSnippetMark();
+        
+        let endTryBlockSnippet = new StringCodeSnippet(`${Helpers.endTryBlock}();\n`, node.range);
+        
+        let labelAfterLastCatchBlock = new LabelCodeSnippet();
+        let snippetContainer = new CodeSnippetContainer([beginTryBlockSnippet, tryBlockStatements, endTryBlockSnippet, labelAfterLastCatchBlock.getJumpToSnippet()], node.range);
+        
+        
+        for(let i = 0; i < node.catchCases.length; i++){
+            let catchCase = node.catchCases[i];
+            let exceptionType: JavaType = catchCase.exceptionTypes[0].resolvedType!;
+            if(catchCase.exceptionTypes.length > 0) exceptionType = this.throwableType;
+            
+            // exception lies on top of stack
+            let exceptionVariable = new JavaLocalVariable(catchCase.exceptionIdentifier, catchCase.exceptionIdentifierPosition, exceptionType);
+            exceptionVariable.isFinal = true;
+            this.currentSymbolTable.addSymbol(exceptionVariable);
+            
+            snippetContainer.addNextStepMark();
+            snippetContainer.addParts(catchCaseLabels[i]);
+            let storeExceptionVariableStatement = new StringCodeSnippet(`${Helpers.threadStack}[${StepParams.stackBase} + ${exceptionVariable.stackframePosition}] = ${Helpers.getExceptionAndTrimStack}(true);\n`);
+            snippetContainer.addParts(storeExceptionVariableStatement);
+            
+            let statement = this.compileStatementOrTerm(catchCase.statement);
+            
+            if(statement){
+                if(statement instanceof CodeSnippetContainer) statement.removeNextStepBeforeSnippetMark();
+                snippetContainer.addParts(statement);
+            }  
+            
+            snippetContainer.addParts(labelAfterLastCatchBlock.getJumpToSnippet());
+
+        }        
+        
+        finallyBlockLabel = new LabelCodeSnippet();
+        snippetContainer.addNextStepMark();
+        snippetContainer.addParts(labelAfterLastCatchBlock);
+        if(node.finallyStatement){
+            snippetContainer.addParts(finallyBlockLabel);
+            snippetContainer.addStringPart(`${Helpers.getExceptionAndTrimStack}(false);\n`);
+            let finallyStatement = this.compileStatementOrTerm(node.finallyStatement);
+            if(finallyStatement instanceof CodeSnippetContainer) finallyStatement.removeNextStepBeforeSnippetMark();
+            snippetContainer.addParts(finallyStatement);
+            snippetContainer.addStringPart(`if(${Helpers.getExceptionAndTrimStack}(false)){${Helpers.return}(); return;};\n`);
+        }
+
+        return snippetContainer;
+        
+    }
+
 
 
 }

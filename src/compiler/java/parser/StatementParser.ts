@@ -1,7 +1,7 @@
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType.ts";
-import { ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTReturnNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode } from "./AST.ts";
+import { ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTReturnNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode } from "./AST.ts";
 import { TermParser } from "./TermParser.ts";
 
 export class StatementParser extends TermParser {
@@ -31,6 +31,8 @@ export class StatementParser extends TermParser {
                 return this.nodeFactory.buildContinueNode(this.getAndSkipToken());
             case TokenType.keywordTry:
                 return this.parseTryCatch();
+            case TokenType.keywordThrow:
+                return this.parseThrow();
             case TokenType.keywordReturn:
                 return this.parseReturn();
             default:
@@ -253,6 +255,20 @@ export class StatementParser extends TermParser {
         return switchNode;
     }
 
+    parseThrow(): ASTThrowNode | undefined {
+        let throwToken = this.getAndSkipToken();
+        let exception = this.parseTerm();
+        this.expectSemicolon(true, true);
+
+        if(!exception) return undefined;
+
+        return {
+            kind: TokenType.keywordThrow,
+            exception: exception,
+            range: throwToken.range
+        }
+    }
+
     parseTryCatch(): ASTTryCatchNode | undefined {
         let tryToken = this.getAndSkipToken();
         let statement = this.parseStatementOrExpression();
@@ -273,6 +289,10 @@ export class StatementParser extends TermParser {
             if(exceptionTypes.length > 0 && identifier && statement){
                 tryNode.catchCases.push(this.nodeFactory.buildCatchNode(catchToken, exceptionTypes, identifier, statement));
             }            
+        }
+
+        if(this.comesToken(TokenType.keywordFinally, true)){
+            tryNode.finallyStatement = this.parseStatementOrExpression(true);
         }
 
         return tryNode;

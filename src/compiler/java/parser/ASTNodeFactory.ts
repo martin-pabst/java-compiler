@@ -461,7 +461,7 @@ export class ASTNodeFactory {
         return {
             kind: TokenType.keywordTry,
             range: {startLineNumber: tryToken.range.startLineNumber, startColumn: tryToken.range.startColumn, endLineNumber: statement.range.endLineNumber, endColumn: statement.range.endColumn},
-            statement: statement,
+            tryStatement: statement,
             catchCases: []
         }
     }

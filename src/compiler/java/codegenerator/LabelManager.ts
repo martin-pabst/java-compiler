@@ -1,11 +1,16 @@
 import { Step } from "../../common/interpreter/Program";
 import { CodeSnippet as CodeSnippet } from "./CodeSnippet";
 
+
+type LabelIndexingListener = (index: number) => void;
+
 export class LabelCodeSnippet extends CodeSnippet {
 
     static count: number = 0;
 
     id: number;
+
+    labelIndexingListeners: LabelIndexingListener[] = [];
 
     constructor(){
         super();
@@ -31,7 +36,12 @@ export class LabelCodeSnippet extends CodeSnippet {
 
     index(currentIndex: number): number {
         this.stepIndex = currentIndex;
+        this.labelIndexingListeners.forEach(lil => lil(currentIndex));
         return currentIndex;
+    }
+
+    addIndexingListener(labelIndexingListener: LabelIndexingListener){
+        this.labelIndexingListeners.push(labelIndexingListener);
     }
 
     public static resetCount(){
@@ -56,7 +66,7 @@ export class JumpToLabelCodeSnippet extends CodeSnippet {
     }
 
     emit(): string {
-        return "return " + this.label.stepIndex + "; // Jump to step " + this.label.stepIndex + "\n";    
+        return "return " + this.label.stepIndex + ";\n";    
     }
 
     emitToStep(currentStep: Step, _steps: Step[]): Step {
