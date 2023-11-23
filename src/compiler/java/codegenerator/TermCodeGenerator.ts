@@ -441,6 +441,13 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
         field.usagePositions.push({file: this.module.file, range: node.range});
 
+        if (field.isFinal && field.initialValueIsConstant) {
+            let constantValue = field.initialValue!;
+            let constantValueAsString = typeof constantValue == "string" ? `"${constantValue}"` : "" + constantValue;
+            return new StringCodeSnippet(constantValueAsString, range, field.type, constantValue);
+        }
+
+
         if(field.isStatic){
             let classIdentifier = field.classEnum.identifier;
             let snippet = new OneParameterTemplate(`${Helpers.classes}["${classIdentifier}"].${field.getInternalName()}`)

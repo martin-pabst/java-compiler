@@ -317,6 +317,7 @@ export class TypeResolver {
                             let f: Field = new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility);
                             f.isStatic = field.isStatic;
                             f.isFinal = field.isFinal;
+                            f.classEnum = javaEnum;
                             javaEnum.fields.push(f);
                         }
                     }
@@ -344,6 +345,7 @@ export class TypeResolver {
                                         let f: Field = new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility);
                                         f.isStatic = field.isStatic;
                                         f.isFinal = field.isFinal;
+                                        f.classEnum = javaClass;
                                         javaClass.fields.push(f);
                                     }
                                 }
