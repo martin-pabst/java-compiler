@@ -8,6 +8,7 @@ import { ThrowableClass } from "../../java/runtime/system/javalang/ThrowableClas
 import { SystemException } from "./SystemException.ts";
 import { IThrowable } from "./ThrowableType.ts";
 import { ArithmeticExceptionClass } from "../../java/runtime/system/javalang/ArithmeticExceptionClass.ts";
+import { NullPointerExceptionClass } from "../../java/runtime/system/javalang/NullPointerExceptionClass.ts";
 
 
 type ProgramState = {
@@ -374,7 +375,7 @@ export class Thread {
         throw exception;
     }
 
-    NPE(identifier: string, startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number){
+    NPE(startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number){
 
         let range: IRange = {
             startLineNumber: startLineNumber,
@@ -383,7 +384,7 @@ export class Thread {
             endColumn: endColumn 
         }
 
-        let exception = new ArithmeticExceptionClass(identifier + " hat den Wert null, daher kann nicht auf Attribute/Methoden zugegriffen werden.");
+        let exception = new NullPointerExceptionClass("Auf ein Attribut/eine Methode von null kann nicht zugegriffen werden.");
         exception.range = range;
 
         throw exception;

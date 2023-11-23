@@ -224,11 +224,12 @@ export class ASTNodeFactory {
         }
     }
 
-    buildAttributeDereferencingNode(identifier: Token): ASTAttributeDereferencingNode {
+    buildAttributeDereferencingNode(node: ASTTermNode, identifier: Token): ASTAttributeDereferencingNode {
         return {
             kind: TokenType.dereferenceAttribute,
             range: identifier.range,
-            attributeIdentifier: <string>identifier.value
+            attributeIdentifier: <string>identifier.value,
+            nodeToGetObject: node
         }
     }
 

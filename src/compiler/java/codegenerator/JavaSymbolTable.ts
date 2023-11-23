@@ -1,5 +1,6 @@
 import { BaseStackframe, BaseSymbol, BaseSymbolTable, SymbolKind } from "../../common/BaseSymbolTable";
 import { IRange } from "../../common/range/Range";
+import { TokenType } from "../TokenType.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaClass } from "../types/JavaClass";
 import { JavaEnum } from "../types/JavaEnum";
@@ -43,10 +44,15 @@ export class JavaSymbolTable extends BaseSymbolTable {
     private findSymbolIntern(identifier: string, classContext: JavaClass | JavaEnum | undefined): JavaLocalVariable | undefined {
         let symbol = this.identifierToSymbolMap.get(identifier);
         if(symbol) return symbol;
+
         if(this.parent){
             if(this.parent.classContext == classContext){
                 return this.parent.findSymbolIntern(identifier, classContext);
             }
+        }
+
+        if(this.classContext){
+            return this.classContext.getField(identifier, TokenType.keywordPrivate);
         }
 
         return undefined;

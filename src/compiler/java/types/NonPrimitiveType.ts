@@ -5,6 +5,7 @@ import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
+import { Visibility } from "./Visibility.ts";
 
 /**
  * A NonPrimitiveType 
@@ -22,6 +23,8 @@ export abstract class NonPrimitiveType extends JavaType {
 
     abstract getFields(): Field[];
     abstract getMethods(): Method[];
+
+    abstract getField(identifier: string, uptoVisibility: Visibility, forceStatic?: boolean): Field | undefined;
 
     runtimeClass?: Klass;
 

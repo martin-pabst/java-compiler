@@ -1,4 +1,33 @@
 export var testPrograms = {
+fieldTest:`
+
+A a = new A();
+a.privateA = 12;
+a.protectedA = 12;
+a.publicA = 14;
+
+class A extends B {
+   private int privateA;
+   protected int protectedA;
+   int publicA;
+
+   void doIt(){
+      privateA = 10;
+      protectedA = 12;
+      publicA = 14;
+   }
+}
+
+class B {
+   private int privateB;
+   protected int protectedB;
+   int publicB;
+
+   void doIt(){
+      publicA = 10;
+   }
+}
+`,
 tryCatchTest:`
 A a = new A();
 a.testA();

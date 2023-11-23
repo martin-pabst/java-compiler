@@ -261,7 +261,7 @@ export abstract class TermParser extends TokenIterator {
             } else {
                 let identifier = this.expectAndSkipIdentifierAsToken();
                 if (identifier.value == "") return node;
-                return this.nodeFactory.buildAttributeDereferencingNode(identifier);
+                return this.nodeFactory.buildAttributeDereferencingNode(node, identifier);
             }
         }
     }
