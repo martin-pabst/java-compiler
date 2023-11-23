@@ -31,6 +31,11 @@ export abstract class NonPrimitiveType extends JavaType {
     private extendsImplements: Record<string, boolean> = {};
     private isExtendedImplementedBy: Record<string, boolean> = {};
 
+    staticInitializer?: Program;
+
+    staticConstructorsDependOn: Map<NonPrimitiveType, boolean> = new Map();
+
+
     constructor(identifier: string, identifierRange: IRange, module: JavaBaseModule){
         super(identifier, identifierRange, module);
         this.isPrimitive = false;

@@ -109,11 +109,11 @@ export class Interpreter {
     executeOneStep(stepInto: boolean) {
 
         if (this.scheduler.state != SchedulerState.paused) {
-            // TODO!
-            // this.init();
             if (this.scheduler.state == SchedulerState.not_initialized) {
                 return;
             }
+            this.printManager.clear();
+            this.init(this.mainModule!);
             this.resetRuntime();
         }
 

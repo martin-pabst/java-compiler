@@ -5,14 +5,9 @@ import { CodeSnippet } from "../codegenerator/CodeSnippet.ts";
 import { JavaBaseModule } from "../module/JavaBaseModule.ts";
 import { NonPrimitiveType } from "./NonPrimitiveType.ts";
 
-export abstract class JavaClassOrEnum extends NonPrimitiveType {
+export abstract class JavaTypeWithInstanceInitializer extends NonPrimitiveType {
 
     instanceInitializer: CodeSnippet[] = [];
-    
-    staticInitializer?: Program;
-
-    staticConstructorsDependOn: Map<JavaClassOrEnum, boolean> = new Map();
-
 
     constructor(identifier: string, identifierRange: IRange, module: JavaBaseModule) {
 

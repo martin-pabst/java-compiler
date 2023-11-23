@@ -1,5 +1,6 @@
 # TODO-List
 
+## done:
   * wire up interpreter  -> done!
   * CodeGenerator: while-loop, then test performance... -> done. Looks great!
   * CodeGenerator: implicit casting -> done, needs testing...
@@ -9,8 +10,18 @@
   * CodeGenerator: object instantiation -> done
   * CodeGenerator: field access -> done
   * CodeGenerator: constant folding -> done
+  * try ... catch ... finally -> done
+  * check if return statement happened in every execution line
+  * check if local variables have been initialized before first access
 
-  
+
+## next todos
+  * wire up step over, step into, step out
+  * enums...
+  * interfaces...
+  * generics
+
+
 
   
 

@@ -2,7 +2,7 @@ import { File } from "../../common/module/File";
 import { JavaTypeStore } from "./JavaTypeStore";
 import { JavaCompiledModule as JavaCompiledModule } from "./JavaCompiledModule";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
-import { JavaClassOrEnum } from "../types/JavaClassOrEnum";
+import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer";
 
 
 /**
@@ -93,7 +93,7 @@ export class JavaModuleManager {
                     }
                 }
 
-                if(cdef instanceof JavaClassOrEnum){
+                if(cdef instanceof JavaTypeWithInstanceInitializer){
                     cdef.staticInitializer?.compileToJavascriptFunctions();
                 }
             }

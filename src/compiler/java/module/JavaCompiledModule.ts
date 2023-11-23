@@ -1,9 +1,10 @@
 import { Error } from "../../common/Error";
-import { Program } from "../../common/interpreter/Program";
+import { Program, Step } from "../../common/interpreter/Program";
 import { File } from "../../common/module/File";
 import { TokenList } from "../lexer/Token";
 import { ASTGlobalNode } from "../parser/AST";
 import { JavaType } from "../types/JavaType";
+import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { JavaBaseModule } from "./JavaBaseModule";
 import { JavaModuleManager } from "./JavaModuleManager";
@@ -26,6 +27,51 @@ export class JavaCompiledModule extends JavaBaseModule {
 
     constructor(file: File, public moduleManager: JavaModuleManager){
         super(file, false);
+    }
+
+    setBreakpoint(line: number){
+        let steps = this.findSteps(line);
+        steps.forEach(step => step.setBreakpoint());
+    }
+
+    clearBreakpoint(line: number){
+        let steps = this.findSteps(line);
+        steps.forEach(step => step.clearBreakpoint());
+    }
+
+    findSteps(line: number): Step[] {
+        if(this.mainProgram){
+            let step = this.mainProgram.findStep(line);
+            if(step) return [step];
+        }
+
+        for(let type of this.types){
+
+            if(type instanceof NonPrimitiveType){
+
+                if(type.staticInitializer){
+                    let step = type.staticInitializer.findStep(line);
+                    if(step) return [step];
+                }
+
+                // A instance initializer may have been copied to several constructors, so if 
+                // breakpoint in instance initializer is set there may be several steps to
+                // consider setting a breakpoint in.
+                let steps: Step[] = [];
+                for(let method of type.getMethods()){
+                    if(method.program){
+                        let step = method.program.findStep(line);
+                        if(step) steps.push(step);
+                    }
+                }
+
+                return steps;
+            }
+
+        }
+
+        return [];
+
     }
 
     resetBeforeCompilation(){

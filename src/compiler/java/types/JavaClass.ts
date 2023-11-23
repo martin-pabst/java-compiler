@@ -4,7 +4,7 @@ import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
-import { JavaClassOrEnum } from "./JavaClassOrEnum.ts";
+import { JavaTypeWithInstanceInitializer } from "./JavaTypeWithInstanceInitializer.ts";
 import { GenericVariantOfJavaInterface, IJavaInterface, JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
@@ -13,7 +13,7 @@ import { Visibility } from "./Visibility";
 
 
 
-export abstract class IJavaClass extends JavaClassOrEnum {
+export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     isPrimitive: false;
     genericInformation: GenericInformation | undefined = undefined;
 

@@ -1,5 +1,5 @@
 import { JavaModuleManager } from "../java/module/JavaModuleManager";
-import { JavaClassOrEnum } from "../java/types/JavaClassOrEnum";
+import { JavaTypeWithInstanceInitializer } from "../java/types/JavaTypeWithInstanceInitializer";
 import { Error } from "./Error";
 import { Program } from "./interpreter/Program";
 import { Klass, KlassObjectRegistry } from "./interpreter/StepFunction";
@@ -31,14 +31,14 @@ export class Executable {
     }
 
     setupStaticInitializationSequence(errors: Error[]) {
-        let classesToInitialize: JavaClassOrEnum[] = [];
+        let classesToInitialize: JavaTypeWithInstanceInitializer[] = [];
         
         this.staticInitializationSequence = [];
 
         for(let module of this.moduleManager.modules){
             if(!module.ast) continue;
             for(let cdef of module.ast.classOrInterfaceOrEnumDefinitions){
-                if(cdef instanceof JavaClassOrEnum){
+                if(cdef instanceof JavaTypeWithInstanceInitializer){
                     if(cdef.staticInitializer && cdef.runtimeClass){
                         classesToInitialize.push(cdef);
                     }

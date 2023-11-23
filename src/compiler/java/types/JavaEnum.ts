@@ -7,7 +7,7 @@ import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
 import { Field } from "./Field";
 import { GenericTypeParameter } from "./GenericInformation";
 import { JavaClass } from "./JavaClass";
-import { JavaClassOrEnum } from "./JavaClassOrEnum.ts";
+import { JavaTypeWithInstanceInitializer } from "./JavaTypeWithInstanceInitializer.ts";
 import { JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
@@ -15,7 +15,7 @@ import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility.ts";
 
 
-export class JavaEnum extends JavaClassOrEnum {
+export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
     fields: Field[] = [];
     methods: Method[] = [];

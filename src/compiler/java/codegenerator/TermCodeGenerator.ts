@@ -21,7 +21,7 @@ import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { BinopCastCodeGenerator } from "./BinopCastCodeGenerator.ts";
 import { Method } from "../types/Method.ts";
-import { JavaClassOrEnum } from "../types/JavaClassOrEnum.ts";
+import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { MissingStatementManager } from "./MissingStatementsManager.ts";
@@ -35,7 +35,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
     symbolTableStack: JavaSymbolTable[] = [];
 
-    classOfCurrentlyCompiledStaticInitialization?: JavaClassOrEnum;
+    classOfCurrentlyCompiledStaticInitialization?: JavaTypeWithInstanceInitializer;
 
     missingStatementManager: MissingStatementManager = new MissingStatementManager();
 
