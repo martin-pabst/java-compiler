@@ -22,7 +22,24 @@ export abstract class IJavaInterface extends NonPrimitiveType {
     }
 
     getFields(): Field[] { return [] };
+
     abstract getMethods(): Method[];
+
+    abstract getExtends(): IJavaInterface[];
+
+
+    getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): Field | undefined {
+        let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
+        if (field) return field;
+        if (uptoVisibility == TokenType.keywordPrivate) uptoVisibility = TokenType.keywordProtected;
+        for(let interf of this.getExtends()){
+            field = interf.getField(identifier, uptoVisibility, forceStatic);
+            if(field) return field
+        }
+        return undefined;
+    }
+
+
 
 }
 
@@ -56,15 +73,15 @@ export class JavaInterface extends IJavaInterface {
         this.extends = this.extends.concat(ext);
     }
 
-    public registerExtendsImplementsOnAncestors(type?: NonPrimitiveType){
-        if(type) this.registerChildType(type);
+    public registerExtendsImplementsOnAncestors(type?: NonPrimitiveType) {
+        if (type) this.registerChildType(type);
 
         type = type || this;
 
-        for(let impl of this.extends){
+        for (let impl of this.extends) {
             (<JavaInterface>impl).registerExtendsImplementsOnAncestors(type);
         }
-    
+
     }
 
 
@@ -94,7 +111,7 @@ export class JavaInterface extends IJavaInterface {
 
     canExplicitlyCastTo(otherType: JavaType): boolean {
         if (this.canImplicitlyCastTo(otherType)) return true;
-        if(otherType instanceof NonPrimitiveType){
+        if (otherType instanceof NonPrimitiveType) {
             return otherType.canImplicitlyCastTo(this);
         }
 
@@ -165,7 +182,7 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
     canExplicitlyCastTo(otherType: JavaType): boolean {
         if (this.canImplicitlyCastTo(otherType)) return true;
 
-        if(otherType instanceof NonPrimitiveType){
+        if (otherType instanceof NonPrimitiveType) {
             return otherType.canImplicitlyCastTo(this);
         }
 

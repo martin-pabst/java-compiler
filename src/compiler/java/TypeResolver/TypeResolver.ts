@@ -7,6 +7,7 @@ import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaModuleManager } from "../module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "../module/libraries/JavaLibraryModuleManager";
 import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTTypeNode } from "../parser/AST";
+import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
 import { ArrayType } from "../types/ArrayType";
 import { Field } from "../types/Field";
 import { GenericTypeParameter } from "../types/GenericInformation";
@@ -41,6 +42,8 @@ export class TypeResolver {
 
     generateNewTypesWithGenericsButWithoutFieldsAndMethods() {
 
+        let baseEnumClass = <EnumClass><any>this.libraryModuleManager.typestore.getType("Enum");
+
         for (let module of this.dirtyModules) {
             for (let declNode of module.ast!.classOrInterfaceOrEnumDefinitions) {
                 let resolvedType: NonPrimitiveType | undefined = undefined;
@@ -55,7 +58,7 @@ export class TypeResolver {
                         this.generateGenericParameters(declNode, <JavaInterface>resolvedType);
                         break;
                     case TokenType.keywordEnum:
-                        resolvedType = new JavaEnum(declNode.identifier, module, declNode.identifierRange);
+                        resolvedType = new JavaEnum(declNode.identifier, module, declNode.identifierRange, baseEnumClass);
                 }
 
                 if (resolvedType) {
@@ -268,6 +271,7 @@ export class TypeResolver {
             method.isAbstract = methodNode.isAbstract;
             method.isFinal = methodNode.isFinal;
             method.isStatic = methodNode.isStatic;
+            method.classEnumInterface = type;
 
             method.returnParameterType = methodNode.returnParameterType?.resolvedType;
             for (let p of methodNode.parameters) {
@@ -313,6 +317,7 @@ export class TypeResolver {
                             let f: Field = new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility);
                             f.isStatic = field.isStatic;
                             f.isFinal = field.isFinal;
+                            f.classEnum = javaEnum;
                             javaEnum.fields.push(f);
                         }
                     }
@@ -340,6 +345,7 @@ export class TypeResolver {
                                         let f: Field = new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility);
                                         f.isStatic = field.isStatic;
                                         f.isFinal = field.isFinal;
+                                        f.classEnum = javaClass;
                                         javaClass.fields.push(f);
                                     }
                                 }

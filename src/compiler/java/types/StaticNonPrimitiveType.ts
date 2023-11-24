@@ -1,9 +1,11 @@
+import { Field } from "./Field.ts";
 import { GenericTypeParameter } from "./GenericInformation";
 import { JavaClass } from "./JavaClass";
-import { JavaClassOrEnum } from "./JavaClassOrEnum";
+import { JavaTypeWithInstanceInitializer } from "./JavaTypeWithInstanceInitializer.ts";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
 import { NonPrimitiveType } from "./NonPrimitiveType";
+import { Visibility } from "./Visibility.ts";
 
 export class StaticNonPrimitiveType extends JavaType {
 
@@ -24,5 +26,10 @@ export class StaticNonPrimitiveType extends JavaType {
     getPossibleMethods(identifier: string, length: number, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
         return this.nonPrimitiveType.getPossibleMethods(identifier, length, isConstructor, hasToBeStatic);
    }
+
+   getField(identifier: string, uptoVisibility: Visibility): Field | undefined {
+        return this.nonPrimitiveType.getField(identifier, uptoVisibility, true);
+   }
+
 
 }

@@ -24,6 +24,7 @@ import { testPrograms } from "./testgui/testprograms/TestPrograms.ts";
 import { JavaBaseModule } from "./compiler/java/module/JavaBaseModule.ts";
 import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts";
 import { ProgramViewerComponent } from "./testgui/ProgramViewerComponent.ts";
+import { ProgramPointerPositionInfo } from "./compiler/common/interpreter/Scheduler.ts";
 
 export class Main {
 
@@ -49,6 +50,8 @@ export class Main {
   compiler: JavaCompiler;
   interpreter: Interpreter;
 
+  decorations?: monaco.editor.IEditorDecorationsCollection;
+
   constructor() {
     this.language = new JavaLanguage();
     this.language.registerLanguageAtMonacoEditor();
@@ -58,7 +61,7 @@ export class Main {
     /*
      * Test program:
      */
-    this.inputEditor.setValue(testPrograms.tryCatchTest);
+    this.inputEditor.setValue(testPrograms.primzahlzwillinge);
 
     this.tabManager = new TabManager(document.getElementById('tabs')!,
       ['token', 'ast', 'code', 'errors']);
@@ -85,6 +88,44 @@ export class Main {
     this.interpreter = new Interpreter(new TestPrintManager(), this.actionManager);
 
     this.initButtons();
+
+    this.interpreter.showProgramPointerCallback = (showHide: "show" | "hide", positionInfo?: ProgramPointerPositionInfo) => {
+      switch (showHide) {
+        case "show":
+          this.decorations?.clear();
+          let lineNumber: number | undefined = positionInfo?.range.startLineNumber! || positionInfo?.range.endLineNumber;
+          if (!lineNumber) return;
+
+          let range = new monaco.Range(lineNumber, positionInfo?.range.startColumn || 1, lineNumber, positionInfo?.range.endColumn || 100)
+
+          this.decorations = this.inputEditor.editor.createDecorationsCollection([{
+            range: range,
+            options: {
+              isWholeLine: true,
+              className: "jo_revealProgramPointer",
+              overviewRuler: {
+                color: "#6fd61b",
+                position: monaco.editor.OverviewRulerLane.Center
+              },
+              minimap: {
+                color: "#6fd61b",
+                position: monaco.editor.MinimapPosition.Inline
+              }
+            },
+          },
+          {
+            range: range,
+            options: { beforeContentClassName: 'jo_revealProgramPointerBefore' }
+          }])
+          break;
+      }
+
+      let nextStep = positionInfo?.program.stepsSingle[positionInfo.nextStepIndex];
+      console.log(nextStep?.codeAsString);
+    }
+
+
+
   }
 
   initButtons() {
@@ -111,16 +152,16 @@ export class Main {
 
     let module = this.compiler.moduleManager.getModuleFromFile(this.file)!;
 
-    
-    if(module){
+
+    if (module) {
       TokenPrinter.print(module.tokens!, this.tokenDiv);
       this.astComponent.buildTreeView(module.ast);
-  
+
       this.markErrors(module);
       this.printErrors(module);
-  
+
       let codePrinter = new CodePrinter();
-  
+
     }
 
     this.interpreter.setExecutable(executable);

@@ -4,6 +4,7 @@ import { EmptyRange, IRange } from "../range/Range";
 import { StepFunction, StepParams } from "./StepFunction.ts";
 import { CodePrinter } from "../../java/codegenerator/CodePrinter.ts";
 import { CatchBlockInfo } from "./ExceptionInfo.ts";
+import { Thread, ThreadState } from "./Thread.ts";
 
 
 
@@ -11,52 +12,77 @@ export class Step {
     // compiled function returns new programposition
     run?: StepFunction;
 
+    originalRun?: StepFunction; // if breakpoint present then this points to run function
+
     isBreakpoint: boolean = false;
-    range!: {startLineNumber?:number, startColumn?: number, endLineNumber?: number, endColumn?: number};
+    range!: { startLineNumber?: number, startColumn?: number, endLineNumber?: number, endColumn?: number };
     codeAsString: string = "";
     stopStepOverBeforeStep: boolean = false;
 
     catchBlockInfoList?: CatchBlockInfo[];
     finallyBlockIndex?: number;
 
-    constructor(public index: number){
-        this.range = {startLineNumber: undefined, startColumn: undefined, endLineNumber: undefined, endColumn: undefined};
+    constructor(public index: number) {
+        this.range = { startLineNumber: undefined, startColumn: undefined, endLineNumber: undefined, endColumn: undefined };
+    }
+
+    setBreakpoint() {
+        if (!this.originalRun) return; // breakpoint already set
+        this.originalRun = this.run;
+        this.run = this.breakpointRunFunction;
+    }
+
+    clearBreakpoint() {
+        if (this.originalRun) {
+            this.run = this.originalRun;
+            this.originalRun = undefined;
+        }
+    }
+
+    breakpointRunFunction(thread: Thread, stack: any[], stackBase: number): number {
+        if (thread.haltAtNextBreakpoint) {
+            thread.state = ThreadState.blocked;
+            return -1;
+        } else {
+            thread.haltAtNextBreakpoint = true;
+            return this.originalRun!(thread, stack, stackBase);
+        }
     }
 
     isEmpty(): boolean {
         return this.codeAsString.trim() == "";
     }
 
-    setRangeStartIfUndefined(range?: IRange){
-        if(!this.range.startLineNumber && range && range != EmptyRange.instance){
+    setRangeStartIfUndefined(range?: IRange) {
+        if (!this.range.startLineNumber && range && range != EmptyRange.instance) {
             this.range.startLineNumber = range.startLineNumber;
             this.range.startColumn = range.startColumn;
         }
     }
 
-    adaptRangeEnd(range?: IRange){
-        if(range && range != EmptyRange.instance){
-            if(!this.range.endLineNumber){
+    adaptRangeEnd(range?: IRange) {
+        if (range && range != EmptyRange.instance) {
+            if (!this.range.endLineNumber) {
                 this.range.endLineNumber = range.endLineNumber;
                 this.range.endColumn = range.endColumn;
-            } else if(this.range.endLineNumber < range.endLineNumber){
+            } else if (this.range.endLineNumber < range.endLineNumber) {
                 this.range.endLineNumber = range.endLineNumber;
                 this.range.endColumn = range.endColumn;
-            } else if(this.range.endLineNumber == range.endLineNumber && this.range.endColumn! < range.endColumn){
+            } else if (this.range.endLineNumber == range.endLineNumber && this.range.endColumn! < range.endColumn) {
                 this.range.endColumn = range.endColumn;
             }
         }
     }
 
-    compileToJavascriptFunction(){
+    compileToJavascriptFunction() {
         // @ts-ignore
-        this.run = new Function(StepParams.thread, StepParams.stack, StepParams.stackBase, this.codeAsString);    
+        this.run = new Function(StepParams.thread, StepParams.stack, StepParams.stackBase, this.codeAsString);
     }
 
 }
 
 export class Program {
-    
+
     numberOfThisObjects: number = 0;
     numberOfParameters: number = 0;         // without "this"
     numberOfLocalVariables: number = 0;
@@ -66,19 +92,19 @@ export class Program {
 
     constructor(public module: Module, public symbolTable: BaseSymbolTable | undefined, public methodIdentifierWithClass: string) {
         let stackFrame = symbolTable?.stackframe;
-        if(stackFrame){
+        if (stackFrame) {
             this.numberOfThisObjects = stackFrame.numberOfThisObjects;
             this.numberOfParameters = stackFrame.numberOfParameters;
             this.numberOfLocalVariables = stackFrame.numberOfLocalVariables;
         }
     }
 
-    compileToJavascriptFunctions(){
+    compileToJavascriptFunctions() {
         this.stepsSingle.forEach(step => step.compileToJavascriptFunction());
         this.stepsMultiple.forEach(step => step.compileToJavascriptFunction());
     }
 
-    addStep(statement: string){
+    addStep(statement: string) {
         let step = new Step(this.stepsSingle.length);
         step.codeAsString = statement;
         this.stepsSingle.push(step);
@@ -88,4 +114,15 @@ export class Program {
         return new CodePrinter().printProgram(this);
     }
 
+    findStep(line: number): Step | undefined {
+        for (let step of this.stepsSingle) {
+            let range = step.range;
+            if (range) {
+                if (range.startLineNumber! <= line && line <= range.endLineNumber!) {
+                    return step;
+                }
+            }
+        }
+    }
+    
 }

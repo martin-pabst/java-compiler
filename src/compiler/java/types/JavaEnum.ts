@@ -1,18 +1,21 @@
 import { UsagePosition } from "../../common/UsagePosition";
 import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
+import { TokenType } from "../TokenType.ts";
 import { JavaBaseModule } from "../module/JavaBaseModule";
+import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
 import { Field } from "./Field";
 import { GenericTypeParameter } from "./GenericInformation";
 import { JavaClass } from "./JavaClass";
-import { JavaClassOrEnum } from "./JavaClassOrEnum.ts";
+import { JavaTypeWithInstanceInitializer } from "./JavaTypeWithInstanceInitializer.ts";
 import { JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
 import { NonPrimitiveType } from "./NonPrimitiveType";
+import { Visibility } from "./Visibility.ts";
 
 
-export class JavaEnum extends JavaClassOrEnum {
+export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
     fields: Field[] = [];
     methods: Method[] = [];
@@ -23,8 +26,17 @@ export class JavaEnum extends JavaClassOrEnum {
 
     private implements: JavaInterface[] = [];
 
-    constructor(identifier: string, module: JavaBaseModule, identifierRange: IRange) {
+    constructor(identifier: string, module: JavaBaseModule, identifierRange: IRange, public baseEnumClass: EnumClass) {
         super(identifier, identifierRange, module);
+    }
+
+    getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): Field | undefined {
+        let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
+        if (field) return field;
+        if (uptoVisibility == TokenType.keywordPrivate) uptoVisibility = TokenType.keywordProtected;
+
+        return this.baseEnumClass.getType().getField(identifier, uptoVisibility, forceStatic);
+
     }
 
     isGenericTypeParameter(): boolean {
@@ -78,7 +90,7 @@ export class JavaEnum extends JavaClassOrEnum {
         }
 
         return false;
-        
+
     }
 
     canExplicitlyCastTo(otherType: JavaType): boolean {

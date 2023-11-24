@@ -4,7 +4,7 @@ import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
-import { JavaClassOrEnum } from "./JavaClassOrEnum.ts";
+import { JavaTypeWithInstanceInitializer } from "./JavaTypeWithInstanceInitializer.ts";
 import { GenericVariantOfJavaInterface, IJavaInterface, JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
@@ -13,7 +13,7 @@ import { Visibility } from "./Visibility";
 
 
 
-export abstract class IJavaClass extends JavaClassOrEnum {
+export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     isPrimitive: false;
     genericInformation: GenericInformation | undefined = undefined;
 
@@ -29,6 +29,21 @@ export abstract class IJavaClass extends JavaClassOrEnum {
     abstract getMethods(): Method[];
 
     abstract getExtends(): IJavaClass | undefined;    
+    abstract getImplements(): IJavaInterface[];
+
+    getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): Field | undefined {
+            let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
+            if(field) return field;
+            if(uptoVisibility == TokenType.keywordPrivate) uptoVisibility = TokenType.keywordProtected;
+
+            let baseClass = this.getExtends();
+            if(baseClass){
+                return baseClass.getField(identifier, uptoVisibility, forceStatic);
+            } else {
+                return undefined;
+            }
+    }
+
 }
 
 

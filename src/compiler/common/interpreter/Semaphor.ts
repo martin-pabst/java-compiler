@@ -1,4 +1,4 @@
-import { Thread } from "./Thread";
+import { Thread, ThreadState } from "./Thread";
 import { Scheduler } from "./Scheduler";
 
 export class Semaphor {
@@ -21,6 +21,7 @@ export class Semaphor {
         } else {
             this.scheduler.suspendThread(thread);
             this.waitingThreads.push(thread);
+            thread.state = ThreadState.blocked;
             return false;
         }
     }

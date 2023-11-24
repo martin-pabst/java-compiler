@@ -8,9 +8,11 @@ import { Thread, ThreadState } from "./Thread";
 
 export enum SchedulerState { not_initialized, running, paused, stopped }
 
-export type TextPositionWithModule = {
+export type ProgramPointerPositionInfo = {
     module: Module,
-    range: IRange
+    range: IRange, 
+    nextStepIndex: number,
+    program: Program
 }
 
 
@@ -34,12 +36,24 @@ export class Scheduler {
 
 
     run(numberOfStepsMax: number) {
+        if(this.state != SchedulerState.running) return;
+
         let stepsPerThread = Math.ceil(numberOfStepsMax / this.runningThreads.length);
         let numberOfStepsInThisRun = 0;
         if (this.runningThreads.length == 0) return;
 
+        let lastStoredStepsInThisRun = -1;          // watchdog uses this to decide if there's any runnable thread left
 
-        while (numberOfStepsInThisRun < numberOfStepsMax) {
+        while (numberOfStepsInThisRun < numberOfStepsMax && this.state == SchedulerState.running) {
+
+            // watchdog:
+            if(this.currentThreadIndex == 0){
+                if(lastStoredStepsInThisRun == numberOfStepsInThisRun || this.runningThreads.length == 0){
+                    break;
+                }
+                lastStoredStepsInThisRun = numberOfStepsInThisRun;
+            }
+
             let currentThread = this.runningThreads[this.currentThreadIndex];
 
             /**
@@ -47,11 +61,9 @@ export class Scheduler {
              */
             let threadState = currentThread.run(stepsPerThread);
 
-            numberOfStepsInThisRun += Math.max(threadState.stepsExecuted, 1);  // to avoid endless loop
+            numberOfStepsInThisRun += threadState.stepsExecuted;  // to avoid endless loop
 
-            switch (threadState.state) {
-                case ThreadState.exited:
-                case ThreadState.exitedWithException:
+            if (threadState.state == ThreadState.terminated || threadState.state == ThreadState.terminatedWithException) {
 
                     // TODO: Print Exception if present
 
@@ -67,9 +79,6 @@ export class Scheduler {
                         return;
                     }
 
-                    return;
-                case ThreadState.paused:
-                    this.setState(SchedulerState.paused);
                     return;
             }
 
@@ -104,16 +113,16 @@ export class Scheduler {
     runSingleStepKeepingThread(stepInto: boolean, callback: () => void) {
         this.keepThread = true;
         if (stepInto) {
-            if (this.state <= SchedulerState.paused) {
+            if (this.state == SchedulerState.paused) {
+                this.setState(SchedulerState.running);
                 this.run(1);
+                this.setState(SchedulerState.paused);
             }
-            this.keepThread = false;
             callback();
         } else {
             let thread = this.runningThreads[this.currentThreadIndex];
             if (thread == null) return;
             thread.markSingleStepOver(() => {
-                this.keepThread = false;
                 callback();
             });
         }
@@ -124,7 +133,6 @@ export class Scheduler {
         let thread = this.runningThreads[this.currentThreadIndex];
         if (thread == null) return;
         thread.markStepOut(() => {
-            this.keepThread = false;
             callback();
         });
     }
@@ -156,20 +164,26 @@ export class Scheduler {
     }
 
     restoreThread(thread: Thread) {
+        thread.state = ThreadState.runnable;
         this.runningThreads.push(thread);
     }
 
     /**
      * for displaying next program position in editor
      */
-    getNextStepPosition(): TextPositionWithModule {
+    getNextStepPosition(): ProgramPointerPositionInfo | undefined {
         let currentThread = this.runningThreads[this.currentThreadIndex];
+        if(!currentThread) return undefined;
         let programState = currentThread.currentProgramState;
         let step = programState.currentStepList[programState.stepIndex];
+        if(!step) return undefined;
+
         return {
             module: programState.program.module,
             //@ts-ignore
-            range: step.range
+            range: step.range,
+            nextStepIndex: programState.stepIndex,
+            program: programState.program
         }
     }
 
@@ -210,6 +224,7 @@ export class Scheduler {
         // }
 
         // this.popProgram();
+        mainThread.state = ThreadState.runnable;
 
         this.runningThreads.push(mainThread);
         this.currentThreadIndex = 0;
