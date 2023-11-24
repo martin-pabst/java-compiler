@@ -41,7 +41,7 @@ export class Step {
 
     breakpointRunFunction(thread: Thread, stack: any[], stackBase: number): number {
         if (thread.haltAtNextBreakpoint) {
-            thread.state = ThreadState.paused;
+            thread.state = ThreadState.blocked;
             return -1;
         } else {
             thread.haltAtNextBreakpoint = true;

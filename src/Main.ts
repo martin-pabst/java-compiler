@@ -24,6 +24,7 @@ import { testPrograms } from "./testgui/testprograms/TestPrograms.ts";
 import { JavaBaseModule } from "./compiler/java/module/JavaBaseModule.ts";
 import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts";
 import { ProgramViewerComponent } from "./testgui/ProgramViewerComponent.ts";
+import { TextPositionWithModule } from "./compiler/common/interpreter/Scheduler.ts";
 
 export class Main {
 
@@ -49,6 +50,8 @@ export class Main {
   compiler: JavaCompiler;
   interpreter: Interpreter;
 
+  decorations?: monaco.editor.IEditorDecorationsCollection;
+
   constructor() {
     this.language = new JavaLanguage();
     this.language.registerLanguageAtMonacoEditor();
@@ -58,7 +61,7 @@ export class Main {
     /*
      * Test program:
      */
-    this.inputEditor.setValue(testPrograms.primzahlzwillinge);
+    this.inputEditor.setValue(testPrograms.singleStepTest);
 
     this.tabManager = new TabManager(document.getElementById('tabs')!,
       ['token', 'ast', 'code', 'errors']);
@@ -85,6 +88,26 @@ export class Main {
     this.interpreter = new Interpreter(new TestPrintManager(), this.actionManager);
 
     this.initButtons();
+
+    this.interpreter.showProgramPointerCallback = (showHide: "show" | "hide", textPosWithModule?: TextPositionWithModule) => {
+      switch(showHide){
+        case "show": 
+        this.decorations?.clear();
+        let lineNumber: number | undefined = textPosWithModule?.range.startLineNumber! || textPosWithModule?.range.endLineNumber;
+        if(!lineNumber) return;
+        this.decorations = this.inputEditor.editor.createDecorationsCollection([{
+          range: new monaco.Range(lineNumber, 2, lineNumber, 1),
+          options: {
+            isWholeLine: true,
+            inlineClassName: "myLineDecoration",
+          },
+        }])
+        break;
+      }
+    }
+
+
+
   }
 
   initButtons() {

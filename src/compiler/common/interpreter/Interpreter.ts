@@ -9,6 +9,8 @@ import { KlassObjectRegistry } from "./StepFunction.ts";
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
 
+export type ShowProgramPointerCallback = (showHide: "show" | "hide", _textPositionWithModule?: TextPositionWithModule) => void;
+
 export class Interpreter {
 
     maxStepsPerSecond = 1e6;
@@ -31,6 +33,7 @@ export class Interpreter {
     // gamepadTool: GamepadTool;
 
     eventManager: EventManager<InterpreterEvents> = new EventManager();
+    showProgramPointerCallback?: ShowProgramPointerCallback;
 
     actions: string[] = ["start", "pause", "stop", "stepOver",
         "stepInto", "stepOut", "restart"];
@@ -74,6 +77,7 @@ export class Interpreter {
         this.loadController = new LoadController(this.scheduler, this);
         this.initTimer();
         this.setState(SchedulerState.not_initialized);
+
     }
 
     setExecutable(executable: Executable){
@@ -115,6 +119,9 @@ export class Interpreter {
             this.printManager.clear();
             this.init(this.mainModule!);
             this.resetRuntime();
+            this.showProgramPointer(this.scheduler.getNextStepPosition());
+            this.setState(SchedulerState.paused);
+            return;
         }
 
         this.scheduler.runSingleStepKeepingThread(stepInto, () => {
@@ -126,7 +133,7 @@ export class Interpreter {
     }
 
     showProgramPointer(_textPositionWithModule: TextPositionWithModule) {
-        // TODO: Show program pointer
+        if(this.showProgramPointerCallback) this.showProgramPointerCallback("show", _textPositionWithModule);
     }
 
     pause() {
@@ -172,6 +179,8 @@ export class Interpreter {
         }
 
         this.hideProgrampointerPosition();
+
+        this.scheduler.keepThread = false;
 
         this.setState(SchedulerState.running);
 
@@ -319,8 +328,8 @@ export class Interpreter {
 
         this.mainModule = newMainModule;
 
-        this.scheduler.init(this.mainModule, this.classObjectRegistry);
         this.setState(SchedulerState.stopped);
+        this.scheduler.init(this.mainModule, this.classObjectRegistry);
 
     }
 

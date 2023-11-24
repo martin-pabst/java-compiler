@@ -34,12 +34,24 @@ export class Scheduler {
 
 
     run(numberOfStepsMax: number) {
+        if(this.state != SchedulerState.running) return;
+
         let stepsPerThread = Math.ceil(numberOfStepsMax / this.runningThreads.length);
         let numberOfStepsInThisRun = 0;
         if (this.runningThreads.length == 0) return;
 
+        let lastStoredStepsInThisRun = -1;          // watchdog uses this to decide if there's any runnable thread left
 
-        while (numberOfStepsInThisRun < numberOfStepsMax) {
+        while (numberOfStepsInThisRun < numberOfStepsMax && this.state == SchedulerState.running) {
+
+            // watchdog:
+            if(this.currentThreadIndex == 0){
+                if(lastStoredStepsInThisRun == numberOfStepsInThisRun || this.runningThreads.length == 0){
+                    break;
+                }
+                lastStoredStepsInThisRun = numberOfStepsInThisRun;
+            }
+
             let currentThread = this.runningThreads[this.currentThreadIndex];
 
             /**
@@ -47,11 +59,9 @@ export class Scheduler {
              */
             let threadState = currentThread.run(stepsPerThread);
 
-            numberOfStepsInThisRun += Math.max(threadState.stepsExecuted, 1);  // to avoid endless loop
+            numberOfStepsInThisRun += threadState.stepsExecuted;  // to avoid endless loop
 
-            switch (threadState.state) {
-                case ThreadState.exited:
-                case ThreadState.exitedWithException:
+            if (threadState.state == ThreadState.terminated || threadState.state == ThreadState.terminatedWithException) {
 
                     // TODO: Print Exception if present
 
@@ -67,9 +77,6 @@ export class Scheduler {
                         return;
                     }
 
-                    return;
-                case ThreadState.paused:
-                    this.setState(SchedulerState.paused);
                     return;
             }
 
@@ -107,13 +114,11 @@ export class Scheduler {
             if (this.state <= SchedulerState.paused) {
                 this.run(1);
             }
-            this.keepThread = false;
             callback();
         } else {
             let thread = this.runningThreads[this.currentThreadIndex];
             if (thread == null) return;
             thread.markSingleStepOver(() => {
-                this.keepThread = false;
                 callback();
             });
         }
@@ -124,7 +129,6 @@ export class Scheduler {
         let thread = this.runningThreads[this.currentThreadIndex];
         if (thread == null) return;
         thread.markStepOut(() => {
-            this.keepThread = false;
             callback();
         });
     }
@@ -156,6 +160,7 @@ export class Scheduler {
     }
 
     restoreThread(thread: Thread) {
+        thread.state = ThreadState.runnable;
         this.runningThreads.push(thread);
     }
 
@@ -210,6 +215,7 @@ export class Scheduler {
         // }
 
         // this.popProgram();
+        mainThread.state = ThreadState.runnable;
 
         this.runningThreads.push(mainThread);
         this.currentThreadIndex = 0;

@@ -1,6 +1,6 @@
 import { Program, Step } from "./Program";
 import { Semaphor } from "./Semaphor";
-import { Scheduler } from "./Scheduler";
+import { Scheduler, SchedulerState } from "./Scheduler";
 import { IRange } from "../range/Range.ts";
 import { KlassObjectRegistry } from "./StepFunction.ts";
 import { ExceptionInfo, CatchBlockInfo, Exception } from "./ExceptionInfo.ts";
@@ -28,7 +28,14 @@ type ThreadStateInfoAfterRun = {
     stepsExecuted: number;
 }
 
-export enum ThreadState { beforeRunning, running, paused, waiting, exited, exitedWithException }
+/**
+ * @link https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.State.html
+ */
+export enum ThreadState { new,          // A thread that has not yet started is in this state.
+                          runnable,     // A thread executing in the Java virtual machine is in this state.
+                          blocked,      // A thread that is blocked waiting for a monitor lock (semaphor!) is in this state.
+                          terminated,   // A thread that has exited is in this state.
+                          terminatedWithException }
 
 export class Thread {
     s: any[] = [];  // stack
@@ -38,13 +45,16 @@ export class Thread {
 
     currentlyHeldSemaphors: Semaphor[] = [];
 
-    state: ThreadState = ThreadState.beforeRunning;
+    private _state: ThreadState = ThreadState.new;
+    public get state () {return this._state} // setter: see below
 
     exception?: Exception;
     stackTrace?: ProgramState[];
 
     stepEndsWhenProgramstackLengthLowerOrEqual: number = -1;
     stepEndsWhenStepIndexGreater: number = Number.MAX_SAFE_INTEGER;
+
+    haltAtNextBreakpoint: boolean = false;
 
     stepCallback!: () => void;
 
@@ -63,11 +73,10 @@ export class Thread {
     run(maxNumberOfSteps: number): ThreadStateInfoAfterRun {
         let numberOfSteps = 0;
         let stack = this.s; // for performance reasons
-        this.state = ThreadState.running;
 
         try {
             //@ts-ignore
-            while (numberOfSteps < maxNumberOfSteps && this.state != ThreadState.exited) {
+            while (numberOfSteps < maxNumberOfSteps && this.state == ThreadState.runnable) {
                 // For performance reasons: store all necessary data in local variables
                 let currentProgramState = this.currentProgramState;
                 let stepIndex = currentProgramState.stepIndex;
@@ -77,7 +86,7 @@ export class Thread {
                 if (this.stepEndsWhenProgramstackLengthLowerOrEqual >= 0) {
                     // singlestep-mode (slower...)
                     while (numberOfSteps < maxNumberOfSteps &&
-                        this.state == ThreadState.running && !this.isSingleStepCompleted()) {
+                        this.state == ThreadState.runnable && !this.isSingleStepCompleted()) {
                         let step = currentStepList[stepIndex];
 
                         /**
@@ -98,11 +107,11 @@ export class Thread {
                     }
                     if (this.isSingleStepCompleted()) {
                         this.stepCallback();
-                        this.state = ThreadState.paused;
+                        return { state: this.state, stepsExecuted: numberOfSteps }
                     }
                 } else {
                     // not in singlestep-mode (faster!)
-                    while (numberOfSteps < maxNumberOfSteps && this.state == ThreadState.running) {
+                    while (numberOfSteps < maxNumberOfSteps && this.state == ThreadState.runnable) {
                         let step = currentStepList[stepIndex];
                         /**
                          * Behold, hier the steps run!
@@ -143,6 +152,10 @@ export class Thread {
         return { state: this.state, stepsExecuted: numberOfSteps }
     }
 
+    public set state(state: ThreadState){
+        this._state = state;
+    }
+
 
     isSingleStepCompleted() {
         return this.programStack.length < this.stepEndsWhenProgramstackLengthLowerOrEqual ||
@@ -152,7 +165,7 @@ export class Thread {
 
     markSingleStepOver(callbackWhenSingleStepOverEnds: () => void) {
 
-        this.stepEndsWhenProgramstackLengthLowerOrEqual = this.programStack.length - 1;
+        this.stepEndsWhenProgramstackLengthLowerOrEqual = this.programStack.length;
         this.stepEndsWhenStepIndexGreater = this.currentProgramState.stepIndex;
         this.stepCallback = () => {
             this.stepEndsWhenProgramstackLengthLowerOrEqual = -1;
@@ -176,6 +189,11 @@ export class Thread {
 
     }
 
+    start(){
+        if([ThreadState.new, ThreadState.blocked].indexOf(this.state) >= 0){
+            this.state = ThreadState.runnable;
+        }
+    }
 
     throwException(exception: Exception & IThrowable) {
         let classNames = exception.getExtendedImplementedIdentifiers().slice();
@@ -236,7 +254,7 @@ export class Thread {
         if (this.programStack.length == 0) {
             this.stackTrace = stackTrace;
             this.exception = exception;
-            this.state = ThreadState.exitedWithException;
+            this.state = ThreadState.terminatedWithException;
             console.log(exception);
         } else {
             while (newProgramStates.length > 0) this.programStack.push(newProgramStates.pop()!);
@@ -263,7 +281,7 @@ export class Thread {
 
     aquireSemaphor(semaphor: Semaphor) {
         if (!semaphor.aquire(this)) {
-            this.state = ThreadState.waiting;
+            this.state = ThreadState.blocked;
         }
     }
 
@@ -289,7 +307,7 @@ export class Thread {
             //     this.switchFromMultipleToSingleStep(this.currentProgramState);
             // }
         } else {
-            this.state = ThreadState.exited;
+            this.state = ThreadState.terminated;
         }
     }
 

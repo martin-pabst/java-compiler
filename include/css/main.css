@@ -84,3 +84,7 @@ body, html, #main {
 .jo_speedcontrol-outer {
     margin-left: 10px;
 }
+
+.myLineDecoration {
+    background-color: green;
+}
