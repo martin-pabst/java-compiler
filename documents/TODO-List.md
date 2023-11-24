@@ -13,10 +13,10 @@
   * try ... catch ... finally -> done
   * check if return statement happened in every execution line
   * check if local variables have been initialized before first access
+  * wire up step over, step into, step out
 
 
 ## next todos
-  * wire up step over, step into, step out
   * enums...
   * interfaces...
   * generics

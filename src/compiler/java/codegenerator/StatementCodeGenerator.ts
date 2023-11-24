@@ -2,7 +2,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBlockNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTThrowNode, ASTTryCatchNode, ASTWhileNode } from "../parser/AST";
+import { ASTBinaryNode, ASTBlockNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTWhileNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippetContainer, EmptyPart } from "./CodeSnippetKinds.ts";
@@ -129,7 +129,18 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         this.pushAndGetNewSymbolTable(node.range, false);
 
         let firstStatement = this.compileStatementOrTerm(node.firstStatement);
-        let condition = this.compileTerm(node.condition);
+
+
+        let conditionNode = node.condition;
+        if(!conditionNode) return undefined;
+
+        let negationResult = this.negateConditionIfPossible(conditionNode);
+
+        conditionNode = negationResult.newNode;
+
+        let condition = this.compileTerm(conditionNode);
+
+
         let lastStatement = this.compileStatementOrTerm(node.lastStatement);
 
         let statementsToRepeat = this.compileStatementOrTerm(node.statementToRepeat);
@@ -150,7 +161,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         forSnippet.addParts(firstStatement);
         forSnippet.addNextStepMark();
         forSnippet.addParts(label1);
-        forSnippet.addParts(new OneParameterTemplate('if(!(§1)){\n').applyToSnippet(this.voidType, node.condition!.range, condition));
+        forSnippet.addParts(new OneParameterTemplate(negationResult.negationHappened ? 'if(§1){\n' : 'if(!(§1)){\n').applyToSnippet(this.voidType, node.condition!.range, condition));
         forSnippet.addParts(jumpToLabel2);
         forSnippet.addStringPart("}\n");
         forSnippet.addNextStepMark();
@@ -210,7 +221,14 @@ export class StatementCodeGenerator extends TermCodeGenerator {
     }
 
     compileWhileStatement(node: ASTWhileNode): CodeSnippetContainer | undefined {
-        let condition = this.compileTerm(node.condition);
+        let conditionNode = node.condition;
+        if(!conditionNode) return undefined;
+
+        let negationResult = this.negateConditionIfPossible(conditionNode);
+
+        conditionNode = negationResult.newNode;
+
+        let condition = this.compileTerm(conditionNode);
 
         this.printErrorifValueNotBoolean(condition?.type, node.condition);
 
@@ -222,7 +240,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         let label1 = new LabelCodeSnippet();
         let label2 = new LabelCodeSnippet();
         whileSnippet.addParts(label1);
-        let sn1 = SnippetFramer.frame(condition, "if(!(§1)){\n", this.voidType);
+        let sn1 = SnippetFramer.frame(condition, negationResult.negationHappened ? "if(§1){\n" : "if(!(§1)){\n", this.voidType);
         whileSnippet.addParts(sn1);
         whileSnippet.addParts(new JumpToLabelCodeSnippet(label2));
         whileSnippet.addStringPart("}", undefined);
@@ -236,9 +254,42 @@ export class StatementCodeGenerator extends TermCodeGenerator {
     }
 
 
+    negateConditionIfPossible(node: ASTTermNode): {newNode: ASTTermNode, negationHappened: boolean} {
+        if(node.kind == TokenType.binaryOp){
+            let node1 = <ASTBinaryNode> node;
+            switch(node1.operator){
+                case TokenType.lower: node1.operator = TokenType.greaterOrEqual; break;
+                case TokenType.lowerOrEqual: node1.operator = TokenType.greater; break;
+                case TokenType.greater: node1.operator = TokenType.lowerOrEqual; break;
+                case TokenType.greaterOrEqual: node1.operator = TokenType.lower; break;
+                case TokenType.notEqual: node1.operator = TokenType.equal; break;
+                case TokenType.equal: node1.operator = TokenType.notEqual; break;
+                default: 
+                    return {newNode: node1, negationHappened: false};
+            }
+            return {newNode: node1, negationHappened: true};
+        }
+
+        if(node.kind == TokenType.unaryPrefixOp){
+            let node1 = <ASTUnaryPrefixNode>node;
+            if(node1.operator == TokenType.not){
+                return {newNode: node1.term, negationHappened: true}
+            }
+        }
+
+        return {newNode: node, negationHappened: false}
+    }
 
     compileIfStatement(node: ASTIfNode): CodeSnippetContainer | undefined {
-        let condition = this.compileTerm(node.condition);
+
+        let conditionNode = node.condition;
+        if(!conditionNode) return undefined;
+
+        let negationResult = this.negateConditionIfPossible(conditionNode);
+
+        conditionNode = negationResult.newNode;
+
+        let condition = this.compileTerm(conditionNode);
 
         this.printErrorifValueNotBoolean(condition?.type, node.condition);
 
@@ -256,7 +307,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
 
         let ifSnippet = new CodeSnippetContainer([], node.range);
 
-        let sn1 = SnippetFramer.frame(condition, "if(!(§1)){\n", this.voidType);
+        let sn1 = SnippetFramer.frame(condition, negationResult.negationHappened ? "if(§1){\n" : "if(!(§1)){\n", this.voidType);
         let label1 = new LabelCodeSnippet();
         ifSnippet.addParts(sn1);
         let jumpToLabel1 = new JumpToLabelCodeSnippet(label1);

@@ -221,9 +221,14 @@ export class BinaryOperatorTemplate extends CodeTemplate {
 
         if (snippet0IsPure && snippet1IsPure) {
             if(this.operator == "/" || this.operator == "%"){
-                return new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " (" + snippets[1].getPureTerm() + 
-                `|| ${Helpers.throwAE}("Teilen durch 0", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`,
-                 _range, _resultType);
+                if(snippet1IsConstant && snippets[1].getConstantValue() != 0){
+                    return new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm(),
+                     _range, _resultType);
+                } else {
+                    return new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " (" + snippets[1].getPureTerm() + 
+                    `|| ${Helpers.throwAE}("Teilen durch 0", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`,
+                     _range, _resultType);
+                }
             } else {
                 return new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm(), _range, _resultType);
             }
