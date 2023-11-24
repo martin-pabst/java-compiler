@@ -132,8 +132,14 @@ export class Interpreter {
         }
     }
 
-    showProgramPointer(_textPositionWithModule: TextPositionWithModule) {
-        if(this.showProgramPointerCallback) this.showProgramPointerCallback("show", _textPositionWithModule);
+    showProgramPointer(_textPositionWithModule: TextPositionWithModule | undefined) {
+        if(this.showProgramPointerCallback){
+            if(_textPositionWithModule){
+                this.showProgramPointerCallback("show", _textPositionWithModule);
+            } else {
+                this.showProgramPointerCallback("hide");
+            }
+        } 
     }
 
     pause() {
@@ -199,6 +205,7 @@ export class Interpreter {
         this.scheduler.stepOut(() => {
             this.pause();
         })
+        this.setState(SchedulerState.running);
     }
 
     registerActions() {

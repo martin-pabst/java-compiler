@@ -52,7 +52,7 @@ export class Thread {
     stackTrace?: ProgramState[];
 
     stepEndsWhenProgramstackLengthLowerOrEqual: number = -1;
-    stepEndsWhenStepIndexGreater: number = Number.MAX_SAFE_INTEGER;
+    stepEndsWhenStepIndexIsNotEqualTo: number = Number.MAX_SAFE_INTEGER;
 
     haltAtNextBreakpoint: boolean = false;
 
@@ -160,13 +160,13 @@ export class Thread {
     isSingleStepCompleted() {
         return this.programStack.length < this.stepEndsWhenProgramstackLengthLowerOrEqual ||
             this.programStack.length == this.stepEndsWhenProgramstackLengthLowerOrEqual &&
-            this.currentProgramState.stepIndex > this.stepEndsWhenStepIndexGreater;
+            this.currentProgramState.stepIndex != this.stepEndsWhenStepIndexIsNotEqualTo;
     }
 
     markSingleStepOver(callbackWhenSingleStepOverEnds: () => void) {
 
         this.stepEndsWhenProgramstackLengthLowerOrEqual = this.programStack.length;
-        this.stepEndsWhenStepIndexGreater = this.currentProgramState.stepIndex;
+        this.stepEndsWhenStepIndexIsNotEqualTo = this.currentProgramState.stepIndex;
         this.stepCallback = () => {
             this.stepEndsWhenProgramstackLengthLowerOrEqual = -1;
             callbackWhenSingleStepOverEnds();
@@ -180,8 +180,8 @@ export class Thread {
 
     markStepOut(callbackWhenStepOutEnds: () => void) {
 
-        this.stepEndsWhenProgramstackLengthLowerOrEqual = this.programStack.length - 2;
-        this.stepEndsWhenStepIndexGreater = -1;
+        this.stepEndsWhenProgramstackLengthLowerOrEqual = this.programStack.length - 1;
+        this.stepEndsWhenStepIndexIsNotEqualTo = -1;
         this.stepCallback = () => {
             this.stepEndsWhenProgramstackLengthLowerOrEqual = -1;
             callbackWhenStepOutEnds();

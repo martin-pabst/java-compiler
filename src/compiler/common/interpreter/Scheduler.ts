@@ -111,8 +111,10 @@ export class Scheduler {
     runSingleStepKeepingThread(stepInto: boolean, callback: () => void) {
         this.keepThread = true;
         if (stepInto) {
-            if (this.state <= SchedulerState.paused) {
+            if (this.state == SchedulerState.paused) {
+                this.setState(SchedulerState.running);
                 this.run(1);
+                this.setState(SchedulerState.paused);
             }
             callback();
         } else {
@@ -167,10 +169,13 @@ export class Scheduler {
     /**
      * for displaying next program position in editor
      */
-    getNextStepPosition(): TextPositionWithModule {
+    getNextStepPosition(): TextPositionWithModule | undefined {
         let currentThread = this.runningThreads[this.currentThreadIndex];
+        if(!currentThread) return undefined;
         let programState = currentThread.currentProgramState;
         let step = programState.currentStepList[programState.stepIndex];
+        if(!step) return undefined;
+
         return {
             module: programState.program.module,
             //@ts-ignore
