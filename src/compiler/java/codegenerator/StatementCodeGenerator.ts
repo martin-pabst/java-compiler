@@ -312,7 +312,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
     compileCaseStatement(node: ASTCaseNode, index: number, labelArray : Array<LabelCodeSnippet>, typeId: string | undefined) : [CodeSnippet,CodeSnippet] | undefined{
         if(!node.constant) return undefined;
-        let constant = this.compileTerm(node.constant);git 
+        let constant = this.compileTerm(node.constant);
         let caseSnippet = new CodeSnippetContainer([], node.range);
         let caseStatementSnippet = new CodeSnippetContainer([], node.range);
         
