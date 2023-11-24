@@ -260,7 +260,7 @@ export class CodeSnippetContainer extends CodeSnippet {
 
 }
 
-class NextStepMark extends CodeSnippet {
+export class NextStepMark extends CodeSnippet {
     emit(): string {
         return "";
     }

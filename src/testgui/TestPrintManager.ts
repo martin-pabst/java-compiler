@@ -3,8 +3,11 @@ import { DOM } from "../tools/DOM";
 
 export class TestPrintManager implements PrintManager {
     print(text: string | undefined, withNewline: boolean, color: number | undefined): void {
-        if(!text) return;
-        text = "" + text;
+        if(!text){
+            text = "";
+        }  else {
+            text = "" + text;
+        }
         let output = document.getElementById('output')!;
 
         if(withNewline){
