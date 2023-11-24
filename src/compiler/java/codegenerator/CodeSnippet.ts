@@ -102,6 +102,7 @@ export class StringCodeSnippet extends CodeSnippet {
     emitToStep(currentStep: Step, _steps: Step[]): Step {
         currentStep.codeAsString = currentStep.codeAsString + this.text;
 
+        currentStep.setRangeStartIfUndefined(this.range);
         currentStep.adaptRangeEnd(this.range);
 
         this.emitToStepListeners.forEach(esl => esl(currentStep));
