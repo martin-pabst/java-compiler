@@ -4,12 +4,12 @@ import { Module } from "../module/Module";
 import { EventManager } from "./EventManager";
 import { LoadController } from "./LoadController";
 import { PrintManager } from "./PrintManager";
-import { TextPositionWithModule, Scheduler, SchedulerState } from "./Scheduler";
+import { ProgramPointerPositionInfo, Scheduler, SchedulerState } from "./Scheduler";
 import { KlassObjectRegistry } from "./StepFunction.ts";
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
 
-export type ShowProgramPointerCallback = (showHide: "show" | "hide", _textPositionWithModule?: TextPositionWithModule) => void;
+export type ShowProgramPointerCallback = (showHide: "show" | "hide", _textPositionWithModule?: ProgramPointerPositionInfo) => void;
 
 export class Interpreter {
 
@@ -132,7 +132,7 @@ export class Interpreter {
         }
     }
 
-    showProgramPointer(_textPositionWithModule: TextPositionWithModule | undefined) {
+    showProgramPointer(_textPositionWithModule: ProgramPointerPositionInfo | undefined) {
         if(this.showProgramPointerCallback){
             if(_textPositionWithModule){
                 this.showProgramPointerCallback("show", _textPositionWithModule);

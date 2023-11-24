@@ -8,9 +8,11 @@ import { Thread, ThreadState } from "./Thread";
 
 export enum SchedulerState { not_initialized, running, paused, stopped }
 
-export type TextPositionWithModule = {
+export type ProgramPointerPositionInfo = {
     module: Module,
-    range: IRange
+    range: IRange, 
+    nextStepIndex: number,
+    program: Program
 }
 
 
@@ -169,7 +171,7 @@ export class Scheduler {
     /**
      * for displaying next program position in editor
      */
-    getNextStepPosition(): TextPositionWithModule | undefined {
+    getNextStepPosition(): ProgramPointerPositionInfo | undefined {
         let currentThread = this.runningThreads[this.currentThreadIndex];
         if(!currentThread) return undefined;
         let programState = currentThread.currentProgramState;
@@ -179,7 +181,9 @@ export class Scheduler {
         return {
             module: programState.program.module,
             //@ts-ignore
-            range: step.range
+            range: step.range,
+            nextStepIndex: programState.stepIndex,
+            program: programState.program
         }
     }
 
