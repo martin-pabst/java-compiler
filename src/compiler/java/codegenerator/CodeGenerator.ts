@@ -371,7 +371,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                     field.initialValueIsConstant = true;
                 }
 
-                let assignmentTemplate = `__Klass.${field.getInternalName()} = §1;\n`;
+                let assignmentTemplate = `${Helpers.classes}.${classContext.identifier}.${field.getInternalName()} = §1;\n`;
 
                 snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, fieldNode.initialization!.range, snippet);
 
@@ -381,7 +381,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             } else {
                 field.initialValueIsConstant = true;
                 let initialValueAsString = field.type instanceof PrimitiveType ? field.type.defaultValueAsString : "null";
-                snippet = new StringCodeSnippet(`__Klass.${field.getInternalName()} = ${initialValueAsString};\n`);
+                snippet = new StringCodeSnippet(`${Helpers.classes}.${classContext.identifier}.${field.getInternalName()} = ${initialValueAsString};\n`);
             }
 
             if (classContext.runtimeClass) {

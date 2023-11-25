@@ -187,11 +187,7 @@ export class Parser extends StatementParser {
             if (this.lookahead(1).tt == TokenType.leftBracket) {
                 this.parseMethodDeclaration(classASTNode, modifiers, false, type);
             } else {
-                if (classASTNode.kind == TokenType.keywordClass || classASTNode.kind == TokenType.keywordEnum) {
                     this.parseFieldDeclaration(classASTNode, modifiers, type);
-                } else {
-                    this.pushError("Ein Interface kann keine Attribute besitzen.", "error");
-                }
             }
         }
 
@@ -242,7 +238,7 @@ export class Parser extends StatementParser {
         }
     }
 
-    parseFieldDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode, modifiers: ASTNodeWithModifiers, type: ASTTypeNode | undefined) {
+    parseFieldDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers, type: ASTTypeNode | undefined) {
         let rangeStart = this.cct.range;
         let identifier = this.expectAndSkipIdentifierAsToken();
 
@@ -375,8 +371,9 @@ export class Parser extends StatementParser {
                 switch (this.tt) {
                     case TokenType.identifier:
                     case TokenType.keywordVoid:
-                        let returnType = this.parseType();
-                        if (returnType) this.parseMethodDeclaration(interfaceNode, modifiers, false, returnType);
+                        this.parseAttributeOrMethodDeclaration(interfaceNode, modifiers);
+                    // let returnType = this.parseType();
+                        // if (returnType) this.parseMethodDeclaration(interfaceNode, modifiers, false, returnType);
                         break;
                     case TokenType.at:
                         this.parseAnnotation();

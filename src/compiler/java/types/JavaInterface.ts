@@ -61,6 +61,10 @@ export class JavaInterface extends IJavaInterface {
         super(identifier, module, declarationRange);
     }
 
+    getFields(): Field[] {
+        return this.fields;
+    }
+
     isGenericVariant(): boolean {
         return false;
     }

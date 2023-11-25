@@ -1,4 +1,17 @@
 export var testPrograms = {
+staticFieldsTest: `
+A a = new A();
+a.test();
+
+class A {
+   static int x;
+   int y;
+
+   void test(){
+      println("x: " + x + ", y: " + y);
+   }
+}
+`,
 interfaceTest: `
 T t = new T();
 t.def();
