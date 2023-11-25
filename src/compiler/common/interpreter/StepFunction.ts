@@ -4,9 +4,9 @@ import { Thread } from "./Thread.ts";
 export type StepFunction = (thread: Thread, stack: any[], stackBase: number) => number;
 
 export class StepParams {
-    static thread = "t";            // type Thread
-    static stack = "s";             // type any[]
-    static stackBase = "sb";        // type number
+    static thread = "__t";            // type Thread
+    static stack = "__s";             // type any[]
+    static stackBase = "__sb";        // type number
 }
 
 export class Helpers {
