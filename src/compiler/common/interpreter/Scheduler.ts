@@ -1,3 +1,4 @@
+import { Executable } from "../Executable.ts";
 import { Module } from "../module/Module";
 import { IRange } from "../range/Range";
 import { Interpreter } from "./Interpreter";
@@ -187,7 +188,7 @@ export class Scheduler {
         }
     }
 
-    init(mainModule: Module, runtimeClassObjects: { [identifier: string]: Klass }) {
+    init(executable: Executable, runtimeClassObjects: { [identifier: string]: Klass }) {
 
         this.classObjectRegistry = runtimeClassObjects;
 
@@ -198,8 +199,17 @@ export class Scheduler {
 
         let mainThread = new Thread(this, []);
 
-        let mainProgram = mainModule.getMainProgram();
-        if (mainProgram) mainThread.pushProgram(mainProgram);
+        let mainModule = executable.mainModule;
+
+        if(mainModule){
+            let mainProgram = mainModule.getMainProgram();
+            if (mainProgram) mainThread.pushProgram(mainProgram);
+        }
+
+        for(let staticInitStep of executable.staticInitializationSequence){
+            mainThread.pushProgram(staticInitStep.program);
+        }
+
 
         // TODO: Initialize static variables for all classes
 

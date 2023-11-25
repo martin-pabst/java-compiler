@@ -5,7 +5,7 @@ import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode, ASTAttributeDereferencingNode } from "../parser/AST";
+import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode, ASTAttributeDereferencingNode, ASTEnumValueNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { ArrayType } from "../types/ArrayType";
 import { Field } from "../types/Field";
@@ -35,7 +35,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
     symbolTableStack: JavaSymbolTable[] = [];
 
-    classOfCurrentlyCompiledStaticInitialization?: JavaTypeWithInstanceInitializer;
+    classOfCurrentlyCompiledStaticInitialization?: NonPrimitiveType;
 
     missingStatementManager: MissingStatementManager = new MissingStatementManager();
 
@@ -108,6 +108,13 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         // cast parameter values
+        let snippet = this.invokeConstructor(parameterValues, method, klassType, node);
+
+        return snippet;
+
+    }
+
+    protected invokeConstructor(parameterValues: CodeSnippet[], method: Method, klassType: IJavaClass | JavaEnum, node: ASTNewObjectNode | ASTEnumValueNode, enumValueIdentifier?: string, enumValueIndex?: number) {
         for (let i = 0; i < parameterValues.length; i++) {
             let destinationType = method.parameters[i].type;
             parameterValues[i] = this.compileCast(parameterValues[i]!, destinationType, "explicit");
@@ -115,7 +122,8 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
         let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention ? "native" : "java";
 
-        let template: string = `new ${Helpers.classes}["${klassType.identifier}"]().${method.getInternalName(callingConvention)}(`
+        // call javascript constructor and directly thereafter call java constructor
+        let template: string = `new ${Helpers.classes}["${klassType.identifier}"](${enumValueIdentifier ? '"' + enumValueIdentifier + '", ' + enumValueIndex : ""}).${method.getInternalName(callingConvention)}(`;
 
         if (callingConvention == "java") {
             template += `${StepParams.thread}` + (parameterValues.length > 0 ? ", " : "");
@@ -131,9 +139,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
             (<CodeSnippetContainer>snippet).addNextStepMark();
             snippet.finalValueIsOnStack = true;
         }
-
         return snippet;
-
     }
 
     pushAndGetNewSymbolTable(range: IRange, withStackframe: boolean, classContext?: JavaClass | JavaEnum | undefined, methodContext?: Method): JavaSymbolTable {
@@ -481,7 +487,9 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
             objectSnippet = this.compileTerm(node.nodeToGetObject);
             if(!objectSnippet) return undefined;
             let range = node.nodeToGetObject.range;
-            objectSnippet = SnippetFramer.frame(objectSnippet, `(§1 || ${Helpers.throwNPE}(${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn}))`);
+            if(!(objectSnippet.type instanceof JavaEnum)){
+                objectSnippet = SnippetFramer.frame(objectSnippet, `(§1 || ${Helpers.throwNPE}(${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn}))`);
+            }
         } else {
             let classContext = this.currentSymbolTable.getClassContext();
             if (!classContext) {

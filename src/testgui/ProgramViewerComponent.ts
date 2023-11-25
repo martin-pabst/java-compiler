@@ -66,6 +66,9 @@ export class ProgramViewerComponent {
         let classesElement: ProgramViewerNode = {};
         this.treeview.addNode(true, "Classes", undefined, classesElement, classesElement, null);
         
+        let enumsElement: ProgramViewerNode = {};
+        this.treeview.addNode(true, "Enums", undefined, enumsElement, enumsElement, null);
+        
 
         for (let module of moduleManager.modules) {
             this.addModuleNode(module, modulesElement);
@@ -73,7 +76,7 @@ export class ProgramViewerComponent {
                 if(type instanceof JavaClass){
                     this.addClassNode(type, classesElement);
                 } else if(type instanceof JavaEnum){
-                    
+                    this.addEnumNode(type, enumsElement);                    
                 } else if(type instanceof JavaInterface){
 
                 }
@@ -105,6 +108,37 @@ export class ProgramViewerComponent {
             }
 
             this.treeview.addNode(false, method.identifier, methodNode.iconClass, methodNode, methodNode, classNode);
+
+        }
+
+
+    }
+
+    addEnumNode(type: JavaEnum, enumsElement: ProgramViewerNode) {
+        let enumNode: ProgramViewerNode = {
+            iconClass: "img_enumdeclaration-dark",
+            program: this.dontIndent(`enum ${type.identifier}
+            \n/*Fields:*/\n${type.fields.map(field => field.type + " " + field.identifier).join("\n")}
+            `)
+        }
+
+        this.treeview.addNode(true, type.identifier, enumNode.iconClass, enumNode, enumNode, enumsElement);
+
+        let staticInitializerNode: ProgramViewerNode = {
+            program: type.staticInitializer?.getSourcecode()
+        }
+        this.treeview.addNode(false, "static initializer", staticInitializerNode.iconClass, staticInitializerNode, staticInitializerNode, enumNode);
+
+        for(let method of type.methods){
+            let methodNode: ProgramViewerNode = {
+                iconClass: "img_methoddeclaration-dark",
+                program: 
+                `/* Method ${method.identifier} (internal name: ${method.getInternalName("java")})*/\n` + 
+                `/* Program stub: */\n` + method.programStub + "\n\n" +
+                `/* Program: */\n` + method.program?.getSourcecode() + "\n" 
+            }
+
+            this.treeview.addNode(false, method.identifier, methodNode.iconClass, methodNode, methodNode, enumNode);
 
         }
 

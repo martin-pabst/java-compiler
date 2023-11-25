@@ -101,7 +101,7 @@ export abstract class NonPrimitiveType extends JavaType {
                     && (!hasToBeStatic || m.isStatic)
                 ));
                 //@ts-ignore
-                if (type["getExtends"]) type = type.getExtends();
+                type = type.getExtends();
             }
         }
 

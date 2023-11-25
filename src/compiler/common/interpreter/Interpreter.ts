@@ -24,8 +24,7 @@ export class Interpreter {
     timerId: any;
     timerIntervalMs: number = 10;
 
-    mainModule?: Module;
-    moduleStoreVersion: number = -100;
+    executable?: Executable;
 
     // inputManager: InputManager;
 
@@ -83,7 +82,7 @@ export class Interpreter {
     setExecutable(executable: Executable){
         this.classObjectRegistry = executable.classObjectRegistry;
         if(executable.mainModule){
-            this.init(executable.mainModule);
+            this.init(executable);
             this.setState(SchedulerState.stopped);
         } else {
             this.setState(SchedulerState.not_initialized);
@@ -117,7 +116,7 @@ export class Interpreter {
                 return;
             }
             this.printManager.clear();
-            this.init(this.mainModule!);
+            this.init(this.executable!);
             this.resetRuntime();
             this.showProgramPointer(this.scheduler.getNextStepPosition());
             this.setState(SchedulerState.paused);
@@ -178,9 +177,9 @@ export class Interpreter {
         // this.main.getBottomDiv()?.console?.clearErrors();
 
 
-        if (this.scheduler.state != SchedulerState.paused && this.mainModule) {
+        if (this.scheduler.state != SchedulerState.paused && this.executable) {
             this.printManager.clear();
-            this.init(this.mainModule);
+            this.init(this.executable);
             this.resetRuntime();
         }
 
@@ -313,7 +312,7 @@ export class Interpreter {
         // this.gngEreignisbehandlungHelper = null;
     }
 
-    init(newMainModule: Module) {
+    init(executable: Executable) {
 
         // this.main.getBottomDiv()?.console?.clearErrors();
 
@@ -333,10 +332,8 @@ export class Interpreter {
         // }
 
 
-        this.mainModule = newMainModule;
-
         this.setState(SchedulerState.stopped);
-        this.scheduler.init(this.mainModule, this.classObjectRegistry);
+        this.scheduler.init(executable, this.classObjectRegistry);
 
     }
 

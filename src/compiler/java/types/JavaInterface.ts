@@ -48,6 +48,7 @@ export class JavaInterface extends IJavaInterface {
     genericInformation: GenericInformation = [];
 
     methods: Method[] = [];
+    fields: Field[] = [];               // A interface may have fields, but they must be static final
 
     private extends: IJavaInterface[] = [];
 

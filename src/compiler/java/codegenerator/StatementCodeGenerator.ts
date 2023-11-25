@@ -111,7 +111,12 @@ export class StatementCodeGenerator extends TermCodeGenerator {
                 this.pushError("Die Methode erwartet einen Rückgabewert vom Typ " + method.returnParameterType.identifier + ", hier wird aber keiner übergeben.", "error", node.range);
                 return undefined;
             }            
-            snippet.addStringPart(`${Helpers.return}();\n`);
+
+            if(method.isConstructor){
+                snippet.addStringPart(`${Helpers.return}(${StepParams.stack}[0]);\n`);
+            } else {
+                snippet.addStringPart(`${Helpers.return}();\n`);
+            }
         } 
 
         snippet.addNextStepMark();

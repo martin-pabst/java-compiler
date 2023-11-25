@@ -272,6 +272,7 @@ export class TypeResolver {
             method.isFinal = methodNode.isFinal;
             method.isStatic = methodNode.isStatic;
             method.classEnumInterface = type;
+            method.isConstructor = methodNode.isContructor;
 
             method.returnParameterType = methodNode.returnParameterType?.resolvedType;
             for (let p of methodNode.parameters) {
@@ -321,6 +322,16 @@ export class TypeResolver {
                             javaEnum.fields.push(f);
                         }
                     }
+
+                    // each enum value gets compiled to a public static final field
+                    for(let enumValue of decl.valueNodes){
+                        let f: Field = new Field(enumValue.identifier, enumValue.identifierRange, module, javaEnum, TokenType.keywordPublic);
+                        f.isStatic = true;
+                        f.isFinal = true;
+                        f.classEnum = javaEnum;
+                        javaEnum.fields.push(f);
+                    }
+
                 }
             }
         }

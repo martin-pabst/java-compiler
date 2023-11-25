@@ -1,4 +1,11 @@
 export var testPrograms = {
+enumTest: `
+println(Test.eins.name());
+
+enum Test {
+   eins, zwei, drei
+}
+`,
 singleStepTest:`
 println("A");
 println("B");

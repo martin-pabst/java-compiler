@@ -26,6 +26,8 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
     private implements: JavaInterface[] = [];
 
+    
+
     constructor(identifier: string, module: JavaBaseModule, identifierRange: IRange, public baseEnumClass: EnumClass) {
         super(identifier, identifierRange, module);
     }
@@ -37,6 +39,10 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
         return this.baseEnumClass.getType().getField(identifier, uptoVisibility, forceStatic);
 
+    }
+
+    getExtends():EnumClass {
+        return this.baseEnumClass;
     }
 
     isGenericTypeParameter(): boolean {

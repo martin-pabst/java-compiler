@@ -3,7 +3,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTClassDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTMethodDeclarationNode, ASTStaticInitializerNode } from "../parser/AST";
+import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTMethodDeclarationNode, ASTStaticInitializerNode } from "../parser/AST";
 import { Field } from "../types/Field.ts";
 import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
@@ -16,6 +16,9 @@ import { type TypeResolver } from "../TypeResolver/TypeResolver.ts"; // only for
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
 import { Method } from "../types/Method.ts";
+import { JavaEnum } from "../types/JavaEnum.ts";
+import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
+import { JavaInterface } from "../types/JavaInterface.ts";
 
 export class CodeGenerator extends StatementCodeGenerator {
 
@@ -31,13 +34,6 @@ export class CodeGenerator extends StatementCodeGenerator {
     constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore) {
         super(module, libraryTypestore, compiledTypesTypestore);
         this.linker = new SnippetLinker();
-    }
-
-    /**
-     * returns all field that could not be resolved to a constant value yet
-     */
-    compileStaticInitializers(): Field[] {
-        return []; // TODO
     }
 
     start() {
@@ -79,9 +75,10 @@ export class CodeGenerator extends StatementCodeGenerator {
         for (let cdef of this.module.ast?.classOrInterfaceOrEnumDefinitions) {
             switch (cdef.kind) {
                 case TokenType.keywordClass:
-                    this.compileClass(cdef);
+                    this.compileClassDeclaration(cdef);
                     break;
                 case TokenType.keywordEnum:
+                    this.compileEnumDeclaration(cdef);
                     break;
                 case TokenType.keywordInterface:
                     break;
@@ -89,40 +86,63 @@ export class CodeGenerator extends StatementCodeGenerator {
         }
     }
 
-    compileClass(cdef: ASTClassDefinitionNode) {
+    compileClassDeclaration(cdef: ASTClassDefinitionNode) {
         let type = cdef.resolvedType;
         if (!type || !cdef.resolvedType) return;
         let classContext = <JavaClass>cdef.resolvedType;
 
         this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
 
-        let fieldSnippets: CodeSnippet[] = [];
-        let staticFieldSnippets: CodeSnippet[] = [new StringCodeSnippet(`let __Klass = ${Helpers.classes}["${classContext.identifier}"];\n`)];
-
         // first step: static fields and static initializers
-        for (let fieldOrInitializer of cdef.fieldsOrInstanceInitializers) {
-
-            switch (fieldOrInitializer.kind) {
-                case TokenType.fieldDeclaration:
-                    if (!fieldOrInitializer.isStatic) continue;
-                    let snippet = this.compileField(fieldOrInitializer, classContext);
-                    if (snippet) {
-                        staticFieldSnippets.push(snippet);
-                    }
-                    break;
-                case TokenType.staticInitializerBlock:
-                    let snippet2 = this.compileStaticInitializerBlock(fieldOrInitializer);
-                    if (snippet2) {
-                        staticFieldSnippets.push(snippet2);
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-        }
+        this.compileStaticFieldsAndInitializerAndEnumValues(classContext, cdef);
 
         // second step: non-static fields and instance initializers
+        this.compileInstanceFieldsAndInitializer(cdef, classContext);
+        
+        this.compileMethodsAndConstructors(cdef, classContext);
+
+        this.popSymbolTable();
+
+    }
+
+    compileEnumDeclaration(cdef: ASTEnumDefinitionNode) {
+        let type = cdef.resolvedType;
+        if (!type || !cdef.resolvedType) return;
+        let classContext = <JavaEnum>cdef.resolvedType;
+
+        this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
+
+        // first step: static fields and static initializers
+        this.compileStaticFieldsAndInitializerAndEnumValues(classContext, cdef);
+
+        // second step: non-static fields and instance initializers
+        this.compileInstanceFieldsAndInitializer(cdef, classContext);
+        
+        this.compileMethodsAndConstructors(cdef, classContext);
+
+        this.popSymbolTable();
+
+    }
+
+    private compileMethodsAndConstructors(cdef: ASTClassDefinitionNode | ASTEnumDefinitionNode, classContext: JavaClass | JavaEnum) {
+        let constructorFound: boolean = false;
+        for (let method of cdef.methods) {
+            this.compileMethodDeclaration(method, classContext);
+            if (method.isContructor){
+                constructorFound = true;
+                if(cdef.kind == TokenType.keywordEnum){
+                    if(method.visibility != TokenType.keywordPrivate){
+                        this.pushError("Konstruktoren von enums müssen die Sichtbarkeit private haben.", "error", method.range);
+                    }
+                }
+            } 
+        }
+
+        if (!constructorFound && classContext instanceof JavaClass) this.buildStandardConstructors(classContext);
+    }
+
+    private compileInstanceFieldsAndInitializer(cdef: ASTClassDefinitionNode | ASTEnumDefinitionNode, classContext: JavaClass | JavaEnum) {
+        let fieldSnippets: CodeSnippet[] = [];
         for (let fieldOrInitializer of cdef.fieldsOrInstanceInitializers) {
 
             switch (fieldOrInitializer.kind) {
@@ -146,21 +166,73 @@ export class CodeGenerator extends StatementCodeGenerator {
         }
 
         classContext.instanceInitializer = fieldSnippets;
+    }
+
+    private compileStaticFieldsAndInitializerAndEnumValues(classContext: JavaClass | JavaEnum | JavaInterface, cdef: ASTClassDefinitionNode | ASTEnumDefinitionNode) {
+        let staticFieldSnippets: CodeSnippet[] = [new StringCodeSnippet(`let __Klass = ${Helpers.classes}["${classContext.identifier}"];\n`)];
+        for (let fieldOrInitializer of cdef.fieldsOrInstanceInitializers) {
+
+            switch (fieldOrInitializer.kind) {
+                case TokenType.fieldDeclaration:
+                    if (!fieldOrInitializer.isStatic) continue;
+                    let snippet = this.compileField(fieldOrInitializer, classContext);
+                    if (snippet) {
+                        staticFieldSnippets.push(snippet);
+                    }
+                    break;
+                case TokenType.staticInitializerBlock:
+                    let snippet2 = this.compileStaticInitializerBlock(fieldOrInitializer);
+                    if (snippet2) {
+                        staticFieldSnippets.push(snippet2);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        if(cdef.kind == TokenType.keywordEnum){
+            this.compileEnumValueConstruction(<JavaEnum>classContext, cdef, staticFieldSnippets);
+        }
 
         classContext.staticInitializer = this.buildInitializer(staticFieldSnippets, "staticInitializer");
         cdef.staticInitializer = classContext.staticInitializer;
+    }
 
+    compileEnumValueConstruction(javaEnum: JavaEnum, enumDeclNode: ASTEnumDefinitionNode, staticFieldSnippets: CodeSnippet[]) {
 
-        let constructorFound: boolean = false;
-        for (let method of cdef.methods) {
-            this.compileMethodDeclaration(method, classContext);
-            if (method.isContructor) constructorFound = true;
+        let parameterlessConstructor = javaEnum.methods.find(m => m.isConstructor && m.parameters.length == 0);
+
+        let enumValueIndex: number = 0;
+        for(let valueNode of enumDeclNode.valueNodes){
+            
+            // find suitable constructor and invoke it!
+            let callConstructorSnippet: CodeSnippet;
+            if(valueNode.parameterValues.length > 0 || parameterlessConstructor){
+
+                let parameterSnippets = <CodeSnippet[]>valueNode.parameterValues.map(pv => this.compileTerm(pv));
+                if(parameterSnippets.some(sn => (!sn || !sn.type))) continue; // if there had been an error when compiling parameter values
+
+                let constructor = this.searchMethod(javaEnum.identifier, javaEnum, parameterSnippets.map(sn => sn!.type!), true, false, false);
+                if(!constructor){
+                    this.pushError("Es konnte kein passender Konstruktor gefunden werden ", "error", enumDeclNode);
+                    continue;
+                }
+
+                callConstructorSnippet = this.invokeConstructor(parameterSnippets, constructor, javaEnum, valueNode, valueNode.identifier, enumValueIndex);
+                callConstructorSnippet = new CodeSnippetContainer(callConstructorSnippet);
+                (<CodeSnippetContainer>callConstructorSnippet).ensureFinalValueIsOnStack();
+                (<CodeSnippetContainer>callConstructorSnippet).addNextStepMark();
+            } else {
+                callConstructorSnippet = new StringCodeSnippet(`new __Klass("${valueNode.identifier}", ${enumValueIndex})`);
+            }
+
+            let buildEnumValueSnippet = new OneParameterTemplate(`__Klass.values.push(__Klass["${valueNode.identifier}"] = §1);\n`).applyToSnippet(javaEnum, valueNode.range, callConstructorSnippet);
+            staticFieldSnippets.push(buildEnumValueSnippet);
+
+            enumValueIndex++;
         }
-
-        if (!constructorFound) this.buildStandardConstructors(classContext);
-
-        this.popSymbolTable();
-
     }
 
     /**
@@ -244,7 +316,7 @@ export class CodeGenerator extends StatementCodeGenerator {
      * @see TypeResolver#buildRuntimeClassesAndTheirFields
      * @returns 
      */
-    compileField(fieldNode: ASTFieldDeclarationNode, classContext: JavaClass): CodeSnippet | undefined {
+    compileField(fieldNode: ASTFieldDeclarationNode, classContext: JavaClass | JavaEnum | JavaInterface): CodeSnippet | undefined {
 
         if (!fieldNode.type.resolvedType) return undefined;
 
@@ -255,11 +327,18 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         field.initialValue = field.type instanceof PrimitiveType ? field.type.getDefaultValue() : null;
 
+        if(classContext instanceof JavaInterface){
+            if(!fieldNode.isStatic || !fieldNode.isFinal){
+                this.pushError("Attribute von Interfaces müssen static und final sein.", "error", fieldNode);
+            }
+        }
+
         if (fieldNode.isStatic) {
 
             this.classOfCurrentlyCompiledStaticInitialization = classContext;
             let snippet = this.compileTerm(fieldNode.initialization);
             this.classOfCurrentlyCompiledStaticInitialization = undefined;
+
 
             if (snippet) {
 
@@ -320,7 +399,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     }
 
-    compileMethodDeclaration(methodNode: ASTMethodDeclarationNode, classContext: JavaClass) {
+    compileMethodDeclaration(methodNode: ASTMethodDeclarationNode, classContext: JavaClass | JavaEnum) {
 
         let method = methodNode.method;
         if (!method) return;
@@ -343,7 +422,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         if (method.isConstructor) {
 
-            if (!this.callingOtherConstructorInSameClassHappened && classContext.instanceInitializer) {
+            if (!this.callingOtherConstructorInSameClassHappened && classContext.instanceInitializer.length > 0) {
                 snippets = snippets.concat(classContext.instanceInitializer);
             }
 
@@ -363,7 +442,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
 
-        if (!this.missingStatementManager.hasReturnHappened()) {
+        if (!this.missingStatementManager.hasReturnHappened() && !methodNode.isContructor) {
             snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
         }
 

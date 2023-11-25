@@ -194,6 +194,8 @@ export interface ASTEnumDefinitionNode
     kind: TokenType.keywordEnum;
     parent: TypeScope;
     valueNodes: ASTEnumValueNode[];
+
+    staticInitializer?: Program       // only for debugging purposes,
 }
 
 
