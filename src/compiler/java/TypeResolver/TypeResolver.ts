@@ -42,7 +42,7 @@ export class TypeResolver {
 
     generateNewTypesWithGenericsButWithoutFieldsAndMethods() {
 
-        let baseEnumClass = <EnumClass><any>this.libraryModuleManager.typestore.getType("Enum");
+        let baseEnumClass = <JavaClass><any>this.libraryModuleManager.typestore.getType("Enum");
 
         for (let module of this.dirtyModules) {
             for (let declNode of module.ast!.classOrInterfaceOrEnumDefinitions) {

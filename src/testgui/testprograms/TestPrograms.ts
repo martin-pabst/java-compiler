@@ -1,9 +1,13 @@
 export var testPrograms = {
 enumTest: `
-println(Test.eins.name());
+println(Test.eins.x);
 
 enum Test {
-   eins, zwei, drei
+   eins(5), zwei(10), drei(20);
+   int x;
+   private Test(int wert){
+      x = wert;
+   }
 }
 `,
 singleStepTest:`

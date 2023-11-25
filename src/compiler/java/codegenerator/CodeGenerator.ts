@@ -169,7 +169,7 @@ export class CodeGenerator extends StatementCodeGenerator {
     }
 
     private compileStaticFieldsAndInitializerAndEnumValues(classContext: JavaClass | JavaEnum | JavaInterface, cdef: ASTClassDefinitionNode | ASTEnumDefinitionNode) {
-        let staticFieldSnippets: CodeSnippet[] = [new StringCodeSnippet(`let __Klass = ${Helpers.classes}["${classContext.identifier}"];\n`)];
+        let staticFieldSnippets: CodeSnippet[] = [];
         for (let fieldOrInitializer of cdef.fieldsOrInstanceInitializers) {
 
             switch (fieldOrInitializer.kind) {
@@ -225,10 +225,10 @@ export class CodeGenerator extends StatementCodeGenerator {
                 (<CodeSnippetContainer>callConstructorSnippet).ensureFinalValueIsOnStack();
                 (<CodeSnippetContainer>callConstructorSnippet).addNextStepMark();
             } else {
-                callConstructorSnippet = new StringCodeSnippet(`new __Klass("${valueNode.identifier}", ${enumValueIndex})`);
+                callConstructorSnippet = new StringCodeSnippet(`new ${Helpers.classes}["${javaEnum.identifier}"]("${valueNode.identifier}", ${enumValueIndex})`);
             }
 
-            let buildEnumValueSnippet = new OneParameterTemplate(`__Klass.values.push(__Klass["${valueNode.identifier}"] = §1);\n`).applyToSnippet(javaEnum, valueNode.range, callConstructorSnippet);
+            let buildEnumValueSnippet = new OneParameterTemplate(`${Helpers.classes}["${javaEnum.identifier}"].values.push(${Helpers.classes}["${javaEnum.identifier}"]["${valueNode.identifier}"] = §1);\n`).applyToSnippet(javaEnum, valueNode.range, callConstructorSnippet);
             staticFieldSnippets.push(buildEnumValueSnippet);
 
             enumValueIndex++;

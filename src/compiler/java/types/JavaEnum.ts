@@ -28,7 +28,7 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
     
 
-    constructor(identifier: string, module: JavaBaseModule, identifierRange: IRange, public baseEnumClass: EnumClass) {
+    constructor(identifier: string, module: JavaBaseModule, identifierRange: IRange, public baseEnumClass: JavaClass) {
         super(identifier, identifierRange, module);
     }
 
@@ -37,11 +37,11 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
         if (field) return field;
         if (uptoVisibility == TokenType.keywordPrivate) uptoVisibility = TokenType.keywordProtected;
 
-        return this.baseEnumClass.getType().getField(identifier, uptoVisibility, forceStatic);
+        return this.baseEnumClass.getField(identifier, uptoVisibility, forceStatic);
 
     }
 
-    getExtends():EnumClass {
+    getExtends():JavaClass {
         return this.baseEnumClass;
     }
 

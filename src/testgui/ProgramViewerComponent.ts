@@ -98,20 +98,23 @@ export class ProgramViewerComponent {
 
         this.treeview.addNode(true, type.identifier, classNode.iconClass, classNode, classNode, classesElement);
 
-        for(let method of type.methods){
+        this.addMethods(type, classNode);
+
+
+    }
+
+    private addMethods(type: JavaClass | JavaEnum, classNode: ProgramViewerNode) {
+        for (let method of type.methods) {
             let methodNode: ProgramViewerNode = {
                 iconClass: "img_methoddeclaration-dark",
-                program: 
-                `/* Method ${method.identifier} (internal name: ${method.getInternalName("java")})*/\n` + 
-                `/* Program stub: */\n` + method.programStub + "\n\n" +
-                `/* Program: */\n` + method.program?.getSourcecode() + "\n" 
-            }
+                program: `/* Method ${method.identifier} (internal name: ${method.getInternalName("java")})*/\n` +
+                    `/* Program stub: */\n` + method.programStub + "\n\n" +
+                    `/* Program: */\n` + method.program?.getSourcecode() + "\n"
+            };
 
             this.treeview.addNode(false, method.identifier, methodNode.iconClass, methodNode, methodNode, classNode);
 
         }
-
-
     }
 
     addEnumNode(type: JavaEnum, enumsElement: ProgramViewerNode) {
@@ -129,19 +132,7 @@ export class ProgramViewerComponent {
         }
         this.treeview.addNode(false, "static initializer", staticInitializerNode.iconClass, staticInitializerNode, staticInitializerNode, enumNode);
 
-        for(let method of type.methods){
-            let methodNode: ProgramViewerNode = {
-                iconClass: "img_methoddeclaration-dark",
-                program: 
-                `/* Method ${method.identifier} (internal name: ${method.getInternalName("java")})*/\n` + 
-                `/* Program stub: */\n` + method.programStub + "\n\n" +
-                `/* Program: */\n` + method.program?.getSourcecode() + "\n" 
-            }
-
-            this.treeview.addNode(false, method.identifier, methodNode.iconClass, methodNode, methodNode, enumNode);
-
-        }
-
+        this.addMethods(type, enumNode)
 
     }
 

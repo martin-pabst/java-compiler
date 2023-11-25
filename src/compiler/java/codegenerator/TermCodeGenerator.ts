@@ -117,7 +117,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
     protected invokeConstructor(parameterValues: CodeSnippet[], method: Method, klassType: IJavaClass | JavaEnum, node: ASTNewObjectNode | ASTEnumValueNode, enumValueIdentifier?: string, enumValueIndex?: number) {
         for (let i = 0; i < parameterValues.length; i++) {
             let destinationType = method.parameters[i].type;
-            parameterValues[i] = this.compileCast(parameterValues[i]!, destinationType, "explicit");
+            parameterValues[i] = this.compileCast(parameterValues[i]!, destinationType, "implicit");
         }
 
         let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention ? "native" : "java";
@@ -461,7 +461,9 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
             snippet.isLefty = !field.isFinal;
             return snippet;
         } else {
-            let snippet = new OneParameterTemplate(`(§1 || ${Helpers.throwNPE}(${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn})).${field.getInternalName()}`)
+            let template: string = objectSnippet.type instanceof JavaEnum ? `§1` : `(§1 || ${Helpers.throwNPE}(${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn}))`;
+
+            let snippet = new OneParameterTemplate(`${template}.${field.getInternalName()}`)
             .applyToSnippet(field.type, range, objectSnippet);
             snippet.isLefty = !field.isFinal;
             return snippet;

@@ -80,6 +80,7 @@ export class Interpreter {
     }
 
     setExecutable(executable: Executable){
+        this.executable = executable;
         this.classObjectRegistry = executable.classObjectRegistry;
         if(executable.mainModule){
             this.init(executable);
