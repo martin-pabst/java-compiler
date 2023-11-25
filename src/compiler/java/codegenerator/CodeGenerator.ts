@@ -55,7 +55,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         this.missingStatementManager.endMethodBody(undefined, this.module.errors);
 
-        let endOfProgramSnippet = new CodeSnippetContainer(new StringCodeSnippet("t.state = 4;"));
+        let endOfProgramSnippet = new CodeSnippetContainer(new StringCodeSnippet(`${Helpers.exit}();`, {startLineNumber: -1, startColumn: -1, endLineNumber: -1, endColumn: -1}));
         endOfProgramSnippet.enforceNewStepBeforeSnippet();
 
         snippets.push(endOfProgramSnippet);

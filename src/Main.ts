@@ -61,7 +61,7 @@ export class Main {
     /*
      * Test program:
      */
-    this.inputEditor.setValue(testPrograms.staticFieldsTest);
+    this.inputEditor.setValue(testPrograms.simpleWhileLoops);
 
     this.tabManager = new TabManager(document.getElementById('tabs')!,
       ['token', 'ast', 'code', 'errors']);
@@ -118,10 +118,13 @@ export class Main {
             options: { beforeContentClassName: 'jo_revealProgramPointerBefore' }
           }])
           break;
+          case "hide":
+            this.decorations?.clear();
+            break;
       }
 
-      let nextStep = positionInfo?.program.stepsSingle[positionInfo.nextStepIndex];
-      console.log(nextStep?.codeAsString);
+      // let nextStep = positionInfo?.program.stepsSingle[positionInfo.nextStepIndex];
+      // console.log(nextStep?.codeAsString);
     }
 
 

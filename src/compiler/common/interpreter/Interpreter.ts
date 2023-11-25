@@ -135,7 +135,9 @@ export class Interpreter {
     showProgramPointer(_textPositionWithModule: ProgramPointerPositionInfo | undefined) {
         if(this.showProgramPointerCallback){
             if(_textPositionWithModule){
-                this.showProgramPointerCallback("show", _textPositionWithModule);
+                if(_textPositionWithModule.range.startLineNumber >= 0){
+                    this.showProgramPointerCallback("show", _textPositionWithModule);
+                }
             } else {
                 this.showProgramPointerCallback("hide");
             }
@@ -149,6 +151,8 @@ export class Interpreter {
     }
 
     stop(restart: boolean) {
+
+        this.showProgramPointer(undefined);
 
         // this.inputManager.hide();
         this.setState(SchedulerState.stopped);
@@ -262,6 +266,7 @@ export class Interpreter {
     setState(state: SchedulerState) {
 
         if (state == SchedulerState.stopped) {
+            this.showProgramPointer(undefined);
             // TODO
             // this.closeAllWebsockets();
         }

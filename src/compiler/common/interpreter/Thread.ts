@@ -408,6 +408,8 @@ export class Thread {
         throw exception;
     }
 
-
+    exit(){
+        this.state = ThreadState.terminated;
+    }
 
 }

@@ -23,6 +23,7 @@ export class Helpers {
     static endTryBlock = StepParams.thread + "." + Thread.prototype.endCatchTryBlock.name;
     static throwAE = StepParams.thread + "." + Thread.prototype.AE.name;
     static throwNPE = StepParams.thread + "." + Thread.prototype.NPE.name;
+    static exit = StepParams.thread + "." + Thread.prototype.exit.name;
 }
 
 /**
