@@ -1,4 +1,31 @@
 export var testPrograms = {
+interfaceTest: `
+T t = new T();
+t.def();
+
+S s = new S();
+s.def();
+
+interface Test {
+   int doIt(String s);
+
+   default void def(){
+      println("Hier!" + doIt("Test"));
+   }
+}
+
+class T implements Test {
+   int doIt(String s){
+      return 10;
+   }
+} 
+
+
+class S implements Test {
+   int doIt(String s){
+      return 20;
+   }
+}`,
 enumTest: `
 println(Test.eins.x);
 

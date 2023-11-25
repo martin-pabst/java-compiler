@@ -23,6 +23,7 @@ export class LibraryDeclarationLexer {
             ["private", TokenType.keywordPrivate],
             ["static", TokenType.keywordStatic],
             ["abstract", TokenType.keywordAbstract],
+            ["default", TokenType.keywordDefault],
         ]
 
     );

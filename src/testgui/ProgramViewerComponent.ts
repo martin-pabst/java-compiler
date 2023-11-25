@@ -18,7 +18,8 @@ type ProgramViewerNode = {
     iconClass?: IconClass
 }
 
-type IconClass = "img_classdeclaration-dark" | "img_enumdeclaration-dark" | "img_interfacedeclaration-dark" | "img_methoddeclaration-dark" | "img_attributedeclaration-dark";
+type IconClass = "img_classdeclaration-dark" | "img_enumdeclaration-dark" | "img_interfacedeclaration-dark" | "img_methoddeclaration-dark" | "img_attributedeclaration-dark"
+                  | "img_constructordeclaration-dark" | "img_instanceinitialization-dark" | "img_staticinitialization-dark";
 
 export class ProgramViewerComponent {
 
@@ -69,6 +70,9 @@ export class ProgramViewerComponent {
         let enumsElement: ProgramViewerNode = {};
         this.treeview.addNode(true, "Enums", undefined, enumsElement, enumsElement, null);
         
+        let interfacesElement: ProgramViewerNode = {};
+        this.treeview.addNode(true, "Interfaces", undefined, interfacesElement, interfacesElement, null);
+        
 
         for (let module of moduleManager.modules) {
             this.addModuleNode(module, modulesElement);
@@ -78,7 +82,7 @@ export class ProgramViewerComponent {
                 } else if(type instanceof JavaEnum){
                     this.addEnumNode(type, enumsElement);                    
                 } else if(type instanceof JavaInterface){
-
+                    this.addInterfaceNode(type, interfacesElement);                    
                 }
             }
         }
@@ -96,6 +100,13 @@ export class ProgramViewerComponent {
             `)
         }
 
+        let staticInitializerNode: ProgramViewerNode = {
+            iconClass: "img_staticinitialization-dark",
+            program: type.staticInitializer?.getSourcecode()
+        }
+
+        this.treeview.addNode(false, "static initializer", staticInitializerNode.iconClass, staticInitializerNode, staticInitializerNode, classNode);
+
         this.treeview.addNode(true, type.identifier, classNode.iconClass, classNode, classNode, classesElement);
 
         this.addMethods(type, classNode);
@@ -103,10 +114,10 @@ export class ProgramViewerComponent {
 
     }
 
-    private addMethods(type: JavaClass | JavaEnum, classNode: ProgramViewerNode) {
+    private addMethods(type: JavaClass | JavaEnum | JavaInterface, classNode: ProgramViewerNode) {
         for (let method of type.methods) {
             let methodNode: ProgramViewerNode = {
-                iconClass: "img_methoddeclaration-dark",
+                iconClass: method.isConstructor ? "img_constructordeclaration-dark" : "img_methoddeclaration-dark",
                 program: `/* Method ${method.identifier} (internal name: ${method.getInternalName("java")})*/\n` +
                     `/* Program stub: */\n` + method.programStub + "\n\n" +
                     `/* Program: */\n` + method.program?.getSourcecode() + "\n"
@@ -128,11 +139,32 @@ export class ProgramViewerComponent {
         this.treeview.addNode(true, type.identifier, enumNode.iconClass, enumNode, enumNode, enumsElement);
 
         let staticInitializerNode: ProgramViewerNode = {
+            iconClass: "img_staticinitialization-dark",
             program: type.staticInitializer?.getSourcecode()
         }
         this.treeview.addNode(false, "static initializer", staticInitializerNode.iconClass, staticInitializerNode, staticInitializerNode, enumNode);
 
         this.addMethods(type, enumNode)
+
+    }
+
+    addInterfaceNode(type: JavaInterface, interfacesElement: ProgramViewerNode) {
+        let interfaceNode: ProgramViewerNode = {
+            iconClass: "img_interfacedeclaration-dark",
+            program: this.dontIndent(`interface ${type.identifier}
+            \n/*Static fields:*/\n${type.fields.map(field => field.type + " " + field.identifier).join("\n")}
+            `)
+        }
+
+        this.treeview.addNode(true, type.identifier, interfaceNode.iconClass, interfaceNode, interfaceNode, interfacesElement);
+
+        let staticInitializerNode: ProgramViewerNode = {
+            iconClass: "img_staticinitialization-dark",
+            program: type.staticInitializer?.getSourcecode()
+        }
+        this.treeview.addNode(false, "static initializer", staticInitializerNode.iconClass, staticInitializerNode, staticInitializerNode, interfaceNode);
+
+        this.addMethods(type, interfaceNode)
 
     }
 

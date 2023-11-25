@@ -20,6 +20,8 @@ export class Method {
 
     isConstructor: boolean = false;
 
+    isDefault: boolean = false;
+
     program?: Program;
 
     parameters: Parameter[] = [];
@@ -38,6 +40,8 @@ export class Method {
     usagePositions: UsagePosition[] = [];
 
     programStub?: string;       // only for debugging purposes
+
+    callbackAfterCodeGeneration: (() => void)[] = [];
 
     constructor(public identifier: string, public identifierRange: IRange, public module: JavaBaseModule,
           public visibility: Visibility = TokenType.keywordPublic){
@@ -67,6 +71,7 @@ export class Method {
         newMethod.isConstructor = this.isConstructor;
         newMethod.isFinal = this.isFinal;
         newMethod.isAbstract = this.isAbstract;
+        newMethod.isDefault = this.isDefault;
 
         return newMethod;
 

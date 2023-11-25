@@ -6,6 +6,7 @@ import { JavaBaseModule } from "../module/JavaBaseModule";
 import { GenericTypeParameter } from "./GenericInformation";
 import { JavaClass } from "./JavaClass";
 import { JavaEnum } from "./JavaEnum";
+import { JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { Visibility } from "./Visibility";
 
@@ -13,7 +14,7 @@ export class Field extends BaseSymbol {
 
     isStatic: boolean = false;
 
-    classEnum!: JavaClass | JavaEnum;
+    classEnum!: JavaClass | JavaEnum | JavaInterface;
 
     internalName?: string;
 

@@ -282,6 +282,9 @@ export class Parser extends StatementParser {
                 case TokenType.keywordAbstract:
                     astNodeWithModifiers.isAbstract = true;
                     break;
+                case TokenType.keywordDefault:
+                    astNodeWithModifiers.isDefault = true;
+                    break;
                 default:
                     foundModifier = false;
             }
@@ -368,7 +371,7 @@ export class Parser extends StatementParser {
             while (!this.comesToken([TokenType.rightCurlyBracket, TokenType.endofSourcecode], false)) {
 
                 let modifiers = this.parseModifiers();
-
+                
                 switch (this.tt) {
                     case TokenType.identifier:
                     case TokenType.keywordVoid:

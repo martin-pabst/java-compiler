@@ -22,6 +22,7 @@ type ModifiersAndType = {
     final: boolean,
     static: boolean,
     abstract: boolean,
+    default: boolean,
     type: TokenType.keywordClass | TokenType.keywordInterface | TokenType.keywordEnum
 }
 
@@ -80,7 +81,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 npt = new JavaInterface(identifier, module, LibraryDeclarationParser.nullRange);
                 break;
             case TokenType.keywordEnum:
-                npt = new JavaEnum(identifier, module, LibraryDeclarationParser.nullRange);
+                npt = new JavaEnum(identifier, module, LibraryDeclarationParser.nullRange, Object.getPrototypeOf(Object.getPrototypeOf(klass)).type);
                 let npt2 = <JavaEnum> npt;
                 npt2.runtimeClass = klass;
                 break;
@@ -261,6 +262,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             static: false,
             final: false,
             abstract: false,
+            default: false,
             type: TokenType.keywordClass
         }
 
@@ -281,6 +283,9 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                     break;
                 case TokenType.keywordAbstract:
                     m.abstract = true;
+                    break;
+                case TokenType.keywordDefault:
+                    m.default = true;
                     break;
                 case TokenType.keywordClass:
                 case TokenType.keywordInterface:
@@ -413,6 +418,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             m.isFinal = modifiers.final;
             m.isAbstract = modifiers.abstract;
             m.classEnumInterface = klassType;
+            m.isDefault = modifiers.default;
 
             this.expect(TokenType.rightBracket, true);
             klassType.methods.push(m);

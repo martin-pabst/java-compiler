@@ -42,6 +42,7 @@ export class ASTNodeFactory {
             isFinal: modifiers.isFinal,
             isStatic: modifiers.isStatic,
             isAbstract: modifiers.isAbstract,
+            isDefault: modifiers.isDefault,
             genericParameterDefinitions: [],
             fieldsOrInstanceInitializers: [],
             methods: [],
@@ -76,7 +77,8 @@ export class ASTNodeFactory {
             valueNodes: [],
             isAbstract: false,
             isFinal: false,
-            isStatic: false
+            isStatic: false,
+            isDefault: modifiers.isDefault
         }
 
         if(annotations.length > 0){
@@ -113,6 +115,7 @@ export class ASTNodeFactory {
             isFinal: modifiers.isFinal,
             isStatic: modifiers.isStatic,
             isAbstract: modifiers.isAbstract,
+            isDefault: modifiers.isDefault,
             genericParameterDefinitions: [],
             methods: [],
             annotations: [],
@@ -142,6 +145,7 @@ export class ASTNodeFactory {
             isStatic: modifiers.isStatic,
             isAbstract: modifiers.isAbstract,
             isContructor: isContructor,
+            isDefault: modifiers.isDefault,
             parameters: [],
             returnParameterType: returnParameterType,
             statement: undefined,
@@ -172,6 +176,7 @@ export class ASTNodeFactory {
             isFinal: modifiers.isFinal,
             isStatic: modifiers.isStatic,
             isAbstract: modifiers.isAbstract,
+            isDefault: modifiers.isDefault,
             annotations: []
         }
 
@@ -190,7 +195,8 @@ export class ASTNodeFactory {
             visibility: TokenType.keywordPublic,
             isFinal: false,
             isStatic: false,
-            isAbstract: false
+            isAbstract: false,
+            isDefault: false
         }
     }
 

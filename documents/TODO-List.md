@@ -14,12 +14,16 @@
   * check if return statement happened in every execution line
   * check if local variables have been initialized before first access
   * wire up step over, step into, step out
+  * enums...    -> needs more testing
+  * interfaces...  -> needs more testing
 
 
 ## next todos
-  * enums...
-  * interfaces...
+  * library method to gather information for automated tests
+  * library method examples
   * generics
+  * Lambda Functions
+  * Array constants
 
 
 

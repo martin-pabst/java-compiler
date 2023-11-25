@@ -4,6 +4,7 @@ import { TokenType } from "../TokenType.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaClass } from "../types/JavaClass";
 import { JavaEnum } from "../types/JavaEnum";
+import { JavaInterface } from "../types/JavaInterface.ts";
 import { JavaType } from "../types/JavaType.ts";
 import { Method } from "../types/Method.ts";
 import { JavaLocalVariable } from "./JavaLocalVariable";
@@ -18,7 +19,7 @@ export class JavaSymbolTable extends BaseSymbolTable {
     declare identifierToSymbolMap: Map<string, JavaLocalVariable>;
 
     constructor(public module: JavaCompiledModule, range: IRange, withStackFrame: boolean,
-        public classContext?: JavaClass | JavaEnum | undefined,
+        public classContext?: JavaClass | JavaEnum | JavaInterface | undefined,
         public methodContext?: Method){
         super(range, module.file);
         if(withStackFrame){
@@ -41,7 +42,7 @@ export class JavaSymbolTable extends BaseSymbolTable {
         return this.findSymbolIntern(identifier, this.classContext);
     }
 
-    private findSymbolIntern(identifier: string, classContext: JavaClass | JavaEnum | undefined): JavaLocalVariable | undefined {
+    private findSymbolIntern(identifier: string, classContext: JavaClass | JavaEnum | JavaInterface | undefined): JavaLocalVariable | undefined {
         let symbol = this.identifierToSymbolMap.get(identifier);
         if(symbol) return symbol;
 

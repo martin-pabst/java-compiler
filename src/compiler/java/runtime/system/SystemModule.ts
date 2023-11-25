@@ -38,7 +38,8 @@ export class SystemModule extends JavaLibraryModule {
         )
 
         this.classes.push(
-            ObjectClass, StringClass, NumberClass, IntegerClass, EnumClass, 
+            ObjectClass, EnumClass,     // These two MUST come first!
+            StringClass, NumberClass, IntegerClass,  
             ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass
         )
 

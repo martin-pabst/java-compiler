@@ -67,6 +67,17 @@ export class JavaClass extends IJavaClass {
         super(identifier, module, identifierRange);
     }
 
+    findMethodWithSignature(signature: string): Method | undefined {
+        for(let method of this.methods){
+            if(method.getInternalName("java") == signature) return method;
+        }
+        if(this.extends){
+            return (<JavaClass>this.extends).findMethodWithSignature(signature);
+        }
+
+        return undefined;
+    }
+
     isGenericVariant(): boolean {
         return false;
     }

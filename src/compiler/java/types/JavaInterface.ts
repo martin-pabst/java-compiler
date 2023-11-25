@@ -98,6 +98,26 @@ export class JavaInterface extends IJavaInterface {
         return this.methods;
     }
 
+    private getAllInheritedMethodsHelper(alreadyFoundSignatureMap: Map<string, Method>) {
+        for(let m of this.methods){
+            let signature = m.getInternalName("java");
+            if(!alreadyFoundSignatureMap.get(signature)){
+                alreadyFoundSignatureMap.set(signature, m);
+            }
+        }
+        for(let intf of this.extends){
+            (<JavaInterface>intf).getAllInheritedMethodsHelper(alreadyFoundSignatureMap);
+        }
+    }
+
+    public getAllInheritedMethods(): Method[] {
+        let map: Map<string, Method> = new Map();
+        this.getAllInheritedMethodsHelper(map);
+        let list: Method[] = [];
+        map.forEach((method, signatur) => list.push(method));
+        return list;
+    }
+
     canImplicitlyCastTo(otherType: JavaType): boolean {
         if (!(otherType instanceof JavaInterface)) return false;
 

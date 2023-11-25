@@ -1,5 +1,5 @@
 import { ErrorLevel } from "../../common/Error";
-import { Klass } from "../../common/interpreter/StepFunction";
+import { Helpers, Klass, StepParams } from "../../common/interpreter/StepFunction";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
@@ -8,6 +8,7 @@ import { JavaModuleManager } from "../module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "../module/libraries/JavaLibraryModuleManager";
 import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTTypeNode } from "../parser/AST";
 import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
+import { InterfaceClass } from "../runtime/system/javalang/InterfaceClass.ts";
 import { ArrayType } from "../types/ArrayType";
 import { Field } from "../types/Field";
 import { GenericTypeParameter } from "../types/GenericInformation";
@@ -243,10 +244,15 @@ export class TypeResolver {
 
 
     buildAllMethods() {
+
+        let classes: JavaClass[] = [];
+
         for (let module of this.dirtyModules) {
             for (let declNode of module.ast!.classOrInterfaceOrEnumDefinitions) {
                 switch (declNode.kind) {
+                    //@ts-ignore
                     case TokenType.keywordClass:
+                        classes.push(<JavaClass>declNode.resolvedType);
                     case TokenType.keywordEnum:
                         let resolvedType1 = <JavaClass | JavaEnum>declNode.resolvedType;
                         // this.buildFields(declNode, resolvedType1, module);
@@ -259,6 +265,50 @@ export class TypeResolver {
                 }
             }
         }
+
+        // replenish class types with default methods of implemented interfaces if necessary
+        for (let javaClass of classes) {
+
+            for (let ji of javaClass.getImplements()) {
+                let javaInterface = <JavaInterface>ji;
+                for (let method of javaInterface.getMethods()) {
+
+                    let classesMethod = javaClass.findMethodWithSignature(method.getInternalName("java"));
+
+                    if (!classesMethod) {
+                        if (method.isDefault) {
+                            let copy = method.getCopy();
+                            javaClass.methods.push(copy);
+                            method.callbackAfterCodeGeneration.push(() => {
+                                copy.program = method.program;
+
+                                let runtimeClass = javaClass.runtimeClass!;
+                                runtimeClass.__programs.push(method.program);
+
+                                let methodIndex = runtimeClass.__programs.length - 1;
+
+                                let parameterIdentifiers = method.parameters.map(p => p.identifier);
+                                let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
+                                method.programStub =
+                                    `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
+                                    `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`;
+                                runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
+                                    method.programStub);
+                            });
+                        } else {
+                            javaClass.module.errors.push({
+                                message: "Die Klasse " + javaClass.identifier + " muss noch die Methode " + method.identifier + " des Interfaces " + javaInterface.identifier + " implementieren",
+                                level: "error",
+                                range: javaClass.identifierRange
+                            })
+                        }
+                    }
+
+                }
+            }
+
+        }
+
 
     }
 
@@ -273,6 +323,7 @@ export class TypeResolver {
             method.isStatic = methodNode.isStatic;
             method.classEnumInterface = type;
             method.isConstructor = methodNode.isContructor;
+            method.isDefault = methodNode.isDefault;
 
             method.returnParameterType = methodNode.returnParameterType?.resolvedType;
             for (let p of methodNode.parameters) {
@@ -307,7 +358,9 @@ export class TypeResolver {
 
         let enumRuntimeClass: Klass = (<JavaEnum>this.libraryModuleManager.typestore.getType("Enum")!).runtimeClass!;
 
-        // initialize fields of enums
+        let interfaceClass: Klass = InterfaceClass;
+
+        // initialize fields of enums and interfaces
         for (let module of this.dirtyModules) {
             for (let decl of module.ast!.classOrInterfaceOrEnumDefinitions) {
                 if (decl.kind == TokenType.keywordEnum) {
@@ -324,7 +377,7 @@ export class TypeResolver {
                     }
 
                     // each enum value gets compiled to a public static final field
-                    for(let enumValue of decl.valueNodes){
+                    for (let enumValue of decl.valueNodes) {
                         let f: Field = new Field(enumValue.identifier, enumValue.identifierRange, module, javaEnum, TokenType.keywordPublic);
                         f.isStatic = true;
                         f.isFinal = true;
@@ -332,6 +385,20 @@ export class TypeResolver {
                         javaEnum.fields.push(f);
                     }
 
+                } else if (decl.kind == TokenType.keywordInterface) {
+                    let javaInterface = <JavaInterface>decl.resolvedType;
+                    javaInterface?.initRuntimeClass(interfaceClass);
+
+                    // interfaces may have static fields...
+                    for (let field of decl.fieldsOrInstanceInitializers) {
+                        if (field.kind == TokenType.fieldDeclaration) {
+                            let f: Field = new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility);
+                            f.isStatic = field.isStatic;
+                            f.isFinal = field.isFinal;
+                            f.classEnum = javaInterface;
+                            javaInterface.fields.push(f);
+                        }
+                    }
                 }
             }
         }

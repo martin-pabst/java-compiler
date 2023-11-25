@@ -94,15 +94,23 @@ export abstract class NonPrimitiveType extends JavaType {
                 }
             }
         } else {
-            let type: NonPrimitiveType | undefined = this;
-            while (type) {
-                methods = methods.concat(type.getMethods().filter(m => 
-                    m.parameters.length == length && !m.isConstructor && m.identifier == identifier
-                    && (!hasToBeStatic || m.isStatic)
-                ));
-                //@ts-ignore
-                type = type.getExtends();
+
+            methods = this.getMethods().filter(m => 
+                m.parameters.length == length && !m.isConstructor && m.identifier == identifier
+                && (!hasToBeStatic || m.isStatic)
+            )
+
+            //@ts-ignore
+            let ext = this.getExtends();        // is array if this instanceOf JavaInterface
+
+            if(ext){
+                if(!Array.isArray(ext)) ext = [ext];
+    
+                for(let type of ext){
+                    methods = methods.concat(type.getPossibleMethods(identifier, length, isConstructor, hasToBeStatic));
+                }
             }
+
         }
 
         return methods;

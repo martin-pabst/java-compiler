@@ -3,7 +3,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTMethodDeclarationNode, ASTStaticInitializerNode } from "../parser/AST";
+import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTMethodDeclarationNode, ASTStaticInitializerNode } from "../parser/AST";
 import { Field } from "../types/Field.ts";
 import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
@@ -81,6 +81,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                     this.compileEnumDeclaration(cdef);
                     break;
                 case TokenType.keywordInterface:
+                    this.compileInterfaceDeclaration(cdef);
                     break;
             }
         }
@@ -98,6 +99,22 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         // second step: non-static fields and instance initializers
         this.compileInstanceFieldsAndInitializer(cdef, classContext);
+        
+        this.compileMethodsAndConstructors(cdef, classContext);
+
+        this.popSymbolTable();
+
+    }
+
+    compileInterfaceDeclaration(cdef: ASTInterfaceDefinitionNode) {
+        let type = cdef.resolvedType;
+        if (!type || !cdef.resolvedType) return;
+        let classContext = <JavaInterface>cdef.resolvedType;
+
+        this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
+
+        // first step: static fields and static initializers
+        this.compileStaticFieldsAndInitializerAndEnumValues(classContext, cdef);
         
         this.compileMethodsAndConstructors(cdef, classContext);
 
@@ -124,7 +141,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     }
 
-    private compileMethodsAndConstructors(cdef: ASTClassDefinitionNode | ASTEnumDefinitionNode, classContext: JavaClass | JavaEnum) {
+    private compileMethodsAndConstructors(cdef: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, classContext: JavaClass | JavaEnum | JavaInterface) {
         let constructorFound: boolean = false;
         for (let method of cdef.methods) {
             this.compileMethodDeclaration(method, classContext);
@@ -168,13 +185,18 @@ export class CodeGenerator extends StatementCodeGenerator {
         classContext.instanceInitializer = fieldSnippets;
     }
 
-    private compileStaticFieldsAndInitializerAndEnumValues(classContext: JavaClass | JavaEnum | JavaInterface, cdef: ASTClassDefinitionNode | ASTEnumDefinitionNode) {
+    private compileStaticFieldsAndInitializerAndEnumValues(classContext: JavaClass | JavaEnum | JavaInterface, cdef: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode) {
         let staticFieldSnippets: CodeSnippet[] = [];
         for (let fieldOrInitializer of cdef.fieldsOrInstanceInitializers) {
 
             switch (fieldOrInitializer.kind) {
                 case TokenType.fieldDeclaration:
-                    if (!fieldOrInitializer.isStatic) continue;
+                    if (!fieldOrInitializer.isStatic) {
+                        if(classContext instanceof JavaInterface){
+                            this.pushError("Interfaces können nur statische Attribute besitzen.", "error", cdef);
+                        }
+                        continue;
+                    } 
                     let snippet = this.compileField(fieldOrInitializer, classContext);
                     if (snippet) {
                         staticFieldSnippets.push(snippet);
@@ -399,80 +421,94 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     }
 
-    compileMethodDeclaration(methodNode: ASTMethodDeclarationNode, classContext: JavaClass | JavaEnum) {
+    compileMethodDeclaration(methodNode: ASTMethodDeclarationNode, classContext: JavaClass | JavaEnum | JavaInterface) {
 
         let method = methodNode.method;
         if (!method) return;
 
-        this.missingStatementManager.beginMethodBody(method.parameters);
-
+        
         if (methodNode.isContructor) {
             this.callingOtherConstructorInSameClassHappened = false;
             this.superConstructorHasBeenCalled = false;
         }
-
+        
         let symbolTable = this.pushAndGetNewSymbolTable(methodNode.range, true, classContext, method);
-
+        
         for (let parameter of method.parameters) {
             this.currentSymbolTable.addSymbol(parameter);
         }
-
-
+        
+        
         let snippets: CodeSnippet[] = [];
-
+        
         if (method.isConstructor) {
-
+            
+            if(classContext instanceof JavaInterface){
+                this.pushError("Interfaces haben keinen Konstruktor.", "error", methodNode);
+                return undefined;
+            }
+            
             if (!this.callingOtherConstructorInSameClassHappened && classContext.instanceInitializer.length > 0) {
                 snippets = snippets.concat(classContext.instanceInitializer);
             }
-
+            
             if (!this.superConstructorHasBeenCalled) {
                 // TODO: insert call to default super constructor
             }
-
+            
         }
+        
+        if(methodNode.statement){
 
+            if(method.isAbstract) this.pushError("Eine abstrakte Methode kann keinen Methodenrumpf besitzen.", "error", methodNode);
+            if(classContext instanceof JavaInterface && !(method.isAbstract || method.isDefault)) this.pushError("In Interfaces können nur default-Methoden und abstrakte Methoden einen Methodenrumpf haben.", "error", methodNode);
 
-        let snippet = methodNode.statement ? this.compileStatementOrTerm(methodNode.statement) : undefined;
-        if (snippet) snippets.push(snippet);
-
-        if (methodNode.isContructor) {
-            snippets.push(new StringCodeSnippet(`${Helpers.return}(${StepParams.stack}[0]);\n`))
-        }
-
-        method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
-
-        if (!this.missingStatementManager.hasReturnHappened() && !methodNode.isContructor) {
-            snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
-        }
-
-        this.missingStatementManager.endMethodBody(method, this.module.errors);
-
-        this.linker.link(snippets, method.program);
-
-        methodNode.program = method.program;    // only for debugging purposes
-
-        let runtimeClass = classContext.runtimeClass;
-
-        if (runtimeClass) {
-            runtimeClass.__programs.push(method.program);
-            method.program.compileToJavascriptFunctions();
-            let methodIndex = runtimeClass.__programs.length - 1;
-
-            let parameterIdentifiers = method.parameters.map(p => p.identifier);
-            let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
-
-            if (method.isStatic) {
-                method.programStub =
-                    `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
-                    `${Helpers.pushProgram}(this.__programs[${methodIndex}]);`;
-            } else {
-                method.programStub =
-                    `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
-                    `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`;
+            this.missingStatementManager.beginMethodBody(method.parameters);
+            
+            let snippet = methodNode.statement ? this.compileStatementOrTerm(methodNode.statement) : undefined;
+            if (snippet) snippets.push(snippet);
+            
+            if (methodNode.isContructor) {
+                snippets.push(new StringCodeSnippet(`${Helpers.return}(${StepParams.stack}[0]);\n`))
             }
-            runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
-                method.programStub);
+    
+            method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
+    
+            if (!this.missingStatementManager.hasReturnHappened() && !methodNode.isContructor) {
+                snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
+            }
+    
+            this.missingStatementManager.endMethodBody(method, this.module.errors);
+    
+            this.linker.link(snippets, method.program);
+    
+            methodNode.program = method.program;    // only for debugging purposes
+    
+            let runtimeClass = classContext.runtimeClass;
+    
+            if (runtimeClass) {
+                runtimeClass.__programs.push(method.program);
+                method.program.compileToJavascriptFunctions();
+
+                method.callbackAfterCodeGeneration.forEach(callback => callback());
+
+                let methodIndex = runtimeClass.__programs.length - 1;
+    
+                let parameterIdentifiers = method.parameters.map(p => p.identifier);
+                let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
+    
+                if (method.isStatic) {
+                    method.programStub =
+                        `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
+                        `${Helpers.pushProgram}(this.__programs[${methodIndex}]);`;
+                } else {
+                    method.programStub =
+                        `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
+                        `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`;
+                }
+                runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
+                    method.programStub);
+            }
         }
 
         this.popSymbolTable();

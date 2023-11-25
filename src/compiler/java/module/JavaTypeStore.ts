@@ -1,4 +1,5 @@
 import { KlassObjectRegistry } from "../../common/interpreter/StepFunction";
+import { JavaClass } from "../types/JavaClass";
 import { JavaType } from "../types/JavaType";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 
@@ -34,6 +35,18 @@ export class JavaTypeStore {
         this.typeMap.forEach((type, key) => {
             type.registerExtendsImplementsOnAncestors();
         })
+    }
+
+    getClasses(): JavaClass[] {
+        let classes: JavaClass[] = [];
+        
+        this.typeMap.forEach((type, identifier) => {
+            if(type instanceof JavaClass){
+                classes.push(type);
+            }
+        })
+
+        return classes;
     }
 
 }

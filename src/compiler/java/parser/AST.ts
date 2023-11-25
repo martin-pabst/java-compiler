@@ -71,6 +71,7 @@ export interface ASTNodeWithModifiers {
     isFinal: boolean;
     isStatic: boolean;
     isAbstract: boolean;
+    isDefault: boolean;
 }
 
 
@@ -173,11 +174,13 @@ export interface ASTClassDefinitionNode
 }
 
 export interface ASTInterfaceDefinitionNode
-    extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers,
-    ASTNodeWithIdentifier, AnnotatedNode, ASTTypeDefiningNode, ASTTypeDefinitionWithFields {
+extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers,
+ASTNodeWithIdentifier, AnnotatedNode, ASTTypeDefiningNode, ASTTypeDefinitionWithFields {
     kind: TokenType.keywordInterface;
     parent: TypeScope;
     implements: ASTTypeNode[];
+
+    staticInitializer?: Program       // only for debugging purposes,
 }
 
 export interface ASTEnumValueNode extends ASTNode {

@@ -25,6 +25,7 @@ import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceIn
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { MissingStatementManager } from "./MissingStatementsManager.ts";
+import { JavaInterface } from "../types/JavaInterface.ts";
 
 
 export class TermCodeGenerator extends BinopCastCodeGenerator {
@@ -142,7 +143,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         return snippet;
     }
 
-    pushAndGetNewSymbolTable(range: IRange, withStackframe: boolean, classContext?: JavaClass | JavaEnum | undefined, methodContext?: Method): JavaSymbolTable {
+    pushAndGetNewSymbolTable(range: IRange, withStackframe: boolean, classContext?: JavaClass | JavaEnum | JavaInterface | undefined, methodContext?: Method): JavaSymbolTable {
         let newSymbolTable = new JavaSymbolTable(this.module, range, withStackframe, classContext, methodContext);
         if (this.currentSymbolTable) {
             this.currentSymbolTable.addChildTable(newSymbolTable);
