@@ -17,12 +17,13 @@
   * enums...    -> needs more testing
   * interfaces...  -> needs more testing
   * use templates to generate fast code for static library functions like Math.sin, Math.atan2, ...
+  * invoke methods on expressions wich evaluate to a string primitive (with constant folding)
 
 
 ## next todos
+  * generics
   * library method to gather information for automated tests
   * library method examples
-  * generics
   * Lambda Functions
   * Array constants
 

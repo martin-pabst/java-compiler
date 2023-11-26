@@ -1,4 +1,22 @@
 export var testPrograms = {
+simpleGenericsTest: `
+A<String> a = new A<String>();
+a.set("Test");
+println(a.get());
+
+class A<T> {
+   T obj;
+   
+   T get(){
+      return obj;
+   }
+
+   void set(T t){
+      obj = t;
+   }
+}
+
+`,
 staticFieldsTest: `
 A a = new A();
 a.test();
