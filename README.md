@@ -1,5 +1,5 @@
 # New java-compiler for the  [online-ide](https://www.online-ide.de)
-This compiler/interpreter combo (work in progress...) understands a fairly large subset of the java programming language and transpiles it stepwise into individual javascript functions. These can then be executed inside a browser step by step. The compiler is a replacement for the old one that is currently integrated in the online-ide. Main difference is that there is no more intermediate language (P-Code) needed. First experiments indicate that the new compiler/interpreter combo executes java code about 50 times faster than the old one.
+This compiler/interpreter combo (work in progress...) understands a fairly large subset of the java programming language and transpiles it stepwise into individual javascript functions. These can then be executed inside a browser step by step. The compiler is a replacement for the old one that is currently integrated in the online-ide. Main difference is that there is no more intermediate language (P-Code) needed. Initial tests indicate that the new compiler/interpreter combo executes java code about 50 times faster than the old one.
 
 ## Features (done)
   * primitive types (int, long, double, ...)
