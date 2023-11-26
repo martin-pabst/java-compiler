@@ -525,6 +525,23 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
             parameterValues[i] = this.compileCast(parameterValues[i]!, destinationType, "implicit");
         }
 
+        let returnParameter = method.returnParameterType || this.voidType;
+
+        if(method.constantFoldingFunction){
+            let allParametersConstant: boolean = !parameterValues.some(v => !v.isConstant())
+            if(allParametersConstant){
+                let constantValues = parameterValues.map(p => p.getConstantValue());
+                let result = method.constantFoldingFunction(...constantValues);
+                let resultAsString = method.returnParameterType == this.stringType ? `"${result}"` : "" + result;
+                return new StringCodeSnippet(resultAsString, node.range, returnParameter, result);
+            }
+        }
+
+        // For library functions like Math.sin, Math.abs, ... we use templates to compile to nativ javascript functions:
+        if(method.template){
+            return new SeveralParameterTemplate(method.template).applyToSnippet(returnParameter, node.range, ...parameterValues);
+        }
+
         let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention ? "native" : "java";
 
         let objectTemplate: string;
@@ -545,7 +562,6 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
         parameterValues.unshift(objectSnippet);
 
-        let returnParameter = method.returnParameterType || this.voidType;
 
         let snippet = new SeveralParameterTemplate(objectTemplate).applyToSnippet(returnParameter, node.range, ...parameterValues);
 

@@ -24,6 +24,7 @@ export class LibraryDeclarationLexer {
             ["static", TokenType.keywordStatic],
             ["abstract", TokenType.keywordAbstract],
             ["default", TokenType.keywordDefault],
+            ["final", TokenType.keywordFinal],
         ]
 
     );

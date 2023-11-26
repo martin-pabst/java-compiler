@@ -429,7 +429,7 @@ export class BinopCastCodeGenerator {
         if (!typeFrom || !typeTo) return false;
 
         let typeFromIndex = primitiveTypeMap[typeFrom.identifier] || boxedTypesMap[typeFrom.identifier];
-        let typeToIndex = primitiveTypeMap[typeFrom.identifier] || boxedTypesMap[typeFrom.identifier];
+        let typeToIndex = primitiveTypeMap[typeTo.identifier] || boxedTypesMap[typeTo.identifier];
 
         if (typeToIndex == nString) return true;
 

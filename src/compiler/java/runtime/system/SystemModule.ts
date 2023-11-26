@@ -3,6 +3,7 @@ import { JavaLibraryModule } from "../../module/libraries/JavaLibraryModule";
 import { ArithmeticExceptionClass } from "./javalang/ArithmeticExceptionClass.ts";
 import { EnumClass } from "./javalang/EnumClass.ts";
 import { ExceptionClass } from "./javalang/ExceptionClass.ts";
+import { MathClass } from "./javalang/MathClass.ts";
 import { NullPointerExceptionClass } from "./javalang/NullPointerExceptionClass.ts";
 import { ObjectClass, StringClass } from "./javalang/ObjectClassStringClass";
 import { RuntimeExceptionClass } from "./javalang/RuntimeException.ts";
@@ -38,8 +39,9 @@ export class SystemModule extends JavaLibraryModule {
         )
 
         this.classes.push(
-            ObjectClass, EnumClass,     // These two MUST come first!
-            StringClass, NumberClass, IntegerClass,  
+            ObjectClass, EnumClass,                  // These two MUST come first!
+            StringClass, NumberClass, IntegerClass,  // boxed primitive types
+            MathClass,
             ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass
         )
 

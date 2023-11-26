@@ -10,12 +10,15 @@ type LibraryMethodDeclaration = {
     signature: string;
     native?: Function;
     java?: Function;
+    template?: string;
+    constantFoldingFunction?: (...parms: any) => any;
 }
 
 type LibraryAttributeDeclaration = {
     type: LMADeclarationType;
     signature: string;
     nativeIdentifier: string;
+    constantValue: any;
 } 
 
 type LibraryMethodOrAttributeDeclaration = LibraryClassDeclaration | LibraryMethodDeclaration | LibraryAttributeDeclaration;

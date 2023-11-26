@@ -16,6 +16,7 @@
   * wire up step over, step into, step out
   * enums...    -> needs more testing
   * interfaces...  -> needs more testing
+  * use templates to generate fast code for static library functions like Math.sin, Math.atan2, ...
 
 
 ## next todos

@@ -457,19 +457,30 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 klass.prototype[m.getInternalName("java")] = mdecl.java;
             }
 
+            if(mdecl.template){
+                m.template = mdecl.template;
+            }
+
+            if(mdecl.constantFoldingFunction){
+                m.constantFoldingFunction = mdecl.constantFoldingFunction;
+            }
+
         } else {
-            // let adecl = <LibraryAttributeDeclaration> decl;
+            let adecl = <LibraryAttributeDeclaration> decl;
             // attribute
             let a = new Field(identifier, EmptyRange.instance, module, type, modifiers.visibility);
             a.isStatic = modifiers.static;
             a.isFinal = modifiers.final;
             a.classEnum = klassType;
 
+            a.internalName = adecl.nativeIdentifier || identifier;
+            if(typeof adecl.constantValue !== "undefined"){
+                a.initialValue = adecl.constantValue;
+                a.initialValueIsConstant = true;
+            }
+
             klassType.fields.push(a);
-            if(this.comesToken(TokenType.colon, true)){
-                let realName = this.expectIdentifier();
-                a.internalName = realName;
-            }                        
+
         }
 
     }

@@ -26,6 +26,9 @@ export class Method {
 
     parameters: Parameter[] = [];
 
+    template?: string;      // only for library Methods, i.e. Math.sin
+    constantFoldingFunction?: (...parms: any) => any; 
+
     /**
      * undefined, if null
      */
