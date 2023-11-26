@@ -1,4 +1,5 @@
 import { Step } from "../../common/interpreter/Program";
+import { StepParams } from "../../common/interpreter/StepFunction";
 import { EmptyRange, IRange } from "../../common/range/Range";
 import { JavaType } from "../types/JavaType";
 import { CodeSnippet, ConstantValue, StringCodeSnippet } from "./CodeSnippet";
@@ -217,7 +218,7 @@ export class CodeSnippetContainer extends CodeSnippet {
     lastPartOrPop(): CodeSnippet {
         if (this.parts.length == 0) return new EmptyPart(); // shouldn't occur
 
-        return this.finalValueIsOnStack ? new StringCodeSnippet("s.pop()", this.range) : this.parts[this.parts.length - 1];
+        return this.finalValueIsOnStack ? new StringCodeSnippet(`${StepParams.stack}.pop()`, this.range) : this.parts[this.parts.length - 1];
     }
 
     ensureFinalValueIsOnStack() {

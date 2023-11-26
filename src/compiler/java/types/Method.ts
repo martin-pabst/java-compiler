@@ -75,6 +75,12 @@ export class Method {
         newMethod.isFinal = this.isFinal;
         newMethod.isAbstract = this.isAbstract;
         newMethod.isDefault = this.isDefault;
+        newMethod.parameters = newParameters;
+        newMethod.returnParameterType = newReturnParameter;
+
+        this.getInternalName("java");
+        this.getInternalName("native");
+        newMethod.internalNames = this.internalNames;
 
         return newMethod;
 

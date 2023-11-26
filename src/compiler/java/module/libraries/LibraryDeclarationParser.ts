@@ -1,4 +1,4 @@
-import { Klass } from "../../../common/interpreter/StepFunction";
+import { Helpers, Klass, StepParams } from "../../../common/interpreter/StepFunction";
 import { EmptyRange, IRange } from "../../../common/range/Range";
 import { TokenType } from "../../TokenType";
 import { ArrayType } from "../../types/ArrayType";
@@ -436,12 +436,12 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                     if(m.isConstructor){
                         body = `
                             this.${realName}(${parameterNames.join(", ")});
-                            __t.push(this); 
+                            ${Helpers.threadStack}.push(this); 
                         `
                     } else {
                         body = `
                             ${hasReturnValue? 'let __returnValue = ':''}this.${realName}(${parameterNames.join(", ")});
-                            ${hasReturnValue? '__t.push(__returnValue);':''} 
+                            ${hasReturnValue? `${Helpers.threadStack}.push(__returnValue);`:''} 
                         `
                     }
 

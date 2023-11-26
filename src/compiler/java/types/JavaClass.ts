@@ -246,7 +246,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     }
 
     canImplicitlyCastTo(otherType: JavaType): boolean {
-        if(!(otherType instanceof IJavaInterface)) return false;
+        if(!(otherType instanceof NonPrimitiveType)) return false;
 
         // ArrayList<Integer> can cast to List or to ArrayList
         if(otherType instanceof JavaInterface || otherType instanceof JavaClass){

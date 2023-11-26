@@ -75,6 +75,7 @@ export class Step {
     }
 
     compileToJavascriptFunction() {
+        console.log(this.codeAsString);
         // @ts-ignore
         this.run = new Function(StepParams.thread, StepParams.stack, StepParams.stackBase, this.codeAsString);
     }

@@ -1,4 +1,5 @@
 import { Step } from "../../common/interpreter/Program";
+import { StepParams } from "../../common/interpreter/StepFunction";
 import { IRange } from "../../common/range/Range";
 import { JavaType } from "../types/JavaType";
 
@@ -24,7 +25,7 @@ export abstract class CodeSnippet {
     }
 
     lastPartOrPop(): CodeSnippet {
-        return this.finalValueIsOnStack ? new StringCodeSnippet("s.pop()", this.range) : this;
+        return this.finalValueIsOnStack ? new StringCodeSnippet(`${StepParams.stack}.pop()`, this.range) : this;
     }
 
     isPureTermWithoutPop(){
@@ -131,7 +132,7 @@ export class StringCodeSnippet extends CodeSnippet {
     }
 
     lastPartOrPop(): CodeSnippet {
-        return this.finalValueIsOnStack ? new StringCodeSnippet("s.pop()", this.range) : this;
+        return this.finalValueIsOnStack ? new StringCodeSnippet(`${StepParams.stack}.pop()`, this.range) : this;
     }
 
     endsWith(suffix: string){

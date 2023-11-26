@@ -354,7 +354,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
         
         let statement = node.isPrintln ? Helpers.println : Helpers.print;
         
-        if (firstParameter) {
+        if (firstParameter && firstParameter.type != this.voidType) {
             firstParameter = this.compileCast(firstParameter, this.stringType, "implicit");
             if (secondParameter) {
                 return new TwoParameterTemplate(`${statement}(§1, §2);\n`)

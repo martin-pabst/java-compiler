@@ -1,4 +1,4 @@
-import { Helpers } from "../../common/interpreter/StepFunction";
+import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { IRange } from "../../common/range/Range";
 import { JavaType } from "../types/JavaType";
 import { CodeSnippet, ConstantValue, StringCodeSnippet } from "./CodeSnippet";
@@ -80,8 +80,8 @@ export class TwoParameterTemplate extends CodeTemplate {
             snippetContainer.addParts(snippets[1].allButLastPart()); 0
         }
 
-        snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\§1', 'g'), 's.pop()')
-            .replace(new RegExp('\\§2', 'g'), 's.pop()'), range);
+        snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\§1', 'g'), `${StepParams.stack}.pop()`)
+            .replace(new RegExp('\\§2', 'g'), `${StepParams.stack}.pop()`), range);
         return snippetContainer;
 
     }
@@ -250,12 +250,12 @@ export class BinaryOperatorTemplate extends CodeTemplate {
             snippetContainer.addParts(snippets[1].allButLastPart());
 
             switch (this.operator) {
-                case '-': snippetContainer.addStringPart(`-s.pop() + s.pop()`, _range); break;
-                case '/': snippetContainer.addStringPart(`1/(s.pop() || ${Helpers.throwAE}("Teilen durch 0", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn})) * s.pop()`, _range); break;
-                case '<': snippetContainer.addStringPart(`pop() > pop()`, _range); break;
-                case '>': snippetContainer.addStringPart(`pop() < pop()`, _range); break;
-                case '<=': snippetContainer.addStringPart(`pop() >= pop()`, _range); break;
-                case '>=': snippetContainer.addStringPart(`pop() <= pop()`, _range); break;
+                case '-': snippetContainer.addStringPart(`-${StepParams.stack}.pop() + ${StepParams.stack}.pop()`, _range); break;
+                case '/': snippetContainer.addStringPart(`1/(${StepParams.stack}.pop() || ${Helpers.throwAE}("Teilen durch 0", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn})) * ${StepParams.stack}.pop()`, _range); break;
+                case '<': snippetContainer.addStringPart(`${StepParams.stack}.pop() > ${StepParams.stack}.pop()`, _range); break;
+                case '>': snippetContainer.addStringPart(`${StepParams.stack}.pop() < ${StepParams.stack}.pop()`, _range); break;
+                case '<=': snippetContainer.addStringPart(`${StepParams.stack}.pop() >= ${StepParams.stack}.pop()`, _range); break;
+                case '>=': snippetContainer.addStringPart(`${StepParams.stack}.pop() <= ${StepParams.stack}.pop()`, _range); break;
             }
             snippetContainer.finalValueIsOnStack = false;
             return snippetContainer;
