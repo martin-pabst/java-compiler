@@ -1,11 +1,13 @@
 import { Program } from "../../../common/interpreter/Program";
-import { JavaLibraryModule } from "../../module/libraries/JavaLibraryModule";
+import { Klass } from "../../../common/interpreter/StepFunction.ts";
+import { JavaLibraryModule, LibraryKlassType } from "../../module/libraries/JavaLibraryModule";
 import { ArithmeticExceptionClass } from "./javalang/ArithmeticExceptionClass.ts";
 import { EnumClass } from "./javalang/EnumClass.ts";
 import { ExceptionClass } from "./javalang/ExceptionClass.ts";
 import { MathClass } from "./javalang/MathClass.ts";
 import { NullPointerExceptionClass } from "./javalang/NullPointerExceptionClass.ts";
 import { ObjectClass, StringClass } from "./javalang/ObjectClassStringClass";
+import { PrimitiveStringClass } from "./javalang/PrimitiveStringClass.ts";
 import { RuntimeExceptionClass } from "./javalang/RuntimeException.ts";
 import { ThrowableClass } from "./javalang/ThrowableClass.ts";
 import { BooleanPrimitiveType } from "./primitiveTypes/BooleanPrimitiveType";
@@ -22,6 +24,8 @@ import { IntegerClass } from "./primitiveTypes/wrappers/IntegerClass";
 import { NumberClass } from "./primitiveTypes/wrappers/NumberClass";
 
 export class SystemModule extends JavaLibraryModule {
+
+    public primitiveStringClass: Klass & LibraryKlassType = PrimitiveStringClass;
 
     constructor(){
         super();

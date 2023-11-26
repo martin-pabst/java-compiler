@@ -1,7 +1,9 @@
-import { KlassObjectRegistry } from "../../common/interpreter/StepFunction";
+import { Klass, KlassObjectRegistry } from "../../common/interpreter/StepFunction";
+import { PrimitiveStringClass } from "../runtime/system/javalang/PrimitiveStringClass";
 import { JavaClass } from "../types/JavaClass";
 import { JavaType } from "../types/JavaType";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
+import { LibraryKlassType } from "./libraries/JavaLibraryModule";
 
 export class JavaTypeStore {
  

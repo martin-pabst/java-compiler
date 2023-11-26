@@ -5,6 +5,7 @@ import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
 import { ASTNode, AssignmentOperator, BinaryOperator, ConstantType, LogicOperator } from "../parser/AST";
+import { PrimitiveStringClass } from "../runtime/system/javalang/PrimitiveStringClass";
 import { ArrayType } from "../types/ArrayType";
 import { JavaType } from "../types/JavaType";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
@@ -59,6 +60,8 @@ export class BinopCastCodeGenerator {
     booleanType: JavaType;
     stringType: JavaType;
     throwableType: JavaType;
+
+    primitiveStringClass = PrimitiveStringClass;
 
     primitiveTypes: JavaType[] = [];
 

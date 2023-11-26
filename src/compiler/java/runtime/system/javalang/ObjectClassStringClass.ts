@@ -46,9 +46,10 @@ export class StringClass extends ObjectClass {
 
     static __javaDeclarations: LibraryDeclarations = [
         {type: "c", signature: "class String extends Object"},
-        {type: "m", signature: "public String()", native: StringClass.prototype._emptyConstructor},
-        {type: "m", signature: "public String(String original)", native: StringClass.prototype._constructor2},
-        {type: "m", signature: "public String toString()", native: StringClass.prototype._nToString}
+        {type: "c", signature: "public String()", native: StringClass.prototype._emptyConstructor},
+        {type: "c", signature: "public String(String original)", native: StringClass.prototype._constructor2},
+        {type: "m", signature: "public String toString()", template: "§1"},
+        {type: "m", signature: "public int length()", template: "§1.value.length"},
     ]
 
     public value: string;
@@ -69,7 +70,7 @@ export class StringClass extends ObjectClass {
         return this;
     }
 
-    _nToString(t: Thread) {
+    _nToString() {
         return this;        
     }
 

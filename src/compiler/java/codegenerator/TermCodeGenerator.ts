@@ -470,27 +470,27 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
             return snippet;
         }
 
-
+        
     }
-
-
-
+    
+    
+    
     compileMethodCall(node: ASTMethodCallNode): CodeSnippet | undefined {
         let untestedParameterValues = node.parameterValues.map(p => this.compileTerm(p));
-
+        
         for (let p of untestedParameterValues) {
             if (!p || !p.type) return undefined;
         }
-
+        
         //@ts-ignore
         let parameterValues: CodeSnippet[] = untestedParameterValues;
-
+        
         let objectSnippet: CodeSnippet | undefined;
         if (node.nodeToGetObject) {
             objectSnippet = this.compileTerm(node.nodeToGetObject);
             if(!objectSnippet) return undefined;
             let range = node.nodeToGetObject.range;
-            if(!(objectSnippet.type instanceof JavaEnum)){
+            if(!(objectSnippet.type instanceof JavaEnum) && objectSnippet.type != this.stringType){
                 objectSnippet = SnippetFramer.frame(objectSnippet, `(§1 || ${Helpers.throwNPE}(${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn}))`);
             }
         } else {
@@ -501,7 +501,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
             }
             objectSnippet = new StringCodeSnippet(`${StepParams.stack}[${StepParams.stackBase}]`, EmptyRange.instance, classContext);
         }
-
+        
         if (!objectSnippet || !objectSnippet.type) {
             return undefined;
         }
@@ -529,9 +529,9 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
         if(method.constantFoldingFunction){
             let allParametersConstant: boolean = !parameterValues.some(v => !v.isConstant())
-            if(allParametersConstant){
+            if(allParametersConstant && (method.isStatic || objectSnippet.isConstant())){
                 let constantValues = parameterValues.map(p => p.getConstantValue());
-                let result = method.constantFoldingFunction(...constantValues);
+                let result = method.isStatic ? method.constantFoldingFunction(...constantValues) : method.constantFoldingFunction(objectSnippet.getConstantValue(), ...constantValues);
                 let resultAsString = method.returnParameterType == this.stringType ? `"${result}"` : "" + result;
                 return new StringCodeSnippet(resultAsString, node.range, returnParameter, result);
             }
@@ -539,7 +539,11 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
         // For library functions like Math.sin, Math.abs, ... we use templates to compile to nativ javascript functions:
         if(method.template){
-            return new SeveralParameterTemplate(method.template).applyToSnippet(returnParameter, node.range, ...parameterValues);
+            if(method.isStatic){
+                return new SeveralParameterTemplate(method.template).applyToSnippet(returnParameter, node.range, ...parameterValues);
+            } else {
+                return new SeveralParameterTemplate(method.template).applyToSnippet(returnParameter, node.range, objectSnippet, ...parameterValues);
+            }
         }
 
         let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention ? "native" : "java";
@@ -577,6 +581,9 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
     searchMethod(identifier: string, objectType: JavaType, parameterTypes: JavaType[],
         isConstructor: boolean, hasToBeStatic: boolean, takingVisibilityIntoAccount: boolean): Method | undefined {
+        
+        if(objectType == this.stringType) objectType = this.primitiveStringClass.type;
+
         let possibleMethods: Method[];
 
         if (objectType instanceof StaticNonPrimitiveType) {

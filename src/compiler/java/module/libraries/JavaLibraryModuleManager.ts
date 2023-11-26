@@ -11,13 +11,18 @@ export class JavaLibraryModuleManager {
     typestore: JavaTypeStore;
 
     constructor(...additionalModules: JavaLibraryModule[]){
-        this.libraryModules.push(new SystemModule())
+        let systemModule = new SystemModule();
+        this.libraryModules.push(systemModule)
         if(additionalModules){
             this.libraryModules.push(...additionalModules);
         }
 
         this.typestore = new JavaTypeStore();
         this.compileClassesToTypes();
+
+        let ldp: LibraryDeclarationParser = new LibraryDeclarationParser();
+        ldp.parseClassOrEnumOrInterfaceDeclarationWithoutGenerics(systemModule.primitiveStringClass, systemModule);
+        ldp.parseAttributesAndMethods(systemModule.primitiveStringClass, this.typestore, systemModule);
     }
 
     compileClassesToTypes(){
