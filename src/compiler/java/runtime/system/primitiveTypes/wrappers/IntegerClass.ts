@@ -10,6 +10,8 @@ export class IntegerClass extends NumberClass {
 
     static __javaDeclarations: LibraryDeclarations = [
         {type: "c", signature: "class Integer extends Number"},
+        {type: "a", signature: "final static int MAX_VALUE", constantValue: 0x80000000-1},
+        {type: "a", signature: "final static int MIN_VALUE", constantValue: -0x80000000},
         {type: "m", signature: "public double doubleValue()"},
         {type: "m", signature: "public float floatValue()"},
         {type: "m", signature: "public int intValue()"},
