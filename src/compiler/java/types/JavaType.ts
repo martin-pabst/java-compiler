@@ -31,4 +31,12 @@ export abstract class JavaType extends BaseType {
     public registerExtendsImplementsOnAncestors(){
     }
 
+    abstract toString(): string;
+
+    abstract getReifiedIdentifier(): string;
+
+    getInternalName(): string {
+        return this.identifier;
+    }
+
 }

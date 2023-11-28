@@ -52,4 +52,20 @@ export class ArrayType extends JavaType {
         return undefined;
     }
 
+    toString(): string {
+        let s: string = this.elementType.toString();
+        for(let i = 0; i < this.dimension; i++) s += "[]";
+        return s;
+    }
+
+    getReifiedIdentifier(): string {
+        return this.toString();
+    }
+
+    getInternalName(): string {
+        let internalName = this.identifier;
+        for(let i = 0; i < this.dimension; i++) internalName += "I_I";        
+        return internalName;
+    }
+
 }

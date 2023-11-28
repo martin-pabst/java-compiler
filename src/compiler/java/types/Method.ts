@@ -106,8 +106,8 @@ export class Method {
             let cc = callingConvention == "java" ? "j" : "n";
     
             let shorthand = this.isConstructor ? 'c' : 'm';
-            let s = `_${shorthand}${cc}$${this.identifier}$${this.returnParameterType ? this.returnParameterType.identifier : 'void'}$`;
-            s += this.parameters.map(p => p.type.identifier).join("$");
+            let s = `_${shorthand}${cc}$${this.identifier}$${this.returnParameterType ? this.returnParameterType.getInternalName() : 'void'}$`;
+            s += this.parameters.map(p => p.type.getInternalName()).join("$");
             this.internalNames[callingConvention] = s;
         }
         return this.internalNames[callingConvention];
@@ -118,4 +118,11 @@ export class Method {
         this.parameters.forEach(p => p.usagePositions = []);
     }
 
+    getSignature(){
+        if(this.isConstructor){
+            return this.identifier + "(" + this.parameters.map(p => p.type.getReifiedIdentifier()).join(", ") + ")";
+        } else {
+            return this.returnParameterType?.getReifiedIdentifier() + this.identifier + "(" + this.parameters.map(p => p.type.getReifiedIdentifier()).join(", ") + ")";
+        }
+    }
 }

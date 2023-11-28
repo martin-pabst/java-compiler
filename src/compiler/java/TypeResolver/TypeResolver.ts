@@ -271,6 +271,7 @@ export class TypeResolver {
 
             for (let ji of javaClass.getImplements()) {
                 let javaInterface = <JavaInterface>ji;
+                let notImplementedMethods: Method[] = [];
                 for (let method of javaInterface.getMethods()) {
 
                     let classesMethod = javaClass.findMethodWithSignature(method.getInternalName("java"));
@@ -295,15 +296,17 @@ export class TypeResolver {
                                 runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
                                     method.programStub);
                             });
-                        } else {
-                            javaClass.module.errors.push({
-                                message: "Die Klasse " + javaClass.identifier + " muss noch die Methode " + method.identifier + " des Interfaces " + javaInterface.identifier + " implementieren",
-                                level: "error",
-                                range: javaClass.identifierRange
-                            })
                         }
                     }
-
+                    
+                }
+                
+                if(notImplementedMethods.length > 0){                    
+                    javaClass.module.errors.push({
+                        message: "Die Klasse " + javaClass.identifier + " muss noch folgende Methoden des Interfaces " + javaInterface.identifier + " implementieren: " + notImplementedMethods.map(m => m.getSignature()).join(", "),
+                        level: "error",
+                        range: javaClass.identifierRange
+                    })
                 }
             }
 

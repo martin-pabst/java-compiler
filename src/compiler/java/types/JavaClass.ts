@@ -44,6 +44,19 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
             }
     }
 
+    toString(): string {
+        let s: string = this.identifier;
+        
+        if(this.genericInformation && this.genericInformation.length > 0){
+            s += "<" + this.genericInformation.map(gi => gi.toString()).join(", ") + ">";
+        }
+        return s;
+    }
+
+    getReifiedIdentifier(): string {
+        return this.identifier;
+    }
+    
 }
 
 
@@ -66,6 +79,7 @@ export class JavaClass extends IJavaClass {
     constructor(identifier: string, module: JavaBaseModule, identifierRange: IRange) {
         super(identifier, module, identifierRange);
     }
+
 
     findMethodWithSignature(signature: string): Method | undefined {
         for(let method of this.methods){
@@ -183,6 +197,20 @@ export class GenericVariantOfJavaClass extends IJavaClass {
 
     constructor(public isGenericVariantOf: JavaClass, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
         super(isGenericVariantOf.identifier, isGenericVariantOf.module, isGenericVariantOf.identifierRange);
+    }
+
+    toString(): string {
+        let s: string = this.identifier;
+
+        let genericInformation = this.isGenericVariantOf.genericInformation;
+        
+        if(genericInformation && genericInformation.length > 0){
+            s += "<" + genericInformation.map(gi => {
+                let type = this.typeMap.get(gi);
+                return type?.toString();
+            }).join(", ") + ">";
+        }
+        return s;
     }
 
     isGenericVariant(): boolean {

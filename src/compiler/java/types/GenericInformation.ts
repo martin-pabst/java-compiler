@@ -8,6 +8,7 @@ import { IJavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
 import { NonPrimitiveType } from "./NonPrimitiveType";
+import { Visibility } from "./Visibility.ts";
 
 export class GenericTypeParameter extends NonPrimitiveType {
 
@@ -27,6 +28,16 @@ export class GenericTypeParameter extends NonPrimitiveType {
         public upperBounds: (IJavaClass | IJavaInterface)[] = [], public lowerBound?: IJavaClass){
         super(identifier, identifierRange, module);
         this.isWildcard = (this.identifier == '?');
+    }
+
+    getField(identifier: string, uptoVisibility: Visibility, forceStatic?: boolean | undefined): Field | undefined {
+        return undefined;
+    }
+
+    toString(): string {
+        return this.identifier + 
+        (this.lowerBound ? "super " + this.lowerBound?.toString() : "") + 
+        (this.upperBounds.length > 0 ? "extends " + this.upperBounds.map(ub => ub.toString).join(" & ") : "");
     }
 
     isGenericVariant(): boolean {
@@ -105,6 +116,10 @@ export class GenericTypeParameter extends NonPrimitiveType {
         }
 
         return false;
+    }
+
+    getReifiedIdentifier(): string {
+        return this.identifier;
     }
 
 

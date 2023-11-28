@@ -39,7 +39,18 @@ export abstract class IJavaInterface extends NonPrimitiveType {
         return undefined;
     }
 
+    toString(): string {
+        let s: string = this.identifier;
+        
+        if(this.genericInformation && this.genericInformation.length > 0){
+            s += "<" + this.genericInformation.map(gi => gi.toString()).join(", ") + ">";
+        }
+        return s;
+    }
 
+    getReifiedIdentifier(): string {
+        return this.identifier;
+    }
 
 }
 
@@ -161,6 +172,20 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
 
     constructor(public isGenericVariantOf: JavaInterface, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
         super(isGenericVariantOf.identifier, isGenericVariantOf.module, isGenericVariantOf.identifierRange);
+    }
+
+    toString(): string {
+        let s: string = this.identifier;
+
+        let genericInformation = this.isGenericVariantOf.genericInformation;
+        
+        if(genericInformation && genericInformation.length > 0){
+            s += "<" + genericInformation.map(gi => {
+                let type = this.typeMap.get(gi);
+                return type?.toString();
+            }).join(", ") + ">";
+        }
+        return s;
     }
 
     isGenericVariant(): boolean {
