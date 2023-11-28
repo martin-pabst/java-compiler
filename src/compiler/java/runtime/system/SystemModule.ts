@@ -20,8 +20,13 @@ import { LongPrimitiveType } from "./primitiveTypes/LongPrimitiveType";
 import { ShortPrimitiveType } from "./primitiveTypes/ShortPrimitiveType.ts";
 import { StringPrimitiveType } from "./primitiveTypes/StringPrimitiveType.ts";
 import { VoidPrimitiveType } from "./primitiveTypes/VoidPrimitiveType";
+import { BooleanClass } from "./primitiveTypes/wrappers/BooleanClass.ts";
+import { DoubleClass } from "./primitiveTypes/wrappers/DoubleClass.ts";
+import { FloatClass } from "./primitiveTypes/wrappers/FloatClass.ts";
 import { IntegerClass } from "./primitiveTypes/wrappers/IntegerClass";
+import { LongClass } from "./primitiveTypes/wrappers/LongClass.ts";
 import { NumberClass } from "./primitiveTypes/wrappers/NumberClass";
+import { ShortClass } from "./primitiveTypes/wrappers/ShortClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -44,7 +49,7 @@ export class SystemModule extends JavaLibraryModule {
 
         this.classes.push(
             ObjectClass, EnumClass,                  // These two MUST come first!
-            StringClass, NumberClass, IntegerClass,  // boxed primitive types
+            StringClass, NumberClass, IntegerClass, LongClass, FloatClass, DoubleClass, ShortClass, BooleanClass,  // boxed primitive types
             MathClass,
             ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass
         )

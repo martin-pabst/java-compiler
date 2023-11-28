@@ -28,10 +28,10 @@ type ModifiersAndType = {
 
 export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
-    static endOfSourcecodeToken: LdToken = {tt: TokenType.endofSourcecode, value: ""};
+    static endOfSourcecodeToken: LdToken = { tt: TokenType.endofSourcecode, value: "" };
     static visibilityTokens: TokenType[] = [TokenType.keywordPublic, TokenType.keywordProtected, TokenType.keywordPrivate];
 
-    static nullRange: IRange = {startLineNumber: 0, startColumn: 0, endLineNumber: 0, endColumn: 0};
+    static nullRange: IRange = { startLineNumber: 0, startColumn: 0, endLineNumber: 0, endColumn: 0 };
 
     tokenList: LdToken[] = [];
     pos: number = 0;
@@ -39,18 +39,18 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     tt: TokenType = TokenType.endofSourcecode;
     currentDeclaration: string = "";
 
-    currentTypeStore: JavaTypeStore = new JavaTypeStore(); 
+    currentTypeStore: JavaTypeStore = new JavaTypeStore();
     currentGenericParameterMap: JavaTypeMap = {};
 
-    constructor(){
+    constructor() {
         super();
     }
 
     parseClassOrEnumOrInterfaceDeclarationWithoutGenerics(klass: Klass & LibraryKlassType, module: JavaBaseModule): NonPrimitiveType {
-        
+
         let javaClassDeclaration = klass.__javaDeclarations?.find(decl => decl.type == "c");
 
-        if(!javaClassDeclaration){
+        if (!javaClassDeclaration) {
             console.log("Error parsing library class " + klass.name + ": missing java class declaration.");
         }
 
@@ -61,14 +61,14 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         let modifiersAndType = this.parseModifiersAndType(true);
 
         let identifier: string = "";
-        if(this.expect(TokenType.identifier, false)){
+        if (this.expect(TokenType.identifier, false)) {
             identifier = this.cct.value;
             this.nextToken();
-        } 
-        
+        }
+
         let npt: NonPrimitiveType;
 
-        switch(modifiersAndType.type){
+        switch (modifiersAndType.type) {
             case TokenType.keywordClass:
                 npt = new JavaClass(identifier, module, LibraryDeclarationParser.nullRange);
                 let npt1 = <JavaClass>npt;
@@ -82,25 +82,25 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 break;
             case TokenType.keywordEnum:
                 npt = new JavaEnum(identifier, module, LibraryDeclarationParser.nullRange, Object.getPrototypeOf(Object.getPrototypeOf(klass)).type);
-                let npt2 = <JavaEnum> npt;
+                let npt2 = <JavaEnum>npt;
                 npt2.runtimeClass = klass;
                 break;
         }
-        
+
         klass.type = npt;
 
         return npt;
     }
 
 
-    parseClassOrInterfaceDeclarationGenericsAndExtendsImplements(klass: Klass & LibraryKlassType, typestore: JavaTypeStore, module: JavaBaseModule){
+    parseClassOrInterfaceDeclarationGenericsAndExtendsImplements(klass: Klass & LibraryKlassType, typestore: JavaTypeStore, module: JavaBaseModule) {
 
         this.currentGenericParameterMap = {};
-        this.currentTypeStore = typestore;        
+        this.currentTypeStore = typestore;
 
         let javaClassDeclaration = klass.__javaDeclarations?.find(decl => decl.type == "c");
 
-        if(!javaClassDeclaration){
+        if (!javaClassDeclaration) {
             console.log("Error parsing library class " + klass.name + ": missing java class declaration.");
         }
 
@@ -112,8 +112,8 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         let npt = klass.type;
 
-        if(this.comesToken(TokenType.lower, true)){
-            if(npt instanceof JavaEnum){
+        if (this.comesToken(TokenType.lower, true)) {
+            if (npt instanceof JavaEnum) {
                 this.pushError("Ein enum-Typ kann nicht generisch sein.");
                 this.skipTill([TokenType.keywordExtends, TokenType.keywordImplements], false);
             } else {
@@ -121,19 +121,19 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             }
         }
 
-        while(this.comesToken([TokenType.keywordExtends, TokenType.keywordImplements], false)){
-            if(npt instanceof JavaEnum){
+        while (this.comesToken([TokenType.keywordExtends, TokenType.keywordImplements], false)) {
+            if (npt instanceof JavaEnum) {
                 this.pushError("Ein enum-Typ kann nicht generisch sein.");
                 this.skipTill([TokenType.keywordExtends, TokenType.keywordImplements], false);
             } else {
                 let npt1: JavaClass | JavaInterface = <any>npt;
                 let tt = this.tt;
                 this.nextToken();
-                switch(tt){
+                switch (tt) {
                     case TokenType.keywordExtends:
                         let types = this.parseCommaSeparatedTypeList(module);
-                        if(types.length > 0){
-                            if(npt1 instanceof JavaClass){
+                        if (types.length > 0) {
+                            if (npt1 instanceof JavaClass) {
                                 npt1.setExtends(<any>types[0])
                             } else {
                                 npt1.addExtends(<any>types);
@@ -142,15 +142,15 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                         break;
                     case TokenType.keywordImplements:
                         let types1 = this.parseCommaSeparatedTypeList(module)
-                        if(types1.length > 0){
-                            if(npt1 instanceof JavaClass){
+                        if (types1.length > 0) {
+                            if (npt1 instanceof JavaClass) {
                                 npt1.addImplements(<any>types1);
                             }
                         }
-                    break;
+                        break;
                 }
             }
-            
+
         }
 
     }
@@ -159,14 +159,14 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         let types: JavaType[] = [];
         do {
             types.push(this.parseType(module))
-        } while(this.comesToken(TokenType.comma, true));
+        } while (this.comesToken(TokenType.comma, true));
         return types;
     }
 
     parseGenericParameters(npt: JavaClass | JavaInterface, module: JavaBaseModule) {
         do {
             npt.genericInformation.push(this.parseGenericParameterDeclaration(module))
-        } while(this.comesToken(TokenType.comma, true));
+        } while (this.comesToken(TokenType.comma, true));
 
         this.expect(TokenType.greater, true);
     }
@@ -174,17 +174,17 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     parseGenericParameterDeclaration(module: JavaBaseModule): GenericTypeParameter {
         let identifier = this.expectIdentifier();
         let upperBounds: (JavaClass | JavaInterface)[] = [];
-        let lowerBound: JavaClass|undefined = undefined;
+        let lowerBound: JavaClass | undefined = undefined;
 
-        while(this.comesToken([TokenType.keywordExtends, TokenType.keywordImplements], false)){
+        while (this.comesToken([TokenType.keywordExtends, TokenType.keywordImplements], false)) {
             let tt = this.tt;
             this.nextToken();
-            switch(tt){
+            switch (tt) {
                 case TokenType.keywordExtends:
                     this.nextToken();
                     do {
                         upperBounds.push(<any>this.parseType(module));
-                    } while(this.comesToken(TokenType.ampersand, true))
+                    } while (this.comesToken(TokenType.ampersand, true))
                     break;
                 case TokenType.keywordImplements:
                     this.nextToken();
@@ -204,28 +204,28 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
      */
     parseType(module: JavaBaseModule): JavaType {
         let id = this.expectIdentifier();
-        if(id == "") return this.currentTypeStore.getType("void")!;
+        if (id == "") return this.currentTypeStore.getType("void")!;
 
         let type = this.findType(id);
 
-        if(this.comesToken(TokenType.lower, true)){
-            if(!type.genericInformation){
+        if (this.comesToken(TokenType.lower, true)) {
+            if (!type.genericInformation) {
                 this.pushError("Der Typ " + type.identifier + " ist nicht generisch.");
                 this.skipTill(TokenType.greater, true);
             } else {
                 let typeMap: Map<GenericTypeParameter, JavaType> = new Map();
-                for(let gtp of type.genericInformation){
+                for (let gtp of type.genericInformation) {
                     typeMap.set(gtp, this.parseType(module))
                     this.expect(TokenType.comma, true);
-                    if(this.comesToken(TokenType.greater, false)) break;
+                    if (this.comesToken(TokenType.greater, false)) break;
                 }
                 this.expect(TokenType.greater, true);
                 type = type.getCopyWithConcreteType(typeMap);
             }
         }
 
-        while(this.comesToken(TokenType.leftRightSquareBracket, true)){
-            if(type instanceof ArrayType){
+        while (this.comesToken(TokenType.leftRightSquareBracket, true)) {
+            if (type instanceof ArrayType) {
                 type.dimension++;
             } else {
                 type = new ArrayType(type, 1, module, LibraryDeclarationParser.nullRange);
@@ -237,9 +237,9 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
     findType(id: string): JavaType {
         let type = this.currentTypeStore.getType(id);
-        if(type) return type;
+        if (type) return type;
         type = this.currentGenericParameterMap[id];
-        if(type) return type;
+        if (type) return type;
 
         this.pushError("Konnte den Typ " + id + " nicht finden.");
 
@@ -247,7 +247,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     }
 
     expectIdentifier(): string {
-        if(this.comesToken(TokenType.identifier, false)){
+        if (this.comesToken(TokenType.identifier, false)) {
             let id: string = this.cct.value;
             this.nextToken();
             return id;
@@ -268,8 +268,8 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         let typeMissing: boolean = true;
 
-        while(!this.isEnd()){
-            switch(this.tt){
+        while (!this.isEnd()) {
+            switch (this.tt) {
                 case TokenType.keywordPublic:
                 case TokenType.keywordProtected:
                 case TokenType.keywordPrivate:
@@ -290,22 +290,22 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 case TokenType.keywordClass:
                 case TokenType.keywordInterface:
                 case TokenType.keywordEnum:
-                        m.type = this.tt;
-                        typeMissing = false;
-                        break;
-                default: 
-                {
-                    if(typeMissing && withType) this.pushError("Es fehlt der Typ (class, interface oder enum).")
-                    return m;
-                }
+                    m.type = this.tt;
+                    typeMissing = false;
+                    break;
+                default:
+                    {
+                        if (typeMissing && withType) this.pushError("Es fehlt der Typ (class, interface oder enum).")
+                        return m;
+                    }
             }
             this.nextToken();
-        }    
+        }
 
         return m;
     }
 
-    initTokens(declaration: string){
+    initTokens(declaration: string) {
         this.tokenList = this.lex(declaration);
         this.pos = 0;
         this.cct = this.tokenList[0];
@@ -313,32 +313,32 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         this.currentDeclaration = declaration;
     }
 
-    comesToken(tt: TokenType| TokenType[], skip: boolean){
-        if(!Array.isArray(tt)) tt = [tt];
+    comesToken(tt: TokenType | TokenType[], skip: boolean) {
+        if (!Array.isArray(tt)) tt = [tt];
 
-        if(tt.indexOf(this.tt) >= 0){
-            if(skip) this.nextToken();
+        if (tt.indexOf(this.tt) >= 0) {
+            if (skip) this.nextToken();
             return true;
         }
 
         return false;
     }
 
-    skipTill(tt: TokenType| TokenType[], skipIfFound: boolean){
-        if(!Array.isArray(tt)) tt = [tt];
+    skipTill(tt: TokenType | TokenType[], skipIfFound: boolean) {
+        if (!Array.isArray(tt)) tt = [tt];
 
-        while(!this.isEnd() && tt.indexOf(this.tt) <= 0){
+        while (!this.isEnd() && tt.indexOf(this.tt) <= 0) {
             this.nextToken();
         }
 
-        if(skipIfFound) this.nextToken();
+        if (skipIfFound) this.nextToken();
 
         return;
     }
 
-    nextToken(){
+    nextToken() {
         this.pos++;
-        if(this.pos >= this.tokenList.length){
+        if (this.pos >= this.tokenList.length) {
             this.cct = LibraryDeclarationParser.endOfSourcecodeToken;
             this.tt = this.cct.tt;
             return;
@@ -351,13 +351,13 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         return this.pos >= this.tokenList.length;
     }
 
-    pushError(error: string){   
+    pushError(error: string) {
         console.log("Error parsing library declaration (" + error + "): " + this.currentDeclaration);
     }
 
     expect(tt: TokenType, skip: boolean): boolean {
-        if(tt == this.tt){
-            if(skip) this.nextToken();
+        if (tt == this.tt) {
+            if (skip) this.nextToken();
             return true;
         }
         this.pushError("Erwartet wird " + TokenType[tt] + ", gefunden wurde: " + this.cct.value);
@@ -369,28 +369,28 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
      * Parse Attributes and Methods
      */
 
-    parseAttributesAndMethods(klass: Klass & LibraryKlassType, typestore: JavaTypeStore, module: JavaBaseModule){
+    parseAttributesAndMethods(klass: Klass & LibraryKlassType, typestore: JavaTypeStore, module: JavaBaseModule) {
 
         this.currentGenericParameterMap = {};
-        this.currentTypeStore = typestore;        
+        this.currentTypeStore = typestore;
 
         let javaClassDeclaration = klass.__javaDeclarations;
 
-        if(!javaClassDeclaration){
+        if (!javaClassDeclaration) {
             return;
         }
 
-        for(let decl of javaClassDeclaration.filter( cd => cd.type == "a" || cd.type == "m")){
+        for (let decl of javaClassDeclaration.filter(cd => cd.type == "a" || cd.type == "m")) {
             this.initTokens(decl.signature);
             this.parseAttributeOrMethod(klass, module, decl);
         }
 
     }
 
-    parseAttributeOrMethod(klass: Klass & LibraryKlassType, module: JavaBaseModule, decl: LibraryMethodOrAttributeDeclaration){
-        
+    parseAttributeOrMethod(klass: Klass & LibraryKlassType, module: JavaBaseModule, decl: LibraryMethodOrAttributeDeclaration) {
+
         let klassType = <JavaClass>klass.type;
-        
+
         let modifiers = this.parseModifiersAndType(false);
 
         let type = this.parseType(module);
@@ -399,19 +399,19 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         let identifier = isConstructor ? klassType.identifier : this.expectIdentifier();
 
-        if(decl.type == "m"){
+        if (decl.type == "m") {
             this.comesToken(TokenType.leftBracket, true);
             // method
             let m = new Method(identifier, EmptyRange.instance, module, modifiers.visibility);
             m.returnParameterType = type;
             m.isConstructor = isConstructor;
-            if(!this.comesToken(TokenType.rightBracket, false)){
-                do{
+            if (!this.comesToken(TokenType.rightBracket, false)) {
+                do {
                     let isFinal = this.comesToken(TokenType.keywordFinal, true);
                     let type = this.parseType(module);
                     let id = this.expectIdentifier();
-                    m.parameters.push(new Parameter(id, EmptyRange.instance, module, type, isFinal));            
-                } while(this.comesToken(TokenType.comma, true));
+                    m.parameters.push(new Parameter(id, EmptyRange.instance, module, type, isFinal));
+                } while (this.comesToken(TokenType.comma, true));
             }
 
             m.isStatic = modifiers.static;
@@ -423,50 +423,68 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             this.expect(TokenType.rightBracket, true);
             klassType.methods.push(m);
 
-            let mdecl = <LibraryMethodDeclaration> decl;
+            let mdecl = <LibraryMethodDeclaration>decl;
             let hasReturnValue: boolean = m.returnParameterType?.identifier != 'void';
 
-            if(mdecl.native){
+            if (mdecl.native) {
                 let realName: string = mdecl.native.name;
-                klass.prototype[m.getInternalName("native")] = mdecl.native;
-                if(!mdecl.java){
+                if(m.isStatic){
+                    klass[m.getInternalName("native")] = mdecl.native;
+                } else {
+                    klass.prototype[m.getInternalName("native")] = mdecl.native;
+                }
+
+                if (!mdecl.java) {
                     let parameterNames = m.parameters.map(p => p.identifier);
-                    
+
                     let body: string;
-                    if(m.isConstructor){
+                    if (m.isConstructor) {
                         body = `
                             this.${realName}(${parameterNames.join(", ")});
                             ${Helpers.threadStack}.push(this); 
                         `
+                        parameterNames.unshift('__t');
+                        parameterNames.push(body);
+
+                        klass.prototype[m.getInternalName("java")] = new Function(...parameterNames);
+                    } else if (m.isStatic) {
+                        body = `
+                            ${hasReturnValue ? 'let __returnValue = ' : ''}this.${realName}(${parameterNames.join(", ")});
+                            ${hasReturnValue ? `${Helpers.threadStack}.push(__returnValue);` : ''} 
+                        `
+                        parameterNames.unshift('__t');
+                        parameterNames.push(body);
+
+                        klass[m.getInternalName("java")] = new Function(...parameterNames);
                     } else {
                         body = `
-                            ${hasReturnValue? 'let __returnValue = ':''}this.${realName}(${parameterNames.join(", ")});
-                            ${hasReturnValue? `${Helpers.threadStack}.push(__returnValue);`:''} 
+                            ${hasReturnValue ? 'let __returnValue = ' : ''}this.${realName}(${parameterNames.join(", ")});
+                            ${hasReturnValue ? `${Helpers.threadStack}.push(__returnValue);` : ''} 
                         `
+                        parameterNames.unshift('__t');
+                        parameterNames.push(body);
+
+                        klass.prototype[m.getInternalName("java")] = new Function(...parameterNames);
                     }
 
-                    parameterNames.unshift('__t');
-                    parameterNames.push(body);
-
-                    klass.prototype[m.getInternalName("java")] = new Function(...parameterNames);
                 }
                 m.hasImplementationWithNativeCallingConvention = true;
-            } 
+            }
 
-            if(mdecl.java){
+            if (mdecl.java) {
                 klass.prototype[m.getInternalName("java")] = mdecl.java;
             }
 
-            if(mdecl.template){
+            if (mdecl.template) {
                 m.template = mdecl.template;
             }
 
-            if(mdecl.constantFoldingFunction){
+            if (mdecl.constantFoldingFunction) {
                 m.constantFoldingFunction = mdecl.constantFoldingFunction;
             }
 
         } else {
-            let adecl = <LibraryAttributeDeclaration> decl;
+            let adecl = <LibraryAttributeDeclaration>decl;
             // attribute
             let a = new Field(identifier, EmptyRange.instance, module, type, modifiers.visibility);
             a.isStatic = modifiers.static;
@@ -474,7 +492,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             a.classEnum = klassType;
 
             a.internalName = adecl.nativeIdentifier || identifier;
-            if(typeof adecl.constantValue !== "undefined"){
+            if (typeof adecl.constantValue !== "undefined") {
                 a.initialValue = adecl.constantValue;
                 a.initialValueIsConstant = true;
             }

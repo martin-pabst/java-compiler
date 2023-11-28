@@ -490,7 +490,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
             objectSnippet = this.compileTerm(node.nodeToGetObject);
             if(!objectSnippet) return undefined;
             let range = node.nodeToGetObject.range;
-            if(!(objectSnippet.type instanceof JavaEnum) && objectSnippet.type != this.stringType){
+            if(!(objectSnippet.type instanceof JavaEnum) && objectSnippet.type != this.stringType && !(objectSnippet.type instanceof StaticNonPrimitiveType)){
                 objectSnippet = SnippetFramer.frame(objectSnippet, `(§1 || ${Helpers.throwNPE}(${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn}))`);
             }
         } else {
