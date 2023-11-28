@@ -296,6 +296,8 @@ export class TypeResolver {
                                 runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
                                     method.programStub);
                             });
+                        } else {
+                            notImplementedMethods.push(method);
                         }
                     }
                     
@@ -304,6 +306,17 @@ export class TypeResolver {
                 if(notImplementedMethods.length > 0){                    
                     javaClass.module.errors.push({
                         message: "Die Klasse " + javaClass.identifier + " muss noch folgende Methoden des Interfaces " + javaInterface.identifier + " implementieren: " + notImplementedMethods.map(m => m.getSignature()).join(", "),
+                        level: "error",
+                        range: javaClass.identifierRange
+                    })
+                }
+            }
+
+            if(!javaClass._isAbstract){
+                let abstractMethodsNotYetImplemented: Method[] = javaClass.getAbstractMethodsNotYetImplemented();
+                if(abstractMethodsNotYetImplemented.length > 0){
+                    javaClass.module.errors.push({
+                        message: "Die Klasse " + javaClass.identifier + " muss noch folgende Methoden ihrer abstrakten Oberklassen implementieren: " + abstractMethodsNotYetImplemented.map(m => m.getSignature()).join(", "),
                         level: "error",
                         range: javaClass.identifierRange
                     })

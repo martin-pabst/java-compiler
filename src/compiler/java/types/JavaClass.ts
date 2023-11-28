@@ -57,6 +57,8 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
         return this.identifier;
     }
     
+    abstract isAbstract(): boolean;
+
 }
 
 
@@ -65,7 +67,7 @@ export class JavaClass extends IJavaClass {
 
     isStatic: boolean = false;
     isFinal: boolean = false;
-    isAbstract: boolean = false;
+    _isAbstract: boolean = false;
 
     fields: Field[] = [];
     methods: Method[] = [];
@@ -80,6 +82,29 @@ export class JavaClass extends IJavaClass {
         super(identifier, module, identifierRange);
     }
 
+    getAbstractMethodsNotYetImplemented(): Method[] {
+
+        let abstractMethods: Method[] = [];
+        let concreteMethodSignatures: Map<string, Method> = new Map();
+
+        let klass: IJavaClass | undefined = this;
+    
+        while(klass){
+            for(let m of klass.getMethods()){
+                if(m.isAbstract){
+                    abstractMethods.push(m);
+                } else {
+                    concreteMethodSignatures.set(m.getSignature(), m);
+                }
+            }
+            klass = klass.getExtends();
+        }
+
+        let abstractMethodsNotYetImplemented = abstractMethods.filter(m => !concreteMethodSignatures.get(m.getSignature()));
+
+        return abstractMethodsNotYetImplemented;
+
+    }
 
     findMethodWithSignature(signature: string): Method | undefined {
         for(let method of this.methods){
@@ -121,7 +146,9 @@ export class JavaClass extends IJavaClass {
         return this.implements;
     }
 
-
+    isAbstract(): boolean {
+        return this._isAbstract;
+    }
 
     public getFields(): Field[] {
 
@@ -216,6 +243,10 @@ export class GenericVariantOfJavaClass extends IJavaClass {
             }).join(", ") + ">";
         }
         return s;
+    }
+
+    isAbstract(): boolean {
+        return this.isGenericVariantOf.isAbstract();
     }
 
     isGenericVariant(): boolean {

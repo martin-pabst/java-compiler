@@ -74,7 +74,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 let npt1 = <JavaClass>npt;
                 npt1.isStatic = modifiersAndType.static;
                 npt1.isFinal = modifiersAndType.final;
-                npt1.isAbstract = modifiersAndType.abstract;
+                npt1._isAbstract = modifiersAndType.abstract;
                 npt1.runtimeClass = klass;
                 break;
             case TokenType.keywordInterface:

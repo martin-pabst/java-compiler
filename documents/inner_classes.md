@@ -9,6 +9,7 @@
     * when accessing outer member: compiler _$outer.member or _$outer._$outer.member, ...
   * static inner classes don't have access to members of outer classes and therefore don't need __outer.
   * inner classes have visibility modifiers: public, private, protected
+  * types JavaClass, JavaInterface, JavaEnum 
   
 
 ```java

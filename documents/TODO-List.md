@@ -22,10 +22,11 @@
 
 ## next todos
   * generics
+  * Array constants
   * library method to gather information for automated tests
   * library method examples
   * Lambda Functions
-  * Array constants
+  * anonymous inner classes
 
 
 
