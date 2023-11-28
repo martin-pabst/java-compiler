@@ -10,7 +10,6 @@ export class IntegerClass extends NumberClass {
 
     static __javaDeclarations: LibraryDeclarations = [
         {type: "c", signature: "class Integer extends Number"},
-<<<<<<< HEAD
         {type: "a", signature: "static final int MAX_VALUE", constantValue: 0x80000000 - 1},
         {type: "a", signature: "static final int MIN_VALUE", constantValue: -0x80000000},
         // for doubleValue(), floatValue(), intValue() and longValue() there are methods (if called for a Number variable containing an Integer value) and templates
@@ -19,14 +18,6 @@ export class IntegerClass extends NumberClass {
         {type: "m", signature: "public final float floatValue()", native: IntegerClass.prototype.floatValue, template: "§1.value"},
         {type: "m", signature: "public final int intValue()", native: IntegerClass.prototype.intValue, template: "§1.value"},
         {type: "m", signature: "public final long longValue()", native: IntegerClass.prototype.longValue, template: "§1.value"},
-=======
-        {type: "a", signature: "final static int MAX_VALUE", constantValue: 0x80000000-1},
-        {type: "a", signature: "final static int MIN_VALUE", constantValue: -0x80000000},
-        {type: "m", signature: "public double doubleValue()"},
-        {type: "m", signature: "public float floatValue()"},
-        {type: "m", signature: "public int intValue()"},
-        {type: "m", signature: "public long longValue()"},
->>>>>>> 87637d5b3ca9c9e327d289a338eac5567de6cbd3
         {type: "m", signature: "public int compareTo(Integer anotherInteger)", native: IntegerClass.prototype._compareTo},
         {type: "m", signature: "public int parseInt(String s)", native: IntegerClass.prototype.parseInt},
         {type: "m", signature: "public int parseInt(String sr, int radix)", native: IntegerClass.prototype.parseInt},
