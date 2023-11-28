@@ -145,31 +145,36 @@ export class JavaClass extends IJavaClass {
     
     }
 
-    canImplicitlyCastTo(otherType: JavaType): boolean {
-        if(otherType instanceof JavaInterface){
-            for(let intf of this.implements){
-                if(intf.canExplicitlyCastTo(otherType)) return true;
+    canImplicitlyCastTo(bType: JavaType): boolean {
+
+        if(bType == this) return true;                   // A can cast to A.
+
+        if(bType instanceof JavaInterface){               // can class A cast to interface BI?
+            for(let x of this.implements){                 // A implements X
+                if(x.canImplicitlyCastTo(bType)) return true;  // if x can cast to BI, then A can cast, too
             }
             return false;
         }
 
-        if(otherType instanceof JavaClass){
-            if(otherType == this) return true;
-            if(!this.extends) return false;
-            return this.extends.canExplicitlyCastTo(otherType);
+        if(bType instanceof JavaClass){                   // can class A cast to class B?
+            if(bType == this) return true;
+            if(!this.extends) return false;               // A should at least extend Object, so this must not happen...
+            return this.extends.canImplicitlyCastTo(bType); // A extends C; if C can cast to B, then also A can
         }
 
         return false;
 
     }
 
-    canExplicitlyCastTo(otherType: JavaType): boolean {
-        if(otherType.isPrimitive) return false;
+    canExplicitlyCastTo(bType: JavaType): boolean {
+        if(bType.isPrimitive) return false;
 
-        if(this.canImplicitlyCastTo(otherType)) return true;
+        if(bType == this) return true;                   // A can cast to A.
 
-        if(otherType instanceof NonPrimitiveType){
-            return otherType.canImplicitlyCastTo(this);
+        if(this.canImplicitlyCastTo(bType)) return true;
+
+        if(bType instanceof NonPrimitiveType){
+            return bType.canImplicitlyCastTo(this);
         }
 
         return false;
@@ -274,9 +279,9 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     }
 
     canImplicitlyCastTo(otherType: JavaType): boolean {
-        if(!(otherType instanceof NonPrimitiveType)) return false;
+        if(!(otherType instanceof NonPrimitiveType)) return false;          // we can't cast a class type to a primitive type. Auto-Unboxing is done in BinOpCastCodeGenerator.ts
 
-        // ArrayList<Integer> can cast to List or to ArrayList
+        // ArrayList<Integer> can cast to List or to raw type ArrayList or to raw type List
         if(otherType instanceof JavaInterface || otherType instanceof JavaClass){
             if(this.isGenericVariantOf.canExplicitlyCastTo(otherType)) return true;
             return false;
@@ -288,12 +293,14 @@ export class GenericVariantOfJavaClass extends IJavaClass {
             // ArrayList<Integer> can cast to Collection<Integer> or Collection<? extends Number>
             let ot1 = <GenericVariantOfJavaInterface>otherType;
     
-            if(!this.isGenericVariantOf.canExplicitlyCastTo(ot1.isGenericVariantOf)) return false;
+            if(!this.isGenericVariantOf.canImplicitlyCastTo(ot1.isGenericVariantOf)) return false;
     
-            // Find concrete parameterized supertype of this.isGenericVariantFrom which is generic variant from otherType
-            // ... Find concrete parameterized supertype of ArrayList<Integer> which is generic variant from List (so: find List<Integer>)
+            // Find concrete parameterized implemented interface of this.isGenericVariantOf which is generic variant of otherType
+            // ... Find concrete parameterized supertype of ArrayList<Integer> which is generic variant of List (so: find List<Integer>)
      
-            // superTypeOfMeWhichIsGenericVariantOfOtherType ==> smgvo
+            // interfaceImplementedByMeWhichIsGenericVariantOfOtherType ==> iibm
+            // scenario class ArrayList<X> should get casted to List<String>
+            // strategy: construct Type List<X> from ArrayList<X> and then compare X to String
             let iibm = this.findInterfaceImplementedByMeWhichIsGenericVariantOf(ot1);
     
             if(iibm == null) return false;
@@ -306,7 +313,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     
                 if(othersType instanceof GenericTypeParameter && othersType.isWildcard){
                     for(let ext of othersType.upperBounds){
-                        if(myType?.canExplicitlyCastTo(ext)) return true;
+                        if(myType?.canImplicitlyCastTo(ext)) return true;
                     }
                 }
     
@@ -320,7 +327,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
             // MyArrayList<Integer> can cast to ArrayList<Integer> or ArrayList<? extends Number>
             let ot1 = <GenericVariantOfJavaClass>otherType;
     
-            if(!this.isGenericVariantOf.canExplicitlyCastTo(ot1.isGenericVariantOf)) return false;
+            if(!this.isGenericVariantOf.canImplicitlyCastTo(ot1.isGenericVariantOf)) return false;
     
             // Find concrete parameterized supertype of this.isGenericVariantFrom which is generic variant from otherType
             // ... Find concrete parameterized supertype of MyArrayList<Integer> which is generic variant from ArrayList (so: find ArrayList<Integer>)
@@ -338,7 +345,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     
                 if(othersType instanceof GenericTypeParameter && othersType.isWildcard){
                     for(let ext of othersType.upperBounds){
-                        if(myType?.canExplicitlyCastTo(ext)) return true;
+                        if(myType?.canImplicitlyCastTo(ext)) return true;
                     }
                 }
     
