@@ -58,6 +58,7 @@ export interface ASTGlobalNode extends ASTNode, TypeScope {
 
 export interface ASTTypeDefiningNode {
     resolvedType?: NonPrimitiveType;
+    innerTypes: ASTTypeDefiningNode[];
 }
 
 export interface ASTNodeWithIdentifier {
@@ -166,7 +167,6 @@ export interface ASTClassDefinitionNode
     ASTTypeDefiningNode {
     kind: TokenType.keywordClass;
     parent: TypeScope;
-    innerClasses: ASTClassDefinitionNode[],
     extends: ASTTypeNode | undefined,
     implements: ASTTypeNode[],
 
@@ -209,6 +209,7 @@ export interface ASTEnumDefinitionNode
 export interface ASTBlockNode extends ASTStatementNode {
     kind: TokenType.block;
     statements: ASTStatementNode[];
+    innerTypes: ASTTypeDefiningNode[];
 }
 
 export interface ASTProgramNode extends ASTNode {
@@ -289,6 +290,12 @@ export interface ASTNewObjectNode extends ASTTermNode {
     kind: TokenType.newObject;
     type: ASTTypeNode;
     parameterValues: ASTTermNode[];
+}
+
+export interface AnonymousClassNode extends ASTTermNode {
+    kind: TokenType.anonymousClass;
+    interfaceIdentifier: string;
+    klass: ASTClassDefinitionNode;
 }
 
 // Tobias: new Array

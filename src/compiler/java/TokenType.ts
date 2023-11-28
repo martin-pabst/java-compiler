@@ -165,6 +165,7 @@ export enum TokenType {
     astProgram,
     instanceInitializerBlock,
     staticInitializerBlock,
+    anonymousClass,
 
     type, // e.g. int[][]
     fieldDeclaration,

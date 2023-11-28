@@ -5,6 +5,7 @@ import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
+import { StaticNonPrimitiveType } from "./StaticNonPrimitiveType.ts";
 import { Visibility } from "./Visibility.ts";
 
 /**
@@ -25,6 +26,9 @@ export abstract class NonPrimitiveType extends JavaType {
     abstract getMethods(): Method[];
 
     abstract getField(identifier: string, uptoVisibility: Visibility, forceStatic?: boolean): Field | undefined;
+
+    outerType?: NonPrimitiveType | StaticNonPrimitiveType;      // a local class defined inside a static method has a StaticNonPrimitiveType outerType
+    innerTypes: NonPrimitiveType[] = [];
 
     runtimeClass?: Klass;
 

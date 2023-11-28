@@ -16,11 +16,45 @@
 class OuterClass {
   int x = 10;
 
-  class InnerClass {
+  public class InnerClass {
     public int myInnerMethod() {
       return x;
     }
   }
+
+  private int test() {
+    interface InnerInterface {
+      ...
+    }
+
+    printl("Test");
+    final int localVar = 100;
+
+    class InnerClass2 {           // block scope
+
+      void do(){
+        int y = localVar * 2;
+        int z = x * 2;
+      }
+
+    }
+
+    void test2(){
+       Runnable r = new Runnable {      // block scope anonymous
+          void run(){
+            ...
+          }
+       }
+
+       List<String> list;
+       Collections.sort(list, (a, b) -> b - a );            // Lambda function with functional interface Comparable<String, String>
+       Collections.sort(list, (a, b) -> { return b - a;});    
+
+
+    }
+
+  }
+
 }
 
 public class Main {
