@@ -44,7 +44,7 @@ export abstract class TermParser extends TokenIterator {
 
     currentClassOrInterface?: ASTClassDefinitionNode | ASTInterfaceDefinitionNode;
 
-    constructor(protected module: JavaCompiledModule) {
+    constructor(public module: JavaCompiledModule) {
         super(module.tokens!, module);
         this.nodeFactory = new ASTNodeFactory(this);
 

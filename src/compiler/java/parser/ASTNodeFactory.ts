@@ -27,13 +27,16 @@ export class ASTNodeFactory {
 
     }
 
-    buildClassNode(modifiers: ASTNodeWithModifiers, identifier: Token, 
+    buildClassNode(modifiers: ASTNodeWithModifiers, identifier: Token,
         parent: TypeScope, annotations: ASTAnnotationNode[]): ASTClassDefinitionNode {
+
+        let path: string = (parent.path != "" ? parent.path + "." : "") + identifier;
 
         let node: ASTClassDefinitionNode = {
             kind: TokenType.keywordClass,
             range: modifiers.range,
             parent: parent,
+            path: path,
             extends: undefined,
             implements: [],
             identifier: <string>identifier.value,
@@ -46,12 +49,13 @@ export class ASTNodeFactory {
             genericParameterDefinitions: [],
             fieldsOrInstanceInitializers: [],
             methods: [],
-            innerClasses: [],
             classOrInterfaceOrEnumDefinitions: [],
-            annotations: []
+            annotations: [],
+            resolvedType: undefined,
+            module: this.parser.module
         }
 
-        if(annotations.length > 0){
+        if (annotations.length > 0) {
             node.annotations = annotations.slice();
             annotations.splice(0, annotations.length);
         }
@@ -61,13 +65,16 @@ export class ASTNodeFactory {
 
     }
 
-    buildEnumNode(modifiers: ASTNodeWithModifiers, identifier: Token , 
+    buildEnumNode(modifiers: ASTNodeWithModifiers, identifier: Token,
         parent: TypeScope, annotations: ASTAnnotationNode[]): ASTEnumDefinitionNode {
+
+        let path: string = (parent.path != "" ? parent.path + "." : "") + identifier;
 
         let node: ASTEnumDefinitionNode = {
             kind: TokenType.keywordEnum,
             range: modifiers.range,
             parent: parent,
+            path: path,
             identifier: <string>identifier.value,
             identifierRange: identifier.range,
             visibility: modifiers.visibility,
@@ -78,10 +85,13 @@ export class ASTNodeFactory {
             isAbstract: false,
             isFinal: false,
             isStatic: false,
-            isDefault: modifiers.isDefault
+            isDefault: modifiers.isDefault,
+            resolvedType: undefined,
+            classOrInterfaceOrEnumDefinitions: [],
+            module: this.parser.module
         }
 
-        if(annotations.length > 0){
+        if (annotations.length > 0) {
             node.annotations = annotations.slice();
             annotations.splice(0, annotations.length);
         }
@@ -92,22 +102,27 @@ export class ASTNodeFactory {
     }
 
     buildEnumValueNode(identifier: Token): ASTEnumValueNode {
-        return {
+        let node: ASTEnumValueNode = {
             kind: TokenType.initializeEnumValue,
             range: identifier.range,
-            identifier: <string> identifier.value,
+            identifier: <string>identifier.value,
             identifierRange: identifier.range,
             parameterValues: []
         }
+
+        return node;
     }
 
-    buildInterfaceNode(modifiers: ASTNodeWithModifiers, identifier: Token, 
+    buildInterfaceNode(modifiers: ASTNodeWithModifiers, identifier: Token,
         parent: TypeScope, annotations: ASTAnnotationNode[]): ASTInterfaceDefinitionNode {
+
+        let path: string = (parent.path != "" ? parent.path + "." : "") + identifier;
 
         let node: ASTInterfaceDefinitionNode = {
             kind: TokenType.keywordInterface,
             range: modifiers.range,
             parent: parent,
+            path: path,
             implements: [],
             identifier: <string>identifier.value,
             identifierRange: identifier.range,
@@ -119,10 +134,13 @@ export class ASTNodeFactory {
             genericParameterDefinitions: [],
             methods: [],
             annotations: [],
-            fieldsOrInstanceInitializers: [] // only static fields and static initializers...
+            fieldsOrInstanceInitializers: [], // only static fields and static initializers...,
+            resolvedType: undefined,
+            classOrInterfaceOrEnumDefinitions: [],
+            module: this.parser.module
         }
 
-        if(annotations.length > 0){
+        if (annotations.length > 0) {
             node.annotations = annotations.slice();
             annotations.splice(0, annotations.length);
         }
@@ -152,7 +170,7 @@ export class ASTNodeFactory {
             annotations: []
         }
 
-        if(annotations.length > 0){
+        if (annotations.length > 0) {
             node.annotations = annotations.slice();
             annotations.splice(0, annotations.length);
         }
@@ -161,7 +179,7 @@ export class ASTNodeFactory {
 
     }
 
-    buildFieldDeclarationNode(rangeStart: IRange, identifier: Token, type: ASTTypeNode, 
+    buildFieldDeclarationNode(rangeStart: IRange, identifier: Token, type: ASTTypeNode,
         initialization: ASTTermNode | undefined, modifiers: ASTNodeWithModifiers,
         annotations: ASTAnnotationNode[]): ASTFieldDeclarationNode {
 
@@ -180,7 +198,7 @@ export class ASTNodeFactory {
             annotations: []
         }
 
-        if(annotations.length > 0){
+        if (annotations.length > 0) {
             node.annotations = annotations.slice();
             annotations.splice(0, annotations.length);
         }
@@ -411,7 +429,7 @@ export class ASTNodeFactory {
         }
     }
 
-    buildSimplifiedForLoop(tokenFor: Token, elementType: ASTTypeNode, elementIdentifier: Token, collection: ASTTermNode, statementsToRepeat: ASTStatementNode): ASTSimpifiedForLoopNode{
+    buildSimplifiedForLoop(tokenFor: Token, elementType: ASTTypeNode, elementIdentifier: Token, collection: ASTTermNode, statementsToRepeat: ASTStatementNode): ASTSimpifiedForLoopNode {
         return {
             kind: TokenType.forLoopOverCollection,
             range: { startLineNumber: tokenFor.range.startLineNumber, startColumn: tokenFor.range.startColumn, endLineNumber: statementsToRepeat.range.endLineNumber, endColumn: statementsToRepeat.range.endColumn },
@@ -419,7 +437,7 @@ export class ASTNodeFactory {
             elementIdentifier: <string>elementIdentifier.value,
             elementIdentifierPosition: elementIdentifier.range,
             collection: collection,
-            statementToRepeat: statementsToRepeat                  
+            statementToRepeat: statementsToRepeat
         }
     }
 
@@ -459,7 +477,7 @@ export class ASTNodeFactory {
     buildReturnNode(returnToken: Token, term: ASTTermNode | undefined): ASTReturnNode {
         return {
             kind: TokenType.keywordReturn,
-            range: term ? {startLineNumber: returnToken.range.startLineNumber, startColumn: returnToken.range.startColumn, endLineNumber: term.range.endLineNumber, endColumn: term.range.endColumn} : returnToken.range,
+            range: term ? { startLineNumber: returnToken.range.startLineNumber, startColumn: returnToken.range.startColumn, endLineNumber: term.range.endLineNumber, endColumn: term.range.endColumn } : returnToken.range,
             term: term
         }
     }
@@ -467,16 +485,16 @@ export class ASTNodeFactory {
     buildTryCatchNode(tryToken: Token, statement: ASTStatementNode): ASTTryCatchNode {
         return {
             kind: TokenType.keywordTry,
-            range: {startLineNumber: tryToken.range.startLineNumber, startColumn: tryToken.range.startColumn, endLineNumber: statement.range.endLineNumber, endColumn: statement.range.endColumn},
+            range: { startLineNumber: tryToken.range.startLineNumber, startColumn: tryToken.range.startColumn, endLineNumber: statement.range.endLineNumber, endColumn: statement.range.endColumn },
             tryStatement: statement,
             catchCases: []
         }
     }
 
-    buildCatchNode(catchToken: Token, exceptionTypes: ASTTypeNode[], exceptionIdentifier: Token, statement: ASTStatementNode): ASTCatchNode{
+    buildCatchNode(catchToken: Token, exceptionTypes: ASTTypeNode[], exceptionIdentifier: Token, statement: ASTStatementNode): ASTCatchNode {
         return {
             kind: TokenType.keywordCatch,
-            range: {startLineNumber: catchToken.range.startLineNumber, startColumn: catchToken.range.startColumn, endLineNumber: statement.range.endLineNumber, endColumn: statement.range.endColumn},
+            range: { startLineNumber: catchToken.range.startLineNumber, startColumn: catchToken.range.startColumn, endLineNumber: statement.range.endLineNumber, endColumn: statement.range.endColumn },
             exceptionTypes: exceptionTypes,
             exceptionIdentifier: <string>exceptionIdentifier.value,
             exceptionIdentifierPosition: exceptionIdentifier.range,
@@ -484,7 +502,7 @@ export class ASTNodeFactory {
         }
     }
 
-    buildAnnotationNode(identifer: Token): ASTAnnotationNode{
+    buildAnnotationNode(identifer: Token): ASTAnnotationNode {
         return {
             kind: TokenType.annotation,
             range: identifer.range,
@@ -493,13 +511,13 @@ export class ASTNodeFactory {
     }
 
     buildLocalVariableDeclaration(type: ASTTypeNode, identifer: Token, initialization: ASTTermNode | undefined, isFinal: boolean): ASTLocalVariableDeclaration | undefined {
-        let end = initialization? initialization : identifer;
+        let end = initialization ? initialization : identifer;
 
         return {
             kind: TokenType.localVariableDeclaration,
             identifier: <string>identifer.value,
             identifierRange: identifer.range,
-            range: {startLineNumber: type.range.startLineNumber, startColumn: type.range.startColumn, endLineNumber: end.range.endLineNumber, endColumn: end.range.endColumn},
+            range: { startLineNumber: type.range.startLineNumber, startColumn: type.range.startColumn, endLineNumber: end.range.endLineNumber, endColumn: end.range.endColumn },
             type: type,
             initialization: initialization,
             isFinal: isFinal

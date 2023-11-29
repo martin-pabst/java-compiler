@@ -6,7 +6,7 @@ import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaModuleManager } from "../module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "../module/libraries/JavaLibraryModuleManager";
-import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTTypeNode } from "../parser/AST";
+import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTTypeNode, TypeScope } from "../parser/AST";
 import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
 import { InterfaceClass } from "../runtime/system/javalang/InterfaceClass.ts";
 import { ArrayType } from "../types/ArrayType";
@@ -20,12 +20,43 @@ import { Method } from "../types/Method";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { Parameter } from "../types/Parameter";
 
+
+
+
+
 export class TypeResolver {
 
     dirtyModules: JavaCompiledModule[];
 
+    classDefinitionNodes: ASTClassDefinitionNode[] = [];
+    interfaces: ASTInterfaceDefinitionNode[] = [];
+    enums: ASTEnumDefinitionNode[] = [];
+
     constructor(private moduleManager: JavaModuleManager, private libraryModuleManager: JavaLibraryModuleManager) {
         this.dirtyModules = this.moduleManager.getNewOrDirtyModules();
+    }
+
+    gatherTypeDefinitionNodes(){
+        for(let module of this.dirtyModules){
+            this.gatherTypeDefinitionNodesRecursively(module.ast!);
+        }
+    }
+
+    gatherTypeDefinitionNodesRecursively(typeScope: TypeScope){
+        for(let tdn of typeScope.classOrInterfaceOrEnumDefinitions){
+            switch(tdn.kind){
+                case TokenType.keywordClass:
+                    this.classDefinitionNodes.push(tdn);
+                    break;
+                case TokenType.keywordInterface:
+                    this.interfaces.push(tdn);
+                    break;
+                case TokenType.keywordEnum:
+                    this.enums.push(tdn);
+                    break;
+            }
+            this.gatherTypeDefinitionNodesRecursively(tdn);
+        }
     }
 
     resolve() {
@@ -43,33 +74,62 @@ export class TypeResolver {
 
     generateNewTypesWithGenericsButWithoutFieldsAndMethods() {
 
+        for(let klass of this.classDefinitionNodes){
+            let resolvedType = new JavaClass(klass.identifier, klass.module, klass.identifierRange);
+            this.generateGenericParameters(klass, <JavaClass>resolvedType);
+            klass.resolvedType = resolvedType;
+            this.moduleManager.typestore.addType(resolvedType);
+            klass.module.types.push(klass.resolvedType);
+        }
+
+        for(let intf of this.interfaces){
+            let resolvedType = new JavaInterface(intf.identifier, intf.module, intf.identifierRange);
+            this.generateGenericParameters(intf, <JavaInterface>resolvedType);
+            intf.resolvedType = resolvedType;
+            this.moduleManager.typestore.addType(resolvedType);
+            intf.module.types.push(intf.resolvedType);
+        }
+
         let baseEnumClass = <JavaClass><any>this.libraryModuleManager.typestore.getType("Enum");
 
-        for (let module of this.dirtyModules) {
-            for (let declNode of module.ast!.classOrInterfaceOrEnumDefinitions) {
-                let resolvedType: NonPrimitiveType | undefined = undefined;
-
-                switch (declNode.kind) {
-                    case TokenType.keywordClass:
-                        resolvedType = new JavaClass(declNode.identifier, module, declNode.identifierRange);
-                        this.generateGenericParameters(declNode, <JavaClass>resolvedType);
-                        break;
-                    case TokenType.keywordInterface:
-                        resolvedType = new JavaInterface(declNode.identifier, module, declNode.identifierRange);
-                        this.generateGenericParameters(declNode, <JavaInterface>resolvedType);
-                        break;
-                    case TokenType.keywordEnum:
-                        resolvedType = new JavaEnum(declNode.identifier, module, declNode.identifierRange, baseEnumClass);
-                }
-
-                if (resolvedType) {
-                    declNode.resolvedType = resolvedType;
-                    this.moduleManager.typestore.addType(resolvedType);
-                    module.types.push(declNode.resolvedType);
-                }
-            }
+        for(let enumNode of this.enums){
+            let resolvedType = new JavaEnum(enumNode.identifier, enumNode.module, enumNode.identifierRange, baseEnumClass);
+            enumNode.resolvedType = resolvedType;
+            this.moduleManager.typestore.addType(resolvedType);
+            enumNode.module.types.push(enumNode.resolvedType);
         }
+
     }
+
+    // generateNewTypesWithGenericsButWithoutFieldsAndMethodsOld() {
+
+    //     let baseEnumClass = <JavaClass><any>this.libraryModuleManager.typestore.getType("Enum");
+
+    //     for (let module of this.dirtyModules) {
+    //         for (let declNode of module.ast!.classOrInterfaceOrEnumDefinitions) {
+    //             let resolvedType: NonPrimitiveType | undefined = undefined;
+
+    //             switch (declNode.kind) {
+    //                 case TokenType.keywordClass:
+    //                     resolvedType = new JavaClass(declNode.identifier, module, declNode.identifierRange);
+    //                     this.generateGenericParameters(declNode, <JavaClass>resolvedType);
+    //                     break;
+    //                 case TokenType.keywordInterface:
+    //                     resolvedType = new JavaInterface(declNode.identifier, module, declNode.identifierRange);
+    //                     this.generateGenericParameters(declNode, <JavaInterface>resolvedType);
+    //                     break;
+    //                 case TokenType.keywordEnum:
+    //                     resolvedType = new JavaEnum(declNode.identifier, module, declNode.identifierRange, baseEnumClass);
+    //             }
+
+    //             if (resolvedType) {
+    //                 declNode.resolvedType = resolvedType;
+    //                 this.moduleManager.typestore.addType(resolvedType);
+    //                 module.types.push(declNode.resolvedType);
+    //             }
+    //         }
+    //     }
+    // }
 
     generateGenericParameters(node: ASTClassDefinitionNode | ASTInterfaceDefinitionNode, type: JavaClass | JavaInterface) {
         for (let gpNode of node.genericParameterDefinitions) {

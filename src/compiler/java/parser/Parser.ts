@@ -41,13 +41,13 @@ export class Parser extends StatementParser {
             },
             classOrInterfaceOrEnumDefinitions: [],
             mainProgramNode: this.nodeFactory.buildMainProgramNode(this.cct),
-            collectedTypeNodes: []
+            collectedTypeNodes: [],
+            path: ""
         }
 
     }
 
     parse() {
-
 
         while (!this.isEnd()) {
             let pos = this.pos;
@@ -122,8 +122,7 @@ export class Parser extends StatementParser {
                     case TokenType.keywordClass:
                     case TokenType.keywordEnum:
                     case TokenType.keywordInterface:
-                        this.pushError("Private classes/enums/interfaces kann dieser Compiler leider nicht verarbeiten.");
-                        // this.parseClassOrInterfaceOrEnum(classASTNode, modifiers);
+                        this.parseClassOrInterfaceOrEnum(classASTNode, modifiers);
                         break;
                     case TokenType.at:
                         this.parseAnnotation();
@@ -144,7 +143,7 @@ export class Parser extends StatementParser {
         this.setEndOfRange(classASTNode);
     }
 
-    parseInstanceInitializer(classASTNode: ASTClassDefinitionNode| ASTEnumDefinitionNode) {
+    parseInstanceInitializer(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode) {
         let blockNode = this.nodeFactory.buildInstanceInitializerNode(this.cct);
         this.nextToken(); // skip {
 
@@ -187,7 +186,7 @@ export class Parser extends StatementParser {
             if (this.lookahead(1).tt == TokenType.leftBracket) {
                 this.parseMethodDeclaration(classASTNode, modifiers, false, type);
             } else {
-                    this.parseFieldDeclaration(classASTNode, modifiers, type);
+                this.parseFieldDeclaration(classASTNode, modifiers, type);
             }
         }
 
@@ -205,7 +204,7 @@ export class Parser extends StatementParser {
             if (this.comesToken([TokenType.identifier, TokenType.keywordFinal], false)) {
                 do {
                     this.parseParameter(methodNode);
-                } while(this.comesToken(TokenType.comma, true));
+                } while (this.comesToken(TokenType.comma, true));
             }
             this.expect(TokenType.rightBracket, true);
         }
@@ -313,6 +312,11 @@ export class Parser extends StatementParser {
                 let modifiers = this.parseModifiers();
 
                 switch (this.tt) {
+                    case TokenType.keywordClass:
+                    case TokenType.keywordEnum:
+                    case TokenType.keywordInterface:
+                        this.parseClassOrInterfaceOrEnum(enumNode, modifiers);
+                        break;
                     case TokenType.identifier:
                         this.parseAttributeOrMethodDeclaration(enumNode, modifiers);
                         break;
@@ -367,12 +371,17 @@ export class Parser extends StatementParser {
             while (!this.comesToken([TokenType.rightCurlyBracket, TokenType.endofSourcecode], false)) {
 
                 let modifiers = this.parseModifiers();
-                
+
                 switch (this.tt) {
+                    case TokenType.keywordClass:
+                    case TokenType.keywordEnum:
+                    case TokenType.keywordInterface:
+                        this.parseClassOrInterfaceOrEnum(interfaceNode, modifiers);
+                        break;
                     case TokenType.identifier:
                     case TokenType.keywordVoid:
                         this.parseAttributeOrMethodDeclaration(interfaceNode, modifiers);
-                    // let returnType = this.parseType();
+                        // let returnType = this.parseType();
                         // if (returnType) this.parseMethodDeclaration(interfaceNode, modifiers, false, returnType);
                         break;
                     case TokenType.at:

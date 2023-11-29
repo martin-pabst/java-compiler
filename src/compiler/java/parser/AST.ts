@@ -3,6 +3,7 @@ import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable.ts";
 import { LabelCodeSnippet } from "../codegenerator/LabelManager.ts";
+import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { GenericTypeParameter } from "../types/GenericInformation.ts";
 import { JavaType } from "../types/JavaType.ts";
 import { Method } from "../types/Method.ts";
@@ -40,6 +41,7 @@ export interface ASTDebugProgram extends ASTNode {
 
 export interface TypeScope {
     classOrInterfaceOrEnumDefinitions: (ASTClassDefinitionNode | ASTInterfaceDefinitionNode | ASTEnumDefinitionNode)[];
+    path: string;
 }
 
 export interface ASTGlobalNode extends ASTNode, TypeScope {
@@ -55,11 +57,6 @@ export interface ASTGlobalNode extends ASTNode, TypeScope {
 /**
  * Building blocks for nodes...
  */
-
-export interface ASTTypeDefiningNode {
-    resolvedType?: NonPrimitiveType;
-    innerTypes: ASTTypeDefiningNode[];
-}
 
 export interface ASTNodeWithIdentifier {
     identifier: string;
@@ -86,6 +83,13 @@ export interface ASTParameterNode extends ASTNode, ASTNodeWithIdentifier {
 
 export interface AnnotatedNode {
     annotations: ASTAnnotationNode[]
+}
+
+export interface TypeDefinition {
+    resolvedType: JavaType | undefined;
+    path: string;
+    parent: TypeScope;
+    module: JavaCompiledModule;
 }
 
 export interface TypeDefinitionWithMethods {
@@ -163,10 +167,8 @@ export interface ASTStaticInitializerNode extends ASTStatementNode {
 
 export interface ASTClassDefinitionNode
     extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers,
-    ASTTypeDefinitionWithFields, TypeScope, ASTNodeWithIdentifier, AnnotatedNode,
-    ASTTypeDefiningNode {
+    ASTTypeDefinitionWithFields, TypeScope, ASTNodeWithIdentifier, AnnotatedNode, TypeDefinition {
     kind: TokenType.keywordClass;
-    parent: TypeScope;
     extends: ASTTypeNode | undefined,
     implements: ASTTypeNode[],
 
@@ -175,9 +177,8 @@ export interface ASTClassDefinitionNode
 
 export interface ASTInterfaceDefinitionNode
 extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNodeWithModifiers,
-ASTNodeWithIdentifier, AnnotatedNode, ASTTypeDefiningNode, ASTTypeDefinitionWithFields {
+ASTNodeWithIdentifier, AnnotatedNode, ASTTypeDefinitionWithFields, TypeScope, TypeDefinition {
     kind: TokenType.keywordInterface;
-    parent: TypeScope;
     implements: ASTTypeNode[];
 
     staticInitializer?: Program       // only for debugging purposes,
@@ -193,9 +194,8 @@ export interface ASTEnumValueNode extends ASTNode {
 export interface ASTEnumDefinitionNode
     extends ASTNode, TypeDefinitionWithMethods, ASTNodeWithModifiers,
     ASTTypeDefinitionWithFields, ASTNodeWithIdentifier,
-    AnnotatedNode, ASTTypeDefiningNode {
+    AnnotatedNode, TypeDefinition, TypeScope {
     kind: TokenType.keywordEnum;
-    parent: TypeScope;
     valueNodes: ASTEnumValueNode[];
 
     staticInitializer?: Program       // only for debugging purposes,
@@ -209,7 +209,6 @@ export interface ASTEnumDefinitionNode
 export interface ASTBlockNode extends ASTStatementNode {
     kind: TokenType.block;
     statements: ASTStatementNode[];
-    innerTypes: ASTTypeDefiningNode[];
 }
 
 export interface ASTProgramNode extends ASTNode {

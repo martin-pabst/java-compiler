@@ -16,21 +16,21 @@
 class OuterClass {
   int x = 10;
 
-  public class InnerClass {
+  public class InnerClass {               // Path: OuterClass.InnerClass  (class-scope: allowed)
     public int myInnerMethod() {
       return x;
     }
   }
 
   private int test() {
-    interface InnerInterface {
+    interface InnerInterface {            // Local class: for the time being we don't allow these
       ...
     }
 
     printl("Test");
     final int localVar = 100;
 
-    class InnerClass2 {           // block scope
+    class InnerClass2 {           // Local class: for the time being we don't allow these
 
       void do(){
         int y = localVar * 2;
@@ -40,7 +40,7 @@ class OuterClass {
     }
 
     void test2(){
-       Runnable r = new Runnable {      // block scope anonymous
+       Runnable r = new Runnable {      // block scope anonymous -> allowed!
           void run(){
             ...
           }
