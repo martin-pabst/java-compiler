@@ -1,7 +1,7 @@
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { Token } from "../lexer/Token.ts";
-import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope, ASTNewArrayNode, ASTInstanceInitializerNode, ASTStaticInitializerNode } from "./AST";
+import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope as ASTTypeScope, ASTNewArrayNode, ASTInstanceInitializerNode, ASTStaticInitializerNode } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
 export class ASTNodeFactory {
@@ -10,7 +10,7 @@ export class ASTNodeFactory {
 
     }
 
-    buildTypeNode(enclosingClassOrInterface: ASTClassDefinitionNode | ASTInterfaceDefinitionNode | undefined, startRange?: IRange): ASTTypeNode {
+    buildTypeNode(parentTypeScope: ASTTypeScope | undefined, startRange?: IRange): ASTTypeNode {
 
         if (!startRange) startRange = this.parser.cct.range;
 
@@ -22,13 +22,13 @@ export class ASTNodeFactory {
             genericParameterInvocations: [],
             isVoidType: false,
             isVarKeyword: false,
-            enclosingClassOrInterface: enclosingClassOrInterface
+            parentTypeScope: parentTypeScope
         }
 
     }
 
     buildClassNode(modifiers: ASTNodeWithModifiers, identifier: Token,
-        parent: TypeScope, annotations: ASTAnnotationNode[]): ASTClassDefinitionNode {
+        parent: ASTTypeScope, annotations: ASTAnnotationNode[]): ASTClassDefinitionNode {
 
         let path: string = (parent.path != "" ? parent.path + "." : "") + identifier;
 
@@ -66,7 +66,7 @@ export class ASTNodeFactory {
     }
 
     buildEnumNode(modifiers: ASTNodeWithModifiers, identifier: Token,
-        parent: TypeScope, annotations: ASTAnnotationNode[]): ASTEnumDefinitionNode {
+        parent: ASTTypeScope, annotations: ASTAnnotationNode[]): ASTEnumDefinitionNode {
 
         let path: string = (parent.path != "" ? parent.path + "." : "") + identifier;
 
@@ -114,7 +114,7 @@ export class ASTNodeFactory {
     }
 
     buildInterfaceNode(modifiers: ASTNodeWithModifiers, identifier: Token,
-        parent: TypeScope, annotations: ASTAnnotationNode[]): ASTInterfaceDefinitionNode {
+        parent: ASTTypeScope, annotations: ASTAnnotationNode[]): ASTInterfaceDefinitionNode {
 
         let path: string = (parent.path != "" ? parent.path + "." : "") + identifier;
 

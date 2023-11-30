@@ -103,5 +103,14 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
         return this.canImplicitlyCastTo(otherType);
     }
 
+    toString(): string {
+        return this.identifier;
+    }
+
+    getReifiedIdentifier(): string {
+        return this.identifier;
+    }
+
+
 }
 

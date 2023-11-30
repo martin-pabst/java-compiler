@@ -15,6 +15,7 @@ import { Visibility } from "./Visibility";
 
 export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     isPrimitive: false;
+
     genericInformation: GenericInformation | undefined = undefined;
 
     public usagePositions: UsagePosition[] = [];
@@ -72,7 +73,6 @@ export class JavaClass extends IJavaClass {
     fields: Field[] = [];
     methods: Method[] = [];
 
-    visibility: Visibility = TokenType.keywordPublic;
     enclosingParent: JavaClass | undefined = undefined;
 
     private extends?: IJavaClass;

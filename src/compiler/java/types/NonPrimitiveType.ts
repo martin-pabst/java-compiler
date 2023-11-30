@@ -1,6 +1,7 @@
 import { Program } from "../../common/interpreter/Program.ts";
 import { Klass } from "../../common/interpreter/StepFunction.ts";
 import { IRange } from "../../common/range/Range";
+import { TokenType } from "../TokenType.ts";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { JavaType } from "./JavaType";
@@ -26,6 +27,8 @@ export abstract class NonPrimitiveType extends JavaType {
     abstract getMethods(): Method[];
 
     abstract getField(identifier: string, uptoVisibility: Visibility, forceStatic?: boolean): Field | undefined;
+    
+    visibility: Visibility = TokenType.keywordPublic;
 
     outerType?: NonPrimitiveType | StaticNonPrimitiveType;      // a local class defined inside a static method has a StaticNonPrimitiveType outerType
     innerTypes: NonPrimitiveType[] = [];

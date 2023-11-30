@@ -63,7 +63,6 @@ export class JavaInterface extends IJavaInterface {
 
     private extends: IJavaInterface[] = [];
 
-    visibility: Visibility = TokenType.keywordPublic;
     enclosingParent: JavaClass | undefined = undefined;
 
     public usagePositions: UsagePosition[] = [];

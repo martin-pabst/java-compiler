@@ -40,6 +40,7 @@ export interface ASTDebugProgram extends ASTNode {
 }
 
 export interface TypeScope {
+    kind: TokenType.keywordClass | TokenType.keywordInterface | TokenType.keywordEnum | TokenType.global;
     classOrInterfaceOrEnumDefinitions: (ASTClassDefinitionNode | ASTInterfaceDefinitionNode | ASTEnumDefinitionNode)[];
     path: string;
 }
@@ -124,7 +125,8 @@ export interface ASTTypeNode extends ASTNode {
     arrayDimensions: number;
     isVoidType: boolean;
     isVarKeyword: boolean;  // type inference...
-    enclosingClassOrInterface?: ASTClassDefinitionNode | ASTInterfaceDefinitionNode
+    
+    parentTypeScope?: TypeScope
 
     resolvedType?: JavaType;
 }

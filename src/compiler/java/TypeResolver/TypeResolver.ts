@@ -19,9 +19,7 @@ import { JavaType } from "../types/JavaType";
 import { Method } from "../types/Method";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { Parameter } from "../types/Parameter";
-
-
-
+import { Visibility } from "../types/Visibility.ts";
 
 
 export class TypeResolver {
@@ -35,6 +33,22 @@ export class TypeResolver {
     constructor(private moduleManager: JavaModuleManager, private libraryModuleManager: JavaLibraryModuleManager) {
         this.dirtyModules = this.moduleManager.getNewOrDirtyModules();
     }
+
+    resolve() {
+
+        this.gatherTypeDefinitionNodes();
+
+        this.generateNewTypesWithGenericsButWithoutFieldsAndMethods();
+
+        this.resolveTypeReferences();
+
+        this.resolveGenericParameterTypesAndExtendsImplements();
+
+        this.buildAllMethods();
+
+        this.buildRuntimeClassesAndTheirFields();
+    }
+
 
     gatherTypeDefinitionNodes(){
         for(let module of this.dirtyModules){
@@ -57,19 +71,6 @@ export class TypeResolver {
             }
             this.gatherTypeDefinitionNodesRecursively(tdn);
         }
-    }
-
-    resolve() {
-
-        this.generateNewTypesWithGenericsButWithoutFieldsAndMethods();
-
-        this.resolveTypeReferences();
-
-        this.resolveGenericParameterTypesAndExtendsImplements();
-
-        this.buildAllMethods();
-
-        this.buildRuntimeClassesAndTheirFields();
     }
 
     generateNewTypesWithGenericsButWithoutFieldsAndMethods() {
@@ -148,6 +149,7 @@ export class TypeResolver {
     }
 
     resolveTypeNode(typeNode: ASTTypeNode, module: JavaBaseModule): JavaType | undefined {
+        
         let primaryType = this.findPrimaryTypeByIdentifier(typeNode, module);
 
         if (!primaryType) return;
@@ -185,15 +187,42 @@ export class TypeResolver {
     findPrimaryTypeByIdentifier(typeNode: ASTTypeNode, module: JavaBaseModule): JavaType | undefined {
         let identifer = typeNode.identifier;
 
+        let type: JavaType | undefined;
+
         // Generic parameter variable?
-        if (typeNode.enclosingClassOrInterface) {
-            for (let gpType of typeNode.enclosingClassOrInterface.genericParameterDefinitions) {
-                let gp = gpType.resolvedType;
-                if (gp && gp.identifier == identifer) return gp;
+        if (typeNode.parentTypeScope) {
+            
+            if([TokenType.keywordClass, TokenType.keywordInterface].indexOf(typeNode.parentTypeScope.kind) >= 0){
+                let classOrInterfaceNode: ASTClassDefinitionNode | ASTInterfaceDefinitionNode = <any>typeNode.parentTypeScope;
+                for (let gpType of classOrInterfaceNode.genericParameterDefinitions) {
+                    let gp = gpType.resolvedType;
+                    if (gp && gp.identifier == identifer) return gp;
+                }
             }
+            
+            if(typeNode.identifier.indexOf(".") < 0){
+                let parentTypeScope: TypeScope | undefined = typeNode.parentTypeScope;
+                while(parentTypeScope){
+                    let path: string = parentTypeScope.path;
+                    
+                    if(path != ""){
+                        type = this.moduleManager.typestore.getType(path + "." + typeNode.identifier);
+                        if(type) return type;
+                    }
+    
+                    //@ts-ignore
+                    parentTypeScope = parentTypeScope.parentTypeScope;
+                }
+            }
+
         }
 
-        let type = this.moduleManager.typestore.getType(identifer);
+        type = this.moduleManager.typestore.getType(identifer);
+        if(identifer.indexOf(".") >= 0){
+            if(!(type instanceof NonPrimitiveType)) return type; // should'nt be possible because primitive type identifiers don't contain dots
+            if(type.visibility == TokenType.keywordPublic) return type;
+            type = undefined;            
+        }
 
         if (!type) {
             type = this.libraryModuleManager.typestore.getType(identifer);
