@@ -18,11 +18,16 @@ export class JavaTypeStore {
     }
 
     addType(type: JavaType) {
-        this.typeMap.set(type.identifier, type);
+        if(type instanceof NonPrimitiveType){
+            let identifier = type.path == "" ? type.identifier : type.path + "." + type.identifier;
+            this.typeMap.set(identifier, type);
+        } else {
+            this.typeMap.set(type.identifier, type);
+        }
     }
 
-    getType(identifier: string): JavaType | undefined {
-        return this.typeMap.get(identifier);
+    getType(identifierWithPath: string): JavaType | undefined {
+        return this.typeMap.get(identifierWithPath);
     }
 
     populateClassObjectRegistry(klassObjectRegistry: KlassObjectRegistry){

@@ -43,7 +43,7 @@ export abstract class NonPrimitiveType extends JavaType {
     staticConstructorsDependOn: Map<NonPrimitiveType, boolean> = new Map();
 
 
-    constructor(identifier: string, identifierRange: IRange, module: JavaBaseModule){
+    constructor(identifier: string, identifierRange: IRange, public path: string, module: JavaBaseModule){
         super(identifier, identifierRange, module);
         this.isPrimitive = false;
     }

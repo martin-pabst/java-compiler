@@ -19,14 +19,29 @@
   * use templates to generate fast code for static library functions like Math.sin, Math.atan2, ...
   * invoke methods on expressions wich evaluate to a string primitive (with constant folding)
 
+## working status on current issue:
+  * current project: named inner classes
+  * added path to ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTEnumDefinitionNode
+  * added parent to ...
+  * added path to ...
+  * added path to NonPrimitiveType
+  * above mentioned path and parent attributes get written in TypeResolver
+  * TypeResolver finds types with dots in identifier
+  * CodeGenerator invokes compileClass/compileEnum/compileInterface for named inner classes/enums/interfaces
+
+### fine-grained next todos on current issue:
+  * for non-static inner classes:
+    * add invisible parameter "outer" to constructor of inner classes
+    * add invisible attribute "ouber" to inner classes
+    * on access to attribute of outer class: compile s[sb + 0].outer (.outer...).attributeIdentifier
 
 ## next todos
-  * generics
+  * generics (status: mostly done)
+  * anonymous inner classes
   * Array constants
   * library method to gather information for automated tests
   * library method examples
   * Lambda Functions
-  * anonymous inner classes
 
 
 

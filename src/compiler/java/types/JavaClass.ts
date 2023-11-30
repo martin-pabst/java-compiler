@@ -21,8 +21,8 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     public usagePositions: UsagePosition[] = [];
 
     
-    constructor(identifier: string, module: JavaBaseModule, identifierRange: IRange){
-        super(identifier, identifierRange, module);        
+    constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule){
+        super(identifier, identifierRange, path, module);        
         this.isPrimitive = false;
     }
 
@@ -78,8 +78,8 @@ export class JavaClass extends IJavaClass {
     private extends?: IJavaClass;
     private implements: IJavaInterface[] = [];
 
-    constructor(identifier: string, module: JavaBaseModule, identifierRange: IRange) {
-        super(identifier, module, identifierRange);
+    constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
+        super(identifier, identifierRange, path, module);
     }
 
     getAbstractMethodsNotYetImplemented(): Method[] {
@@ -228,7 +228,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     public usagePositions: UsagePosition[] = [];
 
     constructor(public isGenericVariantOf: JavaClass, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
-        super(isGenericVariantOf.identifier, isGenericVariantOf.module, isGenericVariantOf.identifierRange);
+        super(isGenericVariantOf.identifier, isGenericVariantOf.identifierRange ,isGenericVariantOf.path, isGenericVariantOf.module);
     }
 
     toString(): string {

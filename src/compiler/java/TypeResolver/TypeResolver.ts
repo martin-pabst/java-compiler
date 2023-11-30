@@ -76,25 +76,25 @@ export class TypeResolver {
     generateNewTypesWithGenericsButWithoutFieldsAndMethods() {
 
         for(let klass of this.classDefinitionNodes){
-            let resolvedType = new JavaClass(klass.identifier, klass.module, klass.identifierRange);
+            let resolvedType = new JavaClass(klass.identifier, klass.identifierRange, klass.path, klass.module);
             this.generateGenericParameters(klass, <JavaClass>resolvedType);
             klass.resolvedType = resolvedType;
             this.moduleManager.typestore.addType(resolvedType);
             klass.module.types.push(klass.resolvedType);
         }
 
-        for(let intf of this.interfaces){
-            let resolvedType = new JavaInterface(intf.identifier, intf.module, intf.identifierRange);
-            this.generateGenericParameters(intf, <JavaInterface>resolvedType);
-            intf.resolvedType = resolvedType;
+        for(let interfaceNode of this.interfaces){
+            let resolvedType = new JavaInterface(interfaceNode.identifier, interfaceNode.identifierRange, interfaceNode.path, interfaceNode.module);
+            this.generateGenericParameters(interfaceNode, <JavaInterface>resolvedType);
+            interfaceNode.resolvedType = resolvedType;
             this.moduleManager.typestore.addType(resolvedType);
-            intf.module.types.push(intf.resolvedType);
+            interfaceNode.module.types.push(interfaceNode.resolvedType);
         }
 
         let baseEnumClass = <JavaClass><any>this.libraryModuleManager.typestore.getType("Enum");
 
         for(let enumNode of this.enums){
-            let resolvedType = new JavaEnum(enumNode.identifier, enumNode.module, enumNode.identifierRange, baseEnumClass);
+            let resolvedType = new JavaEnum(enumNode.identifier, enumNode.identifierRange, enumNode.path, enumNode.module, baseEnumClass);
             enumNode.resolvedType = resolvedType;
             this.moduleManager.typestore.addType(resolvedType);
             enumNode.module.types.push(enumNode.resolvedType);

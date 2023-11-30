@@ -13,8 +13,8 @@ import { Visibility } from "./Visibility";
 
 export abstract class IJavaInterface extends NonPrimitiveType {
 
-    constructor(public identifier: string, public module: JavaBaseModule, public identifierRange: IRange) {
-        super(identifier, identifierRange, module);
+    constructor(public identifier: string, public identifierRange: IRange, path: string, public module: JavaBaseModule) {
+        super(identifier, identifierRange, path, module);
     }
 
     getFile(): File {
@@ -67,8 +67,8 @@ export class JavaInterface extends IJavaInterface {
 
     public usagePositions: UsagePosition[] = [];
 
-    constructor(identifier: string, module: JavaBaseModule, declarationRange: IRange) {
-        super(identifier, module, declarationRange);
+    constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
+        super(identifier, identifierRange, path, module);
     }
 
     getFields(): Field[] {
@@ -170,7 +170,7 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
     public usagePositions: UsagePosition[] = [];
 
     constructor(public isGenericVariantOf: JavaInterface, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
-        super(isGenericVariantOf.identifier, isGenericVariantOf.module, isGenericVariantOf.identifierRange);
+        super(isGenericVariantOf.identifier, isGenericVariantOf.identifierRange, isGenericVariantOf.path, isGenericVariantOf.module);
     }
 
     toString(): string {

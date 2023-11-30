@@ -9,9 +9,9 @@ export abstract class JavaTypeWithInstanceInitializer extends NonPrimitiveType {
 
     instanceInitializer: CodeSnippet[] = [];
 
-    constructor(identifier: string, identifierRange: IRange, module: JavaBaseModule) {
+    constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
 
-        super(identifier, identifierRange, module);
+        super(identifier, identifierRange, path, module);
 
     }
 

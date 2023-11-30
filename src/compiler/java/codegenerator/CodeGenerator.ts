@@ -3,7 +3,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTMethodDeclarationNode, ASTStaticInitializerNode } from "../parser/AST";
+import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTMethodDeclarationNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
 import { Field } from "../types/Field.ts";
 import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
@@ -37,7 +37,7 @@ export class CodeGenerator extends StatementCodeGenerator {
     }
 
     start() {
-        this.compileClasses();
+        this.compileClassesEnumsAndInterfaces(this.module.ast);
         this.compileMainProgram();
     }
 
@@ -69,10 +69,10 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     }
 
-    compileClasses() {
-        if (!this.module.ast?.classOrInterfaceOrEnumDefinitions) return;
+    compileClassesEnumsAndInterfaces(typeScope: TypeScope | undefined) {
+        if (!typeScope) return;
 
-        for (let cdef of this.module.ast?.classOrInterfaceOrEnumDefinitions) {
+        for (let cdef of typeScope.classOrInterfaceOrEnumDefinitions) {
             switch (cdef.kind) {
                 case TokenType.keywordClass:
                     this.compileClassDeclaration(cdef);
@@ -84,6 +84,8 @@ export class CodeGenerator extends StatementCodeGenerator {
                     this.compileInterfaceDeclaration(cdef);
                     break;
             }
+
+            this.compileClassesEnumsAndInterfaces(cdef);
         }
     }
 

@@ -2,7 +2,7 @@ import { Error } from "../../common/Error";
 import { Program, Step } from "../../common/interpreter/Program";
 import { File } from "../../common/module/File";
 import { TokenList } from "../lexer/Token";
-import { ASTGlobalNode } from "../parser/AST";
+import { ASTClassDefinitionNode, ASTGlobalNode } from "../parser/AST";
 import { JavaType } from "../types/JavaType";
 import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
