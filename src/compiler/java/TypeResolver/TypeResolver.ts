@@ -349,6 +349,7 @@ export class TypeResolver {
                     //@ts-ignore
                     case TokenType.keywordClass:
                         classes.push(<JavaClass>declNode.resolvedType);
+                        // fallthrough:
                     case TokenType.keywordEnum:
                         let resolvedType1 = <JavaClass | JavaEnum>declNode.resolvedType;
                         // this.buildFields(declNode, resolvedType1, module);

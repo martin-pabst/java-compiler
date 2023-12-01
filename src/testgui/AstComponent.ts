@@ -130,7 +130,8 @@ export class AstComponent {
         for(const [field, value] of Object.entries(node)){
 
             if(field == 'parent') continue;
-            if(field == 'enclosingClassOrInterface') continue;
+            if(field == 'outerType') continue;
+            if(field == 'parentTypeScope') continue;
             if(!value) continue;
 
             if(value['kind'] != null && value['range'] != null){

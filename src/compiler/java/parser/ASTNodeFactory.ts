@@ -30,7 +30,7 @@ export class ASTNodeFactory {
     buildClassNode(modifiers: ASTNodeWithModifiers, identifier: Token,
         parent: ASTTypeScope, annotations: ASTAnnotationNode[]): ASTClassDefinitionNode {
 
-        let path: string = (parent.path != "" ? parent.path + "." : "") + identifier;
+        let path: string = (parent.path != "" ? parent.path + "." : "") + identifier.value;
 
         let node: ASTClassDefinitionNode = {
             kind: TokenType.keywordClass,
@@ -68,7 +68,7 @@ export class ASTNodeFactory {
     buildEnumNode(modifiers: ASTNodeWithModifiers, identifier: Token,
         parent: ASTTypeScope, annotations: ASTAnnotationNode[]): ASTEnumDefinitionNode {
 
-        let path: string = (parent.path != "" ? parent.path + "." : "") + identifier;
+        let path: string = (parent.path != "" ? parent.path + "." : "") + identifier.value;
 
         let node: ASTEnumDefinitionNode = {
             kind: TokenType.keywordEnum,
@@ -116,7 +116,7 @@ export class ASTNodeFactory {
     buildInterfaceNode(modifiers: ASTNodeWithModifiers, identifier: Token,
         parent: ASTTypeScope, annotations: ASTAnnotationNode[]): ASTInterfaceDefinitionNode {
 
-        let path: string = (parent.path != "" ? parent.path + "." : "") + identifier;
+        let path: string = (parent.path != "" ? parent.path + "." : "") + identifier.value;
 
         let node: ASTInterfaceDefinitionNode = {
             kind: TokenType.keywordInterface,

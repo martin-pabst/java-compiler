@@ -19,8 +19,7 @@ export class JavaTypeStore {
 
     addType(type: JavaType) {
         if(type instanceof NonPrimitiveType){
-            let identifier = type.path == "" ? type.identifier : type.path + "." + type.identifier;
-            this.typeMap.set(identifier, type);
+            this.typeMap.set(type.path, type);
         } else {
             this.typeMap.set(type.identifier, type);
         }

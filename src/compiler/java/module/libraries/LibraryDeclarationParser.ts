@@ -70,20 +70,23 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         switch (modifiersAndType.type) {
             case TokenType.keywordClass:
-                npt = new JavaClass(identifier, module, LibraryDeclarationParser.nullRange);
+                npt = new JavaClass(identifier, LibraryDeclarationParser.nullRange, "", module);
                 let npt1 = <JavaClass>npt;
                 npt1.isStatic = modifiersAndType.static;
                 npt1.isFinal = modifiersAndType.final;
                 npt1._isAbstract = modifiersAndType.abstract;
                 npt1.runtimeClass = klass;
+                npt1.path = npt1.identifier;
                 break;
             case TokenType.keywordInterface:
-                npt = new JavaInterface(identifier, module, LibraryDeclarationParser.nullRange);
+                npt = new JavaInterface(identifier, LibraryDeclarationParser.nullRange, "", module);
+                npt.path = npt.identifier;
                 break;
             case TokenType.keywordEnum:
-                npt = new JavaEnum(identifier, module, LibraryDeclarationParser.nullRange, Object.getPrototypeOf(Object.getPrototypeOf(klass)).type);
+                npt = new JavaEnum(identifier, LibraryDeclarationParser.nullRange, "", module,  Object.getPrototypeOf(Object.getPrototypeOf(klass)).type);
                 let npt2 = <JavaEnum>npt;
                 npt2.runtimeClass = klass;
+                npt2.path = npt2.identifier;
                 break;
         }
 
