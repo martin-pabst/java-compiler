@@ -24,6 +24,8 @@ export class Helpers {
     static throwAE = StepParams.thread + "." + Thread.prototype.AE.name;
     static throwNPE = StepParams.thread + "." + Thread.prototype.NPE.name;
     static exit = StepParams.thread + "." + Thread.prototype.exit.name;
+
+    static outerClassAttributeIdentifier = "__outerClass";
 }
 
 /**

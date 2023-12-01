@@ -85,7 +85,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                     break;
             }
 
-            this.compileClassesEnumsAndInterfaces(cdef);
+            this.compileClassesEnumsAndInterfaces(cdef);        // compile named inner classes
         }
     }
 
@@ -432,10 +432,18 @@ export class CodeGenerator extends StatementCodeGenerator {
         if (methodNode.isContructor) {
             this.callingOtherConstructorInSameClassHappened = false;
             this.superConstructorHasBeenCalled = false;
+
+            if(classContext.path != "" && !classContext.isStatic){
+                method.hasOuterClassParameter = true;
+            }
         }
         
         let symbolTable = this.pushAndGetNewSymbolTable(methodNode.range, true, classContext, method);
         
+        if(method.hasOuterClassParameter){
+            this.currentSymbolTable.reserveNextStackframeLocation(); // make room for __outer-Parameter
+        }
+
         for (let parameter of method.parameters) {
             this.currentSymbolTable.addSymbol(parameter);
         }
@@ -454,6 +462,11 @@ export class CodeGenerator extends StatementCodeGenerator {
                 snippets = snippets.concat(classContext.instanceInitializer);
             }
             
+            if(method.hasOuterClassParameter){
+                let storeOuterClassReferenceSnippet = new StringCodeSnippet(`${StepParams.stack}[0].${Helpers.outerClassAttributeIdentifier} = ${StepParams.stack[1]};\n`);
+                snippets.push(storeOuterClassReferenceSnippet);
+            }
+
             if (!this.superConstructorHasBeenCalled) {
                 // TODO: insert call to default super constructor
             }

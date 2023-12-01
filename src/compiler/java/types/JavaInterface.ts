@@ -63,8 +63,6 @@ export class JavaInterface extends IJavaInterface {
 
     private extends: IJavaInterface[] = [];
 
-    enclosingParent: JavaClass | undefined = undefined;
-
     public usagePositions: UsagePosition[] = [];
 
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {

@@ -198,7 +198,7 @@ export abstract class TermParser extends TokenIterator {
                 let leftBracketOrLeftSquareBracket = this.lookForTokenTillOtherToken([TokenType.leftBracket, TokenType.leftSquareBracket], [TokenType.semicolon, TokenType.leftCurlyBracket])
                 switch (leftBracketOrLeftSquareBracket) {
                     case TokenType.leftBracket:
-                        node = this.parseNewObjectInstantiation();
+                        node = this.parseNewObjectInstantiation(undefined);
                         break;
                     case TokenType.leftSquareBracket:
                         node = this.parseNewArray();
@@ -235,7 +235,13 @@ export abstract class TermParser extends TokenIterator {
     
                 switch (this.tt) {
                     case TokenType.dot:
-                        node = this.parseAttributeOrMethodCall(node)
+                        this.nextToken(); // skip dot
+                        //@ts-ignore
+                        if(this.tt == TokenType.keywordNew){
+                            node = this.parseNewObjectInstantiation(node);
+                        } else {
+                            node = this.parseAttributeOrMethodCall(node)
+                        }
                         break;
                     case TokenType.leftSquareBracket:
                         node = this.parseSelectArrayElement(node);
@@ -251,7 +257,6 @@ export abstract class TermParser extends TokenIterator {
 
 
     parseAttributeOrMethodCall(node: ASTTermNode | undefined): ASTTermNode | undefined {
-        this.nextToken(); // skip .
         if (!node) {
             this.pushError("Der Punkt-Operator kann nur nach einem Bezeichner (identifier) kommen.", "error");
             return undefined;
@@ -414,14 +419,19 @@ export abstract class TermParser extends TokenIterator {
         return newArrayNode;
     }
 
-    parseNewObjectInstantiation(): ASTNewObjectNode | undefined {
+    /**
+     * 
+     * @param node  is undefinded except for instantiating objects of named private classes like object.new ClassIdentifier(...)
+     * @returns 
+     */
+    parseNewObjectInstantiation(node: ASTTermNode | undefined): ASTNewObjectNode | undefined {
         let startToken = this.cct;
         this.nextToken(); // skip new keyword
         let type = this.parseType();
 
         if (!type) return undefined;
 
-        let newObjectNode = this.nodeFactory.buildNewObjectNode(startToken, type);
+        let newObjectNode = this.nodeFactory.buildNewObjectNode(startToken, type, node);
 
         if (this.expect(TokenType.leftBracket), true) {
 

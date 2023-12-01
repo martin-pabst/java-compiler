@@ -294,12 +294,13 @@ export class ASTNodeFactory {
         }
     }
 
-    buildNewObjectNode(startToken: Token, type: ASTTypeNode): ASTNewObjectNode {
+    buildNewObjectNode(startToken: Token, type: ASTTypeNode, object: ASTTermNode | undefined): ASTNewObjectNode {
         return {
             kind: TokenType.newObject,
             range: startToken.range,
             parameterValues: [],
-            type: type
+            type: type,
+            object: object
         }
     }
 

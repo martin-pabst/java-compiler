@@ -291,6 +291,7 @@ export interface ASTNewObjectNode extends ASTTermNode {
     kind: TokenType.newObject;
     type: ASTTypeNode;
     parameterValues: ASTTermNode[];
+    object?: ASTTermNode;
 }
 
 export interface AnonymousClassNode extends ASTTermNode {

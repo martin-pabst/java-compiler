@@ -79,6 +79,10 @@ export class TypeResolver {
             let resolvedType = new JavaClass(klass.identifier, klass.identifierRange, klass.path, klass.module);
             this.generateGenericParameters(klass, <JavaClass>resolvedType);
             klass.resolvedType = resolvedType;
+            resolvedType.visibility = klass.visibility;
+            resolvedType.isStatic = klass.isStatic;
+            resolvedType._isAbstract = klass.isAbstract;
+
             this.moduleManager.typestore.addType(resolvedType);
             klass.module.types.push(klass.resolvedType);
         }
@@ -87,6 +91,7 @@ export class TypeResolver {
             let resolvedType = new JavaInterface(interfaceNode.identifier, interfaceNode.identifierRange, interfaceNode.path, interfaceNode.module);
             this.generateGenericParameters(interfaceNode, <JavaInterface>resolvedType);
             interfaceNode.resolvedType = resolvedType;
+            resolvedType.visibility = interfaceNode.visibility;
             this.moduleManager.typestore.addType(resolvedType);
             interfaceNode.module.types.push(interfaceNode.resolvedType);
         }
@@ -96,6 +101,8 @@ export class TypeResolver {
         for(let enumNode of this.enums){
             let resolvedType = new JavaEnum(enumNode.identifier, enumNode.identifierRange, enumNode.path, enumNode.module, baseEnumClass);
             enumNode.resolvedType = resolvedType;
+            resolvedType.visibility = enumNode.visibility;
+            resolvedType.isStatic = true;                       // "Nested enum types are implicitly static. It is permissible to explicitly declare a nested enum type to be static.", see https://docs.oracle.com/javase/specs/jls/se7/html/jls-8.html#jls-8.9
             this.moduleManager.typestore.addType(resolvedType);
             enumNode.module.types.push(enumNode.resolvedType);
         }

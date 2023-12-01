@@ -20,14 +20,11 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
     fields: Field[] = [];
     methods: Method[] = [];
 
-    enclosingParent: JavaClass | undefined = undefined;
-
     public usagePositions: UsagePosition[] = [];
 
     private implements: JavaInterface[] = [];
 
     
-
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule, public baseEnumClass: JavaClass) {
         super(identifier, identifierRange, path, module);
     }

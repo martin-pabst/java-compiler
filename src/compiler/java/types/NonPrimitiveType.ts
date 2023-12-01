@@ -29,6 +29,7 @@ export abstract class NonPrimitiveType extends JavaType {
     abstract getField(identifier: string, uptoVisibility: Visibility, forceStatic?: boolean): Field | undefined;
     
     visibility: Visibility = TokenType.keywordPublic;
+    isStatic: boolean = false; // static inner classes behave differently from non-static inner classes
 
     outerType?: NonPrimitiveType | StaticNonPrimitiveType;      // a local class defined inside a static method has a StaticNonPrimitiveType outerType
     innerTypes: NonPrimitiveType[] = [];

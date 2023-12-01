@@ -73,8 +73,6 @@ export class JavaClass extends IJavaClass {
     fields: Field[] = [];
     methods: Method[] = [];
 
-    enclosingParent: JavaClass | undefined = undefined;
-
     private extends?: IJavaClass;
     private implements: IJavaInterface[] = [];
 

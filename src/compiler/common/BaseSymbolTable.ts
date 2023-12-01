@@ -86,4 +86,8 @@ export class BaseStackframe {
 
     }
 
+    increaseNextFreePosition(){
+        this.nextFreePosition++;
+    }
+
 }

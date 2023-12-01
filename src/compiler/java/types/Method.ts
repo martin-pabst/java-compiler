@@ -25,6 +25,7 @@ export class Method {
     program?: Program;
 
     parameters: Parameter[] = [];
+    hasOuterClassParameter: boolean = false;            // constructors of non-static inner classes have invisible first parameter with identifier outerClassAttributeIdentifier
 
     template?: string;      // only for library Methods, i.e. Math.sin
     constantFoldingFunction?: (...parms: any) => any; 
@@ -75,6 +76,7 @@ export class Method {
         newMethod.isFinal = this.isFinal;
         newMethod.isAbstract = this.isAbstract;
         newMethod.isDefault = this.isDefault;
+        newMethod.hasOuterClassParameter = this.hasOuterClassParameter;
         newMethod.parameters = newParameters;
         newMethod.returnParameterType = newReturnParameter;
 
