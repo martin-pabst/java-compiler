@@ -78,6 +78,9 @@ export class Parser extends StatementParser {
 
             let identifier = this.expectAndSkipIdentifierAsToken();
 
+            // back up current class before entering child class
+            let currentClassOrInterface = this.currentClassOrInterface;
+
             if (identifier.value != "") {
                 switch (tt) {
                     case TokenType.keywordClass:
@@ -91,6 +94,9 @@ export class Parser extends StatementParser {
                         break;
                 }
             }
+
+            // restore current class after leaving child class
+            this.currentClassOrInterface = currentClassOrInterface;
         }
 
     }

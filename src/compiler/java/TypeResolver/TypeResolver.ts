@@ -26,9 +26,9 @@ export class TypeResolver {
 
     dirtyModules: JavaCompiledModule[];
 
-    classDefinitionNodes: ASTClassDefinitionNode[] = [];
-    interfaces: ASTInterfaceDefinitionNode[] = [];
-    enums: ASTEnumDefinitionNode[] = [];
+    classDeclarationNodes: ASTClassDefinitionNode[] = [];
+    interfaceDeclarationNodes: ASTInterfaceDefinitionNode[] = [];
+    enumDeclarationNodes: ASTEnumDefinitionNode[] = [];
 
     constructor(private moduleManager: JavaModuleManager, private libraryModuleManager: JavaLibraryModuleManager) {
         this.dirtyModules = this.moduleManager.getNewOrDirtyModules();
@@ -38,7 +38,7 @@ export class TypeResolver {
 
         this.gatherTypeDefinitionNodes();
 
-        this.generateNewTypesWithGenericsButWithoutFieldsAndMethods();
+        this.generateNewTypesWithGenericsButWithoutFieldsAndMethodsAndResolveOuterTypes();
 
         this.resolveTypeReferences();
 
@@ -50,61 +50,74 @@ export class TypeResolver {
     }
 
 
-    gatherTypeDefinitionNodes(){
-        for(let module of this.dirtyModules){
+    gatherTypeDefinitionNodes() {
+        for (let module of this.dirtyModules) {
             this.gatherTypeDefinitionNodesRecursively(module.ast!);
         }
     }
 
-    gatherTypeDefinitionNodesRecursively(typeScope: TypeScope){
-        for(let tdn of typeScope.classOrInterfaceOrEnumDefinitions){
-            switch(tdn.kind){
+    gatherTypeDefinitionNodesRecursively(typeScope: TypeScope) {
+        for (let tdn of typeScope.classOrInterfaceOrEnumDefinitions) {
+            switch (tdn.kind) {
                 case TokenType.keywordClass:
-                    this.classDefinitionNodes.push(tdn);
+                    this.classDeclarationNodes.push(tdn);
                     break;
                 case TokenType.keywordInterface:
-                    this.interfaces.push(tdn);
+                    this.interfaceDeclarationNodes.push(tdn);
                     break;
                 case TokenType.keywordEnum:
-                    this.enums.push(tdn);
+                    this.enumDeclarationNodes.push(tdn);
                     break;
             }
             this.gatherTypeDefinitionNodesRecursively(tdn);
         }
     }
 
-    generateNewTypesWithGenericsButWithoutFieldsAndMethods() {
+    generateNewTypesWithGenericsButWithoutFieldsAndMethodsAndResolveOuterTypes() {
 
-        for(let klass of this.classDefinitionNodes){
-            let resolvedType = new JavaClass(klass.identifier, klass.identifierRange, klass.path, klass.module);
-            this.generateGenericParameters(klass, <JavaClass>resolvedType);
-            klass.resolvedType = resolvedType;
-            resolvedType.visibility = klass.visibility;
-            resolvedType.isStatic = klass.isStatic;
-            resolvedType._isAbstract = klass.isAbstract;
+        let declarationNodesWithClassParent: (ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode)[] = [];
+
+        for (let klassNode of this.classDeclarationNodes) {
+            let resolvedType = new JavaClass(klassNode.identifier, klassNode.identifierRange, klassNode.path, klassNode.module);
+            this.generateGenericParameters(klassNode, <JavaClass>resolvedType);
+            klassNode.resolvedType = resolvedType;
+            resolvedType.visibility = klassNode.visibility;
+            resolvedType.isStatic = klassNode.isStatic;
+            resolvedType._isAbstract = klassNode.isAbstract;
 
             this.moduleManager.typestore.addType(resolvedType);
-            klass.module.types.push(klass.resolvedType);
+            klassNode.module.types.push(klassNode.resolvedType);
+
+            if(klassNode.parent.kind != TokenType.global) declarationNodesWithClassParent.push(klassNode);
         }
 
-        for(let interfaceNode of this.interfaces){
+        for (let interfaceNode of this.interfaceDeclarationNodes) {
             let resolvedType = new JavaInterface(interfaceNode.identifier, interfaceNode.identifierRange, interfaceNode.path, interfaceNode.module);
             this.generateGenericParameters(interfaceNode, <JavaInterface>resolvedType);
             interfaceNode.resolvedType = resolvedType;
             resolvedType.visibility = interfaceNode.visibility;
             this.moduleManager.typestore.addType(resolvedType);
             interfaceNode.module.types.push(interfaceNode.resolvedType);
+
+            if(interfaceNode.parent.kind != TokenType.global) declarationNodesWithClassParent.push(interfaceNode);
         }
 
         let baseEnumClass = <JavaClass><any>this.libraryModuleManager.typestore.getType("Enum");
 
-        for(let enumNode of this.enums){
+        for (let enumNode of this.enumDeclarationNodes) {
             let resolvedType = new JavaEnum(enumNode.identifier, enumNode.identifierRange, enumNode.path, enumNode.module, baseEnumClass);
             enumNode.resolvedType = resolvedType;
             resolvedType.visibility = enumNode.visibility;
             resolvedType.isStatic = true;                       // "Nested enum types are implicitly static. It is permissible to explicitly declare a nested enum type to be static.", see https://docs.oracle.com/javase/specs/jls/se7/html/jls-8.html#jls-8.9
             this.moduleManager.typestore.addType(resolvedType);
             enumNode.module.types.push(enumNode.resolvedType);
+
+            if(enumNode.parent.kind != TokenType.global) declarationNodesWithClassParent.push(enumNode);
+        }
+
+        for(let node of declarationNodesWithClassParent){
+            //@ts-ignore
+            node.resolvedType!.outerType = node.parent.resolvedType;
         }
 
     }
@@ -156,7 +169,7 @@ export class TypeResolver {
     }
 
     resolveTypeNode(typeNode: ASTTypeNode, module: JavaBaseModule): JavaType | undefined {
-        
+
         let primaryType = this.findPrimaryTypeByIdentifier(typeNode, module);
 
         if (!primaryType) return;
@@ -198,25 +211,25 @@ export class TypeResolver {
 
         // Generic parameter variable?
         if (typeNode.parentTypeScope) {
-            
-            if([TokenType.keywordClass, TokenType.keywordInterface].indexOf(typeNode.parentTypeScope.kind) >= 0){
+
+            if ([TokenType.keywordClass, TokenType.keywordInterface].indexOf(typeNode.parentTypeScope.kind) >= 0) {
                 let classOrInterfaceNode: ASTClassDefinitionNode | ASTInterfaceDefinitionNode = <any>typeNode.parentTypeScope;
                 for (let gpType of classOrInterfaceNode.genericParameterDefinitions) {
                     let gp = gpType.resolvedType;
                     if (gp && gp.identifier == identifer) return gp;
                 }
             }
-            
-            if(typeNode.identifier.indexOf(".") < 0){
+
+            if (typeNode.identifier.indexOf(".") < 0) {
                 let parentTypeScope: TypeScope | undefined = typeNode.parentTypeScope;
-                while(parentTypeScope){
+                while (parentTypeScope) {
                     let path: string = parentTypeScope.path;
-                    
-                    if(path != ""){
+
+                    if (path != "") {
                         type = this.moduleManager.typestore.getType(path + "." + typeNode.identifier);
-                        if(type) return type;
+                        if (type) return type;
                     }
-    
+
                     //@ts-ignore
                     parentTypeScope = parentTypeScope.parentTypeScope;
                 }
@@ -225,10 +238,10 @@ export class TypeResolver {
         }
 
         type = this.moduleManager.typestore.getType(identifer);
-        if(identifer.indexOf(".") >= 0){
-            if(!(type instanceof NonPrimitiveType)) return type; // should'nt be possible because primitive type identifiers don't contain dots
-            if(type.visibility == TokenType.keywordPublic) return type;
-            type = undefined;            
+        if (identifer.indexOf(".") >= 0) {
+            if (!(type instanceof NonPrimitiveType)) return type; // should'nt be possible because primitive type identifiers don't contain dots
+            if (type.visibility == TokenType.keywordPublic) return type;
+            type = undefined;
         }
 
         if (!type) {
@@ -244,24 +257,21 @@ export class TypeResolver {
     }
 
     resolveGenericParameterTypesAndExtendsImplements() {
-        for (let module of this.dirtyModules) {
-            for (let declNode of module.ast!.classOrInterfaceOrEnumDefinitions) {
 
-                switch (declNode.kind) {
-                    case TokenType.keywordClass:
-                        let resolvedType1 = <JavaClass>declNode.resolvedType;
-                        this.resolveGenericParameters(declNode, module);
-                        this.resolveClassExtendsImplements(declNode, resolvedType1, module);
-                        break;
-                    case TokenType.keywordInterface:
-                        let resolvedType2 = <JavaInterface>declNode.resolvedType;
-                        this.resolveGenericParameters(declNode, module);
-                        this.resolveInterfaceExtends(declNode, resolvedType2, module);
-                        break;
-                }
-
-            }
+        for (let klassNode of this.classDeclarationNodes) {
+            let module = klassNode.resolvedType!.module;
+            let resolvedType1 = <JavaClass>klassNode.resolvedType;
+            this.resolveGenericParameters(klassNode, module);
+            this.resolveClassExtendsImplements(klassNode, resolvedType1, module);
         }
+
+        for (let interfaceNode of this.interfaceDeclarationNodes) {
+            let module = interfaceNode.resolvedType!.module;
+            let resolvedType2 = <JavaInterface>interfaceNode.resolvedType;
+            this.resolveGenericParameters(interfaceNode, module);
+            this.resolveInterfaceExtends(interfaceNode, resolvedType2, module);
+        }
+
     }
 
     resolveClassExtendsImplements(declNode: ASTClassDefinitionNode, resolvedType1: JavaClass, module: JavaBaseModule) {
@@ -341,27 +351,19 @@ export class TypeResolver {
 
     buildAllMethods() {
 
-        let classes: JavaClass[] = [];
-
-        for (let module of this.dirtyModules) {
-            for (let declNode of module.ast!.classOrInterfaceOrEnumDefinitions) {
-                switch (declNode.kind) {
-                    //@ts-ignore
-                    case TokenType.keywordClass:
-                        classes.push(<JavaClass>declNode.resolvedType);
-                        // fallthrough:
-                    case TokenType.keywordEnum:
-                        let resolvedType1 = <JavaClass | JavaEnum>declNode.resolvedType;
-                        // this.buildFields(declNode, resolvedType1, module);
-                        this.buildMethods(declNode, resolvedType1, module);
-                        break;
-                    case TokenType.keywordInterface:
-                        let resolvedType2 = <JavaInterface>declNode.resolvedType;
-                        this.buildMethods(declNode, resolvedType2, module);
-                        break;
-                }
-            }
+        for (let klassNode of this.classDeclarationNodes) {
+            this.buildMethods(klassNode);
         }
+
+        for (let enumNode of this.enumDeclarationNodes) {
+            this.buildMethods(enumNode);
+        }
+
+        for (let interfaceNode of this.interfaceDeclarationNodes) {
+            this.buildMethods(interfaceNode)
+        }
+
+        let classes: JavaClass[] = this.classDeclarationNodes.filter(cn => cn.resolvedType).map(cn => <JavaClass>cn.resolvedType);
 
         // replenish class types with default methods of implemented interfaces if necessary
         for (let javaClass of classes) {
@@ -397,10 +399,10 @@ export class TypeResolver {
                             notImplementedMethods.push(method);
                         }
                     }
-                    
+
                 }
-                
-                if(notImplementedMethods.length > 0){                    
+
+                if (notImplementedMethods.length > 0) {
                     javaClass.module.errors.push({
                         message: "Die Klasse " + javaClass.identifier + " muss noch folgende Methoden des Interfaces " + javaInterface.identifier + " implementieren: " + notImplementedMethods.map(m => m.getSignature()).join(", "),
                         level: "error",
@@ -409,9 +411,9 @@ export class TypeResolver {
                 }
             }
 
-            if(!javaClass._isAbstract){
+            if (!javaClass._isAbstract) {
                 let abstractMethodsNotYetImplemented: Method[] = javaClass.getAbstractMethodsNotYetImplemented();
-                if(abstractMethodsNotYetImplemented.length > 0){
+                if (abstractMethodsNotYetImplemented.length > 0) {
                     javaClass.module.errors.push({
                         message: "Die Klasse " + javaClass.identifier + " muss noch folgende Methoden ihrer abstrakten Oberklassen implementieren: " + abstractMethodsNotYetImplemented.map(m => m.getSignature()).join(", "),
                         level: "error",
@@ -425,8 +427,11 @@ export class TypeResolver {
 
     }
 
-    buildMethods(node: ASTInterfaceDefinitionNode | ASTClassDefinitionNode | ASTEnumDefinitionNode,
-        type: JavaInterface | JavaClass | JavaEnum, module: JavaCompiledModule) {
+    buildMethods(node: ASTInterfaceDefinitionNode | ASTClassDefinitionNode | ASTEnumDefinitionNode) {
+
+        let type: JavaInterface | JavaClass | JavaEnum = <any>node.resolvedType;
+        let module = type.module;
+
         for (let methodNode of node.methods) {
             let method = new Method(methodNode.identifier, methodNode.identifierRange,
                 module, methodNode.visibility);
@@ -474,46 +479,45 @@ export class TypeResolver {
         let interfaceClass: Klass = InterfaceClass;
 
         // initialize fields of enums and interfaces
-        for (let module of this.dirtyModules) {
-            for (let decl of module.ast!.classOrInterfaceOrEnumDefinitions) {
-                if (decl.kind == TokenType.keywordEnum) {
-                    let javaEnum = <JavaEnum>decl.resolvedType;
-                    if (javaEnum) javaEnum.initRuntimeClass(enumRuntimeClass);
-                    for (let field of decl.fieldsOrInstanceInitializers) {
-                        if (field.kind == TokenType.fieldDeclaration) {
-                            let f: Field = new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility);
-                            f.isStatic = field.isStatic;
-                            f.isFinal = field.isFinal;
-                            f.classEnum = javaEnum;
-                            javaEnum.fields.push(f);
-                        }
-                    }
-
-                    // each enum value gets compiled to a public static final field
-                    for (let enumValue of decl.valueNodes) {
-                        let f: Field = new Field(enumValue.identifier, enumValue.identifierRange, module, javaEnum, TokenType.keywordPublic);
-                        f.isStatic = true;
-                        f.isFinal = true;
-                        f.classEnum = javaEnum;
-                        javaEnum.fields.push(f);
-                    }
-
-                } else if (decl.kind == TokenType.keywordInterface) {
-                    let javaInterface = <JavaInterface>decl.resolvedType;
-                    javaInterface?.initRuntimeClass(interfaceClass);
-
-                    // interfaces may have static fields...
-                    for (let field of decl.fieldsOrInstanceInitializers) {
-                        if (field.kind == TokenType.fieldDeclaration) {
-                            let f: Field = new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility);
-                            f.isStatic = field.isStatic;
-                            f.isFinal = field.isFinal;
-                            f.classEnum = javaInterface;
-                            javaInterface.fields.push(f);
-                        }
-                    }
+        for (let enumNode of this.enumDeclarationNodes) {
+            let javaEnum = enumNode.resolvedType!;
+            javaEnum.initRuntimeClass(enumRuntimeClass);
+            for (let field of enumNode.fieldsOrInstanceInitializers) {
+                if (field.kind == TokenType.fieldDeclaration) {
+                    let f: Field = new Field(field.identifier, field.range, javaEnum.module, field.type.resolvedType!, field.visibility);
+                    f.isStatic = field.isStatic;
+                    f.isFinal = field.isFinal;
+                    f.classEnum = javaEnum;
+                    javaEnum.fields.push(f);
                 }
             }
+
+            // each enum value gets compiled to a public static final field
+            for (let enumValue of enumNode.valueNodes) {
+                let f: Field = new Field(enumValue.identifier, enumValue.identifierRange, javaEnum.module, javaEnum, TokenType.keywordPublic);
+                f.isStatic = true;
+                f.isFinal = true;
+                f.classEnum = javaEnum;
+                javaEnum.fields.push(f);
+            }
+
+        }
+
+        for (let interfaceNode of this.interfaceDeclarationNodes) {
+            let javaInterface = interfaceNode.resolvedType!;
+            javaInterface.initRuntimeClass(interfaceClass);
+
+            // interfaces may have static fields...
+            for (let field of interfaceNode.fieldsOrInstanceInitializers) {
+                if (field.kind == TokenType.fieldDeclaration) {
+                    let f: Field = new Field(field.identifier, field.range, javaInterface.module, field.type.resolvedType!, field.visibility);
+                    f.isStatic = field.isStatic;
+                    f.isFinal = field.isFinal;
+                    f.classEnum = javaInterface;
+                    javaInterface.fields.push(f);
+                }
+            }
+
         }
 
         let objectClass = <JavaClass>this.libraryModuleManager.typestore.getType("Object");
@@ -522,29 +526,25 @@ export class TypeResolver {
         let done: boolean = false;
         while (!done) {
             done = true;
-            for (let module of this.dirtyModules) {
-                for (let decl of module.ast!.classOrInterfaceOrEnumDefinitions) {
-                    if (decl.kind == TokenType.keywordClass) {
-                        let javaClass = <JavaClass>decl.resolvedType;
-                        if (!javaClass.runtimeClass) {
-                            let baseClass = javaClass.getExtends();
-                            if (!baseClass) baseClass = objectClass;
-                            if (baseClass.runtimeClass) {
-                                javaClass.initRuntimeClass(baseClass.runtimeClass);  // first recursively initialize field of base classes
-                                for (let field of decl.fieldsOrInstanceInitializers) {
-                                    if (field.kind == TokenType.fieldDeclaration) {
-                                        let f: Field = new Field(field.identifier, field.range, module, field.type.resolvedType!, field.visibility);
-                                        f.isStatic = field.isStatic;
-                                        f.isFinal = field.isFinal;
-                                        f.classEnum = javaClass;
-                                        javaClass.fields.push(f);
-                                    }
+            for (let classNode of this.classDeclarationNodes) {
+                    let javaClass = classNode.resolvedType!;
+                    if (!javaClass.runtimeClass) {
+                        let baseClass = javaClass.getExtends();
+                        if (!baseClass) baseClass = objectClass;
+                        if (baseClass.runtimeClass) {
+                            javaClass.initRuntimeClass(baseClass.runtimeClass);  // first recursively initialize field of base classes
+                            for (let field of classNode.fieldsOrInstanceInitializers) {
+                                if (field.kind == TokenType.fieldDeclaration) {
+                                    let f: Field = new Field(field.identifier, field.range, javaClass.module, field.type.resolvedType!, field.visibility);
+                                    f.isStatic = field.isStatic;
+                                    f.isFinal = field.isFinal;
+                                    f.classEnum = javaClass;
+                                    javaClass.fields.push(f);
                                 }
-                                done = false;
                             }
+                            done = false;
                         }
                     }
-                }
             }
         }
 

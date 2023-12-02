@@ -5,6 +5,9 @@ import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable.ts";
 import { LabelCodeSnippet } from "../codegenerator/LabelManager.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { GenericTypeParameter } from "../types/GenericInformation.ts";
+import { JavaClass } from "../types/JavaClass.ts";
+import { JavaEnum } from "../types/JavaEnum.ts";
+import { JavaInterface } from "../types/JavaInterface.ts";
 import { JavaType } from "../types/JavaType.ts";
 import { Method } from "../types/Method.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
@@ -173,6 +176,7 @@ export interface ASTClassDefinitionNode
     kind: TokenType.keywordClass;
     extends: ASTTypeNode | undefined,
     implements: ASTTypeNode[],
+    resolvedType: JavaClass | undefined;
 
     staticInitializer?: Program       // only for debugging purposes,
 }
@@ -182,6 +186,7 @@ extends ASTNode, TypeDefinitionWithMethods, ASTTypeDefinitionWithGenerics, ASTNo
 ASTNodeWithIdentifier, AnnotatedNode, ASTTypeDefinitionWithFields, TypeScope, TypeDefinition {
     kind: TokenType.keywordInterface;
     implements: ASTTypeNode[];
+    resolvedType: JavaInterface | undefined;
 
     staticInitializer?: Program       // only for debugging purposes,
 }
@@ -199,6 +204,7 @@ export interface ASTEnumDefinitionNode
     AnnotatedNode, TypeDefinition, TypeScope {
     kind: TokenType.keywordEnum;
     valueNodes: ASTEnumValueNode[];
+    resolvedType: JavaEnum | undefined;
 
     staticInitializer?: Program       // only for debugging purposes,
 }

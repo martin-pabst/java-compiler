@@ -351,6 +351,10 @@ export abstract class TermParser extends TokenIterator {
         }
 
         type.identifier = this.expectAndSkipIdentifierAsString();
+        while(this.comesToken(TokenType.dot, true)){
+            type.identifier += "." + this.expectAndSkipIdentifierAsString();
+        }
+
         if (type.identifier == "") return type;  // erroneous type
 
         if (this.comesToken(TokenType.lower, true)) {     // generic parameter invocation?

@@ -61,7 +61,7 @@ export class Main {
     /*
      * Test program:
      */
-    this.inputEditor.setValue(testPrograms.simpleGenericsTest);
+    this.inputEditor.setValue(testPrograms.innerClassesTest);
 
     this.tabManager = new TabManager(document.getElementById('tabs')!,
       ['token', 'ast', 'code', 'errors']);

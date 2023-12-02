@@ -32,7 +32,6 @@ export abstract class NonPrimitiveType extends JavaType {
     isStatic: boolean = false; // static inner classes behave differently from non-static inner classes
 
     outerType?: NonPrimitiveType | StaticNonPrimitiveType;      // a local class defined inside a static method has a StaticNonPrimitiveType outerType
-    innerTypes: NonPrimitiveType[] = [];
 
     runtimeClass?: Klass;
 
@@ -43,10 +42,12 @@ export abstract class NonPrimitiveType extends JavaType {
 
     staticConstructorsDependOn: Map<NonPrimitiveType, boolean> = new Map();
 
+    public pathAndIdentifier: string;
 
-    constructor(identifier: string, identifierRange: IRange, public path: string, module: JavaBaseModule){
+    constructor(identifier: string, identifierRange: IRange, pathAndIdentifier: string, module: JavaBaseModule){
         super(identifier, identifierRange, module);
         this.isPrimitive = false;
+        this.pathAndIdentifier = pathAndIdentifier;
     }
 
     clearUsagePositionsAndInheritanceInformation(){

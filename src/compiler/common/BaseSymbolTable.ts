@@ -86,8 +86,9 @@ export class BaseStackframe {
 
     }
 
-    increaseNextFreePosition(){
+    insertInvisibleParameter(){
         this.nextFreePosition++;
+        this.numberOfParameters++;
     }
 
 }

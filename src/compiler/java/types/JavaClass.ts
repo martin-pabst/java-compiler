@@ -226,7 +226,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     public usagePositions: UsagePosition[] = [];
 
     constructor(public isGenericVariantOf: JavaClass, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
-        super(isGenericVariantOf.identifier, isGenericVariantOf.identifierRange ,isGenericVariantOf.path, isGenericVariantOf.module);
+        super(isGenericVariantOf.identifier, isGenericVariantOf.identifierRange ,isGenericVariantOf.pathAndIdentifier, isGenericVariantOf.module);
     }
 
     toString(): string {

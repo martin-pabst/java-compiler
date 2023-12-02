@@ -121,13 +121,17 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
             parameterValues[i] = this.compileCast(parameterValues[i]!, destinationType, "implicit");
         }
 
-        let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention ? "native" : "java";
+        let classHasOuterType: boolean = (klassType.outerType && !klassType.isStatic) ? true : false;
+
+        let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention && !classHasOuterType ? "native" : "java";
 
         // call javascript constructor and directly thereafter call java constructor
         let template: string = `new ${Helpers.classes}["${klassType.identifier}"](${enumValueIdentifier ? '"' + enumValueIdentifier + '", ' + enumValueIndex : ""}).${method.getInternalName(callingConvention)}(`;
 
         // instantiation of non-static inner class-object?
-        if(method.hasOuterClassParameter){
+        // we can't rely on method.hasOuterClassParameter because this object instantiation
+        // could be before standard constructor methods have been built.
+        if(classHasOuterType){
             let objectNode: ASTTermNode | undefined = (<ASTNewObjectNode>node).object;
             if(objectNode){
                 let objectSnippet = this.compileTerm(objectNode);
@@ -135,7 +139,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
                     parameterValues.unshift(objectSnippet);
                 }
             } else {
-                parameterValues.unshift(new StringCodeSnippet(`${StepParams.stack}[0]`));
+                parameterValues.unshift(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}`));
             }
         }
 
@@ -304,13 +308,14 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
         // does method in inner class access field of outer class?
         let outerType:  NonPrimitiveType | StaticNonPrimitiveType | undefined =  this.currentSymbolTable.classContext?.outerType;
-        let outerClassLevel: number = 0;
+        let outerClassLevel: number = 1;
         while(outerType && outerType instanceof NonPrimitiveType) {
             let field = outerType.getField(node.identifier, TokenType.keywordPrivate);
             if(field){
                 return this.compileFieldAccess(field, node.range, outerClassLevel);
             }
             outerType = outerType.outerType;
+            outerClassLevel++;
         }
 
         if (!symbol) {
@@ -331,7 +336,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
     compileSymbolOnStackframeAccess(symbol: BaseSymbol, range: IRange): CodeSnippet | undefined {
         let type = (<JavaLocalVariable | Parameter>symbol).type;
-        let snippet = new StringCodeSnippet(`${StepParams.stack}[${StepParams.stackBase} + ${symbol.stackframePosition}]`, range, type);
+        let snippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(symbol.stackframePosition!)}`, range, type);
         snippet.isLefty = !symbol.isFinal;
         return snippet;
     }
@@ -363,9 +368,10 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
             let outerClassPraefix: string = "";
             while(outerClassLevel > 0){
                 outerClassPraefix += Helpers.outerClassAttributeIdentifier + ".";
+                outerClassLevel--;
             }
 
-            snippet = new StringCodeSnippet(`${StepParams.stack}[${StepParams.stackBase}].${outerClassPraefix}${fieldName}`, range, type);
+            snippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${outerClassPraefix}${fieldName}`, range, type);
         }
         snippet.isLefty = !field.isFinal;
         return snippet;
@@ -528,7 +534,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
                 this.pushError("Außerhalb einer Klasse kann eine Methode nur mit Punktschreibweise (Object.Methode(...)) aufgerufen werden.", "error", node);
                 return undefined;
             }
-            objectSnippet = new StringCodeSnippet(`${StepParams.stack}[${StepParams.stackBase}]`, EmptyRange.instance, classContext);
+            objectSnippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}`, EmptyRange.instance, classContext);
         }
         
         if (!objectSnippet || !objectSnippet.type) {

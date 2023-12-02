@@ -113,7 +113,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
             }            
 
             if(method.isConstructor){
-                snippet.addStringPart(`${Helpers.return}(${StepParams.stack}[0]);\n`);
+                snippet.addStringPart(`${Helpers.return}(${Helpers.elementRelativeToStackbase(0)});\n`);
             } else {
                 snippet.addStringPart(`${Helpers.return}();\n`);
             }

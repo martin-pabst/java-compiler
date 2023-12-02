@@ -118,6 +118,7 @@ export class Thread {
                          * parameter identifers inside function: 
                          *                    t, s, sb, h
                          */
+                        console.log(step.codeAsString);
                         stepIndex = step.run!(this, stack, stackBase);
                         if (currentProgramState != this.currentProgramState) {
                             currentProgramState.stepIndex = stepIndex;

@@ -108,7 +108,7 @@ export class Method {
             let cc = callingConvention == "java" ? "j" : "n";
     
             let shorthand = this.isConstructor ? 'c' : 'm';
-            let s = `_${shorthand}${cc}$${this.identifier}$${this.returnParameterType ? this.returnParameterType.getInternalName() : 'void'}$`;
+            let s = `_${shorthand}${cc}$${this.isConstructor ? "_constructor_" : this.identifier}$${this.returnParameterType ? this.returnParameterType.getInternalName() : 'void'}$`;
             s += this.parameters.map(p => p.type.getInternalName()).join("$");
             this.internalNames[callingConvention] = s;
         }

@@ -19,6 +19,7 @@ import { Method } from "../types/Method.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
 import { JavaInterface } from "../types/JavaInterface.ts";
+import { EmptyRange } from "../../common/range/Range.ts";
 
 export class CodeGenerator extends StatementCodeGenerator {
 
@@ -271,13 +272,19 @@ export class CodeGenerator extends StatementCodeGenerator {
         for (let baseConstructor of baseClass.getMethods().filter(m => m.isConstructor && m.visibility != TokenType.keywordPrivate)) {
 
             let method = baseConstructor.getCopy();
+            if(classContext.outerType && !classContext.isStatic){
+                method.hasOuterClassParameter = true;
+            }
 
             classContext.methods.push(method);
 
-            if (classContext.instanceInitializer?.length == 0) {
+            if (classContext.instanceInitializer?.length == 0 && !method.hasOuterClassParameter) {
                 method.hasImplementationWithNativeCallingConvention = baseConstructor.hasImplementationWithNativeCallingConvention;
                 return; // unaltered implementation of base class constructor suffices for child class
             }
+
+            // let's build a new method!
+            let symbolTable = this.pushAndGetNewSymbolTable(EmptyRange.instance, true, classContext, method);
 
             method.identifier = classContext.identifier;
             method.hasImplementationWithNativeCallingConvention = false;
@@ -291,17 +298,31 @@ export class CodeGenerator extends StatementCodeGenerator {
             if (parametersForSuperCall.length > 0) parametersForSuperCall = ", " + parametersForSuperCall;
 
             let steps = classContext.instanceInitializer.slice();
-            let getBaseClass: string = `let obj = ${StepParams.stack}[${StepParams.stackBase}];\nlet baseKlass = Object.getPrototypeOf(Object.getPrototypeOf(obj));\n`
+
+            if(method.hasOuterClassParameter){
+                let storeOuterClassReferenceSnippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${Helpers.outerClassAttributeIdentifier} = ${Helpers.elementRelativeToStackbase(1)};\n`);
+                steps.unshift(storeOuterClassReferenceSnippet);
+            }
+
+            let getBaseClass: string = `let obj = ${Helpers.elementRelativeToStackbase(0)};\nlet baseKlass = Object.getPrototypeOf(Object.getPrototypeOf(obj));\n`
             let superCall: string = `baseKlass.${baseConstructor.getInternalName(baseConstructor.hasImplementationWithNativeCallingConvention ? "native" : "java")}.call(obj${parametersForSuperCall});\n`;
-            let returnCall: string = `${Helpers.return}(${StepParams.stack}[${StepParams.stackBase}]);\n`;
+            let returnCall: string = `${Helpers.return}(${Helpers.elementRelativeToStackbase(0)});\n`;
 
             steps.push(new StringCodeSnippet(getBaseClass + superCall));
             let returnSnippet = new CodeSnippetContainer(new StringCodeSnippet(returnCall));
             returnSnippet.enforceNewStepBeforeSnippet();
             steps.push(returnSnippet);
 
-            method.program = new Program(this.module, this.currentSymbolTable, classContext.identifier + method.identifier);
+            let parameterIdentifiers = method.parameters.map(p => p.identifier);
+            if(method.hasOuterClassParameter){
+                parameterIdentifiers.unshift(Helpers.outerClassAttributeIdentifier);
+            }
+            let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
+
+            method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
             method.program.numberOfThisObjects = 1;
+            method.program.numberOfParameters = parameterIdentifiers.length;
+            
             this.linker.link(steps, method.program);
 
             method.program.compileToJavascriptFunctions();
@@ -313,8 +334,6 @@ export class CodeGenerator extends StatementCodeGenerator {
                 runtimeClass.__programs.push(method.program);
                 let methodIndex = runtimeClass.__programs.length - 1;
 
-                let parameterIdentifiers = method.parameters.map(p => p.identifier);
-                let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
 
                 runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
                     `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});
@@ -322,6 +341,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
             }
 
+            this.popSymbolTable();
         }
 
     }
@@ -402,7 +422,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                     field.initialValueIsConstant = true;
                     snippet = undefined;
                 } else {
-                    let assignmentTemplate = `${StepParams.stack}[${StepParams.stackBase}].${field.getInternalName()} = §1;\n`;
+                    let assignmentTemplate = `${Helpers.elementRelativeToStackbase(0)}.${field.getInternalName()} = §1;\n`;
 
                     snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, fieldNode.initialization!.range, snippet);
 
@@ -433,7 +453,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             this.callingOtherConstructorInSameClassHappened = false;
             this.superConstructorHasBeenCalled = false;
 
-            if(classContext.path != "" && !classContext.isStatic){
+            if(classContext.outerType && !classContext.isStatic){
                 method.hasOuterClassParameter = true;
             }
         }
@@ -441,7 +461,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         let symbolTable = this.pushAndGetNewSymbolTable(methodNode.range, true, classContext, method);
         
         if(method.hasOuterClassParameter){
-            this.currentSymbolTable.reserveNextStackframeLocation(); // make room for __outer-Parameter
+            this.currentSymbolTable.insertInvisibleParameter(); // make room for __outer-Parameter
         }
 
         for (let parameter of method.parameters) {
@@ -463,7 +483,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             }
             
             if(method.hasOuterClassParameter){
-                let storeOuterClassReferenceSnippet = new StringCodeSnippet(`${StepParams.stack}[0].${Helpers.outerClassAttributeIdentifier} = ${StepParams.stack[1]};\n`);
+                let storeOuterClassReferenceSnippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${Helpers.outerClassAttributeIdentifier} = ${Helpers.elementRelativeToStackbase(1)};\n`);
                 snippets.push(storeOuterClassReferenceSnippet);
             }
 
@@ -484,7 +504,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             if (snippet) snippets.push(snippet);
             
             if (methodNode.isContructor) {
-                snippets.push(new StringCodeSnippet(`${Helpers.return}(${StepParams.stack}[0]);\n`))
+                snippets.push(new StringCodeSnippet(`${Helpers.return}(${Helpers.elementRelativeToStackbase(0)});\n`))
             }
     
             method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);

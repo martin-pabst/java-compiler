@@ -1,4 +1,25 @@
 export var testPrograms = {
+innerClassesTest: `
+A a = new A();
+A.B b = a.getB();
+b.doIt();
+
+class A {
+   int i = 10;
+
+   class B {
+      void doIt(){
+         println(i);
+      }
+   }
+
+   B getB(){
+      return new B();
+   }
+
+
+}
+`,
 simpleGenericsTest: `
 A<String> a = new A<String>();
 a.set("Test");

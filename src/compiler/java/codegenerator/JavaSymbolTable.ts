@@ -66,8 +66,8 @@ export class JavaSymbolTable extends BaseSymbolTable {
         }
     }
 
-    public reserveNextStackframeLocation(){
-        this.getStackFrame()?.increaseNextFreePosition();
+    public insertInvisibleParameter(){
+        this.getStackFrame()?.insertInvisibleParameter();
     }
 
     getStackFrame(): BaseStackframe | undefined {

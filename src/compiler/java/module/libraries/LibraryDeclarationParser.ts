@@ -76,17 +76,17 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 npt1.isFinal = modifiersAndType.final;
                 npt1._isAbstract = modifiersAndType.abstract;
                 npt1.runtimeClass = klass;
-                npt1.path = npt1.identifier;
+                npt1.pathAndIdentifier = npt1.identifier;
                 break;
             case TokenType.keywordInterface:
                 npt = new JavaInterface(identifier, LibraryDeclarationParser.nullRange, "", module);
-                npt.path = npt.identifier;
+                npt.pathAndIdentifier = npt.identifier;
                 break;
             case TokenType.keywordEnum:
                 npt = new JavaEnum(identifier, LibraryDeclarationParser.nullRange, "", module,  Object.getPrototypeOf(Object.getPrototypeOf(klass)).type);
                 let npt2 = <JavaEnum>npt;
                 npt2.runtimeClass = klass;
-                npt2.path = npt2.identifier;
+                npt2.pathAndIdentifier = npt2.identifier;
                 break;
         }
 
