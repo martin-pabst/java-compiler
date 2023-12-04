@@ -4,11 +4,13 @@ import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType";
 import {
     ASTAnnotationNode,
+    ASTAnonymousClassNode,
     ASTClassDefinitionNode,
     ASTEnumDefinitionNode,
     ASTEnumValueNode,
     ASTGenericParameterDeclarationNode,
     ASTInterfaceDefinitionNode, ASTMethodDeclarationNode,
+    ASTNewObjectNode,
     ASTNodeWithModifiers, ASTTypeNode, TypeScope
 } from "./AST.ts";
 import { StatementParser } from "./StatementParser.ts";
@@ -115,6 +117,10 @@ export class Parser extends StatementParser {
             }
         }
 
+        this.parseClassBody(classASTNode);
+    }
+
+    private parseClassBody(classASTNode: ASTClassDefinitionNode) {
         if (this.expect(TokenType.leftCurlyBracket, true)) {
             while (!this.comesToken([TokenType.rightCurlyBracket, TokenType.endofSourcecode], false)) {
 
@@ -486,6 +492,19 @@ export class Parser extends StatementParser {
         }
     }
 
+    parseAnonymousInnerClassBody(newObjectNode: ASTNewObjectNode): ASTAnonymousClassNode | undefined {
+
+        let classNode = this.nodeFactory.buildClassNode(this.nodeFactory.buildNodeWithModifiers(this.cct.range), undefined, this.currentClassOrInterface!, []);
+
+        this.parseClassBody(classNode);
+
+        if(newObjectNode && classNode){
+            return this.nodeFactory.buildAnonymousInnerClassNode(newObjectNode, classNode);
+        } else {
+            return undefined;
+        }
+
+    }
 
 
 }

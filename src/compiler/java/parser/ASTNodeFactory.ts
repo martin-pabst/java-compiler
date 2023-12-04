@@ -1,7 +1,7 @@
-import { IRange } from "../../common/range/Range";
+import { EmptyRange, IRange, Range } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { Token } from "../lexer/Token.ts";
-import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope as ASTTypeScope, ASTNewArrayNode, ASTInstanceInitializerNode, ASTStaticInitializerNode } from "./AST";
+import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope as ASTTypeScope, ASTNewArrayNode, ASTInstanceInitializerNode, ASTStaticInitializerNode, ASTAnonymousClassNode } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
 export class ASTNodeFactory {
@@ -27,10 +27,12 @@ export class ASTNodeFactory {
 
     }
 
-    buildClassNode(modifiers: ASTNodeWithModifiers, identifier: Token,
+    buildClassNode(modifiers: ASTNodeWithModifiers, identifier: Token | undefined,
         parent: ASTTypeScope, annotations: ASTAnnotationNode[]): ASTClassDefinitionNode {
 
-        let path: string = (parent.path != "" ? parent.path + "." : "") + identifier.value;
+        let identifierValue = identifier ? <string>identifier.value : "";
+
+        let path: string = (parent.path != "" ? parent.path + "." : "") + identifierValue;
 
         let node: ASTClassDefinitionNode = {
             kind: TokenType.keywordClass,
@@ -39,8 +41,8 @@ export class ASTNodeFactory {
             path: path,
             extends: undefined,
             implements: [],
-            identifier: <string>identifier.value,
-            identifierRange: identifier.range,
+            identifier: identifierValue,
+            identifierRange: identifier ? identifier.range : EmptyRange.instance,
             visibility: modifiers.visibility,
             isFinal: modifiers.isFinal,
             isStatic: modifiers.isStatic,
@@ -301,6 +303,18 @@ export class ASTNodeFactory {
             parameterValues: [],
             type: type,
             object: object
+        }
+    }
+
+    buildAnonymousInnerClassNode(newObjectNode: ASTNewObjectNode, klass: ASTClassDefinitionNode): ASTAnonymousClassNode{
+
+        let range = new Range(newObjectNode.range.startLineNumber, newObjectNode.range.startColumn, klass.range.endLineNumber, klass.range.endColumn);
+
+        return {
+            kind: TokenType.anonymousClass,
+            newObjectNode: newObjectNode,
+            klass: klass,
+            range: range
         }
     }
 

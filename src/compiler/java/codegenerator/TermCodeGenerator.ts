@@ -5,7 +5,7 @@ import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode, ASTAttributeDereferencingNode, ASTEnumValueNode } from "../parser/AST";
+import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode, ASTAttributeDereferencingNode, ASTEnumValueNode, ASTAnonymousClassNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { ArrayType } from "../types/ArrayType";
 import { Field } from "../types/Field";
@@ -71,11 +71,13 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
             case TokenType.newArray:
                 snippet = this.compileNewArrayNode(<ASTNewArrayNode>ast); break;
             case TokenType.newObject:
-                snippet = this.compileNewObjectNOde(<ASTNewObjectNode>ast); break;
+                snippet = this.compileNewObjectNode(<ASTNewObjectNode>ast); break;
             case TokenType.selectArrayElement:
                 snippet = this.compileSelectArrayElement(<ASTSelectArrayElementNode>ast); break;
             case TokenType.dereferenceAttribute:
                 snippet = this.compileDereferenceAttribute(<ASTAttributeDereferencingNode>ast); break;
+            case TokenType.anonymousClass:
+                snippet = this.compileAnonymousInnerClass(<ASTAnonymousClassNode>ast); break;
 
         }
 
@@ -86,7 +88,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         return snippet;
     }
 
-    compileNewObjectNOde(node: ASTNewObjectNode): CodeSnippet | undefined {
+    compileNewObjectNode(node: ASTNewObjectNode): CodeSnippet | undefined {
         // new t.classes[<identifier>]().<constructorIdentifier>(param1, ..., paramN)
         // constructor has to return this or push it to stack!
 
@@ -676,6 +678,21 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         return undefined;
+    }
+
+    /**
+     * 
+     *  Compiles expressions like new MyAbstractClass(p1, p2){ attributeDeclarations, instanceInitializers, methodDeclarations }
+     * 
+     * @param node 
+     */
+    compileAnonymousInnerClass(node: ASTAnonymousClassNode): CodeSnippet | undefined {
+
+        
+
+
+
+
     }
 
 

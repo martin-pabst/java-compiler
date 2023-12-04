@@ -1,6 +1,6 @@
 import { TokenType } from "../TokenType.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
-import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator } from "./AST.ts";
+import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode } from "./AST.ts";
 import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator.ts";
 
@@ -428,7 +428,7 @@ export abstract class TermParser extends TokenIterator {
      * @param node  is undefinded except for instantiating objects of named private classes like object.new ClassIdentifier(...)
      * @returns 
      */
-    parseNewObjectInstantiation(node: ASTTermNode | undefined): ASTNewObjectNode | undefined {
+    parseNewObjectInstantiation(node: ASTTermNode | undefined): ASTNewObjectNode | ASTAnonymousClassNode | undefined {
         let startToken = this.cct;
         this.nextToken(); // skip new keyword
         let type = this.parseType();
@@ -450,8 +450,16 @@ export abstract class TermParser extends TokenIterator {
         }
 
         this.setEndOfRange(newObjectNode);
-        return newObjectNode;
+
+        if(this.comesToken(TokenType.leftCurlyBracket, false)){
+            return this.parseAnonymousInnerClassBody(newObjectNode);
+        } else {
+            return newObjectNode;
+        }
+
     }
+
+    abstract parseAnonymousInnerClassBody(newObjectNode: ASTNewObjectNode): ASTAnonymousClassNode | undefined;
 
     parseSelectArrayElement(array: ASTTermNode | undefined): ASTSelectArrayElementNode | undefined {
         if (!array) {

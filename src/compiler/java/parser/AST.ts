@@ -300,9 +300,9 @@ export interface ASTNewObjectNode extends ASTTermNode {
     object?: ASTTermNode;
 }
 
-export interface AnonymousClassNode extends ASTTermNode {
+export interface ASTAnonymousClassNode extends ASTTermNode {
     kind: TokenType.anonymousClass;
-    interfaceIdentifier: string;
+    newObjectNode: ASTNewObjectNode;
     klass: ASTClassDefinitionNode;
 }
 

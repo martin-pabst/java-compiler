@@ -579,6 +579,6 @@ export class CodeGenerator extends StatementCodeGenerator {
         return snippet;
     }
 
-
+    
 
 }
