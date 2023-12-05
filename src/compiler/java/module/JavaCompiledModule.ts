@@ -1,6 +1,7 @@
 import { Error } from "../../common/Error";
 import { Program, Step } from "../../common/interpreter/Program";
 import { File } from "../../common/module/File";
+import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable.ts";
 import { TokenList } from "../lexer/Token";
 import { ASTClassDefinitionNode, ASTGlobalNode } from "../parser/AST";
 import { JavaType } from "../types/JavaType";
@@ -22,8 +23,10 @@ export class JavaCompiledModule extends JavaBaseModule {
 
     usedTypesFromOtherModules: Map<JavaType, boolean> = new Map();
 
-
     errors: Error[] = [];
+
+    symbolTables: JavaSymbolTable[] = [];
+
 
     constructor(file: File, public moduleManager: JavaModuleManager){
         super(file, false);

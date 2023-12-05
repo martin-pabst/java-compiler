@@ -688,7 +688,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
      */
     compileAnonymousInnerClass(node: ASTAnonymousClassNode): CodeSnippet | undefined {
 
-        
+            
 
 
 

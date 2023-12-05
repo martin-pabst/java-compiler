@@ -44,7 +44,8 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     compileMainProgram() {
         let ast = this.module.ast!;
-        this.currentSymbolTable = new JavaSymbolTable(this.module, ast.range, true);
+        this.pushAndGetNewSymbolTable(ast.range, true);
+
         this.missingStatementManager.beginMethodBody([]);
 
         let snippets: CodeSnippet[] = [];
@@ -68,6 +69,8 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         ast.program = this.module.mainProgram;  // only for debugging
 
+
+        this.popSymbolTable();
     }
 
     compileClassesEnumsAndInterfaces(typeScope: TypeScope | undefined) {

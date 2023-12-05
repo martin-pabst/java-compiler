@@ -65,3 +65,31 @@ public class Main {
   }
 }
 ```
+
+
+
+
+## Implementation details
+
+  * We have to track which outer local variables are accessed inside inner classes' methods. 
+  * We store class-object in step.
+  * 
+  * Compiled code:
+  ```javascript
+    new this.AnoymousClass1(localVar1, localVar2, ...).c_$$xy(__t, parameter1, ..., parameterN)
+
+    javascript-class:
+    class AnonymousClass1 extends XYZ {
+
+      constructor(localVar1, localVar2, ...){
+        super();
+        this.localVar1 = localVar1;
+        this.localVar2 = localVar2;
+        ...
+      }
+
+    }
+
+
+  ```
+
