@@ -168,7 +168,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             switch (fieldOrInitializer.kind) {
                 case TokenType.fieldDeclaration:
                     if (fieldOrInitializer.isStatic) continue;
-                    let snippet = this.compileField(fieldOrInitializer, classContext);
+                    let snippet = this.compileFieldDeclaration(fieldOrInitializer, classContext);
                     if (snippet) {
                         fieldSnippets.push(snippet);
                     }
@@ -200,7 +200,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                         }
                         continue;
                     } 
-                    let snippet = this.compileField(fieldOrInitializer, classContext);
+                    let snippet = this.compileFieldDeclaration(fieldOrInitializer, classContext);
                     if (snippet) {
                         staticFieldSnippets.push(snippet);
                     }
@@ -356,11 +356,13 @@ export class CodeGenerator extends StatementCodeGenerator {
 
 
     /**
-     * All fields inside types are already built by TypeResolver
+     * All fields inside types are already built by TypeResolver. 
+     * This method handles field initialization and adds all fields to the
+     * symbol table.
      * @see TypeResolver#buildRuntimeClassesAndTheirFields
      * @returns 
      */
-    compileField(fieldNode: ASTFieldDeclarationNode, classContext: JavaClass | JavaEnum | JavaInterface): CodeSnippet | undefined {
+    compileFieldDeclaration(fieldNode: ASTFieldDeclarationNode, classContext: JavaClass | JavaEnum | JavaInterface): CodeSnippet | undefined {
 
         if (!fieldNode.type.resolvedType) return undefined;
 
@@ -475,6 +477,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             
             if(classContext instanceof JavaInterface){
                 this.pushError("Interfaces haben keinen Konstruktor.", "error", methodNode);
+                this.popSymbolTable();
                 return undefined;
             }
             
@@ -579,6 +582,6 @@ export class CodeGenerator extends StatementCodeGenerator {
         return snippet;
     }
 
-    
+
 
 }
