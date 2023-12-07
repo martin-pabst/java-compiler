@@ -283,12 +283,16 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
             symbol.usagePositions.push({ file: this.module.file, range: node.range });
 
             if (symbol.onStackframe()) {
-                if(symbolInformation.outerClassLevel == 0){
+                if (symbolInformation.outerClassLevel == 0) {
                     this.missingStatementManager.onSymbolRead(symbol, node.range, this.module.errors);
                     return this.compileSymbolOnStackframeAccess(symbol, node.range);
                 } else {
                     let innerClassAttributeIndentifier = this.innerClassVariableManager.getInnerClassAttributeIdentifier(symbolInformation);
-                    this.compileNonStaticNonFinalFieldAccess(innerClassAttributeIndentifier);
+                    this.compileOuterClassLocalVariableAccess(innerClassAttributeIndentifier, symbol.type, symbol.identifierRange);
+                    symbol.usagePositions.push({
+                        file: this.module.file,
+                        range: node.range
+                    })
                 }
             }
             if (symbol.kind == SymbolKind.field) {
@@ -347,6 +351,12 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
         this.pushError("Der Compiler kennt den Bezeichner " + node.identifier + " an dieser Stelle nicht.", "error", node);
         return undefined;
 
+    }
+
+    compileOuterClassLocalVariableAccess(innerClassAttributeIndentifier: string, type: JavaType, range: IRange) {
+        let snippet: CodeSnippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${innerClassAttributeIndentifier}`, range, type);
+        snippet.isLefty = false;
+        return snippet;
     }
 
     compileSymbolOnStackframeAccess(symbol: BaseSymbol, range: IRange): CodeSnippet | undefined {
