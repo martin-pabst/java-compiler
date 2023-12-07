@@ -25,8 +25,7 @@ export class JavaCompiledModule extends JavaBaseModule {
 
     errors: Error[] = [];
 
-    symbolTables: JavaSymbolTable[] = [];
-
+    symbolTables: JavaSymbolTable[] = [];  // contains one symbol table for main program and one for each class/interface/enum in global scope    
 
     constructor(file: File, public moduleManager: JavaModuleManager){
         super(file, false);

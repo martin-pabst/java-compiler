@@ -367,7 +367,8 @@ export class StatementCodeGenerator extends TermCodeGenerator {
     }
 
     compileLocaleVariableDeclaration(node: ASTLocalVariableDeclaration): CodeSnippet | undefined {
-        let variable = new JavaLocalVariable(node.identifier, node.identifierRange, node.type.resolvedType!);
+        let variable = new JavaLocalVariable(node.identifier, node.identifierRange, 
+            node.type.resolvedType!, this.currentSymbolTable);
         variable.isFinal = node.isFinal;
         this.currentSymbolTable.addSymbol(variable);    // sets stackOffset
 
@@ -470,7 +471,7 @@ export class StatementCodeGenerator extends TermCodeGenerator {
             if(catchCase.exceptionTypes.length > 0) exceptionType = this.throwableType;
             
             // exception lies on top of stack
-            let exceptionVariable = new JavaLocalVariable(catchCase.exceptionIdentifier, catchCase.exceptionIdentifierPosition, exceptionType);
+            let exceptionVariable = new JavaLocalVariable(catchCase.exceptionIdentifier, catchCase.exceptionIdentifierPosition, exceptionType, this.currentSymbolTable);
             exceptionVariable.isFinal = true;
             this.currentSymbolTable.addSymbol(exceptionVariable);
             

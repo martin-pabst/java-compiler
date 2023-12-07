@@ -7,7 +7,13 @@ import { JavaEnum } from "../types/JavaEnum";
 import { JavaInterface } from "../types/JavaInterface.ts";
 import { JavaType } from "../types/JavaType.ts";
 import { Method } from "../types/Method.ts";
+import { Visibility } from "../types/Visibility.ts";
 import { JavaLocalVariable } from "./JavaLocalVariable";
+
+export type LocalVariableInformation = {
+    symbol: JavaLocalVariable,
+    outerClassLevel: number
+}
 
 
 export class JavaSymbolTable extends BaseSymbolTable {
@@ -41,22 +47,34 @@ export class JavaSymbolTable extends BaseSymbolTable {
         childTable.parent = this;
     }
 
-    findSymbol(identifier: string): BaseSymbol | undefined {
-        return this.findSymbolIntern(identifier, this.classContext);
+    findSymbol(identifier: string): LocalVariableInformation | undefined {
+        return this.findSymbolIntern(identifier, TokenType.keywordPrivate, true, 0);
     }
 
-    private findSymbolIntern(identifier: string, classContext: JavaClass | JavaEnum | JavaInterface | undefined): JavaLocalVariable | undefined {
+    private findSymbolIntern(identifier: string, upToVisibility: Visibility, searchForFields: boolean, outerClassLevel: number): LocalVariableInformation | undefined {
         let symbol = this.identifierToSymbolMap.get(identifier);
-        if(symbol) return symbol;
+        if(symbol) return {
+            symbol: symbol,
+            outerClassLevel: outerClassLevel
+        }
 
         if(this.parent){
-            if(this.parent.classContext == classContext){
-                return this.parent.findSymbolIntern(identifier, classContext);
+            if(this.parent.classContext == this.classContext){
+                return this.parent.findSymbolIntern(identifier, upToVisibility, false, outerClassLevel);
+            } else {
+                return this.parent.findSymbolIntern(identifier, TokenType.keywordProtected, true, outerClassLevel + 1);
             }
         }
 
-        if(this.classContext){
-            return this.classContext.getField(identifier, TokenType.keywordPrivate);
+        if(this.classContext && searchForFields){
+            let field = this.classContext.getField(identifier, TokenType.keywordPrivate);
+            if(field){
+                return {
+                    symbol: field,
+                    outerClassLevel: outerClassLevel
+                } 
+            }
+            
         }
 
         return undefined;

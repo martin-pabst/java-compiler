@@ -44,7 +44,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     compileMainProgram() {
         let ast = this.module.ast!;
-        this.pushAndGetNewSymbolTable(ast.range, true);
+        this.pushAndGetNewSymbolTable(ast.range, true).classContext = undefined;
 
         this.missingStatementManager.beginMethodBody([]);
 
@@ -372,7 +372,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         let field = classContext.fields.find(f => f.identifier == fieldNode.identifier);
         if (!field) return undefined;
 
-        this.currentSymbolTable.addSymbol(field);
+        // this.currentSymbolTable.addSymbol(field);
 
         field.initialValue = field.type instanceof PrimitiveType ? field.type.getDefaultValue() : null;
 
