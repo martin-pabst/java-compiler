@@ -26,10 +26,10 @@ import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { MissingStatementManager } from "./MissingStatementsManager.ts";
 import { JavaInterface } from "../types/JavaInterface.ts";
-import { InnnerClassVariableManager } from "./InnerClassVariableManager.ts";
+import { UsagePosition } from "../../common/UsagePosition.ts";
 
 
-export class TermCodeGenerator extends BinopCastCodeGenerator {
+export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
     constantTypeToTypeMap: { [key: number]: JavaType } = {}
 
@@ -41,7 +41,6 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
     missingStatementManager: MissingStatementManager = new MissingStatementManager();
 
-    innerClassVariableManager: InnnerClassVariableManager = new InnnerClassVariableManager();
 
     constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore) {
         super(module, libraryTypestore, compiledTypesTypestore);
@@ -287,8 +286,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
                     this.missingStatementManager.onSymbolRead(symbol, node.range, this.module.errors);
                     return this.compileSymbolOnStackframeAccess(symbol, node.range);
                 } else {
-                    let innerClassAttributeIndentifier = this.innerClassVariableManager.getInnerClassAttributeIdentifier(symbolInformation);
-                    this.compileOuterClassLocalVariableAccess(innerClassAttributeIndentifier, symbol.type, symbol.identifierRange);
+                    this.compileOuterClassLocalVariableAccess(symbol, node.range);
                     symbol.usagePositions.push({
                         file: this.module.file,
                         range: node.range
@@ -353,8 +351,15 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
 
     }
 
-    compileOuterClassLocalVariableAccess(innerClassAttributeIndentifier: string, type: JavaType, range: IRange) {
-        let snippet: CodeSnippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${innerClassAttributeIndentifier}`, range, type);
+    compileOuterClassLocalVariableAccess(symbol: JavaLocalVariable, range: IRange) {
+
+        // generate invisible field
+        let f: Field = new Field(symbol.identifier, symbol.identifierRange, this.module, symbol.type, TokenType.keywordPrivate);
+        f.isInnerClassCopyOfOuterClassLocalVariable = symbol;
+        let klass: JavaClass = <JavaClass>this.currentSymbolTable.classContext;
+        klass.fields.push(f);
+
+        let snippet: CodeSnippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${f.getInternalName()}`, range, symbol.type);
         snippet.isLefty = false;
         return snippet;
     }
@@ -399,6 +404,15 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
             snippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${outerClassPraefix}${fieldName}`, range, type);
         }
         snippet.isLefty = !field.isFinal;
+
+        let usagePosition: UsagePosition = {file: this.module.file, range: range};
+
+        if(field.isInnerClassCopyOfOuterClassLocalVariable){
+            field.isInnerClassCopyOfOuterClassLocalVariable.usagePositions.push(usagePosition);            
+        } else {
+            field.usagePositions.push()
+        }
+
         return snippet;
     }
 
@@ -709,14 +723,7 @@ export class TermCodeGenerator extends BinopCastCodeGenerator {
      * 
      * @param node 
      */
-    compileAnonymousInnerClass(node: ASTAnonymousClassNode): CodeSnippet | undefined {
-
-
-
-
-
-
-    }
+    abstract compileAnonymousInnerClass(node: ASTAnonymousClassNode): CodeSnippet | undefined ;
 
 
 }

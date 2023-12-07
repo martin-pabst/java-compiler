@@ -7,6 +7,7 @@ import { JavaTypeStore } from "../module/JavaTypeStore";
 import { ASTNode, AssignmentOperator, BinaryOperator, ConstantType, LogicOperator } from "../parser/AST";
 import { PrimitiveStringClass } from "../runtime/system/javalang/PrimitiveStringClass";
 import { ArrayType } from "../types/ArrayType";
+import { JavaClass } from "../types/JavaClass";
 import { JavaType } from "../types/JavaType";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { CodeSnippet, ConstantValue, StringCodeSnippet } from "./CodeSnippet";
@@ -60,6 +61,7 @@ export class BinopCastCodeGenerator {
     booleanType: JavaType;
     stringType: JavaType;
     throwableType: JavaType;
+    objectType: JavaClass;
 
     primitiveStringClass = PrimitiveStringClass;
 
@@ -76,6 +78,7 @@ export class BinopCastCodeGenerator {
         this.booleanType = this.libraryTypestore.getType("boolean")!;
         this.stringType = this.libraryTypestore.getType("string")!;
         this.throwableType = this.libraryTypestore.getType("Throwable")!;
+        this.objectType = <JavaClass>this.libraryTypestore.getType("Object")!;
 
         this.primitiveTypes.push(this.voidType);  // dummy for "otherClass"
         for (let i = 1; i < primitiveTypeIdentifiers.length; i++) this.primitiveTypes.push(this.libraryTypestore.getType(primitiveTypeIdentifiers[i])!);

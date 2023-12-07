@@ -2,6 +2,7 @@ import { BaseSymbol, SymbolKind } from "../../common/BaseSymbolTable";
 import { UsagePosition } from "../../common/UsagePosition";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
+import { JavaLocalVariable } from "../codegenerator/JavaLocalVariable";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { GenericTypeParameter } from "./GenericInformation";
 import { JavaClass } from "./JavaClass";
@@ -24,6 +25,8 @@ export class Field extends BaseSymbol {
     initialValueIsConstant: boolean = false;    // enables us to resolve values of final variables as constants
 
     declare type: JavaType;
+
+    isInnerClassCopyOfOuterClassLocalVariable?: JavaLocalVariable;
 
     constructor(identifier: string, identifierRange: IRange, public module: JavaBaseModule,
          type: JavaType, public visibility: Visibility = TokenType.keywordPublic){

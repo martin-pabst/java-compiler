@@ -3,7 +3,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTMethodDeclarationNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
+import { ASTAnonymousClassNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTMethodDeclarationNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
 import { Field } from "../types/Field.ts";
 import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
@@ -57,7 +57,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         this.missingStatementManager.endMethodBody(undefined, this.module.errors);
 
-        let endOfProgramSnippet = new CodeSnippetContainer(new StringCodeSnippet(`${Helpers.exit}();`, {startLineNumber: -1, startColumn: -1, endLineNumber: -1, endColumn: -1}));
+        let endOfProgramSnippet = new CodeSnippetContainer(new StringCodeSnippet(`${Helpers.exit}();`, { startLineNumber: -1, startColumn: -1, endLineNumber: -1, endColumn: -1 }));
         endOfProgramSnippet.enforceNewStepBeforeSnippet();
 
         snippets.push(endOfProgramSnippet);
@@ -105,7 +105,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         // second step: non-static fields and instance initializers
         this.compileInstanceFieldsAndInitializer(cdef, classContext);
-        
+
         this.compileMethodsAndConstructors(cdef, classContext);
 
         this.popSymbolTable();
@@ -121,7 +121,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         // first step: static fields and static initializers
         this.compileStaticFieldsAndInitializerAndEnumValues(classContext, cdef);
-        
+
         this.compileMethodsAndConstructors(cdef, classContext);
 
         this.popSymbolTable();
@@ -140,7 +140,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         // second step: non-static fields and instance initializers
         this.compileInstanceFieldsAndInitializer(cdef, classContext);
-        
+
         this.compileMethodsAndConstructors(cdef, classContext);
 
         this.popSymbolTable();
@@ -151,14 +151,14 @@ export class CodeGenerator extends StatementCodeGenerator {
         let constructorFound: boolean = false;
         for (let method of cdef.methods) {
             this.compileMethodDeclaration(method, classContext);
-            if (method.isContructor){
+            if (method.isContructor) {
                 constructorFound = true;
-                if(cdef.kind == TokenType.keywordEnum){
-                    if(method.visibility != TokenType.keywordPrivate){
+                if (cdef.kind == TokenType.keywordEnum) {
+                    if (method.visibility != TokenType.keywordPrivate) {
                         this.pushError("Konstruktoren von enums müssen die Sichtbarkeit private haben.", "error", method.range);
                     }
                 }
-            } 
+            }
         }
 
         if (!constructorFound && classContext instanceof JavaClass) this.buildStandardConstructors(classContext);
@@ -198,11 +198,11 @@ export class CodeGenerator extends StatementCodeGenerator {
             switch (fieldOrInitializer.kind) {
                 case TokenType.fieldDeclaration:
                     if (!fieldOrInitializer.isStatic) {
-                        if(classContext instanceof JavaInterface){
+                        if (classContext instanceof JavaInterface) {
                             this.pushError("Interfaces können nur statische Attribute besitzen.", "error", cdef);
                         }
                         continue;
-                    } 
+                    }
                     let snippet = this.compileFieldDeclaration(fieldOrInitializer, classContext);
                     if (snippet) {
                         staticFieldSnippets.push(snippet);
@@ -220,7 +220,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         }
 
-        if(cdef.kind == TokenType.keywordEnum){
+        if (cdef.kind == TokenType.keywordEnum) {
             this.compileEnumValueConstruction(<JavaEnum>classContext, cdef, staticFieldSnippets);
         }
 
@@ -233,17 +233,17 @@ export class CodeGenerator extends StatementCodeGenerator {
         let parameterlessConstructor = javaEnum.methods.find(m => m.isConstructor && m.parameters.length == 0);
 
         let enumValueIndex: number = 0;
-        for(let valueNode of enumDeclNode.valueNodes){
-            
+        for (let valueNode of enumDeclNode.valueNodes) {
+
             // find suitable constructor and invoke it!
             let callConstructorSnippet: CodeSnippet;
-            if(valueNode.parameterValues.length > 0 || parameterlessConstructor){
+            if (valueNode.parameterValues.length > 0 || parameterlessConstructor) {
 
                 let parameterSnippets = <CodeSnippet[]>valueNode.parameterValues.map(pv => this.compileTerm(pv));
-                if(parameterSnippets.some(sn => (!sn || !sn.type))) continue; // if there had been an error when compiling parameter values
+                if (parameterSnippets.some(sn => (!sn || !sn.type))) continue; // if there had been an error when compiling parameter values
 
                 let constructor = this.searchMethod(javaEnum.identifier, javaEnum, parameterSnippets.map(sn => sn!.type!), true, false, false);
-                if(!constructor){
+                if (!constructor) {
                     this.pushError("Es konnte kein passender Konstruktor gefunden werden ", "error", enumDeclNode);
                     continue;
                 }
@@ -275,7 +275,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         for (let baseConstructor of baseClass.getMethods().filter(m => m.isConstructor && m.visibility != TokenType.keywordPrivate)) {
 
             let method = baseConstructor.getCopy();
-            if(classContext.outerType && !classContext.isStatic){
+            if (classContext.outerType && !classContext.isStatic) {
                 method.hasOuterClassParameter = true;
             }
 
@@ -302,7 +302,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
             let steps = classContext.instanceInitializer.slice();
 
-            if(method.hasOuterClassParameter){
+            if (method.hasOuterClassParameter) {
                 let storeOuterClassReferenceSnippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${Helpers.outerClassAttributeIdentifier} = ${Helpers.elementRelativeToStackbase(1)};\n`);
                 steps.unshift(storeOuterClassReferenceSnippet);
             }
@@ -317,7 +317,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             steps.push(returnSnippet);
 
             let parameterIdentifiers = method.parameters.map(p => p.identifier);
-            if(method.hasOuterClassParameter){
+            if (method.hasOuterClassParameter) {
                 parameterIdentifiers.unshift(Helpers.outerClassAttributeIdentifier);
             }
             let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
@@ -325,7 +325,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
             method.program.numberOfThisObjects = 1;
             method.program.numberOfParameters = parameterIdentifiers.length;
-            
+
             this.linker.link(steps, method.program);
 
             method.program.compileToJavascriptFunctions();
@@ -376,8 +376,8 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         field.initialValue = field.type instanceof PrimitiveType ? field.type.getDefaultValue() : null;
 
-        if(classContext instanceof JavaInterface){
-            if(!fieldNode.isStatic || !fieldNode.isFinal){
+        if (classContext instanceof JavaInterface) {
+            if (!fieldNode.isStatic || !fieldNode.isFinal) {
                 this.pushError("Attribute von Interfaces müssen static und final sein.", "error", fieldNode);
             }
         }
@@ -453,42 +453,42 @@ export class CodeGenerator extends StatementCodeGenerator {
         let method = methodNode.method;
         if (!method) return;
 
-        
+
         if (methodNode.isContructor) {
             this.callingOtherConstructorInSameClassHappened = false;
             this.superConstructorHasBeenCalled = false;
 
-            if(classContext.outerType && !classContext.isStatic){
+            if (classContext.outerType && !classContext.isStatic) {
                 method.hasOuterClassParameter = true;
             }
         }
-        
+
         let symbolTable = this.pushAndGetNewSymbolTable(methodNode.range, true, classContext, method);
-        
-        if(method.hasOuterClassParameter){
+
+        if (method.hasOuterClassParameter) {
             this.currentSymbolTable.insertInvisibleParameter(); // make room for __outer-Parameter
         }
 
         for (let parameter of method.parameters) {
             this.currentSymbolTable.addSymbol(parameter);
         }
-        
-        
+
+
         let snippets: CodeSnippet[] = [];
-        
+
         if (method.isConstructor) {
-            
-            if(classContext instanceof JavaInterface){
+
+            if (classContext instanceof JavaInterface) {
                 this.pushError("Interfaces haben keinen Konstruktor.", "error", methodNode);
                 this.popSymbolTable();
                 return undefined;
             }
-            
+
             if (!this.callingOtherConstructorInSameClassHappened && classContext.instanceInitializer.length > 0) {
                 snippets = snippets.concat(classContext.instanceInitializer);
             }
-            
-            if(method.hasOuterClassParameter){
+
+            if (method.hasOuterClassParameter) {
                 let storeOuterClassReferenceSnippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${Helpers.outerClassAttributeIdentifier} = ${Helpers.elementRelativeToStackbase(1)};\n`);
                 snippets.push(storeOuterClassReferenceSnippet);
             }
@@ -496,37 +496,37 @@ export class CodeGenerator extends StatementCodeGenerator {
             if (!this.superConstructorHasBeenCalled) {
                 // TODO: insert call to default super constructor
             }
-            
-        }
-        
-        if(methodNode.statement){
 
-            if(method.isAbstract) this.pushError("Eine abstrakte Methode kann keinen Methodenrumpf besitzen.", "error", methodNode);
-            if(classContext instanceof JavaInterface && !(method.isAbstract || method.isDefault)) this.pushError("In Interfaces können nur default-Methoden und abstrakte Methoden einen Methodenrumpf haben.", "error", methodNode);
+        }
+
+        if (methodNode.statement) {
+
+            if (method.isAbstract) this.pushError("Eine abstrakte Methode kann keinen Methodenrumpf besitzen.", "error", methodNode);
+            if (classContext instanceof JavaInterface && !(method.isAbstract || method.isDefault)) this.pushError("In Interfaces können nur default-Methoden und abstrakte Methoden einen Methodenrumpf haben.", "error", methodNode);
 
             this.missingStatementManager.beginMethodBody(method.parameters);
-            
+
             let snippet = methodNode.statement ? this.compileStatementOrTerm(methodNode.statement) : undefined;
             if (snippet) snippets.push(snippet);
-            
+
             if (methodNode.isContructor) {
                 snippets.push(new StringCodeSnippet(`${Helpers.return}(${Helpers.elementRelativeToStackbase(0)});\n`))
             }
-    
+
             method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
-    
+
             if (!this.missingStatementManager.hasReturnHappened() && !methodNode.isContructor) {
                 snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
             }
-    
+
             this.missingStatementManager.endMethodBody(method, this.module.errors);
-    
+
             this.linker.link(snippets, method.program);
-    
+
             methodNode.program = method.program;    // only for debugging purposes
-    
+
             let runtimeClass = classContext.runtimeClass;
-    
+
             if (runtimeClass) {
                 runtimeClass.__programs.push(method.program);
                 method.program.compileToJavascriptFunctions();
@@ -534,10 +534,10 @@ export class CodeGenerator extends StatementCodeGenerator {
                 method.callbackAfterCodeGeneration.forEach(callback => callback());
 
                 let methodIndex = runtimeClass.__programs.length - 1;
-    
+
                 let parameterIdentifiers = method.parameters.map(p => p.identifier);
                 let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
-    
+
                 if (method.isStatic) {
                     method.programStub =
                         `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
@@ -584,6 +584,48 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         return snippet;
     }
+
+    /**
+ * 
+ *  Compiles expressions like new MyAbstractClass(p1, p2){ attributeDeclarations, instanceInitializers, methodDeclarations }
+ * 
+ * @param node 
+ */
+    compileAnonymousInnerClass(node: ASTAnonymousClassNode): CodeSnippet | undefined {
+
+        let outerClass = this.currentSymbolTable.classContext;
+        let klass = new JavaClass("", node.range, "", this.module);
+        klass.outerType = outerClass;
+
+        node.klass.resolvedType = klass;
+
+        // setup provisionally version of runtime class to collect programs: 
+        klass.runtimeClass = class {
+            __programs = [];
+        };  //
+
+        this.compileClassDeclaration(node.klass);
+
+        let outerLocalVariableIdentifiers = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.getInternalName());
+
+        // final version of runtime class:
+        klass.runtimeClass = class extends klass.getExtends()?.runtimeClass! {
+
+            __programs = klass.runtimeClass!.__programs;
+            
+            constructor(...args: any){
+                super();
+                for(let i = 0; i < outerLocalVariableIdentifiers.length; i++){
+                    this[outerLocalVariableIdentifiers[i]] = args[i];
+                }
+            }
+
+        };  //
+
+        // TODO: snippet which instantiates object of this class calling it's typescript constructor and it's java constructor
+
+    }
+
 
 
 
