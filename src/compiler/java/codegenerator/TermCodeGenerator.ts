@@ -65,7 +65,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             case TokenType.literal:
                 snippet = this.compileLiteralNode(<ASTLiteralNode>ast); break;
             case TokenType.symbol:
-                snippet = this.compileVariableNode(<ASTSymbolNode>ast); break;
+                snippet = this.compileSymbolNode(<ASTSymbolNode>ast); break;
             case TokenType.methodCall:
                 snippet = this.compileMethodCall(<ASTMethodCallNode>ast); break;
             case TokenType.newArray:
@@ -88,7 +88,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         return snippet;
     }
 
-    compileNewObjectNode(node: ASTNewObjectNode): CodeSnippet | undefined {
+    compileNewObjectNode(node: ASTNewObjectNode, newObjectSnippet?: CodeSnippet): CodeSnippet | undefined {
         // new t.classes[<identifier>]().<constructorIdentifier>(param1, ..., paramN)
         // constructor has to return this or push it to stack!
 
@@ -111,13 +111,15 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         // cast parameter values
-        let snippet = this.invokeConstructor(parameterValues, method, klassType, node);
+        let snippet = this.invokeConstructor(parameterValues, method, klassType, node, newObjectSnippet);
 
         return snippet;
 
     }
 
-    protected invokeConstructor(parameterValues: CodeSnippet[], method: Method, klassType: IJavaClass | JavaEnum, node: ASTNewObjectNode | ASTEnumValueNode, enumValueIdentifier?: string, enumValueIndex?: number) {
+    protected invokeConstructor(parameterValues: CodeSnippet[], method: Method, klassType: IJavaClass | JavaEnum, 
+        node: ASTNewObjectNode | ASTEnumValueNode, newObjectSnippet: CodeSnippet | undefined,
+         enumValueIdentifier?: string, enumValueIndex?: number) {
         for (let i = 0; i < parameterValues.length; i++) {
             let destinationType = method.parameters[i].type;
             parameterValues[i] = this.compileCast(parameterValues[i]!, destinationType, "implicit");
@@ -127,8 +129,12 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention && !classHasOuterType ? "native" : "java";
 
+        if(!newObjectSnippet){
+            newObjectSnippet = new StringCodeSnippet(`new ${Helpers.classes}["${klassType.identifier}"](${enumValueIdentifier ? '"' + enumValueIdentifier + '", ' + enumValueIndex : ""})`);
+        }
+
         // call javascript constructor and directly thereafter call java constructor
-        let template: string = `new ${Helpers.classes}["${klassType.identifier}"](${enumValueIdentifier ? '"' + enumValueIdentifier + '", ' + enumValueIndex : ""}).${method.getInternalName(callingConvention)}(`;
+        let template: string = `§1.${method.getInternalName(callingConvention)}(`;
 
         // instantiation of non-static inner class-object?
         // we can't rely on method.hasOuterClassParameter because this object instantiation
@@ -149,10 +155,10 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             template += `${StepParams.thread}` + (parameterValues.length > 0 ? ", " : "");
         }
 
-        let i = 1;
+        let i = 2;
         template += parameterValues.map(_p => "§" + (i++)).join(", ") + ")";
 
-        let snippet = new SeveralParameterTemplate(template).applyToSnippet(klassType, node.range, ...parameterValues);
+        let snippet = new SeveralParameterTemplate(template).applyToSnippet(klassType, node.range, newObjectSnippet, ...parameterValues);
 
         if (callingConvention == "java") {
             snippet = new CodeSnippetContainer(SnippetFramer.frame(snippet, '§1;\n'));
@@ -272,7 +278,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     }
 
 
-    compileVariableNode(node: ASTSymbolNode): CodeSnippet | undefined {
+    compileSymbolNode(node: ASTSymbolNode): CodeSnippet | undefined {
 
         // first try: symbol table (parameters, local variables, fields)
         let symbolInformation = this.currentSymbolTable.findSymbol(node.identifier);

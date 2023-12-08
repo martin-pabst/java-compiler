@@ -1,7 +1,7 @@
 import { BaseSymbolTable } from "../BaseSymbolTable";
 import { Module } from "../module/Module";
 import { EmptyRange, IRange } from "../range/Range";
-import { StepFunction, StepParams } from "./StepFunction.ts";
+import { Klass, StepFunction, StepParams } from "./StepFunction.ts";
 import { CodePrinter } from "../../java/codegenerator/CodePrinter.ts";
 import { CatchBlockInfo } from "./ExceptionInfo.ts";
 import { Thread, ThreadState } from "./Thread.ts";
@@ -21,6 +21,7 @@ export class Step {
 
     catchBlockInfoList?: CatchBlockInfo[];
     finallyBlockIndex?: number;
+    innerClass?: Klass;         // if inner class is instantiated in this step
 
     constructor(public index: number) {
         this.range = { startLineNumber: undefined, startColumn: undefined, endLineNumber: undefined, endColumn: undefined };

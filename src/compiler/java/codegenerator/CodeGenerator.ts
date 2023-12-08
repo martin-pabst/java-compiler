@@ -248,7 +248,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                     continue;
                 }
 
-                callConstructorSnippet = this.invokeConstructor(parameterSnippets, constructor, javaEnum, valueNode, valueNode.identifier, enumValueIndex);
+                callConstructorSnippet = this.invokeConstructor(parameterSnippets, constructor, javaEnum, valueNode, undefined, valueNode.identifier, enumValueIndex);
                 callConstructorSnippet = new CodeSnippetContainer(callConstructorSnippet);
                 (<CodeSnippetContainer>callConstructorSnippet).ensureFinalValueIsOnStack();
                 (<CodeSnippetContainer>callConstructorSnippet).addNextStepMark();
@@ -596,34 +596,45 @@ export class CodeGenerator extends StatementCodeGenerator {
         let outerClass = this.currentSymbolTable.classContext;
         let klass = new JavaClass("", node.range, "", this.module);
         klass.outerType = outerClass;
+        klass.setExtends(this.objectType);
 
         node.klass.resolvedType = klass;
 
+        let programs: Program[] = [];
         // setup provisionally version of runtime class to collect programs: 
         klass.runtimeClass = class {
-            __programs = [];
+            
         };  //
 
+        klass.runtimeClass.__programs = programs;
         this.compileClassDeclaration(node.klass);
+        this.buildStandardConstructors(klass);
 
-        let outerLocalVariableIdentifiers = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.getInternalName());
+        let outerLocalVariables = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.isInnerClassCopyOfOuterClassLocalVariable);
+        let invisibleFieldIdentifiers = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.getInternalName());
 
         // final version of runtime class:
         klass.runtimeClass = class extends klass.getExtends()?.runtimeClass! {
-
-            __programs = klass.runtimeClass!.__programs;
             
             constructor(...args: any){
                 super();
-                for(let i = 0; i < outerLocalVariableIdentifiers.length; i++){
-                    this[outerLocalVariableIdentifiers[i]] = args[i];
+                for(let i = 0; i < invisibleFieldIdentifiers.length; i++){
+                    this[invisibleFieldIdentifiers[i]] = args[i];
                 }
             }
 
         };  //
 
-        // TODO: snippet which instantiates object of this class calling it's typescript constructor and it's java constructor
+        klass.runtimeClass.__programs = programs;
+        // snippet which instantiates object of this class calling it's typescript constructor and it's java constructor
 
+        let template = `new this.innerClass(${outerLocalVariables.map(v => Helpers.elementRelativeToStackbase(v!.stackframePosition!)).join(", ")})`;
+        let newClassSnippet = new StringCodeSnippet(template, node.range, klass);
+        newClassSnippet.addEmitToStepListener((step) => step.innerClass = klass.runtimeClass);
+
+        let snippet = this.compileNewObjectNode(node.newObjectNode, newClassSnippet);
+
+        return snippet;
     }
 
 

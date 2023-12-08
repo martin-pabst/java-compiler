@@ -58,14 +58,6 @@ export class JavaSymbolTable extends BaseSymbolTable {
             outerClassLevel: outerClassLevel
         }
 
-        if(this.parent){
-            if(this.parent.classContext == this.classContext){
-                return this.parent.findSymbolIntern(identifier, upToVisibility, false, outerClassLevel);
-            } else {
-                return this.parent.findSymbolIntern(identifier, TokenType.keywordProtected, true, outerClassLevel + 1);
-            }
-        }
-
         if(this.classContext && searchForFields){
             let field = this.classContext.getField(identifier, TokenType.keywordPrivate);
             if(field){
@@ -75,6 +67,14 @@ export class JavaSymbolTable extends BaseSymbolTable {
                 } 
             }
             
+        }
+
+        if(this.parent){
+            if(this.parent.classContext == this.classContext){
+                return this.parent.findSymbolIntern(identifier, upToVisibility, false, outerClassLevel);
+            } else {
+                return this.parent.findSymbolIntern(identifier, TokenType.keywordProtected, true, outerClassLevel + 1);
+            }
         }
 
         return undefined;
