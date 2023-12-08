@@ -13,8 +13,9 @@ class A {
             println("Hier!");
             println(i);
          }
-      }
+      };
 
+      t.doIt();
    }
 
 }
@@ -22,7 +23,7 @@ class A {
 interface Test {
    void doIt();
 }
-`,
+ `,
 innerClassesTest: `
 A a = new A();
 A.B b = a.getB();

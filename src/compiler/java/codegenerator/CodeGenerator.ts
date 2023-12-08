@@ -18,7 +18,7 @@ import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts
 import { Method } from "../types/Method.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
-import { JavaInterface } from "../types/JavaInterface.ts";
+import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
 import { EmptyRange } from "../../common/range/Range.ts";
 
 export class CodeGenerator extends StatementCodeGenerator {
@@ -607,6 +607,21 @@ export class CodeGenerator extends StatementCodeGenerator {
         };  //
 
         klass.runtimeClass.__programs = programs;
+
+
+        let type = node.newObjectNode.type.resolvedType;
+        if(type instanceof IJavaInterface){
+            node.klass.implements.push(node.newObjectNode.type);
+            klass.addImplements(type);
+        } else if(type instanceof IJavaClass) {
+            node.klass.extends = node.newObjectNode.type;
+            klass.setExtends(type);
+        } else {
+            this.pushError("Anonyme innere Klassen können nur auf Grundlage von Interfaces oder von Klassen erstellt werden.", "error", node.newObjectNode.range);
+        }
+
+        node.newObjectNode.type.resolvedType = klass;
+
         this.compileClassDeclaration(node.klass);
         this.buildStandardConstructors(klass);
 
