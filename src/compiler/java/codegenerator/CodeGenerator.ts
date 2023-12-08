@@ -77,6 +77,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         if (!typeScope) return;
 
         for (let cdef of typeScope.classOrInterfaceOrEnumDefinitions) {
+            if(cdef.identifier == "") continue;     // anonymous inner class
             switch (cdef.kind) {
                 case TokenType.keywordClass:
                     this.compileClassDeclaration(cdef);
@@ -645,7 +646,9 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         let template = `new this.innerClass(${outerLocalVariables.map(v => Helpers.elementRelativeToStackbase(v!.stackframePosition!)).join(", ")})`;
         let newClassSnippet = new StringCodeSnippet(template, node.range, klass);
-        newClassSnippet.addEmitToStepListener((step) => step.innerClass = klass.runtimeClass);
+        newClassSnippet.addEmitToStepListener((step) => {
+            step.innerClass = klass.runtimeClass;
+        });
 
         let snippet = this.compileNewObjectNode(node.newObjectNode, newClassSnippet);
 

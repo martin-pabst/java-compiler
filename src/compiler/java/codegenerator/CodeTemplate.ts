@@ -175,7 +175,9 @@ export class SeveralParameterTemplate extends CodeTemplate {
             for(let parameter of this.orderedParameters){
                 appliedTemplate = appliedTemplate.replace(new RegExp('\\' + parameter.parameter, 'g'), snippets[parameter.n - 1].emit());
             }            
-            return new StringCodeSnippet(appliedTemplate, range, resultType);
+            let snippet = new StringCodeSnippet(appliedTemplate, range, resultType);
+            snippet.takeEmitToStepListenersFrom(snippets);
+            return snippet;
         }
 
         let snippetContainer = new CodeSnippetContainer([], range, resultType);

@@ -92,7 +92,7 @@ export interface AnnotatedNode {
 export interface TypeDefinition {
     resolvedType: JavaType | undefined;
     path: string;
-    parent: TypeScope;
+    parent?: TypeScope;
     module: JavaCompiledModule;
 }
 

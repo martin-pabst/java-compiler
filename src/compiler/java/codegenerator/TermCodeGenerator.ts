@@ -178,9 +178,10 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         this.currentSymbolTable = newSymbolTable;
         return newSymbolTable;
     }
-
+    
     popSymbolTable() {
-        return this.symbolTableStack.pop();
+        this.symbolTableStack.pop();
+        this.currentSymbolTable = this.symbolTableStack[this.symbolTableStack.length - 1];
     }
 
     compileSelectArrayElement(node: ASTSelectArrayElementNode): CodeSnippet | undefined {

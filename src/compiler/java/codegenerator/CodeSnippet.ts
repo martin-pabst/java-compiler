@@ -100,6 +100,15 @@ export class StringCodeSnippet extends CodeSnippet {
         this.emitToStepListeners.push(emitToStepListener);
     }
 
+    takeEmitToStepListenersFrom(snippets: CodeSnippet[]) {
+        for(let sn of snippets){
+            if(sn instanceof StringCodeSnippet){
+                this.emitToStepListeners = this.emitToStepListeners.concat(sn.emitToStepListeners);
+            }
+        }
+    }
+
+
     emitToStep(currentStep: Step, _steps: Step[]): Step {
         currentStep.codeAsString = currentStep.codeAsString + this.text;
 
