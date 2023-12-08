@@ -124,7 +124,7 @@ export class Method {
         if(this.isConstructor){
             return this.identifier + "(" + this.parameters.map(p => p.type.getReifiedIdentifier()).join(", ") + ")";
         } else {
-            return this.returnParameterType?.getReifiedIdentifier() + this.identifier + "(" + this.parameters.map(p => p.type.getReifiedIdentifier()).join(", ") + ")";
+            return this.returnParameterType?.getReifiedIdentifier() + " " + this.identifier + "(" + this.parameters.map(p => p.type.getReifiedIdentifier()).join(", ") + ")";
         }
     }
 }

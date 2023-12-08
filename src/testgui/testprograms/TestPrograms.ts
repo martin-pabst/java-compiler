@@ -1,21 +1,24 @@
 export var testPrograms = {
 anonymousInnerClassTest:`
 A a = new A();
-a.test();
+Test t = a.test();
+t.doIt();
 
 class A {
    int i = 10;
 
-   void test(){
+   Test test(){
 
-      Test t = new Test(){
+      int j = 20;
+
+      return new Test(){
          void doIt(){
             println("Hier!");
             println(i);
+            println(j);
          }
       };
 
-      t.doIt();
    }
 
 }
@@ -23,7 +26,7 @@ class A {
 interface Test {
    void doIt();
 }
- `,
+    `,
 innerClassesTest: `
 A a = new A();
 A.B b = a.getB();

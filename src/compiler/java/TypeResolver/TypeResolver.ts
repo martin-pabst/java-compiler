@@ -88,7 +88,7 @@ export class TypeResolver {
             this.moduleManager.typestore.addType(resolvedType);
             klassNode.module.types.push(klassNode.resolvedType);
 
-            if(klassNode.parent.kind != TokenType.global) declarationNodesWithClassParent.push(klassNode);
+            if(klassNode.parent?.kind != TokenType.global) declarationNodesWithClassParent.push(klassNode);
         }
 
         for (let interfaceNode of this.interfaceDeclarationNodes) {
@@ -99,7 +99,7 @@ export class TypeResolver {
             this.moduleManager.typestore.addType(resolvedType);
             interfaceNode.module.types.push(interfaceNode.resolvedType);
 
-            if(interfaceNode.parent.kind != TokenType.global) declarationNodesWithClassParent.push(interfaceNode);
+            if(interfaceNode.parent?.kind != TokenType.global) declarationNodesWithClassParent.push(interfaceNode);
         }
 
         let baseEnumClass = <JavaClass><any>this.libraryModuleManager.typestore.getType("Enum");
@@ -112,7 +112,7 @@ export class TypeResolver {
             this.moduleManager.typestore.addType(resolvedType);
             enumNode.module.types.push(enumNode.resolvedType);
 
-            if(enumNode.parent.kind != TokenType.global) declarationNodesWithClassParent.push(enumNode);
+            if(enumNode.parent?.kind != TokenType.global) declarationNodesWithClassParent.push(enumNode);
         }
 
         for(let node of declarationNodesWithClassParent){
@@ -368,59 +368,9 @@ export class TypeResolver {
         // replenish class types with default methods of implemented interfaces if necessary
         for (let javaClass of classes) {
 
-            for (let ji of javaClass.getImplements()) {
-                let javaInterface = <JavaInterface>ji;
-                let notImplementedMethods: Method[] = [];
-                for (let method of javaInterface.getMethods()) {
+            javaClass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods();
 
-                    let classesMethod = javaClass.findMethodWithSignature(method.getInternalName("java"));
-
-                    if (!classesMethod) {
-                        if (method.isDefault) {
-                            let copy = method.getCopy();
-                            javaClass.methods.push(copy);
-                            method.callbackAfterCodeGeneration.push(() => {
-                                copy.program = method.program;
-
-                                let runtimeClass = javaClass.runtimeClass!;
-                                runtimeClass.__programs.push(method.program);
-
-                                let methodIndex = runtimeClass.__programs.length - 1;
-
-                                let parameterIdentifiers = method.parameters.map(p => p.identifier);
-                                let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
-                                method.programStub =
-                                    `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
-                                    `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`;
-                                runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
-                                    method.programStub);
-                            });
-                        } else {
-                            notImplementedMethods.push(method);
-                        }
-                    }
-
-                }
-
-                if (notImplementedMethods.length > 0) {
-                    javaClass.module.errors.push({
-                        message: "Die Klasse " + javaClass.identifier + " muss noch folgende Methoden des Interfaces " + javaInterface.identifier + " implementieren: " + notImplementedMethods.map(m => m.getSignature()).join(", "),
-                        level: "error",
-                        range: javaClass.identifierRange
-                    })
-                }
-            }
-
-            if (!javaClass._isAbstract) {
-                let abstractMethodsNotYetImplemented: Method[] = javaClass.getAbstractMethodsNotYetImplemented();
-                if (abstractMethodsNotYetImplemented.length > 0) {
-                    javaClass.module.errors.push({
-                        message: "Die Klasse " + javaClass.identifier + " muss noch folgende Methoden ihrer abstrakten Oberklassen implementieren: " + abstractMethodsNotYetImplemented.map(m => m.getSignature()).join(", "),
-                        level: "error",
-                        range: javaClass.identifierRange
-                    })
-                }
-            }
+            javaClass.checkIfAbstractParentsAreImplemented();
 
         }
 

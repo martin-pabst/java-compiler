@@ -10,6 +10,7 @@ import { JavaType } from "./JavaType";
 import { Method } from "./Method";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility";
+import { Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 
 
 
@@ -20,35 +21,35 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 
     public usagePositions: UsagePosition[] = [];
 
-    
-    constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule){
-        super(identifier, identifierRange, path, module);        
+
+    constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
+        super(identifier, identifierRange, path, module);
         this.isPrimitive = false;
     }
 
     abstract getFields(): Field[];
     abstract getMethods(): Method[];
 
-    abstract getExtends(): IJavaClass | undefined;    
+    abstract getExtends(): IJavaClass | undefined;
     abstract getImplements(): IJavaInterface[];
 
     getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): Field | undefined {
-            let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
-            if(field) return field;
-            if(uptoVisibility == TokenType.keywordPrivate) uptoVisibility = TokenType.keywordProtected;
+        let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
+        if (field) return field;
+        if (uptoVisibility == TokenType.keywordPrivate) uptoVisibility = TokenType.keywordProtected;
 
-            let baseClass = this.getExtends();
-            if(baseClass){
-                return baseClass.getField(identifier, uptoVisibility, forceStatic);
-            } else {
-                return undefined;
-            }
+        let baseClass = this.getExtends();
+        if (baseClass) {
+            return baseClass.getField(identifier, uptoVisibility, forceStatic);
+        } else {
+            return undefined;
+        }
     }
 
     toString(): string {
         let s: string = this.identifier;
-        
-        if(this.genericInformation && this.genericInformation.length > 0){
+
+        if (this.genericInformation && this.genericInformation.length > 0) {
             s += "<" + this.genericInformation.map(gi => gi.toString()).join(", ") + ">";
         }
         return s;
@@ -57,7 +58,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     getReifiedIdentifier(): string {
         return this.identifier;
     }
-    
+
     abstract isAbstract(): boolean;
 
 }
@@ -86,10 +87,10 @@ export class JavaClass extends IJavaClass {
         let concreteMethodSignatures: Map<string, Method> = new Map();
 
         let klass: IJavaClass | undefined = this;
-    
-        while(klass){
-            for(let m of klass.getMethods()){
-                if(m.isAbstract){
+
+        while (klass) {
+            for (let m of klass.getMethods()) {
+                if (m.isAbstract) {
                     abstractMethods.push(m);
                 } else {
                     concreteMethodSignatures.set(m.getSignature(), m);
@@ -105,14 +106,72 @@ export class JavaClass extends IJavaClass {
     }
 
     findMethodWithSignature(signature: string): Method | undefined {
-        for(let method of this.methods){
-            if(method.getInternalName("java") == signature) return method;
+        for (let method of this.methods) {
+            if (method.getInternalName("java") == signature) return method;
         }
-        if(this.extends){
+        if (this.extends) {
             return (<JavaClass>this.extends).findMethodWithSignature(signature);
         }
 
         return undefined;
+    }
+
+    checkIfAbstractParentsAreImplemented() {
+        if (!this._isAbstract) {
+            let abstractMethodsNotYetImplemented: Method[] = this.getAbstractMethodsNotYetImplemented();
+            if (abstractMethodsNotYetImplemented.length > 0) {
+                this.module.errors.push({
+                    message: "Die Klasse " + this.identifier + " muss noch folgende Methoden ihrer abstrakten Oberklassen implementieren: " + abstractMethodsNotYetImplemented.map(m => m.getSignature()).join(", "),
+                    level: "error",
+                    range: this.identifierRange
+                })
+            }
+        }
+    }
+
+    checkIfInterfacesAreImplementedAndSupplementDefaultMethods() {
+        for (let ji of this.getImplements()) {
+            let javaInterface = <JavaInterface>ji;
+            let notImplementedMethods: Method[] = [];
+            for (let method of javaInterface.getMethods()) {
+
+                let classesMethod = this.findMethodWithSignature(method.getInternalName("java"));
+
+                if (!classesMethod) {
+                    if (method.isDefault) {
+                        let copy = method.getCopy();
+                        this.methods.push(copy);
+                        method.callbackAfterCodeGeneration.push(() => {
+                            copy.program = method.program;
+
+                            let runtimeClass = this.runtimeClass!;
+                            runtimeClass.__programs.push(method.program);
+
+                            let methodIndex = runtimeClass.__programs.length - 1;
+
+                            let parameterIdentifiers = method.parameters.map(p => p.identifier);
+                            let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
+                            method.programStub =
+                                `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
+                                `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`;
+                            runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
+                                method.programStub);
+                        });
+                    } else {
+                        notImplementedMethods.push(method);
+                    }
+                }
+
+            }
+
+            if (notImplementedMethods.length > 0) {
+                this.module.errors.push({
+                    message: "Die Klasse " + this.identifier + " muss noch folgende Methoden des Interfaces " + javaInterface.identifier + " implementieren: " + notImplementedMethods.map(m => m.getSignature()).join(", "),
+                    level: "error",
+                    range: this.identifierRange
+                })
+            }
+        }
     }
 
     isGenericVariant(): boolean {
@@ -123,15 +182,15 @@ export class JavaClass extends IJavaClass {
         return false;
     }
 
-    setExtends(ext: IJavaClass){
+    setExtends(ext: IJavaClass) {
         this.extends = ext;
     }
 
-    addImplements(impl: IJavaInterface | IJavaInterface[]){
-        if(!Array.isArray(impl)) impl = [impl];
+    addImplements(impl: IJavaInterface | IJavaInterface[]) {
+        if (!Array.isArray(impl)) impl = [impl];
         this.implements = this.implements.concat(impl);
     }
- 
+
     getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, NonPrimitiveType>): IJavaClass {
         return new GenericVariantOfJavaClass(this, typeMap);
     }
@@ -158,32 +217,32 @@ export class JavaClass extends IJavaClass {
         return this.methods;
     }
 
-    public registerExtendsImplementsOnAncestors(type?: NonPrimitiveType){
-        if(type) this.registerChildType(type);
+    public registerExtendsImplementsOnAncestors(type?: NonPrimitiveType) {
+        if (type) this.registerChildType(type);
 
         type = type || this;
 
         (<JavaClass>this.extends)?.registerExtendsImplementsOnAncestors(type);
-        for(let impl of this.implements){
+        for (let impl of this.implements) {
             (<JavaInterface>impl).registerExtendsImplementsOnAncestors(type);
         }
-    
+
     }
 
     canImplicitlyCastTo(bType: JavaType): boolean {
 
-        if(bType == this) return true;                   // A can cast to A.
+        if (bType == this) return true;                   // A can cast to A.
 
-        if(bType instanceof JavaInterface){               // can class A cast to interface BI?
-            for(let x of this.implements){                 // A implements X
-                if(x.canImplicitlyCastTo(bType)) return true;  // if x can cast to BI, then A can cast, too
+        if (bType instanceof JavaInterface) {               // can class A cast to interface BI?
+            for (let x of this.implements) {                 // A implements X
+                if (x.canImplicitlyCastTo(bType)) return true;  // if x can cast to BI, then A can cast, too
             }
             return false;
         }
 
-        if(bType instanceof JavaClass){                   // can class A cast to class B?
-            if(bType == this) return true;
-            if(!this.extends) return false;               // A should at least extend Object, so this must not happen...
+        if (bType instanceof JavaClass) {                   // can class A cast to class B?
+            if (bType == this) return true;
+            if (!this.extends) return false;               // A should at least extend Object, so this must not happen...
             return this.extends.canImplicitlyCastTo(bType); // A extends C; if C can cast to B, then also A can
         }
 
@@ -192,13 +251,13 @@ export class JavaClass extends IJavaClass {
     }
 
     canExplicitlyCastTo(bType: JavaType): boolean {
-        if(bType.isPrimitive) return false;
+        if (bType.isPrimitive) return false;
 
-        if(bType == this) return true;                   // A can cast to A.
+        if (bType == this) return true;                   // A can cast to A.
 
-        if(this.canImplicitlyCastTo(bType)) return true;
+        if (this.canImplicitlyCastTo(bType)) return true;
 
-        if(bType instanceof NonPrimitiveType){
+        if (bType instanceof NonPrimitiveType) {
             return bType.canImplicitlyCastTo(this);
         }
 
@@ -226,15 +285,15 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     public usagePositions: UsagePosition[] = [];
 
     constructor(public isGenericVariantOf: JavaClass, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
-        super(isGenericVariantOf.identifier, isGenericVariantOf.identifierRange ,isGenericVariantOf.pathAndIdentifier, isGenericVariantOf.module);
+        super(isGenericVariantOf.identifier, isGenericVariantOf.identifierRange, isGenericVariantOf.pathAndIdentifier, isGenericVariantOf.module);
     }
 
     toString(): string {
         let s: string = this.identifier;
 
         let genericInformation = this.isGenericVariantOf.genericInformation;
-        
-        if(genericInformation && genericInformation.length > 0){
+
+        if (genericInformation && genericInformation.length > 0) {
             s += "<" + genericInformation.map(gi => {
                 let type = this.typeMap.get(gi);
                 return type?.toString();
@@ -260,11 +319,11 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         let copyNeeded = false;
         this.typeMap.forEach((jt, gt) => {
             let jtCopy = jt.getCopyWithConcreteType(otherTypeMap);
-            if(jt != jtCopy) copyNeeded = true;
+            if (jt != jtCopy) copyNeeded = true;
             newTypeMap.set(gt, jt);
         })
 
-        if(!copyNeeded) return this;
+        if (!copyNeeded) return this;
 
         return new GenericVariantOfJavaClass(this.isGenericVariantOf, newTypeMap);
     }
@@ -291,95 +350,95 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         return this.cachedMethods;
     }
 
-    getExtends(): IJavaClass | undefined{
+    getExtends(): IJavaClass | undefined {
         let originalExtends = this.isGenericVariantOf.getExtends();
-        if(!this.cachedExtends && originalExtends){
+        if (!this.cachedExtends && originalExtends) {
             this.cachedExtends = <IJavaClass>originalExtends.getCopyWithConcreteType(this.typeMap);
         }
         return this.cachedExtends;
     }
 
-    getImplements(): IJavaInterface[]{
-        if(!this.cachedImplements){
+    getImplements(): IJavaInterface[] {
+        if (!this.cachedImplements) {
             this.cachedImplements = this.isGenericVariantOf.getImplements().map(impl => <IJavaInterface>impl.getCopyWithConcreteType(this.typeMap));
-        }   
-        
+        }
+
         return this.cachedImplements;
     }
 
     canImplicitlyCastTo(otherType: JavaType): boolean {
-        if(!(otherType instanceof NonPrimitiveType)) return false;          // we can't cast a class type to a primitive type. Auto-Unboxing is done in BinOpCastCodeGenerator.ts
+        if (!(otherType instanceof NonPrimitiveType)) return false;          // we can't cast a class type to a primitive type. Auto-Unboxing is done in BinOpCastCodeGenerator.ts
 
         // ArrayList<Integer> can cast to List or to raw type ArrayList or to raw type List
-        if(otherType instanceof JavaInterface || otherType instanceof JavaClass){
-            if(this.isGenericVariantOf.canExplicitlyCastTo(otherType)) return true;
+        if (otherType instanceof JavaInterface || otherType instanceof JavaClass) {
+            if (this.isGenericVariantOf.canExplicitlyCastTo(otherType)) return true;
             return false;
-        } 
+        }
 
-        if(otherType instanceof GenericVariantOfJavaInterface){
+        if (otherType instanceof GenericVariantOfJavaInterface) {
 
             // Now otherType instanceof GenericVariantOfJavaInterface
             // ArrayList<Integer> can cast to Collection<Integer> or Collection<? extends Number>
             let ot1 = <GenericVariantOfJavaInterface>otherType;
-    
-            if(!this.isGenericVariantOf.canImplicitlyCastTo(ot1.isGenericVariantOf)) return false;
-    
+
+            if (!this.isGenericVariantOf.canImplicitlyCastTo(ot1.isGenericVariantOf)) return false;
+
             // Find concrete parameterized implemented interface of this.isGenericVariantOf which is generic variant of otherType
             // ... Find concrete parameterized supertype of ArrayList<Integer> which is generic variant of List (so: find List<Integer>)
-     
+
             // interfaceImplementedByMeWhichIsGenericVariantOfOtherType ==> iibm
             // scenario class ArrayList<X> should get casted to List<String>
             // strategy: construct Type List<X> from ArrayList<X> and then compare X to String
             let iibm = this.findInterfaceImplementedByMeWhichIsGenericVariantOf(ot1);
-    
-            if(iibm == null) return false;
-            
-            for(let genericParameter of iibm.isGenericVariantOf.genericInformation){
+
+            if (iibm == null) return false;
+
+            for (let genericParameter of iibm.isGenericVariantOf.genericInformation) {
                 let myType = iibm.typeMap.get(genericParameter);
                 let othersType = ot1.typeMap.get(genericParameter);
-    
-                if(myType?.toString() == othersType?.toString()) continue;
-    
-                if(othersType instanceof GenericTypeParameter && othersType.isWildcard){
-                    for(let ext of othersType.upperBounds){
-                        if(myType?.canImplicitlyCastTo(ext)) return true;
+
+                if (myType?.toString() == othersType?.toString()) continue;
+
+                if (othersType instanceof GenericTypeParameter && othersType.isWildcard) {
+                    for (let ext of othersType.upperBounds) {
+                        if (myType?.canImplicitlyCastTo(ext)) return true;
                     }
                 }
-    
+
             }
-    
+
             return true;
         }
 
-        if(otherType instanceof GenericVariantOfJavaClass){
+        if (otherType instanceof GenericVariantOfJavaClass) {
             // Now otherType instanceof GenericVariantOfJavaClass
             // MyArrayList<Integer> can cast to ArrayList<Integer> or ArrayList<? extends Number>
             let ot1 = <GenericVariantOfJavaClass>otherType;
-    
-            if(!this.isGenericVariantOf.canImplicitlyCastTo(ot1.isGenericVariantOf)) return false;
-    
+
+            if (!this.isGenericVariantOf.canImplicitlyCastTo(ot1.isGenericVariantOf)) return false;
+
             // Find concrete parameterized supertype of this.isGenericVariantFrom which is generic variant from otherType
             // ... Find concrete parameterized supertype of MyArrayList<Integer> which is generic variant from ArrayList (so: find ArrayList<Integer>)
-     
+
             // superTypeOfMeWhichIsGenericVariantOfOtherType ==> smgvo
             let smgvo = this.findSuperTypeOfMeWhichIsGenericVariantOf(ot1);
-    
-            if(smgvo == null) return false;
-            
-            for(let genericParameter of smgvo.isGenericVariantOf.genericInformation){
+
+            if (smgvo == null) return false;
+
+            for (let genericParameter of smgvo.isGenericVariantOf.genericInformation) {
                 let myType = smgvo.typeMap.get(genericParameter);
                 let othersType = ot1.typeMap.get(genericParameter);
-    
-                if(myType?.toString() == othersType?.toString()) continue;
-    
-                if(othersType instanceof GenericTypeParameter && othersType.isWildcard){
-                    for(let ext of othersType.upperBounds){
-                        if(myType?.canImplicitlyCastTo(ext)) return true;
+
+                if (myType?.toString() == othersType?.toString()) continue;
+
+                if (othersType instanceof GenericTypeParameter && othersType.isWildcard) {
+                    for (let ext of othersType.upperBounds) {
+                        if (myType?.canImplicitlyCastTo(ext)) return true;
                     }
                 }
-    
+
             }
-    
+
             return true;
 
         }
@@ -388,9 +447,9 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     }
 
     canExplicitlyCastTo(otherType: JavaType): boolean {
-        if(this.canImplicitlyCastTo(otherType)) return true;
+        if (this.canImplicitlyCastTo(otherType)) return true;
 
-        if(otherType instanceof NonPrimitiveType){
+        if (otherType instanceof NonPrimitiveType) {
             return otherType.canImplicitlyCastTo(this);
         }
 
@@ -400,30 +459,30 @@ export class GenericVariantOfJavaClass extends IJavaClass {
 
     findInterfaceImplementedByMeWhichIsGenericVariantOf(otherType: GenericVariantOfJavaInterface): GenericVariantOfJavaInterface | null {
 
-        for(let st of this.getImplements()){
-            if(st instanceof GenericVariantOfJavaInterface){
+        for (let st of this.getImplements()) {
+            if (st instanceof GenericVariantOfJavaInterface) {
                 let found = st.findSuperTypeOfMeWhichIsGenericVariantOf(otherType);
-                if(found != null) return found;
+                if (found != null) return found;
             }
         }
 
         return null;
-    } 
+    }
 
     findSuperTypeOfMeWhichIsGenericVariantOf(otherType: GenericVariantOfJavaClass): GenericVariantOfJavaClass | null {
         let otherTypeIsGenericVariantOf = otherType.isGenericVariantOf;
-        if(otherTypeIsGenericVariantOf == this.isGenericVariantOf) return this;
+        if (otherTypeIsGenericVariantOf == this.isGenericVariantOf) return this;
 
         let ext = this.getExtends();
 
-        if(!ext) return null;
+        if (!ext) return null;
 
-        if(ext instanceof GenericVariantOfJavaClass){
+        if (ext instanceof GenericVariantOfJavaClass) {
             return ext.findSuperTypeOfMeWhichIsGenericVariantOf(otherType);
         }
 
         return null;
-    } 
+    }
 
     clearUsagePositionsAndInheritanceInformation(): void {
         this.usagePositions = [];

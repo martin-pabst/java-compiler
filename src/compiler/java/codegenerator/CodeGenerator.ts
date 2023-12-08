@@ -20,6 +20,7 @@ import { JavaEnum } from "../types/JavaEnum.ts";
 import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
 import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
 import { EmptyRange } from "../../common/range/Range.ts";
+import { MissingStatementManager } from "./MissingStatementsManager.ts";
 
 export class CodeGenerator extends StatementCodeGenerator {
 
@@ -505,6 +506,8 @@ export class CodeGenerator extends StatementCodeGenerator {
             if (method.isAbstract) this.pushError("Eine abstrakte Methode kann keinen Methodenrumpf besitzen.", "error", methodNode);
             if (classContext instanceof JavaInterface && !(method.isAbstract || method.isDefault)) this.pushError("In Interfaces können nur default-Methoden und abstrakte Methoden einen Methodenrumpf haben.", "error", methodNode);
 
+            let msm = this.missingStatementManager;
+            this.missingStatementManager = new MissingStatementManager();
             this.missingStatementManager.beginMethodBody(method.parameters);
 
             let snippet = methodNode.statement ? this.compileStatementOrTerm(methodNode.statement) : undefined;
@@ -521,6 +524,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             }
 
             this.missingStatementManager.endMethodBody(method, this.module.errors);
+            this.missingStatementManager = msm;
 
             this.linker.link(snippets, method.program);
 
@@ -595,20 +599,19 @@ export class CodeGenerator extends StatementCodeGenerator {
     compileAnonymousInnerClass(node: ASTAnonymousClassNode): CodeSnippet | undefined {
 
         let outerClass = this.currentSymbolTable.classContext;
-        let klass = new JavaClass("", node.range, "", this.module);
+        let klass = new JavaClass("", node.newObjectNode.range, "", this.module);
         klass.outerType = outerClass;
         klass.setExtends(this.objectType);
 
         node.klass.resolvedType = klass;
 
-        let programs: Program[] = [];
         // setup provisionally version of runtime class to collect programs: 
         klass.runtimeClass = class {
             
         };  //
 
-        klass.runtimeClass.__programs = programs;
-
+        let oldClass = klass.runtimeClass;
+        oldClass.__programs = [];
 
         let type = node.newObjectNode.type.resolvedType;
         if(type instanceof IJavaInterface){
@@ -621,10 +624,20 @@ export class CodeGenerator extends StatementCodeGenerator {
             this.pushError("Anonyme innere Klassen können nur auf Grundlage von Interfaces oder von Klassen erstellt werden.", "error", node.newObjectNode.range);
         }
 
+        klass.methods = node.klass.methods.map(m => m.method!);
+
+        node.klass.fieldsOrInstanceInitializers.filter(fieldNode => fieldNode.kind == TokenType.fieldDeclaration).forEach(fn => {
+            let field: ASTFieldDeclarationNode = <any>fn;
+            let f: Field = new Field(field.identifier, field.range, klass.module, field.type.resolvedType!, field.visibility);
+            f.isStatic = field.isStatic;
+            f.isFinal = field.isFinal;
+            f.classEnum = klass;
+            klass.fields.push(f);
+        });  
+
         node.newObjectNode.type.resolvedType = klass;
 
         this.compileClassDeclaration(node.klass);
-        this.buildStandardConstructors(klass);
 
         let outerLocalVariables = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.isInnerClassCopyOfOuterClassLocalVariable);
         let invisibleFieldIdentifiers = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.getInternalName());
@@ -641,8 +654,12 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         };  //
 
-        klass.runtimeClass.__programs = programs;
+        Object.assign(klass.runtimeClass, oldClass);
+        Object.assign(klass.runtimeClass.prototype, oldClass.prototype);
         // snippet which instantiates object of this class calling it's typescript constructor and it's java constructor
+
+        klass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods();
+        klass.checkIfAbstractParentsAreImplemented();
 
         let template = `new this.innerClass(${outerLocalVariables.map(v => Helpers.elementRelativeToStackbase(v!.stackframePosition!)).join(", ")})`;
         let newClassSnippet = new StringCodeSnippet(template, node.range, klass);
