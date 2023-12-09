@@ -2,7 +2,7 @@ import { Step } from "../../common/interpreter/Program";
 import { StepParams } from "../../common/interpreter/StepFunction";
 import { EmptyRange, IRange } from "../../common/range/Range";
 import { JavaType } from "../types/JavaType";
-import { CodeSnippet, ConstantValue, StringCodeSnippet } from "./CodeSnippet";
+import { CodeSnippet, ConstantValue, EmitToStepListener, StringCodeSnippet } from "./CodeSnippet";
 import { LabelCodeSnippet } from "./LabelManager";
 
 
@@ -30,6 +30,12 @@ export class CodeSnippetContainer extends CodeSnippet {
         }
 
 
+    }
+
+    getEmitToStepListeners(): EmitToStepListener[] {
+        let listeners: EmitToStepListener[] = [];
+        this.parts.forEach(part => listeners = listeners.concat(part.getEmitToStepListeners()));
+        return listeners;
     }
 
     setRangeStartIfUndefined(range?: IRange) {
@@ -187,8 +193,15 @@ export class CodeSnippetContainer extends CodeSnippet {
         this.parts.push(new NextStepMark());
     }
 
-    addStringPart(part: string, range?: IRange, type?: JavaType) {
-        this.addParts([new StringCodeSnippet(part, range, type)]);
+    addStringPart(part: string, range?: IRange, type?: JavaType, takeListenersFromParts?: CodeSnippet[]) {
+        let newPart = new StringCodeSnippet(part, range, type);
+        
+        if(takeListenersFromParts){
+            takeListenersFromParts.forEach(part => newPart.addEmitToStepListener(part.getEmitToStepListeners()));
+        }
+
+        this.addParts([newPart]);
+        return newPart;
     }
 
     addParts(parts: CodeSnippet | CodeSnippet[] | undefined) {

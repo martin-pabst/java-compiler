@@ -6,7 +6,7 @@ import { JavaType } from "../types/JavaType";
 export type ConstantValue = number | boolean | string | null;
 
 export abstract class CodeSnippet {
-    
+
     public stepIndex: number = -1;
     public range?: IRange;
     public type?: JavaType;
@@ -28,7 +28,7 @@ export abstract class CodeSnippet {
         return this.finalValueIsOnStack ? new StringCodeSnippet(`${StepParams.stack}.pop()`, this.range) : this;
     }
 
-    isPureTermWithoutPop(){
+    isPureTermWithoutPop() {
         return true;
     }
 
@@ -40,11 +40,11 @@ export abstract class CodeSnippet {
         // standard implementation is empty
     }
 
-    getPureTerm(){
+    getPureTerm() {
         return "";
     }
 
-    ensureFinalValueIsOnStack(){
+    ensureFinalValueIsOnStack() {
         // standard implementation is empty
     }
 
@@ -56,8 +56,12 @@ export abstract class CodeSnippet {
         return undefined;
     }
 
-    endsWith(suffix: string){
+    endsWith(suffix: string) {
         return false;
+    }
+
+    getEmitToStepListeners(): EmitToStepListener[] {
+        return [];
     }
 }
 
@@ -68,7 +72,7 @@ export class StringCodeSnippet extends CodeSnippet {
     private constantValue: ConstantValue | undefined;
     private emitToStepListeners: EmitToStepListener[] = [];
 
-    constructor(public text: string, range?: IRange, type?: JavaType, constantValue?: ConstantValue ) {
+    constructor(public text: string, range?: IRange, type?: JavaType, constantValue?: ConstantValue) {
         super();
         this.range = range;
         this.type = type;
@@ -96,18 +100,21 @@ export class StringCodeSnippet extends CodeSnippet {
         return this.text;
     }
 
-    addEmitToStepListener(emitToStepListener: EmitToStepListener){
-        this.emitToStepListeners.push(emitToStepListener);
+    addEmitToStepListener(emitToStepListener: EmitToStepListener | EmitToStepListener[]) {
+        if (!Array.isArray(emitToStepListener)) emitToStepListener = [emitToStepListener];
+        this.emitToStepListeners.push(...emitToStepListener);
     }
 
-    takeEmitToStepListenersFrom(snippets: CodeSnippet[]) {
-        for(let sn of snippets){
-            if(sn instanceof StringCodeSnippet){
-                this.emitToStepListeners = this.emitToStepListeners.concat(sn.emitToStepListeners);
-            }
+    takeEmitToStepListenersFrom(snippets: CodeSnippet | CodeSnippet[]) {
+        if(!Array.isArray(snippets)) snippets = [snippets];
+        for (let sn of snippets) {
+            this.emitToStepListeners = this.emitToStepListeners.concat(sn.getEmitToStepListeners());
         }
     }
 
+    getEmitToStepListeners(): EmitToStepListener[] {
+        return this.emitToStepListeners;
+    }
 
     emitToStep(currentStep: Step, _steps: Step[]): Step {
         currentStep.codeAsString = currentStep.codeAsString + this.text;
@@ -129,10 +136,10 @@ export class StringCodeSnippet extends CodeSnippet {
     }
 
     alterPureTerm(newCode: string) {
-        this.text = newCode;        
+        this.text = newCode;
     }
 
-    getPureTerm(){
+    getPureTerm() {
         return this.text;
     }
 
@@ -144,7 +151,7 @@ export class StringCodeSnippet extends CodeSnippet {
         return this.finalValueIsOnStack ? new StringCodeSnippet(`${StepParams.stack}.pop()`, this.range) : this;
     }
 
-    endsWith(suffix: string){
+    endsWith(suffix: string) {
         return this.text.endsWith(suffix);
     }
 

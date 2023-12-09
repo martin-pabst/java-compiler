@@ -14,7 +14,8 @@ export class SnippetFramer {
         }
 
         let framedSnippet = new CodeSnippetContainer(snippet.allButLastPart(), snippet.range);
-        framedSnippet.addStringPart(template.replace(new RegExp('\\§1', 'g'), snippet.lastPartOrPop().emit()), snippet.range, type);
+        let lastPart = snippet.lastPartOrPop();
+        framedSnippet.addStringPart(template.replace(new RegExp('\\§1', 'g'), lastPart.emit()), snippet.range, type, [lastPart]);
         if(snippet instanceof CodeSnippetContainer && snippet.endsWithNextStepMark()){
             framedSnippet.addNextStepMark();
         }

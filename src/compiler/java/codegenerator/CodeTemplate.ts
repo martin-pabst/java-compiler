@@ -18,13 +18,6 @@ export abstract class CodeTemplate {
 
 }
 
-export class IdentityTemplate extends CodeTemplate {
-
-    applyToSnippet(_resultType: JavaType, _range: IRange, ...snippets: CodeSnippet[]): CodeSnippet {
-        return snippets[0];
-    }
-}
-
 export class OneParameterTemplate extends CodeTemplate {
 
     constructor(private templateString: string) {
@@ -34,11 +27,13 @@ export class OneParameterTemplate extends CodeTemplate {
     applyToSnippet(resultType: JavaType, range: IRange, ...snippets: CodeSnippet[]): CodeSnippet {
 
         if (snippets[0].isPureTerm()) {
-            return new StringCodeSnippet(this.templateString.replace(new RegExp('\\§1', 'g'), snippets[0].getPureTerm()), range, resultType);
+            let newSnippet = new StringCodeSnippet(this.templateString.replace(new RegExp('\\§1', 'g'), snippets[0].getPureTerm()), range, resultType);
+            newSnippet.takeEmitToStepListenersFrom(snippets);
         }
 
         let snippetContainer = new CodeSnippetContainer(snippets[0].allButLastPart(), range, resultType);
-        snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\§1', 'g'), snippets[0].lastPartOrPop().emit()), range);
+        let lastPart = snippets[0].lastPartOrPop();
+        snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\§1', 'g'), lastPart.emit()), range, undefined, [lastPart]);
         return snippetContainer;
     }
 
@@ -66,18 +61,24 @@ export class TwoParameterTemplate extends CodeTemplate {
             snippetContainer.addParts(snippets[0].allButLastPart());
             snippetContainer.addParts(snippets[1].allButLastPart());
 
-            snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\§1', 'g'), snippets[0].lastPartOrPop().emit())
-                .replace(new RegExp('\\§2', 'g'), snippets[1].lastPartOrPop().emit()), range);
+            let lastPart1 = snippets[0].lastPartOrPop();
+            let lastPart2 = snippets[1].lastPartOrPop();
+
+            snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\§1', 'g'), lastPart1.emit())
+                .replace(new RegExp('\\§2', 'g'), lastPart2.emit()), range, undefined, [lastPart1, lastPart2]);
             return snippetContainer;
         }
 
         // Not good: we have to evaluate operands in wrong order to get pop() right...
+        snippets[0].ensureFinalValueIsOnStack();
+        snippets[1].ensureFinalValueIsOnStack();
+
         if (this.templateString.indexOf('§1') < this.templateString.indexOf('§2')) {
-            snippetContainer.addParts(snippets[1].allButLastPart());
-            snippetContainer.addParts(snippets[0].allButLastPart());
+            snippetContainer.addParts(snippets[1]);
+            snippetContainer.addParts(snippets[0]);
         } else {
-            snippetContainer.addParts(snippets[0].allButLastPart());
-            snippetContainer.addParts(snippets[1].allButLastPart()); 0
+            snippetContainer.addParts(snippets[0]);
+            snippetContainer.addParts(snippets[1]); 
         }
 
         snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\§1', 'g'), `${StepParams.stack}.pop()`)
@@ -112,7 +113,9 @@ export class ParametersJoinedTemplate {
             }
     
             if(onlyPureTerms){
-                return new StringCodeSnippet(prefix + snippets.map(s => s.emit()).join(separator) + suffix, range, resultType);
+                let newSnippet = new StringCodeSnippet(prefix + snippets.map(s => s.emit()).join(separator) + suffix, range, resultType);
+                snippets.forEach(sn => newSnippet.takeEmitToStepListenersFrom(sn));
+                return newSnippet;
             }
     
             let snippetContainer = new CodeSnippetContainer([], range, resultType);
@@ -121,9 +124,11 @@ export class ParametersJoinedTemplate {
                 snippetContainer.addParts(snippets[i].allButLastPart());
             }
 
-            let term = prefix + snippets.map( s => s.lastPartOrPop().emit()).join(separator) + suffix;
+            let lastParts = snippets.map(sn => sn.lastPartOrPop());
 
-            snippetContainer.addStringPart(term, range, resultType);
+            let term = prefix + lastParts.map( lp => lp.emit()).join(separator) + suffix;
+
+            snippetContainer.addStringPart(term, range, resultType, lastParts);
     
             return snippetContainer;
     
@@ -187,13 +192,16 @@ export class SeveralParameterTemplate extends CodeTemplate {
         * values get popped in unreversed order.
         */
         let parametersInDescendingOrder = this.orderedParameters.sort((p1, p2) => p2.order - p1.order);
+        let lastParts: CodeSnippet[] = [];
         for (let i = parametersInDescendingOrder.length - 1; i >= 0; i--) {
             let parameter = parametersInDescendingOrder[i];
             snippetContainer.addParts(snippets[parameter.n - 1].allButLastPart());
-            appliedTemplate = appliedTemplate.replace(new RegExp('\\' + parameter.parameter, 'g'), snippets[parameter.n - 1].lastPartOrPop().emit());
+            let lastPart = snippets[parameter.n - 1].lastPartOrPop();
+            lastParts.push(lastPart);
+            appliedTemplate = appliedTemplate.replace(new RegExp('\\' + parameter.parameter, 'g'), lastPart.emit());
         }
 
-        snippetContainer.addStringPart(appliedTemplate, range, resultType);
+        snippetContainer.addStringPart(appliedTemplate, range, resultType, lastParts);
 
         return snippetContainer;
 
