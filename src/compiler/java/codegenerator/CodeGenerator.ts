@@ -674,6 +674,8 @@ export class CodeGenerator extends StatementCodeGenerator {
     }
 
     compileLambdaFunction(node: ASTLambdaFunctionDeclarationNode, expectedType: JavaType | undefined): CodeSnippet | undefined {
+        if(!node || !expectedType) return undefined;
+
         if(!this.isFunctionalInterface(expectedType)){
             this.pushError("Eine Lambda-Funktion darf nur an einer Stelle im Code stehen, an der ein functional interface (d.h. ein Interface mit genau einer Methode) erwartet wird.", "error", node.range);
             return undefined;

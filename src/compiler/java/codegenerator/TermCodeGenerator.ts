@@ -456,8 +456,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     }
 
     compileBinaryOperator(ast: ASTBinaryNode): CodeSnippet | undefined {
-        let leftOperand = this.compileTerm(ast.leftSide);
-        let rightOperand = this.compileTerm(ast.rightSide);
+        let leftOperand = this.compileTerm(ast.leftSide);        
+        let rightOperand = ast.rightSide?.kind == TokenType.lambdaOperator ? this.compileLambdaFunction(<ASTLambdaFunctionDeclarationNode>ast.rightSide, leftOperand?.type) : this.compileTerm(ast.rightSide);
 
         if (leftOperand && rightOperand && leftOperand.type && rightOperand.type) {
             return this.compileBinaryOperation(leftOperand, rightOperand, ast.operator, ast.operatorRange, ast.range);
@@ -749,14 +749,5 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         return undefined;
     }
 
-    /**
-     * 
-     *  Compiles expressions like new MyAbstractClass(p1, p2){ attributeDeclarations, instanceInitializers, methodDeclarations }
-     * 
-     * @param node 
-     */
-    abstract compileAnonymousInnerClass(node: ASTAnonymousClassNode): CodeSnippet | undefined ;
-
-    abstract compileLambdaFunction(node: ASTLambdaFunctionDeclarationNode, expectedType: JavaType | undefined): CodeSnippet | undefined;
 
 }

@@ -4,7 +4,7 @@ import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTNode, AssignmentOperator, BinaryOperator, ConstantType, LogicOperator } from "../parser/AST";
+import { ASTAnonymousClassNode, ASTLambdaFunctionDeclarationNode, ASTNode, AssignmentOperator, BinaryOperator, ConstantType, LogicOperator } from "../parser/AST";
 import { PrimitiveStringClass } from "../runtime/system/javalang/PrimitiveStringClass";
 import { ArrayType } from "../types/ArrayType";
 import { JavaClass } from "../types/JavaClass";
@@ -53,7 +53,7 @@ var plusMinusMultDivAssignmentOperators: TokenType[] = [TokenType.plusAssignment
 var comparisonOperators: TokenType[] = [TokenType.lower, TokenType.greater, TokenType.lowerOrEqual, TokenType.greaterOrEqual, TokenType.notEqual, TokenType.equal];
 
 
-export class BinopCastCodeGenerator {
+export abstract class BinopCastCodeGenerator {
 
     voidType: JavaType;
     charType: JavaType;
@@ -622,4 +622,16 @@ export class BinopCastCodeGenerator {
 
     }
 
+
+        /**
+     * 
+     *  Compiles expressions like new MyAbstractClass(p1, p2){ attributeDeclarations, instanceInitializers, methodDeclarations }
+     * 
+     * @param node 
+     */
+        abstract compileAnonymousInnerClass(node: ASTAnonymousClassNode): CodeSnippet | undefined ;
+
+        abstract compileLambdaFunction(node: ASTLambdaFunctionDeclarationNode, expectedType: JavaType | undefined): CodeSnippet | undefined;
+
+        
 }
