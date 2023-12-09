@@ -93,26 +93,39 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         // new t.classes[<identifier>]().<constructorIdentifier>(param1, ..., paramN)
         // constructor has to return this or push it to stack!
 
-        let untestedParameterValues = node.parameterValues.map(p => this.compileTerm(p));
+        let parameterValues: (CodeSnippet | undefined)[] = [];
 
-        for (let p of untestedParameterValues) {
-            if (!p || !p.type) return undefined;
+        for(let parameterValueNode of node.parameterValues){
+            if(parameterValueNode.kind == TokenType.lambdaOperator){
+                parameterValues.push(undefined);
+            } else {
+                let snippet = this.compileTerm(parameterValueNode);
+                if(!snippet || !snippet.type) return undefined;
+                parameterValues.push(snippet);
+            }
         }
-
-        //@ts-ignore
-        let parameterValues: CodeSnippet[] = untestedParameterValues;
 
         let klassType = <IJavaClass>node.type.resolvedType;
 
-        let method = this.searchMethod(klassType.identifier, klassType, parameterValues.map(p => p!.type!), true, false, true);
+        let method = this.searchMethod(klassType.identifier, klassType, parameterValues.map(p => p?.type), true, false, true);
 
         if (!method) {
             this.pushError("Es konnte kein passender Konstruktor mit dieser Signatur gefunden werden.", "error", node.range);
             return undefined;
         }
 
+        for(let i = 0; i < node.parameterValues.length; i++){
+            let pv = node.parameterValues[i];
+            if(pv.kind == TokenType.lambdaOperator){
+                let snippet = this.compileLambdaFunction(<ASTLambdaFunctionDeclarationNode>pv, method.parameters[i].type);
+                if(!snippet) return undefined;
+                parameterValues[i] = snippet;
+            }
+        }
+
+
         // cast parameter values
-        let snippet = this.invokeConstructor(parameterValues, method, klassType, node, newObjectSnippet);
+        let snippet = this.invokeConstructor(<CodeSnippet[]>parameterValues, method, klassType, node, newObjectSnippet);
 
         return snippet;
 
@@ -557,14 +570,17 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
 
     compileMethodCall(node: ASTMethodCallNode): CodeSnippet | undefined {
-        let untestedParameterValues = node.parameterValues.map(p => this.compileTerm(p));
+        let parameterValues: (CodeSnippet | undefined)[] = [];
 
-        for (let p of untestedParameterValues) {
-            if (!p || !p.type) return undefined;
+        for(let parameterValueNode of node.parameterValues){
+            if(parameterValueNode.kind == TokenType.lambdaOperator){
+                parameterValues.push(undefined);
+            } else {
+                let snippet = this.compileTerm(parameterValueNode);
+                if(!snippet || !snippet.type) return undefined;
+                parameterValues.push(snippet);
+            }
         }
-
-        //@ts-ignore
-        let parameterValues: CodeSnippet[] = untestedParameterValues;
 
         let objectSnippet: CodeSnippet | undefined;
         if (node.nodeToGetObject) {
@@ -587,7 +603,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             return undefined;
         }
 
-        let method = this.searchMethod(node.identifier, objectSnippet.type, parameterValues.map(p => p!.type!), false, objectSnippet instanceof StaticNonPrimitiveType, true);
+        let method = this.searchMethod(node.identifier, objectSnippet.type, parameterValues.map(p => p?.type), false, objectSnippet instanceof StaticNonPrimitiveType, true);
 
         let outerTypeTemplate: string = "";
         // access method of outer type from inner-class method?
@@ -595,7 +611,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             let outerType: NonPrimitiveType | StaticNonPrimitiveType | undefined = this.currentSymbolTable.classContext?.outerType;
             while (outerType && outerType instanceof NonPrimitiveType) {
                 outerTypeTemplate += "." + Helpers.outerClassAttributeIdentifier;
-                method = this.searchMethod(node.identifier, objectSnippet.type, parameterValues.map(p => p!.type!), false, objectSnippet instanceof StaticNonPrimitiveType, true);
+                method = this.searchMethod(node.identifier, objectSnippet.type, parameterValues.map(p => p?.type), false, objectSnippet instanceof StaticNonPrimitiveType, true);
                 if (method) {
                     break;
                 }
@@ -605,7 +621,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
 
         if (!method) {
-            let invisibleMethod = this.searchMethod(node.identifier, objectSnippet.type, parameterValues.map(p => p!.type!), false, objectSnippet instanceof StaticNonPrimitiveType, false);
+            let invisibleMethod = this.searchMethod(node.identifier, objectSnippet.type, parameterValues.map(p => p?.type), false, objectSnippet instanceof StaticNonPrimitiveType, false);
 
             if (invisibleMethod) {
                 this.pushError("Die Methode " + node.identifier + " hat die Sichtbarkeit " + TokenTypeReadable[invisibleMethod.visibility] + ", daher kann hier nicht auf sie zugegriffen werden.", "error", node);
@@ -613,6 +629,15 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 this.pushError("Es konnte keine passende Methode mit diesem Bezeichner/mit dieser Signatur gefunden werden.", "error", node.range);
             }
             return undefined;
+        }
+
+        for(let i = 0; i < node.parameterValues.length; i++){
+            let pv = node.parameterValues[i];
+            if(pv.kind == TokenType.lambdaOperator){
+                let snippet = this.compileLambdaFunction(<ASTLambdaFunctionDeclarationNode>pv, method.parameters[i].type);
+                if(!snippet) return undefined;
+                parameterValues[i] = snippet;
+            }
         }
 
         // cast parameter values
@@ -624,9 +649,9 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let returnParameter = method.returnParameterType || this.voidType;
 
         if (method.constantFoldingFunction) {
-            let allParametersConstant: boolean = !parameterValues.some(v => !v.isConstant())
+            let allParametersConstant: boolean = !parameterValues.some(v => !v!.isConstant())
             if (allParametersConstant && (method.isStatic || objectSnippet.isConstant())) {
-                let constantValues = parameterValues.map(p => p.getConstantValue());
+                let constantValues = parameterValues.map(p => p!.getConstantValue());
                 let result = method.isStatic ? method.constantFoldingFunction(...constantValues) : method.constantFoldingFunction(objectSnippet.getConstantValue(), ...constantValues);
                 let resultAsString = method.returnParameterType == this.stringType ? `"${result}"` : "" + result;
                 return new StringCodeSnippet(resultAsString, node.range, returnParameter, result);
@@ -636,9 +661,9 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         // For library functions like Math.sin, Math.abs, ... we use templates to compile to nativ javascript functions:
         if (method.template) {
             if (method.isStatic) {
-                return new SeveralParameterTemplate(method.template).applyToSnippet(returnParameter, node.range, ...parameterValues);
+                return new SeveralParameterTemplate(method.template).applyToSnippet(returnParameter, node.range, ...(<CodeSnippet[]>parameterValues));
             } else {
-                return new SeveralParameterTemplate(method.template).applyToSnippet(returnParameter, node.range, objectSnippet, ...parameterValues);
+                return new SeveralParameterTemplate(method.template).applyToSnippet(returnParameter, node.range, objectSnippet, ...(<CodeSnippet[]>parameterValues));
             }
         }
 
@@ -663,7 +688,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         parameterValues.unshift(objectSnippet);
 
 
-        let snippet = new SeveralParameterTemplate(objectTemplate).applyToSnippet(returnParameter, node.range, ...parameterValues);
+        let snippet = new SeveralParameterTemplate(objectTemplate).applyToSnippet(returnParameter, node.range, ...(<CodeSnippet[]>parameterValues));
 
         if (callingConvention == "java") {
             if (!snippet.endsWith(";\n")) snippet = new CodeSnippetContainer(SnippetFramer.frame(snippet, '§1;\n'));
@@ -675,7 +700,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     }
 
 
-    searchMethod(identifier: string, objectType: JavaType, parameterTypes: JavaType[],
+    searchMethod(identifier: string, objectType: JavaType, parameterTypes: (JavaType | undefined)[],
         isConstructor: boolean, hasToBeStatic: boolean, takingVisibilityIntoAccount: boolean): Method | undefined {
 
         if (objectType == this.stringType) objectType = this.primitiveStringClass.type;
@@ -713,7 +738,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             for (let i = 0; i < parameterTypes.length; i++) {
                 let fromType = parameterTypes[i];
                 let toType = method.parameters[i].type;
-                if (!this.canCastTo(fromType, toType, "implicit")) {
+                if (fromType && !this.canCastTo(fromType, toType, "implicit")) {
                     suitable = false;
                     break;
                 }

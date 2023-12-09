@@ -1,4 +1,20 @@
 export var testPrograms = {
+lambdaTest2:`
+interface TestInterface {
+   int foo(int n);
+}
+
+
+TestClass tc = new TestClass();
+tc.bar(x -> x * 2);
+
+
+class TestClass {
+   void bar(TestInterface t){
+      println(t.foo(10));
+   }
+}
+`,
 lambdaTest:`
 interface TestInterface {
    int foo(int n);

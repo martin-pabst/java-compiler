@@ -61,7 +61,7 @@ export class Main {
     /*
      * Test program:
      */
-    let testProgram: string = testPrograms.lambdaTest.trim();
+    let testProgram: string = testPrograms.lambdaTest2.trim();
     this.inputEditor.setValue(testProgram);
 
     this.tabManager = new TabManager(document.getElementById('tabs')!,
