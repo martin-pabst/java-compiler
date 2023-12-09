@@ -272,7 +272,7 @@ export class ASTNodeFactory {
 
     buildLambdaFunctionDeclarationNode(startToken: Token): ASTLambdaFunctionDeclarationNode {
         return {
-            kind: TokenType.lambda,
+            kind: TokenType.lambdaOperator,
             range: startToken.range,
             parameters: [],
             statement: undefined

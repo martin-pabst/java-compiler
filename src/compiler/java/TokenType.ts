@@ -83,7 +83,7 @@ export enum TokenType {
     moduloAssignment, // /%=
     and, or,   // &&, ||
     ampersand, // &
-    lambda, // ->
+    lambdaOperator, // ->
 
     singleQuote, doubleQuote, // ', "
 
@@ -264,7 +264,7 @@ export var TokenTypeReadable: { [tt: number]: string } = {
     [TokenType.divisionAssignment]: "/=", // /=
     [TokenType.moduloAssignment]: "%=",
     [TokenType.ampersand]: "&",
-    [TokenType.lambda]: "->",
+    [TokenType.lambdaOperator]: "->",
     [TokenType.and]: "&&",
     [TokenType.or]: "||",
     [TokenType.not]: "!",

@@ -98,6 +98,7 @@ export class Method {
         newMethod.isFinal = this.isFinal;
         newMethod.isAbstract = this.isAbstract;
         newMethod.returnParameterType = this.returnParameterType;
+        newMethod.parameters = newParameters;
         
         return newMethod;
 

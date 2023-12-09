@@ -230,18 +230,21 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         }
 
         if (snippet0IsPure && snippet1IsPure) {
+            let snippet: StringCodeSnippet;
             if(this.operator == "/" || this.operator == "%"){
                 if(snippet1IsConstant && snippets[1].getConstantValue() != 0){
-                    return new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm(),
+                    snippet = new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm(),
                      _range, _resultType);
                 } else {
-                    return new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " (" + snippets[1].getPureTerm() + 
+                    snippet = new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " (" + snippets[1].getPureTerm() + 
                     `|| ${Helpers.throwAE}("Teilen durch 0", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`,
                      _range, _resultType);
                 }
             } else {
-                return new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm(), _range, _resultType);
+                snippet = new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm(), _range, _resultType);
             }
+            snippet.takeEmitToStepListenersFrom(snippets);
+            return snippet;
         }
 
         let snippetContainer = new CodeSnippetContainer([], _range, _resultType);
@@ -250,14 +253,18 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         if (snippet0IsPure || snippet1IsPure) {
             snippetContainer.addParts(snippets[0].allButLastPart());
             snippetContainer.addParts(snippets[1].allButLastPart());
-            snippetContainer.addStringPart(`${snippets[0].lastPartOrPop().emit()} ${this.operator} ${snippets[1].lastPartOrPop().emit()}`)
+            let lastPart0 = snippets[0].lastPartOrPop();
+            let lastPart1 = snippets[1].lastPartOrPop();
+            snippetContainer.addStringPart(`${lastPart0.emit()} ${this.operator} ${lastPart1.emit()}`, undefined, undefined, [lastPart0, lastPart1]);
             snippetContainer.finalValueIsOnStack = false;
             return snippetContainer;
         }
 
         if (['-', '/', '<', '>', '<=', '>='].indexOf(this.operator) >= 0) {
-            snippetContainer.addParts(snippets[0].allButLastPart());
-            snippetContainer.addParts(snippets[1].allButLastPart());
+            snippets[0].ensureFinalValueIsOnStack();
+            snippets[1].ensureFinalValueIsOnStack();
+            snippetContainer.addParts(snippets[0]);
+            snippetContainer.addParts(snippets[1]);
 
             switch (this.operator) {
                 case '-': snippetContainer.addStringPart(`-${StepParams.stack}.pop() + ${StepParams.stack}.pop()`, _range); break;

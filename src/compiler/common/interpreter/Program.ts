@@ -22,6 +22,7 @@ export class Step {
     catchBlockInfoList?: CatchBlockInfo[];
     finallyBlockIndex?: number;
     innerClass?: Klass;         // if inner class is instantiated in this step
+    lambdaObject?: any;
 
     constructor(public index: number) {
         this.range = { startLineNumber: undefined, startColumn: undefined, endLineNumber: undefined, endColumn: undefined };

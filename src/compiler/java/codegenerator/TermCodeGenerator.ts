@@ -5,7 +5,7 @@ import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode, ASTAttributeDereferencingNode, ASTEnumValueNode, ASTAnonymousClassNode } from "../parser/AST";
+import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode, ASTAttributeDereferencingNode, ASTEnumValueNode, ASTAnonymousClassNode, ASTLambdaFunctionDeclarationNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { ArrayType } from "../types/ArrayType";
 import { Field } from "../types/Field";
@@ -27,7 +27,7 @@ import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { MissingStatementManager } from "./MissingStatementsManager.ts";
 import { JavaInterface } from "../types/JavaInterface.ts";
 import { UsagePosition } from "../../common/UsagePosition.ts";
-
+import { OuterClassFieldAccessTracker } from "./OuterClassFieldAccessTracker.ts";
 
 export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
@@ -41,6 +41,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
     missingStatementManager: MissingStatementManager = new MissingStatementManager();
 
+    outerClassFieldAccessTracker: OuterClassFieldAccessTracker = new OuterClassFieldAccessTracker();
 
     constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore) {
         super(module, libraryTypestore, compiledTypesTypestore);
@@ -286,6 +287,9 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         if (symbolInformation) {
             let symbol = symbolInformation.symbol;
+
+            if(symbolInformation.outerClassLevel > 0) this.outerClassFieldAccessTracker.onAccessHappened();
+            
             symbol.usagePositions.push({ file: this.module.file, range: node.range });
 
             if (symbol.onStackframe()) {
@@ -728,5 +732,6 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
      */
     abstract compileAnonymousInnerClass(node: ASTAnonymousClassNode): CodeSnippet | undefined ;
 
+    abstract compileLambdaFunction(node: ASTLambdaFunctionDeclarationNode, expectedType: JavaType | undefined): CodeSnippet | undefined;
 
 }

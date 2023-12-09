@@ -1,4 +1,13 @@
 export var testPrograms = {
+lambdaTest:`
+interface TestInterface {
+   int foo(int n);
+}
+
+TestInterface t = (x) -> { return x * 2; };
+
+println(t.foo(3));
+ `,
 anonymousInnerClassTest:`
 A a = new A();
 Test t = a.test();

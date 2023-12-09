@@ -18,6 +18,8 @@ public interface MyFunctionalInterface2{
 MyFunctionalInterface lambda = () -> {
     System.out.println("Executing...");
 }
+
+Predicate<Integer> p1 = i -> i > 5;
 ```
 
 

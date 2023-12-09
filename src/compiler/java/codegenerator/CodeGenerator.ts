@@ -3,7 +3,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTAnonymousClassNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTMethodDeclarationNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
+import { ASTAnonymousClassNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTMethodDeclarationNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
 import { Field } from "../types/Field.ts";
 import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
@@ -21,6 +21,7 @@ import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceIn
 import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
 import { EmptyRange } from "../../common/range/Range.ts";
 import { MissingStatementManager } from "./MissingStatementsManager.ts";
+import { JavaType } from "../types/JavaType.ts";
 
 export class CodeGenerator extends StatementCodeGenerator {
 
@@ -672,7 +673,121 @@ export class CodeGenerator extends StatementCodeGenerator {
         return snippet;
     }
 
+    compileLambdaFunction(node: ASTLambdaFunctionDeclarationNode, expectedType: JavaType | undefined): CodeSnippet | undefined {
+        if(!this.isFunctionalInterface(expectedType)){
+            this.pushError("Eine Lambda-Funktion darf nur an einer Stelle im Code stehen, an der ein functional interface (d.h. ein Interface mit genau einer Methode) erwartet wird.", "error", node.range);
+            return undefined;
+        }
 
+        if(!node.statement) return undefined;
 
+        let functionalInterface = <IJavaInterface>expectedType;
+        let methodToImplement = functionalInterface.getMethods().find(m => !m.isDefault)!;
+
+        if(node.parameters.length != methodToImplement.parameters.length){
+            this.pushError(`Die Anzahl der Parameter der Lambda-Funktion (${node.parameters.length}) stimmt nicht mit der des functional interfaces ${functionalInterface.identifier} (${methodToImplement.parameters.length}) überein.`, "error", node.range);
+            return;
+        }
+                
+        for(let i = 0; i < node.parameters.length; i++){
+            let lambdaParameter = node.parameters[i];
+            let fiParameter = methodToImplement.parameters[i];
+            if(lambdaParameter.type && lambdaParameter.type.resolvedType){
+                if(!this.canCastTo(fiParameter.type, lambdaParameter.type.resolvedType, "implicit")){
+                    this.pushError(`Der Datentyp des Parameters ${lambdaParameter.identifier} passt nicht zum Datentyp des erwarteten Parameters (${fiParameter.type.toString()}).`, "error", lambdaParameter.range);
+                }
+            }
+        }
+
+        let method = methodToImplement.getCopy();
+        for(let i = 0; i < method.parameters.length; i++){
+            method.parameters[i].identifier = node.parameters[i].identifier;
+        }
+
+        //@ts-ignore    (fake methodNode to use compileMethodDeclaration later)
+        let methodNode: ASTMethodDeclarationNode = {
+            range: node.range,
+            statement: node.statement,
+            isContructor: false,
+            identifier: "",
+            method: method,
+            program: undefined
+        }
+
+        // build class...
+        //
+        let outerClass = this.currentSymbolTable.classContext;
+        let klass = new JavaClass("", node.range, "", this.module);
+        klass.outerType = outerClass;
+        klass.setExtends(this.objectType);
+
+        // setup provisionally version of runtime class to collect programs: 
+        klass.runtimeClass = class {
+            
+        };  //
+
+        let oldClass = klass.runtimeClass;
+        oldClass.__programs = [];
+        klass.addImplements(functionalInterface);
+
+        klass.methods = [method];
+
+        this.outerClassFieldAccessTracker.startTracking();
+
+        this.pushAndGetNewSymbolTable(node.range, false, klass);
+        this.compileMethodDeclaration(methodNode, klass);
+        this.popSymbolTable();
+
+        let outerClassFieldAccessHappened = this.outerClassFieldAccessTracker.hasAccessHappened();
+
+        klass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods();
+
+        let outerLocalVariables = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.isInnerClassCopyOfOuterClassLocalVariable);
+        outerLocalVariables.forEach(v => this.missingStatementManager.onSymbolRead(v!, v!.getLastUsagePosition(), this.module.errors));
+        let invisibleFieldIdentifiers = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.getInternalName());
+
+        // final version of runtime class:
+        klass.runtimeClass = class extends klass.getExtends()?.runtimeClass! {
+            
+            constructor(__outer__:any, ...args: any){
+                super();
+                this[Helpers.outerClassAttributeIdentifier] = __outer__;
+                for(let i = 0; i < invisibleFieldIdentifiers.length; i++){
+                    this[invisibleFieldIdentifiers[i]] = args[i];
+                }
+            }
+
+        };  //
+
+        Object.assign(klass.runtimeClass, oldClass);
+        Object.assign(klass.runtimeClass.prototype, oldClass.prototype);
+        // snippet which instantiates object of this class calling it's typescript constructor and it's java constructor
+
+        let parameterString = Helpers.elementRelativeToStackbase(0);
+        if(outerLocalVariables.length > 0){
+            parameterString += ", " + outerLocalVariables.map(v => Helpers.elementRelativeToStackbase(v!.stackframePosition!)).join(", ");
+        }
+
+        let instantiationAtRuntimeNeeded = outerClassFieldAccessHappened || outerLocalVariables.length > 0;
+
+        let template = instantiationAtRuntimeNeeded ? `new this.innerClass(${parameterString})` : `this.lambdaObject`;
+        let newClassSnippet = new StringCodeSnippet(template, node.range, klass);
+        newClassSnippet.addEmitToStepListener((step) => {
+            if(instantiationAtRuntimeNeeded){
+                step.innerClass = klass.runtimeClass;
+            } else {
+                step.lambdaObject = new klass.runtimeClass!(null);
+            }
+        });
+
+        return newClassSnippet;
+    }
+
+    isFunctionalInterface(type: JavaType | undefined){
+        if(!type) return false;
+        if(!(type instanceof IJavaInterface)) return false;
+        if(type.getMethods().filter(m => !m.isDefault).length != 1) return false;
+        return true;
+    }
 
 }

@@ -429,7 +429,7 @@ export class Lexer {
                         return;
                     } 
                     else if (this.nextChar == '>') {
-                        this.pushToken(TokenType.lambda, '->');
+                        this.pushToken(TokenType.lambdaOperator, '->');
                         this.next();
                         this.next();
                         return;

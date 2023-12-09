@@ -240,7 +240,7 @@ export class CodeSnippetContainer extends CodeSnippet {
         let part = this.getLastPartWithType();
 
         if(part instanceof StringCodeSnippet){
-            part.text = `s.push(${part.text});\n`;
+            part.ensureFinalValueIsOnStack();
             return;
         }
 

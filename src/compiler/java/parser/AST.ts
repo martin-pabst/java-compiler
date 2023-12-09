@@ -148,7 +148,7 @@ export interface ASTMethodDeclarationNode extends ASTNode, ASTNodeWithModifiers,
 }
 
 export interface ASTLambdaFunctionDeclarationNode extends ASTNode {
-    kind: TokenType.lambda,
+    kind: TokenType.lambdaOperator,
     parameters: ASTParameterNode[],
     statement: ASTStatementNode | undefined
 }

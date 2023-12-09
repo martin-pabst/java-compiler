@@ -1,6 +1,6 @@
 import { TokenType } from "../TokenType.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
-import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode } from "./AST.ts";
+import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode } from "./AST.ts";
 import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator.ts";
 
@@ -165,7 +165,7 @@ export abstract class TermParser extends TokenIterator {
             case TokenType.leftBracket:
                 let tokenTypeAfterRightBracket = this.findTokenTypeAfterCorrespondingRightBracket();
                 switch (tokenTypeAfterRightBracket) {
-                    case TokenType.lambda: node = this.parseLambdaFunctionDefinition();
+                    case TokenType.lambdaOperator: node = this.parseLambdaFunctionDefinition();
                         break;
                     case TokenType.leftBracket:
                     case TokenType.identifier:
@@ -185,7 +185,7 @@ export abstract class TermParser extends TokenIterator {
                     case TokenType.leftBracket:
                         node = this.parseMethodCall(undefined);
                         break;
-                    case TokenType.lambda:
+                    case TokenType.lambdaOperator:
                         node = this.parseLambdaFunctionDefinition();
                         break;
                     default:
@@ -315,14 +315,29 @@ export abstract class TermParser extends TokenIterator {
                     }
 
                 } while (this.comesToken(TokenType.comma, true));
-            }
+            } 
 
             this.expect(TokenType.rightBracket, true);
+        } else {
+            let identifier = this.expectAndSkipIdentifierAsToken();
+            if(identifier.value != "") lambdaNode.parameters.push(this.nodeFactory.buildParameterNode(identifier.range, identifier, undefined, false, false));
         }
 
-        this.expect(TokenType.lambda, true);
+        this.expect(TokenType.lambdaOperator, true);
 
-        lambdaNode.statement = this.parseStatementOrExpression();
+        if(this.comesToken(TokenType.leftCurlyBracket, false)){
+            lambdaNode.statement = this.parseStatementOrExpression();
+        } else {
+            let expression = this.parseTerm();
+            if(expression){
+                let statement: ASTReturnNode = {
+                    kind: TokenType.keywordReturn,
+                    range: expression?.range,
+                    term: expression
+                }
+                lambdaNode.statement = statement;
+            }
+        }
 
         this.setEndOfRange(lambdaNode);
 

@@ -88,7 +88,8 @@ export class StringCodeSnippet extends CodeSnippet {
     }
 
     ensureFinalValueIsOnStack(): void {
-        this.text = `push(${this.text})`
+        if(this.text.endsWith(";\n")) this.text = this.text.substring(0, this.text.length - 2);
+        this.text = `push(${this.text});\n`
     }
 
     index(lastIndex: number): number {

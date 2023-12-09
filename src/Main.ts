@@ -61,7 +61,8 @@ export class Main {
     /*
      * Test program:
      */
-    this.inputEditor.setValue(testPrograms.anonymousInnerClassTest);
+    let testProgram: string = testPrograms.lambdaTest.trim();
+    this.inputEditor.setValue(testProgram);
 
     this.tabManager = new TabManager(document.getElementById('tabs')!,
       ['token', 'ast', 'code', 'errors']);

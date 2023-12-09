@@ -1,7 +1,7 @@
 import { BaseType } from "./BaseType";
 import { UsagePosition } from "./UsagePosition";
 import { File } from "./module/File";
-import { IRange } from "./range/Range";
+import { EmptyRange, IRange } from "./range/Range";
 
 export enum SymbolKind { localVariable, parameter, field, staticField }
 
@@ -18,6 +18,11 @@ export abstract class BaseSymbol {
 
     constructor(public identifier: string, public identifierRange: IRange, public type: BaseType, public kind: SymbolKind) {
 
+    }
+
+    getLastUsagePosition(): IRange {
+        if(this.usagePositions.length == 0) return EmptyRange.instance;
+        return this.usagePositions[this.usagePositions.length - 1].range;
     }
 
     // mouseover in debugger-mode => show value ...
