@@ -622,6 +622,9 @@ export abstract class BinopCastCodeGenerator {
 
     }
 
+    isAssignmentOperator(tt: TokenType): boolean {
+        return assignmentOperators.indexOf(tt) >= 0;
+    }
 
         /**
      * 

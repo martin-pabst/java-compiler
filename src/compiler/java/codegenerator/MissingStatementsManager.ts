@@ -125,6 +125,14 @@ export class MissingStatementManager {
         currentMissingStatements.addSymbolDeclaration(symbol, withInitialization);
     }    
     
+    onSymbolAccess(symbol: BaseSymbol, range: IRange, errors: Error[], isWrite: boolean){
+        if(isWrite){
+            this.onSymbolWrite(symbol, range, errors);
+        } else {
+            this.onSymbolRead(symbol, range, errors);
+        } 
+    }
+
     onSymbolRead(symbol: BaseSymbol, range: IRange, errors: Error[]){
         let currentMissingStatements = this.stack[this.stack.length - 1];
         currentMissingStatements.onSymbolRead(symbol, range, errors);

@@ -50,7 +50,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
     }
 
-    compileTerm(ast: ASTTermNode | undefined): CodeSnippet | undefined {
+    compileTerm(ast: ASTTermNode | undefined, isWriteAccess: boolean = false): CodeSnippet | undefined {
 
         if (!ast) return undefined;
 
@@ -66,7 +66,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             case TokenType.literal:
                 snippet = this.compileLiteralNode(<ASTLiteralNode>ast); break;
             case TokenType.symbol:
-                snippet = this.compileSymbolNode(<ASTSymbolNode>ast); break;
+                snippet = this.compileSymbolNode(<ASTSymbolNode>ast, isWriteAccess); break;
             case TokenType.methodCall:
                 snippet = this.compileMethodCall(<ASTMethodCallNode>ast); break;
             case TokenType.newArray:
@@ -293,7 +293,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     }
 
 
-    compileSymbolNode(node: ASTSymbolNode): CodeSnippet | undefined {
+    compileSymbolNode(node: ASTSymbolNode, isWriteAccess: boolean): CodeSnippet | undefined {
 
         // first try: symbol table (parameters, local variables, fields)
         let symbolInformation = this.currentSymbolTable.findSymbol(node.identifier);
@@ -307,7 +307,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
             if (symbol.onStackframe()) {
                 if (symbolInformation.outerClassLevel == 0) {
-                    this.missingStatementManager.onSymbolRead(symbol, node.range, this.module.errors);
+                    this.missingStatementManager.onSymbolAccess(symbol, node.range, this.module.errors, isWriteAccess);
                     return this.compileSymbolOnStackframeAccess(symbol, node.range);
                 } else {
                     return this.compileOuterClassLocalVariableAccess(symbol, node.range);
@@ -456,7 +456,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     }
 
     compileBinaryOperator(ast: ASTBinaryNode): CodeSnippet | undefined {
-        let leftOperand = this.compileTerm(ast.leftSide);        
+        let leftOperand = this.compileTerm(ast.leftSide, this.isAssignmentOperator(ast.operator));        
         let rightOperand = ast.rightSide?.kind == TokenType.lambdaOperator ? this.compileLambdaFunction(<ASTLambdaFunctionDeclarationNode>ast.rightSide, leftOperand?.type) : this.compileTerm(ast.rightSide);
 
         if (leftOperand && rightOperand && leftOperand.type && rightOperand.type) {
