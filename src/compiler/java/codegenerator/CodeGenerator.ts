@@ -273,9 +273,9 @@ export class CodeGenerator extends StatementCodeGenerator {
     buildStandardConstructors(classContext: JavaClass) {
 
         let baseClass: IJavaClass = classContext;
-        while (!baseClass.getMethods().find(m => m.isConstructor && m.visibility != TokenType.keywordPrivate)) baseClass = baseClass.getExtends()!;
+        while (!baseClass.getOwnMethods().find(m => m.isConstructor && m.visibility != TokenType.keywordPrivate)) baseClass = baseClass.getExtends()!;
         // TypeResolver enforces base class to be at least Object
-        for (let baseConstructor of baseClass.getMethods().filter(m => m.isConstructor && m.visibility != TokenType.keywordPrivate)) {
+        for (let baseConstructor of baseClass.getOwnMethods().filter(m => m.isConstructor && m.visibility != TokenType.keywordPrivate)) {
 
             let method = baseConstructor.getCopy();
             if (classContext.outerType && !classContext.isStatic) {
@@ -684,7 +684,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         if(!node.statement) return undefined;
 
         let functionalInterface = <IJavaInterface>expectedType;
-        let methodToImplement = functionalInterface.getMethods().find(m => !m.isDefault)!;
+        let methodToImplement = functionalInterface.getOwnMethods().find(m => !m.isDefault)!;
 
         if(node.parameters.length != methodToImplement.parameters.length){
             this.pushError(`Die Anzahl der Parameter der Lambda-Funktion (${node.parameters.length}) stimmt nicht mit der des functional interfaces ${functionalInterface.identifier} (${methodToImplement.parameters.length}) überein.`, "error", node.range);
@@ -788,7 +788,7 @@ export class CodeGenerator extends StatementCodeGenerator {
     isFunctionalInterface(type: JavaType | undefined){
         if(!type) return false;
         if(!(type instanceof IJavaInterface)) return false;
-        if(type.getMethods().filter(m => !m.isDefault).length != 1) return false;
+        if(type.getOwnMethods().filter(m => !m.isDefault).length != 1) return false;
         return true;
     }
 

@@ -68,7 +68,7 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
     }
 
-    public getMethods(): Method[] {
+    public getOwnMethods(): Method[] {
         return this.methods;
     }
 

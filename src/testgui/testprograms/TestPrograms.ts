@@ -1,4 +1,18 @@
 export var testPrograms = {
+genericMethodTest:`
+Test te = new Test();
+Integer i = Integer.valueOf(10);
+
+te.test(i);
+
+
+
+class Test <T super Integer> {
+   <S extends Integer> void test(S y){
+      
+      y.toString();
+   }
+} `,
 lambdaTest2:`
 interface TestInterface {
    int foo(int n);

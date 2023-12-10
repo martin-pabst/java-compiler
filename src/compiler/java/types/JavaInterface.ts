@@ -23,7 +23,7 @@ export abstract class IJavaInterface extends NonPrimitiveType {
 
     getFields(): Field[] { return [] };
 
-    abstract getMethods(): Method[];
+    abstract getOwnMethods(): Method[];
 
     abstract getExtends(): IJavaInterface[];
 
@@ -106,8 +106,16 @@ export class JavaInterface extends IJavaInterface {
         return this.extends;
     }
 
-    public getMethods(): Method[] {
+    public getOwnMethods(): Method[] {
         return this.methods;
+    }
+
+    public getAllMethods(): Method[] {
+        let methods: Method[] = this.methods;
+        for(let impl of this.extends){
+            methods = methods.concat(impl.getAllMethods());
+        }    
+        return methods;
     }
 
     private getAllInheritedMethodsHelper(alreadyFoundSignatureMap: Map<string, Method>) {
@@ -207,15 +215,24 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
         return new GenericVariantOfJavaInterface(this.isGenericVariantOf, newTypeMap);
     }
 
-    public getMethods(): Method[] {
+    public getOwnMethods(): Method[] {
         if (!this.cachedMethods) {
             this.cachedMethods = [];
 
-            for (let method of this.isGenericVariantOf.getMethods()) {
+            for (let method of this.isGenericVariantOf.getOwnMethods()) {
                 this.cachedMethods.push(method.getCopyWithConcreteType(this.typeMap));
             }
         }
         return this.cachedMethods;
+    }
+
+
+    public getAllMethods(): Method[] {
+        let methods: Method[] = this.getOwnMethods();
+        for(let impl of this.getExtends()){
+            methods = methods.concat(impl.getAllMethods());
+        }    
+        return methods;
     }
 
     getExtends(): IJavaInterface[] {

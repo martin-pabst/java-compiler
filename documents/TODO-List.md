@@ -27,6 +27,7 @@
   * generics (status: mostly done)
   * anonymous inner classes (status: mostly done)
   * Lambda Functions (status: mostly done)
+  * generic methods
   * Array constants
   * library method to gather information for automated tests
   * library method examples

@@ -24,8 +24,23 @@
 // Wildcard without bounds:
    A<?> is equivalent to A<? extends Object>, therefore
    B extends A => B<D> -> A<?> for all D
+
+
+   T  CANNOT cast to ? extends T
+   T CAN cast to ? super T
+
+
 ```
 
 ## Generic methods
+
+public <E> E testMethod(List<? extends E> li, E element);
+
+ArrayList<String> al;
+testMethod(al, "Hier");
+ -> analyze all parameters to find possible types of E ("captures" of E)
+ -> compare captures; if 
+
+
 
 

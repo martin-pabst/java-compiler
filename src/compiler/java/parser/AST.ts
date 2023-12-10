@@ -43,7 +43,7 @@ export interface ASTDebugProgram extends ASTNode {
 }
 
 export interface TypeScope {
-    kind: TokenType.keywordClass | TokenType.keywordInterface | TokenType.keywordEnum | TokenType.global;
+    kind: TokenType.keywordClass | TokenType.keywordInterface | TokenType.keywordEnum | TokenType.global | TokenType.methodDeclaration;
     classOrInterfaceOrEnumDefinitions: (ASTClassDefinitionNode | ASTInterfaceDefinitionNode | ASTEnumDefinitionNode)[];
     path: string;
 }
@@ -113,7 +113,7 @@ export interface ASTGenericParameterDeclarationNode extends ASTNodeWithIdentifie
 
 // e.g. class List<E extends Comparable<E>>
 export interface ASTTypeDefinitionWithGenerics {
-    genericParameterDefinitions: ASTGenericParameterDeclarationNode[]
+    genericParameterDeclarations: ASTGenericParameterDeclarationNode[]
 }
 
 
@@ -136,7 +136,7 @@ export interface ASTTypeNode extends ASTNode {
 
 // e.g. public int getValue(String key)
 export interface ASTMethodDeclarationNode extends ASTNode, ASTNodeWithModifiers,
-    ASTNodeWithIdentifier, AnnotatedNode {
+    ASTNodeWithIdentifier, AnnotatedNode, TypeScope, ASTTypeDefinitionWithGenerics {
     kind: TokenType.methodDeclaration;
     parameters: ASTParameterNode[];
     returnParameterType: ASTTypeNode | undefined;  // undefined in case of constructor
@@ -145,6 +145,9 @@ export interface ASTMethodDeclarationNode extends ASTNode, ASTNodeWithModifiers,
     statement: ASTStatementNode | undefined;  // undefined in case of abstract method and methoddeclaration in interface
     method?: Method;
     program?: Program,       // only for debugging purposes
+    parentTypeScope: TypeScope,   // class or interface or enum containing this method
+    classOrInterfaceOrEnumDefinitions: (ASTClassDefinitionNode | ASTInterfaceDefinitionNode | ASTEnumDefinitionNode)[];
+    path: string;
 }
 
 export interface ASTLambdaFunctionDeclarationNode extends ASTNode {

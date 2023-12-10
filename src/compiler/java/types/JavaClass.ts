@@ -28,7 +28,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     }
 
     abstract getFields(): Field[];
-    abstract getMethods(): Method[];
+    abstract getOwnMethods(): Method[];
 
     abstract getExtends(): IJavaClass | undefined;
     abstract getImplements(): IJavaInterface[];
@@ -89,7 +89,7 @@ export class JavaClass extends IJavaClass {
         let klass: IJavaClass | undefined = this;
 
         while (klass) {
-            for (let m of klass.getMethods()) {
+            for (let m of klass.getOwnMethods()) {
                 if (m.isAbstract) {
                     abstractMethods.push(m);
                 } else {
@@ -133,7 +133,7 @@ export class JavaClass extends IJavaClass {
         for (let ji of this.getImplements()) {
             let javaInterface = <JavaInterface>ji;
             let notImplementedMethods: Method[] = [];
-            for (let method of javaInterface.getMethods()) {
+            for (let method of javaInterface.getOwnMethods()) {
 
                 let classesMethod = this.findMethodWithSignature(method.getInternalName("java"));
 
@@ -213,8 +213,16 @@ export class JavaClass extends IJavaClass {
 
     }
 
-    public getMethods(): Method[] {
+    public getOwnMethods(): Method[] {
         return this.methods;
+    }
+
+    public getAllMethods(): Method[] {
+        if(this.extends){
+            return this.methods.concat(this.extends?.getAllMethods());
+        } else {
+            return this.methods;
+        }
     }
 
     public registerExtendsImplementsOnAncestors(type?: NonPrimitiveType) {
@@ -244,6 +252,10 @@ export class JavaClass extends IJavaClass {
             if (bType == this) return true;
             if (!this.extends) return false;               // A should at least extend Object, so this must not happen...
             return this.extends.canImplicitlyCastTo(bType); // A extends C; if C can cast to B, then also A can
+        }
+
+        if(bType instanceof GenericTypeParameter){
+            
         }
 
         return false;
@@ -339,15 +351,24 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         return this.cachedFields;
     }
 
-    public getMethods(): Method[] {
+    public getOwnMethods(): Method[] {
         if (!this.cachedMethods) {
             this.cachedMethods = [];
 
-            for (let method of this.isGenericVariantOf.getMethods()) {
+            for (let method of this.isGenericVariantOf.getOwnMethods()) {
                 this.cachedMethods.push(method.getCopyWithConcreteType(this.typeMap));
             }
         }
         return this.cachedMethods;
+    }
+
+    public getAllMethods(): Method[] {
+        let extend = this.getExtends();
+        if(extend){
+            return this.getOwnMethods().concat(extend.getAllMethods());
+        } else {
+            return this.getOwnMethods();
+        }
     }
 
     getExtends(): IJavaClass | undefined {

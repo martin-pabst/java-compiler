@@ -48,7 +48,7 @@ export class ASTNodeFactory {
             isStatic: modifiers.isStatic,
             isAbstract: modifiers.isAbstract,
             isDefault: modifiers.isDefault,
-            genericParameterDefinitions: [],
+            genericParameterDeclarations: [],
             fieldsOrInstanceInitializers: [],
             methods: [],
             classOrInterfaceOrEnumDefinitions: [],
@@ -133,7 +133,7 @@ export class ASTNodeFactory {
             isStatic: modifiers.isStatic,
             isAbstract: modifiers.isAbstract,
             isDefault: modifiers.isDefault,
-            genericParameterDefinitions: [],
+            genericParameterDeclarations: [],
             methods: [],
             annotations: [],
             fieldsOrInstanceInitializers: [], // only static fields and static initializers...,
@@ -153,7 +153,7 @@ export class ASTNodeFactory {
     }
 
     buildMethodNode(returnParameterType: ASTTypeNode | undefined, isContructor: boolean, modifiers: ASTNodeWithModifiers,
-        identifier: Token, rangeStart: IRange, annotations: ASTAnnotationNode[]): ASTMethodDeclarationNode {
+        identifier: Token, rangeStart: IRange, annotations: ASTAnnotationNode[], parent: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode): ASTMethodDeclarationNode {
 
         let node: ASTMethodDeclarationNode = {
             kind: TokenType.methodDeclaration,
@@ -169,7 +169,11 @@ export class ASTNodeFactory {
             parameters: [],
             returnParameterType: returnParameterType,
             statement: undefined,
-            annotations: []
+            annotations: [],
+            parentTypeScope: parent,
+            classOrInterfaceOrEnumDefinitions: [],
+            path: parent.path + "." + identifier,
+            genericParameterDeclarations: []
         }
 
         if (annotations.length > 0) {

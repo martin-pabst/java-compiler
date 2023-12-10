@@ -60,7 +60,7 @@ export class JavaCompiledModule extends JavaBaseModule {
                 // breakpoint in instance initializer is set there may be several steps to
                 // consider setting a breakpoint in.
                 let steps: Step[] = [];
-                for(let method of type.getMethods()){
+                for(let method of type.getOwnMethods()){
                     if(method.program){
                         let step = method.program.findStep(line);
                         if(step) steps.push(step);

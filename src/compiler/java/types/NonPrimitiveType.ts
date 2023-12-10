@@ -24,7 +24,8 @@ export abstract class NonPrimitiveType extends JavaType {
     abstract canImplicitlyCastTo(otherType: JavaType): boolean; // int gets casted to long implicitly; Integer gets casted to Number implicitly e.g. in: Number n = new Integer(10);
 
     abstract getFields(): Field[];
-    abstract getMethods(): Method[];
+    abstract getOwnMethods(): Method[];
+    abstract getAllMethods(): Method[];
 
     abstract getField(identifier: string, uptoVisibility: Visibility, forceStatic?: boolean): Field | undefined;
     
@@ -91,11 +92,11 @@ export abstract class NonPrimitiveType extends JavaType {
         if (isConstructor) {
             let type: NonPrimitiveType | undefined = this;
             while (type) {
-                methods = methods.concat(type.getMethods().filter(m => 
+                methods = methods.concat(type.getOwnMethods().filter(m => 
                     m.parameters.length == length && m.isConstructor
                 ));
                 //@ts-ignore
-                if (type["getExtends"] && type.getMethods().filter(m => m.isConstructor).length == 0){
+                if (type["getExtends"] && type.getOwnMethods().filter(m => m.isConstructor).length == 0){
                     //@ts-ignore
                     type = type.getExtends();
                 } else {
@@ -104,7 +105,7 @@ export abstract class NonPrimitiveType extends JavaType {
             }
         } else {
 
-            methods = this.getMethods().filter(m => 
+            methods = this.getOwnMethods().filter(m => 
                 m.parameters.length == length && !m.isConstructor && m.identifier == identifier
                 && (!hasToBeStatic || m.isStatic)
             )

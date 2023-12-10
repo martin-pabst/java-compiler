@@ -6,7 +6,7 @@ import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaModuleManager } from "../module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "../module/libraries/JavaLibraryModuleManager";
-import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTTypeNode, TypeScope } from "../parser/AST";
+import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTMethodDeclarationNode, ASTTypeDefinitionWithGenerics, ASTTypeNode, TypeScope } from "../parser/AST";
 import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
 import { InterfaceClass } from "../runtime/system/javalang/InterfaceClass.ts";
 import { ArrayType } from "../types/ArrayType";
@@ -88,7 +88,9 @@ export class TypeResolver {
             this.moduleManager.typestore.addType(resolvedType);
             klassNode.module.types.push(klassNode.resolvedType);
 
-            if(klassNode.parent?.kind != TokenType.global) declarationNodesWithClassParent.push(klassNode);
+            if (klassNode.parent?.kind != TokenType.global) declarationNodesWithClassParent.push(klassNode);
+
+            this.generateMethodGenerics(klassNode.methods, klassNode.module);
         }
 
         for (let interfaceNode of this.interfaceDeclarationNodes) {
@@ -99,7 +101,9 @@ export class TypeResolver {
             this.moduleManager.typestore.addType(resolvedType);
             interfaceNode.module.types.push(interfaceNode.resolvedType);
 
-            if(interfaceNode.parent?.kind != TokenType.global) declarationNodesWithClassParent.push(interfaceNode);
+            if (interfaceNode.parent?.kind != TokenType.global) declarationNodesWithClassParent.push(interfaceNode);
+
+            this.generateMethodGenerics(interfaceNode.methods, interfaceNode.module);
         }
 
         let baseEnumClass = <JavaClass><any>this.libraryModuleManager.typestore.getType("Enum");
@@ -112,14 +116,26 @@ export class TypeResolver {
             this.moduleManager.typestore.addType(resolvedType);
             enumNode.module.types.push(enumNode.resolvedType);
 
-            if(enumNode.parent?.kind != TokenType.global) declarationNodesWithClassParent.push(enumNode);
+            if (enumNode.parent?.kind != TokenType.global) declarationNodesWithClassParent.push(enumNode);
+
+            this.generateMethodGenerics(enumNode.methods, enumNode.module);
         }
 
-        for(let node of declarationNodesWithClassParent){
+        for (let node of declarationNodesWithClassParent) {
             //@ts-ignore
             node.resolvedType!.outerType = node.parent.resolvedType;
         }
 
+    }
+
+    generateMethodGenerics(methods: ASTMethodDeclarationNode[], module: JavaCompiledModule) {
+        for (let method of methods) {
+            for (let gpNode of method.genericParameterDeclarations) {
+                let gp = new GenericTypeParameter(gpNode.identifier, module, gpNode.identifierRange);
+                gpNode.resolvedType = gp;
+                // type.genericInformation.push(gp);
+            }
+        }
     }
 
     // generateNewTypesWithGenericsButWithoutFieldsAndMethodsOld() {
@@ -153,7 +169,7 @@ export class TypeResolver {
     // }
 
     generateGenericParameters(node: ASTClassDefinitionNode | ASTInterfaceDefinitionNode, type: JavaClass | JavaInterface) {
-        for (let gpNode of node.genericParameterDefinitions) {
+        for (let gpNode of node.genericParameterDeclarations) {
             let gp = new GenericTypeParameter(gpNode.identifier, type.module, gpNode.identifierRange);
             gpNode.resolvedType = gp;
             type.genericInformation.push(gp);
@@ -212,18 +228,30 @@ export class TypeResolver {
         // Generic parameter variable?
         if (typeNode.parentTypeScope) {
 
-            if ([TokenType.keywordClass, TokenType.keywordInterface].indexOf(typeNode.parentTypeScope.kind) >= 0) {
-                let classOrInterfaceNode: ASTClassDefinitionNode | ASTInterfaceDefinitionNode = <any>typeNode.parentTypeScope;
-                for (let gpType of classOrInterfaceNode.genericParameterDefinitions) {
+            let parentTypeScope: TypeScope = typeNode.parentTypeScope;
+
+            if (parentTypeScope.kind == TokenType.methodDeclaration) {
+                let methodDeclarationNode: ASTMethodDeclarationNode = <any>parentTypeScope;
+                for (let gpType of methodDeclarationNode.genericParameterDeclarations) {
+                    let gp = gpType.resolvedType;
+                    if (gp && gp.identifier == identifer) return gp;
+                }
+                parentTypeScope = methodDeclarationNode.parentTypeScope;
+            }
+
+
+            if ([TokenType.keywordClass, TokenType.keywordInterface].indexOf(parentTypeScope.kind) >= 0) {
+                let classOrInterfaceNode: ASTClassDefinitionNode | ASTInterfaceDefinitionNode = <any>parentTypeScope;
+                for (let gpType of classOrInterfaceNode.genericParameterDeclarations) {
                     let gp = gpType.resolvedType;
                     if (gp && gp.identifier == identifer) return gp;
                 }
             }
 
-            if (typeNode.identifier.indexOf(".") < 0) {
-                let parentTypeScope: TypeScope | undefined = typeNode.parentTypeScope;
-                while (parentTypeScope) {
-                    let path: string = parentTypeScope.path;
+            if (typeNode.identifier.indexOf(".") >= 0) {
+                let parentTypeScope1: TypeScope | undefined = parentTypeScope;
+                while (parentTypeScope1) {
+                    let path: string = parentTypeScope1.path;
 
                     if (path != "") {
                         type = this.moduleManager.typestore.getType(path + "." + typeNode.identifier);
@@ -231,7 +259,7 @@ export class TypeResolver {
                     }
 
                     //@ts-ignore
-                    parentTypeScope = parentTypeScope.parentTypeScope;
+                    parentTypeScope1 = parentTypeScope1.parentTypeScope;
                 }
             }
 
@@ -263,13 +291,19 @@ export class TypeResolver {
             let resolvedType1 = <JavaClass>klassNode.resolvedType;
             this.resolveGenericParameters(klassNode, module);
             this.resolveClassExtendsImplements(klassNode, resolvedType1, module);
+            for(let method of klassNode.methods){
+                this.resolveGenericParameters(method, module);
+            }
         }
-
+        
         for (let interfaceNode of this.interfaceDeclarationNodes) {
             let module = interfaceNode.resolvedType!.module;
             let resolvedType2 = <JavaInterface>interfaceNode.resolvedType;
             this.resolveGenericParameters(interfaceNode, module);
             this.resolveInterfaceExtends(interfaceNode, resolvedType2, module);
+            for(let method of interfaceNode.methods){
+                this.resolveGenericParameters(method, module);
+            }
         }
 
     }
@@ -310,8 +344,8 @@ export class TypeResolver {
         }
     }
 
-    resolveGenericParameters(node: ASTClassDefinitionNode | ASTInterfaceDefinitionNode, module: JavaBaseModule) {
-        for (let gpNode of node.genericParameterDefinitions) {
+    resolveGenericParameters(node: ASTTypeDefinitionWithGenerics, module: JavaBaseModule) {
+        for (let gpNode of node.genericParameterDeclarations) {
             let gpType = gpNode.resolvedType;
             if (!gpType) continue;
             if (gpNode.extends) {
@@ -477,24 +511,24 @@ export class TypeResolver {
         while (!done) {
             done = true;
             for (let classNode of this.classDeclarationNodes) {
-                    let javaClass = classNode.resolvedType!;
-                    if (!javaClass.runtimeClass) {
-                        let baseClass = javaClass.getExtends();
-                        if (!baseClass) baseClass = objectClass;
-                        if (baseClass.runtimeClass) {
-                            javaClass.initRuntimeClass(baseClass.runtimeClass);  // first recursively initialize field of base classes
-                            for (let field of classNode.fieldsOrInstanceInitializers) {
-                                if (field.kind == TokenType.fieldDeclaration) {
-                                    let f: Field = new Field(field.identifier, field.range, javaClass.module, field.type.resolvedType!, field.visibility);
-                                    f.isStatic = field.isStatic;
-                                    f.isFinal = field.isFinal;
-                                    f.classEnum = javaClass;
-                                    javaClass.fields.push(f);
-                                }
+                let javaClass = classNode.resolvedType!;
+                if (!javaClass.runtimeClass) {
+                    let baseClass = javaClass.getExtends();
+                    if (!baseClass) baseClass = objectClass;
+                    if (baseClass.runtimeClass) {
+                        javaClass.initRuntimeClass(baseClass.runtimeClass);  // first recursively initialize field of base classes
+                        for (let field of classNode.fieldsOrInstanceInitializers) {
+                            if (field.kind == TokenType.fieldDeclaration) {
+                                let f: Field = new Field(field.identifier, field.range, javaClass.module, field.type.resolvedType!, field.visibility);
+                                f.isStatic = field.isStatic;
+                                f.isFinal = field.isFinal;
+                                f.classEnum = javaClass;
+                                javaClass.fields.push(f);
                             }
-                            done = false;
                         }
+                        done = false;
                     }
+                }
             }
         }
 

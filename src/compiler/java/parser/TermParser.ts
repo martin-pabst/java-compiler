@@ -1,6 +1,6 @@
 import { TokenType } from "../TokenType.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
-import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode } from "./AST.ts";
+import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode, ASTMethodDeclarationNode } from "./AST.ts";
 import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator.ts";
 
@@ -43,6 +43,7 @@ export abstract class TermParser extends TokenIterator {
     nodeFactory: ASTNodeFactory;
 
     currentClassOrInterface?: ASTClassDefinitionNode | ASTInterfaceDefinitionNode;
+    currentMethod?: ASTMethodDeclarationNode;
 
     constructor(public module: JavaCompiledModule) {
         super(module.tokens!, module);
@@ -348,7 +349,7 @@ export abstract class TermParser extends TokenIterator {
         // ArrayList; HashMap<Integer, ArrayList<Boolean>>; int[][], ...
         // general Syntax: <identifier><genericParameterInvocation><ArrayDimension[]>
 
-        let type = this.nodeFactory.buildTypeNode(this.currentClassOrInterface);
+        let type = this.nodeFactory.buildTypeNode(this.currentMethod? this.currentMethod : this.currentClassOrInterface);
         this.module.ast!.collectedTypeNodes.push(type);
 
         if (this.tt == TokenType.keywordVoid) {

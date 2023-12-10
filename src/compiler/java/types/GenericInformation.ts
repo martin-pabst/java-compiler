@@ -37,7 +37,7 @@ export class GenericTypeParameter extends NonPrimitiveType {
     toString(): string {
         return this.identifier + 
         (this.lowerBound ? "super " + this.lowerBound?.toString() : "") + 
-        (this.upperBounds.length > 0 ? "extends " + this.upperBounds.map(ub => ub.toString).join(" & ") : "");
+        (this.upperBounds.length > 0 ? " extends " + this.upperBounds.map(ub => ub.toString()).join(" & ") : "");
     }
 
     isGenericVariant(): boolean {
@@ -63,14 +63,22 @@ export class GenericTypeParameter extends NonPrimitiveType {
         return this.fieldCache;
     }
 
-    getMethods(): Method[]{
+    getOwnMethods(): Method[]{
         if(!this.methodCache){
             this.methodCache = [];
             for(let ub of this.upperBounds){
-                this.methodCache = this.methodCache.concat(ub.getMethods());
+                this.methodCache = this.methodCache.concat(ub.getAllMethods());
             }
         }
         return this.methodCache;
+    }
+
+    getAllMethods(): Method[]{
+        return this.getOwnMethods();
+    }
+
+    getPossibleMethods(identifier: string, length: number, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
+        return this.getAllMethods().filter(m => m.identifier == identifier && m.isConstructor == isConstructor && (m.isStatic || !hasToBeStatic));
     }
 
     getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, JavaType>): JavaType {
