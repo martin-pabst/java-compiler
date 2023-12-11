@@ -660,6 +660,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         // snippet which instantiates object of this class calling it's typescript constructor and it's java constructor
 
         klass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods();
+        klass.takeSignaturesFromOverriddenMethods();
         klass.checkIfAbstractParentsAreImplemented();
 
         let template = `new this.innerClass(${outerLocalVariables.map(v => Helpers.elementRelativeToStackbase(v!.stackframePosition!)).join(", ")})`;

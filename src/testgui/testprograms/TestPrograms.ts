@@ -1,5 +1,21 @@
 export var testPrograms = {
-genericMethodTest:`
+genericMethodTest2:`
+interface i1<T> {
+   void doIt(T t);
+}
+
+class c1 implements i1<String> {
+   void doIt(String x){
+      println("Hier");
+   }
+}
+
+c1 x = new c1();
+i1 y = c1;
+
+i1.doIt(); 
+`,
+genericMethodTest1:`
 Test te = new Test();
 Integer i = Integer.valueOf(10);
 

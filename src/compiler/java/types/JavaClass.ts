@@ -129,6 +129,21 @@ export class JavaClass extends IJavaClass {
         }
     }
 
+    takeSignaturesFromOverriddenMethods() {
+
+        let baseClass = this.getExtends();
+        let allBaseClassMethods = baseClass?.getAllMethods();
+        for(let m of this.methods){
+            let internalName = m.getInternalName("java");
+            let baseMethod = allBaseClassMethods?.find(m1 => m1.getInternalName("java") == internalName);
+            if(baseMethod){
+                m.takeInternalJavaNameWithGenericParamterIdentifiersFrom(baseMethod);
+            }
+        }
+
+    }
+
+
     checkIfInterfacesAreImplementedAndSupplementDefaultMethods() {
         for (let ji of this.getImplements()) {
             let javaInterface = <JavaInterface>ji;
@@ -160,6 +175,8 @@ export class JavaClass extends IJavaClass {
                     } else {
                         notImplementedMethods.push(method);
                     }
+                } else {
+                    classesMethod.takeInternalJavaNameWithGenericParamterIdentifiersFrom(method);
                 }
 
             }
@@ -258,7 +275,7 @@ export class JavaClass extends IJavaClass {
             for(let ext of bType.upperBounds){
                 if(!this.canImplicitlyCastTo(ext)) return false;
             }
-            
+
             if(bType.lowerBound && !bType.lowerBound.canImplicitlyCastTo(this)) return false;
             
             return true;

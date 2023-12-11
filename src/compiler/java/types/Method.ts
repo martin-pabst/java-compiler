@@ -35,7 +35,8 @@ export class Method {
      */
     returnParameterType?: JavaType;
 
-    private internalNames: {[callingConvention: string]: string} = {}
+    private signatureCache: {[callingConvention: string]: string} = {}
+    private signatureCacheWithGenericParameterIdentifiers: {[callingConvention: string]: string} = {}
 
     public hasImplementationWithNativeCallingConvention: boolean = false;
 
@@ -82,7 +83,7 @@ export class Method {
 
         this.getInternalName("java");
         this.getInternalName("native");
-        newMethod.internalNames = this.internalNames;
+        newMethod.signatureCacheWithGenericParameterIdentifiers = this.signatureCache;
 
         return newMethod;
 
@@ -105,16 +106,29 @@ export class Method {
     }
 
     getInternalName(callingConvention: CallingConvention): string {
-        if(!this.internalNames[callingConvention]){
+        if(!this.signatureCache[callingConvention]){
             let cc = callingConvention == "java" ? "j" : "n";
     
             let shorthand = this.isConstructor ? 'c' : 'm';
             let s = `_${shorthand}${cc}$${this.isConstructor ? "_constructor_" : this.identifier}$${this.returnParameterType ? this.returnParameterType.getInternalName() : 'void'}$`;
             s += this.parameters.map(p => p.type.getInternalName()).join("$");
-            this.internalNames[callingConvention] = s;
+            this.signatureCache[callingConvention] = s;
         }
-        return this.internalNames[callingConvention];
+        return this.signatureCache[callingConvention];
     }
+
+    getInternalNameWithGenericParameterIdentifiers(callingConvention: CallingConvention): string {
+        if(!this.signatureCacheWithGenericParameterIdentifiers[callingConvention]){
+            this.signatureCacheWithGenericParameterIdentifiers[callingConvention] = this.getInternalName(callingConvention);
+        }
+        return this.signatureCache[callingConvention];
+    }
+
+    takeInternalJavaNameWithGenericParamterIdentifiersFrom(method: Method) {
+        this.signatureCache["java"] = method.getInternalNameWithGenericParameterIdentifiers("java");
+        this.signatureCacheWithGenericParameterIdentifiers["java"] = this.signatureCache["java"];
+    }
+
 
     clearUsagePositions(): void {
         this.usagePositions = [];

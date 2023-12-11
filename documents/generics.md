@@ -29,6 +29,8 @@
    T  CANNOT cast to ? extends T
    T CAN cast to ? super T
 
+// OldStyle classes
+   A<X> -> A for all A, X
 
 ```
 

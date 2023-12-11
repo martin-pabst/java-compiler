@@ -208,8 +208,8 @@ export class TypeResolver {
                             typeMap.set(gp, <NonPrimitiveType>gpType);
                         }
                     }
-                    if (primaryType instanceof JavaClass) primaryType = primaryType.getCopyWithConcreteType(typeMap);
                 }
+                if (primaryType instanceof JavaClass || primaryType instanceof JavaInterface) primaryType = primaryType.getCopyWithConcreteType(typeMap);
             }
         }
 
@@ -403,6 +403,8 @@ export class TypeResolver {
         for (let javaClass of classes) {
 
             javaClass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods();
+
+            javaClass.takeSignaturesFromOverriddenMethods();
 
             javaClass.checkIfAbstractParentsAreImplemented();
 

@@ -330,10 +330,10 @@ export abstract class BinopCastCodeGenerator {
 
         if (!castTo.isPrimitive) {
             // snippet has primitive type. boxing?
-            let boxedTypeIndex = boxedTypesMap[castTo.identifier];
-            if (boxedTypeIndex && primitiveTypeMap[type.identifier] == boxedTypeIndex) {
+            // let boxedTypeIndex = boxedTypesMap[castTo.identifier];
+            // if (primitiveTypeMap[type.identifier] == boxedTypeIndex) {
                 return this.box(snippet);
-            }
+            // }
 
             this.pushError("Der Typ " + type.identifier + " kann nicht in den Typ " + castTo.identifier + " gecastet werden.", "error", snippet.range!);
             return snippet;
@@ -439,7 +439,9 @@ export abstract class BinopCastCodeGenerator {
 
         if (typeToIndex == nString) return true;
 
-        if (!typeFrom.isPrimitive && !typeTo.isPrimitive) {
+        if ((!typeFrom.isPrimitive || typeFrom == this.stringType) && !typeTo.isPrimitive) {
+            if(typeFrom == this.stringType) typeFrom = this.primitiveStringClass.type;
+
             if (typeFrom instanceof ArrayType || typeTo instanceof ArrayType) {
                 if (typeFrom instanceof ArrayType && typeTo instanceof ArrayType) {
                     return typeFrom.dimension == typeTo.dimension && this.canCastTo(typeFrom.elementType, typeTo.elementType, castType);

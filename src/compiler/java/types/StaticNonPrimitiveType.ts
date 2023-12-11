@@ -9,6 +9,13 @@ import { Visibility } from "./Visibility.ts";
 
 export class StaticNonPrimitiveType extends JavaType {
 
+    toString(): string {
+        throw new Error("Method not implemented.");
+    }
+    getReifiedIdentifier(): string {
+        throw new Error("Method not implemented.");
+    }
+
 
 
     constructor(public nonPrimitiveType: NonPrimitiveType) {
@@ -31,5 +38,8 @@ export class StaticNonPrimitiveType extends JavaType {
         return this.nonPrimitiveType.getField(identifier, uptoVisibility, true);
    }
 
+   canImplicitlyCastTo(type: JavaType){
+        return false;
+   }
 
 }
