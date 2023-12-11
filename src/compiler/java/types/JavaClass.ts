@@ -255,7 +255,13 @@ export class JavaClass extends IJavaClass {
         }
 
         if(bType instanceof GenericTypeParameter){
+            for(let ext of bType.upperBounds){
+                if(!this.canImplicitlyCastTo(ext)) return false;
+            }
             
+            if(bType.lowerBound && !bType.lowerBound.canImplicitlyCastTo(this)) return false;
+            
+            return true;
         }
 
         return false;
