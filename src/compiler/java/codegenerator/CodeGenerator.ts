@@ -553,7 +553,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                         `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
                         `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`;
                 }
-                runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
+                runtimeClass.prototype[method.getInternalNameWithGenericParameterIdentifiers("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
                     method.programStub);
             }
         }

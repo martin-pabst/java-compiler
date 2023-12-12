@@ -11,10 +11,9 @@ class c1 implements i1<String> {
 }
 
 c1 x = new c1();
-i1 y = c1;
+i1 y = x;
 
-i1.doIt(); 
-`,
+y.doIt("Test");`,
 genericMethodTest1:`
 Test te = new Test();
 Integer i = Integer.valueOf(10);

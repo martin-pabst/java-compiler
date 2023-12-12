@@ -121,7 +121,7 @@ export class Method {
         if(!this.signatureCacheWithGenericParameterIdentifiers[callingConvention]){
             this.signatureCacheWithGenericParameterIdentifiers[callingConvention] = this.getInternalName(callingConvention);
         }
-        return this.signatureCache[callingConvention];
+        return this.signatureCacheWithGenericParameterIdentifiers[callingConvention];
     }
 
     takeInternalJavaNameWithGenericParamterIdentifiersFrom(method: Method) {
