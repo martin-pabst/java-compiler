@@ -3,7 +3,7 @@ import { EmptyRange, IRange } from "../../../common/range/Range";
 import { TokenType } from "../../TokenType";
 import { ArrayType } from "../../types/ArrayType";
 import { Field } from "../../types/Field";
-import { GenericTypeParameter } from "../../types/GenericInformation";
+import { GenericInformation, GenericTypeParameter } from "../../types/GenericInformation";
 import { JavaClass } from "../../types/JavaClass";
 import { JavaEnum } from "../../types/JavaEnum";
 import { JavaInterface } from "../../types/JavaInterface";
@@ -115,12 +115,12 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         let npt = klass.type;
 
-        if (this.comesToken(TokenType.lower, true)) {
+        if (this.comesToken(TokenType.lower, false)) {
             if (npt instanceof JavaEnum) {
                 this.pushError("Ein enum-Typ kann nicht generisch sein.");
                 this.skipTill([TokenType.keywordExtends, TokenType.keywordImplements], false);
             } else {
-                this.parseGenericParameters(<any>npt, module);
+                npt.genericInformation = this.parseGenericParameters(module);
             }
         }
 
@@ -166,12 +166,18 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         return types;
     }
 
-    parseGenericParameters(npt: JavaClass | JavaInterface, module: JavaBaseModule) {
+    parseGenericParameters(module: JavaBaseModule): GenericInformation {
+        if(!this.comesToken(TokenType.lower, true)) return [];
+
+        let gi: GenericInformation = [];
+
         do {
-            npt.genericInformation.push(this.parseGenericParameterDeclaration(module))
+            gi.push(this.parseGenericParameterDeclaration(module))
         } while (this.comesToken(TokenType.comma, true));
 
         this.expect(TokenType.greater, true);
+
+        return gi;
     }
 
     parseGenericParameterDeclaration(module: JavaBaseModule): GenericTypeParameter {
@@ -393,8 +399,11 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     parseAttributeOrMethod(klass: Klass & LibraryKlassType, module: JavaBaseModule, decl: LibraryMethodOrAttributeDeclaration) {
 
         let klassType = <JavaClass>klass.type;
-
+        
+        // example: "public <E> E testMethod(List<? extends E> li, E element)"
         let modifiers = this.parseModifiersAndType(false);
+
+        let genericInformation = this.parseGenericParameters(module);
 
         let type = this.parseType(module);
 
@@ -408,6 +417,8 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             let m = new Method(identifier, EmptyRange.instance, module, modifiers.visibility);
             m.returnParameterType = type;
             m.isConstructor = isConstructor;
+            m.genericInformation = genericInformation;
+
             if (!this.comesToken(TokenType.rightBracket, false)) {
                 do {
                     let isFinal = this.comesToken(TokenType.keywordFinal, true);

@@ -3,7 +3,7 @@ import { Program } from "../../common/interpreter/Program";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
-import { GenericTypeParameter } from "./GenericInformation";
+import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
 import { JavaClass } from "./JavaClass";
 import { JavaEnum } from "./JavaEnum";
 import { JavaInterface } from "./JavaInterface";
@@ -47,6 +47,8 @@ export class Method {
     programStub?: string;       // only for debugging purposes
 
     callbackAfterCodeGeneration: (() => void)[] = [];
+
+    genericInformation: GenericInformation = [];
 
     constructor(public identifier: string, public identifierRange: IRange, public module: JavaBaseModule,
           public visibility: Visibility = TokenType.keywordPublic){
