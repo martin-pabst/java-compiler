@@ -357,5 +357,25 @@ for(int i = 0; i < max - 2; i++) {
 }
 
 println();
-println(k + " Primzahlzwillinge gefunden!");`
+println(k + " Primzahlzwillinge gefunden!");`,
+switch_case:
+`
+class A {
+   static final int x = 5;
+   static final String y= "XYZ";
+}
+String s = "XYZ";
+switch(s) {
+   case A.y: 
+   case "PQR": println("A"); break;
+   default: println("B"); break;
+}
+int t = 2;
+switch(t) {
+   case A.x: break;
+   default: println("C");
+}
+
+
+`
 }
