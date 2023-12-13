@@ -321,13 +321,20 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             return undefined;
         }
         if (!constant.isConstant()) {
-            this.pushError("Nach case dürfen nur konstante Ausdrücke stehen.", "error", node.constant.range);
+            this.pushError("Nach case dürfen nur konstante Ausdrücke stehen, z.B. eine feste Zahl oder Zeichenkette. Wenn du an dieser Stelle etwas anderes (einen Term oder eine Variable) verwenden möchtest, informiere dich über sogenannten constant expressions in Java.", "error", node.constant.range);
+        }
+
+
+        if (!constant.type || constant.type.identifier.toLowerCase() != typeId?.toLowerCase()) {
+            this.pushError(`Ich erwarte hier einen Ausdruck vom Typ ${typeId} - dem Datentyp des Switch-Ausdrucks - bekomme aber einen Ausdruck vom Typ ${constant.type?.identifier}.`, "error", node.constant.range);
+            return undefined;
         }
 
         let constantValue = constant.getConstantValue();
-        
+
         switch(typeId) {
             case 'String':
+            case 'char':
                 caseSnippet.addStringPart(`case "${constantValue}": \n`, node.range); break;
             default:
                 caseSnippet.addStringPart(`case ${constantValue}: \n`, node.range);
@@ -355,7 +362,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
     compileSwitchCaseStatement(node: ASTSwitchCaseNode): CodeSnippet | undefined {
         let term = this.compileTerm(node.term);
         if (!this.isDefined(term)) return undefined;
-        if(!term.type?.identifier || !["int","char", "String"].includes(term.type?.identifier)) {
+        if(!term.type?.identifier || !["byte","short","int","char","String"].includes(term.type?.identifier)) {
             this.pushError("Die Anweisung switch(x) ist nur möglich, wenn x den Typ int, String, oder enum hat.", "error", node.term.range);
         }
         let type = term.type;

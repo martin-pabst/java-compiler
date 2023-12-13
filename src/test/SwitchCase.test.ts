@@ -4,7 +4,7 @@ import { JavaCompiler } from '../compiler/java/JavaCompiler';
 import { Interpreter } from '../compiler/common/interpreter/Interpreter';
 import { TestPrintManager } from '../testgui/TestPrintManager';
 
-test('test switch case', () => {
+test('test switch case with int', () => {
     let file = new File();
     let code =`
     int x = 1;
@@ -49,7 +49,7 @@ test('test switch case', () => {
 
 });
 
-test('test switch case with int', () => {
+test('test switch case with String', () => {
     let file = new File();
     let code =`
     String x = "Test";
