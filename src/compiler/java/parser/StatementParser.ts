@@ -4,7 +4,7 @@ import { TokenType } from "../TokenType.ts";
 import { ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTReturnNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode } from "./AST.ts";
 import { TermParser } from "./TermParser.ts";
 
-export class StatementParser extends TermParser {
+export abstract class StatementParser extends TermParser {
 
     constructor(module: JavaCompiledModule) {
         super(module);
