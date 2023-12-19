@@ -40,7 +40,10 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     currentDeclaration: string = "";
 
     currentTypeStore: JavaTypeStore = new JavaTypeStore();
-    currentGenericParameterMap: JavaTypeMap = {};
+    currentGenericParameterMap: Record<string, GenericTypeParameter> = {};
+
+    startBracketList: TokenType[] = [TokenType.leftBracket, TokenType.leftCurlyBracket, TokenType.leftSquareBracket, TokenType.lower];
+    endBracketList: TokenType[] = [TokenType.rightBracket, TokenType.rightCurlyBracket, TokenType.rightSquareBracket, TokenType.greater];
 
     constructor() {
         super();
@@ -98,7 +101,6 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
     parseClassOrInterfaceDeclarationGenericsAndExtendsImplements(klass: Klass & LibraryKlassType, typestore: JavaTypeStore, module: JavaBaseModule) {
 
-        this.currentGenericParameterMap = {};
         this.currentTypeStore = typestore;
 
         let javaClassDeclaration = klass.__javaDeclarations?.find(decl => decl.type == "c");
@@ -168,17 +170,55 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
     parseGenericParameters(module: JavaBaseModule): GenericInformation {
         if(!this.comesToken(TokenType.lower, true)) return [];
+        if(!this.comesToken(TokenType.identifier, true)){
+            this.pushError("Lese Definition eines generischen Parameters. Nach dem < wird ein Bezeichner erwartet.");
+            return [];
+        } 
 
         let gi: GenericInformation = [];
+        
+        // first step: only collect identifiers because generic parameters can reference each other recursively
+        let startPos = this.pos;
+        do{
+
+            let identifier = <string>this.cct.value;
+            let gp = new GenericTypeParameter(identifier, module, LibraryDeclarationParser.nullRange, [], undefined);
+            gi.push(gp);
+            this.currentGenericParameterMap[identifier] = gp;
+            this.skipSymmetricBracketsUntil([TokenType.comma, TokenType.greater])
+
+        } while (this.comesToken(TokenType.comma, true))
+
+        this.expect(TokenType.greater, true);
+
+        // second step: parse generic parameters with their upper/lower bounds
+        this.pos = startPos;
 
         do {
-            gi.push(this.parseGenericParameterDeclaration(module))
+            this.parseGenericParameterDeclaration(module)
         } while (this.comesToken(TokenType.comma, true));
 
         this.expect(TokenType.greater, true);
 
         return gi;
     }
+
+
+
+    skipSymmetricBracketsUntil(tt: TokenType[]){
+        let bracketCounter: number = 0;
+
+        while(this.pos < this.tokenList.length && (bracketCounter > 0 || tt.indexOf(this.tt) < 0)){
+            if(this.startBracketList.indexOf(this.tt) >= 0){
+                bracketCounter++;
+            } else if(this.endBracketList.indexOf(this.tt) >= 0){
+                bracketCounter--;
+            }
+            this.nextToken();
+        }
+
+    }
+
 
     parseGenericParameterDeclaration(module: JavaBaseModule): GenericTypeParameter {
         let identifier = this.expectIdentifier();
@@ -202,8 +242,10 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             }
         }
 
-        let gp = new GenericTypeParameter(identifier, module, LibraryDeclarationParser.nullRange, upperBounds, lowerBound);
-        this.currentGenericParameterMap[gp.identifier] = gp;
+        let gp = this.currentGenericParameterMap[identifier];
+        gp.upperBounds = upperBounds;
+        gp.lowerBound = lowerBound;
+
         return gp;
     }
 
@@ -380,7 +422,6 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
     parseAttributesAndMethods(klass: Klass & LibraryKlassType, typestore: JavaTypeStore, module: JavaBaseModule) {
 
-        this.currentGenericParameterMap = {};
         this.currentTypeStore = typestore;
 
         let javaClassDeclaration = klass.__javaDeclarations;

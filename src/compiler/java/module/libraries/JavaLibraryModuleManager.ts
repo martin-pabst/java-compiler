@@ -46,6 +46,7 @@ export class JavaLibraryModuleManager {
 
         for(let module of this.libraryModules){
             for(let klass of module.classes){
+                ldp.currentGenericParameterMap = {};
                 ldp.parseClassOrInterfaceDeclarationGenericsAndExtendsImplements(klass, this.typestore, module);
                 ldp.parseAttributesAndMethods(klass, this.typestore, module);
             }
