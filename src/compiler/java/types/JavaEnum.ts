@@ -72,6 +72,11 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
         return this.methods;
     }
 
+    getAllMethods(): Method[] {
+        return this.getOwnMethods().concat(this.baseEnumClass.getAllMethods());
+    }
+
+
     canImplicitlyCastTo(otherType: JavaType): boolean {
         if (otherType.isPrimitive) return false;
 

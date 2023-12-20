@@ -7,7 +7,6 @@ import { JavaBaseModule } from "../JavaBaseModule";
 export type LibraryKlassType = {
 
     __javaDeclarations: LibraryDeclarations;
-    type: NonPrimitiveType;
 
 }
 

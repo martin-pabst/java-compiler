@@ -19,9 +19,6 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 
     genericInformation: GenericInformation | undefined = undefined;
 
-    public usagePositions: UsagePosition[] = [];
-
-
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
         super(identifier, identifierRange, path, module);
         this.isPrimitive = false;

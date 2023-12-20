@@ -1,3 +1,4 @@
+import { JavaTypeStore } from "../../java/module/JavaTypeStore.ts";
 import { Executable } from "../Executable.ts";
 import { Module } from "../module/Module";
 import { IRange } from "../range/Range";
@@ -29,6 +30,7 @@ export class Scheduler {
 
     timeStampProgramStarted: number = 0;
     stepCountSinceStartOfProgram: number = 0;
+    libraryTypeStore?: JavaTypeStore;
 
 
     constructor(public interpreter: Interpreter) {
@@ -188,9 +190,10 @@ export class Scheduler {
         }
     }
 
-    init(executable: Executable, runtimeClassObjects: { [identifier: string]: Klass }) {
+    init(executable: Executable) {
 
-        this.classObjectRegistry = runtimeClassObjects;
+        this.classObjectRegistry = executable.classObjectRegistry;
+        this.libraryTypeStore = executable.libraryModuleManager.typestore;
 
         this.runningThreads = [];
         this.semaphors = [];

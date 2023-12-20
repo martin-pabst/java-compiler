@@ -10,12 +10,12 @@ export class ArithmeticExceptionClass extends RuntimeExceptionClass {
     stacktrace: Stacktrace = [];
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "c", signature: "class ArithmeticException extends RuntimeException"},
-        {type: "m", signature: "public ArithmeticException()", native: ExceptionClass.prototype._constructor},
-        {type: "m", signature: "public ArithmeticException(String message)", native: ThrowableClass.prototype._constructor_m},
-        {type: "m", signature: "public ArithmeticException(Throwable cause)", native: ThrowableClass.prototype._constructor_c},
-        {type: "m", signature: "public ArithmeticException(String message, Throwable cause)", native: ThrowableClass.prototype._constructor_m_c},
-        {type: "m", signature: "public String toString()", native: ThrowableClass.prototype._toString}
+        {type: "declaration", signature: "class ArithmeticException extends RuntimeException"},
+        {type: "method", signature: "public ArithmeticException()", native: ExceptionClass.prototype._constructor},
+        {type: "method", signature: "public ArithmeticException(String message)", native: ThrowableClass.prototype._constructor_m},
+        {type: "method", signature: "public ArithmeticException(Throwable cause)", native: ThrowableClass.prototype._constructor_c},
+        {type: "method", signature: "public ArithmeticException(String message, Throwable cause)", native: ThrowableClass.prototype._constructor_m_c},
+        {type: "method", signature: "public String toString()", native: ThrowableClass.prototype._toString}
     ]
 
 

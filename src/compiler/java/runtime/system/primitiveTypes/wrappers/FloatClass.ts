@@ -9,19 +9,19 @@ import { NumberClass } from "./NumberClass";
 export class FloatClass extends NumberClass {
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "c", signature: "class Float extends Number"},
-        {type: "a", signature: "static final int MAX_VALUE", constantValue: Number.MAX_VALUE}, 
-        {type: "a", signature: "static final int MIN_VALUE", constantValue: Number.MIN_VALUE},
+        {type: "declaration", signature: "class Float extends Number"},
+        {type: "field", signature: "static final int MAX_VALUE", constantValue: Number.MAX_VALUE}, 
+        {type: "field", signature: "static final int MIN_VALUE", constantValue: Number.MIN_VALUE},
         // for doubleValue(), floatValue(), intValue() and longValue() there are methods (if called for a Number variable containing an Long value) and templates
         // (if called fo Long variable). Offering templates to the compiler is only possible because the methods are final.
-        {type: "m", signature: "public final double doubleValue()", native: FloatClass.prototype.doubleValue, template: "§1.value"},
-        {type: "m", signature: "public final float floatValue()", native: FloatClass.prototype.floatValue, template: "§1.value"},
-        {type: "m", signature: "public final int intValue()", native: FloatClass.prototype.intValue, template: "(Math.trunc(§1.value) % 0x100000000 - 0x80000000)"},
-        {type: "m", signature: "public final long longValue()", native: FloatClass.prototype.longValue, template: "Math.trunc(§1.value)"},
-        {type: "m", signature: "public int compareTo(Float otherValue)", native: FloatClass.prototype._compareTo},
-        {type: "m", signature: "public int parseFloat(String s)", native: FloatClass.prototype.parseFloat},
-        {type: "m", signature: "public static Float valueOf(float f)", native: FloatClass.valueOf},
-        {type: "m", signature: "public static Float valueOf(String s)", native: FloatClass.valueOfString},
+        {type: "method", signature: "public final double doubleValue()", native: FloatClass.prototype.doubleValue, template: "§1.value"},
+        {type: "method", signature: "public final float floatValue()", native: FloatClass.prototype.floatValue, template: "§1.value"},
+        {type: "method", signature: "public final int intValue()", native: FloatClass.prototype.intValue, template: "(Math.trunc(§1.value) % 0x100000000 - 0x80000000)"},
+        {type: "method", signature: "public final long longValue()", native: FloatClass.prototype.longValue, template: "Math.trunc(§1.value)"},
+        {type: "method", signature: "public int compareTo(Float otherValue)", native: FloatClass.prototype._compareTo},
+        {type: "method", signature: "public int parseFloat(String s)", native: FloatClass.prototype.parseFloat},
+        {type: "method", signature: "public static Float valueOf(float f)", native: FloatClass.valueOf},
+        {type: "method", signature: "public static Float valueOf(String s)", native: FloatClass.valueOfString},
     ]
 
     static type: NonPrimitiveType;

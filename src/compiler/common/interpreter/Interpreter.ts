@@ -18,8 +18,6 @@ export class Interpreter {
     loadController: LoadController;
     scheduler: Scheduler;
 
-    private classObjectRegistry: KlassObjectRegistry = {};
-
     isExternalTimer: boolean = false;
     timerId: any;
     timerIntervalMs: number = 10;
@@ -81,7 +79,6 @@ export class Interpreter {
 
     setExecutable(executable: Executable){
         this.executable = executable;
-        this.classObjectRegistry = executable.classObjectRegistry;
         if(executable.mainModule){
             this.init(executable);
             this.setState(SchedulerState.stopped);
@@ -339,7 +336,7 @@ export class Interpreter {
 
 
         this.setState(SchedulerState.stopped);
-        this.scheduler.init(executable, this.classObjectRegistry);
+        this.scheduler.init(executable);
 
     }
 

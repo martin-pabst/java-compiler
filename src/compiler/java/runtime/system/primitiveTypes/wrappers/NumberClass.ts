@@ -10,14 +10,14 @@ export class NumberClass extends ObjectClass {
     value: number = 0;
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "c", signature: "abstract class Number extends Object"},
-        {type: "m", signature: "public byte byteValue()", native: NumberClass.prototype.byteValue},
-        {type: "m", signature: "public short shortValue()", native: NumberClass.prototype.shortValue},
-        {type: "m", signature: "abstract public double doubleValue()"},
-        {type: "m", signature: "abstract public float floatValue()"},
-        {type: "m", signature: "abstract public int intValue()"},
-        {type: "m", signature: "abstract public long longValue()"},
-        {type: "m", signature: "public String toString()", native: NumberClass.prototype.toString},
+        {type: "declaration", signature: "abstract class Number extends Object"},
+        {type: "method", signature: "public byte byteValue()", native: NumberClass.prototype.byteValue},
+        {type: "method", signature: "public short shortValue()", native: NumberClass.prototype.shortValue},
+        {type: "method", signature: "abstract public double doubleValue()"},
+        {type: "method", signature: "abstract public float floatValue()"},
+        {type: "method", signature: "abstract public int intValue()"},
+        {type: "method", signature: "abstract public long longValue()"},
+        {type: "method", signature: "public String toString()", native: NumberClass.prototype.toString},
     ]
 
     static type: NonPrimitiveType;

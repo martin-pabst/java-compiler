@@ -1,4 +1,5 @@
 import { BaseType } from "../../common/BaseType";
+import { UsagePosition } from "../../common/UsagePosition.ts";
 import { IRange } from "../../common/range/Range";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
@@ -9,9 +10,12 @@ export abstract class JavaType extends BaseType {
     isPrimitive: boolean;
     genericInformation: GenericInformation | undefined;
 
+    public usagePositions: UsagePosition[] = [];
+
     abstract getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, JavaType>): JavaType;
 
-    constructor(identifier: string, identifierRange: IRange, public module: JavaBaseModule){
+    constructor(identifier: string, identifierRange: IRange, 
+        public module: JavaBaseModule){
         super(identifier, identifierRange, module.file);
         this.isPrimitive = false;
     }

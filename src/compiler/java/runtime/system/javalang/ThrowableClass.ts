@@ -10,13 +10,13 @@ export class ThrowableClass extends ObjectClass implements IThrowable, Exception
     range?: IRange;
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "c", signature: "class Throwable extends Object"},
-        {type: "m", signature: "public Throwable()", native: ThrowableClass.prototype._constructor},
-        {type: "m", signature: "public Throwable(String message)", native: ThrowableClass.prototype._constructor_m},
-        {type: "m", signature: "public Throwable(Throwable cause)", native: ThrowableClass.prototype._constructor_c},
-        {type: "m", signature: "public Throwable(String message, Throwable cause)", native: ThrowableClass.prototype._constructor_m_c},
-        {type: "m", signature: "public String toString()", native: ThrowableClass.prototype._toString},
-        {type: "m", signature: "public String getMessage()", native: ThrowableClass.prototype._getMessage},
+        {type: "declaration", signature: "class Throwable extends Object"},
+        {type: "method", signature: "public Throwable()", native: ThrowableClass.prototype._constructor},
+        {type: "method", signature: "public Throwable(String message)", native: ThrowableClass.prototype._constructor_m},
+        {type: "method", signature: "public Throwable(Throwable cause)", native: ThrowableClass.prototype._constructor_c},
+        {type: "method", signature: "public Throwable(String message, Throwable cause)", native: ThrowableClass.prototype._constructor_m_c},
+        {type: "method", signature: "public String toString()", native: ThrowableClass.prototype._toString},
+        {type: "method", signature: "public String getMessage()", native: ThrowableClass.prototype._getMessage},
     ]
 
 

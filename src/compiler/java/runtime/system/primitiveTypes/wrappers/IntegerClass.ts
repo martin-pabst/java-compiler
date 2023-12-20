@@ -9,21 +9,21 @@ import { NumberClass } from "./NumberClass";
 export class IntegerClass extends NumberClass {
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "c", signature: "class Integer extends Number"},
-        {type: "a", signature: "static final int MAX_VALUE", constantValue: 0x80000000 - 1},
-        {type: "a", signature: "static final int MIN_VALUE", constantValue: -0x80000000},
+        {type: "declaration", signature: "class Integer extends Number"},
+        {type: "field", signature: "static final int MAX_VALUE", constantValue: 0x80000000 - 1},
+        {type: "field", signature: "static final int MIN_VALUE", constantValue: -0x80000000},
         // for doubleValue(), floatValue(), intValue() and longValue() there are methods (if called for a Number variable containing an Integer value) and templates
         // (if called fo Integer variable). Offering templates to the compiler is only possible because the methods are final.
-        {type: "m", signature: "public final double doubleValue()", native: IntegerClass.prototype.doubleValue, template: "§1.value"},
-        {type: "m", signature: "public final float floatValue()", native: IntegerClass.prototype.floatValue, template: "§1.value"},
-        {type: "m", signature: "public final int intValue()", native: IntegerClass.prototype.intValue, template: "§1.value"},
-        {type: "m", signature: "public final long longValue()", native: IntegerClass.prototype.longValue, template: "§1.value"},
-        {type: "m", signature: "public int compareTo(Integer anotherInteger)", native: IntegerClass.prototype._compareTo},
-        {type: "m", signature: "public int parseInt(String s)", native: IntegerClass.prototype.parseInt},
-        {type: "m", signature: "public int parseInt(String sr, int radix)", native: IntegerClass.prototype.parseInt},
-        {type: "m", signature: "public static Integer valueOf(int i)", native: IntegerClass.valueOf},
-        {type: "m", signature: "public static Integer valueOf(String s)", native: IntegerClass.valueOfString},
-        {type: "m", signature: "public static Integer valueOf(String s, int radix)", native: IntegerClass.valueOfString},
+        {type: "method", signature: "public final double doubleValue()", native: IntegerClass.prototype.doubleValue, template: "§1.value"},
+        {type: "method", signature: "public final float floatValue()", native: IntegerClass.prototype.floatValue, template: "§1.value"},
+        {type: "method", signature: "public final int intValue()", native: IntegerClass.prototype.intValue, template: "§1.value"},
+        {type: "method", signature: "public final long longValue()", native: IntegerClass.prototype.longValue, template: "§1.value"},
+        {type: "method", signature: "public int compareTo(Integer anotherInteger)", native: IntegerClass.prototype._compareTo},
+        {type: "method", signature: "public int parseInt(String s)", native: IntegerClass.prototype.parseInt},
+        {type: "method", signature: "public int parseInt(String sr, int radix)", native: IntegerClass.prototype.parseInt},
+        {type: "method", signature: "public static Integer valueOf(int i)", native: IntegerClass.valueOf},
+        {type: "method", signature: "public static Integer valueOf(String s)", native: IntegerClass.valueOfString},
+        {type: "method", signature: "public static Integer valueOf(String s, int radix)", native: IntegerClass.valueOfString},
     ]
 
     static type: NonPrimitiveType;

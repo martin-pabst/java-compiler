@@ -40,7 +40,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     currentDeclaration: string = "";
 
     currentTypeStore: JavaTypeStore = new JavaTypeStore();
-    currentGenericParameterMap: Record<string, GenericTypeParameter> = {};
+    genericParameterMapStack: Record<string, GenericTypeParameter>[] = [];
 
     startBracketList: TokenType[] = [TokenType.leftBracket, TokenType.leftCurlyBracket, TokenType.leftSquareBracket, TokenType.lower];
     endBracketList: TokenType[] = [TokenType.rightBracket, TokenType.rightCurlyBracket, TokenType.rightSquareBracket, TokenType.greater];
@@ -51,7 +51,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
     parseClassOrEnumOrInterfaceDeclarationWithoutGenerics(klass: Klass & LibraryKlassType, module: JavaBaseModule): NonPrimitiveType {
 
-        let javaClassDeclaration = klass.__javaDeclarations?.find(decl => decl.type == "c");
+        let javaClassDeclaration = klass.__javaDeclarations?.find(decl => decl.type == "declaration");
 
         if (!javaClassDeclaration) {
             console.log("Error parsing library class " + klass.name + ": missing java class declaration.");
@@ -103,7 +103,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         this.currentTypeStore = typestore;
 
-        let javaClassDeclaration = klass.__javaDeclarations?.find(decl => decl.type == "c");
+        let javaClassDeclaration = klass.__javaDeclarations?.find(decl => decl.type == "declaration");
 
         if (!javaClassDeclaration) {
             console.log("Error parsing library class " + klass.name + ": missing java class declaration.");
@@ -170,21 +170,23 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
     parseGenericParameters(module: JavaBaseModule): GenericInformation {
         if(!this.comesToken(TokenType.lower, true)) return [];
-        if(!this.comesToken(TokenType.identifier, true)){
+        let startPos = this.pos;
+        if(!this.comesToken(TokenType.identifier, false)){
             this.pushError("Lese Definition eines generischen Parameters. Nach dem < wird ein Bezeichner erwartet.");
             return [];
         } 
 
         let gi: GenericInformation = [];
         
+        let currentGenericParameterMap = this.genericParameterMapStack[this.genericParameterMapStack.length - 1];
+
         // first step: only collect identifiers because generic parameters can reference each other recursively
-        let startPos = this.pos;
         do{
 
             let identifier = <string>this.cct.value;
             let gp = new GenericTypeParameter(identifier, module, LibraryDeclarationParser.nullRange, [], undefined);
             gi.push(gp);
-            this.currentGenericParameterMap[identifier] = gp;
+            currentGenericParameterMap[identifier] = gp;
             this.skipSymmetricBracketsUntil([TokenType.comma, TokenType.greater])
 
         } while (this.comesToken(TokenType.comma, true))
@@ -192,7 +194,8 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         this.expect(TokenType.greater, true);
 
         // second step: parse generic parameters with their upper/lower bounds
-        this.pos = startPos;
+        this.pos = startPos - 1;
+        this.nextToken();
 
         do {
             this.parseGenericParameterDeclaration(module)
@@ -242,7 +245,8 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             }
         }
 
-        let gp = this.currentGenericParameterMap[identifier];
+        let currentGenericParameterMap = this.genericParameterMapStack[this.genericParameterMapStack.length - 1];
+        let gp = currentGenericParameterMap[identifier];
         gp.upperBounds = upperBounds;
         gp.lowerBound = lowerBound;
 
@@ -289,7 +293,12 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     findType(id: string): JavaType {
         let type = this.currentTypeStore.getType(id);
         if (type) return type;
-        type = this.currentGenericParameterMap[id];
+
+        for(let gpm of this.genericParameterMapStack){
+            type = gpm[id];
+            if(type) break;
+        }
+
         if (type) return type;
 
         this.pushError("Konnte den Typ " + id + " nicht finden.");
@@ -378,7 +387,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     skipTill(tt: TokenType | TokenType[], skipIfFound: boolean) {
         if (!Array.isArray(tt)) tt = [tt];
 
-        while (!this.isEnd() && tt.indexOf(this.tt) <= 0) {
+        while (!this.isEnd() && tt.indexOf(this.tt) < 0) {
             this.nextToken();
         }
 
@@ -430,7 +439,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             return;
         }
 
-        for (let decl of javaClassDeclaration.filter(cd => cd.type == "a" || cd.type == "m")) {
+        for (let decl of javaClassDeclaration.filter(cd => cd.type == "field" || cd.type == "method")) {
             this.initTokens(decl.signature);
             this.parseAttributeOrMethod(klass, module, decl);
         }
@@ -438,6 +447,8 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     }
 
     parseAttributeOrMethod(klass: Klass & LibraryKlassType, module: JavaBaseModule, decl: LibraryMethodOrAttributeDeclaration) {
+
+        this.genericParameterMapStack.push({});
 
         let klassType = <JavaClass>klass.type;
         
@@ -452,7 +463,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         let identifier = isConstructor ? klassType.identifier : this.expectIdentifier();
 
-        if (decl.type == "m") {
+        if (decl.type == "method") {
             this.comesToken(TokenType.leftBracket, true);
             // method
             let m = new Method(identifier, EmptyRange.instance, module, modifiers.visibility);
@@ -555,6 +566,8 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             klassType.fields.push(a);
 
         }
+
+        this.genericParameterMapStack.pop();
 
     }
 }

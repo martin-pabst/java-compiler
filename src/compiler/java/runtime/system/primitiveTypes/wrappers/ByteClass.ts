@@ -9,21 +9,21 @@ import { NumberClass } from "./NumberClass";
 export class ByteClass extends NumberClass {
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "c", signature: "class Byte extends Number"},
-        {type: "a", signature: "static final int MAX_VALUE", constantValue: 0x80 - 1},
-        {type: "a", signature: "static final int MIN_VALUE", constantValue: -0x80},
+        {type: "declaration", signature: "class Byte extends Number"},
+        {type: "field", signature: "static final int MAX_VALUE", constantValue: 0x80 - 1},
+        {type: "field", signature: "static final int MIN_VALUE", constantValue: -0x80},
         // for doubleValue(), floatValue(), intValue() and longValue() there are methods (if called for a Number variable containing an Integer value) and templates
         // (if called fo Integer variable). Offering templates to the compiler is only possible because the methods are final.
-        {type: "m", signature: "public final double doubleValue()", native: ByteClass.prototype.doubleValue, template: "§1.value"},
-        {type: "m", signature: "public final float floatValue()", native: ByteClass.prototype.floatValue, template: "§1.value"},
-        {type: "m", signature: "public final int intValue()", native: ByteClass.prototype.intValue, template: "§1.value"},
-        {type: "m", signature: "public final long longValue()", native: ByteClass.prototype.longValue, template: "§1.value"},
-        {type: "m", signature: "public int compareTo(Short otherShort)", native: ByteClass.prototype._compareTo},
-        {type: "m", signature: "public int parseByte(String s)", native: ByteClass.prototype.parseByte},
-        {type: "m", signature: "public int parseByte(String sr, int radix)", native: ByteClass.prototype.parseByte},
-        {type: "m", signature: "public static Byte valueOf(byte i)", native: ByteClass.valueOf},
-        {type: "m", signature: "public static Byte valueOf(String s)", native: ByteClass.valueOfString},
-        {type: "m", signature: "public static Byte valueOf(String s, byte radix)", native: ByteClass.valueOfString},
+        {type: "method", signature: "public final double doubleValue()", native: ByteClass.prototype.doubleValue, template: "§1.value"},
+        {type: "method", signature: "public final float floatValue()", native: ByteClass.prototype.floatValue, template: "§1.value"},
+        {type: "method", signature: "public final int intValue()", native: ByteClass.prototype.intValue, template: "§1.value"},
+        {type: "method", signature: "public final long longValue()", native: ByteClass.prototype.longValue, template: "§1.value"},
+        {type: "method", signature: "public int compareTo(Short otherShort)", native: ByteClass.prototype._compareTo},
+        {type: "method", signature: "public int parseByte(String s)", native: ByteClass.prototype.parseByte},
+        {type: "method", signature: "public int parseByte(String sr, int radix)", native: ByteClass.prototype.parseByte},
+        {type: "method", signature: "public static Byte valueOf(byte i)", native: ByteClass.valueOf},
+        {type: "method", signature: "public static Byte valueOf(String s)", native: ByteClass.valueOfString},
+        {type: "method", signature: "public static Byte valueOf(String s, byte radix)", native: ByteClass.valueOfString},
     ]
 
     static type: NonPrimitiveType;

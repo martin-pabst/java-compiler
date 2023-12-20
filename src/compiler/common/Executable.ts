@@ -1,4 +1,5 @@
 import { JavaModuleManager } from "../java/module/JavaModuleManager";
+import { JavaLibraryModuleManager } from "../java/module/libraries/JavaLibraryModuleManager.ts";
 import { JavaTypeWithInstanceInitializer } from "../java/types/JavaTypeWithInstanceInitializer";
 import { NonPrimitiveType } from "../java/types/NonPrimitiveType";
 import { Error } from "./Error";
@@ -21,7 +22,9 @@ export class Executable {
 
     mainModule?: Module;
 
-    constructor(public classObjectRegistry: KlassObjectRegistry, public moduleManager: JavaModuleManager,
+    constructor(public classObjectRegistry: KlassObjectRegistry, 
+        public moduleManager: JavaModuleManager,
+        public libraryModuleManager: JavaLibraryModuleManager,
         public globalErrors: Error[],
         lastOpenedFile?: File, currentlyOpenedFile?: File) {
 

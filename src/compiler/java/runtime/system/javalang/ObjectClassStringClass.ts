@@ -1,4 +1,5 @@
 import { Program } from "../../../../common/interpreter/Program";
+import { Scheduler } from "../../../../common/interpreter/Scheduler.ts";
 import { Thread } from "../../../../common/interpreter/Thread";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
 
@@ -7,9 +8,9 @@ export class ObjectClass {
     declare _m$toString$String$: (t: Thread) => void;
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "c", signature: "class Object"},
-        {type: "m", signature: "public Object()", native: ObjectClass.prototype._constructor},
-        {type: "m", signature: "public String toString()", native: ObjectClass.prototype._nToString}
+        {type: "declaration", signature: "class Object"},
+        {type: "method", signature: "public Object()", native: ObjectClass.prototype._constructor},
+        {type: "method", signature: "public String toString()", native: ObjectClass.prototype._nToString}
     ]
 
     declare __programs: Program[]; // only for compatibility with java classes; not used in library classes
@@ -45,11 +46,11 @@ export class ObjectClass {
 export class StringClass extends ObjectClass {
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "c", signature: "class String extends Object"},
-        {type: "c", signature: "public String()", native: StringClass.prototype._emptyConstructor},
-        {type: "c", signature: "public String(String original)", native: StringClass.prototype._constructor2},
-        {type: "m", signature: "public String toString()", template: "§1"},
-        {type: "m", signature: "public int length()", template: "§1.value.length"},
+        {type: "declaration", signature: "class String extends Object"},
+        {type: "method", signature: "public String()", native: StringClass.prototype._emptyConstructor},
+        {type: "method", signature: "public String(String original)", native: StringClass.prototype._constructor2},
+        {type: "method", signature: "public String toString()", template: "§1"},
+        {type: "method", signature: "public int length()", template: "§1.value.length"},
     ]
 
     public value: string;

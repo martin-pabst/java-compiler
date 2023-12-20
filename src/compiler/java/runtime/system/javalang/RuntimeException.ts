@@ -9,12 +9,12 @@ export class RuntimeExceptionClass extends ExceptionClass {
     stacktrace: Stacktrace = [];
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "c", signature: "class RuntimeException extends Exception"},
-        {type: "m", signature: "public RuntimeException()", native: ExceptionClass.prototype._constructor},
-        {type: "m", signature: "public RuntimeException(String message)", native: ThrowableClass.prototype._constructor_m},
-        {type: "m", signature: "public RuntimeException(Throwable cause)", native: ThrowableClass.prototype._constructor_c},
-        {type: "m", signature: "public RuntimeException(String message, Throwable cause)", native: ThrowableClass.prototype._constructor_m_c},
-        {type: "m", signature: "public String toString()", native: ThrowableClass.prototype._toString}
+        {type: "declaration", signature: "class RuntimeException extends Exception"},
+        {type: "method", signature: "public RuntimeException()", native: ExceptionClass.prototype._constructor},
+        {type: "method", signature: "public RuntimeException(String message)", native: ThrowableClass.prototype._constructor_m},
+        {type: "method", signature: "public RuntimeException(Throwable cause)", native: ThrowableClass.prototype._constructor_c},
+        {type: "method", signature: "public RuntimeException(String message, Throwable cause)", native: ThrowableClass.prototype._constructor_m_c},
+        {type: "method", signature: "public String toString()", native: ThrowableClass.prototype._toString}
     ]
 
 

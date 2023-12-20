@@ -1,4 +1,4 @@
-type LMADeclarationType = "c" | "a" | "m";
+type LMADeclarationType = "declaration" | "field" | "method";
 
 type LibraryClassDeclaration = {
     type: LMADeclarationType;

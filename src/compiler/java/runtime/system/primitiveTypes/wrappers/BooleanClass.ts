@@ -12,13 +12,13 @@ export class BooleanClass extends ObjectClass {
     static TRUE: BooleanClass = new BooleanClass(true);
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "c", signature: "class Boolean extends Object"},
-        {type: "a", signature: "static final boolean FALSE", constantValue: BooleanClass.FALSE},
-        {type: "a", signature: "static final boolean TRUE", constantValue: BooleanClass.TRUE},
-        {type: "m", signature: "public final boolean booleanValue()", template: "§1.value"},
-        {type: "m", signature: "public int compareTo(Boolean otherBoolean)", native: BooleanClass.prototype._compareTo},
-        {type: "m", signature: "public static boolean getBoolean(String name)", template: '§1 == "true"'},
-        {type: "m", signature: "public static boolean parseBoolean(String name)", template: '§1 == "true"'},
+        {type: "declaration", signature: "class Boolean extends Object"},
+        {type: "field", signature: "static final boolean FALSE", constantValue: BooleanClass.FALSE},
+        {type: "field", signature: "static final boolean TRUE", constantValue: BooleanClass.TRUE},
+        {type: "method", signature: "public final boolean booleanValue()", template: "§1.value"},
+        {type: "method", signature: "public int compareTo(Boolean otherBoolean)", native: BooleanClass.prototype._compareTo},
+        {type: "method", signature: "public static boolean getBoolean(String name)", template: '§1 == "true"'},
+        {type: "method", signature: "public static boolean parseBoolean(String name)", template: '§1 == "true"'},
     ]
 
     static type: NonPrimitiveType;

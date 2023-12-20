@@ -84,7 +84,9 @@ export class JavaCompiler {
         this.moduleManager.typestore.populateClassObjectRegistry(klassObjectRegistry);
 
 
-        let executable = new Executable(klassObjectRegistry, this.moduleManager, this.errors, this.lastOpenedFile, currentlyOpenFile);
+        let executable = new Executable(klassObjectRegistry, 
+            this.moduleManager, this.libraryModuleManager,
+            this.errors, this.lastOpenedFile, currentlyOpenFile);
 
         if(executable.mainModule){
             this.lastOpenedFile = executable.mainModule.file;

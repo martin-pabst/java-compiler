@@ -9,21 +9,21 @@ import { NumberClass } from "./NumberClass";
 export class LongClass extends NumberClass {
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "c", signature: "class Long extends Number"},
-        {type: "a", signature: "static final int MAX_VALUE", constantValue: Number.MAX_SAFE_INTEGER}, 
-        {type: "a", signature: "static final int MIN_VALUE", constantValue: Number.MIN_SAFE_INTEGER},
+        {type: "declaration", signature: "class Long extends Number"},
+        {type: "field", signature: "static final int MAX_VALUE", constantValue: Number.MAX_SAFE_INTEGER}, 
+        {type: "field", signature: "static final int MIN_VALUE", constantValue: Number.MIN_SAFE_INTEGER},
         // for doubleValue(), floatValue(), intValue() and longValue() there are methods (if called for a Number variable containing an Long value) and templates
         // (if called fo Long variable). Offering templates to the compiler is only possible because the methods are final.
-        {type: "m", signature: "public final double doubleValue()", native: LongClass.prototype.doubleValue, template: "§1.value"},
-        {type: "m", signature: "public final float floatValue()", native: LongClass.prototype.floatValue, template: "§1.value"},
-        {type: "m", signature: "public final int intValue()", native: LongClass.prototype.intValue, template: "(§1.value % 0x100000000 - 0x80000000)"},
-        {type: "m", signature: "public final long longValue()", native: LongClass.prototype.longValue, template: "§1.value"},
-        {type: "m", signature: "public int compareTo(Long anotherLong)", native: LongClass.prototype._compareTo},
-        {type: "m", signature: "public int parseInt(String s)", native: LongClass.prototype.parseInt},
-        {type: "m", signature: "public int parseInt(String sr, int radix)", native: LongClass.prototype.parseInt},
-        {type: "m", signature: "public static Long valueOf(long i)", native: LongClass.valueOf},
-        {type: "m", signature: "public static Long valueOf(String s)", native: LongClass.valueOfString},
-        {type: "m", signature: "public static Long valueOf(String s, int radix)", native: LongClass.valueOfString},
+        {type: "method", signature: "public final double doubleValue()", native: LongClass.prototype.doubleValue, template: "§1.value"},
+        {type: "method", signature: "public final float floatValue()", native: LongClass.prototype.floatValue, template: "§1.value"},
+        {type: "method", signature: "public final int intValue()", native: LongClass.prototype.intValue, template: "(§1.value % 0x100000000 - 0x80000000)"},
+        {type: "method", signature: "public final long longValue()", native: LongClass.prototype.longValue, template: "§1.value"},
+        {type: "method", signature: "public int compareTo(Long anotherLong)", native: LongClass.prototype._compareTo},
+        {type: "method", signature: "public int parseInt(String s)", native: LongClass.prototype.parseInt},
+        {type: "method", signature: "public int parseInt(String sr, int radix)", native: LongClass.prototype.parseInt},
+        {type: "method", signature: "public static Long valueOf(long i)", native: LongClass.valueOf},
+        {type: "method", signature: "public static Long valueOf(String s)", native: LongClass.valueOfString},
+        {type: "method", signature: "public static Long valueOf(String s, int radix)", native: LongClass.valueOfString},
     ]
 
     static type: NonPrimitiveType;

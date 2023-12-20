@@ -4,9 +4,9 @@ import { ObjectClass, StringClass } from "./ObjectClassStringClass";
 export class EnumClass extends ObjectClass {
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "c", signature: "class Enum extends Object"},
-        {type: "m", signature: "public String name()", native: EnumClass.prototype._name},
-        {type: "m", signature: "public int ordinal()", native: EnumClass.prototype._ordinal},
+        {type: "declaration", signature: "class Enum extends Object"},
+        {type: "method", signature: "public String name()", native: EnumClass.prototype._name},
+        {type: "method", signature: "public int ordinal()", native: EnumClass.prototype._ordinal},
     ]
 
     public name: string;

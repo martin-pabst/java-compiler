@@ -1,6 +1,7 @@
 import { Program } from "../../../common/interpreter/Program";
 import { Klass } from "../../../common/interpreter/StepFunction.ts";
 import { JavaLibraryModule, LibraryKlassType } from "../../module/libraries/JavaLibraryModule";
+import { IteratorInterface } from "./collections/IteratorInterface.ts";
 import { ArithmeticExceptionClass } from "./javalang/ArithmeticExceptionClass.ts";
 import { EnumClass } from "./javalang/EnumClass.ts";
 import { ExceptionClass } from "./javalang/ExceptionClass.ts";
@@ -51,7 +52,10 @@ export class SystemModule extends JavaLibraryModule {
             ObjectClass, EnumClass,                  // These two MUST come first!
             StringClass, NumberClass, IntegerClass, LongClass, FloatClass, DoubleClass, ShortClass, BooleanClass,  // boxed primitive types
             MathClass,
-            ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass
+            ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass,
+
+            // Collections
+            IteratorInterface
         )
 
     }
