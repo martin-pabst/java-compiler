@@ -679,7 +679,9 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         if (callingConvention == "java") {
-            objectTemplate += `${StepParams.thread}` + (parameterValues.length > 0 ? ", " : "");
+            objectTemplate += `${StepParams.thread}` +
+             (method.isStatic ? ''  : `, undefined` ) +     // non-static methods have callback-function as second parameter
+             (parameterValues.length > 0 ? ", " : "");
         }
 
         let i = 2;

@@ -551,9 +551,9 @@ export class CodeGenerator extends StatementCodeGenerator {
                 } else {
                     method.programStub =
                         `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
-                        `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`;
+                        `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}], ${Helpers.callbackParameter});`;
                 }
-                runtimeClass.prototype[method.getInternalNameWithGenericParameterIdentifiers("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
+                runtimeClass.prototype[method.getInternalNameWithGenericParameterIdentifiers("java")] = new Function(StepParams.thread, Helpers.callbackParameter, ...parameterIdentifiers,
                     method.programStub);
             }
         }

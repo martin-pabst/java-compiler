@@ -2,7 +2,7 @@ import { Program, Step } from "./Program";
 import { Semaphor } from "./Semaphor";
 import { Scheduler, SchedulerState } from "./Scheduler";
 import { IRange } from "../range/Range.ts";
-import { KlassObjectRegistry } from "./StepFunction.ts";
+import { CallbackFunction, KlassObjectRegistry } from "./StepFunction.ts";
 import { ExceptionInfo, CatchBlockInfo, Exception } from "./ExceptionInfo.ts";
 import { ThrowableClass } from "../../java/runtime/system/javalang/ThrowableClass.ts";
 import { SystemException } from "./SystemException.ts";
@@ -57,8 +57,6 @@ export class Thread {
     haltAtNextBreakpoint: boolean = false;
 
     stepCallback!: () => void;
-
-    lastDepositedCallback: (() => void) | undefined = undefined;
 
     classes: KlassObjectRegistry;
 
@@ -316,7 +314,7 @@ export class Thread {
      * call a java method which is executed by this thread
      * @param program 
      */
-    pushProgram(program: Program) {
+    pushProgram(program: Program, callback?: CallbackFunction) {
         // Object creation is faster than Object.assign, see
         // https://measurethat.net/Benchmarks/Show/18401/0/objectassign-vs-creating-new-objects3
         let state: ProgramState = {
@@ -325,11 +323,9 @@ export class Thread {
             // currentStepList: this.scheduler.executeMode == NExecuteMode.singleSteps ? program.stepsSingle : program.stepsMultiple,
             stackBase: this.s.length - program.numberOfParameters - program.numberOfThisObjects,  // 1 because of [this, parameter 1, ..., parameter n]
             stepIndex: 0,
-            callbackAfterFinished: this.lastDepositedCallback,
+            callbackAfterFinished: callback,
             exceptionInfoList: []
         }
-
-        this.lastDepositedCallback = undefined;
 
         for (let i = 0; i < program.numberOfLocalVariables; i++) {
             this.s.push(null);
@@ -338,11 +334,6 @@ export class Thread {
         this.programStack.push(state);
         this.currentProgramState = state;
     }
-
-    pushCallback(callback: () => void) {
-        this.lastDepositedCallback = callback;
-    }
-
 
     newArray(defaultValue: any, ...dimensions: number[]): Array<any> {
         let n0 = dimensions[0];

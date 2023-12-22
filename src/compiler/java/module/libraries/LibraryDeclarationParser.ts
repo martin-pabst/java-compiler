@@ -261,6 +261,12 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         let id = this.expectIdentifier();
         if (id == "") return this.currentTypeStore.getType("void")!;
 
+        if(id == "?"){
+            let gt = new GenericTypeParameter(id, module, EmptyRange.instance);
+            gt.isWildcard = true;
+            return gt;
+        }
+
         let type = this.findType(id);
 
         if (this.comesToken(TokenType.lower, true)) {
@@ -270,27 +276,40 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             } else {
                 let typeMap: Map<GenericTypeParameter, JavaType> = new Map();
                 for (let gtp of type.genericInformation) {
-                    typeMap.set(gtp, this.parseType(module))
-                    this.expect(TokenType.comma, true);
+                    let t = this.parseType(module);
+
+                    if(t instanceof GenericTypeParameter && t.isWildcard){
+                        if(this.comesToken(TokenType.keywordExtends, true)){
+                            t.upperBounds.push(<any>this.parseType(module));
+                        }
+                        if(this.comesToken(TokenType.keywordSuper, true)){
+                            t.lowerBound = <any>this.parseType(module);
+                        }
+                    }
+
+                    typeMap.set(gtp, t)
                     if (this.comesToken(TokenType.greater, false)) break;
+                    this.expect(TokenType.comma, true);
                 }
                 this.expect(TokenType.greater, true);
                 type = type.getCopyWithConcreteType(typeMap);
             }
         }
 
-        while (this.comesToken(TokenType.leftRightSquareBracket, true)) {
+        while (this.comesToken(TokenType.leftSquareBracket, true)) {
             if (type instanceof ArrayType) {
                 type.dimension++;
             } else {
                 type = new ArrayType(type, 1, module, LibraryDeclarationParser.nullRange);
             }
+            this.expect(TokenType.rightSquareBracket, true);
         }
 
         return type;
     }
 
     findType(id: string): JavaType {
+
         let type = this.currentTypeStore.getType(id);
         if (type) return type;
 
@@ -450,7 +469,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         this.genericParameterMapStack.push({});
 
-        let klassType = <JavaClass>klass.type;
+        let klassType = <JavaClass|JavaInterface|JavaEnum>klass.type;
         
         // example: "public <E> E testMethod(List<? extends E> li, E element)"
         let modifiers = this.parseModifiersAndType(false);
@@ -525,9 +544,11 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                     } else {
                         body = `
                             ${hasReturnValue ? 'let __returnValue = ' : ''}this.${realName}(${parameterNames.join(", ")});
-                            ${hasReturnValue ? `${Helpers.threadStack}.push(__returnValue);` : ''} 
+                            ${hasReturnValue ? `${Helpers.threadStack}.push(__returnValue);` : ''}
+                            if(__callback)__callback(); 
                         `
                         parameterNames.unshift('__t');
+                        parameterNames.unshift('__callback');
                         parameterNames.push(body);
 
                         klass.prototype[m.getInternalName("java")] = new Function(...parameterNames);
@@ -538,7 +559,13 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             }
 
             if (mdecl.java) {
-                klass.prototype[m.getInternalName("java")] = mdecl.java;
+                if(klassType instanceof JavaInterface || m.isAbstract){
+                    if(mdecl.java.name != m.getInternalName("java")){
+                        console.log(`${LibraryDeclarationParser.name}: Method ${mdecl.java.name} should have identifier ${m.getInternalName("java")}.` );
+                    }
+                } else {
+                    klass.prototype[m.getInternalName("java")] = mdecl.java;
+                }
             }
 
             if (mdecl.template) {

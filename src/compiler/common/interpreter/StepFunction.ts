@@ -1,6 +1,8 @@
 import { Thread } from "./Thread.ts";
 
 export type StepFunction = (thread: Thread, stack: any[], stackBase: number) => number;
+export type CallbackFunction = (() => void) | undefined;
+
 
 export class StepParams {
     static thread = "__t";            // type Thread
@@ -23,6 +25,8 @@ export class Helpers {
     static throwAE = StepParams.thread + "." + Thread.prototype.AE.name;
     static throwNPE = StepParams.thread + "." + Thread.prototype.NPE.name;
     static exit = StepParams.thread + "." + Thread.prototype.exit.name;
+
+    static callbackParameter = "callback";
 
     static elementRelativeToStackbase(index: number) {
         return StepParams.stack + "[" + StepParams.stackBase + (index != 0 ? " + " + index : "") + "]";

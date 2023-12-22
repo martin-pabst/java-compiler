@@ -63,8 +63,8 @@ export class ArrayType extends JavaType {
     }
 
     getInternalName(): string {
-        let internalName = this.identifier;
-        for(let i = 0; i < this.dimension; i++) internalName += "I_I";        
+        let internalName = this.elementType.identifier;
+        for(let i = 0; i < this.dimension; i++) internalName += "_I";        
         return internalName;
     }
 

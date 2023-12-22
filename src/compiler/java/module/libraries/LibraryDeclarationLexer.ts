@@ -32,6 +32,8 @@ export class LibraryDeclarationLexer {
     static specialTokenMap: { [character: string]: TokenType } = {
         "(": TokenType.leftBracket,
         ")": TokenType.rightBracket,
+        "[": TokenType.leftSquareBracket,
+        "]": TokenType.rightSquareBracket,
         "<": TokenType.lower,
         ">": TokenType.greater,
         ",": TokenType.comma,

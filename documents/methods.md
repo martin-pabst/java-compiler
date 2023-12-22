@@ -73,7 +73,7 @@ object.methodIdentifier(t: Thread, callback1, p1, ..., pn)
 ```  
   
 
-### c) java method
+### c) java method (NOT static)
   * in order to make unified method calls possible, a java-method is represented by a javascript-proxy-method:
 ```javascript
 methodIdentifier(t: Thread, callback, p1, ..., pn){
@@ -88,6 +88,9 @@ methodIdentifier(t: Thread, callback, p1, ..., pn){
 object.methodIdentifier(t, null, p1, ..., pn);   // we don't need a callback as thread won't execute next step before method is complete   
 ```
   * if method returns a value you can get it via ``t.sf.pop()`` in the next step.
+
+### d) static java method
+  * static methods don't get called from library methods, so we don't need the callback-parameter.
 
 
 
