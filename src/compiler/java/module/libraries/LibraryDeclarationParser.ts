@@ -548,8 +548,8 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                             ${hasReturnValue ? `${Helpers.threadStack}.push(__returnValue);` : ''}
                             if(__callback)__callback(); 
                         `
-                        parameterNames.unshift('__t');
                         parameterNames.unshift('__callback');
+                        parameterNames.unshift('__t');
                         parameterNames.push(body);
 
                         klass.prototype[m.getInternalName("java")] = new Function(...parameterNames);
