@@ -175,6 +175,7 @@ export enum TokenType {
     print,
     println,
     initializeEnumValue,
+    wildcardType
 }
 
 export var TokenTypeReadable: { [tt: number]: string } = {

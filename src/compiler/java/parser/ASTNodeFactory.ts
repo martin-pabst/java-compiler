@@ -1,13 +1,23 @@
 import { EmptyRange, IRange, Range } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { Token } from "../lexer/Token.ts";
-import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope as ASTTypeScope, ASTNewArrayNode, ASTInstanceInitializerNode, ASTStaticInitializerNode, ASTAnonymousClassNode } from "./AST";
+import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope as ASTTypeScope, ASTNewArrayNode, ASTInstanceInitializerNode, ASTStaticInitializerNode, ASTAnonymousClassNode, ASTWildcardNode } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
 export class ASTNodeFactory {
 
     constructor(private parser: TermParser) {
 
+    }
+
+    buildWildcardNode(startRange?: IRange): ASTWildcardNode {
+        if (!startRange) startRange = this.parser.cct.range;
+
+        return {
+            kind: TokenType.wildcardType,
+            range: startRange,
+            extends: []
+        }
     }
 
     buildTypeNode(parentTypeScope: ASTTypeScope | undefined, startRange?: IRange): ASTTypeNode {

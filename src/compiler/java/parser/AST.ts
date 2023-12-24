@@ -116,6 +116,11 @@ export interface ASTTypeDefinitionWithGenerics {
     genericParameterDeclarations: ASTGenericParameterDeclarationNode[]
 }
 
+export interface ASTWildcardNode extends ASTNode {
+    kind: TokenType.wildcardType,
+    extends: ASTTypeNode[],
+    super?: ASTTypeNode
+} 
 
 /**
  * Nodes for class, interface, enum
@@ -124,7 +129,7 @@ export interface ASTTypeDefinitionWithGenerics {
 export interface ASTTypeNode extends ASTNode {
     kind: TokenType.type,
     identifier: string;
-    genericParameterInvocations: ASTTypeNode[];
+    genericParameterInvocations: (ASTTypeNode | ASTWildcardNode)[];
     arrayDimensions: number;
     isVoidType: boolean;
     isVarKeyword: boolean;  // type inference...

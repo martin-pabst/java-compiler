@@ -1,6 +1,7 @@
 import { TokenType } from "../TokenType.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
-import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode, ASTMethodDeclarationNode } from "./AST.ts";
+import { GenericTypeParameter } from "../types/GenericInformation.ts";
+import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode, ASTMethodDeclarationNode, ASTWildcardNode } from "./AST.ts";
 import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator.ts";
 
@@ -375,7 +376,22 @@ export abstract class TermParser extends TokenIterator {
 
         if (this.comesToken(TokenType.lower, true)) {     // generic parameter invocation?
             do {
-                let genericParameterType = this.parseType();
+                let genericParameterType: ASTTypeNode | ASTWildcardNode | undefined;
+                if(this.comesToken(TokenType.ternaryOperator, false)){
+                    genericParameterType = this.nodeFactory.buildWildcardNode();
+                    this.nextToken(); // buildWildcardNode took range of current token...
+                    if(this.comesToken(TokenType.keywordExtends, true)){
+                        do {
+                            let type = this.parseType();
+                            if(type) genericParameterType.extends.push(type);
+                        } while(this.comesToken(TokenType.ampersand, true))
+                    }
+                    if(this.comesToken(TokenType.keywordSuper, true)){
+                        genericParameterType.super = this.parseType();
+                    }
+                } else {
+                    genericParameterType = this.parseType();
+                }
                 if (genericParameterType) type.genericParameterInvocations.push(genericParameterType);
             } while (this.comesToken(TokenType.comma, true))
             this.expect(TokenType.greater, true);

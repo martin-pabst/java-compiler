@@ -671,11 +671,11 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         let objectTemplate: string;
         if (objectSnippet.type instanceof StaticNonPrimitiveType) {
-            objectTemplate = `§1.${method.getInternalName(callingConvention)}(`
+            objectTemplate = `§1.${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}(`
         } else if (method.isStatic) {
-            objectTemplate = `§1.constructor.${method.getInternalName(callingConvention)}(`
+            objectTemplate = `§1.constructor.${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}(`
         } else {
-            objectTemplate = `§1${outerTypeTemplate}.${method.getInternalName(callingConvention)}(`
+            objectTemplate = `§1${outerTypeTemplate}.${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}(`
         }
 
         if (callingConvention == "java") {
