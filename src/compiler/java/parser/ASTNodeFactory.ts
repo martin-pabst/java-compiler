@@ -1,7 +1,7 @@
 import { EmptyRange, IRange, Range } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { Token } from "../lexer/Token.ts";
-import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope as ASTTypeScope, ASTNewArrayNode, ASTInstanceInitializerNode, ASTStaticInitializerNode, ASTAnonymousClassNode, ASTWildcardNode } from "./AST";
+import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope as ASTTypeScope, ASTNewArrayNode, ASTInstanceInitializerNode, ASTStaticInitializerNode, ASTAnonymousClassNode, ASTWildcardTypeNode, ASTVoidTypeNode, ASTArrayTypeNode, ASTGenericTypeInstantiationNode, ASTBaseTypeNode } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
 export class ASTNodeFactory {
@@ -10,7 +10,7 @@ export class ASTNodeFactory {
 
     }
 
-    buildWildcardNode(startRange?: IRange): ASTWildcardNode {
+    buildWildcardTypeNode(startRange?: IRange): ASTWildcardTypeNode {
         if (!startRange) startRange = this.parser.cct.range;
 
         return {
@@ -20,22 +20,74 @@ export class ASTNodeFactory {
         }
     }
 
-    buildTypeNode(parentTypeScope: ASTTypeScope | undefined, startRange?: IRange): ASTTypeNode {
-
+    buildVoidTypeNode(startRange?: IRange): ASTVoidTypeNode {
         if (!startRange) startRange = this.parser.cct.range;
 
         return {
-            kind: TokenType.type,
-            range: startRange,
-            identifier: "",
-            arrayDimensions: 0,
-            genericParameterInvocations: [],
-            isVoidType: false,
-            isVarKeyword: false,
-            parentTypeScope: parentTypeScope
+            kind: TokenType.voidType,
+            range: startRange
         }
-
     }
+
+    buildVarTypeNode(startRange?: IRange): ASTVoidTypeNode {
+        if (!startRange) startRange = this.parser.cct.range;
+
+        return {
+            kind: TokenType.voidType,
+            range: startRange
+        }
+    }
+
+    buildArrayTypeNode(arrayOf: ASTTypeNode, startRange?: IRange): ASTArrayTypeNode {
+        if (!startRange) startRange = this.parser.cct.range;
+
+        return {
+            kind: TokenType.arrayType,
+            range: startRange,
+            arrayDimensions: 0,
+            arrayOf: arrayOf
+        }
+    }
+
+    buildGenericTypeInstantiationNode(baseType: ASTTypeNode, startRange?: IRange): ASTGenericTypeInstantiationNode {
+        if (!startRange) startRange = this.parser.cct.range;
+
+        return {
+            kind: TokenType.genericTypeInstantiation,
+            range: startRange,
+            baseType: baseType,
+            actualTypeArguments: []
+        }
+    }
+
+    buildBaseTypeNode(identifier: string, startRange?: IRange): ASTBaseTypeNode {
+        if (!startRange) startRange = this.parser.cct.range;
+
+        return {
+            kind: TokenType.baseType,
+            range: startRange,
+            identifier: identifier
+        }
+    }
+
+
+
+    // buildTypeNode(parentTypeScope: ASTTypeScope | undefined, startRange?: IRange): ASTTypeNode {
+
+    //     if (!startRange) startRange = this.parser.cct.range;
+
+    //     return {
+    //         kind: TokenType.type,
+    //         range: startRange,
+    //         identifier: "",
+    //         arrayDimensions: 0,
+    //         genericParameterInvocations: [],
+    //         isVoidType: false,
+    //         isVarKeyword: false,
+    //         parentTypeScope: parentTypeScope
+    //     }
+
+    // }
 
     buildClassNode(modifiers: ASTNodeWithModifiers, identifier: Token | undefined,
         parent: ASTTypeScope, annotations: ASTAnnotationNode[]): ASTClassDefinitionNode {

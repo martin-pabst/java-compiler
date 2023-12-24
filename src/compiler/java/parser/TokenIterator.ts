@@ -12,7 +12,8 @@ export class TokenIterator {
         TokenType.space, TokenType.comment,
         TokenType.lower, TokenType.greater, TokenType.dot,
         TokenType.leftRightSquareBracket, TokenType.comma,
-        TokenType.keywordVar
+        TokenType.keywordVar, TokenType.ternaryOperator,
+        TokenType.keywordExtends, TokenType.keywordSuper
     ]
 
     static spaceTokenTypes: TokenType[] = [
@@ -62,6 +63,12 @@ export class TokenIterator {
     getAndSkipToken(): Token {
         this.nextToken();
         return this.lastToken;
+    }
+
+    getRangeAndThenSkipToken(): IRange {
+        let range = this.cct.range;
+        this.nextToken();
+        return range;
     }
 
     nextToken() {

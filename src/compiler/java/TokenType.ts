@@ -167,7 +167,6 @@ export enum TokenType {
     staticInitializerBlock,
     anonymousClass,
 
-    type, // e.g. int[][]
     fieldDeclaration,
     methodDeclaration,
     parameterDeclaration,
@@ -175,7 +174,15 @@ export enum TokenType {
     print,
     println,
     initializeEnumValue,
-    wildcardType
+    
+    type, // e.g. int[][]
+    baseType,  // type described only by an identifier, e.g. "ArrayList" or "int"
+    wildcardType,
+    voidType,
+    varType,
+    arrayType,
+    genericTypeInstantiation, // instantiation of a generic type with actual type arguments
+
 }
 
 export var TokenTypeReadable: { [tt: number]: string } = {
