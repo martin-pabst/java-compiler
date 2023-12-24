@@ -6,7 +6,7 @@ import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaModuleManager } from "../module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "../module/libraries/JavaLibraryModuleManager";
-import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTMethodDeclarationNode, ASTTypeDefinitionWithGenerics, ASTTypeNode, TypeScope } from "../parser/AST";
+import { ASTArrayTypeNode, ASTBaseTypeNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTGenericTypeInstantiationNode, ASTInterfaceDefinitionNode, ASTMethodDeclarationNode, ASTTypeDefinitionWithGenerics, ASTTypeNode, ASTWildcardTypeNode, TypeScope } from "../parser/AST";
 import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
 import { InterfaceClass } from "../runtime/system/javalang/InterfaceClass.ts";
 import { ArrayType } from "../types/ArrayType";
@@ -186,41 +186,80 @@ export class TypeResolver {
 
     resolveTypeNode(typeNode: ASTTypeNode, module: JavaBaseModule): JavaType | undefined {
 
-        let primaryType = this.findPrimaryTypeByIdentifier(typeNode, module);
-
-        if (!primaryType) return;
-
-        if (typeNode.genericParameterInvocations.length > 0) {
-            if (!primaryType.hasGenericParameters()) {
-                this.pushError("Der Datentyp " + typeNode.identifier + " ist nicht generisch.", typeNode.range, module);
-            } else if (primaryType.genericInformation!.length != typeNode.genericParameterInvocations.length) {
-                this.pushError("Der Datentyp " + typeNode.identifier + " hat " + primaryType.genericInformation!.length + " generische Parameter, hier werden aber " + typeNode.genericParameterInvocations.length + " konkrete Datentypen dafür angegeben.", typeNode.range, module);
-            } else {
+        switch (typeNode.kind) {
+            case TokenType.baseType: return typeNode.resolvedType = this.findPrimaryTypeByIdentifier(<ASTBaseTypeNode>typeNode, module);
+            case TokenType.genericTypeInstantiation:
+                let genericTypeNode = <ASTGenericTypeInstantiationNode>typeNode;
+                this.resolveTypeNode(genericTypeNode.baseType, module);
+                let baseType = genericTypeNode.baseType.resolvedType;
+                if (!baseType) return undefined;
+                if (!baseType.hasGenericParameters()) {
+                    this.pushError("Der Datentyp " + baseType.toString() + " ist nicht generisch.", typeNode.range, module);
+                    return undefined;
+                }
+                if (genericTypeNode.actualTypeArguments.length != baseType.genericInformation?.length) {
+                    this.pushError("Der Datentyp " + baseType.toString() + " hat " + baseType.genericInformation!.length + " generische Parameter, hier werden aber " + genericTypeNode.actualTypeArguments.length + " konkrete Datentypen dafür angegeben.", genericTypeNode.range, module);
+                    return undefined;
+                }
                 let typeMap: Map<GenericTypeParameter, NonPrimitiveType> = new Map();
-                for (let i = 0; i < typeNode.genericParameterInvocations.length; i++) {
-                    let gp = primaryType.genericInformation![i];
-                    let gpNode = typeNode.genericParameterInvocations[i];
+                for (let i = 0; i < genericTypeNode.actualTypeArguments.length; i++) {
+                    let gp = baseType.genericInformation![i];
+                    let gpNode = genericTypeNode.actualTypeArguments[i];
                     let gpType = this.resolveTypeNode(gpNode, module);
                     if (gpType) {
                         if (gpType.isPrimitive) {
-                            this.pushError("Als konkreter Typ für einen generischen Typparameter kann kein primitiver Datentyp (hier: " + primaryType.identifier + ") verwendet werden.", typeNode.range, module);
+                            this.pushError("Als konkreter Typ für einen generischen Typparameter kann kein primitiver Datentyp (hier: " + baseType.identifier + ") verwendet werden.", typeNode.range, module);
                         } else {
                             typeMap.set(gp, <NonPrimitiveType>gpType);
                         }
                     }
                 }
-                if (primaryType instanceof JavaClass || primaryType instanceof JavaInterface) primaryType = primaryType.getCopyWithConcreteType(typeMap);
-            }
+                if (baseType instanceof JavaClass || baseType instanceof JavaInterface) {
+                    genericTypeNode.resolvedType = baseType.getCopyWithConcreteType(typeMap);
+                } else {
+                    genericTypeNode.resolvedType = baseType;
+                }
+
+                return genericTypeNode.resolvedType;
+            case TokenType.arrayType:
+                let arrayTypeNode = <ASTArrayTypeNode>typeNode;
+                let baseType1 = this.resolveTypeNode(arrayTypeNode.arrayOf, module);
+                if (!baseType1) return undefined;
+                return typeNode.resolvedType = new ArrayType(baseType1, arrayTypeNode.arrayDimensions, module, arrayTypeNode.range);
+            case TokenType.voidType:
+                return typeNode.resolvedType = this.libraryModuleManager.typestore.getType("void");
+            case TokenType.varType:
+                // resolve later...
+                return undefined;
+            case TokenType.wildcardType:
+                let wildcardTypeNode = <ASTWildcardTypeNode>typeNode;
+                let upperBounds: (IJavaClass | IJavaInterface)[] = [];
+                for (let ubNode of wildcardTypeNode.extends) {
+                    let upperBound = this.resolveTypeNode(ubNode, module);
+                    if (!(upperBound instanceof IJavaClass || upperBound instanceof IJavaInterface)) {
+                        this.pushError("Als upper bounds eines generischen Wildcardtyps sind nur Klassen oder Interfaces möglich.", ubNode.range, module);
+                    } else if (upperBound) {
+                        upperBounds.push(upperBound);
+                    }
+                }
+
+                let type = new GenericTypeParameter("?", module, wildcardTypeNode.range, upperBounds);
+                if (wildcardTypeNode.super) {
+                    let lowerBound = this.resolveTypeNode(wildcardTypeNode.super, module);
+                    if (!(lowerBound instanceof IJavaClass)) {
+                        this.pushError("Als lower bounds eines generischen Wildcardtyps sind nur Klassen oder Interfaces möglich.", wildcardTypeNode.range, module);
+                    } else {
+                        type.lowerBound = lowerBound;
+                    }
+                }
+
+                return wildcardTypeNode.resolvedType = type;
         }
 
-        if (typeNode.arrayDimensions > 0) {
-            primaryType = new ArrayType(primaryType, typeNode.arrayDimensions, module, typeNode.range);
-        }
-
-        return typeNode.resolvedType = primaryType;;
     }
 
-    findPrimaryTypeByIdentifier(typeNode: ASTTypeNode, module: JavaBaseModule): JavaType | undefined {
+
+    findPrimaryTypeByIdentifier(typeNode: ASTBaseTypeNode, module: JavaBaseModule): JavaType | undefined {
         let identifer = typeNode.identifier;
 
         let type: JavaType | undefined;
@@ -291,17 +330,17 @@ export class TypeResolver {
             let resolvedType1 = <JavaClass>klassNode.resolvedType;
             this.resolveGenericParameters(klassNode, module);
             this.resolveClassExtendsImplements(klassNode, resolvedType1, module);
-            for(let method of klassNode.methods){
+            for (let method of klassNode.methods) {
                 this.resolveGenericParameters(method, module);
             }
         }
-        
+
         for (let interfaceNode of this.interfaceDeclarationNodes) {
             let module = interfaceNode.resolvedType!.module;
             let resolvedType2 = <JavaInterface>interfaceNode.resolvedType;
             this.resolveGenericParameters(interfaceNode, module);
             this.resolveInterfaceExtends(interfaceNode, resolvedType2, module);
-            for(let method of interfaceNode.methods){
+            for (let method of interfaceNode.methods) {
                 this.resolveGenericParameters(method, module);
             }
         }

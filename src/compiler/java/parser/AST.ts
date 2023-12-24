@@ -122,16 +122,44 @@ export interface ASTTypeDefinitionWithGenerics {
  */
 // e.g. HashMap<String, Integer>
 export interface ASTTypeNode extends ASTNode {
-    kind: TokenType.type,
-    identifier: string;
-    genericParameterInvocations: ASTTypeNode[];
-    arrayDimensions: number;
-    isVoidType: boolean;
-    isVarKeyword: boolean;  // type inference...
+    kind: TokenType.baseType | TokenType.wildcardType | TokenType.varType 
+    | TokenType.voidType | TokenType.arrayType | TokenType.genericTypeInstantiation,
     
     parentTypeScope?: TypeScope
-
     resolvedType?: JavaType;
+}
+
+export interface ASTWildcardTypeNode extends ASTTypeNode {
+    kind: TokenType.wildcardType,
+    extends: ASTTypeNode[],
+    super?: ASTTypeNode
+} 
+
+export interface ASTVoidTypeNode extends ASTTypeNode {
+    kind: TokenType.voidType
+}
+
+// type inference...
+export interface ASTVarTypeNode extends ASTTypeNode {
+    kind: TokenType.varType
+}
+
+export interface ASTArrayTypeNode extends ASTTypeNode {
+    kind: TokenType.arrayType,
+    arrayDimensions: number,
+    arrayOf: ASTTypeNode
+}
+
+// instantiation of a generic type with actual type arguments
+export interface ASTGenericTypeInstantiationNode extends ASTTypeNode {
+    kind: TokenType.genericTypeInstantiation,
+    baseType: ASTTypeNode,
+    actualTypeArguments: ASTTypeNode[]
+}
+
+export interface ASTBaseTypeNode extends ASTTypeNode {
+    kind: TokenType.baseType,
+    identifier: string
 }
 
 // e.g. public int getValue(String key)

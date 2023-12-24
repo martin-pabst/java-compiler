@@ -382,7 +382,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
             if (!initValueSnippet?.type) return undefined;
 
-            if (node.type.isVarKeyword) {
+            if (node.type.kind == TokenType.varType) {
                 variable.type = initValueSnippet.type;
             } else {
                 let type = node.type.resolvedType;
