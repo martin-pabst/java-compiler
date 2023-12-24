@@ -14,6 +14,7 @@ import { Parameter } from "../../types/Parameter";
 import { Visibility } from "../../types/Visibility";
 import { JavaBaseModule } from "../JavaBaseModule";
 import { JavaTypeStore } from "../JavaTypeStore";
+import { LibraryAttributeDeclaration, LibraryMethodDeclaration, LibraryMethodOrAttributeDeclaration } from "./DeclareType";
 import { LibraryKlassType, JavaTypeMap } from "./JavaLibraryModule";
 import { LdToken, LibraryDeclarationLexer } from "./LibraryDeclarationLexer";
 

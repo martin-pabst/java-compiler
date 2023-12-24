@@ -1,11 +1,11 @@
-type LMADeclarationType = "declaration" | "field" | "method";
+export type LMADeclarationType = "declaration" | "field" | "method";
 
-type LibraryClassDeclaration = {
+export type LibraryClassDeclaration = {
     type: LMADeclarationType;
     signature: string;
 }
 
-type LibraryMethodDeclaration = {
+export type LibraryMethodDeclaration = {
     type: LMADeclarationType;
     signature: string;
     native?: Function;
@@ -14,13 +14,13 @@ type LibraryMethodDeclaration = {
     constantFoldingFunction?: (...parms: any) => any;
 }
 
-type LibraryAttributeDeclaration = {
+export type LibraryAttributeDeclaration = {
     type: LMADeclarationType;
     signature: string;
     nativeIdentifier: string;
     constantValue: any;
 } 
 
-type LibraryMethodOrAttributeDeclaration = LibraryClassDeclaration | LibraryMethodDeclaration | LibraryAttributeDeclaration;
+export type LibraryMethodOrAttributeDeclaration = LibraryClassDeclaration | LibraryMethodDeclaration | LibraryAttributeDeclaration;
 
-type LibraryDeclarations = LibraryMethodOrAttributeDeclaration[];
+export type LibraryDeclarations = LibraryMethodOrAttributeDeclaration[];

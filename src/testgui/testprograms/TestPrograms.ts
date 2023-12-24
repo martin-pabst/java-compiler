@@ -1,17 +1,26 @@
 export var testPrograms = {
-genericMethodTest2:`
-interface i1<T> {
+arrayListTest:`
+ArrayList<String> list = new ArrayList<String>();
+
+list.add("one");
+list.add("two");
+list.add("three");
+
+println(list.get(1));
+`,
+genericParameterTest:`
+interface I1<T> {
    void doIt(T t);
 }
 
-class c1 implements i1<String> {
+class C1 implements I1<String> {
    void doIt(String x){
       println("Hier");
    }
 }
 
-c1 x = new c1();
-i1 y = x;
+C1 x = new C1();
+I1 y = x;
 
 y.doIt("Test");`,
 genericMethodTest1:`
@@ -19,8 +28,6 @@ Test te = new Test();
 Integer i = Integer.valueOf(10);
 
 te.test(i);
-
-
 
 class Test <T super Integer> {
    <S extends Integer> void test(S y){

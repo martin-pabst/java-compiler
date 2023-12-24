@@ -1,4 +1,5 @@
 import { Thread } from "../../../../../common/interpreter/Thread";
+import { LibraryDeclarations } from "../../../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../../../types/NonPrimitiveType";
 import { ObjectClass, StringClass } from "../../javalang/ObjectClassStringClass";
 import { NumberClass } from "./NumberClass";

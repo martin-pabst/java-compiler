@@ -3,6 +3,7 @@ import { File } from "../../../common/module/File";
 import { JavaType } from "../../types/JavaType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { JavaBaseModule } from "../JavaBaseModule";
+import { LibraryDeclarations } from "./DeclareType.ts";
 
 export type LibraryKlassType = {
 

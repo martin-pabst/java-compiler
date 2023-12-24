@@ -1,6 +1,7 @@
 import { Program } from "../../../../common/interpreter/Program";
 import { Scheduler } from "../../../../common/interpreter/Scheduler.ts";
 import { Thread } from "../../../../common/interpreter/Thread";
+import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
 
 export class ObjectClass {

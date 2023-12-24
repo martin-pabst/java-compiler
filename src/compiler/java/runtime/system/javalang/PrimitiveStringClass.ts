@@ -1,3 +1,4 @@
+import { LibraryDeclarations } from "../../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
 import { ObjectClass } from "./ObjectClassStringClass";
 
