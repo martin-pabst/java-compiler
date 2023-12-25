@@ -3,12 +3,12 @@ import { UsagePosition } from "../../common/UsagePosition.ts";
 import { IRange } from "../../common/range/Range";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
-import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
+import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter.ts";
 
 export abstract class JavaType extends BaseType {
 
     isPrimitive: boolean;
-    genericInformation: GenericInformation | undefined;
+    genericTypeParameters: GenericTypeParameters | undefined;
 
     public usagePositions: UsagePosition[] = [];
 
@@ -22,8 +22,8 @@ export abstract class JavaType extends BaseType {
 
     hasGenericParameters(): boolean {
         if(this.isPrimitive) return false;
-        if(!this.genericInformation) return false;
-        return this.genericInformation.length > 0;
+        if(!this.genericTypeParameters) return false;
+        return this.genericTypeParameters.length > 0;
     }
 
     isUsableAsIndex(): boolean {

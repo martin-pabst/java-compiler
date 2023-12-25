@@ -4,7 +4,7 @@ import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
-import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
+import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter";
 import { JavaClass } from "./JavaClass";
 import { JavaType } from "./JavaType";
 import { Method } from "./Method";
@@ -42,8 +42,8 @@ export abstract class IJavaInterface extends NonPrimitiveType {
     toString(): string {
         let s: string = this.identifier;
         
-        if(this.genericInformation && this.genericInformation.length > 0){
-            s += "<" + this.genericInformation.map(gi => gi.toString()).join(", ") + ">";
+        if(this.genericTypeParameters && this.genericTypeParameters.length > 0){
+            s += "<" + this.genericTypeParameters.map(gi => gi.toString()).join(", ") + ">";
         }
         return s;
     }
@@ -56,7 +56,6 @@ export abstract class IJavaInterface extends NonPrimitiveType {
 
 
 export class JavaInterface extends IJavaInterface {
-    genericInformation: GenericInformation = [];
 
     methods: Method[] = [];
     fields: Field[] = [];               // A interface may have fields, but they must be static final
@@ -67,6 +66,7 @@ export class JavaInterface extends IJavaInterface {
 
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
         super(identifier, identifierRange, path, module);
+        this.genericTypeParameters = [];
     }
 
     getFields(): Field[] {
@@ -139,13 +139,26 @@ export class JavaInterface extends IJavaInterface {
     }
 
     canImplicitlyCastTo(otherType: JavaType): boolean {
+        if(otherType instanceof GenericTypeParameter){
+            for(let ext of otherType.upperBounds){
+                if(!this.canImplicitlyCastTo(ext)) return false;
+            }
+
+            if(otherType.catches) otherType.catches.push(this);
+
+            return true;
+        }
+
         if (!(otherType instanceof JavaInterface)) return false;
 
         if (otherType == this) return true;
 
         for (let intf of this.extends) {
-            if (intf.canExplicitlyCastTo(otherType)) return true;
+            if (intf.canImplicitlyCastTo(otherType)) return true;
         }
+
+        if(otherType.identifier == 'Object') return true;
+
 
         return false;
     }
@@ -161,7 +174,7 @@ export class JavaInterface extends IJavaInterface {
 
     clearUsagePositionsAndInheritanceInformation(): void {
         this.usagePositions = [];
-        this.genericInformation.forEach(gi => gi.usagePositions = []);
+        this.genericTypeParameters!.forEach(gi => gi.usagePositions = []);
         this.methods.forEach(m => m.clearUsagePositions());
     }
 }
@@ -182,10 +195,10 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
     toString(): string {
         let s: string = this.identifier;
 
-        let genericInformation = this.isGenericVariantOf.genericInformation;
+        let genericTypeParameters = this.isGenericVariantOf.genericTypeParameters;
         
-        if(genericInformation && genericInformation.length > 0){
-            s += "<" + genericInformation.map(gi => {
+        if(genericTypeParameters && genericTypeParameters.length > 0){
+            s += "<" + genericTypeParameters.map(gi => {
                 let type = this.typeMap.get(gi);
                 return type?.toString();
             }).join(", ") + ">";
@@ -254,11 +267,23 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
     }
 
     canImplicitlyCastTo(otherType: JavaType): boolean {
+
+        if(otherType instanceof GenericTypeParameter){
+            for(let ext of otherType.upperBounds){
+                if(!this.canImplicitlyCastTo(ext)) return false;
+            }
+
+            if(otherType.catches) otherType.catches.push(this);
+
+            return true;
+        }
+
+
         if (!(otherType instanceof IJavaInterface)) return false;
 
         // List<Integer> or ArrayList<Integer> can cast to List
         if (otherType instanceof JavaInterface) {
-            if (this.isGenericVariantOf.canExplicitlyCastTo(otherType)) return true;
+            if (this.isGenericVariantOf.canImplicitlyCastTo(otherType)) return true;
             return false;
         }
 
@@ -266,7 +291,7 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
         // Collection<Integer> can cast to Collection<Integer> or List<? extends Number>
         let ot1 = <GenericVariantOfJavaInterface><any>otherType;
 
-        if (!this.isGenericVariantOf.canExplicitlyCastTo(ot1.isGenericVariantOf)) return false;
+        if (!this.isGenericVariantOf.canImplicitlyCastTo(ot1.isGenericVariantOf)) return false;
 
         // Find concrete parameterized supertype of this.isGenericVariantFrom which is generic variant from otherType
         // ... Find concrete parameterized supertype of ArrayList<Integer> which is generic variant from List (so: find List<Integer>)
@@ -276,16 +301,14 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
 
         if (smgvo == null) return false;
 
-        for (let genericParameter of smgvo.isGenericVariantOf.genericInformation) {
+        for (let genericParameter of smgvo.isGenericVariantOf.genericTypeParameters!) {
             let myType = smgvo.typeMap.get(genericParameter);
             let othersType = ot1.typeMap.get(genericParameter);
 
-            if (myType?.toString() == othersType?.toString()) continue;
+            if(!myType || !othersType) return false;
 
-            if (othersType instanceof GenericTypeParameter && othersType.isWildcard) {
-                for (let ext of othersType.upperBounds) {
-                    if (myType?.canExplicitlyCastTo(ext)) return true;
-                }
+            if(!(myType.canImplicitlyCastTo(otherType) && otherType.canImplicitlyCastTo(myType))) {
+                return false;
             }
 
         }

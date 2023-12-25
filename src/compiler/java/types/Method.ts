@@ -1,9 +1,10 @@
+import { Error } from "../../common/Error";
 import { UsagePosition } from "../../common/UsagePosition";
 import { Program } from "../../common/interpreter/Program";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
-import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
+import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter";
 import { JavaClass } from "./JavaClass";
 import { JavaEnum } from "./JavaEnum";
 import { JavaInterface } from "./JavaInterface";
@@ -47,8 +48,6 @@ export class Method {
     programStub?: string;       // only for debugging purposes
 
     callbackAfterCodeGeneration: (() => void)[] = [];
-
-    genericInformation: GenericInformation = [];
 
     constructor(public identifier: string, public identifierRange: IRange, public module: JavaBaseModule,
           public visibility: Visibility = TokenType.keywordPublic){
@@ -144,4 +143,44 @@ export class Method {
             return this.returnParameterType?.getReifiedIdentifier() + " " + this.identifier + "(" + this.parameters.map(p => p.type.getReifiedIdentifier()).join(", ") + ")";
         }
     }
+
+}
+
+
+export class GenericMethod extends Method {
+    
+    constructor(identifier: string, identifierRange: IRange, module: JavaBaseModule,
+        visibility: Visibility = TokenType.keywordPublic, public genericTypeParameters: GenericTypeParameters){
+            super(identifier, identifierRange, module, visibility);
+
+        }
+
+    initCatches(){
+        for(let p of this.genericTypeParameters){
+            p.catches = [];
+        }
+    }
+
+    checkCatches(methodCallPosition: IRange): Error[] {
+        let errors: Error[] = [];
+        for(let gp of this.genericTypeParameters){
+            gp.checkCatches(errors, methodCallPosition);
+        }
+        return errors;
+    }
+
+    getCopyWithConcreteTypes(): Method {
+
+        let typeMap: Map<GenericTypeParameter, NonPrimitiveType> = new Map();
+
+        for(let gp of this.genericTypeParameters){
+            typeMap.set(gp, gp.catches![0]);
+        }
+
+        return this.getCopyWithConcreteType(typeMap);
+ 
+    }
+
+
+
 }

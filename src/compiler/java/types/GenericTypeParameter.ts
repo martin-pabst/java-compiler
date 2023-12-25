@@ -1,3 +1,4 @@
+import { Error } from "../../common/Error.ts";
 import { UsagePosition } from "../../common/UsagePosition";
 import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
@@ -17,6 +18,9 @@ export class GenericTypeParameter extends NonPrimitiveType {
     private fieldCache?: Field[];
     private methodCache?: Method[];
     public usagePositions: UsagePosition[] = [];
+
+    // only used for generic type parameters of generic methods:
+    public catches?: NonPrimitiveType[];
 
     /**
      * 
@@ -130,7 +134,40 @@ export class GenericTypeParameter extends NonPrimitiveType {
         return this.identifier;
     }
 
+    initCatches(){
+        this.catches = [];
+    }
+
+    checkCatches(errors: Error[], methodCallPosition: IRange) {
+        if(!this.catches || this.catches.length == 0){
+            errors.push({
+                message: `Der generische Parameter ${this.identifier} ist bei diesem Methodenaufruf unbestimmt.`,
+                level: "error",
+                range: methodCallPosition
+            })
+            return;
+        }
+
+        let catchesAsString = this.catches.map(c => c.toString());
+        let allEqual = true;
+        for(let i = 0; i < catchesAsString.length && allEqual; i++){
+            for(let j = i + 1; j < catchesAsString.length && allEqual; j++){
+                if(catchesAsString[i] != catchesAsString[j]){
+                    allEqual = false;
+                }
+            }
+        }
+
+        if(!allEqual){
+            errors.push({
+                message: `Der generische Parameter ${this.identifier} hat bei diesem Methodenaufruf unterschiedliche Ausprägungen: ${catchesAsString.join(", ")}`,
+                level: "error",
+                range: methodCallPosition
+            })
+        }
+
+    }
 
 }
 
-export type GenericInformation  = GenericTypeParameter[];
+export type GenericTypeParameters  = GenericTypeParameter[];

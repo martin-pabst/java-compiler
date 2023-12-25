@@ -3,12 +3,12 @@ import { EmptyRange, IRange } from "../../../common/range/Range";
 import { TokenType } from "../../TokenType";
 import { ArrayType } from "../../types/ArrayType";
 import { Field } from "../../types/Field";
-import { GenericInformation, GenericTypeParameter } from "../../types/GenericInformation";
+import { GenericTypeParameters, GenericTypeParameter } from "../../types/GenericTypeParameter";
 import { JavaClass } from "../../types/JavaClass";
 import { JavaEnum } from "../../types/JavaEnum";
 import { JavaInterface } from "../../types/JavaInterface";
 import { JavaType } from "../../types/JavaType";
-import { Method } from "../../types/Method";
+import { GenericMethod, Method } from "../../types/Method";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { Parameter } from "../../types/Parameter";
 import { Visibility } from "../../types/Visibility";
@@ -169,7 +169,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         return types;
     }
 
-    parseGenericParameters(module: JavaBaseModule): GenericInformation {
+    parseGenericParameters(module: JavaBaseModule): GenericTypeParameters {
         if(!this.comesToken(TokenType.lower, true)) return [];
         let startPos = this.pos;
         if(!this.comesToken(TokenType.identifier, false)){
@@ -177,7 +177,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             return [];
         } 
 
-        let gi: GenericInformation = [];
+        let gi: GenericTypeParameters = [];
         
         let currentGenericParameterMap = this.genericParameterMapStack[this.genericParameterMapStack.length - 1];
 
@@ -271,12 +271,12 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         let type = this.findType(id);
 
         if (this.comesToken(TokenType.lower, true)) {
-            if (!type.genericInformation) {
+            if (!type.genericTypeParameters) {
                 this.pushError("Der Typ " + type.identifier + " ist nicht generisch.");
                 this.skipTill(TokenType.greater, true);
             } else {
                 let typeMap: Map<GenericTypeParameter, JavaType> = new Map();
-                for (let gtp of type.genericInformation) {
+                for (let gtp of type.genericTypeParameters) {
                     let t = this.parseType(module);
 
                     if(t instanceof GenericTypeParameter && t.isWildcard){
@@ -475,7 +475,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         // example: "public <E> E testMethod(List<? extends E> li, E element)"
         let modifiers = this.parseModifiersAndType(false);
 
-        let genericInformation = this.parseGenericParameters(module);
+        let genericParameters = this.parseGenericParameters(module);
 
         let type = this.parseType(module);
 
@@ -486,10 +486,11 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         if (decl.type == "method") {
             this.comesToken(TokenType.leftBracket, true);
             // method
-            let m = new Method(identifier, EmptyRange.instance, module, modifiers.visibility);
+            let m = genericParameters.length == 0 ? 
+                new Method(identifier, EmptyRange.instance, module, modifiers.visibility) :
+                new GenericMethod(identifier, EmptyRange.instance, module, modifiers.visibility, genericParameters);
             m.returnParameterType = type;
             m.isConstructor = isConstructor;
-            m.genericInformation = genericInformation;
 
             if (!this.comesToken(TokenType.rightBracket, false)) {
                 do {

@@ -3,7 +3,7 @@ import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
-import { GenericInformation, GenericTypeParameter } from "./GenericInformation";
+import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter.ts";
 import { JavaTypeWithInstanceInitializer } from "./JavaTypeWithInstanceInitializer.ts";
 import { GenericVariantOfJavaInterface, IJavaInterface, JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
@@ -16,8 +16,6 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 
 export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     isPrimitive: false;
-
-    genericInformation: GenericInformation | undefined = undefined;
 
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
         super(identifier, identifierRange, path, module);
@@ -46,8 +44,8 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     toString(): string {
         let s: string = this.identifier;
 
-        if (this.genericInformation && this.genericInformation.length > 0) {
-            s += "<" + this.genericInformation.map(gi => gi.toString()).join(", ") + ">";
+        if (this.genericTypeParameters && this.genericTypeParameters.length > 0) {
+            s += "<" + this.genericTypeParameters.map(gi => gi.toString()).join(", ") + ">";
         }
         return s;
     }
@@ -62,7 +60,6 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 
 
 export class JavaClass extends IJavaClass {
-    genericInformation: GenericInformation = [];
 
     isStatic: boolean = false;
     isFinal: boolean = false;
@@ -76,6 +73,7 @@ export class JavaClass extends IJavaClass {
 
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
         super(identifier, identifierRange, path, module);
+        this.genericTypeParameters = [];
     }
 
     getAbstractMethodsNotYetImplemented(): Method[] {
@@ -255,6 +253,16 @@ export class JavaClass extends IJavaClass {
 
         if (bType == this) return true;                   // A can cast to A.
 
+        if(bType instanceof GenericTypeParameter){
+            for(let ext of bType.upperBounds){
+                if(!this.canImplicitlyCastTo(ext)) return false;
+            }
+
+            if(bType.catches) bType.catches.push(this);
+
+            return true;
+        }
+
         if (bType instanceof JavaInterface) {               // can class A cast to interface BI?
             for (let x of this.implements) {                 // A implements X
                 if (x.canImplicitlyCastTo(bType)) return true;  // if x can cast to BI, then A can cast, too
@@ -299,7 +307,7 @@ export class JavaClass extends IJavaClass {
 
     clearUsagePositionsAndInheritanceInformation(): void {
         this.usagePositions = [];
-        this.genericInformation.forEach(gi => gi.usagePositions = []);
+        this.genericTypeParameters?.forEach(gi => gi.usagePositions = []);
         this.methods.forEach(m => m.clearUsagePositions());
         this.fields.forEach(f => f.usagePositions = []);
     }
@@ -323,7 +331,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     toString(): string {
         let s: string = this.identifier;
 
-        let genericInformation = this.isGenericVariantOf.genericInformation;
+        let genericInformation = this.isGenericVariantOf.genericTypeParameters;
 
         if (genericInformation && genericInformation.length > 0) {
             s += "<" + genericInformation.map(gi => {
@@ -408,6 +416,18 @@ export class GenericVariantOfJavaClass extends IJavaClass {
     }
 
     canImplicitlyCastTo(otherType: JavaType): boolean {
+
+        if(otherType instanceof GenericTypeParameter){
+            for(let ext of otherType.upperBounds){
+                if(!this.canImplicitlyCastTo(ext)) return false;
+            }
+
+            if(otherType.catches) otherType.catches.push(this);
+
+            return true;
+        }
+
+
         if (!(otherType instanceof NonPrimitiveType)) return false;          // we can't cast a class type to a primitive type. Auto-Unboxing is done in BinOpCastCodeGenerator.ts
 
         // ArrayList<Integer> can cast to List or to raw type ArrayList or to raw type List
@@ -434,7 +454,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
 
             if (iibm == null) return false;
 
-            for (let genericParameter of iibm.isGenericVariantOf.genericInformation) {
+            for (let genericParameter of iibm.isGenericVariantOf.genericTypeParameters!) {
                 let myType = iibm.typeMap.get(genericParameter);
                 let othersType = ot1.typeMap.get(genericParameter);
 
@@ -466,7 +486,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
 
             if (smgvo == null) return false;
 
-            for (let genericParameter of smgvo.isGenericVariantOf.genericInformation) {
+            for (let genericParameter of smgvo.isGenericVariantOf.genericTypeParameters!) {
                 let myType = smgvo.typeMap.get(genericParameter);
                 let othersType = ot1.typeMap.get(genericParameter);
 

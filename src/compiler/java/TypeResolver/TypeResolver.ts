@@ -8,15 +8,15 @@ import { JavaModuleManager } from "../module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "../module/libraries/JavaLibraryModuleManager";
 import { ASTArrayTypeNode, ASTBaseTypeNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTGenericTypeInstantiationNode, ASTInterfaceDefinitionNode, ASTMethodDeclarationNode, ASTTypeDefinitionWithGenerics, ASTTypeNode, ASTWildcardTypeNode, TypeScope } from "../parser/AST";
 import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
-import { InterfaceClass } from "../runtime/system/javalang/InterfaceClass.ts";
+import { InterfaceClass } from "../runtime/system/javalang/InterfaceClass";
 import { ArrayType } from "../types/ArrayType";
 import { Field } from "../types/Field";
-import { GenericTypeParameter } from "../types/GenericInformation";
+import { GenericTypeParameter } from "../types/GenericTypeParameter";
 import { IJavaClass, JavaClass } from "../types/JavaClass";
 import { JavaEnum } from "../types/JavaEnum";
 import { IJavaInterface, JavaInterface } from "../types/JavaInterface";
 import { JavaType } from "../types/JavaType";
-import { Method } from "../types/Method";
+import { GenericMethod, Method } from "../types/Method";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { Parameter } from "../types/Parameter";
 import { Visibility } from "../types/Visibility.ts";
@@ -172,7 +172,7 @@ export class TypeResolver {
         for (let gpNode of node.genericParameterDeclarations) {
             let gp = new GenericTypeParameter(gpNode.identifier, type.module, gpNode.identifierRange);
             gpNode.resolvedType = gp;
-            type.genericInformation.push(gp);
+            type.genericTypeParameters!.push(gp);
         }
     }
 
@@ -197,13 +197,13 @@ export class TypeResolver {
                     this.pushError("Der Datentyp " + baseType.toString() + " ist nicht generisch.", typeNode.range, module);
                     return undefined;
                 }
-                if (genericTypeNode.actualTypeArguments.length != baseType.genericInformation?.length) {
-                    this.pushError("Der Datentyp " + baseType.toString() + " hat " + baseType.genericInformation!.length + " generische Parameter, hier werden aber " + genericTypeNode.actualTypeArguments.length + " konkrete Datentypen dafür angegeben.", genericTypeNode.range, module);
+                if (genericTypeNode.actualTypeArguments.length != baseType.genericTypeParameters?.length) {
+                    this.pushError("Der Datentyp " + baseType.toString() + " hat " + baseType.genericTypeParameters!.length + " generische Parameter, hier werden aber " + genericTypeNode.actualTypeArguments.length + " konkrete Datentypen dafür angegeben.", genericTypeNode.range, module);
                     return undefined;
                 }
                 let typeMap: Map<GenericTypeParameter, NonPrimitiveType> = new Map();
                 for (let i = 0; i < genericTypeNode.actualTypeArguments.length; i++) {
-                    let gp = baseType.genericInformation![i];
+                    let gp = baseType.genericTypeParameters![i];
                     let gpNode = genericTypeNode.actualTypeArguments[i];
                     let gpType = this.resolveTypeNode(gpNode, module);
                     if (gpType) {
@@ -458,8 +458,18 @@ export class TypeResolver {
         let module = type.module;
 
         for (let methodNode of node.methods) {
-            let method = new Method(methodNode.identifier, methodNode.identifierRange,
-                module, methodNode.visibility);
+
+            let method: Method;
+
+            if(methodNode.genericParameterDeclarations.length > 0){
+                let genericParameters = methodNode.genericParameterDeclarations.map(gp => gp.resolvedType!);
+                method = new GenericMethod(methodNode.identifier, methodNode.identifierRange,
+                    module, methodNode.visibility, genericParameters);
+            } else {
+                method = new Method(methodNode.identifier, methodNode.identifierRange,
+                    module, methodNode.visibility);
+            }
+
             methodNode.method = method;
             method.isAbstract = methodNode.isAbstract;
             method.isFinal = methodNode.isFinal;

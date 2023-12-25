@@ -2,15 +2,13 @@ import { Program } from "../../common/interpreter/Program.ts";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable.ts";
-import { LabelCodeSnippet } from "../codegenerator/LabelManager.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
-import { GenericTypeParameter } from "../types/GenericInformation.ts";
+import { GenericTypeParameter } from "../types/GenericTypeParameter.ts";
 import { JavaClass } from "../types/JavaClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { JavaInterface } from "../types/JavaInterface.ts";
 import { JavaType } from "../types/JavaType.ts";
 import { Method } from "../types/Method.ts";
-import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { Visibility } from "../types/Visibility.ts";
 
 export type ASTNodes = ASTNode[];

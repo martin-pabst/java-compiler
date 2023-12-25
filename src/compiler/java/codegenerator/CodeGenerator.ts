@@ -245,7 +245,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                 let parameterSnippets = <CodeSnippet[]>valueNode.parameterValues.map(pv => this.compileTerm(pv));
                 if (parameterSnippets.some(sn => (!sn || !sn.type))) continue; // if there had been an error when compiling parameter values
 
-                let constructor = this.searchMethod(javaEnum.identifier, javaEnum, parameterSnippets.map(sn => sn!.type!), true, false, false);
+                let constructor = this.searchMethod(javaEnum.identifier, javaEnum, parameterSnippets.map(sn => sn!.type!), true, false, false, enumDeclNode.range);
                 if (!constructor) {
                     this.pushError("Es konnte kein passender Konstruktor gefunden werden ", "error", enumDeclNode);
                     continue;
