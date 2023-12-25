@@ -7,7 +7,6 @@ import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaModuleManager } from "../module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "../module/libraries/JavaLibraryModuleManager";
 import { ASTArrayTypeNode, ASTBaseTypeNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTGenericTypeInstantiationNode, ASTInterfaceDefinitionNode, ASTMethodDeclarationNode, ASTTypeDefinitionWithGenerics, ASTTypeNode, ASTWildcardTypeNode, TypeScope } from "../parser/AST";
-import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
 import { InterfaceClass } from "../runtime/system/javalang/InterfaceClass";
 import { ArrayType } from "../types/ArrayType";
 import { Field } from "../types/Field";
@@ -19,7 +18,6 @@ import { JavaType } from "../types/JavaType";
 import { GenericMethod, Method } from "../types/Method";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { Parameter } from "../types/Parameter";
-import { Visibility } from "../types/Visibility.ts";
 
 
 export class TypeResolver {
@@ -138,35 +136,6 @@ export class TypeResolver {
         }
     }
 
-    // generateNewTypesWithGenericsButWithoutFieldsAndMethodsOld() {
-
-    //     let baseEnumClass = <JavaClass><any>this.libraryModuleManager.typestore.getType("Enum");
-
-    //     for (let module of this.dirtyModules) {
-    //         for (let declNode of module.ast!.classOrInterfaceOrEnumDefinitions) {
-    //             let resolvedType: NonPrimitiveType | undefined = undefined;
-
-    //             switch (declNode.kind) {
-    //                 case TokenType.keywordClass:
-    //                     resolvedType = new JavaClass(declNode.identifier, module, declNode.identifierRange);
-    //                     this.generateGenericParameters(declNode, <JavaClass>resolvedType);
-    //                     break;
-    //                 case TokenType.keywordInterface:
-    //                     resolvedType = new JavaInterface(declNode.identifier, module, declNode.identifierRange);
-    //                     this.generateGenericParameters(declNode, <JavaInterface>resolvedType);
-    //                     break;
-    //                 case TokenType.keywordEnum:
-    //                     resolvedType = new JavaEnum(declNode.identifier, module, declNode.identifierRange, baseEnumClass);
-    //             }
-
-    //             if (resolvedType) {
-    //                 declNode.resolvedType = resolvedType;
-    //                 this.moduleManager.typestore.addType(resolvedType);
-    //                 module.types.push(declNode.resolvedType);
-    //             }
-    //         }
-    //     }
-    // }
 
     generateGenericParameters(node: ASTClassDefinitionNode | ASTInterfaceDefinitionNode, type: JavaClass | JavaInterface) {
         for (let gpNode of node.genericParameterDeclarations) {

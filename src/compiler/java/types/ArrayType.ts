@@ -29,7 +29,11 @@ export class ArrayType extends JavaType {
     }
 
     getCopyWithConcreteType(_typeMap: Map<GenericTypeParameter, JavaType>): JavaType {
-        return this;
+        if(!(this.elementType instanceof GenericTypeParameter)) return this;
+        let mappedElemenType = _typeMap.get(this.elementType);
+        if(!mappedElemenType) return this;
+
+        return new ArrayType(mappedElemenType, this.dimension, this.module, this.identifierRange)
     }
 
     getFile(): File {

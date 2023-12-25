@@ -7,6 +7,12 @@ list.add("two");
 list.add("three");
 
 println(list.get(1));
+
+String[] list2 = new String[1];
+
+String[] list3 = list.toArray(list2);
+
+println(list3[2]);
 `,
 genericParameterTest:`
 interface I1<T> {

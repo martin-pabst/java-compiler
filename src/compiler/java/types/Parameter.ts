@@ -2,7 +2,7 @@ import { BaseSymbol, SymbolKind } from "../../common/BaseSymbolTable";
 import { UsagePosition } from "../../common/UsagePosition";
 import { IRange } from "../../common/range/Range";
 import { JavaBaseModule } from "../module/JavaBaseModule";
-import { GenericTypeParameter } from "./GenericInformation";
+import { GenericTypeParameter } from "./GenericTypeParameter";
 import { JavaType } from "./JavaType";
 
 export class Parameter extends BaseSymbol {
