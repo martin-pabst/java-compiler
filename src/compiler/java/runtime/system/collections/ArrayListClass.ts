@@ -15,8 +15,8 @@ export class ArrayListClass extends SystemCollection {
         { type: "method", signature: "ArrayList()", native: ArrayListClass.prototype._constructor },
 
         // from InterableInterface
-        { type: "method", signature: "Iterator<T> iterator()", native: ArrayListClass.prototype._iterator },
-
+        { type: "method", signature: "Iterator<E> iterator()", native: ArrayListClass.prototype._iterator },
+ 
         // from CollectionInterface
         { type: "method", signature: "Object[] toArray()", native: ArrayListClass.prototype._toArray, template: "§1.elements.slice()" },
         { type: "method", signature: "<T> T[] toArray(T[] a)", native: ArrayListClass.prototype._toArray, template: "§1.elements.slice()" },

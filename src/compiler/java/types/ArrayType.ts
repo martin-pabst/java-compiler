@@ -4,7 +4,7 @@ import { CodeTemplate } from "../codegenerator/CodeTemplate";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
 import { BinaryOperator, UnaryPrefixOperator } from "../parser/AST";
-import { GenericTypeParameters, GenericTypeParameter } from "./GenericInformation";
+import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter";
 import { JavaType } from "./JavaType";
 
 export class ArrayType extends JavaType {

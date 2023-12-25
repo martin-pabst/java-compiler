@@ -116,14 +116,14 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         this.skipTill([TokenType.lower, TokenType.keywordExtends, TokenType.keywordImplements], false);
 
-        let npt = klass.type;
+        let npt = klass.type as JavaClass | JavaInterface | JavaEnum;
 
         if (this.comesToken(TokenType.lower, false)) {
             if (npt instanceof JavaEnum) {
                 this.pushError("Ein enum-Typ kann nicht generisch sein.");
                 this.skipTill([TokenType.keywordExtends, TokenType.keywordImplements], false);
             } else {
-                npt.genericInformation = this.parseGenericParameters(module);
+                npt.genericTypeParameters = this.parseGenericParameters(module);
             }
         }
 
