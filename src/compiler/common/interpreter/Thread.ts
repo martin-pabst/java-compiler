@@ -111,13 +111,16 @@ export class Thread {
                     // not in singlestep-mode (faster!)
                     while (numberOfSteps < maxNumberOfSteps && this.state == ThreadState.runnable) {
                         let step = currentStepList[stepIndex];
+                        
                         /**
                          * Behold, hier the steps run!
                          * parameter identifers inside function: 
                          *                    t, s, sb, h
                          */
-                        console.log(step.codeAsString);
+                        
+                        // console.log(step.codeAsString);
                         stepIndex = step.run!(this, stack, stackBase);
+                        
                         if (currentProgramState != this.currentProgramState) {
                             currentProgramState.stepIndex = stepIndex;
 

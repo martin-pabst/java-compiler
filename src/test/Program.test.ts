@@ -45,7 +45,7 @@ test('test if simple program with for-loop compiles and runs as expected', () =>
     interpreter.runMainProgramSynchronously();
 
     expect(clearSpy).toHaveBeenCalled();
-    expect(printSpy).toHaveBeenCalledWith(5050, false, undefined);
+    expect(printSpy).toHaveBeenCalledWith("5050", false, undefined);
 });
 
 
