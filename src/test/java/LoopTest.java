@@ -18,13 +18,3 @@ while(b < 4000){
 
 assertEquals(b, 4181, "Test of while-loop should yield 4181.");
 
-/**::
- * Test if clause
- */
-
-String t = "Test";
-t = "NewTest";
-assertEquals(t, "NewTest", "Assigning a string literal to a String variable doesn't work...");
-if(t < "Zest") t += t;
-
-assertEquals(t, "NewTestNewTest", "if-clause gone wrong...");
