@@ -10,7 +10,7 @@ export class ViteTestAssertions implements Assertions {
 
     check = '\xB7';
 
-    constructor(private context: TestContext){
+    constructor(private context: TestContext, private lineOffset: number){
 
     }
     
@@ -52,7 +52,7 @@ export class ViteTestAssertions implements Assertions {
         console.log(chalk.gray("Details:     ") + detail);
         if(step && step.range){
             console.log(chalk.gray("Position:    ") + chalk.white("Line ") + 
-            chalk.blue(step.range.startLineNumber) + chalk.white(", Column ") + 
+            chalk.blue(step.range.startLineNumber! + this.lineOffset) + chalk.white(", Column ") + 
             chalk.blue(step.range.startColumn))
 
             let fileText = thread.currentProgramState.program.module.file.getText();
@@ -61,9 +61,9 @@ export class ViteTestAssertions implements Assertions {
             for(let i = -4; i <= 2; i++){
                 let line = step.range.startLineNumber! + i;
                 if(i == 0){
-                    console.log(chalk.blue(threeDez(line) + ": ") + chalk.italic.white(getLine(fileText, line)))
+                    console.log(chalk.blue(threeDez(line + this.lineOffset) + ": ") + chalk.italic.white(getLine(fileText, line)))
                 } else {
-                    console.log(chalk.blue(threeDez(line) + ": ") + chalk.gray(getLine(fileText, line)))
+                    console.log(chalk.blue(threeDez(line + this.lineOffset) + ": ") + chalk.gray(getLine(fileText, line)))
                 }
             }
 

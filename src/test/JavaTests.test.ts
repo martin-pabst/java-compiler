@@ -7,16 +7,17 @@ import { Interpreter } from "../compiler/common/interpreter/Interpreter";
 import { ViteTestAssertions } from "./lib/ViteTestAssertions";
 import chalk from "chalk";
 import { PrintManager } from "../compiler/common/interpreter/PrintManager";
+import { getLine, getLineNumber, threeDez } from "../tools/StringTools";
 
 class StoreOutputPrintManager implements PrintManager {
-    
+
     output: string = "";
 
     print(text: string | undefined, withNewline: boolean, color: number | undefined): void {
-        if(!text) return;
-        if(text.startsWith("Duration")) return;
+        if (!text) return;
+        if (text.startsWith("Duration")) return;
         this.output += text;
-        if(withNewline) this.output += "\n";
+        if (withNewline) this.output += "\n";
     }
     clear(): void {
         this.output = "";
@@ -43,6 +44,7 @@ function test1(sourcecode: string, file: string) {
     sourcecode = sourcecode.replace(/\r\n/g, "\n");
     let testBegin = sourcecode.indexOf("/**::");
     while (testBegin >= 0) {
+        let lineOffset = getLineNumber(sourcecode, testBegin);
         let titleBegin = sourcecode.indexOf(" * ", testBegin) + 3;
         let titleEnd = sourcecode.indexOf("\n", titleBegin);
 
@@ -57,13 +59,13 @@ function test1(sourcecode: string, file: string) {
         let expectedOutputIndex = code.indexOf("@expectedOutput:");
         let expectedOutput: string | undefined;
 
-        if(expectedOutputIndex >= 0){
+        if (expectedOutputIndex >= 0) {
             let i1 = code.indexOf('"', expectedOutputIndex);
             let i2 = code.indexOf('"', i1 + 1);
             expectedOutput = code.substring(i1 + 1, i2);
         }
 
-        compileAndTest(title, code, expectedOutput);
+        compileAndTest(title, code, lineOffset, expectedOutput);
 
         testBegin = sourcecode.indexOf("/**::", testBegin + 1);
     }
@@ -72,7 +74,7 @@ function test1(sourcecode: string, file: string) {
 
 }
 
-function compileAndTest(name: string, program: string, expectedOutput?: string) {
+function compileAndTest(name: string, program: string, lineOffset: number, expectedOutput?: string) {
 
     test(name, (context) => {
         let file = new File();
@@ -87,7 +89,7 @@ function compileAndTest(name: string, program: string, expectedOutput?: string) 
             console.log(chalk.red("Compilation errors ") + "in " + name);
             for (let error of module.errors) {
                 console.log(chalk.white("Line ") +
-                    chalk.blue(error.range.startLineNumber) + chalk.white(", Column ") +
+                    chalk.blue(error.range.startLineNumber + lineOffset) + chalk.white(", Column ") +
                     chalk.blue(error.range.startColumn) + chalk.white(": " + error.message));
 
             }
@@ -101,21 +103,52 @@ function compileAndTest(name: string, program: string, expectedOutput?: string) 
 
             let interpreter = new Interpreter(printManager);
             interpreter.setExecutable(executable);
-            interpreter.setAssertions(new ViteTestAssertions(context));
+            interpreter.setAssertions(new ViteTestAssertions(context, lineOffset));
 
             interpreter.runMainProgramSynchronously();
 
-            if(expectedOutput){
-                if(expectedOutput != printManager.output){
+            let codeNotReachedAssertions = interpreter.codeReachedAssertions.getUnreachedAssertions();
+            if (codeNotReachedAssertions.length > 0) {
+                console.log(chalk.red("Test failed: ") + "CodeReached-assertions not reached");
+
+                for (let cnr of codeNotReachedAssertions) {
+                    console.log(chalk.gray("Details:     ") + cnr.messageIfNotReached);
+                    console.log(chalk.gray("Position:    ") + chalk.white("Line ") + 
+                        chalk.blue(cnr.range.startLineNumber + lineOffset) + chalk.white(", Column ") +
+                        chalk.blue(cnr.range.startColumn) + chalk.white(": " + cnr.messageIfNotReached));
+                    printCode(program, cnr.range.startLineNumber, lineOffset);
+                }
+
+                //@ts-ignore
+                context.task.fails = 1;
+            }
+
+            if (expectedOutput) {
+                if (expectedOutput != printManager.output) {
                     console.log(chalk.red("Test failed: ") + "Output doesn't match expected output.");
                     console.log(chalk.gray("Details:     ") + "Expected: " + chalk.green(expectedOutput) + " Actual: " + chalk.yellow(printManager.output));
                     //@ts-ignore
                     context.task.fails = 1;
                 }
-                        
+
             }
 
         }
 
     });
+
+    function printCode(code: string, errorLine: number, lineOffset: number){
+
+        for(let i = -4; i <= 2; i++){
+            let line = errorLine + i;
+            if(i == 0){
+                console.log(chalk.blue(threeDez(line + lineOffset) + ": ") + chalk.italic.white(getLine(code, line)))
+            } else {
+                console.log(chalk.blue(threeDez(line + lineOffset) + ": ") + chalk.gray(getLine(code, line)))
+            }
+        }
+    }
+
+
+
 }

@@ -416,6 +416,8 @@ export class Thread {
         this.state = ThreadState.terminated;
     }
 
-
+    registerCodeReached(key: string){
+        this.scheduler.interpreter.registerCodeReached(key);
+    }
 
 }

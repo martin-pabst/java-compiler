@@ -29,6 +29,7 @@ import { JavaInterface } from "../types/JavaInterface.ts";
 import { UsagePosition } from "../../common/UsagePosition.ts";
 import { OuterClassFieldAccessTracker } from "./OuterClassFieldAccessTracker.ts";
 import { LabelCodeSnippet } from "./LabelManager.ts";
+import { CodeReacedAssertion, CodeReachedAssertions } from "../../common/interpreter/CodeReachedAssertions.ts";
 
 export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
@@ -602,6 +603,9 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
                 if (node.identifier.startsWith("assert")) {
                     classContext = this.assertionsType;
+                    if (node.identifier == "assertCodeReached") {
+                        return this.registerCodeReachedAssertion(node, parameterValues);
+                    }
                 } else {
                     this.pushError("Außerhalb einer Klasse kann eine Methode nur mit Punktschreibweise (Object.Methode(...)) aufgerufen werden.", "error", node);
                     return undefined;
@@ -616,6 +620,14 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         let method = this.searchMethod(node.identifier, objectSnippet.type, parameterValues.map(p => p?.type), false, objectSnippet instanceof StaticNonPrimitiveType, true, node.range);
+
+        if (node.identifier == "assertCodeReached" && (!method || objectSnippet.type.identifier == "Assertions")) {
+            return this.registerCodeReachedAssertion(node, parameterValues);
+        }
+
+        if (!method && node.identifier.startsWith("assert")) {
+            method = this.searchMethod(node.identifier, this.assertionsType, parameterValues.map(p => p?.type), false, objectSnippet instanceof StaticNonPrimitiveType, true, node.range);
+        }
 
         let outerTypeTemplate: string = "";
         // access method of outer type from inner-class method?
@@ -714,6 +726,17 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         return snippet;
     }
 
+    registerCodeReachedAssertion(node: ASTMethodCallNode, parameterValues: (CodeSnippet | undefined)[]): CodeSnippet | undefined {
+        if(parameterValues.length != 1 || parameterValues[0]?.type != this.stringType || !parameterValues[0].isConstant()){
+            this.pushError("Die Methode assertCodeReached benötigt genau einen konstanten Parameter vom Typ String.", "error", node);
+            return undefined;
+        }
+        let message = <string>parameterValues[0].getConstantValue();
+        let codeReachedAssertion = new CodeReacedAssertion(message, this.module, node.range);
+        this.module.codeReachedAssertions.registerAssertion(codeReachedAssertion);
+
+        return new StringCodeSnippet(`${Helpers.registerCodeReached}("${codeReachedAssertion.key}")`);
+    }
 
     searchMethod(identifier: string, objectType: JavaType, parameterTypes: (JavaType | undefined)[],
         isConstructor: boolean, hasToBeStatic: boolean, takingVisibilityIntoAccount: boolean,

@@ -2,6 +2,7 @@ import { ActionManager } from "../../../testgui/ActionManager.ts";
 import { Assertions } from "../../java/runtime/unittests/Assertions.ts";
 import { Executable } from "../Executable.ts";
 import { Module } from "../module/Module";
+import { CodeReachedAssertions } from "./CodeReachedAssertions.ts";
 import { EventManager } from "./EventManager";
 import { LoadController } from "./LoadController";
 import { DummyPrintManager, PrintManager } from "./PrintManager";
@@ -26,6 +27,7 @@ export class Interpreter {
     executable?: Executable;
 
     assertions?: Assertions;
+    codeReachedAssertions: CodeReachedAssertions = new CodeReachedAssertions();
 
     // inputManager: InputManager;
 
@@ -187,8 +189,6 @@ export class Interpreter {
     start() {
 
         // this.main.getBottomDiv()?.console?.clearErrors();
-
-
         if (this.scheduler.state != SchedulerState.paused && this.executable) {
             this.printManager.clear();
             this.init(this.executable);
@@ -348,12 +348,18 @@ export class Interpreter {
         this.setState(SchedulerState.stopped);
         this.scheduler.init(executable);
 
+        this.codeReachedAssertions.init(executable.moduleManager);
+
     }
 
     hideProgrampointerPosition() {
 
         // this.main.hideProgramPointerPosition();
 
+    }
+
+    registerCodeReached(key: string) {
+        this.codeReachedAssertions.registerAssertionReached(key);
     }
 
 

@@ -4,22 +4,13 @@
  */
     int x = 1;
 
-    boolean case0reached = false;
-    boolean case1reached = false;
-    boolean case2reached = false;
-    boolean defaultCaseReached = false;
-
     switch(x) {
-        case 0: case0reached = true; break;
-        case 1: case1reached = true;
-        case 2: case2reached = true; break;
-        default: defaultCaseReached = true; break;
+        case 0: Assertions.fail("Case 0 must not be reached."); break;
+        case 1: assertCodeReached("Didn't reach case 1");
+        case 2: assertCodeReached("Didn't reach case 2"); break;
+        default: Assertions.fail("Default case must not be reached."); break;
     }
-
-    assertFalse(case0reached, "Case 0 must not be reached.");
-    assertTrue(case1reached, "Didn't reach case 1.");
-    assertTrue(case2reached, "Didn't reach case 2.");
-    assertFalse(defaultCaseReached, "Default case must not be reached.");
+    assertCodeReached("Code after switch...case-block not reached.");
 
     print("Here!")
 
@@ -36,18 +27,16 @@
   String b = "DEF";
   int y = 4;
   
-  boolean case5reached = false;
-
   switch(b) {
       case A.a: Assertions.fail("Case A.a must not be reached."); break;
       
       default: switch(y) {
         case 4:
-        case 5: case5reached = true; break;
+        case 5: assertCodeReached("Didn't reache case 5."); break;
         default: Assertions.fail("Default case must not be reached."); break;
       }
   }
+  assertCodeReached("Code after switch...case-block not reached.");
 
-  assertTrue(case5reached, "Didn't reache case 5.");
 
   print("Here!");

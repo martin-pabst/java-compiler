@@ -10,7 +10,10 @@ export class AssertionsClass extends ObjectClass {
         { type: "declaration", signature: "class Assertions extends Object" },
 
         // {type: "method", signature: "private Assertions()", native: AssertionsClass.prototype._emptyConstructor},
-
+        {
+            type: "method", signature: "public static void assertCodeReached(string message)",
+            template: `${Helpers.registerCodeReached}(§1)`  // §1 gets inserted by compiler magic
+        },
         {
             type: "method", signature: "public static void assertTrue(boolean condition, string message)",
             template: `${Helpers.assertions}.${DummyAssertions.prototype.assertTrue.name}(${StepParams.thread}, this, §1, §2)`

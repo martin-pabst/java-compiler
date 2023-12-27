@@ -115,3 +115,23 @@ export function getLine(text: string, lineNumber: number): string {
 
   return text.substring(index + 1, indexEnd);
 }
+
+export function getLineNumber(text: string, index: number){
+  let i = 0;
+  let lineNumber = -1;
+  while(i >= 0){
+    i = text.indexOf("\n", i + 1);
+    lineNumber++;
+    if(index <= i) return lineNumber;
+  }
+  return lineNumber;
+}
+
+export function generateSecret(length: number): string {
+  let alphabet: string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let secret: string = "";
+  for(let i = 0; i < length; i++){
+    secret += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+  }
+  return secret;
+}

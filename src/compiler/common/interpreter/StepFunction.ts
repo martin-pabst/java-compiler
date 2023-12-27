@@ -27,6 +27,7 @@ export class Helpers {
     static throwNPE = StepParams.thread + "." + Thread.prototype.NPE.name;
     static exit = StepParams.thread + "." + Thread.prototype.exit.name;
     static assertions = StepParams.thread + ".assertions"; 
+    static registerCodeReached = StepParams.thread + "." + Thread.prototype.registerCodeReached.name;; 
 
     static callbackParameter = "callback";
 
