@@ -522,7 +522,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 return undefined;
             }
             return new OneParameterTemplate(`(§1 || ${Helpers.throwNPE}(${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn})).length`)
-                .applyToSnippet(this.intType, range);
+                .applyToSnippet(this.intType, range, objectSnippet);
         }
 
         let objectType = objectSnippet.type;

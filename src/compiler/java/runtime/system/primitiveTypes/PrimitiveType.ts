@@ -2,7 +2,7 @@ import { File } from "../../../../common/module/File";
 import { EmptyRange, IRange } from "../../../../common/range/Range";
 import { TokenType } from "../../../TokenType";
 import { JavaBaseModule } from "../../../module/JavaBaseModule";
-import { GenericTypeParameter } from "../../../types/GenericInformation";
+import { GenericTypeParameter } from "../../../types/GenericTypeParameter";
 import { JavaType } from "../../../types/JavaType";
 
 export abstract class PrimitiveType extends JavaType {

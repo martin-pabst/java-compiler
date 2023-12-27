@@ -4,7 +4,7 @@ import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaLocalVariable } from "../codegenerator/JavaLocalVariable";
 import { JavaBaseModule } from "../module/JavaBaseModule";
-import { GenericTypeParameter } from "./GenericInformation";
+import { GenericTypeParameter } from "./GenericTypeParameter";
 import { JavaClass } from "./JavaClass";
 import { JavaEnum } from "./JavaEnum";
 import { JavaInterface } from "./JavaInterface";
