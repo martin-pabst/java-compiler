@@ -39,3 +39,19 @@
   assertCodeReached("Code after switch...case-block not reached.");
 
   print("Here!");
+
+/**::
+ * switch...case-statement with enum
+ */
+enum Test {
+   eins, zwei, drei
+}
+
+Test t = Test.zwei;
+
+switch(t){
+   case eins: fail("case 'eins' must not be reached.");
+   case Test.zwei: assertCodeReached("Didn't reach case 'Test.zwei'.");
+}
+
+assertCodeReached("Code after switch...case-block not reached.");
