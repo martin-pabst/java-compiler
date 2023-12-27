@@ -21,6 +21,13 @@ export class ViteTestAssertions implements Assertions {
         // expect(condition).to.equal(true, message);
     }
     
+    assertFalse(thread: Thread, step: Step, condition: boolean, message: string): void {
+        if(condition !== false){
+            this.logFailedTest(thread, step, message, "Expected: " + chalk.green("false") + ", actual: " + chalk.yellow("true"));
+        }
+        // expect(condition).to.equal(true, message);
+    }
+    
     assertEqualsNumber(thread: Thread, step: Step, expected: number, actual: number, message: string): void {
         if(Math.abs(expected - actual) > 1e-20){
             this.logFailedTest(thread, step, message, "Expected: " + chalk.green(expected) + ", actual: " + chalk.yellow(actual));
@@ -34,6 +41,11 @@ export class ViteTestAssertions implements Assertions {
         // expect(actual).to.equal(expected, message);
         // assert.equal(actual, expected, message);
     }
+
+    fail(thread: Thread, step: Step, message: string): void {
+        this.logFailedTest(thread, step, "Intentional fail", message);
+    }
+
 
     logFailedTest(thread: Thread, step: Step, message: string, detail: string){
         console.log(chalk.red("Test failed: ") + message);

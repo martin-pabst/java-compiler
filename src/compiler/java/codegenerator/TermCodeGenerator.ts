@@ -28,6 +28,7 @@ import { MissingStatementManager } from "./MissingStatementsManager.ts";
 import { JavaInterface } from "../types/JavaInterface.ts";
 import { UsagePosition } from "../../common/UsagePosition.ts";
 import { OuterClassFieldAccessTracker } from "./OuterClassFieldAccessTracker.ts";
+import { LabelCodeSnippet } from "./LabelManager.ts";
 
 export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
@@ -42,6 +43,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     missingStatementManager: MissingStatementManager = new MissingStatementManager();
 
     outerClassFieldAccessTracker: OuterClassFieldAccessTracker = new OuterClassFieldAccessTracker();
+
+    breakStack: LabelCodeSnippet[] = [];
 
     constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore) {
         super(module, libraryTypestore, compiledTypesTypestore);

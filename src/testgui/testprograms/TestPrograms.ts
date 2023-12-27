@@ -1,5 +1,21 @@
 export var testPrograms = {
-arrayListTest:`
+   switch_case:`
+class A {
+   static final int x = 5;
+   static final String y= "XYZ";
+}
+String s = "XYZ";
+switch(s) {
+   case A.y: 
+   case "PQR": println("A"); break;
+   default: println("B"); break;
+}
+int t = 2;
+switch(t) {
+   case A.x: break;
+   default: println("C");
+}
+`, arrayListTest: `
 ArrayList<String> list = new ArrayList<String>();
 
 list.add("one");
@@ -13,8 +29,7 @@ String[] list2 = new String[1];
 String[] list3 = list.toArray(list2);
 
 println(list3[2]);
-`,
-genericParameterTest:`
+`, genericParameterTest: `
 interface I1<T> {
    void doIt(T t);
 }
@@ -29,7 +44,7 @@ C1 x = new C1();
 I1 y = x;
 
 y.doIt("Test");`,
-genericMethodTest1:`
+   genericMethodTest1: `
 Test te = new Test();
 Integer i = Integer.valueOf(10);
 
@@ -41,7 +56,7 @@ class Test <T super Integer> {
       y.toString();
    }
 } `,
-lambdaTest2:`
+   lambdaTest2: `
 interface TestInterface {
    int foo(int n);
 }
@@ -57,7 +72,7 @@ class TestClass {
    }
 }
 `,
-lambdaTest:`
+   lambdaTest: `
 interface TestInterface {
    int foo(int n);
 }
@@ -66,7 +81,7 @@ TestInterface t = (x) -> { return x * 2; };
 
 println(t.foo(3));
  `,
-anonymousInnerClassTest:`
+   anonymousInnerClassTest: `
 A a = new A();
 Test t = a.test();
 t.doIt();
@@ -94,7 +109,7 @@ interface Test {
    void doIt();
 }
     `,
-innerClassesTest: `
+   innerClassesTest: `
 A a = new A();
 A.B b = a.getB();
 b.doIt();
@@ -115,7 +130,7 @@ class A {
 
 }
 `,
-simpleGenericsTest: `
+   simpleGenericsTest: `
 A<String> a = new A<String>();
 a.set("Test");
 println(a.get());
@@ -133,7 +148,7 @@ class A<T> {
 }
 
 `,
-staticFieldsTest: `
+   staticFieldsTest: `
 A a = new A();
 a.test();
 
@@ -146,7 +161,7 @@ class A {
    }
 }
 `,
-interfaceTest: `
+   interfaceTest: `
 T t = new T();
 t.def();
 
@@ -173,7 +188,7 @@ class S implements Test {
       return 20;
    }
 }`,
-enumTest: `
+   enumTest: `
 println(Test.eins.x);
 
 enum Test {
@@ -184,7 +199,7 @@ enum Test {
    }
 }
 `,
-singleStepTest:`
+   singleStepTest: `
 println("A");
 println("B");
 println("C");
@@ -195,7 +210,7 @@ println("G");
 println("H");
 println("I");
 `,
-fieldTest:`
+   fieldTest: `
 
 A a = new A();
 a.privateA = 12;
@@ -224,7 +239,7 @@ class B {
    }
 }
 `,
-tryCatchTest:`
+   tryCatchTest: `
 A a = new A();
 a.testA();
 println("Main program continues...");
@@ -263,7 +278,7 @@ class MyException extends Exception {
 }
 
 `,
-stringTest:`
+   stringTest: `
 String s = "A";
 
 new StringTest().test(s);
@@ -280,7 +295,7 @@ class StringTest {
    }
 } 
 `,
-   hanoi:`
+   hanoi: `
 Hanoi h = new Hanoi();
 h.erkläreLösung(1, 3, 4);    // Erkläre, wie man 4 Scheiben von Turm 1 zu Turm 3 bringt.
 
@@ -299,7 +314,7 @@ class Hanoi {
    }
 
 }`,
-simpleClass:`
+   simpleClass: `
 Test m = new Test();
 int i = m.doIt("Hier!");
 
@@ -314,7 +329,7 @@ class Test {
    }
 }
 `,
-simpleWhileLoops: `
+   simpleWhileLoops: `
 int i = 0;
 while(i < 10000){
     int j = 0;
@@ -327,17 +342,17 @@ while(i < 10000){
     }
 }
 `,
-arrayIndices: `
+   arrayIndices: `
 int[] test = new int[10];
 test[5] = 2;
 println(test[5]);
 `,
-forLoop:`
+   forLoop: `
 for(int i = 0; i < 10; i++){
     print(i + ", ");
 }
 `,
-primzahlzwillinge:`int max = 100000;
+   primzahlzwillinge: `int max = 100000;
 boolean[] isPrime = new boolean[max];
 for(int i = 0; i < max; i++) {
    isPrime[i] = true;

@@ -16,12 +16,20 @@ export class AssertionsClass extends ObjectClass {
             template: `${Helpers.assertions}.${DummyAssertions.prototype.assertTrue.name}(${StepParams.thread}, this, §1, §2)`
         },
         {
+            type: "method", signature: "public static void assertFalse(boolean condition, string message)",
+            template: `${Helpers.assertions}.${DummyAssertions.prototype.assertFalse.name}(${StepParams.thread}, this, §1, §2)`
+        },
+        {
             type: "method", signature: "public static void assertEquals(int expected, int actual, string message)",
             template: `${Helpers.assertions}.${DummyAssertions.prototype.assertEqualsNumber.name}(${StepParams.thread}, this, §1, §2, §3)`
         },
         {
             type: "method", signature: "public static void assertEquals(string expected, string actual, string message)",
             template: `${Helpers.assertions}.${DummyAssertions.prototype.assertEqualsString.name}(${StepParams.thread}, this, §1, §2, §3)`
+        },
+        {
+            type: "method", signature: "public static void fail(string message)",
+            template: `${Helpers.assertions}.${DummyAssertions.prototype.fail.name}(${StepParams.thread}, this, §1)`
         },
     ]
 

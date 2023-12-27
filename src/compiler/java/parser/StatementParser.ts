@@ -26,9 +26,9 @@ export abstract class StatementParser extends TermParser {
             case TokenType.keywordSwitch:
                 return this.parseSwitch();
             case TokenType.keywordBreak:
-                return this.nodeFactory.buildBreakNode(this.getAndSkipToken());
+                return this.nodeFactory.buildBreakNode(this.getAndSkipTokenWithSemicolon());
             case TokenType.keywordContinue:
-                return this.nodeFactory.buildContinueNode(this.getAndSkipToken());
+                return this.nodeFactory.buildContinueNode(this.getAndSkipTokenWithSemicolon());
             case TokenType.keywordTry:
                 return this.parseTryCatch();
             case TokenType.keywordThrow:
@@ -230,15 +230,15 @@ export abstract class StatementParser extends TermParser {
         if (!this.expect(TokenType.leftCurlyBracket, true) || !term) return undefined;
 
         let switchNode = this.nodeFactory.buildSwitchCaseNode(switchToken, term);
-        while(this.comesToken([TokenType.keywordCase, TokenType.keywordDefault], true)){
+        while(this.comesToken([TokenType.keywordCase, TokenType.keywordDefault], false)){
             let isCase = this.tt == TokenType.keywordCase;
             let caseDefaultToken = this.cct;
             this.nextToken(); // skip case or default
-            let constant = isCase ? this.parseTerm() : undefined;
+            let constant = isCase ? this.parseTermUnary() : undefined;
             this.expect(TokenType.colon, true);
  
             let caseNode = this.nodeFactory.buildCaseNode(caseDefaultToken, constant);
-            while(!this.isEnd() && !this.comesToken([TokenType.keywordCase, TokenType.keywordDefault, TokenType.rightCurlyBracket], true)){
+            while(!this.isEnd() && !this.comesToken([TokenType.keywordCase, TokenType.keywordDefault, TokenType.rightCurlyBracket], false)){
                 let statement = this.parseStatementOrExpression();
                 if(statement) caseNode.statements.push(statement);
             }
