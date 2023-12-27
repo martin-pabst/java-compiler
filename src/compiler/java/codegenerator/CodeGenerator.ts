@@ -1,27 +1,22 @@
-import { Program, Step } from "../../common/interpreter/Program";
+import { Program } from "../../common/interpreter/Program";
 import { Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
+import { EmptyRange } from "../../common/range/Range.ts";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
 import { ASTAnonymousClassNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTMethodDeclarationNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
+import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
 import { Field } from "../types/Field.ts";
 import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
+import { JavaEnum } from "../types/JavaEnum.ts";
+import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
+import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { CodeSnippetContainer } from "./CodeSnippetKinds.ts";
-import { CodeTemplate, OneParameterTemplate } from "./CodeTemplate.ts";
-import { JavaSymbolTable } from "./JavaSymbolTable";
+import { OneParameterTemplate } from "./CodeTemplate.ts";
+import { MissingStatementManager } from "./MissingStatementsManager.ts";
 import { SnippetLinker } from "./SnippetLinker";
 import { StatementCodeGenerator } from "./StatementCodeGenerator";
-import { type TypeResolver } from "../TypeResolver/TypeResolver.ts"; // only for jsDoc below
-import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
-import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
-import { Method } from "../types/Method.ts";
-import { JavaEnum } from "../types/JavaEnum.ts";
-import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
-import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
-import { EmptyRange } from "../../common/range/Range.ts";
-import { MissingStatementManager } from "./MissingStatementsManager.ts";
-import { JavaType } from "../types/JavaType.ts";
 
 export class CodeGenerator extends StatementCodeGenerator {
 

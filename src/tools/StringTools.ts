@@ -27,8 +27,14 @@ export function dateToStringWithoutTime(date: Date): string{
   return `${twoDez(date.getDate())}.${twoDez(date.getMonth() + 1)}.${date.getFullYear()}`;
 }
 
-function twoDez(z: number):string {
+export function twoDez(z: number):string {
   if(z < 10) return "0" + z;
+  return "" + z;
+}
+
+export function threeDez(z: number):string {
+  if(z < 10) return "  " + z;
+  if(z < 100) return " " + z;
   return "" + z;
 }
 
@@ -93,4 +99,19 @@ export function countSubstrings(text: string, subString: string, allowOverlappin
       } else break;
   }
   return n;
+}
+
+export function getLine(text: string, lineNumber: number): string {
+  if(lineNumber < 0 || !text) return "";
+
+  let index = 0;
+  for(let i = 1; i < lineNumber; i++){
+    index = text.indexOf("\n", index + 1);
+    if(index < 0) return "";
+  }
+
+  let indexEnd = text.indexOf("\n", index + 1);
+  if(indexEnd < 0) indexEnd = text.length;
+
+  return text.substring(index + 1, indexEnd);
 }

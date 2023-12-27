@@ -1,9 +1,10 @@
 import { ActionManager } from "../../../testgui/ActionManager.ts";
+import { Assertions } from "../../java/runtime/unittests/Assertions.ts";
 import { Executable } from "../Executable.ts";
 import { Module } from "../module/Module";
 import { EventManager } from "./EventManager";
 import { LoadController } from "./LoadController";
-import { PrintManager } from "./PrintManager";
+import { DummyPrintManager, PrintManager } from "./PrintManager";
 import { ProgramPointerPositionInfo, Scheduler, SchedulerState } from "./Scheduler";
 import { KlassObjectRegistry } from "./StepFunction.ts";
 
@@ -24,10 +25,14 @@ export class Interpreter {
 
     executable?: Executable;
 
+    assertions?: Assertions;
+
     // inputManager: InputManager;
 
     // keyboardTool: KeyboardTool;
     // gamepadTool: GamepadTool;
+
+    public printManager: PrintManager;
 
     eventManager: EventManager<InterpreterEvents> = new EventManager();
     showProgramPointerCallback?: ShowProgramPointerCallback;
@@ -52,7 +57,7 @@ export class Interpreter {
 
 
 
-    constructor(public printManager: PrintManager, private actionManager?: ActionManager) {
+    constructor(printManager?: PrintManager, private actionManager?: ActionManager) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {
 
         // this.printManager = new PrintManager($runDiv, this.main);
@@ -67,6 +72,8 @@ export class Interpreter {
 
         // TODO: This wires up speedcontrol with interpreter
         // controlButtons.setInterpreter(this);
+
+        this.printManager = printManager || new DummyPrintManager();
 
         this.registerActions();
 
@@ -87,6 +94,9 @@ export class Interpreter {
         }
     }
 
+    setAssertions(assertions: Assertions){
+        this.assertions = assertions;
+    }
 
     initTimer() {
 

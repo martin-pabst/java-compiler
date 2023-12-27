@@ -150,9 +150,7 @@ export class Scheduler {
     }
 
     createThread(program: Program, initialStack: any[] = [], callbackAfterFinished?: () => void) {
-
         let thread = new Thread(this, initialStack);
-        thread.lastDepositedCallback = callbackAfterFinished;
         thread.pushProgram(program);
     }
 

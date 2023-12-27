@@ -1,6 +1,7 @@
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
 
+
 export default defineConfig({
   server: {
     open: '/index.html',
@@ -15,3 +16,4 @@ export default defineConfig({
     }
   }
 });
+

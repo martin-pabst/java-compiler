@@ -12,8 +12,6 @@ import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility";
 import { Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 
-
-
 export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     isPrimitive: false;
 
@@ -27,6 +25,8 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 
     abstract getExtends(): IJavaClass | undefined;
     abstract getImplements(): IJavaInterface[];
+
+    abstract isFinal(): boolean;
 
     getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): Field | undefined {
         let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
@@ -62,7 +62,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 export class JavaClass extends IJavaClass {
 
     isStatic: boolean = false;
-    isFinal: boolean = false;
+    _isFinal: boolean = false;
     _isAbstract: boolean = false;
 
     fields: Field[] = [];
@@ -74,6 +74,10 @@ export class JavaClass extends IJavaClass {
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
         super(identifier, identifierRange, path, module);
         this.genericTypeParameters = [];
+    }
+
+    isFinal(): boolean {
+        return this._isFinal;
     }
 
     getAbstractMethodsNotYetImplemented(): Method[] {
@@ -133,6 +137,13 @@ export class JavaClass extends IJavaClass {
             let baseMethod = allBaseClassMethods?.find(m1 => m1.getInternalName("java") == internalName);
             if(baseMethod){
                 m.takeInternalJavaNameWithGenericParamterIdentifiersFrom(baseMethod);
+                if(baseMethod.isFinal){
+                    m.classEnumInterface.module.errors.push({
+                        message: `Die Methode ${m.getSignature()} überschreibt eine als final gekennzeichnete Methode der Oberklasse ${baseMethod.classEnumInterface.identifier}.`,
+                        level: "error",
+                        range: m.identifierRange
+                    })
+                }
             }
         }
 
@@ -326,6 +337,10 @@ export class GenericVariantOfJavaClass extends IJavaClass {
 
     constructor(public isGenericVariantOf: JavaClass, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
         super(isGenericVariantOf.identifier, isGenericVariantOf.identifierRange, isGenericVariantOf.pathAndIdentifier, isGenericVariantOf.module);
+    }
+
+    isFinal(): boolean {
+        return this.isGenericVariantOf._isFinal;
     }
 
     toString(): string {

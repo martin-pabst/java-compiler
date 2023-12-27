@@ -56,6 +56,13 @@ export class TwoParameterTemplate extends CodeTemplate {
             return new StringCodeSnippet(code, range, resultType);
         }
 
+        let countPlaceholderOne = (this.templateString.match(/\§1/g) || []).length;
+        let countPlaceholderTwo = (this.templateString.match(/\§2/g) || []).length;
+
+        if((countPlaceholderOne > 1 && !snippet0Pure) || (countPlaceholderTwo > 1 && !snippet1Pure)){
+            throw "TwoParameterTemplate: can't replace more than one placeholder with non-pure snippet."
+        }
+
         let snippetContainer = new CodeSnippetContainer([], range, resultType);
         if (snippet0Pure || snippet1Pure) {
             snippetContainer.addParts(snippets[0].allButLastPart());

@@ -77,7 +77,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 npt = new JavaClass(identifier, LibraryDeclarationParser.nullRange, "", module);
                 let npt1 = <JavaClass>npt;
                 npt1.isStatic = modifiersAndType.static;
-                npt1.isFinal = modifiersAndType.final;
+                npt1._isFinal = modifiersAndType.final;
                 npt1._isAbstract = modifiersAndType.abstract;
                 npt1.runtimeClass = klass;
                 npt1.pathAndIdentifier = npt1.identifier;

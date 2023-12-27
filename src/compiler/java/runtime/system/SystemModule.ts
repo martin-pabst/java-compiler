@@ -1,6 +1,7 @@
 import { Program } from "../../../common/interpreter/Program";
 import { Klass } from "../../../common/interpreter/StepFunction.ts";
 import { JavaLibraryModule, LibraryKlassType } from "../../module/libraries/JavaLibraryModule";
+import { AssertionsClass } from "../unittests/AssertionsClass.ts";
 import { ArrayListClass } from "./collections/ArrayListClass.ts";
 import { CollectionInterface as CollectionInterface } from "./collections/CollectionInterface.ts";
 import { IterableInterface } from "./collections/IterableInterface.ts";
@@ -59,7 +60,9 @@ export class SystemModule extends JavaLibraryModule {
             ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass,
 
             // Collections
-            IteratorInterface, IterableInterface, CollectionInterface, ListInterface, ArrayListClass
+            IteratorInterface, IterableInterface, CollectionInterface, ListInterface, ArrayListClass,
+
+            AssertionsClass
         )
 
     }

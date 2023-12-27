@@ -76,4 +76,8 @@ export class StringClass extends ObjectClass {
         return this;        
     }
 
+    add(secondString: string): StringClass {
+        return new StringClass(this.value + secondString);
+    }
+
 }

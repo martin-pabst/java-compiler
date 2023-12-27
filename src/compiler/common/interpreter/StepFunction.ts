@@ -1,3 +1,4 @@
+import { IRange } from "../range/Range.ts";
 import { Thread } from "./Thread.ts";
 
 export type StepFunction = (thread: Thread, stack: any[], stackBase: number) => number;
@@ -25,11 +26,16 @@ export class Helpers {
     static throwAE = StepParams.thread + "." + Thread.prototype.AE.name;
     static throwNPE = StepParams.thread + "." + Thread.prototype.NPE.name;
     static exit = StepParams.thread + "." + Thread.prototype.exit.name;
+    static assertions = StepParams.thread + ".assertions"; 
 
     static callbackParameter = "callback";
 
     static elementRelativeToStackbase(index: number) {
         return StepParams.stack + "[" + StepParams.stackBase + (index != 0 ? " + " + index : "") + "]";
+    }
+
+    static checkNPE(object: string, range: IRange){
+        return `(${object} || ${Helpers.throwNPE}(${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn}))`;
     }
 
     static outerClassAttributeIdentifier = "__outerClass";

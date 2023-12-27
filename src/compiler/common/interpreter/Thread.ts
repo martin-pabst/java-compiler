@@ -9,6 +9,7 @@ import { SystemException } from "./SystemException.ts";
 import { IThrowable } from "./ThrowableType.ts";
 import { ArithmeticExceptionClass } from "../../java/runtime/system/javalang/ArithmeticExceptionClass.ts";
 import { NullPointerExceptionClass } from "../../java/runtime/system/javalang/NullPointerExceptionClass.ts";
+import { Assertions, DummyAssertions } from "../../java/runtime/unittests/Assertions.ts";
 
 
 type ProgramState = {
@@ -60,9 +61,17 @@ export class Thread {
 
     classes: KlassObjectRegistry;
 
+    _dummyAssertions: Assertions;
+
+    get assertions(){
+        if(this.scheduler.interpreter.assertions) return this.scheduler.interpreter.assertions;
+        return this._dummyAssertions;
+    }
+
     constructor(public scheduler: Scheduler, initialStack: any[]) {
         this.s = initialStack;
         this.classes = scheduler.classObjectRegistry;
+        this._dummyAssertions = new DummyAssertions();
     }
 
     /**
@@ -120,7 +129,7 @@ export class Thread {
                         
                         // console.log(step.codeAsString);
                         stepIndex = step.run!(this, stack, stackBase);
-                        
+
                         if (currentProgramState != this.currentProgramState) {
                             currentProgramState.stepIndex = stepIndex;
 
@@ -209,7 +218,7 @@ export class Thread {
 
             let ps = this.programStack[this.programStack.length - 1];
 
-            while (ps.exceptionInfoList.length > 0) {
+            while (ps?.exceptionInfoList.length > 0) {
                 let exInfo = ps.exceptionInfoList.pop()!;
                 for (let cn of classNames) {
                     for (let catchBlockInfo of exInfo.catchBlockInfos) {
@@ -406,5 +415,7 @@ export class Thread {
     exit(){
         this.state = ThreadState.terminated;
     }
+
+
 
 }

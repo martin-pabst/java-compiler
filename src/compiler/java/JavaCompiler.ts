@@ -17,6 +17,7 @@ import { Lexer } from "./lexer/Lexer";
 import { JavaModuleManager } from "./module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "./module/libraries/JavaLibraryModuleManager";
 import { Parser } from "./parser/Parser";
+import { Assertions } from "./runtime/unittests/Assertions.ts";
 import { NonPrimitiveType } from "./types/NonPrimitiveType.ts";
 
 export class JavaCompiler {
