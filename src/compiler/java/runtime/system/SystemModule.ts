@@ -4,6 +4,7 @@ import { JavaLibraryModule, LibraryKlassType } from "../../module/libraries/Java
 import { AssertionsClass } from "../unittests/AssertionsClass.ts";
 import { ArrayListClass } from "./collections/ArrayListClass.ts";
 import { CollectionInterface as CollectionInterface } from "./collections/CollectionInterface.ts";
+import { ComparableInterface } from "./collections/ComparableInterface.ts";
 import { IterableInterface } from "./collections/IterableInterface.ts";
 import { IteratorInterface } from "./collections/IteratorInterface.ts";
 import { ListInterface } from "./collections/ListInterface.ts";
@@ -54,7 +55,7 @@ export class SystemModule extends JavaLibraryModule {
         )
 
         this.classes.push(
-            ObjectClass, EnumClass,                  // These two MUST come first!
+            ComparableInterface, ObjectClass, EnumClass,                  // These two MUST come first!
             StringClass, NumberClass, IntegerClass, LongClass, FloatClass, DoubleClass, ShortClass, BooleanClass,  // boxed primitive types
             MathClass,
             ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass,
