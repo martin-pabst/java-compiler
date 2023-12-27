@@ -1,9 +1,14 @@
+import { Interpreter } from "../../../common/interpreter/Interpreter";
 import { Helpers, StepParams } from "../../../common/interpreter/StepFunction";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { ObjectClass } from "../system/javalang/ObjectClassStringClass";
 import { DummyAssertions } from "./Assertions";
+import { Assertions } from "./Assertions";
 
+/**
+ * Java wrapper class to call methods from {@link Assertions}-object inside {@link Interpreter.assertions}
+ */
 export class AssertionsClass extends ObjectClass {
 
     static __javaDeclarations: LibraryDeclarations = [
