@@ -91,7 +91,7 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
                 console.log(chalk.white("Line ") +
                     chalk.blue(error.range.startLineNumber + lineOffset) + chalk.white(", Column ") +
                     chalk.blue(error.range.startColumn) + chalk.white(": " + error.message));
-
+                printCode(program, error.range.startLineNumber, lineOffset);
             }
 
             //@ts-ignore
