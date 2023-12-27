@@ -601,7 +601,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             let classContext = this.currentSymbolTable.getClassContext();
             if (!classContext) {
 
-                if (node.identifier.startsWith("assert")) {
+                if (node.identifier.startsWith("assert") || node.identifier.startsWith("fail")) {
                     classContext = this.assertionsType;
                     if (node.identifier == "assertCodeReached") {
                         return this.registerCodeReachedAssertion(node, parameterValues);
@@ -625,7 +625,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             return this.registerCodeReachedAssertion(node, parameterValues);
         }
 
-        if (!method && node.identifier.startsWith("assert")) {
+        if (!method && node.identifier.startsWith("assert") || node.identifier.startsWith("fail")) {
             method = this.searchMethod(node.identifier, this.assertionsType, parameterValues.map(p => p?.type), false, objectSnippet instanceof StaticNonPrimitiveType, true, node.range);
         }
 
