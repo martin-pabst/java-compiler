@@ -29,7 +29,7 @@ var boxedTypesMap: { [identifier: string]: number | undefined } = {
     "Long": nLong,
     "Float": nFloat,
     "Double": nDouble,
-    "String": nString
+    "String": nString,
 }
 
 var primitiveTypeMap: { [identifier: string]: number | undefined } = {
@@ -62,6 +62,8 @@ export abstract class BinopCastCodeGenerator {
     stringType: JavaType;
     throwableType: JavaType;
     objectType: JavaClass;
+    assertionsType: JavaClass;
+    stringNonPrimitiveType: JavaClass;
 
     primitiveStringClass = PrimitiveStringClass;
 
@@ -79,6 +81,8 @@ export abstract class BinopCastCodeGenerator {
         this.stringType = this.libraryTypestore.getType("string")!;
         this.throwableType = this.libraryTypestore.getType("Throwable")!;
         this.objectType = <JavaClass>this.libraryTypestore.getType("Object")!;
+        this.stringNonPrimitiveType = <JavaClass>this.libraryTypestore.getType("String")!;
+        this.assertionsType = <JavaClass>this.libraryTypestore.getType("Assertions")!;
 
         this.primitiveTypes.push(this.voidType);  // dummy for "otherClass"
         for (let i = 1; i < primitiveTypeIdentifiers.length; i++) this.primitiveTypes.push(this.libraryTypestore.getType(primitiveTypeIdentifiers[i])!);
@@ -219,7 +223,7 @@ export abstract class BinopCastCodeGenerator {
      * both operators are unboxed and operation is not in [==, !=]
      */
     compileBinaryOperationWithStrings(leftSnippet: CodeSnippet, rightSnippet: CodeSnippet, lTypeIndex: number, rTypeIndex: number, lIdentifier: string, rIdentifier: string, operator: BinaryOperator, operatorRange: IRange, wholeRange: IRange): CodeSnippet | undefined {
-        if (operator != TokenType.plus) {
+        if (operator != TokenType.plus && comparisonOperators.indexOf(operator) < 0) {
             this.pushError("Der Operator " + TokenTypeReadable[operator] + " ist für die Typen " + lIdentifier + " und " + rIdentifier + " nicht geeignet.", "error", operatorRange);
             return undefined;
         }
@@ -227,7 +231,9 @@ export abstract class BinopCastCodeGenerator {
         if (lTypeIndex == nOtherClass) leftSnippet = this.wrapWithToStringCall(leftSnippet);
         if (rTypeIndex == nOtherClass) rightSnippet = this.wrapWithToStringCall(rightSnippet);
 
-        return new BinaryOperatorTemplate("+", false).applyToSnippet(this.stringType, wholeRange, leftSnippet, rightSnippet);
+        let returnType: JavaType = operator == TokenType.plus ? this.stringType : this.booleanType;
+
+        return new BinaryOperatorTemplate(TokenTypeReadable[operator], false).applyToSnippet(returnType, wholeRange, leftSnippet, rightSnippet);
 
     }
 
@@ -260,6 +266,15 @@ export abstract class BinopCastCodeGenerator {
         }
 
         if (!leftSnippet.type!.isPrimitive) {
+            if(leftSnippet.type == this.stringNonPrimitiveType && operator == TokenType.plusAssignment){
+                if(!this.canCastTo(rightSnippet.type, this.stringType, "implicit")){
+                    this.pushError("Der Term auf der rechten Seite des Zuweisungsoperators kann nicht in den Typ String umgewandelt werden.", "error", rightSnippet.range!);
+                    return undefined;
+                }
+                rightSnippet = this.compileCast(rightSnippet, this.stringType, "implicit");
+                return new TwoParameterTemplate(`§1 = ${Helpers.checkNPE('§1', leftSnippet.range!)}.add(§2)`).applyToSnippet(leftSnippet.type, wholeRange, leftSnippet, rightSnippet);
+            }
+
             this.pushError("Mit dem Attribut/der Variablen auf der linken Seite des Zuweisungsoperators kann die Berechnung " + operatorAsString + " nicht durchgeführt werden.", "error", operatorRange);
             return leftSnippet;
         }
