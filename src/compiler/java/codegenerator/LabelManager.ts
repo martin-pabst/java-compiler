@@ -71,6 +71,9 @@ export class JumpToLabelCodeSnippet extends CodeSnippet {
 
     emitToStep(currentStep: Step, _steps: Step[]): Step {
         currentStep.codeAsString = currentStep.codeAsString + this.emit();
+        if(!currentStep.range.startLineNumber){
+            currentStep.range = this.range!;
+        }
         return currentStep;
     }
 

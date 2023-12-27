@@ -1,5 +1,18 @@
 export var testPrograms = {
-   switch_case:`
+switch_case_with_enums:`
+enum Test {
+   eins, zwei, drei
+}
+
+Test t = Test.drei;
+
+switch(t){
+   case Test.eins: println("eins!");
+   case Test.zwei: println("zwei!");
+}
+
+println("Fertig");`,
+switch_case:`
 class A {
    static final int x = 5;
    static final String y= "XYZ";
