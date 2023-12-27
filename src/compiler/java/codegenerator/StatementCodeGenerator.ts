@@ -2,7 +2,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTAnonymousClassNode, ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ConstantType } from "../parser/AST"; import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
+import { ASTAnonymousClassNode, ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ConstantType, ASTAttributeDereferencingNode, ASTSymbolNode } from "../parser/AST"; import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippetContainer, EmptyPart } from "./CodeSnippetKinds.ts";
 import { CodeSnippet as CodeSnippet, StringCodeSnippet } from "./CodeSnippet.ts";
@@ -15,6 +15,10 @@ import { Method } from "../types/Method.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { CatchBlockInfo } from "../../common/interpreter/ExceptionInfo.ts";
 import { IntPrimitiveType } from "../runtime/system/primitiveTypes/IntPrimitiveType.ts";
+import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
+import { JavaEnum } from "../types/JavaEnum.ts";
+import { Field } from "../types/Field.ts";
+import { EmptyRange, IRange } from "../../common/range/Range.ts";
 
 export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
@@ -84,7 +88,9 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             return undefined;
         }
         this.breakStack.push(label);
-        return new JumpToLabelCodeSnippet(label);
+        let snippet = new JumpToLabelCodeSnippet(label);
+        snippet.range = node.range;
+        return snippet;
     }
 
 
@@ -310,9 +316,40 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         return !x.includes(undefined);
     }
 
-    compileCaseStatement(node: ASTCaseNode, index: number, labelArray: Array<LabelCodeSnippet>, typeId: string | undefined): [CodeSnippet, CodeSnippet] | undefined {
+    compileCaseStatement(node: ASTCaseNode, index: number, labelArray: Array<LabelCodeSnippet>, 
+        typeId: string | undefined, enumType: JavaEnum | undefined): [CodeSnippet, CodeSnippet] | undefined {
         if (!node.constant) return undefined;
-        let constant = this.compileTerm(node.constant);
+
+        let constant: CodeSnippet | undefined;
+
+        if(enumType){
+            let enumIdentifier = "";
+            let enumIdentifierRange: IRange = EmptyRange.instance;
+            switch(node.constant.kind){
+                case TokenType.dereferenceAttribute:
+                    enumIdentifier = (<ASTAttributeDereferencingNode>node.constant).attributeIdentifier;
+                    enumIdentifierRange = (<ASTAttributeDereferencingNode>node.constant).range;
+                    break;
+                case TokenType.symbol:
+                    enumIdentifier = (<ASTSymbolNode>node.constant).identifier;
+                    enumIdentifierRange = node.constant.range;
+                    break;
+            }
+            let enumIndex = enumType.fields.findIndex(field => field.identifier == enumIdentifier);
+            if(enumIndex < 0){
+                this.pushError(`Der Enum-Typ ${enumType.identifier} hat kein Element mit dem Bezeichner ${enumIdentifier}.`, "error", node.constant.range);
+                return undefined;
+            }
+            enumType.fields[enumIndex].usagePositions.push({
+                file: this.module.file,
+                range: enumIdentifierRange
+            })
+            constant = new StringCodeSnippet(enumIndex + "", enumIdentifierRange, this.intType, enumIndex);
+        } else {
+            constant = this.compileTerm(node.constant);
+        }
+
+
         let caseSnippet = new CodeSnippetContainer([], node.range);
         let caseStatementSnippet = new CodeSnippetContainer([], node.range);
 
@@ -362,10 +399,19 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
     compileSwitchCaseStatement(node: ASTSwitchCaseNode): CodeSnippet | undefined {
         let term = this.compileTerm(node.term);
         if (!this.isDefined(term)) return undefined;
-        if (!term.type?.identifier || !["byte", "short", "int", "char", "String"].includes(term.type?.identifier)) {
+        if(!term.type) return undefined;
+        
+        let type = term.type;
+
+        let enumType = type instanceof JavaEnum ? type as JavaEnum : undefined;
+
+        if(enumType){
+            term = SnippetFramer.frame(term, "§1.ordinal");
+        }
+
+        if (!(enumType || type.identifier && ["byte", "short", "int", "char", "String"].includes(type.identifier))) {
             this.pushError("Die Anweisung switch(x) ist nur möglich, wenn x den Typ int, String, oder enum hat.", "error", node.term.range);
         }
-        let type = term.type;
 
         if (!type) return undefined;
 
@@ -387,7 +433,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
         labelArray.push(breakLabel);
 
-        let caseSnippets = node.caseNodes.map((node, i) => this.compileCaseStatement(node, i, labelArray, type?.identifier));
+        let caseSnippets = node.caseNodes.map((node, i) => this.compileCaseStatement(node, i, labelArray, enumType ? "int" : type.identifier, enumType));
 
         if (!this.listHasNoUndefined(caseSnippets)) return undefined;
 
@@ -401,8 +447,12 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             switchSnippet.addParts(new JumpToLabelCodeSnippet(defaultLabel!));
         }
 
-        switchSnippet.addStringPart("\n }", undefined);
+        switchSnippet.addStringPart("\n }\n", undefined);
+
+        switchSnippet.addParts(new JumpToLabelCodeSnippet(breakLabel));
+
         switchSnippet.addNextStepMark();
+
         caseSnippets.forEach(([_, b]) => switchSnippet.addParts(b));
 
         if (node.defaultNode) {
