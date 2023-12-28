@@ -18,6 +18,7 @@ import { JavaType } from "../types/JavaType";
 import { GenericMethod, Method } from "../types/Method";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { Parameter } from "../types/Parameter";
+import { CycleFinder } from "./CycleFinder";
 
 
 export class TypeResolver {
@@ -32,7 +33,7 @@ export class TypeResolver {
         this.dirtyModules = this.moduleManager.getNewOrDirtyModules();
     }
 
-    resolve() {
+    resolve(): boolean {
 
         this.gatherTypeDefinitionNodes();
 
@@ -42,9 +43,13 @@ export class TypeResolver {
 
         this.resolveGenericParameterTypesAndExtendsImplements();
 
+        if(CycleFinder.findCycle(this.moduleManager)) return false;
+
         this.buildAllMethods();
 
         this.buildRuntimeClassesAndTheirFields();
+
+        return true;
     }
 
 

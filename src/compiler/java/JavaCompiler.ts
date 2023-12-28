@@ -12,6 +12,7 @@ import { KlassObjectRegistry } from "../common/interpreter/StepFunction.ts";
 import { File } from "../common/module/File";
 import { TypeResolver } from "./TypeResolver/TypeResolver";
 import { CodeGenerator } from "./codegenerator/CodeGenerator";
+import { ExceptionTree } from "./codegenerator/ExceptionTree.ts";
 import { LabelCodeSnippet } from "./codegenerator/LabelManager.ts";
 import { Lexer } from "./lexer/Lexer";
 import { JavaModuleManager } from "./module/JavaModuleManager";
@@ -65,25 +66,28 @@ export class JavaCompiler {
         }
 
         let typeResolver = new TypeResolver(this.moduleManager, this.libraryModuleManager);
-        typeResolver.resolve();
+        
+        // resolve returns false if cyclic references are found. In this case we don't continue compiling.
+        if(typeResolver.resolve()){
+            this.moduleManager.typestore.initFastExtendsImplementsLookup();
+    
+            let exceptionTree = new ExceptionTree(this.libraryModuleManager.typestore, this.moduleManager.typestore);
+    
+            for(let module of newOrDirtyModules){
+                let codegenerator = new CodeGenerator(module, this.libraryModuleManager.typestore, 
+                    this.moduleManager.typestore, exceptionTree);
+                codegenerator.start();
+            }
+                
+            this.moduleManager.compileModulesToJavascript();
 
-        this.libraryModuleManager.typestore.registerExtendsImplements();
-        this.moduleManager.typestore.registerExtendsImplements();
-
-        for(let module of newOrDirtyModules){
-            let codegenerator = new CodeGenerator(module, this.libraryModuleManager.typestore, 
-                this.moduleManager.typestore);
-            codegenerator.start();
         }
-
+                
         let klassObjectRegistry: KlassObjectRegistry = {}; 
-
-        this.moduleManager.compileModulesToJavascript();
-
+        
         this.libraryModuleManager.typestore.populateClassObjectRegistry(klassObjectRegistry);
 
         this.moduleManager.typestore.populateClassObjectRegistry(klassObjectRegistry);
-
 
         let executable = new Executable(klassObjectRegistry, 
             this.moduleManager, this.libraryModuleManager,
