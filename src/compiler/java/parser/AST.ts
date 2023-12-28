@@ -437,6 +437,10 @@ export interface ASTBreakNode extends ASTStatementNode {
     kind: TokenType.keywordBreak;
 }
 
+export interface ASTContinueNode extends ASTStatementNode {
+    kind: TokenType.keywordContinue;
+}
+
 export interface ASTReturnNode extends ASTStatementNode {
     kind: TokenType.keywordReturn;
     term: ASTTermNode | undefined;

@@ -35,6 +35,9 @@ export abstract class StatementParser extends TermParser {
                 return this.parseThrow();
             case TokenType.keywordReturn:
                 return this.parseReturn();
+            case TokenType.semicolon:
+                this.nextToken();
+                return undefined;
             default:
                 let statement = this.parseVariableDeclarationOrTerm();
                 if( (expectSemicolonAfterStatement && !this.expectSemicolon(true, true))
@@ -107,7 +110,7 @@ export abstract class StatementParser extends TermParser {
 
         if (this.comesToken(TokenType.leftBracket, true)) {
             let condition = this.parseTerm();
-            this.expect(TokenType.rightBracket);
+            this.expect(TokenType.rightBracket, true);
 
 
             if (condition && statementToRepeat) {

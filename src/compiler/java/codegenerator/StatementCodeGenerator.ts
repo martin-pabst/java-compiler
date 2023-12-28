@@ -2,7 +2,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTAnonymousClassNode, ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ConstantType, ASTAttributeDereferencingNode, ASTSymbolNode } from "../parser/AST"; import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
+import { ASTAnonymousClassNode, ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ConstantType, ASTAttributeDereferencingNode, ASTSymbolNode, ASTContinueNode } from "../parser/AST"; import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippetContainer, EmptyPart } from "./CodeSnippetKinds.ts";
 import { CodeSnippet as CodeSnippet, StringCodeSnippet } from "./CodeSnippet.ts";
@@ -41,6 +41,8 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
                 snippet = this.compilePrintStatement(<ASTPrintStatementNode>ast); break;
             case TokenType.keywordBreak:
                 snippet = this.compileBreakStatement(<ASTBreakNode>ast); break;
+            case TokenType.keywordContinue:
+                snippet = this.compileContinueStatement(<ASTContinueNode>ast); break;
             case TokenType.keywordIf:
                 snippet = this.compileIfStatement(<ASTIfNode>ast); break;
             case TokenType.keywordSwitch:
@@ -82,12 +84,22 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
     }
 
     compileBreakStatement(node: ASTBreakNode): CodeSnippet | undefined {
-        let label = this.breakStack.pop();
+        let label = this.breakStack[this.breakStack.length - 1];
         if (!label) {
             this.pushError("An dieser Stelle kann kein break stehen, da der Ausdruck nicht innerhalb einer Schleife (for, while, do) oder switch-case Anweisung steht.", "error", node);
             return undefined;
         }
-        this.breakStack.push(label);
+        let snippet = new JumpToLabelCodeSnippet(label);
+        snippet.range = node.range;
+        return snippet;
+    }
+
+    compileContinueStatement(node: ASTContinueNode): CodeSnippet | undefined {
+        let label = this.continueStack[this.continueStack.length - 1];
+        if (!label) {
+            this.pushError("An dieser Stelle kann kein continue stehen, da der Ausdruck nicht innerhalb einer Schleife (for, while, do) oder switch-case Anweisung steht.", "error", node);
+            return undefined;
+        }
         let snippet = new JumpToLabelCodeSnippet(label);
         snippet.range = node.range;
         return snippet;
@@ -139,31 +151,41 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         }
 
         snippet.addNextStepMark();
-
+        
         return snippet;
     }
-
+    
 
     compileForStatement(node: ASTForLoopNode): CodeSnippet | undefined {
-
+        
         /*
-         * Local variables declared in head of for statement are valid inside whole for statement, 
-         * so we need a symbol table that encompasses the whole for statement:
-         */
-        this.pushAndGetNewSymbolTable(node.range, false);
+        * Local variables declared in head of for statement are valid inside whole for statement, 
+        * so we need a symbol table that encompasses the whole for statement:
+        */
+       this.pushAndGetNewSymbolTable(node.range, false);
+       
+       let firstStatement = this.compileStatementOrTerm(node.firstStatement);
+       
+       
+       let conditionNode = node.condition;
+       if (!conditionNode) return undefined;
+       
+       let negationResult = this.negateConditionIfPossible(conditionNode);
+       
+       conditionNode = negationResult.newNode;
+       
+       let condition = this.compileTerm(conditionNode);
+       
+       let labelBeforeCheckingCondition = new LabelCodeSnippet();
+       let jumpToLabelBeforeCheckingCondition = new JumpToLabelCodeSnippet(labelBeforeCheckingCondition);
 
-        let firstStatement = this.compileStatementOrTerm(node.firstStatement);
-
-
-        let conditionNode = node.condition;
-        if (!conditionNode) return undefined;
-
-        let negationResult = this.negateConditionIfPossible(conditionNode);
-
-        conditionNode = negationResult.newNode;
-
-        let condition = this.compileTerm(conditionNode);
-
+       let labelBeforeLastStatement = new LabelCodeSnippet();
+       let jumpToLabelBeforeLastStatement = new JumpToLabelCodeSnippet(labelBeforeLastStatement);
+       this.continueStack.push(labelBeforeLastStatement);
+   
+       let labelAfterForBlock = new LabelCodeSnippet();
+       let jumpToLabelAfterForBlock = new JumpToLabelCodeSnippet(labelAfterForBlock);
+       this.breakStack.push(labelAfterForBlock);
 
         let lastStatement = this.compileStatementOrTerm(node.lastStatement);
 
@@ -175,26 +197,28 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         }
         let forSnippet = new CodeSnippetContainer([], node.range, this.voidType);
 
-        let label1 = new LabelCodeSnippet();
-        let jumpToLabel1 = new JumpToLabelCodeSnippet(label1);
-
-        let label2 = new LabelCodeSnippet();
-        let jumpToLabel2 = new JumpToLabelCodeSnippet(label2);
-
 
         forSnippet.addParts(firstStatement);
         forSnippet.addNextStepMark();
-        forSnippet.addParts(label1);
+        forSnippet.addParts(labelBeforeCheckingCondition);
         forSnippet.addParts(new OneParameterTemplate(negationResult.negationHappened ? 'if(§1){\n' : 'if(!(§1)){\n').applyToSnippet(this.voidType, node.condition!.range, condition));
-        forSnippet.addParts(jumpToLabel2);
+        forSnippet.addParts(jumpToLabelAfterForBlock);
         forSnippet.addStringPart("}\n");
         forSnippet.addNextStepMark();
 
         forSnippet.addParts(statementsToRepeat);
-        forSnippet.addParts(lastStatement);
-        forSnippet.addParts(jumpToLabel1);
+
         forSnippet.addNextStepMark();
-        forSnippet.addParts(label2);
+        forSnippet.addParts(labelBeforeLastStatement);
+        forSnippet.addParts(lastStatement);
+        
+        forSnippet.addParts(jumpToLabelBeforeCheckingCondition);
+        
+        forSnippet.addNextStepMark();
+        forSnippet.addParts(labelAfterForBlock);
+
+        this.continueStack.pop();
+        this.breakStack.pop();
 
         this.popSymbolTable();
         return forSnippet;
@@ -206,20 +230,34 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
         this.printErrorifValueNotBoolean(condition?.type, node.condition);
 
+        let labelBeforeEvaluatingCondition = new LabelCodeSnippet();
+        this.continueStack.push(labelBeforeEvaluatingCondition);
+
+        let labelAfterDoWhileBlock = new LabelCodeSnippet();
+        this.breakStack.push(labelAfterDoWhileBlock);
+
         let statementToRepeat = this.compileStatementOrTerm(node.statementToRepeat);
         let doWhileSnippet = new CodeSnippetContainer([], node.range);
 
         if (!condition || !statementToRepeat) return undefined;
 
-        let label1 = new LabelCodeSnippet();
-        doWhileSnippet.addParts(label1);
+
+        let labelAtBeginOfDoWhileBlock = new LabelCodeSnippet();
+        doWhileSnippet.addParts(labelAtBeginOfDoWhileBlock);
         doWhileSnippet.addParts(statementToRepeat);
         doWhileSnippet.addNextStepMark();
+
+        doWhileSnippet.addParts(labelBeforeEvaluatingCondition);
         let sn1 = SnippetFramer.frame(condition, "if(§1){\n", this.voidType);
         doWhileSnippet.addParts(sn1);
-        doWhileSnippet.addParts(new JumpToLabelCodeSnippet(label1));
+        doWhileSnippet.addParts(new JumpToLabelCodeSnippet(labelAtBeginOfDoWhileBlock));
         doWhileSnippet.addStringPart("}", undefined);
+
         doWhileSnippet.addNextStepMark();
+        doWhileSnippet.addParts(labelAfterDoWhileBlock);
+
+        this.breakStack.pop();
+        this.continueStack.pop();
 
         return doWhileSnippet;
     }
@@ -256,23 +294,31 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
         this.printErrorifValueNotBoolean(condition?.type, node.condition);
 
+        let labelAtBeginOfWhileBlock = new LabelCodeSnippet();
+        this.continueStack.push(labelAtBeginOfWhileBlock);
+
+        let labelAfterWhileBlock = new LabelCodeSnippet();
+        this.breakStack.push(labelAfterWhileBlock);
+
         let statementToRepeat = this.compileStatementOrTerm(node.statementToRepeat);
         let whileSnippet = new CodeSnippetContainer([], node.range);
 
         if (!condition || !statementToRepeat) return undefined;
 
-        let label1 = new LabelCodeSnippet();
-        let label2 = new LabelCodeSnippet();
-        whileSnippet.addParts(label1);
+
+        whileSnippet.addParts(labelAtBeginOfWhileBlock);
         let sn1 = SnippetFramer.frame(condition, negationResult.negationHappened ? "if(§1){\n" : "if(!(§1)){\n", this.voidType);
         whileSnippet.addParts(sn1);
-        whileSnippet.addParts(new JumpToLabelCodeSnippet(label2));
+        whileSnippet.addParts(new JumpToLabelCodeSnippet(labelAfterWhileBlock));
         whileSnippet.addStringPart("}", undefined);
         whileSnippet.addNextStepMark();
         whileSnippet.addParts(statementToRepeat);
-        whileSnippet.addParts(new JumpToLabelCodeSnippet(label1));
+        whileSnippet.addParts(new JumpToLabelCodeSnippet(labelAtBeginOfWhileBlock));
         whileSnippet.addNextStepMark();
-        whileSnippet.addParts(label2);
+        whileSnippet.addParts(labelAfterWhileBlock);
+
+        this.breakStack.pop();
+        this.continueStack.pop();
 
         return whileSnippet;
     }

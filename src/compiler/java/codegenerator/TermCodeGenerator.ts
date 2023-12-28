@@ -46,6 +46,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     outerClassFieldAccessTracker: OuterClassFieldAccessTracker = new OuterClassFieldAccessTracker();
 
     breakStack: LabelCodeSnippet[] = [];
+    continueStack: LabelCodeSnippet[] = [];
 
     constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore) {
         super(module, libraryTypestore, compiledTypesTypestore);
