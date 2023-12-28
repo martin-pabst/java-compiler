@@ -145,6 +145,7 @@ export enum TokenType {
     binaryOp, // +, -, *, <=, ...
     unaryPrefixOp, // ! and - 
     localVariableDeclaration,
+    localVariableDeclarations,
     dereferenceAttribute, // dot-operator
     literal, // literal
     castValue, // cast value on top of stack to other type

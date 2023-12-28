@@ -412,9 +412,9 @@ export class TokenIterator {
         let length = nonSpaceTokenTypesFound.length;
         if (length < 2) return false;
 
-        if (nonSpaceTokenTypesFound[length - 1] != TokenType.identifier) return false;
+        if ([TokenType.identifier, TokenType.leftRightSquareBracket].indexOf(nonSpaceTokenTypesFound[length - 1]) < 0) return false;
 
-        if ([TokenType.identifier, TokenType.greater, TokenType.leftRightSquareBracket, TokenType.keywordVar].indexOf(nonSpaceTokenTypesFound[length - 2]) < 0) {
+        if ([TokenType.identifier, TokenType.greater, TokenType.leftRightSquareBracket, TokenType.keywordVar, TokenType.comma].indexOf(nonSpaceTokenTypesFound[length - 2]) < 0) {
             return false;
         }
 

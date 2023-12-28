@@ -1,7 +1,9 @@
+import { EmptyRange } from "../../common/range/Range.ts";
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType.ts";
-import { ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTReturnNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode } from "./AST.ts";
+import { ArrayType } from "../types/ArrayType.ts";
+import { ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLocalVariableDeclarations, ASTReturnNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode } from "./AST.ts";
 import { TermParser } from "./TermParser.ts";
 
 export abstract class StatementParser extends TermParser {
@@ -60,20 +62,32 @@ export abstract class StatementParser extends TermParser {
 
     parseLocalVariableDeclaration(): ASTStatementNode | undefined {
         
+        let declarations: ASTLocalVariableDeclarations = {
+            kind: TokenType.localVariableDeclarations,
+            declarations: [],
+            range: EmptyRange.instance
+        };
+
         let isFinal = this.comesToken(TokenType.keywordFinal, true);
         
         let type = this.parseType();
-        let identifer = this.expectAndSkipIdentifierAsToken();
-        let initialization: ASTTermNode | undefined = undefined;
-        if(this.comesToken(TokenType.assignment, true)){
-            initialization = this.parseTerm();
-        }       
+        do {
+            let identifer = this.expectAndSkipIdentifierAsToken();
+            while(this.comesToken(TokenType.leftRightSquareBracket, true)){
+                if(type) type = this.nodeFactory.buildArrayTypeNode(type);
+            }
+            let initialization: ASTTermNode | undefined = undefined;
+            if(this.comesToken(TokenType.assignment, true)){
+                initialization = this.parseTerm();
+            }       
+    
+            if(type && identifer){
+                declarations.declarations.push(this.nodeFactory.buildLocalVariableDeclaration(type, identifer, initialization, isFinal));
+            }
 
-        if(type && identifer){
-            return this.nodeFactory.buildLocalVariableDeclaration(type, identifer, initialization, isFinal);
-        }
+        } while(this.comesToken(TokenType.comma, true))
 
-        return undefined;
+        return declarations;
     }
 
     parseWhile(): ASTWhileNode | undefined {

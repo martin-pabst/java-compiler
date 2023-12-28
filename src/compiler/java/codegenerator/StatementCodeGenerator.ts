@@ -2,7 +2,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTAnonymousClassNode, ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ConstantType, ASTAttributeDereferencingNode, ASTSymbolNode, ASTContinueNode } from "../parser/AST"; import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
+import { ASTAnonymousClassNode, ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ConstantType, ASTAttributeDereferencingNode, ASTSymbolNode, ASTContinueNode, ASTLocalVariableDeclarations } from "../parser/AST"; import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippetContainer, EmptyPart } from "./CodeSnippetKinds.ts";
 import { CodeSnippet as CodeSnippet, StringCodeSnippet } from "./CodeSnippet.ts";
@@ -39,6 +39,8 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         switch (ast.kind) {
             case TokenType.localVariableDeclaration:
                 snippet = this.compileLocaleVariableDeclaration(<ASTLocalVariableDeclaration>ast); break;
+            case TokenType.localVariableDeclarations:
+                snippet = this.compileLocaleVariableDeclarations(<ASTLocalVariableDeclarations>ast); break;
             case TokenType.print:
                 snippet = this.compilePrintStatement(<ASTPrintStatementNode>ast); break;
             case TokenType.keywordBreak:
@@ -607,6 +609,19 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         return new StringCodeSnippet(`${statement}(undefined, undefined);\n`, node.range);
     }
 
+    compileLocaleVariableDeclarations(node: ASTLocalVariableDeclarations): CodeSnippet | undefined {
+        let snippets: CodeSnippet[] = [];
+
+        for(let lvd of node.declarations){
+            let snippet = this.compileLocaleVariableDeclaration(lvd);
+            if(snippet) snippets.push(snippet);
+        }
+
+        if(snippets.length == 0) return undefined;
+
+        return new CodeSnippetContainer(snippets)
+
+    }
     compileLocaleVariableDeclaration(node: ASTLocalVariableDeclaration): CodeSnippet | undefined {
         let variable = new JavaLocalVariable(node.identifier, node.identifierRange,
             node.type.resolvedType!, this.currentSymbolTable);

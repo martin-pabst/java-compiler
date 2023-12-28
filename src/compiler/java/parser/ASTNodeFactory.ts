@@ -41,6 +41,17 @@ export class ASTNodeFactory {
     buildArrayTypeNode(arrayOf: ASTTypeNode, startRange?: IRange): ASTArrayTypeNode {
         if (!startRange) startRange = this.parser.cct.range;
 
+        if(arrayOf.kind == TokenType.arrayType){
+            let atype =<ASTArrayTypeNode>arrayOf;
+            return {
+                kind: TokenType.arrayType,
+                range: startRange,
+                arrayDimensions: atype.arrayDimensions + 1,
+                arrayOf: atype.arrayOf
+            }
+    
+        }
+
         return {
             kind: TokenType.arrayType,
             range: startRange,
@@ -494,6 +505,23 @@ export class ASTNodeFactory {
         }
     }
 
+    buildBlockNodeFromStatements(statement: ASTStatementNode[]): ASTStatementNode | ASTBlockNode {
+        if(statement.length == 1) return statement[0];
+
+        let range: IRange = {
+            startLineNumber: statement[0].range.startLineNumber,
+            startColumn: statement[0].range.startColumn,
+            endLineNumber: statement[1].range.endLineNumber,
+            endColumn: statement[1].range.endColumn,
+        }
+
+        return {
+            kind: TokenType.block,
+            range: range,
+            statements: statement
+        }
+    }
+
     buildInstanceInitializerNode(leftCurlyBrace: Token): ASTInstanceInitializerNode {
         return {
             kind: TokenType.instanceInitializerBlock,
@@ -591,7 +619,7 @@ export class ASTNodeFactory {
         }
     }
 
-    buildLocalVariableDeclaration(type: ASTTypeNode, identifer: Token, initialization: ASTTermNode | undefined, isFinal: boolean): ASTLocalVariableDeclaration | undefined {
+    buildLocalVariableDeclaration(type: ASTTypeNode, identifer: Token, initialization: ASTTermNode | undefined, isFinal: boolean): ASTLocalVariableDeclaration {
         let end = initialization ? initialization : identifer;
 
         return {

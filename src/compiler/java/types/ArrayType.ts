@@ -69,4 +69,12 @@ export class ArrayType extends JavaType {
         return internalName;
     }
 
+    static increaseArrayDimension(type: JavaType): ArrayType {
+        if(type instanceof ArrayType){
+            type.dimension++;
+            return type;
+        }
+        return new ArrayType(type, 1, type.module, type.identifierRange);
+    }
+
 }

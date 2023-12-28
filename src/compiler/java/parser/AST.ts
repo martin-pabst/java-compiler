@@ -370,6 +370,11 @@ export interface ASTSuperNode extends ASTTermNode {
     kind: TokenType.keywordSuper;
 }
 
+export interface ASTLocalVariableDeclarations extends ASTStatementNode {
+    kind: TokenType.localVariableDeclarations,
+    declarations: ASTLocalVariableDeclaration[]
+}
+
 export interface ASTLocalVariableDeclaration extends ASTStatementNode, ASTNodeWithIdentifier {
     kind: TokenType.localVariableDeclaration;
     type: ASTTypeNode;

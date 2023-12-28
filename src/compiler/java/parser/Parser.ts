@@ -130,7 +130,7 @@ export class Parser extends StatementParser {
                     case TokenType.identifier:
                     case TokenType.keywordVoid:
                     case TokenType.lower:
-                        this.parseAttributeOrMethodDeclaration(classASTNode, modifiers);
+                        this.parseFieldOrMethodDeclaration(classASTNode, modifiers);
                         break;
                     case TokenType.keywordClass:
                     case TokenType.keywordEnum:
@@ -186,7 +186,7 @@ export class Parser extends StatementParser {
 
     }
 
-    parseAttributeOrMethodDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers) {
+    parseFieldOrMethodDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers) {
         /**
          * Problem:
          * class Test { Test a; Test(); Test getValue(); <E> Test<E> genericMethod()}
@@ -198,13 +198,19 @@ export class Parser extends StatementParser {
             let genericParameters = this.parseGenericParameterDefinition();
 
             let type = this.parseType();
+
             if (this.lookahead(1).tt == TokenType.leftBracket) {
                 this.parseMethodDeclaration(classASTNode, modifiers, false, type, genericParameters);
             } else {
                 if(genericParameters.length > 0){
                     this.pushError("Vor Attributen kann keine Definition generischer Parameter stehen.", "error", genericParameters[0].range);
                 }
-                this.parseFieldDeclaration(classASTNode, modifiers, type);
+                do {
+                    this.parseFieldDeclaration(classASTNode, modifiers, type);
+                } while (this.comesToken(TokenType.comma, true));
+ 
+                this.expectSemicolon(true, true);
+
             }
         }
 
@@ -270,6 +276,10 @@ export class Parser extends StatementParser {
         let rangeStart = this.cct.range;
         let identifier = this.expectAndSkipIdentifierAsToken();
 
+        while(this.comesToken(TokenType.leftRightSquareBracket, true)){
+            if(type) type = this.nodeFactory.buildArrayTypeNode(type, type.range);
+        }
+
         let initialization = this.comesToken(TokenType.assignment, true) ? this.parseTerm() : undefined;
 
         if (identifier.value != "" && type != null) {
@@ -278,9 +288,6 @@ export class Parser extends StatementParser {
             classASTNode.fieldsOrInstanceInitializers.push(node);
             this.setEndOfRange(node);
         }
-
-        this.expectSemicolon(true, true);
-
 
     }
 
@@ -349,7 +356,7 @@ export class Parser extends StatementParser {
                     case TokenType.identifier:
                     case TokenType.keywordVoid:
                     case TokenType.lower:
-                        this.parseAttributeOrMethodDeclaration(enumNode, modifiers);
+                        this.parseFieldOrMethodDeclaration(enumNode, modifiers);
                         break;
                     case TokenType.at:
                         this.parseAnnotation();
@@ -412,7 +419,7 @@ export class Parser extends StatementParser {
                     case TokenType.identifier:
                     case TokenType.keywordVoid:
                     case TokenType.lower:
-                        this.parseAttributeOrMethodDeclaration(interfaceNode, modifiers);
+                        this.parseFieldOrMethodDeclaration(interfaceNode, modifiers);
                         // let returnType = this.parseType();
                         // if (returnType) this.parseMethodDeclaration(interfaceNode, modifiers, false, returnType);
                         break;
