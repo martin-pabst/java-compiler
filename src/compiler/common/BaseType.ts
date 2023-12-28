@@ -12,7 +12,7 @@ export class BaseType {
 
     }
 
-    clearUsagePositionsAndInheritanceInformation(): void {
+    clearUsagePositions(): void {
         this.usagePositions = [];
     }
 }

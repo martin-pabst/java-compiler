@@ -9,7 +9,7 @@ export class ExceptionClass extends ThrowableClass implements IThrowable {
     stacktrace: Stacktrace = [];
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "declaration", signature: "class Exception extends Object"},
+        {type: "declaration", signature: "class Exception extends Throwable"},
         {type: "method", signature: "public Exception()", native: ExceptionClass.prototype._constructor},
         {type: "method", signature: "public Exception(String message)", native: ThrowableClass.prototype._constructor_m},
         {type: "method", signature: "public Exception(Throwable cause)", native: ThrowableClass.prototype._constructor_c},

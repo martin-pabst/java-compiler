@@ -37,7 +37,7 @@ export class JavaTypeStore {
         })
     }
 
-    registerExtendsImplements(){
+    initFastExtendsImplementsLookup(){
         this.typeMap.forEach((type, key) => {
             type.registerExtendsImplementsOnAncestors();
         })
@@ -53,6 +53,18 @@ export class JavaTypeStore {
         })
 
         return classes;
+    }
+
+    getNonPrimitiveTypes(): NonPrimitiveType[] {
+        let npts: NonPrimitiveType[] = [];
+        
+        this.typeMap.forEach((type, identifier) => {
+            if(type instanceof NonPrimitiveType){
+                npts.push(type);
+            }
+        })
+
+        return npts;
     }
 
 }

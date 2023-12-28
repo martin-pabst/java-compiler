@@ -5,7 +5,7 @@ import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode, ASTAttributeDereferencingNode, ASTEnumValueNode, ASTAnonymousClassNode, ASTLambdaFunctionDeclarationNode } from "../parser/AST";
+import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode, ASTAttributeDereferencingNode, ASTEnumValueNode, ASTAnonymousClassNode, ASTLambdaFunctionDeclarationNode, ASTCastNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { ArrayType } from "../types/ArrayType";
 import { Field } from "../types/Field";
@@ -84,6 +84,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 snippet = this.compileDereferenceAttribute(<ASTAttributeDereferencingNode>ast); break;
             case TokenType.anonymousClass:
                 snippet = this.compileAnonymousInnerClass(<ASTAnonymousClassNode>ast); break;
+            case TokenType.castValue:
+                snippet = this.compileExplicitCast(<ASTCastNode>ast); break;
 
         }
 
@@ -92,6 +94,35 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         return snippet;
+    }
+
+    compileExplicitCast(node: ASTCastNode): CodeSnippet | undefined {
+
+        let objectSnippet = this.compileTerm(node.objectToCast);
+        if (!objectSnippet || !objectSnippet.type || !node.castType) return undefined;
+
+        if (!(node.castType.resolvedType instanceof NonPrimitiveType)) {
+            this.pushError(`Ein Cast ist nur bei Objekten möglich. Der Typ ${node.castType.resolvedType?.identifier} ist aber keine Klasse/Interface/Enum.`, "error", node);
+            return undefined;
+        }
+
+        let destType = node.castType.resolvedType as NonPrimitiveType;
+        let sourceType = objectSnippet.type as NonPrimitiveType;
+
+        if (sourceType.fastExtendsImplements(destType.identifier)) {
+            this.pushError(`Unnötiger Cast`, "info", node);
+            return objectSnippet;
+        }
+
+        if (!destType.fastExtendsImplements(sourceType.identifier)) {
+            this.pushError(`Casten von ${sourceType.identifier} nach ${destType.identifier} ist nicht möglich.`, "error", node);
+            return objectSnippet;
+        }
+
+        let range = node.range;
+        return SnippetFramer.frame(objectSnippet, `${Helpers.checkCast}(§1, "${destType.pathAndIdentifier}", ${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn})`
+            , destType)
+
     }
 
     compileNewObjectNode(node: ASTNewObjectNode, newObjectSnippet?: CodeSnippet): CodeSnippet | undefined {
@@ -728,7 +759,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     }
 
     registerCodeReachedAssertion(node: ASTMethodCallNode, parameterValues: (CodeSnippet | undefined)[]): CodeSnippet | undefined {
-        if(parameterValues.length != 1 || parameterValues[0]?.type != this.stringType || !parameterValues[0].isConstant()){
+        if (parameterValues.length != 1 || parameterValues[0]?.type != this.stringType || !parameterValues[0].isConstant()) {
             this.pushError("Die Methode assertCodeReached benötigt genau einen konstanten Parameter vom Typ String.", "error", node);
             return undefined;
         }

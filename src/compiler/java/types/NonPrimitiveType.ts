@@ -37,7 +37,6 @@ export abstract class NonPrimitiveType extends JavaType {
     runtimeClass?: Klass;
 
     private extendsImplements: Record<string, boolean> = {};
-    private isExtendedImplementedBy: Record<string, boolean> = {};
 
     staticInitializer?: Program;
 
@@ -48,13 +47,12 @@ export abstract class NonPrimitiveType extends JavaType {
     constructor(identifier: string, identifierRange: IRange, pathAndIdentifier: string, module: JavaBaseModule){
         super(identifier, identifierRange, module);
         this.isPrimitive = false;
-        this.pathAndIdentifier = pathAndIdentifier;
+        this.pathAndIdentifier = pathAndIdentifier || identifier;
+        this.extendsImplements[this.pathAndIdentifier] = true;
     }
 
-    clearUsagePositionsAndInheritanceInformation(){
-        super.clearUsagePositionsAndInheritanceInformation();
-        this.extendsImplements = {};
-        this.isExtendedImplementedBy = {};
+    clearUsagePositions(){
+        super.clearUsagePositions();
     }
 
     getExtendedImplementedIdentifiers(): string[] {
@@ -65,13 +63,8 @@ export abstract class NonPrimitiveType extends JavaType {
         return this.extendsImplements[identifier] ? true : false;
     }
 
-    getExtendedImplementedByIdentifiers(): Record<string, boolean> {
-        return this.isExtendedImplementedBy;
-    }
-
     registerChildType(childType: NonPrimitiveType){
-        if(!this.isExtendedImplementedBy[childType.identifier]) this.isExtendedImplementedBy[childType.identifier] = true;
-        childType.extendsImplements[this.identifier] = true;
+        childType.extendsImplements[this.pathAndIdentifier] = true;
     }
 
     getDefaultValue() {

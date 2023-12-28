@@ -172,7 +172,7 @@ export class JavaInterface extends IJavaInterface {
         return false;
     }
 
-    clearUsagePositionsAndInheritanceInformation(): void {
+    clearUsagePositions(): void {
         this.usagePositions = [];
         this.genericTypeParameters!.forEach(gi => gi.usagePositions = []);
         this.methods.forEach(m => m.clearUsagePositions());
@@ -330,7 +330,7 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
         return null;
     }
 
-    clearUsagePositionsAndInheritanceInformation(): void {
+    clearUsagePositions(): void {
         this.usagePositions = [];
     }
 

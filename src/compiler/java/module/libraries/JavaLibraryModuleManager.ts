@@ -23,6 +23,9 @@ export class JavaLibraryModuleManager {
         let ldp: LibraryDeclarationParser = new LibraryDeclarationParser();
         ldp.parseClassOrEnumOrInterfaceDeclarationWithoutGenerics(systemModule.primitiveStringClass, systemModule);
         ldp.parseAttributesAndMethods(systemModule.primitiveStringClass, this.typestore, systemModule);
+
+        this.typestore.initFastExtendsImplementsLookup();
+
     }
 
     compileClassesToTypes(){
@@ -56,7 +59,7 @@ export class JavaLibraryModuleManager {
 
     clearUsagePositionsAndInheritanceInformation(){
         for(let type of this.javaTypes){
-            type.clearUsagePositionsAndInheritanceInformation();
+            type.clearUsagePositions();
         }
     }
 

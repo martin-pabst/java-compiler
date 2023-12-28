@@ -19,12 +19,14 @@ import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { Field } from "../types/Field.ts";
 import { EmptyRange, IRange } from "../../common/range/Range.ts";
+import { ExceptionTree } from "./ExceptionTree.ts";
 
 export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
-
-    constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore) {
+    constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore,
+        protected exceptionTree: ExceptionTree) {
         super(module, libraryTypestore, compiledTypesTypestore);
+
     }
 
 
@@ -668,7 +670,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
             for (let type of catchCase.exceptionTypes) {
                 if (type.resolvedType instanceof NonPrimitiveType) {
-                    Object.assign(exceptionTypes, type.resolvedType.getExtendedImplementedByIdentifiers())
+                    Object.assign(exceptionTypes,  this.exceptionTree.getAllSubExceptions(type.resolvedType.pathAndIdentifier));
                     exceptionTypes[type.resolvedType.identifier] = true;
                 }
             }

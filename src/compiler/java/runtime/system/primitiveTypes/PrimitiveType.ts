@@ -52,7 +52,7 @@ export abstract class PrimitiveType extends JavaType {
         return this.typeIdentifiers.indexOf(type.identifier);
     }
 
-    clearUsagePositionsAndInheritanceInformation(): void {
+    clearUsagePositions(): void {
         this.usagePositions = [];
     }
 

@@ -14,6 +14,7 @@ import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { CodeSnippetContainer } from "./CodeSnippetKinds.ts";
 import { OneParameterTemplate } from "./CodeTemplate.ts";
+import { ExceptionTree } from "./ExceptionTree.ts";
 import { MissingStatementManager } from "./MissingStatementsManager.ts";
 import { SnippetLinker } from "./SnippetLinker";
 import { StatementCodeGenerator } from "./StatementCodeGenerator";
@@ -29,8 +30,9 @@ export class CodeGenerator extends StatementCodeGenerator {
     callingOtherConstructorInSameClassHappened: boolean = false;    // only relevant while compiling constructor
     superConstructorHasBeenCalled: boolean = false;                 // only relevant while compiling constructor
 
-    constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore) {
-        super(module, libraryTypestore, compiledTypesTypestore);
+    constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore,
+        exceptionTree: ExceptionTree) {
+        super(module, libraryTypestore, compiledTypesTypestore, exceptionTree);
         this.linker = new SnippetLinker();
     }
 

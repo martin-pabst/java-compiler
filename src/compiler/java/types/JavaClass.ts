@@ -278,6 +278,9 @@ export class JavaClass extends IJavaClass {
             for (let x of this.implements) {                 // A implements X
                 if (x.canImplicitlyCastTo(bType)) return true;  // if x can cast to BI, then A can cast, too
             }
+            
+            if(this.extends) return this.extends.canImplicitlyCastTo(bType);
+
             return false;
         }
 
@@ -316,7 +319,7 @@ export class JavaClass extends IJavaClass {
 
     }
 
-    clearUsagePositionsAndInheritanceInformation(): void {
+    clearUsagePositions(): void {
         this.usagePositions = [];
         this.genericTypeParameters?.forEach(gi => gi.usagePositions = []);
         this.methods.forEach(m => m.clearUsagePositions());
@@ -560,7 +563,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         return null;
     }
 
-    clearUsagePositionsAndInheritanceInformation(): void {
+    clearUsagePositions(): void {
         this.usagePositions = [];
 
     }

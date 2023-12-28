@@ -10,6 +10,9 @@ import { IThrowable } from "./ThrowableType.ts";
 import { ArithmeticExceptionClass } from "../../java/runtime/system/javalang/ArithmeticExceptionClass.ts";
 import { NullPointerExceptionClass } from "../../java/runtime/system/javalang/NullPointerExceptionClass.ts";
 import { Assertions, DummyAssertions } from "../../java/runtime/unittests/Assertions.ts";
+import { ObjectClass } from "../../java/runtime/system/javalang/ObjectClassStringClass.ts";
+import { NonPrimitiveType } from "../../java/types/NonPrimitiveType.ts";
+import { ClassCastExceptionClass } from "../../java/runtime/system/javalang/ClassCastExceptionClass.ts";
 
 
 type ProgramState = {
@@ -407,6 +410,26 @@ export class Thread {
         }
 
         let exception = new NullPointerExceptionClass("Auf ein Attribut/eine Methode von null kann nicht zugegriffen werden.");
+        exception.range = range;
+
+        throw exception;
+    }
+
+    CheckCast(object: ObjectClass, destType: string, startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number): ObjectClass{
+        if(object == null) return object;
+
+        let type = object.getType() as NonPrimitiveType;
+
+        if(type.fastExtendsImplements(destType)) return object;
+
+        let range: IRange = {
+            startLineNumber: startLineNumber,
+            startColumn: startColumn,
+            endLineNumber: endLineNumber,
+            endColumn: endColumn 
+        }
+
+        let exception = new ClassCastExceptionClass(`Ein Objekt der Klasse ${type.identifier} ist kein Objekt der Klasse ${destType} und kann daher nicht in diesen Typ gecastet werden.`);
         exception.range = range;
 
         throw exception;
