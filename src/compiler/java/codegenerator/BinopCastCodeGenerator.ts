@@ -316,6 +316,8 @@ export abstract class BinopCastCodeGenerator {
         if (!snippet || !snippet.type || !castTo) return snippet;
         let type: JavaType = snippet.type;
 
+        if(snippet.type == castTo) return snippet;
+
         if (!type.isPrimitive) {
             if (castTo.identifier == "string" || castTo.identifier == "String") {
                 snippet = this.wrapWithToStringCall(snippet);
@@ -335,7 +337,7 @@ export abstract class BinopCastCodeGenerator {
                 }
             } else {
                 // cast object to object
-                if (castType == "explicit" && this.canCastTo(snippet.type, castTo, "explicit") || castType == "implicit" && this.canCastTo(snippet.type, castTo, "explicit")) {
+                if (castType == "explicit" && this.canCastTo(snippet.type, castTo, "explicit") || castType == "implicit" && this.canCastTo(snippet.type, castTo, "implicit")) {
                     return snippet;
                 }
                 this.pushError("Der Typ " + type.identifier + " kann nicht in den Typ " + castTo.identifier + " gecastet werden.", "error", snippet.range!);

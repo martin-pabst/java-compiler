@@ -381,17 +381,15 @@ export class CodeGenerator extends StatementCodeGenerator {
                 this.pushError("Attribute von Interfaces müssen static und final sein.", "error", fieldNode);
             }
         }
-
+        
         if (fieldNode.isStatic) {
-
+            
             this.classOfCurrentlyCompiledStaticInitialization = classContext;
-            let snippet = this.compileTerm(fieldNode.initialization);
+            let snippet = this.compileInitialValue(fieldNode.initialization, fieldNode.type.resolvedType);
             this.classOfCurrentlyCompiledStaticInitialization = undefined;
-
+            
 
             if (snippet) {
-
-                snippet = this.compileCast(snippet, field.type, "implicit");
 
                 if (snippet.isConstant()) {
                     field.initialValue = snippet.getConstantValue();
@@ -417,10 +415,9 @@ export class CodeGenerator extends StatementCodeGenerator {
 
             return snippet;
         } else {
-            let snippet = this.compileTerm(fieldNode.initialization);
-            if (snippet) {
 
-                snippet = this.compileCast(snippet, field.type, "implicit");
+            let snippet = this.compileInitialValue(fieldNode.initialization, fieldNode.type.resolvedType);
+            if (snippet) {
 
                 if (snippet.isConstant()) {
                     field.initialValue = snippet.getConstantValue();

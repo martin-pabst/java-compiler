@@ -23,7 +23,7 @@
   * break and continue in loops -> done
   * String-methods
   * Math-methods
-
+  * Declaration of several fields/local variables like int a = 4, b[], c = 3;
 
 ## working status on current issue:
 

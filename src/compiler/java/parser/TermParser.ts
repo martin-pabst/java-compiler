@@ -1,6 +1,6 @@
 import { TokenType } from "../TokenType.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
-import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode, ASTMethodDeclarationNode, ASTWildcardTypeNode, ASTGenericTypeInstantiationNode, ASTArrayTypeNode } from "./AST.ts";
+import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode, ASTMethodDeclarationNode, ASTWildcardTypeNode, ASTGenericTypeInstantiationNode, ASTArrayTypeNode, ASTArrayLiteralNode } from "./AST.ts";
 import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator.ts";
 
@@ -228,7 +228,9 @@ export abstract class TermParser extends TokenIterator {
             case TokenType.keywordSuper:
                 node = this.nodeFactory.buildSuperNode(this.getAndSkipToken());
                 break;
-
+            case TokenType.leftCurlyBracket:
+                node = this.parseArrayLiteral();
+                break;
         }
 
         if (node) {
@@ -444,7 +446,7 @@ export abstract class TermParser extends TokenIterator {
         let newArrayNode = this.nodeFactory.buildNewArrayNode(startToken, type, []);
 
 
-        if (this.expect(TokenType.leftSquareBracket), true) {
+        if (this.comesToken(TokenType.leftSquareBracket, true)) {
             do {
                 let termNode = this.parseTerm();
                 if (termNode) newArrayNode.dimensions.push(termNode);
@@ -452,6 +454,17 @@ export abstract class TermParser extends TokenIterator {
             } while (this.comesToken(TokenType.leftSquareBracket, true));
 
 
+        } else if(this.comesToken(TokenType.leftRightSquareBracket, false)){
+            newArrayNode.dimensionCount = 0;
+            while(this.comesToken(TokenType.leftRightSquareBracket, true)) newArrayNode.dimensionCount++;
+
+            if(this.expect(TokenType.leftCurlyBracket, false)){
+                newArrayNode.initialization = this.parseArrayLiteral();
+            }
+
+        } else {
+            this.pushError("[ oder [] erwartet.", "error", startToken.range);
+            return undefined;
         }
 
         this.setEndOfRange(newArrayNode);
@@ -536,5 +549,22 @@ export abstract class TermParser extends TokenIterator {
         }
 
         return printlnStatement;
+    }
+
+    parseArrayLiteral(): ASTArrayLiteralNode {
+        let node: ASTArrayLiteralNode = this.nodeFactory.buildArrayLiteralNode();
+        this.expect(TokenType.leftCurlyBracket, true);
+
+        if(!this.comesToken(TokenType.rightCurlyBracket, false)){
+            do {
+                let elementNode = this.parseTerm();
+                if(elementNode) node.elements.push(elementNode);
+            } while(this.comesToken(TokenType.comma, true))
+        }
+
+        this.setEndOfRange(node);
+        this.expect(TokenType.rightCurlyBracket, true);
+
+        return node;
     }
 }

@@ -1,4 +1,16 @@
 export var testPrograms = {
+arrayLiteral:`
+new A().test();
+
+class A {
+   int[] a = {1, 2, 7 + 4};
+
+   void test(){
+      println(a[2]);
+   }
+
+}
+`,
 cast:`
 interface A {}
 

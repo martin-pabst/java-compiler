@@ -339,8 +339,12 @@ export interface ASTAnonymousClassNode extends ASTTermNode {
 export interface ASTNewArrayNode extends ASTTermNode {
     kind: TokenType.newArray;
     arrayType: ASTTypeNode;
+    // first alternative: Array with given number of null/0-entries:
     dimensions: ASTTermNode[];
 
+    // second alternative: Array literal
+    dimensionCount?: number,
+    initialization?: ASTArrayLiteralNode
 }
 
 export interface ASTSelectArrayElementNode extends ASTTermNode {
@@ -360,6 +364,11 @@ export interface ASTLiteralNode extends ASTTermNode {
     kind: TokenType.literal,
     constantType: TokenType,
     value: string | boolean | number
+}
+
+export interface ASTArrayLiteralNode extends ASTTermNode {
+    kind: TokenType.arrayLiteral,
+    elements: ASTTermNode[]
 }
 
 export interface ASTThisNode extends ASTTermNode {

@@ -5,7 +5,7 @@ import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode, ASTAttributeDereferencingNode, ASTEnumValueNode, ASTAnonymousClassNode, ASTLambdaFunctionDeclarationNode, ASTCastNode } from "../parser/AST";
+import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode, ASTAttributeDereferencingNode, ASTEnumValueNode, ASTAnonymousClassNode, ASTLambdaFunctionDeclarationNode, ASTCastNode, ASTArrayLiteralNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { ArrayType } from "../types/ArrayType";
 import { Field } from "../types/Field";
@@ -309,6 +309,81 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             return undefined;
         }
 
+        if (node.initialization) {
+            let arrayLiteralSnippet = this.compileArrayLiteral(elementType, node.initialization);
+            let literalType = arrayLiteralSnippet?.type;
+            if (literalType && literalType instanceof ArrayType) {
+                if (literalType.dimension == -1) {
+                    literalType.dimension = node.dimensionCount || 1;
+                } else {
+                    if (node.dimensionCount && literalType.dimension != node.dimensionCount) {
+                        this.pushError(`Die Dimension ${node.dimensionCount} bei der Deklaration des Arrays stimmt nicht mit der des Array-Literals (${literalType.dimension} überein.)`, "error", node.range);
+                    }
+                }
+            }
+            return arrayLiteralSnippet;
+        } else {
+            return this.compileNewArrayWithDefaultElements(elementType, node);
+        }
+
+    }
+
+    compileArrayLiteral(elementType: JavaType, node: ASTArrayLiteralNode): CodeSnippet | undefined {
+
+        if (node.elements.length == 0) {
+            // Empty array gets dimension == -1
+            return new StringCodeSnippet("[]", node.range, new ArrayType(elementType, -1, this.module, node.range));
+        }
+
+        let elementSnippets: CodeSnippet[] = [];
+        let dimension: number | null = null;
+
+        for (let elementNode of node.elements) {
+            if (elementNode.kind == TokenType.arrayLiteral) {
+                let snippet = this.compileArrayLiteral(elementType, <ASTArrayLiteralNode>elementNode);
+                if (snippet && snippet.type) {
+                    let snippetDimension = snippet.type instanceof ArrayType ? snippet.type.dimension : 0;
+                    if (dimension !== null) {
+                        if (snippetDimension >= 0 && dimension != snippetDimension + 1) {
+                            this.pushError(`Die Elemente des Array-Literals haben unterschiedliche Dimension.`, "error", node.range);
+                            return undefined;
+                        }
+                    } else {
+                        if (snippetDimension >= 0) dimension = snippetDimension + 1;
+                    }
+                    elementSnippets.push(snippet);
+                }
+            } else {
+                let elementSnippet = this.compileTerm(elementNode);
+                if (elementSnippet && elementSnippet.type) {
+                    if (this.canCastTo(elementSnippet.type, elementType, "implicit")) {
+                        elementSnippet = this.compileCast(elementSnippet, elementType, "implicit");
+                        elementSnippets.push(elementSnippet);
+                        if (dimension != null) {
+                            if (dimension != 1) {
+                                this.pushError(`Die Elemente des Array-Literals haben unterschiedliche Dimension.`, "error", node.range);
+                                return undefined;
+                            }
+                        } else {
+                            dimension = 1;
+                        }
+                    } else {
+                        this.pushError(`Der Term kann nicht in den Typ ${elementType.toString()} umgewandelt werden.`, "error", elementNode.range);
+                        return undefined;
+                    }
+                }
+            }
+        }
+
+        if (dimension == null) dimension = -1;
+
+        let type = new ArrayType(elementType, dimension, this.module, node.range);
+
+        return ParametersJoinedTemplate.applyToSnippet(type, node.range, "[", ", ", "]", ...elementSnippets);
+
+    }
+
+    compileNewArrayWithDefaultElements(elementType: JavaType, node: ASTNewArrayNode): CodeSnippet | undefined {
         let defaultValue = elementType.isPrimitive ? (<PrimitiveType>elementType).defaultValueAsString : "null";
 
         let maybeUndefinedDimensionTerms: (CodeSnippet | undefined)[] = node.dimensions.map(d => this.compileDimension(d));
@@ -325,7 +400,6 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let suffix = ")";
 
         return ParametersJoinedTemplate.applyToSnippet(arrayType, node.range, prefix, ', ', suffix, ...dimensionTerms);
-
     }
 
 

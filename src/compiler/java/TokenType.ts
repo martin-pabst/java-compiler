@@ -148,6 +148,7 @@ export enum TokenType {
     localVariableDeclarations,
     dereferenceAttribute, // dot-operator
     literal, // literal
+    arrayLiteral, // array literal like {12, 10, 4 - 5}
     castValue, // cast value on top of stack to other type
     selectArrayElement, // select Element from Array (e.g. a[20])
     methodCall,
