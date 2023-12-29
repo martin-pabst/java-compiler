@@ -389,7 +389,7 @@ export abstract class TermParser extends TokenIterator {
                     this.expect(TokenType.greater, true);
                 }
 
-                if(this.comesToken(TokenType.leftRightSquareBracket, false)){
+                if(this.comesToken(TokenType.leftRightSquareBracket, true)){
                     type = this.nodeFactory.buildArrayTypeNode(type, type.range);
                     // [][][] at the end of type
                     while (this.comesToken(TokenType.leftRightSquareBracket, true)) (<ASTArrayTypeNode>type).arrayDimensions++;

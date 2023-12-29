@@ -73,9 +73,9 @@ export abstract class StatementParser extends TermParser {
         let type = this.parseType();
         do {
             let identifer = this.expectAndSkipIdentifierAsToken();
-            while(this.comesToken(TokenType.leftRightSquareBracket, true)){
-                if(type) type = this.nodeFactory.buildArrayTypeNode(type);
-            }
+
+            type = this.increaseArrayDimensionIfLeftRightSquareBracketsToCome(type);
+
             let initialization: ASTTermNode | undefined = undefined;
             if(this.comesToken(TokenType.assignment, true)){
                 initialization = this.parseTerm();
@@ -89,6 +89,19 @@ export abstract class StatementParser extends TermParser {
 
         return declarations;
     }
+
+    increaseArrayDimensionIfLeftRightSquareBracketsToCome(type: ASTTypeNode | undefined): ASTTypeNode | undefined {
+        let additionalDimension: number = 0;
+        while(this.comesToken(TokenType.leftRightSquareBracket, true)){
+            additionalDimension++;
+        }
+        if(type && additionalDimension > 0){
+            type = this.nodeFactory.buildArrayTypeNode(type, type.range, additionalDimension);
+            this.module.ast?.collectedTypeNodes.push(type);
+        } 
+        return type;
+    }
+
 
     parseWhile(): ASTWhileNode | undefined {
 

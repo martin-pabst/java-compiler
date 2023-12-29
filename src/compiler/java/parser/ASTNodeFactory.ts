@@ -1,6 +1,7 @@
 import { EmptyRange, IRange, Range } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { Token } from "../lexer/Token.ts";
+import { ArrayType } from "../types/ArrayType.ts";
 import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope as ASTTypeScope, ASTNewArrayNode, ASTInstanceInitializerNode, ASTStaticInitializerNode, ASTAnonymousClassNode, ASTWildcardTypeNode, ASTVoidTypeNode, ASTArrayTypeNode, ASTGenericTypeInstantiationNode, ASTBaseTypeNode, ASTArrayLiteralNode } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
@@ -46,26 +47,31 @@ export class ASTNodeFactory {
         }
     }
 
-    buildArrayTypeNode(arrayOf: ASTTypeNode, startRange?: IRange): ASTArrayTypeNode {
+    buildArrayTypeNode(arrayOf: ASTTypeNode, startRange?: IRange, additionalDimension: number = 1): ASTArrayTypeNode {
         if (!startRange) startRange = this.parser.cct.range;
+
+        let ret: ASTArrayTypeNode;
 
         if(arrayOf.kind == TokenType.arrayType){
             let atype =<ASTArrayTypeNode>arrayOf;
-            return {
+            ret = {
                 kind: TokenType.arrayType,
                 range: startRange,
-                arrayDimensions: atype.arrayDimensions + 1,
+                arrayDimensions: atype.arrayDimensions + additionalDimension,
                 arrayOf: atype.arrayOf
             }
     
+        } else {
+            ret = {
+                kind: TokenType.arrayType,
+                range: startRange,
+                arrayDimensions: additionalDimension,
+                arrayOf: arrayOf
+            }
         }
+        
+        return ret;
 
-        return {
-            kind: TokenType.arrayType,
-            range: startRange,
-            arrayDimensions: 0,
-            arrayOf: arrayOf
-        }
     }
 
     buildGenericTypeInstantiationNode(baseType: ASTTypeNode, startRange?: IRange): ASTGenericTypeInstantiationNode {

@@ -13,9 +13,12 @@ assertEquals(20, b.array[2], "Test if array literal in field initialization is c
 class A {
    int[] array = {1, plus(7, 2), 7 + 4};
 
+   String names[] = {"Charles", "Lucy", "Emma"};
+
    void test(){
       assertEquals(11, array[2], "Test array literal in field initialization.");
       assertEquals(9, array[1], "Test array literal in field initialization.");
+      assertEquals("Charles", names[0], "Test array literal with alternative type syntax");
    }
 
    int plus(int a, int b){
@@ -31,3 +34,5 @@ class A {
 int[][] testArray = {{1, 2}, {3, 4}};
 
 assertEquals(2, testArray.length, "Test length of array literal");
+
+

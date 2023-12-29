@@ -2,6 +2,7 @@ import { Range } from "../../common/range/Range.ts";
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType";
+import { JavaType } from "../types/JavaType.ts";
 import {
     ASTAnnotationNode,
     ASTAnonymousClassNode,
@@ -276,9 +277,7 @@ export class Parser extends StatementParser {
         let rangeStart = this.cct.range;
         let identifier = this.expectAndSkipIdentifierAsToken();
 
-        while(this.comesToken(TokenType.leftRightSquareBracket, true)){
-            if(type) type = this.nodeFactory.buildArrayTypeNode(type, type.range);
-        }
+        type = this.increaseArrayDimensionIfLeftRightSquareBracketsToCome(type);
 
         let initialization = this.comesToken(TokenType.assignment, true) ? this.parseTerm() : undefined;
 

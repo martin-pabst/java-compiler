@@ -24,6 +24,9 @@
   * String-methods
   * Math-methods
   * Declaration of several fields/local variables like int a = 4, b[], c = 3;
+  * Array literals
+  * Alternative array declaration: int a[] instead of int[] a
+
 
 ## working status on current issue:
 
@@ -34,12 +37,8 @@
   * anonymous inner classes (status: mostly done)
   * Lambda Functions (status: mostly done)
   * generic methods
-  * Array constants
   * library method examples
 
- - Array-Literals (in den Formen new int[]{1, 2, 3} und int[] tes = { 1, 2, 3, 4, 6, 12, 24 }, auch mehrdimensional)
- - Alternative Array-Deklaration: Bisher geht int[] a;  Es fehlt noch int a[];
- - Deklaration mehrerer lokaler Variablen/mehrerer Attribute in einer Zeile (z.B. int two, three;), auch mit Arrays: int a, b[], c[][];
  - Schlüsselwort this (wird ausgewertet zu Helpers.elementRelativeToStackbase(0)); insbesondere auch in der besonderen Rolle zum Aufruf eines Konstruktors aus einem anderen heraus
  - Schlüsselwort super (insbesondere in der Rolle zum Aufruf eines super-Konstruktors)
 
