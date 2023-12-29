@@ -118,7 +118,6 @@ export class ProgramViewerComponent {
             let methodNode: ProgramViewerNode = {
                 iconClass: method.isConstructor ? "img_constructordeclaration-dark" : "img_methoddeclaration-dark",
                 program: `/* Method ${method.identifier} (internal name: ${method.getInternalName("java")})*/\n` +
-                    `/* Program stub: */\n` + method.programStub + "\n\n" +
                     `/* Program: */\n` + method.program?.getSourcecode() + "\n"
             };
 

@@ -112,7 +112,7 @@ export class MissingStatementManager {
         let currentMissingStatements = this.stack[this.stack.length - 1];
         
         if(method && method.returnParameterType && method.returnParameterType.identifier != "void"){
-            if(!currentMissingStatements.returnHappened){
+            if(!currentMissingStatements.returnHappened && !method.isConstructor){
                 errors.push({message: "Die Methode " + method.identifier + " muss einen Wert vom Typ " + method.returnParameterType.identifier + " zurückliefern. In einem der Ausführungszweige fehlt ein entsprechendes return-statement.", level: "error", range: method.identifierRange});                    
             }
         }

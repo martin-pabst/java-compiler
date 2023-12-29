@@ -32,7 +32,8 @@ export class JavaSymbolTable extends BaseSymbolTable {
         module.symbolTables.push(this);
 
         if(withStackFrame){
-            this.stackframe = new BaseStackframe(classContext ? 1 : 0);    // if calling a method: 1st element on stack is this
+            // inside non-static java-methods: 1st element on stack is this
+            this.stackframe = new BaseStackframe(classContext && !methodContext?.isStatic ? 1 : 0);    
         }
     }
 

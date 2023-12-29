@@ -452,7 +452,7 @@ export class TypeResolver {
             method.isConstructor = methodNode.isContructor;
             method.isDefault = methodNode.isDefault;
 
-            method.returnParameterType = methodNode.returnParameterType?.resolvedType;
+            method.returnParameterType = methodNode.isContructor ? type : methodNode.returnParameterType?.resolvedType;
             for (let p of methodNode.parameters) {
                 if (p.type?.resolvedType) {
                     let parameter = new Parameter(p.identifier, p.identifierRange,

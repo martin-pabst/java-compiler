@@ -1,4 +1,48 @@
 export var testPrograms = {
+superconstructorCall:`
+new A();
+
+class A {
+   A(){
+      super();
+      println("A's constructor called.");
+   }
+}
+
+class B {
+   B(){
+      println("B's constructor called.");
+   }
+}
+`,
+super:`
+new C().test();
+
+
+class A {
+   void printName(){
+      println("Test A");
+   }
+}
+
+class B extends A {
+   void printName(){
+      println("Test B");
+   }
+}
+
+class C extends B {
+   void printName(){
+      println("Test C");
+   }
+
+   void test(){
+      printName();
+      super.printName();
+      super.super.printName();
+   }
+
+}`,
 arrayLiteral:`
 new A().test();
 

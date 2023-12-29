@@ -1,10 +1,11 @@
 import { Program } from "../../common/interpreter/Program";
-import { Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
+import { CallbackFunction, Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
+import { Thread } from "../../common/interpreter/Thread.ts";
 import { EmptyRange } from "../../common/range/Range.ts";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTAnonymousClassNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTMethodDeclarationNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
+import { ASTAnonymousClassNode, ASTBlockNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTMethodCallNode, ASTMethodDeclarationNode, ASTStatementNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
 import { Field } from "../types/Field.ts";
 import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
@@ -24,11 +25,6 @@ export class CodeGenerator extends StatementCodeGenerator {
     linker: SnippetLinker;
 
 
-    /*
-     * These fields describe state of code generation:
-     */
-    callingOtherConstructorInSameClassHappened: boolean = false;    // only relevant while compiling constructor
-    superConstructorHasBeenCalled: boolean = false;                 // only relevant while compiling constructor
 
     constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore,
         exceptionTree: ExceptionTree) {
@@ -76,7 +72,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         if (!typeScope) return;
 
         for (let cdef of typeScope.classOrInterfaceOrEnumDefinitions) {
-            if(cdef.identifier == "") continue;     // anonymous inner class
+            if (cdef.identifier == "") continue;     // anonymous inner class
             switch (cdef.kind) {
                 case TokenType.keywordClass:
                     this.compileClassDeclaration(cdef);
@@ -381,13 +377,13 @@ export class CodeGenerator extends StatementCodeGenerator {
                 this.pushError("Attribute von Interfaces müssen static und final sein.", "error", fieldNode);
             }
         }
-        
+
         if (fieldNode.isStatic) {
-            
+
             this.classOfCurrentlyCompiledStaticInitialization = classContext;
             let snippet = this.compileInitialValue(fieldNode.initialization, fieldNode.type.resolvedType);
             this.classOfCurrentlyCompiledStaticInitialization = undefined;
-            
+
 
             if (snippet) {
 
@@ -447,21 +443,18 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     compileMethodDeclaration(methodNode: ASTMethodDeclarationNode, classContext: JavaClass | JavaEnum | JavaInterface) {
 
-        let method = methodNode.method;
+        const method = methodNode.method;
         if (!method) return;
 
-
+        
         if (methodNode.isContructor) {
-            this.callingOtherConstructorInSameClassHappened = false;
-            this.superConstructorHasBeenCalled = false;
-
             if (classContext.outerType && !classContext.isStatic) {
                 method.hasOuterClassParameter = true;
             }
         }
-
+        
         let symbolTable = this.pushAndGetNewSymbolTable(methodNode.range, true, classContext, method);
-
+        
         if (method.hasOuterClassParameter) {
             this.currentSymbolTable.insertInvisibleParameter(); // make room for __outer-Parameter
         }
@@ -469,9 +462,12 @@ export class CodeGenerator extends StatementCodeGenerator {
         for (let parameter of method.parameters) {
             this.currentSymbolTable.addSymbol(parameter);
         }
-
-
+        
+        
         let snippets: CodeSnippet[] = [];
+        
+        let thisCallHappened: boolean = false;
+        let superCallHappened: boolean = false;
 
         if (method.isConstructor) {
 
@@ -481,7 +477,9 @@ export class CodeGenerator extends StatementCodeGenerator {
                 return undefined;
             }
 
-            if (!this.callingOtherConstructorInSameClassHappened && classContext.instanceInitializer.length > 0) {
+            [thisCallHappened, superCallHappened] = this.checkIfSuperconstructorCallPresent(methodNode.statement);
+
+            if (!thisCallHappened && classContext.instanceInitializer.length > 0) {
                 snippets = snippets.concat(classContext.instanceInitializer);
             }
 
@@ -490,70 +488,107 @@ export class CodeGenerator extends StatementCodeGenerator {
                 snippets.push(storeOuterClassReferenceSnippet);
             }
 
-            if (!this.superConstructorHasBeenCalled) {
-                // TODO: insert call to default super constructor
+        }
+
+
+        if (method.isAbstract) this.pushError("Eine abstrakte Methode kann keinen Methodenrumpf besitzen.", "error", methodNode);
+        if (classContext instanceof JavaInterface && !(method.isAbstract || method.isDefault)) this.pushError("In Interfaces können nur default-Methoden und abstrakte Methoden einen Methodenrumpf haben.", "error", methodNode);
+
+        let msm = this.missingStatementManager;
+        this.missingStatementManager = new MissingStatementManager();
+        this.missingStatementManager.beginMethodBody(method.parameters);
+
+        let snippet = methodNode.statement ? this.compileStatementOrTerm(methodNode.statement) : undefined;
+        if (snippet) snippets.push(snippet);
+
+        if (methodNode.isContructor) {
+            snippets.push(new StringCodeSnippet(`${Helpers.return}(${Helpers.elementRelativeToStackbase(0)});\n`))
+
+            if (!(thisCallHappened || superCallHappened)) {
+                // Has base class a parameterless super constructor?
+                let baseClass = classContext.getExtends();
+                if(baseClass instanceof IJavaClass){
+                    let parameterlessConstructors = baseClass.getPossibleMethods(baseClass.identifier, 0, true, false);
+                    if(parameterlessConstructors.length == 0){
+                        this.pushError(`Da die Oberklasse ${baseClass.identifier} keinen parameterlosen Konstruktor hat, muss in jedem Konstruktor einer Unterklasse gleich zu Beginn der Aufruf eines Konstruktors der Oberklasse erfolgen (super(...)).`, "error", methodNode.identifierRange);
+                    } else {
+                        let parameterlessConstructor = parameterlessConstructors[0];
+                        if(parameterlessConstructor.hasImplementationWithNativeCallingConvention){
+                            let superConstructorCall = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${parameterlessConstructor.getInternalName("native")}();\n`);
+                            snippets.unshift(superConstructorCall);                            
+                        } else {
+                            let superConstructorCall = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${parameterlessConstructor.getInternalName("java")}(${StepParams.thread}, undefined);\n`);
+                            snippets.unshift(superConstructorCall);                            
+                        }
+                    }
+                }
             }
 
         }
 
-        if (methodNode.statement) {
+        method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
 
-            if (method.isAbstract) this.pushError("Eine abstrakte Methode kann keinen Methodenrumpf besitzen.", "error", methodNode);
-            if (classContext instanceof JavaInterface && !(method.isAbstract || method.isDefault)) this.pushError("In Interfaces können nur default-Methoden und abstrakte Methoden einen Methodenrumpf haben.", "error", methodNode);
+        if (!this.missingStatementManager.hasReturnHappened() && !methodNode.isContructor) {
+            snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
+        }
 
-            let msm = this.missingStatementManager;
-            this.missingStatementManager = new MissingStatementManager();
-            this.missingStatementManager.beginMethodBody(method.parameters);
+        this.missingStatementManager.endMethodBody(method, this.module.errors);
+        this.missingStatementManager = msm;
 
-            let snippet = methodNode.statement ? this.compileStatementOrTerm(methodNode.statement) : undefined;
-            if (snippet) snippets.push(snippet);
+        this.linker.link(snippets, method.program);
 
-            if (methodNode.isContructor) {
-                snippets.push(new StringCodeSnippet(`${Helpers.return}(${Helpers.elementRelativeToStackbase(0)});\n`))
-            }
+        methodNode.program = method.program;    // only for debugging purposes
 
-            method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
+        let runtimeClass = classContext.runtimeClass;
 
-            if (!this.missingStatementManager.hasReturnHappened() && !methodNode.isContructor) {
-                snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
-            }
+        if (runtimeClass) {
+            method.program.compileToJavascriptFunctions();
 
-            this.missingStatementManager.endMethodBody(method, this.module.errors);
-            this.missingStatementManager = msm;
+            method.callbackAfterCodeGeneration.forEach(callback => callback());
 
-            this.linker.link(snippets, method.program);
-
-            methodNode.program = method.program;    // only for debugging purposes
-
-            let runtimeClass = classContext.runtimeClass;
-
-            if (runtimeClass) {
-                runtimeClass.__programs.push(method.program);
-                method.program.compileToJavascriptFunctions();
-
-                method.callbackAfterCodeGeneration.forEach(callback => callback());
-
-                let methodIndex = runtimeClass.__programs.length - 1;
-
-                let parameterIdentifiers = method.parameters.map(p => p.identifier);
-                let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
-
-                if (method.isStatic) {
-                    method.programStub =
-                        `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
-                        `${Helpers.pushProgram}(this.__programs[${methodIndex}]);`;
-                } else {
-                    method.programStub =
-                        `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
-                        `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}], ${Helpers.callbackParameter});`;
+            let functionStub: Function;
+            if (method.isStatic) {
+                functionStub = function (this: any, __t: Thread, ...parameters: any) {
+                    __t.s.push(...parameters);        
+                    __t.pushProgram(method!.program!);
                 }
-                runtimeClass.prototype[method.getInternalNameWithGenericParameterIdentifiers("java")] = new Function(StepParams.thread, Helpers.callbackParameter, ...parameterIdentifiers,
-                    method.programStub);
+                runtimeClass[method.getInternalNameWithGenericParameterIdentifiers("java")] = functionStub;
+            } else {
+                functionStub = function (this: any, __t: Thread, __callback: CallbackFunction, ...parameters: any) {
+                    __t.s.push(this, ...parameters);
+                    __t.pushProgram(method!.program!, __callback);
+                }
+                runtimeClass.prototype[method.getInternalNameWithGenericParameterIdentifiers("java")] = functionStub;
             }
+
         }
 
         this.popSymbolTable();
 
+    }
+
+    checkIfSuperconstructorCallPresent(statement: ASTStatementNode | undefined): [boolean, boolean] {
+        if(!statement) return [false, false];
+        if(statement.kind = TokenType.block){
+            let blockstatement = <ASTBlockNode>statement;
+            if(blockstatement.statements.length > 0){
+                statement = blockstatement.statements[0];
+            } else {
+                return [false, false];
+            }
+        } 
+        //@ts-ignore
+        if(!statement.kind == TokenType.methodCall) return [false, false];
+
+        let methodCall = <ASTMethodCallNode>statement;
+
+        let objectKind = methodCall.nodeToGetObject?.kind;
+        if(!objectKind) return [false, false];
+
+        if(objectKind == TokenType.keywordThis) return [true, false];
+        if(objectKind == TokenType.keywordSuper) return [false, true];
+
+        return [false, false];
     }
 
 
@@ -602,17 +637,17 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         // setup provisionally version of runtime class to collect programs: 
         klass.runtimeClass = class {
-            
+
         };  //
 
         let oldClass = klass.runtimeClass;
         oldClass.__programs = [];
 
         let type = node.newObjectNode.type.resolvedType;
-        if(type instanceof IJavaInterface){
+        if (type instanceof IJavaInterface) {
             node.klass.implements.push(node.newObjectNode.type);
             klass.addImplements(type);
-        } else if(type instanceof IJavaClass) {
+        } else if (type instanceof IJavaClass) {
             node.klass.extends = node.newObjectNode.type;
             klass.setExtends(type);
         } else {
@@ -628,7 +663,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             f.isFinal = field.isFinal;
             f.classEnum = klass;
             klass.fields.push(f);
-        });  
+        });
 
         node.newObjectNode.type.resolvedType = klass;
 
@@ -638,11 +673,11 @@ export class CodeGenerator extends StatementCodeGenerator {
         let invisibleFieldIdentifiers = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.getInternalName());
 
         // final version of runtime class:
-        klass.runtimeClass = class extends klass.getExtends()?.runtimeClass! {
-            
-            constructor(...args: any){
+        klass.runtimeClass = class extends klass.getExtends()?.runtimeClass!{
+
+            constructor(...args: any) {
                 super();
-                for(let i = 0; i < invisibleFieldIdentifiers.length; i++){
+                for (let i = 0; i < invisibleFieldIdentifiers.length; i++) {
                     this[invisibleFieldIdentifiers[i]] = args[i];
                 }
             }
@@ -669,35 +704,35 @@ export class CodeGenerator extends StatementCodeGenerator {
     }
 
     compileLambdaFunction(node: ASTLambdaFunctionDeclarationNode, expectedType: JavaType | undefined): CodeSnippet | undefined {
-        if(!node || !expectedType) return undefined;
+        if (!node || !expectedType) return undefined;
 
-        if(!this.isFunctionalInterface(expectedType)){
+        if (!this.isFunctionalInterface(expectedType)) {
             this.pushError("Eine Lambda-Funktion darf nur an einer Stelle im Code stehen, an der ein functional interface (d.h. ein Interface mit genau einer Methode) erwartet wird.", "error", node.range);
             return undefined;
         }
 
-        if(!node.statement) return undefined;
+        if (!node.statement) return undefined;
 
         let functionalInterface = <IJavaInterface>expectedType;
         let methodToImplement = functionalInterface.getOwnMethods().find(m => !m.isDefault)!;
 
-        if(node.parameters.length != methodToImplement.parameters.length){
+        if (node.parameters.length != methodToImplement.parameters.length) {
             this.pushError(`Die Anzahl der Parameter der Lambda-Funktion (${node.parameters.length}) stimmt nicht mit der des functional interfaces ${functionalInterface.identifier} (${methodToImplement.parameters.length}) überein.`, "error", node.range);
             return;
         }
-                
-        for(let i = 0; i < node.parameters.length; i++){
+
+        for (let i = 0; i < node.parameters.length; i++) {
             let lambdaParameter = node.parameters[i];
             let fiParameter = methodToImplement.parameters[i];
-            if(lambdaParameter.type && lambdaParameter.type.resolvedType){
-                if(!this.canCastTo(fiParameter.type, lambdaParameter.type.resolvedType, "implicit")){
+            if (lambdaParameter.type && lambdaParameter.type.resolvedType) {
+                if (!this.canCastTo(fiParameter.type, lambdaParameter.type.resolvedType, "implicit")) {
                     this.pushError(`Der Datentyp des Parameters ${lambdaParameter.identifier} passt nicht zum Datentyp des erwarteten Parameters (${fiParameter.type.toString()}).`, "error", lambdaParameter.range);
                 }
             }
         }
 
         let method = methodToImplement.getCopy();
-        for(let i = 0; i < method.parameters.length; i++){
+        for (let i = 0; i < method.parameters.length; i++) {
             method.parameters[i].identifier = node.parameters[i].identifier;
         }
 
@@ -720,7 +755,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         // setup provisionally version of runtime class to collect programs: 
         klass.runtimeClass = class {
-            
+
         };  //
 
         let oldClass = klass.runtimeClass;
@@ -744,12 +779,12 @@ export class CodeGenerator extends StatementCodeGenerator {
         let invisibleFieldIdentifiers = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.getInternalName());
 
         // final version of runtime class:
-        klass.runtimeClass = class extends klass.getExtends()?.runtimeClass! {
-            
-            constructor(__outer__:any, ...args: any){
+        klass.runtimeClass = class extends klass.getExtends()?.runtimeClass!{
+
+            constructor(__outer__: any, ...args: any) {
                 super();
                 this[Helpers.outerClassAttributeIdentifier] = __outer__;
-                for(let i = 0; i < invisibleFieldIdentifiers.length; i++){
+                for (let i = 0; i < invisibleFieldIdentifiers.length; i++) {
                     this[invisibleFieldIdentifiers[i]] = args[i];
                 }
             }
@@ -761,7 +796,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         // snippet which instantiates object of this class calling it's typescript constructor and it's java constructor
 
         let parameterString = Helpers.elementRelativeToStackbase(0);
-        if(outerLocalVariables.length > 0){
+        if (outerLocalVariables.length > 0) {
             parameterString += ", " + outerLocalVariables.map(v => Helpers.elementRelativeToStackbase(v!.stackframePosition!)).join(", ");
         }
 
@@ -770,7 +805,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         let template = instantiationAtRuntimeNeeded ? `new this.innerClass(${parameterString})` : `this.lambdaObject`;
         let newClassSnippet = new StringCodeSnippet(template, node.range, klass);
         newClassSnippet.addEmitToStepListener((step) => {
-            if(instantiationAtRuntimeNeeded){
+            if (instantiationAtRuntimeNeeded) {
                 step.innerClass = klass.runtimeClass;
             } else {
                 step.lambdaObject = new klass.runtimeClass!(null);
@@ -780,10 +815,10 @@ export class CodeGenerator extends StatementCodeGenerator {
         return newClassSnippet;
     }
 
-    isFunctionalInterface(type: JavaType | undefined){
-        if(!type) return false;
-        if(!(type instanceof IJavaInterface)) return false;
-        if(type.getOwnMethods().filter(m => !m.isDefault).length != 1) return false;
+    isFunctionalInterface(type: JavaType | undefined) {
+        if (!type) return false;
+        if (!(type instanceof IJavaInterface)) return false;
+        if (type.getOwnMethods().filter(m => !m.isDefault).length != 1) return false;
         return true;
     }
 

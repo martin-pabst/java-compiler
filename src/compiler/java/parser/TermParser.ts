@@ -1,6 +1,7 @@
 import { TokenType } from "../TokenType.ts";
+import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
-import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode, ASTMethodDeclarationNode, ASTWildcardTypeNode, ASTGenericTypeInstantiationNode, ASTArrayTypeNode, ASTArrayLiteralNode } from "./AST.ts";
+import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode, ASTMethodDeclarationNode, ASTWildcardTypeNode, ASTGenericTypeInstantiationNode, ASTArrayTypeNode, ASTArrayLiteralNode, ASTMethodCallNode } from "./AST.ts";
 import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator.ts";
 
@@ -223,14 +224,23 @@ export abstract class TermParser extends TokenIterator {
                 node = this.nodeFactory.buildConstantNode(this.getAndSkipToken());
                 break;
             case TokenType.keywordThis:
-                node = this.nodeFactory.buildThisNode(this.getAndSkipToken());
+                let thisToken = this.getAndSkipToken();
+                node = this.nodeFactory.buildThisNode(thisToken);
+                if(this.comesToken(TokenType.leftBracket, false)){
+                    node = this.buildMethodCallNode(thisToken, node);
+                }
                 break;
             case TokenType.keywordSuper:
-                node = this.nodeFactory.buildSuperNode(this.getAndSkipToken());
+                let superToken = this.getAndSkipToken();
+                node = this.nodeFactory.buildSuperNode(superToken);
+                if(this.comesToken(TokenType.leftBracket, false)){
+                    node = this.buildMethodCallNode(superToken, node);
+                }
                 break;
             case TokenType.leftCurlyBracket:
                 node = this.parseArrayLiteral();
                 break;
+                
         }
 
         if (node) {
@@ -267,7 +277,8 @@ export abstract class TermParser extends TokenIterator {
             if (this.lookahead(1).tt == TokenType.leftBracket) {
                 return this.parseMethodCall(node);
             } else {
-                let identifier = this.expectAndSkipIdentifierAsToken();
+                let identifier = 
+                 this.tt == TokenType.keywordSuper ? this.getAndSkipToken() : this.expectAndSkipIdentifierAsToken();
                 if (identifier.value == "") return node;
                 return this.nodeFactory.buildAttributeDereferencingNode(node, identifier);
             }
@@ -277,10 +288,13 @@ export abstract class TermParser extends TokenIterator {
     parseMethodCall(nodeToGetObject: ASTTermNode | undefined): ASTTermNode | undefined {
         let identifier = this.expectAndSkipIdentifierAsToken();
         if (identifier.value == "") return nodeToGetObject;
+        return this.buildMethodCallNode(identifier, nodeToGetObject);
+    }
 
+    buildMethodCallNode(identifier: Token, nodeToGetObject: ASTTermNode | undefined): ASTMethodCallNode | undefined {
         this.expect(TokenType.leftBracket, true);
         let methodCallNode = this.nodeFactory.buildMethodCallNode(identifier, nodeToGetObject);
-
+        
         if (this.tt != TokenType.rightBracket) {
             do {
                 let termNode = this.parseTerm();

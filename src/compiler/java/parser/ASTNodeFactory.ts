@@ -351,9 +351,14 @@ export class ASTNodeFactory {
     }
 
     buildMethodCallNode(identifier: Token, nodeToGetObject: ASTTermNode | undefined): ASTMethodCallNode {
+        let id: string = <string>identifier.value;
+        if(identifier.tt == TokenType.keywordThis || identifier.tt == TokenType.keywordSuper){
+            id = "";
+        }
+
         return {
             kind: TokenType.methodCall,
-            identifier: <string>identifier.value,
+            identifier: id,
             identifierRange: identifier.range,
             range: identifier.range,
             nodeToGetObject: nodeToGetObject,

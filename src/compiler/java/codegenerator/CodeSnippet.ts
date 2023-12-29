@@ -13,6 +13,7 @@ export abstract class CodeSnippet {
     isLefty: boolean = false; // can you assign a value to it?
     finalValueIsOnStack: boolean = false;
 
+    isSuperKeywordWithLevel?: number;
 
     abstract emit(): string;
     abstract index(currentIndex: number): number;

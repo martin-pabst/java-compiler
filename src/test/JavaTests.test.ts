@@ -124,10 +124,11 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
             }
 
             if (expectedOutput) {
-                if (expectedOutput != printManager.output) {
+                let actualOutput = printManager.output.replace(/\n/g, "\\n");
+                if (expectedOutput != actualOutput) {
                     console.log(chalk.gray("Position:    ") + chalk.white("Test beginning with Line ") + chalk.blue(lineOffset)); 
                     console.log(chalk.red("Test failed: ") + "Output doesn't match expected output.");
-                    console.log(chalk.gray("Details:     ") + "Expected: " + chalk.green(expectedOutput) + " Actual: " + chalk.yellow(printManager.output));
+                    console.log(chalk.gray("Details:     ") + "Expected: " + chalk.green(expectedOutput) + " Actual: " + chalk.yellow(actualOutput));
                     //@ts-ignore
                     context.task.fails = 1;
                 }

@@ -23,6 +23,7 @@ export class JavaLibraryModuleManager {
         let ldp: LibraryDeclarationParser = new LibraryDeclarationParser();
         ldp.parseClassOrEnumOrInterfaceDeclarationWithoutGenerics(systemModule.primitiveStringClass, systemModule);
         ldp.parseAttributesAndMethods(systemModule.primitiveStringClass, this.typestore, systemModule);
+        ldp.parseClassOrInterfaceDeclarationGenericsAndExtendsImplements(systemModule.primitiveStringClass, this.typestore, systemModule);
 
         this.typestore.initFastExtendsImplementsLookup();
 
