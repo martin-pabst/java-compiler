@@ -10,7 +10,7 @@ import { IndexOutOfBoundsExceptionClass } from "../javalang/IndexOutOfBoundsExce
 
 export class ArrayListClass extends SystemCollection {
     static __javaDeclarations: LibraryDeclarations = [
-        { type: "declaration", signature: "class ArrayList<E> Implements List<E>" },
+        { type: "declaration", signature: "class ArrayList<E> implements List<E>" },
 
         { type: "method", signature: "ArrayList()", native: ArrayListClass.prototype._constructor },
 

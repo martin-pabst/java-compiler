@@ -24,6 +24,7 @@ export class Helpers {
     static beginTryBlock = StepParams.thread + "." + Thread.prototype.beginTryBlock.name;
     static endTryBlock = StepParams.thread + "." + Thread.prototype.endCatchTryBlock.name;
     static throwAE = StepParams.thread + "." + Thread.prototype.AE.name;
+    static throwIOBE = StepParams.thread + "." + Thread.prototype.IOBE.name;
     static throwNPE = StepParams.thread + "." + Thread.prototype.NPE.name;
     static checkCast = StepParams.thread + "." + Thread.prototype.CheckCast.name;
     static exit = StepParams.thread + "." + Thread.prototype.exit.name;

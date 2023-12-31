@@ -5,9 +5,9 @@ import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter";
-import { JavaClass } from "./JavaClass";
+import { IJavaClass, JavaClass } from "./JavaClass";
 import { JavaEnum } from "./JavaEnum";
-import { JavaInterface } from "./JavaInterface";
+import { IJavaInterface, JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Parameter } from "./Parameter";
@@ -41,7 +41,7 @@ export class Method {
 
     public hasImplementationWithNativeCallingConvention: boolean = false;
 
-    classEnumInterface!: JavaClass | JavaEnum | JavaInterface;
+    classEnumInterface!: IJavaClass | JavaEnum | IJavaInterface;
 
     usagePositions: UsagePosition[] = [];
 
@@ -54,7 +54,7 @@ export class Method {
 
     }
 
-    getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, NonPrimitiveType>): Method {
+    getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, NonPrimitiveType>, genericClassOrInterfaceOrEnum: IJavaClass | JavaEnum | IJavaInterface): Method {
 
         let copyNeeded: boolean = false;
         let newParameters: Parameter[] = [];
@@ -81,6 +81,9 @@ export class Method {
         newMethod.hasOuterClassParameter = this.hasOuterClassParameter;
         newMethod.parameters = newParameters;
         newMethod.returnParameterType = newReturnParameter;
+        newMethod.hasImplementationWithNativeCallingConvention = this.hasImplementationWithNativeCallingConvention;
+        newMethod.template = this.template;
+        newMethod.classEnumInterface = genericClassOrInterfaceOrEnum;
 
         this.getInternalName("java");
         this.getInternalName("native");
@@ -144,6 +147,10 @@ export class Method {
         }
     }
 
+    getPathWithMethodIdentifier(): string {
+        return this.classEnumInterface.pathAndIdentifier + "." + this.getInternalNameWithGenericParameterIdentifiers("java");
+    }
+
 }
 
 
@@ -177,10 +184,8 @@ export class GenericMethod extends Method {
             typeMap.set(gp, gp.catches![0]);
         }
 
-        return this.getCopyWithConcreteType(typeMap);
+        return this.getCopyWithConcreteType(typeMap, this.classEnumInterface);
  
     }
-
-
 
 }

@@ -26,7 +26,7 @@ export abstract class NonPrimitiveType extends JavaType {
     abstract getFields(): Field[];
     abstract getOwnMethods(): Method[];
     abstract getAllMethods(): Method[];
-
+    
     abstract getField(identifier: string, uptoVisibility: Visibility, forceStatic?: boolean): Field | undefined;
     
     visibility: Visibility = TokenType.keywordPublic;

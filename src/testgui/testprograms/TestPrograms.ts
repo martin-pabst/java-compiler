@@ -1,5 +1,42 @@
 export var testPrograms = {
-superconstructorCall:`
+dynamicCallingConvention:`
+ArrayList<String> arrayList = new ArrayList<String>();
+arrayList.add("First");
+
+List<String> list = arrayList;
+
+list.add("Second");
+
+
+class A<E> extends ArrayList<E> {
+
+   boolean add(E e){
+      return super.add(e);
+   }
+
+
+}`,
+charAtError: `
+String s3 = "Das ist ein Test und noch ein Test";
+println(s3.charAt(2));
+
+//assertEquals(s3.charAt(2), 's', "String object charAt not working.");
+`,
+callingConventions:`
+ArrayList<String> arrayList = new ArrayList<String>();
+arrayList.add("First");
+
+List<String> list = arrayList;
+list.add("Second");
+
+
+class A<E> extends ArrayList<E> {
+   boolean add(E e){
+      super.add(e);
+   }
+}
+`,
+   superconstructorCall: `
 new A();
 
 class A {
@@ -15,7 +52,7 @@ class B {
    }
 }
 `,
-super:`
+   super: `
 new C().test();
 
 
@@ -43,7 +80,7 @@ class C extends B {
    }
 
 }`,
-arrayLiteral:`
+   arrayLiteral: `
 new A().test();
 
 class A {
@@ -55,7 +92,7 @@ class A {
 
 }
 `,
-cast:`
+   cast: `
 interface A {}
 
 class B implements A { }
@@ -73,7 +110,7 @@ A a = c;
 C c2 = (C)a;
 
 println("Fertig");`,
-switch_case_with_enums:`
+   switch_case_with_enums: `
 enum Test {
    eins, zwei, drei
 }
@@ -86,7 +123,7 @@ switch(t){
 }
 
 println("Fertig");`,
-switch_case:`
+   switch_case: `
 class A {
    static final int x = 5;
    static final String y= "XYZ";
@@ -197,25 +234,46 @@ interface Test {
 }
     `,
    innerClassesTest: `
-A a = new A();
-A.B b = a.getB();
-b.doIt();
-
-class A {
-   int i = 10;
-
-   class B {
-      void doIt(){
-         println(i);
+   A a = new A();
+   A.B b = a.getB();
+   println(b.getOuterI());
+   a.i = 20;
+   println(b.getOuterI());
+   
+   A.B.C c = new A.B.C();
+   println(c.getOuterI());
+   println(c.getOuterJ());
+   
+   
+   class A {
+      int i = 10;
+   
+      class B {
+         
+         int j = 100;
+   
+         int getOuterI(){
+            return i;
+         }
+   
+         class C {
+           int getOuterJ(){
+               return j;
+           }
+   
+           int getOuterI(){
+               return i;
+           }
+         }
+   
       }
+   
+      B getB(){
+         return new B();
+      }
+   
+   
    }
-
-   B getB(){
-      return new B();
-   }
-
-
-}
 `,
    simpleGenericsTest: `
 A<String> a = new A<String>();

@@ -32,7 +32,7 @@ export class JavaTypeStore {
     populateClassObjectRegistry(klassObjectRegistry: KlassObjectRegistry){
         this.typeMap.forEach((type, key) => {
             if(type instanceof NonPrimitiveType && type.runtimeClass){
-                klassObjectRegistry[type.identifier] = type.runtimeClass;
+                klassObjectRegistry[type.pathAndIdentifier] = type.runtimeClass;
             }
         })
     }

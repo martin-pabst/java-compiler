@@ -25,7 +25,7 @@ import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceIn
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { MissingStatementManager } from "./MissingStatementsManager.ts";
-import { JavaInterface } from "../types/JavaInterface.ts";
+import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
 import { UsagePosition } from "../../common/UsagePosition.ts";
 import { OuterClassFieldAccessTracker } from "./OuterClassFieldAccessTracker.ts";
 import { LabelCodeSnippet } from "./LabelManager.ts";
@@ -157,19 +157,23 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         // new t.classes[<identifier>]().<constructorIdentifier>(param1, ..., paramN)
         // constructor has to return this or push it to stack!
 
-        let parameterValues: (CodeSnippet | undefined)[] = [];
+        let parameterValues: (CodeSnippet | undefined)[] | undefined = this.getParameterValueSnippets(node);
 
-        for (let parameterValueNode of node.parameterValues) {
-            if (parameterValueNode.kind == TokenType.lambdaOperator) {
-                parameterValues.push(undefined);
-            } else {
-                let snippet = this.compileTerm(parameterValueNode);
-                if (!snippet || !snippet.type) return undefined;
-                parameterValues.push(snippet);
-            }
-        }
+        if(!parameterValues) return undefined;
 
         let klassType = <IJavaClass>node.type.resolvedType;
+        /*
+          consider inner classes:
+          class A {
+            class B {
+                class C {
+
+                }
+            }
+          }
+          We need a A-object to construct a new B-object. We need a B-Object to construct a new C-Object
+        */
+
 
         let method = this.searchMethod(klassType.identifier, klassType, parameterValues.map(p => p?.type), true, false, true, node.range);
 
@@ -208,10 +212,10 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention && !classHasOuterType ? "native" : "java";
 
         if (!newObjectSnippet) {
-            newObjectSnippet = new StringCodeSnippet(`new ${Helpers.classes}["${klassType.identifier}"](${enumValueIdentifier ? '"' + enumValueIdentifier + '", ' + enumValueIndex : ""})`);
+            newObjectSnippet = new StringCodeSnippet(`new ${Helpers.classes}["${klassType.pathAndIdentifier}"](${enumValueIdentifier ? '"' + enumValueIdentifier + '", ' + enumValueIndex : ""})`);
         }
 
-        // call javascript constructor and directly thereafter call java constructor
+        // call javascript constructor and directly thereafter call java constructor 
         let template: string = `§1.${method.getInternalName(callingConvention)}(`;
 
         // instantiation of non-static inner class-object?
@@ -219,14 +223,22 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         // could be before standard constructor methods have been built.
         if (classHasOuterType) {
             let objectNode: ASTTermNode | undefined = (<ASTNewObjectNode>node).object;
+            let objectType: JavaType | undefined;
             if (objectNode) {
                 let objectSnippet = this.compileTerm(objectNode);
                 if (objectSnippet) {
                     parameterValues.unshift(objectSnippet);
+                    objectType = objectSnippet.type;
                 }
             } else {
                 parameterValues.unshift(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}`));
+                objectType = this.currentSymbolTable.classContext;
             }
+
+            if(!objectType || !this.canCastTo(objectType, klassType.outerType, "implicit")){
+                this.pushError(`Zum Instanzieren eines Objekts der Klasse ${klassType.identifier} wird ein Objektkontext der Klasse ${klassType.outerType!.identifier} benötigt.`, "error", node);
+            }
+
         }
 
         if (callingConvention == "java") {
@@ -711,7 +723,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
     }
 
-    getParameterValueSnippets(methodCallNode: ASTMethodCallNode): (CodeSnippet | undefined)[] | undefined {
+    getParameterValueSnippets(methodCallNode: ASTMethodCallNode | ASTNewObjectNode): (CodeSnippet | undefined)[] | undefined {
         let parameterValues: (CodeSnippet | undefined)[] = [];
         for (let parameterValueNode of methodCallNode.parameterValues) {
             if (parameterValueNode.kind == TokenType.lambdaOperator) {
@@ -836,18 +848,27 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             }
         }
 
+        let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention || method.template ? "native" : "java";
+        if(callingConvention == "native"){
+            let isFinalOrStatic = (objectSnippet.type instanceof IJavaClass && objectSnippet.type.isFinal()) || method.isFinal || method.isStatic;
+            if(!isFinalOrStatic){
+                if(method.classEnumInterface instanceof IJavaInterface){
+                    callingConvention = "java";
+                } else if(this.module.moduleManager.overriddenOrImplementedMethodPaths[method.getPathWithMethodIdentifier()]){
+                    callingConvention = "java";
+                }
+            }
+        } 
+        
         // For library functions like Math.sin, Math.abs, ... we use templates to compile to nativ javascript functions:
         if (method.template) {
             if (method.isStatic) {
                 return new SeveralParameterTemplate(method.template).applyToSnippet(returnParameter, node.range, ...(<CodeSnippet[]>parameterValueSnippet));
-            } else {
+            } else if(callingConvention == "native") {
                 return new SeveralParameterTemplate(method.template).applyToSnippet(returnParameter, node.range, objectSnippet, ...(<CodeSnippet[]>parameterValueSnippet));
             }
         }
 
-        let isFinalOrStatic = (objectSnippet.type instanceof IJavaClass && objectSnippet.type.isFinal()) || method.isFinal || method.isStatic;
-
-        let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention && isFinalOrStatic ? "native" : "java";
 
         let objectTemplate: string;
         if (objectSnippet.type instanceof StaticNonPrimitiveType) {
