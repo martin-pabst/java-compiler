@@ -2,7 +2,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTAnonymousClassNode, ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ConstantType, ASTAttributeDereferencingNode, ASTSymbolNode, ASTContinueNode, ASTLocalVariableDeclarations, ASTArrayLiteralNode } from "../parser/AST"; import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
+import { ASTAnonymousClassNode, ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ConstantType, ASTAttributeDereferencingNode, ASTSymbolNode, ASTContinueNode, ASTLocalVariableDeclarations, ASTArrayLiteralNode, ASTNewObjectNode } from "../parser/AST"; import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippetContainer, EmptyPart } from "./CodeSnippetKinds.ts";
 import { CodeSnippet as CodeSnippet, StringCodeSnippet } from "./CodeSnippet.ts";
@@ -21,6 +21,8 @@ import { Field } from "../types/Field.ts";
 import { EmptyRange, IRange } from "../../common/range/Range.ts";
 import { ExceptionTree } from "./ExceptionTree.ts";
 import { ArrayType } from "../types/ArrayType.ts";
+import { GenericVariantOfJavaClass, JavaClass } from "../types/JavaClass.ts";
+import { GenericVariantOfJavaInterface } from "../types/JavaInterface.ts";
 
 export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
@@ -673,14 +675,27 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
 
             if (destinationType){
+
+                // allow instantiating generic types without declaring generic parameters like
+                // List<String> test = new ArrayList<String>;
+                if(initializationNode.kind == TokenType.newObject){
+                    if(destinationType instanceof GenericVariantOfJavaClass || destinationType instanceof GenericVariantOfJavaInterface){
+                        if(this.canCastTo(initValueSnippet.type, destinationType.isGenericVariantOf, "implicit")){
+                            initValueSnippet.type = destinationType;
+                            return initValueSnippet;
+                        }
+                    } 
+                    
+                }
+
                 if (!this.canCastTo(initValueSnippet.type, destinationType, "implicit")) {
                     this.pushError("Der Term auf der rechten Seite des Zuweisungsoperators hat den Datentyp " + initValueSnippet.type.identifier + " und kann daher der Variablen auf der linken Seite (Datentyp " + destinationType.toString() + ") nicht zugewiesen werden.", "error", initializationNode);
-                    return new EmptyPart();
+                    return undefined;
                 }
+
+                initValueSnippet = this.compileCast(initValueSnippet, destinationType, "implicit");
             } 
 
-
-            initValueSnippet = this.compileCast(initValueSnippet, destinationType, "implicit");
 
         } else {
             let defaultValue: string = destinationType.isPrimitive ? (<PrimitiveType>destinationType).defaultValueAsString : "null";
