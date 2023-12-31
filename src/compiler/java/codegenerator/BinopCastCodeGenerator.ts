@@ -8,6 +8,7 @@ import { ASTAnonymousClassNode, ASTLambdaFunctionDeclarationNode, ASTNode, Assig
 import { PrimitiveStringClass } from "../runtime/system/javalang/PrimitiveStringClass";
 import { ArrayType } from "../types/ArrayType";
 import { JavaClass } from "../types/JavaClass";
+import { JavaInterface } from "../types/JavaInterface";
 import { JavaType } from "../types/JavaType";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { CodeSnippet, ConstantValue, StringCodeSnippet } from "./CodeSnippet";
@@ -64,6 +65,7 @@ export abstract class BinopCastCodeGenerator {
     objectType: JavaClass;
     assertionsType: JavaClass;
     stringNonPrimitiveType: JavaClass;
+    iterableType: JavaInterface;
 
     primitiveStringClass = PrimitiveStringClass;
 
@@ -83,6 +85,7 @@ export abstract class BinopCastCodeGenerator {
         this.objectType = <JavaClass>this.libraryTypestore.getType("Object")!;
         this.stringNonPrimitiveType = <JavaClass>this.libraryTypestore.getType("String")!;
         this.assertionsType = <JavaClass>this.libraryTypestore.getType("Assertions")!;
+        this.iterableType = <JavaInterface>this.libraryTypestore.getType("Iterable")!;
 
         this.primitiveTypes.push(this.voidType);  // dummy for "otherClass"
         for (let i = 1; i < primitiveTypeIdentifiers.length; i++) this.primitiveTypes.push(this.libraryTypestore.getType(primitiveTypeIdentifiers[i])!);

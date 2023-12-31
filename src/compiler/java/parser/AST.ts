@@ -421,8 +421,9 @@ export interface ASTForLoopNode extends ASTStatementNode {
     statementToRepeat: ASTStatementNode;
 }
 
-export interface ASTSimpifiedForLoopNode extends ASTStatementNode {
-    kind: TokenType.forLoopOverCollection;
+export interface ASTEnhancedForLoopNode extends ASTStatementNode {
+    kind: TokenType.enhancedForLoop;
+    elementIsFinal: boolean,
     elementType: ASTTypeNode;
     elementIdentifier: string;
     elementIdentifierPosition: IRange;

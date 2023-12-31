@@ -35,13 +35,13 @@
 ### fine-grained next todos on current issue:
 
 ## next todos
+  * simplified for-loop over Iterable or array
   * generics (status: mostly done)
   * anonymous inner classes (status: mostly done)
   * Lambda Functions (status: mostly done)
   * generic methods
   * library method examples
   * detect cyclic calling of constructors
-  * 
 
 
   

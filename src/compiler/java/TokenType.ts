@@ -163,7 +163,7 @@ export enum TokenType {
     genericParameterDefinition,
     symbol,
     annotation,
-    forLoopOverCollection,
+    enhancedForLoop,
     astProgram,
     instanceInitializerBlock,
     staticInitializerBlock,

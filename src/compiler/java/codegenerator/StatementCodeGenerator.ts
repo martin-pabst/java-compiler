@@ -2,7 +2,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTAnonymousClassNode, ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ConstantType, ASTAttributeDereferencingNode, ASTSymbolNode, ASTContinueNode, ASTLocalVariableDeclarations, ASTArrayLiteralNode, ASTNewObjectNode } from "../parser/AST"; import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
+import { ASTAnonymousClassNode, ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ConstantType, ASTAttributeDereferencingNode, ASTSymbolNode, ASTContinueNode, ASTLocalVariableDeclarations, ASTArrayLiteralNode, ASTNewObjectNode, ASTEnhancedForLoopNode } from "../parser/AST"; import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippetContainer, EmptyPart } from "./CodeSnippetKinds.ts";
 import { CodeSnippet as CodeSnippet, StringCodeSnippet } from "./CodeSnippet.ts";
@@ -21,8 +21,9 @@ import { Field } from "../types/Field.ts";
 import { EmptyRange, IRange } from "../../common/range/Range.ts";
 import { ExceptionTree } from "./ExceptionTree.ts";
 import { ArrayType } from "../types/ArrayType.ts";
-import { GenericVariantOfJavaClass, JavaClass } from "../types/JavaClass.ts";
+import { GenericVariantOfJavaClass, IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { GenericVariantOfJavaInterface } from "../types/JavaInterface.ts";
+import { SystemCollection } from "../runtime/system/collections/SystemCollection.ts";
 
 export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
@@ -62,6 +63,8 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
                 snippet = this.compileDoStatement(<ASTDoWhileNode>ast); break;
             case TokenType.keywordFor:
                 snippet = this.compileForStatement(<ASTForLoopNode>ast); break;
+            case TokenType.enhancedForLoop:
+                snippet = this.compileEnhancedForLoop(<ASTEnhancedForLoopNode>ast); break;
             case TokenType.keywordReturn:
                 snippet = this.compileReturnStatement(<ASTReturnNode>ast); break;
             case TokenType.keywordTry:
@@ -162,6 +165,64 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         return snippet;
     }
 
+    compileEnhancedForLoop(node: ASTEnhancedForLoopNode): CodeSnippet | undefined {
+
+        let elementType = node.elementType.resolvedType;
+        let collectionSnippet = this.compileTerm(node.collection);
+
+        if (!elementType || !collectionSnippet || !collectionSnippet.type) return undefined;
+
+        /*
+        * Local variables declared in head of for statement are valid inside whole for statement, 
+        * so we need a symbol table that encompasses the whole for statement:
+        */
+        let forLoopSymbolTable = this.pushAndGetNewSymbolTable(node.range, false);
+        let elementVariable = new JavaLocalVariable(node.elementIdentifier, node.elementIdentifierPosition,
+            elementType, forLoopSymbolTable);
+
+        let statementSnippet = this.compileStatementOrTerm(node.statementToRepeat);
+        if(!statementSnippet){
+            this.popSymbolTable();
+            return undefined;
+        }
+
+        let continueLabel = new LabelCodeSnippet();
+        this.continueStack.push(continueLabel);
+
+        let breakLabel = new LabelCodeSnippet();
+        this.breakStack.push(breakLabel);
+
+        let stackIndexForCollection = forLoopSymbolTable.getStackFrame()!.insertInvisibleLocalVariableAndGetItsIndex();
+
+        let assignCollectionSnippet = SnippetFramer.frame(collectionSnippet, `${Helpers.elementRelativeToStackbase(stackIndexForCollection)} = §1;\n`);
+
+        let forLoopSnippet = new CodeSnippetContainer(assignCollectionSnippet, node.range);
+
+        /*
+         * There are 3 cases:
+         * a) loop over array (using an index)
+         * b) loop over a SystemCollection
+         * c) loop over a Iterable
+         */
+
+        let collectionType = collectionSnippet.type;
+        if(collectionType instanceof ArrayType){
+
+        } else if(collectionType instanceof IJavaClass && collectionType.runtimeClass instanceof SystemCollection){
+
+        } else if(this.canCastTo(collectionType, this.iterableType, "implicit")){
+
+        } else {
+            this.pushError("Die vereinfachte for-loop kann nur über Arrays iterieren oder über Klassen, die das Interface Iterable implementieren.", "error", node.collection.range);
+        }
+
+        this.continueStack.pop();
+        this.breakStack.pop();
+
+        this.popSymbolTable();
+        return forLoopSnippet;
+
+    }
 
     compileForStatement(node: ASTForLoopNode): CodeSnippet | undefined {
 
@@ -674,18 +735,18 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             if (!initValueSnippet?.type) return undefined;
 
 
-            if (destinationType){
+            if (destinationType) {
 
                 // allow instantiating generic types without declaring generic parameters like
                 // List<String> test = new ArrayList<String>;
-                if(initializationNode.kind == TokenType.newObject){
-                    if(destinationType instanceof GenericVariantOfJavaClass || destinationType instanceof GenericVariantOfJavaInterface){
-                        if(this.canCastTo(initValueSnippet.type, destinationType.isGenericVariantOf, "implicit")){
+                if (initializationNode.kind == TokenType.newObject) {
+                    if (destinationType instanceof GenericVariantOfJavaClass || destinationType instanceof GenericVariantOfJavaInterface) {
+                        if (this.canCastTo(initValueSnippet.type, destinationType.isGenericVariantOf, "implicit")) {
                             initValueSnippet.type = destinationType;
                             return initValueSnippet;
                         }
-                    } 
-                    
+                    }
+
                 }
 
                 if (!this.canCastTo(initValueSnippet.type, destinationType, "implicit")) {
@@ -694,7 +755,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
                 }
 
                 initValueSnippet = this.compileCast(initValueSnippet, destinationType, "implicit");
-            } 
+            }
 
 
         } else {

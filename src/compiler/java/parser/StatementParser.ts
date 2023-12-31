@@ -3,7 +3,7 @@ import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType.ts";
 import { ArrayType } from "../types/ArrayType.ts";
-import { ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLocalVariableDeclarations, ASTReturnNode, ASTSimpifiedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode } from "./AST.ts";
+import { ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLocalVariableDeclarations, ASTReturnNode, ASTEnhancedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode } from "./AST.ts";
 import { TermParser } from "./TermParser.ts";
 
 export abstract class StatementParser extends TermParser {
@@ -201,7 +201,7 @@ export abstract class StatementParser extends TermParser {
         return blockNode;
     }
 
-    parseFor(): ASTForLoopNode | ASTSimpifiedForLoopNode | undefined {
+    parseFor(): ASTForLoopNode | ASTEnhancedForLoopNode | undefined {
         let tokenFor = this.getAndSkipToken();  // preserve first token to compute range later on
 
         if (!this.expect(TokenType.leftBracket, true)) return undefined;
@@ -209,7 +209,7 @@ export abstract class StatementParser extends TermParser {
         // We have to differentiate between for(int i = 0; i < 10; i++) and for(<Type> <id>: <Term>)
         // therefore we parse till ) and look for :
         let colonFound = this.lookForTokenTillOtherToken(TokenType.colon, [TokenType.rightBracket, TokenType.leftCurlyBracket, TokenType.rightCurlyBracket]);
-        if (colonFound) return this.parseSimplifiedForLoop(tokenFor);
+        if (colonFound) return this.parseEnhancedForLoop(tokenFor);
 
         let firstStatement = this.parseStatementOrExpression(false);
         this.expect(TokenType.semicolon, true);
@@ -230,7 +230,7 @@ export abstract class StatementParser extends TermParser {
 
     }
 
-    parseSimplifiedForLoop(tokenFor: Token): ASTSimpifiedForLoopNode | undefined {
+    parseEnhancedForLoop(tokenFor: Token): ASTEnhancedForLoopNode | undefined {
         // for and ( are already parsed
         let elementType = this.parseType();
         let elementIdentifier = this.expectAndSkipIdentifierAsToken();

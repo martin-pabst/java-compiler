@@ -92,8 +92,13 @@ export class BaseStackframe {
     }
 
     insertInvisibleParameter(){
-        this.nextFreePosition++;
         this.numberOfParameters++;
+    }
+
+    insertInvisibleLocalVariableAndGetItsIndex(): number {
+        let index = this.nextFreePosition++;
+        this.numberOfLocalVariables++;
+        return index;
     }
 
 }
