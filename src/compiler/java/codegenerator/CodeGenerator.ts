@@ -85,7 +85,6 @@ export class CodeGenerator extends StatementCodeGenerator {
                     break;
             }
 
-            this.compileClassesEnumsAndInterfaces(cdef);        // compile named inner classes
         }
     }
 
@@ -104,6 +103,8 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         this.compileMethodsAndConstructors(cdef, classContext);
 
+        this.compileClassesEnumsAndInterfaces(cdef);        // compile named inner classes
+
         this.popSymbolTable();
 
     }
@@ -119,6 +120,8 @@ export class CodeGenerator extends StatementCodeGenerator {
         this.compileStaticFieldsAndInitializerAndEnumValues(classContext, cdef);
 
         this.compileMethodsAndConstructors(cdef, classContext);
+
+        this.compileClassesEnumsAndInterfaces(cdef);        // compile named inner classes
 
         this.popSymbolTable();
 
@@ -138,6 +141,8 @@ export class CodeGenerator extends StatementCodeGenerator {
         this.compileInstanceFieldsAndInitializer(cdef, classContext);
 
         this.compileMethodsAndConstructors(cdef, classContext);
+
+        this.compileClassesEnumsAndInterfaces(cdef);        // compile named inner classes
 
         this.popSymbolTable();
 
@@ -490,78 +495,80 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         }
 
+        if(methodNode.statement){
+            if (method.isAbstract) this.pushError("Eine abstrakte Methode kann keinen Methodenrumpf besitzen.", "error", methodNode);
+            if (classContext instanceof JavaInterface && !(method.isAbstract || method.isDefault)) this.pushError("In Interfaces können nur default-Methoden und abstrakte Methoden einen Methodenrumpf haben.", "error", methodNode);
 
-        if (method.isAbstract) this.pushError("Eine abstrakte Methode kann keinen Methodenrumpf besitzen.", "error", methodNode);
-        if (classContext instanceof JavaInterface && !(method.isAbstract || method.isDefault)) this.pushError("In Interfaces können nur default-Methoden und abstrakte Methoden einen Methodenrumpf haben.", "error", methodNode);
-
-        let msm = this.missingStatementManager;
-        this.missingStatementManager = new MissingStatementManager();
-        this.missingStatementManager.beginMethodBody(method.parameters);
-
-        let snippet = methodNode.statement ? this.compileStatementOrTerm(methodNode.statement) : undefined;
-        if (snippet) snippets.push(snippet);
-
-        if (methodNode.isContructor) {
-            snippets.push(new StringCodeSnippet(`${Helpers.return}(${Helpers.elementRelativeToStackbase(0)});\n`))
-
-            if (!(thisCallHappened || superCallHappened)) {
-                // Has base class a parameterless super constructor?
-                let baseClass = classContext.getExtends();
-                if(baseClass instanceof IJavaClass){
-                    let parameterlessConstructors = baseClass.getPossibleMethods(baseClass.identifier, 0, true, false);
-                    if(parameterlessConstructors.length == 0){
-                        this.pushError(`Da die Oberklasse ${baseClass.identifier} keinen parameterlosen Konstruktor hat, muss in jedem Konstruktor einer Unterklasse gleich zu Beginn der Aufruf eines Konstruktors der Oberklasse erfolgen (super(...)).`, "error", methodNode.identifierRange);
-                    } else {
-                        let parameterlessConstructor = parameterlessConstructors[0];
-                        if(parameterlessConstructor.hasImplementationWithNativeCallingConvention){
-                            let superConstructorCall = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${parameterlessConstructor.getInternalName("native")}();\n`);
-                            snippets.unshift(superConstructorCall);                            
+            let msm = this.missingStatementManager;
+            this.missingStatementManager = new MissingStatementManager();
+            this.missingStatementManager.beginMethodBody(method.parameters);
+    
+            let snippet = methodNode.statement ? this.compileStatementOrTerm(methodNode.statement) : undefined;
+            if (snippet) snippets.push(snippet);
+    
+            if (methodNode.isContructor) {
+                snippets.push(new StringCodeSnippet(`${Helpers.return}(${Helpers.elementRelativeToStackbase(0)});\n`))
+    
+                if (!(thisCallHappened || superCallHappened)) {
+                    // Has base class a parameterless super constructor?
+                    let baseClass = classContext.getExtends();
+                    if(baseClass instanceof IJavaClass){
+                        let parameterlessConstructors = baseClass.getPossibleMethods(baseClass.identifier, 0, true, false);
+                        if(parameterlessConstructors.length == 0){
+                            this.pushError(`Da die Oberklasse ${baseClass.identifier} keinen parameterlosen Konstruktor hat, muss in jedem Konstruktor einer Unterklasse gleich zu Beginn der Aufruf eines Konstruktors der Oberklasse erfolgen (super(...)).`, "error", methodNode.identifierRange);
                         } else {
-                            let superConstructorCall = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${parameterlessConstructor.getInternalName("java")}(${StepParams.thread}, undefined);\n`);
-                            snippets.unshift(superConstructorCall);                            
+                            let parameterlessConstructor = parameterlessConstructors[0];
+                            if(parameterlessConstructor.hasImplementationWithNativeCallingConvention){
+                                let superConstructorCall = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${parameterlessConstructor.getInternalName("native")}();\n`);
+                                snippets.unshift(superConstructorCall);                            
+                            } else {
+                                let superConstructorCall = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${parameterlessConstructor.getInternalName("java")}(${StepParams.thread}, undefined);\n`);
+                                snippets.unshift(superConstructorCall);                            
+                            }
                         }
                     }
                 }
+    
             }
-
-        }
-
-        method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
-
-        if (!this.missingStatementManager.hasReturnHappened() && !methodNode.isContructor) {
-            snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
-        }
-
-        this.missingStatementManager.endMethodBody(method, this.module.errors);
-        this.missingStatementManager = msm;
-
-        this.linker.link(snippets, method.program);
-
-        methodNode.program = method.program;    // only for debugging purposes
-
-        let runtimeClass = classContext.runtimeClass;
-
-        if (runtimeClass) {
-            method.program.compileToJavascriptFunctions();
-
-            method.callbackAfterCodeGeneration.forEach(callback => callback());
-
-            let functionStub: Function;
-            if (method.isStatic) {
-                functionStub = function (this: any, __t: Thread, ...parameters: any) {
-                    __t.s.push(...parameters);        
-                    __t.pushProgram(method!.program!);
-                }
-                runtimeClass[method.getInternalNameWithGenericParameterIdentifiers("java")] = functionStub;
-            } else {
-                functionStub = function (this: any, __t: Thread, __callback: CallbackFunction, ...parameters: any) {
-                    __t.s.push(this, ...parameters);
-                    __t.pushProgram(method!.program!, __callback);
-                }
-                runtimeClass.prototype[method.getInternalNameWithGenericParameterIdentifiers("java")] = functionStub;
+    
+            method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
+    
+            if (!this.missingStatementManager.hasReturnHappened() && !methodNode.isContructor) {
+                snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
             }
+    
+            this.missingStatementManager.endMethodBody(method, this.module.errors);
+            this.missingStatementManager = msm;
+    
+            this.linker.link(snippets, method.program);
+    
+            methodNode.program = method.program;    // only for debugging purposes
+    
+            let runtimeClass = classContext.runtimeClass;
+    
+            if (runtimeClass) {
+                method.program.compileToJavascriptFunctions();
+    
+                method.callbackAfterCodeGeneration.forEach(callback => callback());
+    
+                let functionStub: Function;
+                if (method.isStatic) {
+                    functionStub = function (this: any, __t: Thread, ...parameters: any) {
+                        __t.s.push(...parameters);        
+                        __t.pushProgram(method!.program!);
+                    }
+                    runtimeClass[method.getInternalNameWithGenericParameterIdentifiers("java")] = functionStub;
+                } else {
+                    functionStub = function (this: any, __t: Thread, __callback: CallbackFunction, ...parameters: any) {
+                        __t.s.push(this, ...parameters);
+                        __t.pushProgram(method!.program!, __callback);
+                    }
+                    runtimeClass.prototype[method.getInternalNameWithGenericParameterIdentifiers("java")] = functionStub;
+                }
+    
+            }
+        } 
 
-        }
 
         this.popSymbolTable();
 
@@ -628,12 +635,13 @@ export class CodeGenerator extends StatementCodeGenerator {
  */
     compileAnonymousInnerClass(node: ASTAnonymousClassNode): CodeSnippet | undefined {
 
-        let outerClass = this.currentSymbolTable.classContext;
-        let klass = new JavaClass("", node.newObjectNode.range, "", this.module);
-        klass.outerType = outerClass;
-        klass.setExtends(this.objectType);
+        // let outerClass = this.currentSymbolTable.classContext;
+        let klass = node.klass.resolvedType!;
+        // let klass = new JavaClass("", node.newObjectNode.range, "", this.module);
+        // klass.outerType = outerClass;
+        // klass.setExtends(this.objectType);
 
-        node.klass.resolvedType = klass;
+        // node.klass.resolvedType = klass;
 
         // setup provisionally version of runtime class to collect programs: 
         klass.runtimeClass = class {
@@ -688,8 +696,8 @@ export class CodeGenerator extends StatementCodeGenerator {
         Object.assign(klass.runtimeClass.prototype, oldClass.prototype);
         // snippet which instantiates object of this class calling it's typescript constructor and it's java constructor
 
-        klass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods();
-        klass.takeSignaturesFromOverriddenMethods();
+        klass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods({});
+        klass.takeSignaturesFromOverriddenMethods({});
         klass.checkIfAbstractParentsAreImplemented();
 
         let template = `new this.innerClass(${outerLocalVariables.map(v => Helpers.elementRelativeToStackbase(v!.stackframePosition!)).join(", ")})`;
@@ -772,7 +780,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         let outerClassFieldAccessHappened = this.outerClassFieldAccessTracker.hasAccessHappened();
 
-        klass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods();
+        klass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods({});
 
         let outerLocalVariables = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.isInnerClassCopyOfOuterClassLocalVariable);
         outerLocalVariables.forEach(v => this.missingStatementManager.onSymbolRead(v!, v!.getLastUsagePosition(), this.module.errors));

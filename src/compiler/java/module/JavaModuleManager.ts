@@ -14,6 +14,8 @@ export class JavaModuleManager {
     modules: JavaCompiledModule[] = [];
     typestore: JavaTypeStore;
 
+    overriddenOrImplementedMethodPaths: Record<string, boolean> = {};
+
     constructor(){
         this.typestore = new JavaTypeStore();
     }

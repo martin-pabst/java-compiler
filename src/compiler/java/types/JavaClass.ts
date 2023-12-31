@@ -128,14 +128,17 @@ export class JavaClass extends IJavaClass {
         }
     }
 
-    takeSignaturesFromOverriddenMethods() {
+    takeSignaturesFromOverriddenMethods(overriddenOrImplementedMethodPaths: Record<string, boolean>) {
 
         let baseClass = this.getExtends();
         let allBaseClassMethods = baseClass?.getAllMethods();
+        if(!allBaseClassMethods) return;
+
         for(let m of this.methods){
             let internalName = m.getInternalName("java");
-            let baseMethod = allBaseClassMethods?.find(m1 => m1.getInternalName("java") == internalName);
-            if(baseMethod){
+            let baseMethods = allBaseClassMethods?.filter(m1 => m1.getInternalName("java") == internalName);
+            if(baseMethods.length > 0){
+                let baseMethod = baseMethods[0];
                 m.takeInternalJavaNameWithGenericParamterIdentifiersFrom(baseMethod);
                 if(baseMethod.isFinal){
                     m.classEnumInterface.module.errors.push({
@@ -145,12 +148,13 @@ export class JavaClass extends IJavaClass {
                     })
                 }
             }
+            baseMethods.forEach( m => overriddenOrImplementedMethodPaths[m.getPathWithMethodIdentifier()] = true);
         }
 
     }
 
 
-    checkIfInterfacesAreImplementedAndSupplementDefaultMethods() {
+    checkIfInterfacesAreImplementedAndSupplementDefaultMethods(overriddenOrImplementedMethodPaths: Record<string, boolean>) {
         for (let ji of this.getImplements()) {
             let javaInterface = <JavaInterface>ji;
             let notImplementedMethods: Method[] = [];
@@ -402,7 +406,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
             this.cachedMethods = [];
 
             for (let method of this.isGenericVariantOf.getOwnMethods()) {
-                this.cachedMethods.push(method.getCopyWithConcreteType(this.typeMap));
+                this.cachedMethods.push(method.getCopyWithConcreteType(this.typeMap, this));
             }
         }
         return this.cachedMethods;

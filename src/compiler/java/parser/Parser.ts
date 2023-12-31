@@ -523,6 +523,7 @@ export class Parser extends StatementParser {
         let classNode = this.nodeFactory.buildClassNode(this.nodeFactory.buildNodeWithModifiers(this.cct.range), undefined, this.currentClassOrInterface!, []);
 
         this.parseClassBody(classNode);
+        classNode.extends = newObjectNode.type;     // type maybe interface... we correct this later on in TypeResolver
 
         if (newObjectNode && classNode) {
             return this.nodeFactory.buildAnonymousInnerClassNode(newObjectNode, classNode);

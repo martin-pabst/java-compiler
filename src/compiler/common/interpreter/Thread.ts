@@ -13,6 +13,7 @@ import { Assertions, DummyAssertions } from "../../java/runtime/unittests/Assert
 import { ObjectClass } from "../../java/runtime/system/javalang/ObjectClassStringClass.ts";
 import { NonPrimitiveType } from "../../java/types/NonPrimitiveType.ts";
 import { ClassCastExceptionClass } from "../../java/runtime/system/javalang/ClassCastExceptionClass.ts";
+import { IndexOutOfBoundsExceptionClass } from "../../java/runtime/system/javalang/IndexOutOfBoundsExceptionClass.ts";
 
 
 type ProgramState = {
@@ -131,6 +132,7 @@ export class Thread {
                          */
                         
                         // console.log(step.codeAsString);
+                        
                         stepIndex = step.run!(this, stack, stackBase);
 
                         if (currentProgramState != this.currentProgramState) {
@@ -377,6 +379,7 @@ export class Thread {
         this.scheduler.interpreter.printManager.print(text, true, color);
     }
 
+    
     /**
      * Runtime method to throw Arithmetic exception
      * @param message 
@@ -395,6 +398,29 @@ export class Thread {
         }
 
         let exception = new ArithmeticExceptionClass(message);
+        exception.range = range;
+
+        throw exception;
+    }
+
+    /**
+     * Runtime method to throw IndexOutOfBoundsException exception
+     * @param message 
+     * @param startLineNumber 
+     * @param startColumn 
+     * @param endLineNumber 
+     * @param endColumn 
+     */
+    IOBE(message: string, startLineNumber?: number, startColumn?: number, endLineNumber?: number, endColumn?: number){
+
+        let range: IRange | undefined = startLineNumber ? {
+            startLineNumber: startLineNumber!,
+            startColumn: startColumn!,
+            endLineNumber: endLineNumber!,
+            endColumn: endColumn! 
+        } : undefined;
+
+        let exception = new IndexOutOfBoundsExceptionClass(message);
         exception.range = range;
 
         throw exception;

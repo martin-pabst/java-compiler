@@ -26,7 +26,9 @@
   * Declaration of several fields/local variables like int a = 4, b[], c = 3;
   * Array literals
   * Alternative array declaration: int a[] instead of int[] a
-
+  * Keywords this and super (especially to call constructor from other constructor)
+  * while resolving types: Store which library methods are overridden by java methods. Afterwards we can call all other methods natively.
+  * Instantiate object of generic type without specifying generic parameters, like List<String> list = new ArrayList<>();
 
 ## working status on current issue:
 
@@ -38,9 +40,9 @@
   * Lambda Functions (status: mostly done)
   * generic methods
   * library method examples
+  * detect cyclic calling of constructors
+  * 
 
- - Schlüsselwort this (wird ausgewertet zu Helpers.elementRelativeToStackbase(0)); insbesondere auch in der besonderen Rolle zum Aufruf eines Konstruktors aus einem anderen heraus
- - Schlüsselwort super (insbesondere in der Rolle zum Aufruf eines super-Konstruktors)
 
   
 

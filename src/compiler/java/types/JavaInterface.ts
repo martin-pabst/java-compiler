@@ -27,6 +27,7 @@ export abstract class IJavaInterface extends NonPrimitiveType {
 
     abstract getExtends(): IJavaInterface[];
 
+    abstract isFunctionalInterface(): boolean;
 
     getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): Field | undefined {
         let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
@@ -67,6 +68,10 @@ export class JavaInterface extends IJavaInterface {
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
         super(identifier, identifierRange, path, module);
         this.genericTypeParameters = [];
+    }
+
+    isFunctionalInterface(): boolean {
+        return this.methods.length == 1;
     }
 
     getFields(): Field[] {
@@ -192,6 +197,10 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
         super(isGenericVariantOf.identifier, isGenericVariantOf.identifierRange, isGenericVariantOf.pathAndIdentifier, isGenericVariantOf.module);
     }
 
+    isFunctionalInterface(): boolean {
+        return this.isGenericVariantOf.isFunctionalInterface();
+    }
+
     toString(): string {
         let s: string = this.identifier;
 
@@ -233,7 +242,7 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
             this.cachedMethods = [];
 
             for (let method of this.isGenericVariantOf.getOwnMethods()) {
-                this.cachedMethods.push(method.getCopyWithConcreteType(this.typeMap));
+                this.cachedMethods.push(method.getCopyWithConcreteType(this.typeMap, this));
             }
         }
         return this.cachedMethods;

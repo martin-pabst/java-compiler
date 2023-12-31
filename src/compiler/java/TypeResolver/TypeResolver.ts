@@ -43,7 +43,7 @@ export class TypeResolver {
 
         this.resolveGenericParameterTypesAndExtendsImplements();
 
-        if(CycleFinder.findCycle(this.moduleManager)) return false;
+        if (CycleFinder.findCycle(this.moduleManager)) return false;
 
         this.buildAllMethods();
 
@@ -160,11 +160,17 @@ export class TypeResolver {
 
     resolveTypeNode(typeNode: ASTTypeNode, module: JavaBaseModule): JavaType | undefined {
 
+        if(typeNode.resolvedType) return typeNode.resolvedType;
+
         switch (typeNode.kind) {
             case TokenType.baseType: return typeNode.resolvedType = this.findPrimaryTypeByIdentifier(<ASTBaseTypeNode>typeNode, module);
             case TokenType.genericTypeInstantiation:
                 let genericTypeNode = <ASTGenericTypeInstantiationNode>typeNode;
                 this.resolveTypeNode(genericTypeNode.baseType, module);
+                
+                // ArrayList<> -> ArrayList
+                if(genericTypeNode.actualTypeArguments.length == 0) return typeNode.resolvedType = genericTypeNode.baseType.resolvedType;
+
                 let baseType = genericTypeNode.baseType.resolvedType;
                 if (!baseType) return undefined;
                 if (!baseType.hasGenericParameters()) {
@@ -259,6 +265,9 @@ export class TypeResolver {
                     let gp = gpType.resolvedType;
                     if (gp && gp.identifier == identifer) return gp;
                 }
+                for (let innerclass of classOrInterfaceNode.classOrInterfaceOrEnumDefinitions) {
+                    if (innerclass.identifier == identifer && innerclass.resolvedType) return innerclass.resolvedType;
+                }
             }
 
             if (typeNode.identifier.indexOf(".") >= 0) {
@@ -328,7 +337,14 @@ export class TypeResolver {
             if (extType instanceof IJavaClass) {
                 resolvedType1.setExtends(extType);
             } else {
-                this.pushError("Hinter extends muss eine Klasse stehen.", declNode.extends.range, module);
+                // anonymous inner class? 
+                if (declNode.identifier == "" && extType instanceof IJavaInterface) {
+                    resolvedType1.addImplements(extType);
+                    declNode.implements.push(declNode.extends);
+                    declNode.extends = undefined;
+                } else {
+                    this.pushError("Hinter extends muss eine Klasse stehen.", declNode.extends.range, module);
+                }
             }
         }
 
@@ -398,6 +414,7 @@ export class TypeResolver {
 
     buildAllMethods() {
 
+
         for (let klassNode of this.classDeclarationNodes) {
             this.buildMethods(klassNode);
         }
@@ -412,12 +429,13 @@ export class TypeResolver {
 
         let classes: JavaClass[] = this.classDeclarationNodes.filter(cn => cn.resolvedType).map(cn => <JavaClass>cn.resolvedType);
 
+        this.moduleManager.overriddenOrImplementedMethodPaths = {};
         // replenish class types with default methods of implemented interfaces if necessary
         for (let javaClass of classes) {
 
-            javaClass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods();
+            javaClass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods(this.moduleManager.overriddenOrImplementedMethodPaths);
 
-            javaClass.takeSignaturesFromOverriddenMethods();
+            javaClass.takeSignaturesFromOverriddenMethods(this.moduleManager.overriddenOrImplementedMethodPaths);
 
             javaClass.checkIfAbstractParentsAreImplemented();
 
@@ -435,7 +453,7 @@ export class TypeResolver {
 
             let method: Method;
 
-            if(methodNode.genericParameterDeclarations.length > 0){
+            if (methodNode.genericParameterDeclarations.length > 0) {
                 let genericParameters = methodNode.genericParameterDeclarations.map(gp => gp.resolvedType!);
                 method = new GenericMethod(methodNode.identifier, methodNode.identifierRange,
                     module, methodNode.visibility, genericParameters);
