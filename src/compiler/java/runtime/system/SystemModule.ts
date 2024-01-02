@@ -8,6 +8,7 @@ import { ComparableInterface } from "./collections/ComparableInterface.ts";
 import { IterableInterface } from "./collections/IterableInterface.ts";
 import { IteratorInterface } from "./collections/IteratorInterface.ts";
 import { ListInterface } from "./collections/ListInterface.ts";
+import { ConsumerInterface } from "./functional/ConsumerInterface.ts";
 import { ArithmeticExceptionClass } from "./javalang/ArithmeticExceptionClass.ts";
 import { ClassCastExceptionClass } from "./javalang/ClassCastExceptionClass.ts";
 import { EnumClass } from "./javalang/EnumClass.ts";
@@ -57,13 +58,19 @@ export class SystemModule extends JavaLibraryModule {
 
         this.classes.push(
             ComparableInterface, ObjectClass, EnumClass,                  // These two MUST come first!
+
+            // Functional
+            ConsumerInterface,
+
             StringClass, NumberClass, IntegerClass, LongClass, FloatClass, DoubleClass, ShortClass, BooleanClass,  // boxed primitive types
+
             MathClass,
             ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass, 
             ClassCastExceptionClass,
 
             // Collections
             IteratorInterface, IterableInterface, CollectionInterface, ListInterface, ArrayListClass,
+
 
             AssertionsClass
         )

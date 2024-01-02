@@ -29,13 +29,13 @@
   * Keywords this and super (especially to call constructor from other constructor)
   * while resolving types: Store which library methods are overridden by java methods. Afterwards we can call all other methods natively.
   * Instantiate object of generic type without specifying generic parameters, like List<String> list = new ArrayList<>();
+  * simplified for-loop over Iterable or array
 
 ## working status on current issue:
 
 ### fine-grained next todos on current issue:
 
 ## next todos
-  * simplified for-loop over Iterable or array
   * generics (status: mostly done)
   * anonymous inner classes (status: mostly done)
   * Lambda Functions (status: mostly done)

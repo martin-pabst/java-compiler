@@ -168,12 +168,13 @@ export class JavaClass extends IJavaClass {
     }
 
 
-    checkIfInterfacesAreImplementedAndSupplementDefaultMethods(overriddenOrImplementedMethodPaths: Record<string, boolean>) {
+    checkIfInterfacesAreImplementedAndSupplementDefaultMethods() {
         for (let ji of this.getImplements()) {
             let javaInterface = <JavaInterface>ji;
             let notImplementedMethods: Method[] = [];
             for (let method of javaInterface.getOwnMethods()) {
 
+                // TODO: if method has parameter of generic wildcard type, e.g. "? super String", then classesMethod only needs parameter of type which is superclass of String...
                 let classesMethod = this.findMethodWithSignature(method.getInternalName("java"));
 
                 if (!classesMethod) {
@@ -292,6 +293,10 @@ export class JavaClass extends IJavaClass {
         if(bType instanceof GenericTypeParameter){
             for(let ext of bType.upperBounds){
                 if(!this.canImplicitlyCastTo(ext)) return false;
+            }
+
+            if(bType.lowerBound){
+                if(!bType.lowerBound.canImplicitlyCastTo(this)) return false;
             }
 
             if(bType.catches) bType.catches.push(this);

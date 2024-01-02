@@ -333,7 +333,9 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
 
             if(!myType || !othersType) return false;
 
-            if(!(myType.canImplicitlyCastTo(othersType) && othersType.canImplicitlyCastTo(myType))) {
+            let othersTypeIsGenericWildcardParameter = othersType instanceof GenericTypeParameter && othersType.isWildcard;
+
+            if(!(myType.canImplicitlyCastTo(othersType) && (othersTypeIsGenericWildcardParameter || othersType.canImplicitlyCastTo(myType)))) {
                 return false;
             }
 

@@ -8,6 +8,7 @@ import { JavaTypeStore } from "../module/JavaTypeStore";
 import { ASTAnonymousClassNode, ASTBlockNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTMethodCallNode, ASTMethodDeclarationNode, ASTStatementNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
 import { Field } from "../types/Field.ts";
+import { GenericTypeParameter } from "../types/GenericTypeParameter.ts";
 import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
@@ -734,12 +735,21 @@ export class CodeGenerator extends StatementCodeGenerator {
             return;
         }
 
+        let methodToImplementParameterTypes: JavaType[] = methodToImplement.parameters.map( p => {
+            if(p.type instanceof GenericTypeParameter){
+                if(p.type.lowerBound) return p.type.lowerBound;
+                return p.type;
+            } else {
+                return p.type;
+            }
+        })
+
         for (let i = 0; i < node.parameters.length; i++) {
             let lambdaParameter = node.parameters[i];
-            let fiParameter = methodToImplement.parameters[i];
+            let fiParameterType = methodToImplementParameterTypes[i];
             if (lambdaParameter.type && lambdaParameter.type.resolvedType) {
-                if (!this.canCastTo(fiParameter.type, lambdaParameter.type.resolvedType, "implicit")) {
-                    this.pushError(`Der Datentyp des Parameters ${lambdaParameter.identifier} passt nicht zum Datentyp des erwarteten Parameters (${fiParameter.type.toString()}).`, "error", lambdaParameter.range);
+                if (!this.canCastTo(fiParameterType, lambdaParameter.type.resolvedType, "implicit")) {
+                    this.pushError(`Der Datentyp des Parameters ${lambdaParameter.identifier} passt nicht zum Datentyp des erwarteten Parameters (${fiParameterType.toString()}).`, "error", lambdaParameter.range);
                 }
             }
         }
@@ -747,14 +757,16 @@ export class CodeGenerator extends StatementCodeGenerator {
         let method = methodToImplement.getCopy();
         for (let i = 0; i < method.parameters.length; i++) {
             method.parameters[i].identifier = node.parameters[i].identifier;
+            method.parameters[i].type = methodToImplementParameterTypes[i];
         }
+        method.takeInternalJavaNameWithGenericParamterIdentifiersFrom(methodToImplement);
 
         //@ts-ignore    (fake methodNode to use compileMethodDeclaration later)
         let methodNode: ASTMethodDeclarationNode = {
             range: node.range,
             statement: node.statement,
             isContructor: false,
-            identifier: "",
+            identifier: method.identifier,
             method: method,
             program: undefined
         }
@@ -785,7 +797,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         let outerClassFieldAccessHappened = this.outerClassFieldAccessTracker.hasAccessHappened();
 
-        klass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods({});
+        klass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods();
 
         let outerLocalVariables = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.isInnerClassCopyOfOuterClassLocalVariable);
         outerLocalVariables.forEach(v => this.missingStatementManager.onSymbolRead(v!, v!.getLastUsagePosition(), this.module.errors));

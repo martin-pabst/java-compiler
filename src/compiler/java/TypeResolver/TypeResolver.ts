@@ -432,7 +432,7 @@ export class TypeResolver {
         // replenish class types with default methods of implemented interfaces if necessary
         for (let javaClass of classes) {
 
-            javaClass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods(this.moduleManager.overriddenOrImplementedMethodPaths);
+            javaClass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods();
 
             javaClass.takeSignaturesFromOverriddenMethods(this.moduleManager.overriddenOrImplementedMethodPaths);
 

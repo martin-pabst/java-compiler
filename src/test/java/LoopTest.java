@@ -193,3 +193,39 @@ class A implements Iterable<String> {
 for(var n: new A()){
    println(n);
 }
+
+/**::
+ * forEach with inner class as Consumer
+ * @exptectedOutput: "first\nsecond\nthird\nDone!\n"
+ */
+var list = new ArrayList<String>();
+
+list.add("first");
+list.add("second");
+list.add("third");
+
+var consumer = new Consumer<String>(){
+   void accept(String s){
+      println(s);
+   }
+};
+
+
+list.forEach(consumer);
+
+println("Done!");
+
+/**::
+ * forEach with lambda function as Consumer
+ * @exptectedOutput: "first\nsecond\nthird\nDone!\n"
+ */
+var list = new ArrayList<String>();
+
+list.add("first");
+list.add("second");
+list.add("third");
+
+
+list.forEach(e -> { println(e); });
+
+println("Fertig!");

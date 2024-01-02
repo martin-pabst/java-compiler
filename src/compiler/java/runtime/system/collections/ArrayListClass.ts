@@ -7,6 +7,7 @@ import { CollectionInterface } from "./CollectionInterface.ts";
 import { SystemCollection } from "./SystemCollection.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { IndexOutOfBoundsExceptionClass } from "../javalang/IndexOutOfBoundsExceptionClass.ts";
+import { ConsumerInterface } from "../functional/ConsumerInterface.ts";
 
 export class ArrayListClass extends SystemCollection {
     static __javaDeclarations: LibraryDeclarations = [
@@ -14,8 +15,9 @@ export class ArrayListClass extends SystemCollection {
 
         { type: "method", signature: "ArrayList()", native: ArrayListClass.prototype._constructor },
 
-        // from InterableInterface
+        // from IterableInterface
         { type: "method", signature: "Iterator<E> iterator()", native: ArrayListClass.prototype._iterator },
+        {type: "method", signature: "void forEach(Consumer<? super E> action)", java: ArrayListClass.prototype._mj$forEach$void$Consumer},
  
         // from CollectionInterface
         { type: "method", signature: "Object[] toArray()", native: ArrayListClass.prototype._toArray, template: "§1.elements.slice()" },
@@ -37,6 +39,8 @@ export class ArrayListClass extends SystemCollection {
         {type: "method", signature: "int indexOf (Object o)", native: ArrayListClass.prototype._indexOf},
         {type: "method", signature: "E remove (int index)", native: ArrayListClass.prototype._removeWithIndex},
         {type: "method", signature: "E set (int index, E Element)", native: ArrayListClass.prototype._setWithIndex},
+
+        // 
     ]
 
     static type: NonPrimitiveType;
@@ -45,6 +49,22 @@ export class ArrayListClass extends SystemCollection {
 
     _constructor() {
         return this;
+    }
+
+    _mj$forEach$void$Consumer(t: Thread, callback: CallbackFunction, consumer: ConsumerInterface){
+        let index: number = -1;
+
+        let f = () => {
+            index++;
+            if(index < this.elements.length){
+                consumer._mj$accept$void$T(t, f, this.elements[index]);
+            } else {
+                if(callback) callback();
+            }
+        }
+
+        f();
+
     }
 
     _iterator(){

@@ -1,4 +1,32 @@
 export var testPrograms = {
+consumerTestWithLambda:`
+var list = new ArrayList<String>();
+
+list.add("first");
+list.add("second");
+list.add("third");
+
+
+list.forEach((e) -> {println(e);});
+
+println("Fertig!");
+`,
+   consumerTest:`
+var list = new ArrayList<String>();
+
+list.add("first");
+list.add("second");
+list.add("third");
+
+var consumer = new Consumer<String>(){
+   void accept(String s){
+      println(s);
+   }
+};
+
+
+list.forEach(consumer);
+`,
 iteratorTest:`
 class A implements Iterable<String> {
    Iterator<String> iterator(){

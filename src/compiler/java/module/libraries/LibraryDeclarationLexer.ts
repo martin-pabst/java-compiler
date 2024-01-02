@@ -17,6 +17,7 @@ export class LibraryDeclarationLexer {
             ["enum", TokenType.keywordEnum],
             ["interface", TokenType.keywordInterface],
             ["extends", TokenType.keywordExtends],
+            ["super", TokenType.keywordSuper],
             ["implements", TokenType.keywordImplements],
             ["public", TokenType.keywordPublic],
             ["protected", TokenType.keywordProtected],

@@ -89,7 +89,16 @@ export class GenericTypeParameter extends NonPrimitiveType {
         let ownMappedType = typeMap.get(this);
         if(ownMappedType) return ownMappedType;
 
-        return this;
+        let copy = new GenericTypeParameter(this.identifier, this.module, this.identifierRange);
+        if(this.lowerBound){
+            copy.lowerBound = this.lowerBound.getCopyWithConcreteType(typeMap) as IJavaClass;
+        }
+
+        for(let ub of this.upperBounds){
+            copy.upperBounds.push(ub.getCopyWithConcreteType(typeMap) as IJavaClass | IJavaInterface);
+        }
+
+        return copy;
     }
 
     canImplicitlyCastTo(otherType: JavaType): boolean {
@@ -166,6 +175,15 @@ export class GenericTypeParameter extends NonPrimitiveType {
             })
         }
 
+    }
+
+    getInternalName(): string {
+        if(this.isWildcard){
+            if(this.lowerBound) return this.lowerBound.getInternalName();
+            return this.identifier;
+        } else {
+            return this.identifier;
+        }
     }
 
 }

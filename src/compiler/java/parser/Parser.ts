@@ -520,7 +520,9 @@ export class Parser extends StatementParser {
 
     parseAnonymousInnerClassBody(newObjectNode: ASTNewObjectNode): ASTAnonymousClassNode | undefined {
 
-        let classNode = this.nodeFactory.buildClassNode(this.nodeFactory.buildNodeWithModifiers(this.cct.range), undefined, this.currentClassOrInterface!, []);
+        let parent: TypeScope = this.currentClassOrInterface || this.module.ast!;
+
+        let classNode = this.nodeFactory.buildClassNode(this.nodeFactory.buildNodeWithModifiers(this.cct.range), undefined, parent, []);
 
         this.parseClassBody(classNode);
         classNode.extends = newObjectNode.type;     // type maybe interface... we correct this later on in TypeResolver

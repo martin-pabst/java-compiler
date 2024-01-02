@@ -52,15 +52,15 @@ export class ASTNodeFactory {
 
         let ret: ASTArrayTypeNode;
 
-        if(arrayOf.kind == TokenType.arrayType){
-            let atype =<ASTArrayTypeNode>arrayOf;
+        if (arrayOf.kind == TokenType.arrayType) {
+            let atype = <ASTArrayTypeNode>arrayOf;
             ret = {
                 kind: TokenType.arrayType,
                 range: startRange,
                 arrayDimensions: atype.arrayDimensions + additionalDimension,
                 arrayOf: atype.arrayOf
             }
-    
+
         } else {
             ret = {
                 kind: TokenType.arrayType,
@@ -69,7 +69,7 @@ export class ASTNodeFactory {
                 arrayOf: arrayOf
             }
         }
-        
+
         return ret;
 
     }
@@ -355,7 +355,7 @@ export class ASTNodeFactory {
 
     buildMethodCallNode(identifier: Token, nodeToGetObject: ASTTermNode | undefined): ASTMethodCallNode {
         let id: string = <string>identifier.value;
-        if(identifier.tt == TokenType.keywordThis || identifier.tt == TokenType.keywordSuper){
+        if (identifier.tt == TokenType.keywordThis || identifier.tt == TokenType.keywordSuper) {
             id = "";
         }
 
@@ -405,7 +405,7 @@ export class ASTNodeFactory {
         }
     }
 
-    buildAnonymousInnerClassNode(newObjectNode: ASTNewObjectNode, klass: ASTClassDefinitionNode): ASTAnonymousClassNode{
+    buildAnonymousInnerClassNode(newObjectNode: ASTNewObjectNode, klass: ASTClassDefinitionNode): ASTAnonymousClassNode {
 
         let range = new Range(newObjectNode.range.startLineNumber, newObjectNode.range.startColumn, klass.range.endLineNumber, klass.range.endColumn);
 
@@ -528,7 +528,7 @@ export class ASTNodeFactory {
     }
 
     buildBlockNodeFromStatements(statement: ASTStatementNode[]): ASTStatementNode | ASTBlockNode {
-        if(statement.length == 1) return statement[0];
+        if (statement.length == 1) return statement[0];
 
         let range: IRange = {
             startLineNumber: statement[0].range.startLineNumber,
