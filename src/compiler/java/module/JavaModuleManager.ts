@@ -83,15 +83,15 @@ export class JavaModuleManager {
         return this.modules.filter(m => !m.dirty);
     }
 
-    compileModulesToJavascript(){
+    compileModulesToJavascript(): boolean {
         for(let module of this.modules){
             if(!module.hasErrors()){
                 for(let program of module.programsToCompileToFunctions){
-                    program.compileToJavascriptFunctions();
+                    if(!program.compileToJavascriptFunctions()) return false;
                 }
             }
         }
-
+        return true;
     }
 
 }

@@ -38,8 +38,9 @@ export class Executable {
 
     compileToJavascript(){
         if(!this.isCompiledToJavascript){
-            this.moduleManager.compileModulesToJavascript();
-            this.isCompiledToJavascript = true;
+            if(this.moduleManager.compileModulesToJavascript()){
+                this.isCompiledToJavascript = true;
+            }
         }
     }
 

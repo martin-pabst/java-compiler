@@ -5,6 +5,8 @@ import { Klass, StepFunction, StepParams } from "./StepFunction.ts";
 import { CodePrinter } from "../../java/codegenerator/CodePrinter.ts";
 import { CatchBlockInfo } from "./ExceptionInfo.ts";
 import { Thread, ThreadState } from "./Thread.ts";
+import chalk from "chalk";
+import { getLine, threeDez } from "../../../tools/StringTools.ts";
 
 
 
@@ -94,22 +96,74 @@ export class Program {
     stepsMultiple: Step[] = [];
 
     constructor(public module: Module, public symbolTable: BaseSymbolTable | undefined, public methodIdentifierWithClass: string) {
-        
+
         module.programsToCompileToFunctions.push(this);
-        
+
         let stackFrame = symbolTable?.stackframe;
         if (stackFrame) {
             this.numberOfThisObjects = stackFrame.numberOfThisObjects;
             this.numberOfParameters = stackFrame.numberOfParameters;
             this.numberOfLocalVariables = stackFrame.numberOfLocalVariables;
         }
-        
+
     }
 
-    compileToJavascriptFunctions() {
-        this.stepsSingle.forEach(step => step.compileToJavascriptFunction());
-        this.stepsMultiple.forEach(step => step.compileToJavascriptFunction());
+    compileToJavascriptFunctions(): boolean {
+        let i = 0;
+        let stepList: Step[] = this.stepsSingle;
+        try {
+            for (let step of this.stepsSingle) {
+                step.compileToJavascriptFunction();
+                i++;
+            }
+            i = 0
+            stepList = this.stepsMultiple;
+            for (let step of this.stepsMultiple) {
+                step.compileToJavascriptFunction();
+                i++;
+            }
+        } catch (ex) {
+            console.error("Program.compileToJavascriptFunction: " + ex);
+            console.error(chalk.gray("file: ") + this.module.file + chalk.gray(", steplist: ") + (stepList == this.stepsSingle ? "stepsSinge" : "stepsMultiple"));
+            let step = stepList[i];
+            console.error(chalk.gray("at java sourcecode position line ") + chalk.blue(step.range.startLineNumber) + chalk.gray(", column ") + chalk.blue(step.range.startColumn));
+            console.error(chalk.blue("java-code:"));
+            this.printCode(this.module.file.getText(), step.range.startLineNumber!, 0);
+
+            console.error(chalk.blue("javascript-code:"));
+            this.printSteps(stepList, i);
+            return false;
+        }
+
+        return true;
+
     }
+
+    printCode(code: string, errorLine: number, lineOffset: number){
+
+        for(let i = -4; i <= 2; i++){
+            let line = errorLine + i;
+            if(i == 0){
+                console.error(chalk.blue(threeDez(line + lineOffset) + ": ") + chalk.italic.white(getLine(code, line)))
+            } else {
+                console.error(chalk.blue(threeDez(line + lineOffset) + ": ") + chalk.gray(getLine(code, line)))
+            }
+        }
+    }
+
+    printSteps(stepList: Step[], errorIndex: number){
+
+        for(let i = -2; i <= 2; i++){
+            let index = errorIndex + i;
+            if(index < 0 || index >= stepList.length) continue;
+            if(i == 0){
+                console.error(chalk.white("Step ") + chalk.blue(threeDez(index) + ": ") + chalk.italic.white(stepList[index].codeAsString))
+            } else {
+                console.error(chalk.white("Step ") + chalk.blue(threeDez(index) + ": ") + chalk.gray(stepList[index].codeAsString))
+            }
+        }
+    }
+
 
     addStep(statement: string) {
         let step = new Step(this.stepsSingle.length);
@@ -131,5 +185,5 @@ export class Program {
             }
         }
     }
-    
+
 }

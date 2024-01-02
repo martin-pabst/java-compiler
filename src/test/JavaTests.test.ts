@@ -103,6 +103,13 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
 
             let interpreter = new Interpreter(printManager);
             interpreter.setExecutable(executable);
+
+            if (!executable.isCompiledToJavascript) {
+                //@ts-ignore
+                context.task.fails = 1;
+                return;
+            }
+
             interpreter.setAssertions(new ViteTestAssertions(context, lineOffset));
 
             interpreter.runMainProgramSynchronously();
@@ -113,7 +120,7 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
 
                 for (let cnr of codeNotReachedAssertions) {
                     console.log(chalk.gray("Details:     ") + cnr.messageIfNotReached);
-                    console.log(chalk.gray("Position:    ") + chalk.white("Line ") + 
+                    console.log(chalk.gray("Position:    ") + chalk.white("Line ") +
                         chalk.blue(cnr.range.startLineNumber + lineOffset) + chalk.white(", Column ") +
                         chalk.blue(cnr.range.startColumn) + chalk.white(": " + cnr.messageIfNotReached));
                     printCode(program, cnr.range.startLineNumber, lineOffset);
@@ -126,7 +133,7 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
             if (expectedOutput) {
                 let actualOutput = printManager.output.replace(/\n/g, "\\n");
                 if (expectedOutput != actualOutput) {
-                    console.log(chalk.gray("Position:    ") + chalk.white("Test beginning with Line ") + chalk.blue(lineOffset)); 
+                    console.log(chalk.gray("Position:    ") + chalk.white("Test beginning with Line ") + chalk.blue(lineOffset));
                     console.log(chalk.red("Test failed: ") + "Output doesn't match expected output.");
                     console.log(chalk.gray("Details:     ") + "Expected: " + chalk.green(expectedOutput) + " Actual: " + chalk.yellow(actualOutput));
                     //@ts-ignore
@@ -139,11 +146,11 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
 
     });
 
-    function printCode(code: string, errorLine: number, lineOffset: number){
+    function printCode(code: string, errorLine: number, lineOffset: number) {
 
-        for(let i = -4; i <= 2; i++){
+        for (let i = -4; i <= 2; i++) {
             let line = errorLine + i;
-            if(i == 0){
+            if (i == 0) {
                 console.log(chalk.blue(threeDez(line + lineOffset) + ": ") + chalk.italic.white(getLine(code, line)))
             } else {
                 console.log(chalk.blue(threeDez(line + lineOffset) + ": ") + chalk.gray(getLine(code, line)))

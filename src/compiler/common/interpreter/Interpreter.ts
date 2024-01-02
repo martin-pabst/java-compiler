@@ -90,8 +90,12 @@ export class Interpreter {
         this.executable = executable;
         if(executable.mainModule){
             executable.compileToJavascript();
-            this.init(executable);
-            this.setState(SchedulerState.stopped);
+            if(executable.isCompiledToJavascript){                
+                this.init(executable);
+                this.setState(SchedulerState.stopped);
+            } else {
+                this.setState(SchedulerState.not_initialized);
+            }
         } else {
             this.setState(SchedulerState.not_initialized);
         }
