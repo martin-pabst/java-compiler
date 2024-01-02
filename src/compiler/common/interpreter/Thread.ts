@@ -10,7 +10,7 @@ import { IThrowable } from "./ThrowableType.ts";
 import { ArithmeticExceptionClass } from "../../java/runtime/system/javalang/ArithmeticExceptionClass.ts";
 import { NullPointerExceptionClass } from "../../java/runtime/system/javalang/NullPointerExceptionClass.ts";
 import { Assertions, DummyAssertions } from "../../java/runtime/unittests/Assertions.ts";
-import { ObjectClass } from "../../java/runtime/system/javalang/ObjectClassStringClass.ts";
+import { ObjectClass, StringClass } from "../../java/runtime/system/javalang/ObjectClassStringClass.ts";
 import { NonPrimitiveType } from "../../java/types/NonPrimitiveType.ts";
 import { ClassCastExceptionClass } from "../../java/runtime/system/javalang/ClassCastExceptionClass.ts";
 import { IndexOutOfBoundsExceptionClass } from "../../java/runtime/system/javalang/IndexOutOfBoundsExceptionClass.ts";
@@ -477,6 +477,10 @@ export class Thread {
         exception.range = range;
 
         throw exception;
+    }
+
+    NullstringIfNull(s: StringClass): string {
+        return s == null ? "null" : s.value;
     }
 
     exit() {

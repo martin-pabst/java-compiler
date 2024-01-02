@@ -30,6 +30,7 @@ export class Helpers {
     static exit = StepParams.thread + "." + Thread.prototype.exit.name;
     static assertions = StepParams.thread + ".assertions"; 
     static registerCodeReached = StepParams.thread + "." + Thread.prototype.registerCodeReached.name;; 
+    static nullstringIfNull = StepParams.thread + "." + Thread.prototype.NullstringIfNull.name;
 
     static callbackParameter = "callback";
 

@@ -245,7 +245,7 @@ export abstract class BinopCastCodeGenerator {
     wrapWithToStringCall(leftSnippet: CodeSnippet, primitiveOrClassNeeded: "string" | "String"): CodeSnippet {
         if (leftSnippet.type?.identifier == "String") {
             if (primitiveOrClassNeeded == "string") {
-                return SnippetFramer.frame(leftSnippet, "§1.value", this.stringType);
+                return SnippetFramer.frame(leftSnippet, `${Helpers.nullstringIfNull}(§1)`, this.stringType);
             } else {
                 return leftSnippet;
             }
@@ -259,13 +259,13 @@ export abstract class BinopCastCodeGenerator {
             }
         }
 
-        let newSnippet1 = SnippetFramer.frame(leftSnippet, '§1?._mj$toString$String$(__t, undefined);\n', this.stringNonPrimitiveType);
+        let newSnippet1 = SnippetFramer.frame(leftSnippet, `${Helpers.checkNPE('§1', leftSnippet.range!)}._mj$toString$String$(__t, undefined);\n`, this.stringNonPrimitiveType);
         newSnippet1.finalValueIsOnStack = true;
         let newSnippet2 = new CodeSnippetContainer(newSnippet1);
         newSnippet2.addNextStepMark();
 
         if (primitiveOrClassNeeded == "string") {
-            let newSnippet3 = SnippetFramer.frame(newSnippet2, "§1.value", this.stringType);
+            let newSnippet3 = SnippetFramer.frame(newSnippet2, `${Helpers.nullstringIfNull}(§1)`, this.stringType);
             return newSnippet3;
         } else {
             return newSnippet2;
