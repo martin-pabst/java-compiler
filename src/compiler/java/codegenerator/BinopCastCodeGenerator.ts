@@ -371,6 +371,10 @@ export abstract class BinopCastCodeGenerator {
         }
 
         if (!castTo.isPrimitive) {
+            if(castTo == this.stringNonPrimitiveType){
+                let templ = type == this.stringType ? '§1' : '"" + §1'
+                return SnippetFramer.frame(snippet, `new ${Helpers.classes}["String"](${templ})`, this.stringNonPrimitiveType);
+            }
             // snippet has primitive type. boxing?
             // let boxedTypeIndex = boxedTypesMap[castTo.identifier];
             // if (primitiveTypeMap[type.identifier] == boxedTypeIndex) {
