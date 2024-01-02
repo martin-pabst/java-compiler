@@ -123,15 +123,17 @@ export class Program {
                 i++;
             }
         } catch (ex) {
-            console.error("Program.compileToJavascriptFunction: " + ex);
-            console.error(chalk.gray("file: ") + this.module.file + chalk.gray(", steplist: ") + (stepList == this.stepsSingle ? "stepsSinge" : "stepsMultiple"));
+            let message = "";
+            message += chalk.red("Error compiling program to javascript functions: ") + ex + "\n";
+            message += chalk.gray("file: ") + this.module.file.filename + chalk.gray(", steplist: ") + (stepList == this.stepsSingle ? "stepsSingle" : "stepsMultiple") + "\n";
             let step = stepList[i];
-            console.error(chalk.gray("at java sourcecode position line ") + chalk.blue(step.range.startLineNumber) + chalk.gray(", column ") + chalk.blue(step.range.startColumn));
-            console.error(chalk.blue("java-code:"));
-            this.printCode(this.module.file.getText(), step.range.startLineNumber!, 0);
+            message += chalk.gray("at java sourcecode position line ") + chalk.blue(step.range.startLineNumber) + chalk.gray(", column ") + chalk.blue(step.range.startColumn) + "\n";
+            message += chalk.blue("\njava-code:") + "\n";
+            message += this.printCode(this.module.file.getText(), step.range.startLineNumber!, 0);
 
-            console.error(chalk.blue("javascript-code:"));
-            this.printSteps(stepList, i);
+            message += chalk.blue("\njavascript-code:") + "\n";
+            message += this.printSteps(stepList, i);
+            console.error(message);
             return false;
         }
 
@@ -139,29 +141,35 @@ export class Program {
 
     }
 
-    printCode(code: string, errorLine: number, lineOffset: number){
+    printCode(code: string, errorLine: number, lineOffset: number): string {
+        let message = "";
 
         for(let i = -4; i <= 2; i++){
             let line = errorLine + i;
             if(i == 0){
-                console.error(chalk.blue(threeDez(line + lineOffset) + ": ") + chalk.italic.white(getLine(code, line)))
+                message += chalk.blue(threeDez(line + lineOffset) + ": ") + chalk.italic.white(getLine(code, line)) + "\n";
             } else {
-                console.error(chalk.blue(threeDez(line + lineOffset) + ": ") + chalk.gray(getLine(code, line)))
+                message += chalk.blue(threeDez(line + lineOffset) + ": ") + chalk.gray(getLine(code, line)) + "\n";
             }
         }
+
+        return message;
     }
 
     printSteps(stepList: Step[], errorIndex: number){
+        let message = "";
 
         for(let i = -2; i <= 2; i++){
             let index = errorIndex + i;
             if(index < 0 || index >= stepList.length) continue;
             if(i == 0){
-                console.error(chalk.white("Step ") + chalk.blue(threeDez(index) + ": ") + chalk.italic.white(stepList[index].codeAsString))
+                message += chalk.white("Step ") + chalk.blue(threeDez(index) + ": ") + chalk.italic.white(stepList[index].codeAsString) + "\n";
             } else {
-                console.error(chalk.white("Step ") + chalk.blue(threeDez(index) + ": ") + chalk.gray(stepList[index].codeAsString))
+                message += chalk.white("Step ") + chalk.blue(threeDez(index) + ": ") + chalk.gray(stepList[index].codeAsString) + "\n";
             }
         }
+
+        return message;
     }
 
 
