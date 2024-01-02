@@ -10,6 +10,9 @@ export abstract class Module {
 
     dirty: boolean = true;
 
+    programsToCompileToFunctions: Program[] = [];
+
+
     constructor(public file: File, public isLibraryModule: boolean){
 
     }
@@ -17,12 +20,15 @@ export abstract class Module {
     abstract getMainProgram(): Program | undefined;
 
     isStartable(): boolean {
-        let hasError: boolean = this.errors.find(error => error.level == "error") ? true : false;
         if(this.getMainProgram()){ 
-            return !hasError;
+            return !this.hasErrors();
         }
-
+        
         return false;
+    }
+    
+    hasErrors(): boolean {
+        return this.errors.find(error => error.level == "error") ? true : false;
     }
 
 }

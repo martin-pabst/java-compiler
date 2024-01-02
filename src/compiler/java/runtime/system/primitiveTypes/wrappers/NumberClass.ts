@@ -1,3 +1,4 @@
+import { CallbackFunction } from "../../../../../common/interpreter/StepFunction";
 import { Thread } from "../../../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../../../types/NonPrimitiveType";
@@ -18,7 +19,7 @@ export class NumberClass extends ObjectClass {
         {type: "method", signature: "abstract public float floatValue()"},
         {type: "method", signature: "abstract public int intValue()"},
         {type: "method", signature: "abstract public long longValue()"},
-        {type: "method", signature: "public String toString()", native: NumberClass.prototype.toString},
+        {type: "method", signature: "public String toString()", native: NumberClass.prototype.toString, java: NumberClass.prototype._mj$toString$String$}
     ]
 
     static type: NonPrimitiveType;
@@ -38,6 +39,11 @@ export class NumberClass extends ObjectClass {
 
     toString(): StringClass {
         return new StringClass("" + this.value);
+    }
+
+    _mj$toString$String$(t: Thread, callback: CallbackFunction) {
+        t.s.push(new StringClass("" + this.value));
+        if(callback) callback();
     }
 
 }

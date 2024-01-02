@@ -85,18 +85,9 @@ export class JavaModuleManager {
 
     compileModulesToJavascript(){
         for(let module of this.modules){
-            module.mainProgram?.compileToJavascriptFunctions();
-            if(!module.ast) continue;
-            for(let cdef of module.ast.classOrInterfaceOrEnumDefinitions){
-                if(cdef instanceof NonPrimitiveType){
-                    if(!cdef.runtimeClass) continue;
-                    for(let method of cdef.runtimeClass.__programs){
-                        method.compileToJavascriptFunctions();
-                    }
-                }
-
-                if(cdef instanceof JavaTypeWithInstanceInitializer){
-                    cdef.staticInitializer?.compileToJavascriptFunctions();
+            if(!module.hasErrors()){
+                for(let program of module.programsToCompileToFunctions){
+                    program.compileToJavascriptFunctions();
                 }
             }
         }

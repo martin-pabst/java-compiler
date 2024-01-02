@@ -129,8 +129,7 @@ export class Method {
     }
 
     takeInternalJavaNameWithGenericParamterIdentifiersFrom(method: Method) {
-        this.signatureCache["java"] = method.getInternalNameWithGenericParameterIdentifiers("java");
-        this.signatureCacheWithGenericParameterIdentifiers["java"] = this.signatureCache["java"];
+        this.signatureCacheWithGenericParameterIdentifiers["java"] = method.getInternalNameWithGenericParameterIdentifiers("java");
     }
 
 

@@ -56,7 +56,7 @@ function test1(sourcecode: string, file: string) {
         let code = sourcecode.substring(testBegin, testEnd);
 
 
-        let expectedOutputIndex = code.indexOf("@expectedOutput:");
+        let expectedOutputIndex = code.indexOf("@ExpectOutput:");
         let expectedOutput: string | undefined;
 
         if (expectedOutputIndex >= 0) {

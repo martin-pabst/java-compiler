@@ -339,7 +339,6 @@ export class TypeResolver {
             } else {
                 // anonymous inner class? 
                 if (declNode.identifier == "" && extType instanceof IJavaInterface) {
-                    resolvedType1.addImplements(extType);
                     declNode.implements.push(declNode.extends);
                     declNode.extends = undefined;
                 } else {
@@ -463,7 +462,7 @@ export class TypeResolver {
             }
 
             methodNode.method = method;
-            method.isAbstract = methodNode.isAbstract;
+            method.isAbstract = methodNode.isAbstract; 
             method.isFinal = methodNode.isFinal;
             method.isStatic = methodNode.isStatic;
             method.classEnumInterface = type;

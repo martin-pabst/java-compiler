@@ -1,7 +1,7 @@
 import { Program, Step } from "./Program";
 import { Semaphor } from "./Semaphor";
 import { Scheduler, SchedulerState } from "./Scheduler";
-import { IRange } from "../range/Range.ts";
+import { EmptyRange, IRange } from "../range/Range.ts";
 import { CallbackFunction, KlassObjectRegistry } from "./StepFunction.ts";
 import { ExceptionInfo, CatchBlockInfo, Exception } from "./ExceptionInfo.ts";
 import { ThrowableClass } from "../../java/runtime/system/javalang/ThrowableClass.ts";
@@ -36,11 +36,13 @@ type ThreadStateInfoAfterRun = {
 /**
  * @link https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.State.html
  */
-export enum ThreadState { new,          // A thread that has not yet started is in this state.
-                          runnable,     // A thread executing in the Java virtual machine is in this state.
-                          blocked,      // A thread that is blocked waiting for a monitor lock (semaphor!) is in this state.
-                          terminated,   // A thread that has exited is in this state.
-                          terminatedWithException }
+export enum ThreadState {
+    new,          // A thread that has not yet started is in this state.
+    runnable,     // A thread executing in the Java virtual machine is in this state.
+    blocked,      // A thread that is blocked waiting for a monitor lock (semaphor!) is in this state.
+    terminated,   // A thread that has exited is in this state.
+    terminatedWithException
+}
 
 export class Thread {
     s: any[] = [];  // stack
@@ -48,10 +50,12 @@ export class Thread {
 
     currentProgramState!: ProgramState;  // also lies on top of programStack
 
+    lastRange?: IRange;
+
     currentlyHeldSemaphors: Semaphor[] = [];
 
     private _state: ThreadState = ThreadState.new;
-    public get state () {return this._state} // setter: see below
+    public get state() { return this._state } // setter: see below
 
     exception?: Exception;
     stackTrace?: ProgramState[];
@@ -67,8 +71,8 @@ export class Thread {
 
     _dummyAssertions: Assertions;
 
-    get assertions(){
-        if(this.scheduler.interpreter.assertions) return this.scheduler.interpreter.assertions;
+    get assertions() {
+        if (this.scheduler.interpreter.assertions) return this.scheduler.interpreter.assertions;
         return this._dummyAssertions;
     }
 
@@ -101,7 +105,7 @@ export class Thread {
                         let step = currentStepList[stepIndex];
 
                         /**
-                         * Behold, hier the steps run!
+                         * Behold, here the steps run!
                          */
                         stepIndex = step.run!(this, stack, stackBase);
                         if (currentProgramState != this.currentProgramState) {
@@ -115,24 +119,26 @@ export class Thread {
 
                         this.currentProgramState.stepIndex = stepIndex;
                         numberOfSteps++;
+                        this.lastRange = step.range as IRange;
                     }
                     if (this.isSingleStepCompleted()) {
                         this.stepCallback();
                         return { state: this.state, stepsExecuted: numberOfSteps }
                     }
+
                 } else {
                     // not in singlestep-mode (faster!)
                     while (numberOfSteps < maxNumberOfSteps && this.state == ThreadState.runnable) {
                         let step = currentStepList[stepIndex];
-                        
+
                         /**
-                         * Behold, hier the steps run!
+                         * Behold, here the steps run!
                          * parameter identifers inside function: 
                          *                    t, s, sb, h
                          */
-                        
+
                         // console.log(step.codeAsString);
-                        
+
                         stepIndex = step.run!(this, stack, stackBase);
 
                         if (currentProgramState != this.currentProgramState) {
@@ -168,12 +174,23 @@ export class Thread {
         return { state: this.state, stepsExecuted: numberOfSteps }
     }
 
-    public set state(state: ThreadState){
+    public set state(state: ThreadState) {
         this._state = state;
     }
 
 
     isSingleStepCompleted() {
+
+        // if step to execute is on same position in program text as next step: execute both!
+        if (this.programStack.length == this.stepEndsWhenProgramstackLengthLowerOrEqual) {
+            let nextStep = this.currentProgramState.program.stepsSingle[this.currentProgramState.stepIndex];
+            if (nextStep && nextStep.range && this.lastRange) {
+                if (this.lastRange.startLineNumber == nextStep.range.startLineNumber && this.lastRange.startColumn == nextStep.range.startColumn) {
+                    return false;
+                }
+            }
+        }
+
         return this.programStack.length < this.stepEndsWhenProgramstackLengthLowerOrEqual ||
             this.programStack.length == this.stepEndsWhenProgramstackLengthLowerOrEqual &&
             this.currentProgramState.stepIndex != this.stepEndsWhenStepIndexIsNotEqualTo;
@@ -183,6 +200,7 @@ export class Thread {
 
         this.stepEndsWhenProgramstackLengthLowerOrEqual = this.programStack.length;
         this.stepEndsWhenStepIndexIsNotEqualTo = this.currentProgramState.stepIndex;
+
         this.stepCallback = () => {
             this.stepEndsWhenProgramstackLengthLowerOrEqual = -1;
             callbackWhenSingleStepOverEnds();
@@ -205,8 +223,8 @@ export class Thread {
 
     }
 
-    start(){
-        if([ThreadState.new, ThreadState.blocked].indexOf(this.state) >= 0){
+    start() {
+        if ([ThreadState.new, ThreadState.blocked].indexOf(this.state) >= 0) {
             this.state = ThreadState.runnable;
         }
     }
@@ -281,7 +299,7 @@ export class Thread {
     getExceptionAndTrimStack(removeException: boolean): Exception | undefined {
         let exception = this.currentProgramState.recentlyThrownException;
         if (!exception) return undefined;
-        if(removeException) this.currentProgramState.recentlyThrownException = undefined;
+        if (removeException) this.currentProgramState.recentlyThrownException = undefined;
         this.s.length = this.currentProgramState.afterExceptionTrimStackToSize!;
         return exception;
     }
@@ -379,7 +397,7 @@ export class Thread {
         this.scheduler.interpreter.printManager.print(text, true, color);
     }
 
-    
+
     /**
      * Runtime method to throw Arithmetic exception
      * @param message 
@@ -388,13 +406,13 @@ export class Thread {
      * @param endLineNumber 
      * @param endColumn 
      */
-    AE(message: string, startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number){
+    AE(message: string, startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number) {
 
         let range: IRange = {
             startLineNumber: startLineNumber,
             startColumn: startColumn,
             endLineNumber: endLineNumber,
-            endColumn: endColumn 
+            endColumn: endColumn
         }
 
         let exception = new ArithmeticExceptionClass(message);
@@ -411,13 +429,13 @@ export class Thread {
      * @param endLineNumber 
      * @param endColumn 
      */
-    IOBE(message: string, startLineNumber?: number, startColumn?: number, endLineNumber?: number, endColumn?: number){
+    IOBE(message: string, startLineNumber?: number, startColumn?: number, endLineNumber?: number, endColumn?: number) {
 
         let range: IRange | undefined = startLineNumber ? {
             startLineNumber: startLineNumber!,
             startColumn: startColumn!,
             endLineNumber: endLineNumber!,
-            endColumn: endColumn! 
+            endColumn: endColumn!
         } : undefined;
 
         let exception = new IndexOutOfBoundsExceptionClass(message);
@@ -426,13 +444,13 @@ export class Thread {
         throw exception;
     }
 
-    NPE(startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number){
+    NPE(startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number) {
 
         let range: IRange = {
             startLineNumber: startLineNumber,
             startColumn: startColumn,
             endLineNumber: endLineNumber,
-            endColumn: endColumn 
+            endColumn: endColumn
         }
 
         let exception = new NullPointerExceptionClass("Auf ein Attribut/eine Methode von null kann nicht zugegriffen werden.");
@@ -441,18 +459,18 @@ export class Thread {
         throw exception;
     }
 
-    CheckCast(object: ObjectClass, destType: string, startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number): ObjectClass{
-        if(object == null) return object;
+    CheckCast(object: ObjectClass, destType: string, startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number): ObjectClass {
+        if (object == null) return object;
 
         let type = object.getType() as NonPrimitiveType;
 
-        if(type.fastExtendsImplements(destType)) return object;
+        if (type.fastExtendsImplements(destType)) return object;
 
         let range: IRange = {
             startLineNumber: startLineNumber,
             startColumn: startColumn,
             endLineNumber: endLineNumber,
-            endColumn: endColumn 
+            endColumn: endColumn
         }
 
         let exception = new ClassCastExceptionClass(`Ein Objekt der Klasse ${type.identifier} ist kein Objekt der Klasse ${destType} und kann daher nicht in diesen Typ gecastet werden.`);
@@ -461,11 +479,11 @@ export class Thread {
         throw exception;
     }
 
-    exit(){
+    exit() {
         this.state = ThreadState.terminated;
     }
 
-    registerCodeReached(key: string){
+    registerCodeReached(key: string) {
         this.scheduler.interpreter.registerCodeReached(key);
     }
 

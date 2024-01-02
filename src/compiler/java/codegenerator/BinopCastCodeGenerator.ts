@@ -66,6 +66,7 @@ export abstract class BinopCastCodeGenerator {
     assertionsType: JavaClass;
     stringNonPrimitiveType: JavaClass;
     iterableType: JavaInterface;
+    iteratorType: JavaInterface;
 
     primitiveStringClass = PrimitiveStringClass;
 
@@ -86,6 +87,7 @@ export abstract class BinopCastCodeGenerator {
         this.stringNonPrimitiveType = <JavaClass>this.libraryTypestore.getType("String")!;
         this.assertionsType = <JavaClass>this.libraryTypestore.getType("Assertions")!;
         this.iterableType = <JavaInterface>this.libraryTypestore.getType("Iterable")!;
+        this.iteratorType = <JavaInterface>this.libraryTypestore.getType("Iterator")!;
 
         this.primitiveTypes.push(this.voidType);  // dummy for "otherClass"
         for (let i = 1; i < primitiveTypeIdentifiers.length; i++) this.primitiveTypes.push(this.libraryTypestore.getType(primitiveTypeIdentifiers[i])!);
@@ -231,8 +233,8 @@ export abstract class BinopCastCodeGenerator {
             return undefined;
         }
 
-        if (lTypeIndex == nOtherClass) leftSnippet = this.wrapWithToStringCall(leftSnippet);
-        if (rTypeIndex == nOtherClass) rightSnippet = this.wrapWithToStringCall(rightSnippet);
+        if (lTypeIndex == nOtherClass) leftSnippet = this.wrapWithToStringCall(leftSnippet, "string");
+        if (rTypeIndex == nOtherClass) rightSnippet = this.wrapWithToStringCall(rightSnippet, "string");
 
         let returnType: JavaType = operator == TokenType.plus ? this.stringType : this.booleanType;
 
@@ -240,12 +242,35 @@ export abstract class BinopCastCodeGenerator {
 
     }
 
-    wrapWithToStringCall(leftSnippet: CodeSnippet): CodeSnippet {
-        if (leftSnippet.type?.identifier == "String") return leftSnippet;
+    wrapWithToStringCall(leftSnippet: CodeSnippet, primitiveOrClassNeeded: "string" | "String"): CodeSnippet {
+        if (leftSnippet.type?.identifier == "String") {
+            if (primitiveOrClassNeeded == "string") {
+                return SnippetFramer.frame(leftSnippet, "§1.value", this.stringType);
+            } else {
+                return leftSnippet;
+            }
+        }
 
-        let newSnippet = SnippetFramer.frame(leftSnippet, '(§1?._mj$toString$string$()||"null")');
-        newSnippet.finalValueIsOnStack = true;
-        return newSnippet;
+        if (leftSnippet.type?.identifier == "string") {
+            if (primitiveOrClassNeeded == "String") {
+                return SnippetFramer.frame(leftSnippet, `new ${Helpers.classes}["String"](§1)`, this.stringType);
+            } else {
+                return leftSnippet;
+            }
+        }
+
+        let newSnippet1 = SnippetFramer.frame(leftSnippet, '§1?._mj$toString$String$(__t, undefined);\n', this.stringNonPrimitiveType);
+        newSnippet1.finalValueIsOnStack = true;
+        let newSnippet2 = new CodeSnippetContainer(newSnippet1);
+        newSnippet2.addNextStepMark();
+
+        if (primitiveOrClassNeeded == "string") {
+            let newSnippet3 = SnippetFramer.frame(newSnippet2, "§1.value", this.stringType);
+            return newSnippet3;
+        } else {
+            return newSnippet2;
+        }
+
     }
 
 
@@ -269,8 +294,8 @@ export abstract class BinopCastCodeGenerator {
         }
 
         if (!leftSnippet.type!.isPrimitive) {
-            if(leftSnippet.type == this.stringNonPrimitiveType && operator == TokenType.plusAssignment){
-                if(!this.canCastTo(rightSnippet.type, this.stringType, "implicit")){
+            if (leftSnippet.type == this.stringNonPrimitiveType && operator == TokenType.plusAssignment) {
+                if (!this.canCastTo(rightSnippet.type, this.stringType, "implicit")) {
                     this.pushError("Der Term auf der rechten Seite des Zuweisungsoperators kann nicht in den Typ String umgewandelt werden.", "error", rightSnippet.range!);
                     return undefined;
                 }
@@ -289,7 +314,7 @@ export abstract class BinopCastCodeGenerator {
 
         if (leftTypeIndex == nString) {
             if (!rightSnippet.type?.isPrimitive) {
-                rightSnippet = this.wrapWithToStringCall(rightSnippet);
+                rightSnippet = this.wrapWithToStringCall(rightSnippet, "string");
             }
             return new BinaryOperatorTemplate(operatorAsString, false).applyToSnippet(leftSnippet.type!, wholeRange, leftSnippet, rightSnippet);
         }
@@ -319,14 +344,11 @@ export abstract class BinopCastCodeGenerator {
         if (!snippet || !snippet.type || !castTo) return snippet;
         let type: JavaType = snippet.type;
 
-        if(snippet.type == castTo) return snippet;
+        if (snippet.type == castTo) return snippet;
 
         if (!type.isPrimitive) {
             if (castTo.identifier == "string" || castTo.identifier == "String") {
-                snippet = this.wrapWithToStringCall(snippet);
-                if (castTo.identifier == "string") {
-                    snippet = new OneParameterTemplate("§1.value").applyToSnippet(this.stringType, snippet.range!, snippet);
-                }
+                snippet = this.wrapWithToStringCall(snippet, castTo.identifier);
                 return snippet;
             }
             if (castTo.isPrimitive) {
@@ -352,7 +374,7 @@ export abstract class BinopCastCodeGenerator {
             // snippet has primitive type. boxing?
             // let boxedTypeIndex = boxedTypesMap[castTo.identifier];
             // if (primitiveTypeMap[type.identifier] == boxedTypeIndex) {
-                return this.box(snippet);
+            return this.box(snippet);
             // }
 
             this.pushError("Der Typ " + type.identifier + " kann nicht in den Typ " + castTo.identifier + " gecastet werden.", "error", snippet.range!);
@@ -460,7 +482,7 @@ export abstract class BinopCastCodeGenerator {
         if (typeToIndex == nString) return true;
 
         if ((!typeFrom.isPrimitive || typeFrom == this.stringType) && !typeTo.isPrimitive) {
-            if(typeFrom == this.stringType) typeFrom = this.primitiveStringClass.type;
+            if (typeFrom == this.stringType) typeFrom = this.primitiveStringClass.type;
 
             if (typeFrom instanceof ArrayType || typeTo instanceof ArrayType) {
                 if (typeFrom instanceof ArrayType && typeTo instanceof ArrayType) {
@@ -648,15 +670,15 @@ export abstract class BinopCastCodeGenerator {
         return assignmentOperators.indexOf(tt) >= 0;
     }
 
-        /**
-     * 
-     *  Compiles expressions like new MyAbstractClass(p1, p2){ attributeDeclarations, instanceInitializers, methodDeclarations }
-     * 
-     * @param node 
-     */
-        abstract compileAnonymousInnerClass(node: ASTAnonymousClassNode): CodeSnippet | undefined ;
+    /**
+ * 
+ *  Compiles expressions like new MyAbstractClass(p1, p2){ attributeDeclarations, instanceInitializers, methodDeclarations }
+ * 
+ * @param node 
+ */
+    abstract compileAnonymousInnerClass(node: ASTAnonymousClassNode): CodeSnippet | undefined;
 
-        abstract compileLambdaFunction(node: ASTLambdaFunctionDeclarationNode, expectedType: JavaType | undefined): CodeSnippet | undefined;
+    abstract compileLambdaFunction(node: ASTLambdaFunctionDeclarationNode, expectedType: JavaType | undefined): CodeSnippet | undefined;
 
-        
+
 }

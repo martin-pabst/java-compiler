@@ -459,6 +459,7 @@ export interface ASTContinueNode extends ASTStatementNode {
 export interface ASTReturnNode extends ASTStatementNode {
     kind: TokenType.keywordReturn;
     term: ASTTermNode | undefined;
+    keywordReturnRange: IRange;
 }
 
 export interface ASTCatchNode extends ASTStatementNode {

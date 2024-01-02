@@ -22,7 +22,7 @@ import { EmptyRange, IRange } from "../../common/range/Range.ts";
 import { ExceptionTree } from "./ExceptionTree.ts";
 import { ArrayType } from "../types/ArrayType.ts";
 import { GenericVariantOfJavaClass, IJavaClass, JavaClass } from "../types/JavaClass.ts";
-import { GenericVariantOfJavaInterface } from "../types/JavaInterface.ts";
+import { GenericVariantOfJavaInterface, IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
 import { SystemCollection } from "../runtime/system/collections/SystemCollection.ts";
 
 export abstract class StatementCodeGenerator extends TermCodeGenerator {
@@ -139,7 +139,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             if (!termSnippet) return undefined;
 
             if (!this.canCastTo(termSnippet.type, method.returnParameterType, "implicit")) {
-                this.pushError("Die Methode erwartet einen Rückgabewert vom Typ " + method.returnParameterType.identifier + ", der Wert des Terms hat aber den Datentyp " + termSnippet.type?.identifier + ".", "error", node.range);
+                this.pushError("Die Methode erwartet einen Rückgabewert vom Typ " + method.returnParameterType.identifier + ", der Wert des Terms hat aber den Datentyp " + termSnippet.type?.identifier + ".", "error", node.keywordReturnRange);
                 return undefined;
             }
 
@@ -170,51 +170,184 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         let elementType = node.elementType.resolvedType;
         let collectionSnippet = this.compileTerm(node.collection);
 
-        if (!elementType || !collectionSnippet || !collectionSnippet.type) return undefined;
+        if (!(elementType || node.elementType.kind == TokenType.varType) || !collectionSnippet || !collectionSnippet.type) return undefined;
 
         /*
         * Local variables declared in head of for statement are valid inside whole for statement, 
         * so we need a symbol table that encompasses the whole for statement:
         */
         let forLoopSymbolTable = this.pushAndGetNewSymbolTable(node.range, false);
-        let elementVariable = new JavaLocalVariable(node.elementIdentifier, node.elementIdentifierPosition,
-            elementType, forLoopSymbolTable);
 
-        let statementSnippet = this.compileStatementOrTerm(node.statementToRepeat);
-        if(!statementSnippet){
-            this.popSymbolTable();
-            return undefined;
-        }
 
         let continueLabel = new LabelCodeSnippet();
         this.continueStack.push(continueLabel);
+        let jumpToBeginSnippet = new JumpToLabelCodeSnippet(continueLabel);
 
         let breakLabel = new LabelCodeSnippet();
         this.breakStack.push(breakLabel);
+        let breakJumpSnippet = new JumpToLabelCodeSnippet(breakLabel);
 
         let stackIndexForCollection = forLoopSymbolTable.getStackFrame()!.insertInvisibleLocalVariableAndGetItsIndex();
 
-        let assignCollectionSnippet = SnippetFramer.frame(collectionSnippet, `${Helpers.elementRelativeToStackbase(stackIndexForCollection)} = §1;\n`);
 
-        let forLoopSnippet = new CodeSnippetContainer(assignCollectionSnippet, node.range);
+        let forLoopSnippet = new CodeSnippetContainer([], node.range);
 
         /*
-         * There are 3 cases:
-         * a) loop over array (using an index)
-         * b) loop over a SystemCollection
-         * c) loop over a Iterable
-         */
+        * There are 3 cases:
+        * a) loop over array (using an index)
+        * b) loop over a SystemCollection
+        * c) loop over a Iterable
+        */
 
         let collectionType = collectionSnippet.type;
-        if(collectionType instanceof ArrayType){
+        let collectionElementType: JavaType;
 
-        } else if(collectionType instanceof IJavaClass && collectionType.runtimeClass instanceof SystemCollection){
+        if (collectionType instanceof ArrayType) {
+            /*
+            * Loop over array
+            */
+            let assignCollectionSnippet = SnippetFramer.frame(collectionSnippet, `${Helpers.elementRelativeToStackbase(stackIndexForCollection)} = ${Helpers.checkNPE('§1', node.collection.range)};\n`);
+            assignCollectionSnippet.range = node.collection.range;
+            forLoopSnippet.addParts(assignCollectionSnippet);
 
-        } else if(this.canCastTo(collectionType, this.iterableType, "implicit")){
+            collectionElementType = collectionType.elementType;
+            if (node.elementType.kind != TokenType.varType) {
+                if (!this.typesAreIdentical(elementType!, collectionElementType)) {
+                    this.pushError(`Der Typ ${elementType!.toString()} des Elements ${node.elementIdentifier} muss mit dem Elementtyp des Arrays (${collectionElementType}) übereinstimmen. Tipp: Verwende das var-Schlüsselwort, also for(var element: array){...}`, "error", node.elementIdentifierPosition);
+                }
+            }
+            elementType = collectionElementType;
+            let elementVariable = new JavaLocalVariable(node.elementIdentifier, node.elementIdentifierPosition,
+                elementType, forLoopSymbolTable);
+            forLoopSymbolTable.addSymbol(elementVariable);
+
+
+            let stackIndexForLoopIndex = forLoopSymbolTable.getStackFrame()!.insertInvisibleLocalVariableAndGetItsIndex();
+            forLoopSnippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(stackIndexForLoopIndex)} = -1;\n`, node.collection.range));
+            forLoopSnippet.addNextStepMark();
+            forLoopSnippet.addParts(continueLabel);
+
+            forLoopSnippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(stackIndexForLoopIndex)}++;\nif(${Helpers.elementRelativeToStackbase(stackIndexForLoopIndex)} >= ${Helpers.elementRelativeToStackbase(stackIndexForCollection)}.length){\n   `, node.collection.range));
+            forLoopSnippet.addParts(breakJumpSnippet);
+            forLoopSnippet.addParts(new StringCodeSnippet(`}\n`));
+
+            forLoopSnippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(elementVariable.stackframePosition!)} = ${Helpers.elementRelativeToStackbase(stackIndexForCollection)}[${Helpers.elementRelativeToStackbase(stackIndexForLoopIndex)}];\n`));
+
+            let statementSnippet = this.compileStatementOrTerm(node.statementToRepeat) || new StringCodeSnippet('');
+
+            forLoopSnippet.addParts(statementSnippet);
+
+            forLoopSnippet.addParts(jumpToBeginSnippet);
+            forLoopSnippet.addNextStepMark();
+            forLoopSnippet.addParts(breakLabel);
+
+        } else if (collectionType instanceof IJavaClass && collectionType.runtimeClass!.prototype instanceof SystemCollection) {
+            /*
+             * Loop over SystemCollection
+            */
+            let assignCollectionSnippet = SnippetFramer.frame(collectionSnippet, `${Helpers.elementRelativeToStackbase(stackIndexForCollection)} = ${Helpers.checkNPE('§1', node.collection.range)}.getAllElements();\n`);
+            assignCollectionSnippet.range = node.collection.range;
+            forLoopSnippet.addParts(assignCollectionSnippet);
+
+            collectionElementType = this.objectType;
+            if (collectionType instanceof GenericVariantOfJavaClass) {
+                let firstGenericParametersType = collectionType.getFirstTypeParametersType();
+                if (!firstGenericParametersType) {
+                    this.pushError(`Der Elementtyp der Collection ${collectionType.toString()} kann nicht bestimmt werden.`, "error", node.collection.range);
+                } else {
+                    collectionElementType = firstGenericParametersType;
+                }
+            }
+            if (node.elementType.kind != TokenType.varType) {
+                if (!this.typesAreIdentical(elementType!, collectionElementType)) {
+                    this.pushError(`Der Typ ${elementType!.toString()} des Elements ${node.elementIdentifier} muss mit dem Elementtyp der Collection (${collectionElementType.toString()}) übereinstimmen. Tipp: Verwende das var-Schlüsselwort, also for(var element: array){...}`, "error", node.elementIdentifierPosition);
+                }
+            }
+            elementType = collectionElementType;
+            let elementVariable = new JavaLocalVariable(node.elementIdentifier, node.elementIdentifierPosition,
+                elementType, forLoopSymbolTable);
+            forLoopSymbolTable.addSymbol(elementVariable);
+
+
+            let stackIndexForLoopIndex = forLoopSymbolTable.getStackFrame()!.insertInvisibleLocalVariableAndGetItsIndex();
+            forLoopSnippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(stackIndexForLoopIndex)} = -1;\n`, node.collection.range));
+            forLoopSnippet.addNextStepMark();
+            forLoopSnippet.addParts(continueLabel);
+
+            forLoopSnippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(stackIndexForLoopIndex)}++;\nif(${Helpers.elementRelativeToStackbase(stackIndexForLoopIndex)} >= ${Helpers.elementRelativeToStackbase(stackIndexForCollection)}.length){\n   `, node.collection.range));
+            forLoopSnippet.addParts(breakJumpSnippet);
+            forLoopSnippet.addParts(new StringCodeSnippet(`}\n`));
+
+            forLoopSnippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(elementVariable.stackframePosition!)} = ${Helpers.elementRelativeToStackbase(stackIndexForCollection)}[${Helpers.elementRelativeToStackbase(stackIndexForLoopIndex)}];\n`));
+
+            let statementSnippet = this.compileStatementOrTerm(node.statementToRepeat) || new StringCodeSnippet('');
+
+            forLoopSnippet.addParts(statementSnippet);
+
+            forLoopSnippet.addParts(jumpToBeginSnippet);
+            forLoopSnippet.addNextStepMark();
+            forLoopSnippet.addParts(breakLabel);
+
+
+        } else if (this.canCastTo(collectionType, this.iterableType, "implicit")) {
+            /*
+             * Loop over Iterable
+            */
+            let iteratorSnippet = new CodeSnippetContainer(SnippetFramer.frame(collectionSnippet, `${Helpers.checkNPE('§1', node.collection.range)}._mj$iterator$Iterator$(${StepParams.thread}, undefined);\n`), node.collection.range, this.iteratorType);
+            iteratorSnippet.addNextStepMark();
+            iteratorSnippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(stackIndexForCollection)} = ${Helpers.threadStack}.pop();\n`, node.collection.range));
+            iteratorSnippet.range = node.collection.range;
+            forLoopSnippet.addParts(iteratorSnippet);
+
+            collectionElementType = this.objectType;
+            let nptCollectionType = collectionType as (IJavaClass | IJavaInterface);
+            
+            let iterableInterface = nptCollectionType.findImplementedInterface("Iterable");
+            if(!iterableInterface){
+                this.pushError(`Der Elementtyp der Collection ${collectionType.toString()} kann nicht bestimmt werden.`, "error", node.collection.range);
+            } else {
+                if(iterableInterface instanceof GenericVariantOfJavaInterface){
+                    collectionElementType = iterableInterface.typeMap.get(iterableInterface.isGenericVariantOf.genericTypeParameters![0])!;
+                }
+            }
+
+            if (node.elementType.kind != TokenType.varType) {
+                if (!this.typesAreIdentical(elementType!, collectionElementType)) {
+                    this.pushError(`Der Typ ${elementType!.toString()} des Elements ${node.elementIdentifier} muss mit dem Elementtyp des Iterables(${collectionElementType.toString()}) übereinstimmen. Tipp: Verwende das var-Schlüsselwort, also for(var element: array){...}`, "error", node.elementIdentifierPosition);
+                }
+            }
+            elementType = collectionElementType;
+            let elementVariable = new JavaLocalVariable(node.elementIdentifier, node.elementIdentifierPosition,
+                elementType, forLoopSymbolTable);
+            forLoopSymbolTable.addSymbol(elementVariable);
+
+            forLoopSnippet.addNextStepMark();
+            forLoopSnippet.addParts(continueLabel);
+
+            forLoopSnippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(stackIndexForCollection)}._mj$hasNext$boolean$(${StepParams.thread}, undefined);\n`, node.collection.range));
+            forLoopSnippet.addNextStepMark();
+            
+            forLoopSnippet.addParts(new StringCodeSnippet(`if(!${Helpers.threadStack}.pop()){\n   `, node.collection.range));
+            forLoopSnippet.addParts(breakJumpSnippet);
+            forLoopSnippet.addParts(new StringCodeSnippet(`}\n`));
+            
+            forLoopSnippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(stackIndexForCollection)}._mj$next$E$(${StepParams.thread}, undefined);\n`, node.collection.range));
+            forLoopSnippet.addNextStepMark();
+            forLoopSnippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(elementVariable.stackframePosition!)} = ${Helpers.threadStack}.pop();\n`, node.collection.range));
+
+            let statementSnippet = this.compileStatementOrTerm(node.statementToRepeat) || new StringCodeSnippet('');
+
+            forLoopSnippet.addParts(statementSnippet);
+
+            forLoopSnippet.addParts(jumpToBeginSnippet);
+            forLoopSnippet.addNextStepMark();
+            forLoopSnippet.addParts(breakLabel);
 
         } else {
             this.pushError("Die vereinfachte for-loop kann nur über Arrays iterieren oder über Klassen, die das Interface Iterable implementieren.", "error", node.collection.range);
         }
+
+
 
         this.continueStack.pop();
         this.breakStack.pop();
@@ -222,6 +355,11 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         this.popSymbolTable();
         return forLoopSnippet;
 
+    }
+
+    typesAreIdentical(type1: JavaType, type2: JavaType) {
+        if (!type1 || !type2) return false;
+        return type1.toString() == type2.toString();
     }
 
     compileForStatement(node: ASTForLoopNode): CodeSnippet | undefined {
@@ -243,6 +381,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         conditionNode = negationResult.newNode;
 
         let condition = this.compileTerm(conditionNode);
+        if(!condition) condition = new StringCodeSnippet('true', node.range, this.booleanType);
 
         let labelBeforeCheckingCondition = new LabelCodeSnippet();
         let jumpToLabelBeforeCheckingCondition = new JumpToLabelCodeSnippet(labelBeforeCheckingCondition);
@@ -259,15 +398,16 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
         let statementsToRepeat = this.compileStatementOrTerm(node.statementToRepeat);
 
-        if (!(firstStatement && condition && lastStatement && statementsToRepeat)) {
+        if (!(condition && statementsToRepeat)) {
             this.popSymbolTable();
             return undefined;
         }
         let forSnippet = new CodeSnippetContainer([], node.range, this.voidType);
 
-
-        forSnippet.addParts(firstStatement);
-        forSnippet.addNextStepMark();
+        if(firstStatement){
+            forSnippet.addParts(firstStatement);
+            forSnippet.addNextStepMark();
+        }
         forSnippet.addParts(labelBeforeCheckingCondition);
         forSnippet.addParts(new OneParameterTemplate(negationResult.negationHappened ? 'if(§1){\n' : 'if(!(§1)){\n').applyToSnippet(this.voidType, node.condition!.range, condition));
         forSnippet.addParts(jumpToLabelAfterForBlock);
@@ -278,7 +418,16 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
         forSnippet.addNextStepMark();
         forSnippet.addParts(labelBeforeLastStatement);
-        forSnippet.addParts(lastStatement);
+        if(lastStatement){
+            forSnippet.addParts(lastStatement);
+        } else {
+            jumpToLabelBeforeCheckingCondition.range = {
+                startLineNumber: node.range.endLineNumber,
+                startColumn: node.range.endColumn,
+                endLineNumber: node.range.endLineNumber,
+                endColumn: node.range.endColumn
+            }
+        }
 
         forSnippet.addParts(jumpToLabelBeforeCheckingCondition);
 
@@ -686,6 +835,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         return new CodeSnippetContainer(snippets)
 
     }
+
     compileLocalVariableDeclaration(node: ASTLocalVariableDeclaration): CodeSnippet | undefined {
         let variable = new JavaLocalVariable(node.identifier, node.identifierRange,
             node.type.resolvedType!, this.currentSymbolTable);
@@ -750,7 +900,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
                 }
 
                 if (!this.canCastTo(initValueSnippet.type, destinationType, "implicit")) {
-                    this.pushError("Der Term auf der rechten Seite des Zuweisungsoperators hat den Datentyp " + initValueSnippet.type.identifier + " und kann daher der Variablen auf der linken Seite (Datentyp " + destinationType.toString() + ") nicht zugewiesen werden.", "error", initializationNode);
+                    this.pushError("Der Term auf der rechten Seite des Zuweisungsoperators hat den Datentyp " + initValueSnippet.type.toString() + " und kann daher der Variablen auf der linken Seite (Datentyp " + destinationType.toString() + ") nicht zugewiesen werden.", "error", initializationNode);
                     return undefined;
                 }
 

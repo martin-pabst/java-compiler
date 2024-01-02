@@ -10,7 +10,8 @@ import { JavaType } from "./JavaType";
 import { Method } from "./Method";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility";
-import { Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
+import { CallbackFunction, Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
+import { Thread } from "../../common/interpreter/Thread.ts";
 
 export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     isPrimitive: false;
@@ -27,6 +28,19 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     abstract getImplements(): IJavaInterface[];
 
     abstract isFinal(): boolean;
+
+    findImplementedInterface(identifier: string): IJavaInterface | undefined {
+
+        for(let ext of this.getImplements()){
+            let intf = ext.findImplementedInterface(identifier);
+            if(intf) return intf;
+        }
+
+        if(this.getExtends()) return this.getExtends()?.findImplementedInterface(identifier);
+
+        return undefined;
+    }
+
 
     getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): Field | undefined {
         let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
@@ -170,17 +184,24 @@ export class JavaClass extends IJavaClass {
                             copy.program = method.program;
 
                             let runtimeClass = this.runtimeClass!;
-                            runtimeClass.__programs.push(method.program);
+                            // runtimeClass.__programs.push(method.program);
 
-                            let methodIndex = runtimeClass.__programs.length - 1;
+                            // let methodIndex = runtimeClass.__programs.length - 1;
 
-                            let parameterIdentifiers = method.parameters.map(p => p.identifier);
-                            let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
-                            method.programStub =
-                                `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
-                                `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`;
-                            runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
-                                method.programStub);
+                            // let parameterIdentifiers = method.parameters.map(p => p.identifier);
+                            // let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
+                            // method.programStub =
+                            //     `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
+                            //     `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`;
+                            // runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
+                            //     method.programStub);
+
+                            let functionStub = function (this: any, __t: Thread, __callback: CallbackFunction, ...parameters: any) {
+                                __t.s.push(this, ...parameters);
+                                __t.pushProgram(copy!.program!, __callback);
+                            }
+                            runtimeClass.prototype[copy.getInternalNameWithGenericParameterIdentifiers("java")] = functionStub;
+        
                         });
                     } else {
                         notImplementedMethods.push(method);
@@ -278,7 +299,7 @@ export class JavaClass extends IJavaClass {
             return true;
         }
 
-        if (bType instanceof JavaInterface) {               // can class A cast to interface BI?
+        if (bType instanceof IJavaInterface) {               // can class A cast to interface BI?
             for (let x of this.implements) {                 // A implements X
                 if (x.canImplicitlyCastTo(bType)) return true;  // if x can cast to BI, then A can cast, too
             }
@@ -344,6 +365,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
 
     constructor(public isGenericVariantOf: JavaClass, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
         super(isGenericVariantOf.identifier, isGenericVariantOf.identifierRange, isGenericVariantOf.pathAndIdentifier, isGenericVariantOf.module);
+        this.runtimeClass = this.isGenericVariantOf.runtimeClass;
     }
 
     isFinal(): boolean {
@@ -354,7 +376,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         let s: string = this.identifier;
 
         let genericInformation = this.isGenericVariantOf.genericTypeParameters;
-
+        
         if (genericInformation && genericInformation.length > 0) {
             s += "<" + genericInformation.map(gi => {
                 let type = this.typeMap.get(gi);
@@ -362,6 +384,14 @@ export class GenericVariantOfJavaClass extends IJavaClass {
             }).join(", ") + ">";
         }
         return s;
+    }
+    
+    getFirstTypeParametersType(): JavaType | undefined {
+        let genericInformation = this.isGenericVariantOf.genericTypeParameters;
+        if(genericInformation && genericInformation.length > 0){
+            return this.typeMap.get(genericInformation[0]);
+        }
+        return undefined;
     }
 
     isAbstract(): boolean {

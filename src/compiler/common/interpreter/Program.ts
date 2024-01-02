@@ -56,7 +56,7 @@ export class Step {
     }
 
     setRangeStartIfUndefined(range?: IRange) {
-        if (!this.range.startLineNumber && range && range != EmptyRange.instance) {
+        if (!this.range?.startLineNumber && range && range != EmptyRange.instance) {
             this.range.startLineNumber = range.startLineNumber;
             this.range.startColumn = range.startColumn;
         }
@@ -94,12 +94,16 @@ export class Program {
     stepsMultiple: Step[] = [];
 
     constructor(public module: Module, public symbolTable: BaseSymbolTable | undefined, public methodIdentifierWithClass: string) {
+        
+        module.programsToCompileToFunctions.push(this);
+        
         let stackFrame = symbolTable?.stackframe;
         if (stackFrame) {
             this.numberOfThisObjects = stackFrame.numberOfThisObjects;
             this.numberOfParameters = stackFrame.numberOfParameters;
             this.numberOfLocalVariables = stackFrame.numberOfLocalVariables;
         }
+        
     }
 
     compileToJavascriptFunctions() {

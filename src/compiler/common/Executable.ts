@@ -22,6 +22,8 @@ export class Executable {
 
     mainModule?: Module;
 
+    isCompiledToJavascript: boolean = false;
+
     constructor(public classObjectRegistry: KlassObjectRegistry, 
         public moduleManager: JavaModuleManager,
         public libraryModuleManager: JavaLibraryModuleManager,
@@ -32,6 +34,13 @@ export class Executable {
 
         this.setupStaticInitializationSequence(globalErrors);
 
+    }
+
+    compileToJavascript(){
+        if(!this.isCompiledToJavascript){
+            this.moduleManager.compileModulesToJavascript();
+            this.isCompiledToJavascript = true;
+        }
     }
 
     setupStaticInitializationSequence(errors: Error[]) {
@@ -65,7 +74,6 @@ export class Executable {
 
                 if (!dependsOnOthers) {
                     if (cti.staticInitializer) {
-                        cti.staticInitializer.compileToJavascriptFunctions();
                         this.staticInitializationSequence.push({
                             klass: cti.runtimeClass!,
                             program: cti.staticInitializer

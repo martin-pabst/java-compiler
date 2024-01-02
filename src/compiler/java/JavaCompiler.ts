@@ -79,24 +79,23 @@ export class JavaCompiler {
                 codegenerator.start();
             }
                 
-            this.moduleManager.compileModulesToJavascript();
-
+            
         }
-                
+        
         let klassObjectRegistry: KlassObjectRegistry = {}; 
         
         this.libraryModuleManager.typestore.populateClassObjectRegistry(klassObjectRegistry);
-
+        
         this.moduleManager.typestore.populateClassObjectRegistry(klassObjectRegistry);
-
+        
         let executable = new Executable(klassObjectRegistry, 
             this.moduleManager, this.libraryModuleManager,
             this.errors, this.lastOpenedFile, currentlyOpenFile);
-
-        if(executable.mainModule){
-            this.lastOpenedFile = executable.mainModule.file;
-        }
-
+            
+            if(executable.mainModule){
+                this.lastOpenedFile = executable.mainModule.file;
+            }
+                
         return executable;
 
     }

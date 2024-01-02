@@ -76,7 +76,6 @@ export abstract class NonPrimitiveType extends JavaType {
         this.runtimeClass = class extends baseClass {
             static type = that;
          };
-        this.runtimeClass.__programs = [];
     }
 
     getPossibleMethods(identifier: string, length: number, isConstructor: boolean, hasToBeStatic: boolean): Method[] {

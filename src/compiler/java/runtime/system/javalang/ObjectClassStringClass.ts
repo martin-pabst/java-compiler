@@ -18,7 +18,7 @@ export class ObjectClass {
         {type: "method", signature: "public boolean equals(Object otherObject)", native: ObjectClass.prototype._nEquals},
     ]
 
-    declare __programs: Program[]; // only for compatibility with java classes; not used in library classes
+    // declare __programs: Program[]; // only for compatibility with java classes; not used in library classes
 
     static type: NonPrimitiveType;
 

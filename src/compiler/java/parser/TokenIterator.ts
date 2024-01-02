@@ -386,6 +386,7 @@ export class TokenIterator {
         while (pos1 < this.tokenList.length) {
             let tt = this.tokenList[pos1].tt;
             if (tokensToLookFor.indexOf(tt) >= 0) return tt;
+            if(tillToken.indexOf(tt) >= 0) break;
             pos1++;
         }
 

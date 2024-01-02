@@ -33,6 +33,7 @@ export class CodeGenerator extends StatementCodeGenerator {
     }
 
     start() {
+        this.module.programsToCompileToFunctions = [];
         this.compileClassesEnumsAndInterfaces(this.module.ast);
         this.compileMainProgram();
     }
@@ -329,19 +330,25 @@ export class CodeGenerator extends StatementCodeGenerator {
 
             this.linker.link(steps, method.program);
 
-            method.program.compileToJavascriptFunctions();
-
             let runtimeClass = classContext.runtimeClass;
 
             if (runtimeClass) {
 
-                runtimeClass.__programs.push(method.program);
-                let methodIndex = runtimeClass.__programs.length - 1;
+                // runtimeClass.__programs.push(method.program);
+                // let methodIndex = runtimeClass.__programs.length - 1;
 
 
-                runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
-                    `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});
-                                 ${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`);
+                // runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
+                //     `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});` + 
+                //                  `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`);
+
+
+                let functionStub = function (this: any, __t: Thread, ...parameters: any) {
+                    __t.s.push(this, ...parameters);
+                    __t.pushProgram(method!.program!);
+                }
+
+                runtimeClass.prototype[method.getInternalName("java")] = functionStub;
 
             }
 
@@ -547,8 +554,6 @@ export class CodeGenerator extends StatementCodeGenerator {
             let runtimeClass = classContext.runtimeClass;
     
             if (runtimeClass) {
-                method.program.compileToJavascriptFunctions();
-    
                 method.callbackAfterCodeGeneration.forEach(callback => callback());
     
                 let functionStub: Function;
@@ -649,29 +654,29 @@ export class CodeGenerator extends StatementCodeGenerator {
         };  //
 
         let oldClass = klass.runtimeClass;
-        oldClass.__programs = [];
+        // oldClass.__programs = [];
 
-        let type = node.newObjectNode.type.resolvedType;
-        if (type instanceof IJavaInterface) {
-            node.klass.implements.push(node.newObjectNode.type);
-            klass.addImplements(type);
-        } else if (type instanceof IJavaClass) {
-            node.klass.extends = node.newObjectNode.type;
-            klass.setExtends(type);
-        } else {
-            this.pushError("Anonyme innere Klassen können nur auf Grundlage von Interfaces oder von Klassen erstellt werden.", "error", node.newObjectNode.range);
-        }
+        // let type = node.newObjectNode.type.resolvedType;
+        // if (type instanceof IJavaInterface) {
+        //     node.klass.implements.push(node.newObjectNode.type);
+        //     klass.addImplements(type);
+        // } else if (type instanceof IJavaClass) {
+        //     node.klass.extends = node.newObjectNode.type;
+        //     klass.setExtends(type);
+        // } else {
+        //     this.pushError("Anonyme innere Klassen können nur auf Grundlage von Interfaces oder von Klassen erstellt werden.", "error", node.newObjectNode.range);
+        // }
 
-        klass.methods = node.klass.methods.map(m => m.method!);
+        // klass.methods = node.klass.methods.map(m => m.method!);
 
-        node.klass.fieldsOrInstanceInitializers.filter(fieldNode => fieldNode.kind == TokenType.fieldDeclaration).forEach(fn => {
-            let field: ASTFieldDeclarationNode = <any>fn;
-            let f: Field = new Field(field.identifier, field.range, klass.module, field.type.resolvedType!, field.visibility);
-            f.isStatic = field.isStatic;
-            f.isFinal = field.isFinal;
-            f.classEnum = klass;
-            klass.fields.push(f);
-        });
+        // node.klass.fieldsOrInstanceInitializers.filter(fieldNode => fieldNode.kind == TokenType.fieldDeclaration).forEach(fn => {
+        //     let field: ASTFieldDeclarationNode = <any>fn;
+        //     let f: Field = new Field(field.identifier, field.range, klass.module, field.type.resolvedType!, field.visibility);
+        //     f.isStatic = field.isStatic;
+        //     f.isFinal = field.isFinal;
+        //     f.classEnum = klass;
+        //     klass.fields.push(f);
+        // });
 
         node.newObjectNode.type.resolvedType = klass;
 
@@ -696,9 +701,9 @@ export class CodeGenerator extends StatementCodeGenerator {
         Object.assign(klass.runtimeClass.prototype, oldClass.prototype);
         // snippet which instantiates object of this class calling it's typescript constructor and it's java constructor
 
-        klass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods({});
-        klass.takeSignaturesFromOverriddenMethods({});
-        klass.checkIfAbstractParentsAreImplemented();
+        // klass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods({});
+        // klass.takeSignaturesFromOverriddenMethods({});
+        // klass.checkIfAbstractParentsAreImplemented();
 
         let template = `new this.innerClass(${outerLocalVariables.map(v => Helpers.elementRelativeToStackbase(v!.stackframePosition!)).join(", ")})`;
         let newClassSnippet = new StringCodeSnippet(template, node.range, klass);
@@ -767,7 +772,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         };  //
 
         let oldClass = klass.runtimeClass;
-        oldClass.__programs = [];
+        // oldClass.__programs = [];
         klass.addImplements(functionalInterface);
 
         klass.methods = [method];

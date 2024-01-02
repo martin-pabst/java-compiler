@@ -89,6 +89,7 @@ export class Interpreter {
     setExecutable(executable: Executable){
         this.executable = executable;
         if(executable.mainModule){
+            executable.compileToJavascript();
             this.init(executable);
             this.setState(SchedulerState.stopped);
         } else {
@@ -143,7 +144,7 @@ export class Interpreter {
 
     showProgramPointer(_textPositionWithModule: ProgramPointerPositionInfo | undefined) {
         if(this.showProgramPointerCallback){
-            if(_textPositionWithModule){
+            if(_textPositionWithModule?.range){
                 if(_textPositionWithModule.range.startLineNumber >= 0){
                     this.showProgramPointerCallback("show", _textPositionWithModule);
                 }

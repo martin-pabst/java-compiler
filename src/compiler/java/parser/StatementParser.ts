@@ -197,6 +197,7 @@ export abstract class StatementParser extends TermParser {
         }
 
         this.expect(TokenType.rightCurlyBracket, true);
+        this.setEndOfRange(blockNode);
 
         return blockNode;
     }
@@ -246,7 +247,7 @@ export abstract class StatementParser extends TermParser {
         }
 
         if (elementType && elementIdentifier && collection && statementToRepeat) {
-            return this.nodeFactory.buildSimplifiedForLoop(tokenFor, elementType, elementIdentifier, collection, statementToRepeat);
+            return this.nodeFactory.buildEnhancedForLoop(tokenFor, elementType, elementIdentifier, collection, statementToRepeat);
         }
 
         return undefined;

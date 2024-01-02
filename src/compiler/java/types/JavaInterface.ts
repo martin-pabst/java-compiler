@@ -29,6 +29,15 @@ export abstract class IJavaInterface extends NonPrimitiveType {
 
     abstract isFunctionalInterface(): boolean;
 
+    findImplementedInterface(identifier: string): IJavaInterface | undefined {
+        if(this.identifier == identifier) return this;
+        for(let ext of this.getExtends()){
+            let intf = ext.findImplementedInterface(identifier);
+            if(intf) return intf;
+        }
+        return undefined;
+    }
+
     getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): Field | undefined {
         let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
         if (field) return field;
@@ -197,6 +206,14 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
         super(isGenericVariantOf.identifier, isGenericVariantOf.identifierRange, isGenericVariantOf.pathAndIdentifier, isGenericVariantOf.module);
     }
 
+    getFirstTypeParametersType(): JavaType | undefined {
+        let genericInformation = this.isGenericVariantOf.genericTypeParameters;
+        if(genericInformation && genericInformation.length > 0){
+            return this.typeMap.get(genericInformation[0]);
+        }
+        return undefined;
+    }
+
     isFunctionalInterface(): boolean {
         return this.isGenericVariantOf.isFunctionalInterface();
     }
@@ -229,7 +246,7 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
         this.typeMap.forEach((jt, gt) => {
             let jtCopy = jt.getCopyWithConcreteType(otherTypeMap);
             if (jt != jtCopy) copyNeeded = true;
-            newTypeMap.set(gt, jt);
+            newTypeMap.set(gt, <NonPrimitiveType>jtCopy);
         })
 
         if (!copyNeeded) return this;
@@ -316,7 +333,7 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
 
             if(!myType || !othersType) return false;
 
-            if(!(myType.canImplicitlyCastTo(otherType) && otherType.canImplicitlyCastTo(myType))) {
+            if(!(myType.canImplicitlyCastTo(othersType) && othersType.canImplicitlyCastTo(myType))) {
                 return false;
             }
 

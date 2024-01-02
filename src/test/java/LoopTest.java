@@ -132,3 +132,64 @@ do{
 assertEquals(6, n, "Test continue in do..while-loop");
 
 
+/**::
+ * for-loop with ArrayList as iterator
+ * @ExpectOutput: "12\n13\n14\n"
+ */
+
+var list = new ArrayList<Integer>();
+
+list.add(12);
+list.add(13);
+list.add(14);
+
+for (Iterator<Integer> i = list.iterator(); i.hasNext(); ) {
+    println(i.next());
+}
+
+
+
+
+/**::
+ * Enhanced for loop
+ * @ExpectOutput: "1\n2\n3\n4\n12\n13\n14\n"
+ */
+
+int[] array = {1, 2, 3, 4};
+
+for(var n: array){
+   println(n);
+}
+
+var list = new ArrayList<Integer>();
+
+list.add(12);
+list.add(13);
+list.add(14);
+
+for(var n: list){
+   println(n);
+}
+
+/**::
+ * Enhanced for loop with java-Iterable using inner class
+ * @ExpectOutput: 200\n201\n202\n203\n204\n
+ */
+class A implements Iterable<String> {
+   Iterator<String> iterator(){
+      return new Iterator<String>() {
+         int counter = 200;
+         boolean hasNext(){
+            return counter < 205;
+         }
+
+         String next(){
+            return counter++;
+         }
+      }
+   }
+}
+
+for(var n: new A()){
+   println(n);
+}

@@ -1,5 +1,51 @@
 export var testPrograms = {
-dynamicCallingConvention:`
+iteratorTest:`
+class A implements Iterable<String> {
+   Iterator<String> iterator(){
+      return new Iterator<String>() {
+         int counter = 200;
+         boolean hasNext(){
+            return counter < 210;
+         }
+
+         String next(){
+            return counter++;
+         }
+      }
+   }
+}
+
+for(var n: new A()){
+   println(n);
+}
+`,
+   forLoopWithIterator:`
+var list = new ArrayList<Integer>();
+
+list.add(12);
+list.add(13);
+list.add(14);
+
+for (Iterator<Integer> i = list.iterator(); i.hasNext(); ) {
+    println(i.next());
+}`,
+enhancedForLoopTest:`
+int[] array = {1, 2, 3, 4};
+
+for(var n: array){
+   println(n);
+}
+
+var list = new ArrayList<Integer>();
+
+list.add(12);
+list.add(13);
+list.add(14);
+
+for(var n: list){
+   println(n);
+}`,
+   dynamicCallingConvention:`
 ArrayList<String> arrayList = new ArrayList<String>();
 arrayList.add("First");
 
