@@ -202,29 +202,20 @@ export class JavaClass extends IJavaClass {
                     if (method.isDefault) {
                         let copy = method.getCopy();
                         this.methods.push(copy);
-                        method.callbackAfterCodeGeneration.push(() => {
-                            copy.program = method.program;
 
+                        let f = () => {
                             let runtimeClass = this.runtimeClass!;
-                            // runtimeClass.__programs.push(method.program);
+                            let otherRuntimeClass = javaInterface.runtimeClass!;
+                            let functionIdentifier = copy.getInternalNameWithGenericParameterIdentifiers("java");
+                            runtimeClass.prototype[functionIdentifier] = otherRuntimeClass.prototype[functionIdentifier];
+                        }
 
-                            // let methodIndex = runtimeClass.__programs.length - 1;
+                        if(this.isLibraryType){
+                            f();
+                        } else {
+                            method.callbackAfterCodeGeneration.push(f);
+                        }
 
-                            // let parameterIdentifiers = method.parameters.map(p => p.identifier);
-                            // let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
-                            // method.programStub =
-                            //     `${Helpers.threadStack}.push(${thisFollowedByParameterIdentifiers.join(", ")});\n` +
-                            //     `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`;
-                            // runtimeClass.prototype[method.getInternalName("java")] = new Function(StepParams.thread, ...parameterIdentifiers,
-                            //     method.programStub);
-
-                            let functionStub = function (this: any, __t: Thread, __callback: CallbackFunction, ...parameters: any) {
-                                __t.s.push(this, ...parameters);
-                                __t.pushProgram(copy!.program!, __callback);
-                            }
-                            runtimeClass.prototype[copy.getInternalNameWithGenericParameterIdentifiers("java")] = functionStub;
-        
-                        });
                     } else {
                         notImplementedMethods.push(method);
                     }

@@ -56,6 +56,10 @@ export class JavaLibraryModuleManager {
                 ldp.genericParameterMapStack.pop();
             }
         }        
+
+        for(let javaClass of this.typestore.getClasses()){
+            javaClass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods();
+        }
     }
 
     clearUsagePositionsAndInheritanceInformation(){

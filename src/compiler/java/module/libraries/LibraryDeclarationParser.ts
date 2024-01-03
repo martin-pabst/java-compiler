@@ -75,19 +75,23 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         switch (modifiersAndType.type) {
             case TokenType.keywordClass:
                 npt = new JavaClass(identifier, LibraryDeclarationParser.nullRange, "", module);
+                npt.isLibraryType = true;
                 let npt1 = <JavaClass>npt;
+                npt1.runtimeClass = klass;
                 npt1.isStatic = modifiersAndType.static;
                 npt1._isFinal = modifiersAndType.final;
                 npt1._isAbstract = modifiersAndType.abstract;
-                npt1.runtimeClass = klass;
                 npt1.pathAndIdentifier = npt1.identifier;
                 break;
             case TokenType.keywordInterface:
                 npt = new JavaInterface(identifier, LibraryDeclarationParser.nullRange, "", module);
+                npt.isLibraryType = true;
                 npt.pathAndIdentifier = npt.identifier;
+                npt.runtimeClass = klass;
                 break;
             case TokenType.keywordEnum:
-                npt = new JavaEnum(identifier, LibraryDeclarationParser.nullRange, "", module,  Object.getPrototypeOf(Object.getPrototypeOf(klass)).type);
+                npt = new JavaEnum(identifier, LibraryDeclarationParser.nullRange, "", module, Object.getPrototypeOf(Object.getPrototypeOf(klass)).type);
+                npt.isLibraryType = true;
                 let npt2 = <JavaEnum>npt;
                 npt2.runtimeClass = klass;
                 npt2.pathAndIdentifier = npt2.identifier;
@@ -170,19 +174,19 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     }
 
     parseGenericParameters(module: JavaBaseModule): GenericTypeParameters {
-        if(!this.comesToken(TokenType.lower, true)) return [];
+        if (!this.comesToken(TokenType.lower, true)) return [];
         let startPos = this.pos;
-        if(!this.comesToken(TokenType.identifier, false)){
+        if (!this.comesToken(TokenType.identifier, false)) {
             this.pushError("Lese Definition eines generischen Parameters. Nach dem < wird ein Bezeichner erwartet.");
             return [];
-        } 
+        }
 
         let gi: GenericTypeParameters = [];
-        
+
         let currentGenericParameterMap = this.genericParameterMapStack[this.genericParameterMapStack.length - 1];
 
         // first step: only collect identifiers because generic parameters can reference each other recursively
-        do{
+        do {
 
             let identifier = <string>this.cct.value;
             let gp = new GenericTypeParameter(identifier, module, LibraryDeclarationParser.nullRange, [], undefined);
@@ -209,13 +213,13 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
 
 
-    skipSymmetricBracketsUntil(tt: TokenType[]){
+    skipSymmetricBracketsUntil(tt: TokenType[]) {
         let bracketCounter: number = 0;
 
-        while(this.pos < this.tokenList.length && (bracketCounter > 0 || tt.indexOf(this.tt) < 0)){
-            if(this.startBracketList.indexOf(this.tt) >= 0){
+        while (this.pos < this.tokenList.length && (bracketCounter > 0 || tt.indexOf(this.tt) < 0)) {
+            if (this.startBracketList.indexOf(this.tt) >= 0) {
                 bracketCounter++;
-            } else if(this.endBracketList.indexOf(this.tt) >= 0){
+            } else if (this.endBracketList.indexOf(this.tt) >= 0) {
                 bracketCounter--;
             }
             this.nextToken();
@@ -262,7 +266,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         let id = this.expectIdentifier();
         if (id == "") return this.currentTypeStore.getType("void")!;
 
-        if(id == "?"){
+        if (id == "?") {
             let gt = new GenericTypeParameter(id, module, EmptyRange.instance);
             gt.isWildcard = true;
             return gt;
@@ -279,11 +283,11 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 for (let gtp of type.genericTypeParameters) {
                     let t = this.parseType(module);
 
-                    if(t instanceof GenericTypeParameter && t.isWildcard){
-                        if(this.comesToken(TokenType.keywordExtends, true)){
+                    if (t instanceof GenericTypeParameter && t.isWildcard) {
+                        if (this.comesToken(TokenType.keywordExtends, true)) {
                             t.upperBounds.push(<any>this.parseType(module));
                         }
-                        if(this.comesToken(TokenType.keywordSuper, true)){
+                        if (this.comesToken(TokenType.keywordSuper, true)) {
                             t.lowerBound = <any>this.parseType(module);
                         }
                     }
@@ -314,9 +318,9 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         let type = this.currentTypeStore.getType(id);
         if (type) return type;
 
-        for(let gpm of this.genericParameterMapStack){
+        for (let gpm of this.genericParameterMapStack) {
             type = gpm[id];
-            if(type) break;
+            if (type) break;
         }
 
         if (type) return type;
@@ -470,8 +474,8 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         this.genericParameterMapStack.push({});
 
-        let klassType = <JavaClass|JavaInterface|JavaEnum>klass.type;
-        
+        let klassType = <JavaClass | JavaInterface | JavaEnum>klass.type;
+
         // example: "public <E> E testMethod(List<? extends E> li, E element)"
         let modifiers = this.parseModifiersAndType(false);
 
@@ -486,7 +490,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         if (decl.type == "method") {
             this.comesToken(TokenType.leftBracket, true);
             // method
-            let m = genericParameters.length == 0 ? 
+            let m = genericParameters.length == 0 ?
                 new Method(identifier, EmptyRange.instance, module, modifiers.visibility) :
                 new GenericMethod(identifier, EmptyRange.instance, module, modifiers.visibility, genericParameters);
             m.returnParameterType = type;
@@ -497,7 +501,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                     let isFinal = this.comesToken(TokenType.keywordFinal, true);
                     let type = this.parseType(module);
                     let isEllipsis = this.comesToken(TokenType.ellipsis, true);
-                    if(isEllipsis) type = new ArrayType(type, 1, module, EmptyRange.instance);
+                    if (isEllipsis) type = new ArrayType(type, 1, module, EmptyRange.instance);
                     let id = this.expectIdentifier();
                     m.parameters.push(new Parameter(id, EmptyRange.instance, module, type, isFinal, isEllipsis));
                 } while (this.comesToken(TokenType.comma, true));
@@ -517,7 +521,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
             if (mdecl.native) {
                 let realName: string = mdecl.native.name;
-                if(m.isStatic){
+                if (m.isStatic) {
                     klass[m.getInternalName("native")] = mdecl.native;
                 } else {
                     klass.prototype[m.getInternalName("native")] = mdecl.native;
@@ -563,9 +567,9 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             }
 
             if (mdecl.java) {
-                if(klassType instanceof JavaInterface || m.isAbstract){
-                    if(mdecl.java.name != m.getInternalName("java")){
-                        console.log(`${LibraryDeclarationParser.name}: Method ${mdecl.java.name} should have identifier ${m.getInternalName("java")}.` );
+                if (klassType instanceof JavaInterface || m.isAbstract) {
+                    if (mdecl.java.name != m.getInternalName("java")) {
+                        console.log(`${LibraryDeclarationParser.name}: Method ${mdecl.java.name} should have identifier ${m.getInternalName("java")}.`);
                     }
                 } else {
                     klass.prototype[m.getInternalName("java")] = mdecl.java;

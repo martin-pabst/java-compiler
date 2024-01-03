@@ -36,6 +36,8 @@ export abstract class NonPrimitiveType extends JavaType {
 
     runtimeClass?: Klass;
 
+    isLibraryType: boolean = false;
+
     private extendsImplements: Record<string, boolean> = {};
 
     staticInitializer?: Program;

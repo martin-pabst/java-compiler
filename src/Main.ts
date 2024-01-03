@@ -61,7 +61,7 @@ export class Main {
     /*
      * Test program:
      */
-    let testProgram: string = testPrograms.ellipsisTest.trim();
+    let testProgram: string = testPrograms.sortTest.trim();
     this.inputEditor.setValue(testProgram);
 
     this.tabManager = new TabManager(document.getElementById('tabs')!,

@@ -21,7 +21,7 @@ type ProgramState = {
     currentStepList: Step[];   // Link to program.stepSingle or program.stepMultiple
     stepIndex: number;
     stackBase: number;
-    callbackAfterFinished?: (value: any) => void;
+    callbackAfterFinished?: () => void;
     exceptionInfoList: ExceptionInfo[];
 
     recentlyThrownException?: Exception;
@@ -328,11 +328,10 @@ export class Thread {
         }
 
         let callback = this.programStack.pop()?.callbackAfterFinished;
+        if (returnValue != null) this.s.push(returnValue);
         if (callback != null) {
-            callback(returnValue);
-        } else {
-            if (returnValue != null) this.s.push(returnValue);
-        }
+            callback();
+        } 
 
         if (this.programStack.length > 0) {
             this.currentProgramState = this.programStack[this.programStack.length - 1];

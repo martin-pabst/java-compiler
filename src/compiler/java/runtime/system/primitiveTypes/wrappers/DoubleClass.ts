@@ -10,7 +10,7 @@ import { NumberClass } from "./NumberClass";
 export class DoubleClass extends NumberClass {
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "declaration", signature: "class Double extends Number"},
+        {type: "declaration", signature: "class Double extends Number implements Comparable<Double>"},
         {type: "field", signature: "static final int MAX_VALUE", constantValue: Number.MAX_VALUE}, 
         {type: "field", signature: "static final int MIN_VALUE", constantValue: Number.MIN_VALUE},
         // for doubleValue(), floatValue(), intValue() and longValue() there are methods (if called for a Number variable containing an Long value) and templates

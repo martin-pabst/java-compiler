@@ -13,7 +13,7 @@ export class BooleanClass extends ObjectClass {
     static TRUE: BooleanClass = new BooleanClass(true);
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "declaration", signature: "class Boolean extends Object"},
+        {type: "declaration", signature: "class Boolean extends Object implements Comparable<Boolean>"},
         {type: "field", signature: "static final boolean FALSE", constantValue: BooleanClass.FALSE},
         {type: "field", signature: "static final boolean TRUE", constantValue: BooleanClass.TRUE},
         {type: "method", signature: "public final boolean booleanValue()", template: "§1.value"},

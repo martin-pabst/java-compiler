@@ -8,6 +8,7 @@ import { SystemCollection } from "./SystemCollection.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { IndexOutOfBoundsExceptionClass } from "../javalang/IndexOutOfBoundsExceptionClass.ts";
 import { ConsumerInterface } from "../functional/ConsumerInterface.ts";
+import { ComparatorInterface } from "./ComparatorInterface.ts";
 
 export class ArrayListClass extends SystemCollection {
     static __javaDeclarations: LibraryDeclarations = [
@@ -17,8 +18,8 @@ export class ArrayListClass extends SystemCollection {
 
         // from IterableInterface
         { type: "method", signature: "Iterator<E> iterator()", native: ArrayListClass.prototype._iterator },
-        {type: "method", signature: "void forEach(Consumer<? super E> action)", java: ArrayListClass.prototype._mj$forEach$void$Consumer},
- 
+        { type: "method", signature: "void forEach(Consumer<? super E> action)", java: ArrayListClass.prototype._mj$forEach$void$Consumer },
+
         // from CollectionInterface
         { type: "method", signature: "Object[] toArray()", native: ArrayListClass.prototype._toArray, template: "§1.elements.slice()" },
         { type: "method", signature: "<T> T[] toArray(T[] a)", native: ArrayListClass.prototype._toArray, template: "§1.elements.slice()" },
@@ -31,14 +32,15 @@ export class ArrayListClass extends SystemCollection {
         { type: "method", signature: "boolean remove(Object o)", native: ArrayListClass.prototype._remove, template: "(§1.elements.splice(§1.elements.indexOf(§2), 1))" },
         { type: "method", signature: "boolean removeAll(Collection<?> c)", java: ArrayListClass.prototype._removeAll },
         { type: "method", signature: "int size()", native: ArrayListClass.prototype._size, template: "§1.elements.length" },
-        
+
         // from ListInterface
-        {type: "method", signature: "boolean add(int index, E element)", native: ArrayListClass.prototype._addWithIndex},
-        {type: "method", signature: "boolean addAll(int index, Collection<? extends E> c)", java: ArrayListClass.prototype._addAllWithIndex},
-        {type: "method", signature: "E get (int index)", native: ArrayListClass.prototype._getWithIndex},
-        {type: "method", signature: "int indexOf (Object o)", native: ArrayListClass.prototype._indexOf},
-        {type: "method", signature: "E remove (int index)", native: ArrayListClass.prototype._removeWithIndex},
-        {type: "method", signature: "E set (int index, E Element)", native: ArrayListClass.prototype._setWithIndex},
+        { type: "method", signature: "boolean add(int index, E element)", native: ArrayListClass.prototype._addWithIndex },
+        { type: "method", signature: "boolean addAll(int index, Collection<? extends E> c)", java: ArrayListClass.prototype._addAllWithIndex },
+        { type: "method", signature: "E get (int index)", native: ArrayListClass.prototype._getWithIndex },
+        { type: "method", signature: "int indexOf (Object o)", native: ArrayListClass.prototype._indexOf },
+        { type: "method", signature: "E remove (int index)", native: ArrayListClass.prototype._removeWithIndex },
+        { type: "method", signature: "E set (int index, E Element)", native: ArrayListClass.prototype._setWithIndex },
+        { type: "method", signature: "void sort(Comparator<? super E> comparator)", java: ArrayListClass.prototype._mj$sort$void$Comparator },
 
         // 
     ]
@@ -51,15 +53,15 @@ export class ArrayListClass extends SystemCollection {
         return this;
     }
 
-    _mj$forEach$void$Consumer(t: Thread, callback: CallbackFunction, consumer: ConsumerInterface){
+    _mj$forEach$void$Consumer(t: Thread, callback: CallbackFunction, consumer: ConsumerInterface) {
         let index: number = -1;
 
         let f = () => {
             index++;
-            if(index < this.elements.length){
+            if (index < this.elements.length) {
                 consumer._mj$accept$void$T(t, f, this.elements[index]);
             } else {
-                if(callback) callback();
+                if (callback) callback();
             }
         }
 
@@ -67,7 +69,7 @@ export class ArrayListClass extends SystemCollection {
 
     }
 
-    _iterator(){
+    _iterator() {
 
         let iterator = new ObjectClass();
 
@@ -76,14 +78,14 @@ export class ArrayListClass extends SystemCollection {
         //@ts-ignore
         iterator["_mj$hasNext$boolean$"] = (t: Thread, callback: CallbackFunction) => {
             t.s.push(nextIndex < this.elements.length);
-            if(callback) callback();
+            if (callback) callback();
         }
-        
+
         //@ts-ignore
         iterator["_mj$next$E$"] = (t: Thread, callback: CallbackFunction) => {
-            if(nextIndex < this.elements.length) nextIndex++;
+            if (nextIndex < this.elements.length) nextIndex++;
             t.s.push(this.elements[nextIndex - 1]);
-            if(callback) callback();
+            if (callback) callback();
         }
 
         return iterator;
@@ -98,8 +100,8 @@ export class ArrayListClass extends SystemCollection {
     }
 
     _addWithIndex(element: ObjectClass, index: number) {
-        if(index < 0 || index > this.elements.length){
-            throw new IndexOutOfBoundsExceptionClass(`Der Index beim Einfügen in die ArrayList (${index}) liegt außerhalb des zulässigen Bereichs (0 bis ${this.elements.length})`);            
+        if (index < 0 || index > this.elements.length) {
+            throw new IndexOutOfBoundsExceptionClass(`Der Index beim Einfügen in die ArrayList (${index}) liegt außerhalb des zulässigen Bereichs (0 bis ${this.elements.length})`);
         }
 
         this.elements.splice(index, 0, element);
@@ -107,16 +109,16 @@ export class ArrayListClass extends SystemCollection {
     }
 
     _removeWithIndex(index: number) {
-        if(index < 0 || index >= this.elements.length){
-            throw new IndexOutOfBoundsExceptionClass(`Der Index beim Löschen aus der ArrayList (${index}) liegt außerhalb des zulässigen Bereichs (0 bis ${this.elements.length})`);            
+        if (index < 0 || index >= this.elements.length) {
+            throw new IndexOutOfBoundsExceptionClass(`Der Index beim Löschen aus der ArrayList (${index}) liegt außerhalb des zulässigen Bereichs (0 bis ${this.elements.length})`);
         }
 
         return this.elements.splice(index, 1);
     }
 
     _setWithIndex(index: number, element: ObjectClass) {
-        if(index < 0 || index >= this.elements.length){
-            throw new IndexOutOfBoundsExceptionClass(`Der Index beim Setzen eines Elements der ArrayList (${index}) liegt außerhalb des zulässigen Bereichs (0 bis ${this.elements.length})`);            
+        if (index < 0 || index >= this.elements.length) {
+            throw new IndexOutOfBoundsExceptionClass(`Der Index beim Setzen eines Elements der ArrayList (${index}) liegt außerhalb des zulässigen Bereichs (0 bis ${this.elements.length})`);
         }
 
         let ret = this.elements[index];
@@ -126,8 +128,8 @@ export class ArrayListClass extends SystemCollection {
     }
 
     _getWithIndex(index: number) {
-        if(index < 0 || index >= this.elements.length){
-            throw new IndexOutOfBoundsExceptionClass(`Der Index beim Einfügen in die ArrayList (${index}) liegt außerhalb des zulässigen Bereichs (0 bis ${this.elements.length - 1})`);            
+        if (index < 0 || index >= this.elements.length) {
+            throw new IndexOutOfBoundsExceptionClass(`Der Index beim Einfügen in die ArrayList (${index}) liegt außerhalb des zulässigen Bereichs (0 bis ${this.elements.length - 1})`);
         }
 
         return this.elements[index];
@@ -160,9 +162,9 @@ export class ArrayListClass extends SystemCollection {
 
     _addAllWithIndex(t: Thread, callback: CallbackFunction, index: number, collection: CollectionInterface) {
 
-        if(index < 0 || index > this.elements.length){
+        if (index < 0 || index > this.elements.length) {
             t.throwException(new IndexOutOfBoundsExceptionClass(`Der Index beim Einfügen in die ArrayList (${index}) liegt außerhalb des zulässigen Bereichs (0 bis ${this.elements.length})`));
-            return;            
+            return;
         }
 
         if (collection == null) {
@@ -238,24 +240,24 @@ export class ArrayListClass extends SystemCollection {
 
     }
 
-    _isEmpty(){
+    _isEmpty() {
         return this.elements.length == 0;
     }
 
-    _size(){
+    _size() {
         return this.elements.length;
     }
 
-    _toArray(){
+    _toArray() {
         return this.elements.slice();
     }
 
     _remove(o: ObjectClass) {
         let index = this.elements.indexOf(o);
-        if(index >= 0){
+        if (index >= 0) {
             this.elements.splice(index, 1)
             return true;
-        } 
+        }
         return false;
     }
 
@@ -289,6 +291,80 @@ export class ArrayListClass extends SystemCollection {
 
     _indexOf(element: ObjectClass): number {
         return this.elements.indexOf(element);
+    }
+
+    _mj$sort$void$Comparator(t: Thread, callback: CallbackFunction, comparator: ComparatorInterface) {
+
+        let that = this;
+
+        if (this.elements.length <= 1) {
+            if (callback) callback(); // nothing to do
+        } else {
+            ArrayListClass.prototype.quicksort.call(that, t, callback, comparator, 0, this.elements.length - 1);
+        }
+    }
+
+    quicksort(t: Thread, callback: CallbackFunction, comparator: ComparatorInterface, fromIndex: number, toIndex: number) {
+        let that = this;
+
+        if (toIndex - fromIndex <= 1) {
+            if (callback) callback(); // nothing to do
+            return;
+        }
+
+        ArrayListClass.prototype.partition.call(that, t, () => {
+
+            let partitionIndex: number = t.s.pop();
+            ArrayListClass.prototype.quicksort.call(that, t, () => {
+                ArrayListClass.prototype.quicksort.call(that, t, () => {
+                    if (callback) callback();
+                    return;
+                }, comparator, partitionIndex + 1, toIndex);
+            }, comparator, fromIndex, partitionIndex - 1);
+
+
+        }, comparator, fromIndex, toIndex);
+
+    }
+
+    private partition(t: Thread, callback: () => void, comparator: ComparatorInterface, begin: number, end: number) {
+
+        let that = this;
+
+        let pivot: ObjectClass = that.elements[end];
+        let i: number = begin - 1;
+
+        let j = begin;
+        let loop = () => {
+            if (j < end) {
+                comparator._mj$compare$int$T$T(t, () => {
+                    if (t.s.pop() <= 0) {
+                        i++;
+
+                        let z = that.elements[i];
+                        that.elements[i] = that.elements[j];
+                        that.elements[j] = z;
+                        j++;
+                        loop();
+                    } else {
+                        j++;
+                        loop();
+                    }
+                }, that.elements[j], pivot);
+            } else {
+                // after for-loop
+                let z = that.elements[i + 1];
+                that.elements[i + 1] = that.elements[end];
+                that.elements[end] = z;
+                t.s.push(i + 1);
+                callback();
+                return;
+            }
+        }
+
+        loop();
+
+
     }
 
 }

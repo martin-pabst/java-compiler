@@ -30,16 +30,17 @@
   * while resolving types: Store which library methods are overridden by java methods. Afterwards we can call all other methods natively.
   * Instantiate object of generic type without specifying generic parameters, like List<String> list = new ArrayList<>();
   * simplified for-loop over Iterable or array
+  * varArgs-parameters (== ellipsis)
 
 ## working status on current issue:
 
 ### fine-grained next todos on current issue:
 
 ## next todos
-  * generics (status: mostly done)
-  * anonymous inner classes (status: mostly done)
-  * Lambda Functions (status: mostly done)
-  * generic methods
+  * generics (status: need more testing)
+  * anonymous inner classes (status: need more testing)
+  * Lambda Functions (status: need more testing)
+  * generic methods (status: need more testing)
   * library method examples
   * detect cyclic calling of constructors
 

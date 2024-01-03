@@ -65,7 +65,7 @@ export class StringClass extends ObjectClass {
         {type: "method", signature: "public final int indexOf(char c)", native: StringClass.prototype._nIndexOf1, template: "§1.value.indexOf(§2)"}, 
         {type: "method", signature: "public final int indexOf(char c, int fromIndex)", native: StringClass.prototype._nIndexOf2, template: "§1.value.indexOf(§2, §3)"}, 
         {type: "method", signature: "public final char charAt(int index)", native: StringClass.prototype._nCharAt, template: `(§1.value.charAt(§2) || __t.IOBE("String charAt: Zugriff auf Zeichen außerhalb des zulässingen BEreichs."))`}, 
-        {type: "method", signature: "public final int compareTo(String otherString)", template: "§1.value.localeCompare(§2)", java: StringClass.prototype._mj$compareTo$int$T}, 
+        {type: "method", signature: "public final int compareTo(String otherString)", template: "§1.value.localeCompare(§2.value)", java: StringClass.prototype._mj$compareTo$int$T}, 
         {type: "method", signature: "public final int compareToIgnoreCase(String otherString)", native: StringClass.prototype._nCompareToIgnoreCase, template: "§1.value.localeCompare(§2, undefined, { sensitivity: 'accent' })"}, 
         {type: "method", signature: "public final string concat(string otherString)", native: StringClass.prototype._nConcat, template: "§1.value.concat(§2)"}, 
         {type: "method", signature: "public final boolean contains(string otherString)", native: StringClass.prototype._nContains, template: "(§1.value.indexOf(§2) >= 0)"}, 

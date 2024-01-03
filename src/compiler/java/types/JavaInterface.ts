@@ -204,6 +204,7 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
 
     constructor(public isGenericVariantOf: JavaInterface, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
         super(isGenericVariantOf.identifier, isGenericVariantOf.identifierRange, isGenericVariantOf.pathAndIdentifier, isGenericVariantOf.module);
+        this.runtimeClass = isGenericVariantOf.runtimeClass;
     }
 
     getFirstTypeParametersType(): JavaType | undefined {

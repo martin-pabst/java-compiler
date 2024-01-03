@@ -4,6 +4,7 @@ import { JavaLibraryModule, LibraryKlassType } from "../../module/libraries/Java
 import { AssertionsClass } from "../unittests/AssertionsClass.ts";
 import { ArrayListClass } from "./collections/ArrayListClass.ts";
 import { CollectionInterface as CollectionInterface } from "./collections/CollectionInterface.ts";
+import { ComparatorInterface } from "./collections/ComparatorInterface.ts";
 import { ComparableInterface } from "./collections/ComparableInterface.ts";
 import { IterableInterface } from "./collections/IterableInterface.ts";
 import { IteratorInterface } from "./collections/IteratorInterface.ts";
@@ -36,6 +37,7 @@ import { IntegerClass } from "./primitiveTypes/wrappers/IntegerClass";
 import { LongClass } from "./primitiveTypes/wrappers/LongClass.ts";
 import { NumberClass } from "./primitiveTypes/wrappers/NumberClass";
 import { ShortClass } from "./primitiveTypes/wrappers/ShortClass.ts";
+import { IndexOutOfBoundsExceptionClass } from "./javalang/IndexOutOfBoundsExceptionClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -57,16 +59,19 @@ export class SystemModule extends JavaLibraryModule {
         )
 
         this.classes.push(
-            ComparableInterface, ObjectClass, EnumClass,                  // These two MUST come first!
+            ComparableInterface, ComparatorInterface,
+            
+            ObjectClass, StringClass, EnumClass,                  // These two MUST come first!
+            
 
             // Functional
             ConsumerInterface,
 
-            StringClass, NumberClass, IntegerClass, LongClass, FloatClass, DoubleClass, ShortClass, BooleanClass,  // boxed primitive types
+            NumberClass, IntegerClass, LongClass, FloatClass, DoubleClass, ShortClass, BooleanClass,  // boxed primitive types
 
             MathClass,
             ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass, 
-            ClassCastExceptionClass,
+            ClassCastExceptionClass, IndexOutOfBoundsExceptionClass,
 
             // Collections
             IteratorInterface, IterableInterface, CollectionInterface, ListInterface, ArrayListClass,

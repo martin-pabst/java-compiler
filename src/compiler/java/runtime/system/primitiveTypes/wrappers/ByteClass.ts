@@ -10,7 +10,7 @@ import { NumberClass } from "./NumberClass";
 export class ByteClass extends NumberClass {
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "declaration", signature: "class Byte extends Number"},
+        {type: "declaration", signature: "class Byte extends Number implements Comparable<Byte>"},
         {type: "field", signature: "static final int MAX_VALUE", constantValue: 0x80 - 1},
         {type: "field", signature: "static final int MIN_VALUE", constantValue: -0x80},
         // for doubleValue(), floatValue(), intValue() and longValue() there are methods (if called for a Number variable containing an Integer value) and templates
