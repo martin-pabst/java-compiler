@@ -40,7 +40,7 @@ export class GenericTypeParameter extends NonPrimitiveType {
 
     toString(): string {
         return this.identifier + 
-        (this.lowerBound ? "super " + this.lowerBound?.toString() : "") + 
+        (this.lowerBound ? " super " + this.lowerBound?.toString() : "") + 
         (this.upperBounds.length > 0 ? " extends " + this.upperBounds.map(ub => ub.toString()).join(" & ") : "");
     }
 
@@ -178,12 +178,7 @@ export class GenericTypeParameter extends NonPrimitiveType {
     }
 
     getInternalName(): string {
-        if(this.isWildcard){
-            if(this.lowerBound) return this.lowerBound.getInternalName();
-            return this.identifier;
-        } else {
-            return this.identifier;
-        }
+        return this.identifier;
     }
 
 }

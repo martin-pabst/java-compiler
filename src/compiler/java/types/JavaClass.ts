@@ -118,12 +118,34 @@ export class JavaClass extends IJavaClass {
 
     }
 
-    findMethodWithSignature(signature: string): Method | undefined {
+    findMethodWithSignature(otherMethod: Method): Method | undefined {
+        let otherMethodsIdentifier = otherMethod.identifier;
+        let otherMethodsParameterCount = otherMethod.parameters.length;
         for (let method of this.methods) {
-            if (method.getInternalName("java") == signature) return method;
+            if (method.identifier == otherMethodsIdentifier && method.parameters.length == otherMethodsParameterCount){
+                let parameterTypesCompatible: boolean = true;
+                for(let i = 0; i < otherMethodsParameterCount; i++){
+                    let methodsParameterType = method.parameters[i].type;
+                    let otherMethodsParameterType = otherMethod.parameters[i].type;
+                    if(methodsParameterType && otherMethodsParameterType){
+                        if(methodsParameterType.toString() != otherMethodsParameterType.toString()){
+                            if(!(otherMethodsParameterType instanceof NonPrimitiveType && methodsParameterType instanceof NonPrimitiveType)){
+                                parameterTypesCompatible = false;
+                                break;
+                            } else {
+                                if(!methodsParameterType.canImplicitlyCastTo(otherMethodsParameterType)){
+                                    parameterTypesCompatible = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if(parameterTypesCompatible) return method;
+            } 
         }
         if (this.extends) {
-            return (<JavaClass>this.extends).findMethodWithSignature(signature);
+            return (<JavaClass>this.extends).findMethodWithSignature(otherMethod);
         }
 
         return undefined;
@@ -174,8 +196,7 @@ export class JavaClass extends IJavaClass {
             let notImplementedMethods: Method[] = [];
             for (let method of javaInterface.getOwnMethods()) {
 
-                // TODO: if method has parameter of generic wildcard type, e.g. "? super String", then classesMethod only needs parameter of type which is superclass of String...
-                let classesMethod = this.findMethodWithSignature(method.getInternalName("java"));
+                let classesMethod = this.findMethodWithSignature(method);
 
                 if (!classesMethod) {
                     if (method.isDefault) {

@@ -229,3 +229,30 @@ list.add("third");
 list.forEach(e -> { println(e); });
 
 println("Fertig!");
+
+
+/**::
+ * Enhanced for loop with java-Iterable using inner class
+ * @ExpectOutput: "First\nSecond\n"
+ */
+class A implements Iterable<String> {
+   Iterator<String> iterator(){
+      return new Iterator<String>() {
+         int counter = 200;
+         boolean hasNext(){
+            return counter < 205;
+         }
+
+         String next(){
+            return counter++;
+         }
+      }
+   }
+
+   void forEach(Consumer<String> consumer){
+      consumer.accept("First");
+      consumer.accept("Second");
+   }
+}
+
+new A().forEach((s) -> {println(s);});
