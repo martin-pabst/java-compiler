@@ -262,9 +262,9 @@ export class Parser extends StatementParser {
 
         let type = this.parseType();
 
-        let identifier = this.expectAndSkipIdentifierAsToken();
-
         let isEllipsis = this.comesToken(TokenType.ellipsis, true);
+        
+        let identifier = this.expectAndSkipIdentifierAsToken();
 
         if (type != null && identifier.value != "") {
             let parameterNode = this.nodeFactory.buildParameterNode(startRange, identifier, type, isEllipsis, isFinal);

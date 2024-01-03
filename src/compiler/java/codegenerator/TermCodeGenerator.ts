@@ -188,6 +188,10 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 let snippet = this.compileLambdaFunction(<ASTLambdaFunctionDeclarationNode>pv, method.parameters[i].type);
                 if (!snippet) return undefined;
                 parameterValues[i] = snippet;
+            } else {
+                if(!parameterValues[i]){
+                    return undefined;
+                }
             }
         }
 
@@ -199,13 +203,46 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
     }
 
+    castParameterValuesAndPackEllipsis(parameterValues: (CodeSnippet | undefined)[], method: Method): CodeSnippet[] {
+
+        let ellipsisType: JavaType | undefined;
+        let castParameters: CodeSnippet[] = [];
+
+        for (let i = 0; i < parameterValues.length; i++) {
+
+            let destinationType = ellipsisType;
+            if(!destinationType){
+                let parameter = method.parameters[i];
+                if(parameter.isEllipsis){
+                    destinationType = (<ArrayType>parameter.type).elementType;
+                    ellipsisType = destinationType;
+                } else {
+                    destinationType = parameter.type;
+                }                
+            }
+
+            castParameters.push(this.compileCast(parameterValues[i]!, destinationType, "implicit"));
+        }
+
+        if(!ellipsisType) return castParameters;
+
+        let methodParameterCountMinusOne = method.parameters.length - 1;
+
+        let parametersBeforeEllipsis = castParameters.slice(0, methodParameterCountMinusOne);
+        let ellipsisParameters = castParameters.slice(methodParameterCountMinusOne);
+
+        let ellipsisParameterSnippet = ParametersJoinedTemplate.applyToSnippet(method.parameters[methodParameterCountMinusOne].type, ellipsisParameters[0].range!, "[", ", ", "]", ...ellipsisParameters);
+
+        parametersBeforeEllipsis.push(ellipsisParameterSnippet);
+
+        return parametersBeforeEllipsis;
+    }
+
     protected invokeConstructor(parameterValues: CodeSnippet[], method: Method, klassType: IJavaClass | JavaEnum,
         node: ASTNewObjectNode | ASTEnumValueNode, newObjectSnippet: CodeSnippet | undefined,
         enumValueIdentifier?: string, enumValueIndex?: number) {
-        for (let i = 0; i < parameterValues.length; i++) {
-            let destinationType = method.parameters[i].type;
-            parameterValues[i] = this.compileCast(parameterValues[i]!, destinationType, "implicit");
-        }
+        
+        parameterValues = this.castParameterValuesAndPackEllipsis(parameterValues, method);
 
         let classHasOuterType: boolean = (klassType.outerType && !klassType.isStatic) ? true : false;
 
@@ -827,14 +864,15 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 let snippet = this.compileLambdaFunction(<ASTLambdaFunctionDeclarationNode>pv, method.parameters[i].type);
                 if (!snippet) return undefined;
                 parameterValueSnippet[i] = snippet;
+            } else {
+                if(!parameterValueSnippet[i]){
+                    return undefined;
+                }
             }
         }
 
         // cast parameter values
-        for (let i = 0; i < parameterValueSnippet.length; i++) {
-            let destinationType = method.parameters[i].type;
-            parameterValueSnippet[i] = this.compileCast(parameterValueSnippet[i]!, destinationType, "implicit");
-        }
+        parameterValueSnippet = this.castParameterValuesAndPackEllipsis(parameterValueSnippet, method);
 
         let returnParameter = method.returnParameterType || this.voidType;
 
@@ -958,33 +996,68 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             })
         }
 
+        let bestMethodSoFar: Method | undefined;
+        let castsNeededWithBestMethodSoFar: number = Number.MAX_SAFE_INTEGER;
+
         for (let method of possibleMethods) {
             if (method instanceof GenericMethod) method.initCatches();
+
+            let castsNeeded: number = 0;
+            let ellipsisType: JavaType | undefined;
 
             let suitable: boolean = true;
             for (let i = 0; i < parameterTypes.length; i++) {
                 let fromType = parameterTypes[i];
-                let toType = method.parameters[i].type;
-                if (fromType && !this.canCastTo(fromType, toType, "implicit")) {
-                    suitable = false;
-                    break;
+                if(!fromType) continue;
+                
+                let toType = ellipsisType;
+                if(!toType){
+                    let parameter = method.parameters[i];
+                    if(parameter.isEllipsis){
+                        toType = (<ArrayType>parameter.type).elementType;
+                        ellipsisType = toType;
+                    } else {
+                        toType = parameter.type;
+                    }
+                } 
+
+                if(fromType != toType){
+                    if(fromType?.toString() != toType.toString()){
+                        if (this.canCastTo(fromType, toType, "implicit")) {
+                            castsNeeded++;
+                            if(castsNeeded >= castsNeededWithBestMethodSoFar){
+                                suitable = false;
+                                break;
+                            }
+                        } else {
+                            suitable = false;
+                            break;
+                        }
+
+                    }
                 }
             }
             if (suitable) {
-
-                if (!(method instanceof GenericMethod)) {
-                    return method;
-                }
-
-                let errors = method.checkCatches(methodCallPosition);
-                if (errors.length > 0) {
-                    this.module.errors.push(...errors);
-                    return undefined;
-                }
-
-                return method.getCopyWithConcreteTypes();
+                
+                bestMethodSoFar = method;
+                castsNeededWithBestMethodSoFar = castsNeeded;
 
             }
+        }
+
+        if(bestMethodSoFar){
+            if (!(bestMethodSoFar instanceof GenericMethod)) {
+                return bestMethodSoFar;
+            }
+
+            let errors = bestMethodSoFar.checkCatches(methodCallPosition);
+            if (errors.length > 0) {
+                this.module.errors.push(...errors);
+                return undefined;
+            }
+
+            return bestMethodSoFar.getCopyWithConcreteTypes();
+
         }
 
         return undefined;

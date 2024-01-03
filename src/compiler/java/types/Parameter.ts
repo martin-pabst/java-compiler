@@ -12,7 +12,7 @@ export class Parameter extends BaseSymbol {
     declare type: JavaType;
 
     constructor(identifier: string, identifierRange: IRange,
-         public module: JavaBaseModule, type: JavaType, isFinal: boolean){
+         public module: JavaBaseModule, type: JavaType, isFinal: boolean, public isEllipsis: boolean){
             super(identifier, identifierRange, type, SymbolKind.parameter);
             this.isFinal = isFinal;
          }
@@ -21,7 +21,7 @@ export class Parameter extends BaseSymbol {
         let newType: JavaType = this.type.getCopyWithConcreteType(typeMap);
         if(newType == this.type) return this;
         
-        let copy = new Parameter(this.identifier, this.identifierRange, this.module, newType, this.isFinal);
+        let copy = new Parameter(this.identifier, this.identifierRange, this.module, newType, this.isFinal, this.isEllipsis);
 
         return copy;
     }
@@ -31,7 +31,7 @@ export class Parameter extends BaseSymbol {
     }
 
     getCopy(): Parameter {
-        return new Parameter(this.identifier, this.identifierRange, this.module, this.type, this.isFinal);
+        return new Parameter(this.identifier, this.identifierRange, this.module, this.type, this.isFinal, this.isEllipsis);
     }
 
 }

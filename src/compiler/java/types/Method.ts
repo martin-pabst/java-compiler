@@ -54,6 +54,15 @@ export class Method {
 
     }
 
+    canTakeNumberOfParameters(n: number){
+        if(this.parameters.length == 0) return n == 0;
+        if(this.parameters[this.parameters.length - 1].isEllipsis){
+            return n >= this.parameters.length - 1;
+        } else {
+            return n == this.parameters.length;
+        }
+    }
+
     getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, NonPrimitiveType>, genericClassOrInterfaceOrEnum: IJavaClass | JavaEnum | IJavaInterface): Method {
 
         let copyNeeded: boolean = false;

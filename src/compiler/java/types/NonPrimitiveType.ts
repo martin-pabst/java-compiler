@@ -78,14 +78,14 @@ export abstract class NonPrimitiveType extends JavaType {
          };
     }
 
-    getPossibleMethods(identifier: string, length: number, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
+    getPossibleMethods(identifier: string, numberOfParameters: number, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
         let methods: Method[] = [];
 
         if (isConstructor) {
             let type: NonPrimitiveType | undefined = this;
             while (type) {
                 methods = methods.concat(type.getOwnMethods().filter(m => 
-                    m.parameters.length == length && m.isConstructor
+                    m.canTakeNumberOfParameters(numberOfParameters) && m.isConstructor
                 ));
                 //@ts-ignore
                 if (type["getExtends"] && type.getOwnMethods().filter(m => m.isConstructor).length == 0){
@@ -98,18 +98,18 @@ export abstract class NonPrimitiveType extends JavaType {
         } else {
 
             methods = this.getOwnMethods().filter(m => 
-                m.parameters.length == length && !m.isConstructor && m.identifier == identifier
+                m.canTakeNumberOfParameters(numberOfParameters) && !m.isConstructor && m.identifier == identifier
                 && (!hasToBeStatic || m.isStatic)
             )
 
             //@ts-ignore
-            let ext = this.getExtends();        // is array if this instanceOf JavaInterface
+            let ext = this.getExtends() as NonPrimitiveType | NonPrimitiveType[] | undefined;        // is array if this instanceOf JavaInterface
 
             if(ext){
                 if(!Array.isArray(ext)) ext = [ext];
     
                 for(let type of ext){
-                    methods = methods.concat(type.getPossibleMethods(identifier, length, isConstructor, hasToBeStatic));
+                    methods = methods.concat(type.getPossibleMethods(identifier, numberOfParameters, isConstructor, hasToBeStatic));
                 }
             }
 

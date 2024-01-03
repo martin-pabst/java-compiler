@@ -472,8 +472,11 @@ export class TypeResolver {
             method.returnParameterType = methodNode.isContructor ? type : methodNode.returnParameterType?.resolvedType;
             for (let p of methodNode.parameters) {
                 if (p.type?.resolvedType) {
+
+                    let type = p.isEllipsis ? new ArrayType(p.type.resolvedType, 1, module, p.type.range) : p.type.resolvedType;
+
                     let parameter = new Parameter(p.identifier, p.identifierRange,
-                        module, p.type?.resolvedType, p.isFinal);
+                        module, type, p.isFinal, p.isEllipsis);
                     method.parameters.push(parameter);
                 }
             }

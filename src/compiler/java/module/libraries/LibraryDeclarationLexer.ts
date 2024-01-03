@@ -42,7 +42,8 @@ export class LibraryDeclarationLexer {
         ":": TokenType.colon,
         " ": TokenType.space,
         "\n": TokenType.space,
-        "\r": TokenType.space
+        "\r": TokenType.space,
+        ".": TokenType.dot
     }
 
     constructor() {
@@ -61,8 +62,19 @@ export class LibraryDeclarationLexer {
                     this.pushIdentifierOrKeyword(currentIdentifier, tokens);
                     currentIdentifier = '';
                 }
-                if (tt != TokenType.space) {
-                    tokens.push({ tt: tt, value: c });
+                switch(tt){
+                    case TokenType.space:
+                        break;
+                    case TokenType.dot:
+                        if(this.safeCharAt(declaration, cpos + 1) == "." && this.safeCharAt(declaration, cpos + 2) == "."){
+                            cpos += 2;
+                            tokens.push({tt: TokenType.ellipsis, value: "..."});
+                        } else {
+                            tokens.push({ tt: tt, value: c });
+                        }
+                        break;
+                    default:
+                        tokens.push({ tt: tt, value: c });
                 }
             } else {
                 currentIdentifier += c;
@@ -75,6 +87,11 @@ export class LibraryDeclarationLexer {
         }
 
         return tokens;
+    }
+
+    safeCharAt(s: string, index: number): string {
+        if(index >= 0 && index < s.length) return s.charAt(index);
+        return "";
     }
 
     pushIdentifierOrKeyword(id: string, tokens: LdToken[]) {

@@ -350,7 +350,8 @@ export abstract class TermParser extends TokenIterator {
                 let statement: ASTReturnNode = {
                     kind: TokenType.keywordReturn,
                     range: expression?.range,
-                    term: expression
+                    term: expression,
+                    keywordReturnRange: expression.range
                 }
                 lambdaNode.statement = statement;
             }

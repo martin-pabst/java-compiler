@@ -7,7 +7,7 @@ export class PrimitiveStringClass extends ObjectClass {
 
     static __javaDeclarations: LibraryDeclarations = [
         {type: "declaration", signature: "class string extends Object"},
-        {type: "method", signature: "public final int length()", template: "§1.length"},
+        {type: "method", signature: "public final int length()", template: "§1.length", constantFoldingFunction: (str) => str.length},
         {type: "method", signature: "public final int indexOf(string str)", template: "§1.indexOf(§2)", constantFoldingFunction: (obj, str) => obj.indexOf(str)},
         {type: "method", signature: "public final int indexOf(string str, int fromIndex)", template: "§1.indexOf(§2, §3)", constantFoldingFunction: (obj, str, index) => obj.indexOf(str, index)},
         {type: "method", signature: "public final int indexOf(char c)", template: "§1.indexOf(§2)", constantFoldingFunction: (obj, str) => obj.indexOf(str)},

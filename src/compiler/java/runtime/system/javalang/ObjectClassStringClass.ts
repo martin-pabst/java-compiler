@@ -40,7 +40,7 @@ export class ObjectClass {
     }
 
 
-    _nToString(t: Thread) {
+    _nToString() {
         return new StringClass("Object");
         // `t.stack.push(new ${Helpers.classes}["String"]("Object"));`
     }

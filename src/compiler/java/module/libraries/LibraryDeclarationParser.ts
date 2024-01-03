@@ -496,8 +496,10 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 do {
                     let isFinal = this.comesToken(TokenType.keywordFinal, true);
                     let type = this.parseType(module);
+                    let isEllipsis = this.comesToken(TokenType.ellipsis, true);
+                    if(isEllipsis) type = new ArrayType(type, 1, module, EmptyRange.instance);
                     let id = this.expectIdentifier();
-                    m.parameters.push(new Parameter(id, EmptyRange.instance, module, type, isFinal));
+                    m.parameters.push(new Parameter(id, EmptyRange.instance, module, type, isFinal, isEllipsis));
                 } while (this.comesToken(TokenType.comma, true));
             }
 
