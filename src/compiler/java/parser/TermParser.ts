@@ -173,6 +173,17 @@ export abstract class TermParser extends TokenIterator {
                     case TokenType.identifier:
                     case TokenType.keywordThis:
                     case TokenType.keywordSuper:
+                    case TokenType.shortConstant:
+                    case TokenType.integerConstant:
+                    case TokenType.longConstant:
+                    case TokenType.floatConstant:
+                    case TokenType.doubleConstant:
+                    case TokenType.booleanConstant:
+                    case TokenType.stringConstant:
+                    case TokenType.charConstant:
+                    case TokenType.true:
+                    case TokenType.false:
+
                         node = this.parseCastedObject();
                         break;
                     default:
@@ -226,21 +237,21 @@ export abstract class TermParser extends TokenIterator {
             case TokenType.keywordThis:
                 let thisToken = this.getAndSkipToken();
                 node = this.nodeFactory.buildThisNode(thisToken);
-                if(this.comesToken(TokenType.leftBracket, false)){
+                if (this.comesToken(TokenType.leftBracket, false)) {
                     node = this.buildMethodCallNode(thisToken, node);
                 }
                 break;
             case TokenType.keywordSuper:
                 let superToken = this.getAndSkipToken();
                 node = this.nodeFactory.buildSuperNode(superToken);
-                if(this.comesToken(TokenType.leftBracket, false)){
+                if (this.comesToken(TokenType.leftBracket, false)) {
                     node = this.buildMethodCallNode(superToken, node);
                 }
                 break;
             case TokenType.leftCurlyBracket:
                 node = this.parseArrayLiteral();
                 break;
-                
+
         }
 
         if (node) {
@@ -277,8 +288,8 @@ export abstract class TermParser extends TokenIterator {
             if (this.lookahead(1).tt == TokenType.leftBracket) {
                 return this.parseMethodCall(node);
             } else {
-                let identifier = 
-                 this.tt == TokenType.keywordSuper ? this.getAndSkipToken() : this.expectAndSkipIdentifierAsToken();
+                let identifier =
+                    this.tt == TokenType.keywordSuper ? this.getAndSkipToken() : this.expectAndSkipIdentifierAsToken();
                 if (identifier.value == "") return node;
                 return this.nodeFactory.buildAttributeDereferencingNode(node, identifier);
             }
@@ -294,7 +305,7 @@ export abstract class TermParser extends TokenIterator {
     buildMethodCallNode(identifier: Token, nodeToGetObject: ASTTermNode | undefined): ASTMethodCallNode | undefined {
         this.expect(TokenType.leftBracket, true);
         let methodCallNode = this.nodeFactory.buildMethodCallNode(identifier, nodeToGetObject);
-        
+
         if (this.tt != TokenType.rightBracket) {
             do {
                 let termNode = this.parseTerm();
@@ -367,12 +378,12 @@ export abstract class TermParser extends TokenIterator {
         let returnedType: ASTTypeNode | undefined;
 
         switch (this.tt) {
-            case TokenType.keywordVoid: 
-            returnedType = this.nodeFactory.buildVoidTypeNode(this.getRangeAndThenSkipToken());
-            break;
-            case TokenType.keywordVar: 
-            returnedType = this.nodeFactory.buildVarTypeNode(this.getRangeAndThenSkipToken());
-            break;
+            case TokenType.keywordVoid:
+                returnedType = this.nodeFactory.buildVoidTypeNode(this.getRangeAndThenSkipToken());
+                break;
+            case TokenType.keywordVar:
+                returnedType = this.nodeFactory.buildVarTypeNode(this.getRangeAndThenSkipToken());
+                break;
             case TokenType.ternaryOperator:
                 let wildcardType = this.nodeFactory.buildWildcardTypeNode(this.getRangeAndThenSkipToken());
                 if (this.comesToken(TokenType.keywordExtends, true)) {
@@ -404,7 +415,7 @@ export abstract class TermParser extends TokenIterator {
                     this.expect(TokenType.greater, true);
                 }
 
-                if(this.comesToken(TokenType.leftRightSquareBracket, true)){
+                if (this.comesToken(TokenType.leftRightSquareBracket, true)) {
                     type = this.nodeFactory.buildArrayTypeNode(type, type.range);
                     // [][][] at the end of type
                     while (this.comesToken(TokenType.leftRightSquareBracket, true)) (<ASTArrayTypeNode>type).arrayDimensions++;
@@ -415,7 +426,7 @@ export abstract class TermParser extends TokenIterator {
                 returnedType = type;
         }
 
-        if(returnedType){
+        if (returnedType) {
             this.module.ast?.collectedTypeNodes.push(returnedType);
         }
 
@@ -430,7 +441,7 @@ export abstract class TermParser extends TokenIterator {
         this.nextToken(); // skip (
         let type = this.parseType();
         this.expect(TokenType.rightBracket);
-        let term = this.parseTerm();
+        let term = this.parseTermUnary();
 
         if (type && term) {
             let castNode = this.nodeFactory.buildCastNode(startToken, type, term);
@@ -469,11 +480,11 @@ export abstract class TermParser extends TokenIterator {
             } while (this.comesToken(TokenType.leftSquareBracket, true));
 
 
-        } else if(this.comesToken(TokenType.leftRightSquareBracket, false)){
+        } else if (this.comesToken(TokenType.leftRightSquareBracket, false)) {
             newArrayNode.dimensionCount = 0;
-            while(this.comesToken(TokenType.leftRightSquareBracket, true)) newArrayNode.dimensionCount++;
+            while (this.comesToken(TokenType.leftRightSquareBracket, true)) newArrayNode.dimensionCount++;
 
-            if(this.expect(TokenType.leftCurlyBracket, false)){
+            if (this.expect(TokenType.leftCurlyBracket, false)) {
                 newArrayNode.initialization = this.parseArrayLiteral();
             }
 
@@ -570,11 +581,11 @@ export abstract class TermParser extends TokenIterator {
         let node: ASTArrayLiteralNode = this.nodeFactory.buildArrayLiteralNode();
         this.expect(TokenType.leftCurlyBracket, true);
 
-        if(!this.comesToken(TokenType.rightCurlyBracket, false)){
+        if (!this.comesToken(TokenType.rightCurlyBracket, false)) {
             do {
                 let elementNode = this.parseTerm();
-                if(elementNode) node.elements.push(elementNode);
-            } while(this.comesToken(TokenType.comma, true))
+                if (elementNode) node.elements.push(elementNode);
+            } while (this.comesToken(TokenType.comma, true))
         }
 
         this.setEndOfRange(node);

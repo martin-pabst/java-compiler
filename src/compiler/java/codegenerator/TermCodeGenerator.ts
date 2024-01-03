@@ -127,16 +127,23 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     compileExplicitCast(node: ASTCastNode): CodeSnippet | undefined {
 
         let objectSnippet = this.compileTerm(node.objectToCast);
-        if (!objectSnippet || !objectSnippet.type || !node.castType) return undefined;
+        
+        let sourceType = objectSnippet?.type;
+        let destType = node.castType.resolvedType;
 
-        if (!(node.castType.resolvedType instanceof NonPrimitiveType)) {
-            this.pushError(`Ein Cast ist nur bei Objekten möglich. Der Typ ${node.castType.resolvedType?.identifier} ist aber keine Klasse/Interface/Enum.`, "error", node);
-            return undefined;
+        if (!objectSnippet || !sourceType || !destType) return undefined;
+
+        if(sourceType instanceof NonPrimitiveType && destType instanceof NonPrimitiveType){
+            return this.compileExplicitCastFromObjectToObject(node, objectSnippet, sourceType, destType);            
         }
 
-        let destType = node.castType.resolvedType as NonPrimitiveType;
-        let sourceType = objectSnippet.type as NonPrimitiveType;
+        if(this.canCastTo(sourceType, destType, "explicit")){
+            return this.compileCast(objectSnippet, destType, "explicit");
+        }
 
+    }
+
+    compileExplicitCastFromObjectToObject(node: ASTCastNode, objectSnippet: CodeSnippet, sourceType: NonPrimitiveType, destType: NonPrimitiveType): CodeSnippet | undefined {
         if (sourceType.fastExtendsImplements(destType.identifier)) {
             this.pushError(`Unnötiger Cast`, "info", node);
             return objectSnippet;
@@ -150,8 +157,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let range = node.range;
         return SnippetFramer.frame(objectSnippet, `${Helpers.checkCast}(§1, "${destType.pathAndIdentifier}", ${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn})`
             , destType)
+    }    
 
-    }
 
     compileNewObjectNode(node: ASTNewObjectNode, newObjectSnippet?: CodeSnippet): CodeSnippet | undefined {
         // new t.classes[<identifier>]().<constructorIdentifier>(param1, ..., paramN)
