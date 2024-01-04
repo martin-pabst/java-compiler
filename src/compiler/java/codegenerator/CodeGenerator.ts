@@ -36,121 +36,205 @@ export class CodeGenerator extends StatementCodeGenerator {
     start() {
         this.module.programsToCompileToFunctions = [];
         this.compileClassesEnumsAndInterfaces(this.module.ast);
-        this.compileMainProgram();
+        // this.compileMainProgram();
     }
 
-    compileMainProgram() {
-        let ast = this.module.ast!;
-        this.pushAndGetNewSymbolTable(ast.range, true).classContext = undefined;
+    // compileMainProgram() {
+    //     let ast = this.module.ast!;
+    //     this.pushAndGetNewSymbolTable(ast.range, true).classContext = undefined;
 
-        this.missingStatementManager.beginMethodBody([]);
+    //     this.missingStatementManager.beginMethodBody([]);
 
-        let snippets: CodeSnippet[] = [];
+    //     let snippets: CodeSnippet[] = [];
 
-        for (let statement of ast.mainProgramNode.statements) {
-            let snippet = this.compileStatementOrTerm(statement);
-            if (snippet) snippets.push(snippet);
-        }
+    //     for (let statement of ast.mainProgramNode.statements) {
+    //         let snippet = this.compileStatementOrTerm(statement);
+    //         if (snippet) snippets.push(snippet);
+    //     }
 
-        this.missingStatementManager.endMethodBody(undefined, this.module.errors);
+    //     this.missingStatementManager.endMethodBody(undefined, this.module.errors);
 
-        let endOfProgramSnippet = new CodeSnippetContainer(new StringCodeSnippet(`${Helpers.exit}();`, { startLineNumber: -1, startColumn: -1, endLineNumber: -1, endColumn: -1 }));
-        endOfProgramSnippet.enforceNewStepBeforeSnippet();
+    //     let endOfProgramSnippet = new CodeSnippetContainer(new StringCodeSnippet(`${Helpers.exit}();`, { startLineNumber: -1, startColumn: -1, endLineNumber: -1, endColumn: -1 }));
+    //     endOfProgramSnippet.enforceNewStepBeforeSnippet();
 
-        snippets.push(endOfProgramSnippet);
+    //     snippets.push(endOfProgramSnippet);
 
+    //     this.popSymbolTable();
+    // }
 
-        this.module.mainProgram = new Program(this.module, this.currentSymbolTable,
-            "main program");
-        this.linker.link(snippets, this.module.mainProgram);
-
-        ast.program = this.module.mainProgram;  // only for debugging
-
-
-        this.popSymbolTable();
-    }
 
     compileClassesEnumsAndInterfaces(typeScope: TypeScope | undefined) {
+
+        // First compile all static fields and static initializers in all types:
+        // If they can be evaluated to constants, then you can use them in switch...case-statements later on
+        this.compileStaticFieldsAndInitializerAndEnumValuesRecursive(typeScope);
+
+        this.compileInstanceFieldsInitializersAndStandardConstructorsRecursively(typeScope);
+
+        this.compileMethodsRecursively(typeScope);
+
+    }
+
+    compileInstanceFieldsInitializersAndStandardConstructorsRecursively(typeScope: TypeScope | undefined) {
         if (!typeScope) return;
 
         for (let cdef of typeScope.classOrInterfaceOrEnumDefinitions) {
-            if (cdef.identifier == "") continue;     // anonymous inner class
-            switch (cdef.kind) {
-                case TokenType.keywordClass:
-                    this.compileClassDeclaration(cdef);
-                    break;
-                case TokenType.keywordEnum:
-                    this.compileEnumDeclaration(cdef);
-                    break;
-                case TokenType.keywordInterface:
-                    this.compileInterfaceDeclaration(cdef);
-                    break;
+            if (cdef.isAnonymousInnerType) continue;     // anonymous inner class
+            if(cdef.kind != TokenType.keywordClass && cdef.kind != TokenType.keywordEnum) continue;
+
+            let type = cdef.resolvedType;
+            if (!type || !cdef.resolvedType) return;
+
+            if (cdef.symbolTable) {
+                this.pushSymbolTable(cdef.symbolTable);
+            } else {
+                cdef.symbolTable = this.pushAndGetNewSymbolTable(cdef.range, false, type);
+            }
+            
+            this.compileInstanceFieldsAndInitializer(cdef, type as JavaClass | JavaEnum);
+
+            if (cdef.kind == TokenType.keywordClass) {
+                this.buildStandardConstructors(type as JavaClass);
             }
 
+
+            this.compileInstanceFieldsInitializersAndStandardConstructorsRecursively(cdef);
+
+            this.popSymbolTable();
         }
     }
 
-    compileClassDeclaration(cdef: ASTClassDefinitionNode) {
-        let type = cdef.resolvedType;
-        if (!type || !cdef.resolvedType) return;
-        let classContext = <JavaClass>cdef.resolvedType;
+    compileStaticFieldsAndInitializerAndEnumValuesRecursive(typeScope: TypeScope | undefined) {
+        if (!typeScope) return;
 
-        this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
+        for (let cdef of typeScope.classOrInterfaceOrEnumDefinitions) {
+            if (cdef.isAnonymousInnerType) continue;     // anonymous inner class
 
-        // first step: static fields and static initializers
-        this.compileStaticFieldsAndInitializerAndEnumValues(classContext, cdef);
+            let type = cdef.resolvedType;
+            if (!type || !cdef.resolvedType) return;
 
-        // second step: non-static fields and instance initializers
-        this.compileInstanceFieldsAndInitializer(cdef, classContext);
+            if (cdef.symbolTable) {
+                this.pushSymbolTable(cdef.symbolTable);
+            } else {
+                cdef.symbolTable = this.pushAndGetNewSymbolTable(cdef.range, false, type);
+            }
 
-        this.compileMethodsAndConstructors(cdef, classContext);
+            this.compileStaticFieldsAndInitializerAndEnumValues(type, cdef);
 
-        this.compileClassesEnumsAndInterfaces(cdef);        // compile named inner classes
+            this.compileStaticFieldsAndInitializerAndEnumValuesRecursive(cdef);
 
-        this.popSymbolTable();
+            this.popSymbolTable();
+        }
+    }
+
+
+    compileMethodsRecursively(typeScope: TypeScope | undefined) {
+        if (!typeScope) return;
+
+        for (let cdef of typeScope.classOrInterfaceOrEnumDefinitions) {
+            if (cdef.isAnonymousInnerType) continue;     // anonymous inner class
+
+            let type = cdef.resolvedType;
+            if (!type || !cdef.resolvedType) return;
+
+            if (cdef.symbolTable) {
+                this.pushSymbolTable(cdef.symbolTable);
+            } else {
+                cdef.symbolTable = this.pushAndGetNewSymbolTable(cdef.range, false, type);
+            }
+
+            this.compileMethods(cdef, type);
+
+            this.compileMethodsRecursively(cdef);
+
+            this.popSymbolTable();
+        }
 
     }
 
-    compileInterfaceDeclaration(cdef: ASTInterfaceDefinitionNode) {
-        let type = cdef.resolvedType;
-        if (!type || !cdef.resolvedType) return;
-        let classContext = <JavaInterface>cdef.resolvedType;
+    // compileClassesEnumsAndInterfacesOld(typeScope: TypeScope | undefined) {
+    //     if (!typeScope) return;
 
-        this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
+    //     for (let cdef of typeScope.classOrInterfaceOrEnumDefinitions) {
+    //         if (cdef.isAnonymousInnerType) continue;     // anonymous inner class
+    //         switch (cdef.kind) {
+    //             case TokenType.keywordClass:
+    //                 this.compileClassDeclaration(cdef);
+    //                 break;
+    //             case TokenType.keywordEnum:
+    //                 this.compileEnumDeclaration(cdef);
+    //                 break;
+    //             case TokenType.keywordInterface:
+    //                 this.compileInterfaceDeclaration(cdef);
+    //                 break;
+    //         }
 
-        // first step: static fields and static initializers
-        this.compileStaticFieldsAndInitializerAndEnumValues(classContext, cdef);
+    //     }
+    // }
 
-        this.compileMethodsAndConstructors(cdef, classContext);
+    // compileClassDeclaration(cdef: ASTClassDefinitionNode) {
+    //     let type = cdef.resolvedType;
+    //     if (!type || !cdef.resolvedType) return;
+    //     let classContext = <JavaClass>cdef.resolvedType;
 
-        this.compileClassesEnumsAndInterfaces(cdef);        // compile named inner classes
+    //     this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
 
-        this.popSymbolTable();
+    //     // first step: static fields and static initializers
+    //     this.compileStaticFieldsAndInitializerAndEnumValues(classContext, cdef);
 
-    }
+    //     // second step: non-static fields and instance initializers
+    //     this.compileInstanceFieldsAndInitializer(cdef, classContext);
 
-    compileEnumDeclaration(cdef: ASTEnumDefinitionNode) {
-        let type = cdef.resolvedType;
-        if (!type || !cdef.resolvedType) return;
-        let classContext = <JavaEnum>cdef.resolvedType;
+    //     this.compileMethodsAndConstructors(cdef, classContext);
 
-        this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
+    //     this.compileClassesEnumsAndInterfaces(cdef);        // compile named inner classes
 
-        // first step: static fields and static initializers
-        this.compileStaticFieldsAndInitializerAndEnumValues(classContext, cdef);
+    //     this.popSymbolTable();
 
-        // second step: non-static fields and instance initializers
-        this.compileInstanceFieldsAndInitializer(cdef, classContext);
+    // }
 
-        this.compileMethodsAndConstructors(cdef, classContext);
+    // compileInterfaceDeclaration(cdef: ASTInterfaceDefinitionNode) {
+    //     let type = cdef.resolvedType;
+    //     if (!type || !cdef.resolvedType) return;
+    //     let classContext = <JavaInterface>cdef.resolvedType;
 
-        this.compileClassesEnumsAndInterfaces(cdef);        // compile named inner classes
+    //     this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
 
-        this.popSymbolTable();
+    //     // first step: static fields and static initializers
+    //     this.compileStaticFieldsAndInitializerAndEnumValues(classContext, cdef);
 
-    }
+    //     this.compileMethodsAndConstructors(cdef, classContext);
 
-    private compileMethodsAndConstructors(cdef: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, classContext: JavaClass | JavaEnum | JavaInterface) {
+    //     this.compileClassesEnumsAndInterfaces(cdef);        // compile named inner classes
+
+    //     this.popSymbolTable();
+
+    // }
+
+    // compileEnumDeclaration(cdef: ASTEnumDefinitionNode) {
+    //     let type = cdef.resolvedType;
+    //     if (!type || !cdef.resolvedType) return;
+    //     let classContext = <JavaEnum>cdef.resolvedType;
+
+    //     this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
+
+    //     // first step: static fields and static initializers
+    //     this.compileStaticFieldsAndInitializerAndEnumValues(classContext, cdef);
+
+    //     // second step: non-static fields and instance initializers
+    //     this.compileInstanceFieldsAndInitializer(cdef, classContext);
+
+    //     this.compileMethodsAndConstructors(cdef, classContext);
+
+    //     this.compileClassesEnumsAndInterfaces(cdef);        // compile named inner classes
+
+    //     this.popSymbolTable();
+
+    // }
+
+
+
+    private compileMethods(cdef: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, classContext: JavaClass | JavaEnum | JavaInterface) {
         let constructorFound: boolean = false;
         for (let method of cdef.methods) {
             this.compileMethodDeclaration(method, classContext);
@@ -163,8 +247,6 @@ export class CodeGenerator extends StatementCodeGenerator {
                 }
             }
         }
-
-        if (!constructorFound && classContext instanceof JavaClass) this.buildStandardConstructors(classContext);
     }
 
     private compileInstanceFieldsAndInitializer(cdef: ASTClassDefinitionNode | ASTEnumDefinitionNode, classContext: JavaClass | JavaEnum) {
@@ -271,6 +353,7 @@ export class CodeGenerator extends StatementCodeGenerator {
      * a constructor with same signature 
      */
     buildStandardConstructors(classContext: JavaClass) {
+        if(classContext.methods.some(m => m.isConstructor)) return;
 
         let baseClass: IJavaClass = classContext;
         while (!baseClass.getOwnMethods().find(m => m.isConstructor && m.visibility != TokenType.keywordPrivate)) baseClass = baseClass.getExtends()!;
@@ -459,15 +542,15 @@ export class CodeGenerator extends StatementCodeGenerator {
         const method = methodNode.method;
         if (!method) return;
 
-        
+
         if (methodNode.isContructor) {
             if (classContext.outerType && !classContext.isStatic) {
                 method.hasOuterClassParameter = true;
             }
         }
-        
+
         let symbolTable = this.pushAndGetNewSymbolTable(methodNode.range, true, classContext, method);
-        
+
         if (method.hasOuterClassParameter) {
             this.currentSymbolTable.insertInvisibleParameter(); // make room for __outer-Parameter
         }
@@ -475,10 +558,10 @@ export class CodeGenerator extends StatementCodeGenerator {
         for (let parameter of method.parameters) {
             this.currentSymbolTable.addSymbol(parameter);
         }
-        
-        
+
+
         let snippets: CodeSnippet[] = [];
-        
+
         let thisCallHappened: boolean = false;
         let superCallHappened: boolean = false;
 
@@ -503,64 +586,64 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         }
 
-        if(methodNode.statement){
+        if (methodNode.statement) {
             if (method.isAbstract) this.pushError("Eine abstrakte Methode kann keinen Methodenrumpf besitzen.", "error", methodNode);
             if (classContext instanceof JavaInterface && !(method.isAbstract || method.isDefault)) this.pushError("In Interfaces können nur default-Methoden und abstrakte Methoden einen Methodenrumpf haben.", "error", methodNode);
 
             let msm = this.missingStatementManager;
             this.missingStatementManager = new MissingStatementManager();
             this.missingStatementManager.beginMethodBody(method.parameters);
-    
+
             let snippet = methodNode.statement ? this.compileStatementOrTerm(methodNode.statement) : undefined;
             if (snippet) snippets.push(snippet);
-    
+
             if (methodNode.isContructor) {
                 snippets.push(new StringCodeSnippet(`${Helpers.return}(${Helpers.elementRelativeToStackbase(0)});\n`))
-    
+
                 if (!(thisCallHappened || superCallHappened)) {
                     // Has base class a parameterless super constructor?
                     let baseClass = classContext.getExtends();
-                    if(baseClass instanceof IJavaClass){
+                    if (baseClass instanceof IJavaClass) {
                         let parameterlessConstructors = baseClass.getPossibleMethods(baseClass.identifier, 0, true, false);
-                        if(parameterlessConstructors.length == 0){
+                        if (parameterlessConstructors.length == 0) {
                             this.pushError(`Da die Oberklasse ${baseClass.identifier} keinen parameterlosen Konstruktor hat, muss in jedem Konstruktor einer Unterklasse gleich zu Beginn der Aufruf eines Konstruktors der Oberklasse erfolgen (super(...)).`, "error", methodNode.identifierRange);
                         } else {
                             let parameterlessConstructor = parameterlessConstructors[0];
-                            if(parameterlessConstructor.hasImplementationWithNativeCallingConvention){
+                            if (parameterlessConstructor.hasImplementationWithNativeCallingConvention) {
                                 let superConstructorCall = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${parameterlessConstructor.getInternalName("native")}();\n`);
-                                snippets.unshift(superConstructorCall);                            
+                                snippets.unshift(superConstructorCall);
                             } else {
                                 let superConstructorCall = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${parameterlessConstructor.getInternalName("java")}(${StepParams.thread}, undefined);\n`);
-                                snippets.unshift(superConstructorCall);                            
+                                snippets.unshift(superConstructorCall);
                             }
                         }
                     }
                 }
-    
+
             }
-    
+
             method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
-    
+
             if (!this.missingStatementManager.hasReturnHappened() && !methodNode.isContructor) {
                 snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
             }
-    
+
             this.missingStatementManager.endMethodBody(method, this.module.errors);
             this.missingStatementManager = msm;
-    
+
             this.linker.link(snippets, method.program);
-    
+
             methodNode.program = method.program;    // only for debugging purposes
-    
+
             let runtimeClass = classContext.runtimeClass;
-    
+
             if (runtimeClass) {
                 method.callbackAfterCodeGeneration.forEach(callback => callback());
-    
+
                 let functionStub: Function;
                 if (method.isStatic) {
                     functionStub = function (this: any, __t: Thread, ...parameters: any) {
-                        __t.s.push(...parameters);        
+                        __t.s.push(this, ...parameters);
                         __t.pushProgram(method!.program!);
                     }
                     runtimeClass[method.getInternalNameWithGenericParameterIdentifiers("java")] = functionStub;
@@ -571,9 +654,9 @@ export class CodeGenerator extends StatementCodeGenerator {
                     }
                     runtimeClass.prototype[method.getInternalNameWithGenericParameterIdentifiers("java")] = functionStub;
                 }
-    
+
             }
-        } 
+        }
 
 
         this.popSymbolTable();
@@ -581,25 +664,25 @@ export class CodeGenerator extends StatementCodeGenerator {
     }
 
     checkIfSuperconstructorCallPresent(statement: ASTStatementNode | undefined): [boolean, boolean] {
-        if(!statement) return [false, false];
-        if(statement.kind = TokenType.block){
+        if (!statement) return [false, false];
+        if (statement.kind = TokenType.block) {
             let blockstatement = <ASTBlockNode>statement;
-            if(blockstatement.statements.length > 0){
+            if (blockstatement.statements.length > 0) {
                 statement = blockstatement.statements[0];
             } else {
                 return [false, false];
             }
-        } 
+        }
         //@ts-ignore
-        if(!statement.kind == TokenType.methodCall) return [false, false];
+        if (!statement.kind == TokenType.methodCall) return [false, false];
 
         let methodCall = <ASTMethodCallNode>statement;
 
         let objectKind = methodCall.nodeToGetObject?.kind;
-        if(!objectKind) return [false, false];
+        if (!objectKind) return [false, false];
 
-        if(objectKind == TokenType.keywordThis) return [true, false];
-        if(objectKind == TokenType.keywordSuper) return [false, true];
+        if (objectKind == TokenType.keywordThis) return [true, false];
+        if (objectKind == TokenType.keywordSuper) return [false, true];
 
         return [false, false];
     }
@@ -681,7 +764,11 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         node.newObjectNode.type.resolvedType = klass;
 
-        this.compileClassDeclaration(node.klass);
+        this.compileInstanceFieldsAndInitializer(node.klass, klass);
+        this.buildStandardConstructors(klass);
+        this.compileMethods(node.klass, klass);
+
+
 
         let outerLocalVariables = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.isInnerClassCopyOfOuterClassLocalVariable);
         let invisibleFieldIdentifiers = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.getInternalName());
@@ -735,9 +822,9 @@ export class CodeGenerator extends StatementCodeGenerator {
             return;
         }
 
-        let methodToImplementParameterTypes: JavaType[] = methodToImplement.parameters.map( p => {
-            if(p.type instanceof GenericTypeParameter){
-                if(p.type.lowerBound) return p.type.lowerBound;
+        let methodToImplementParameterTypes: JavaType[] = methodToImplement.parameters.map(p => {
+            if (p.type instanceof GenericTypeParameter) {
+                if (p.type.lowerBound) return p.type.lowerBound;
                 return p.type;
             } else {
                 return p.type;

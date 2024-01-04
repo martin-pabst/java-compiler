@@ -52,8 +52,6 @@ export interface ASTGlobalNode extends ASTNode, TypeScope {
 
     collectedTypeNodes: ASTTypeNode[];
 
-    program?: Program;  // only for debugging purposes
-
 }
 
 /**
@@ -81,6 +79,7 @@ export interface ASTParameterNode extends ASTNode, ASTNodeWithIdentifier {
     type: ASTTypeNode | undefined;    // lambda functions may have parameters without type declaration
     isEllipsis: boolean;
     isFinal: boolean;
+    trackMissingReadAccess: boolean;
 }
 
 export interface AnnotatedNode {
@@ -206,6 +205,7 @@ export interface ASTClassDefinitionNode
     extends: ASTTypeNode | undefined,
     implements: ASTTypeNode[],
     resolvedType: JavaClass | undefined;
+    isAnonymousInnerType: boolean;
 
     staticInitializer?: Program       // only for debugging purposes,
 }
@@ -216,6 +216,7 @@ ASTNodeWithIdentifier, AnnotatedNode, ASTTypeDefinitionWithFields, TypeScope, Ty
     kind: TokenType.keywordInterface;
     implements: ASTTypeNode[];
     resolvedType: JavaInterface | undefined;
+    isAnonymousInnerType: boolean;
 
     staticInitializer?: Program       // only for debugging purposes,
 }
@@ -234,6 +235,7 @@ export interface ASTEnumDefinitionNode
     kind: TokenType.keywordEnum;
     valueNodes: ASTEnumValueNode[];
     resolvedType: JavaEnum | undefined;
+    isAnonymousInnerType: boolean;
 
     staticInitializer?: Program       // only for debugging purposes,
 }

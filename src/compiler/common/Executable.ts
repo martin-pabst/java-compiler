@@ -18,8 +18,6 @@ export class Executable {
 
     staticInitializationSequence: StaticInitializationStep[] = [];
 
-    mainProgram?: Program;
-
     mainModule?: Module;
 
     isCompiledToJavascript: boolean = false;
@@ -112,9 +110,6 @@ export class Executable {
             }
         }
 
-        if (this.mainModule) {
-            this.mainProgram = this.mainModule.getMainProgram();
-        }
     }
 
     findModuleByFile(file?: File): Module | undefined {

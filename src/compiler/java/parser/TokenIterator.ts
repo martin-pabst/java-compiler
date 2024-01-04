@@ -13,7 +13,8 @@ export class TokenIterator {
         TokenType.lower, TokenType.greater, TokenType.dot,
         TokenType.leftRightSquareBracket, TokenType.comma,
         TokenType.keywordVar, TokenType.ternaryOperator,
-        TokenType.keywordExtends, TokenType.keywordSuper
+        TokenType.keywordExtends, TokenType.keywordSuper,
+        TokenType.leftBracket, TokenType.keywordVoid
     ]
 
     static spaceTokenTypes: TokenType[] = [
@@ -394,9 +395,9 @@ export class TokenIterator {
 
     }
 
-    analyzeIfVariableDeclarationAhead(): boolean {
+    analyzeIfVariableDeclarationOrMethodDeclarationAhead(isCodeOutsideClassdeclarations: boolean): "variabledeclaration" | "methoddeclaration" | "statement" {
 
-        if(this.tt == TokenType.keywordFinal) return true;
+        if(this.tt == TokenType.keywordFinal) return "variabledeclaration";
 
         let pos = this.pos;
         let nonSpaceTokenTypesFound: TokenType[] = [];
@@ -405,21 +406,40 @@ export class TokenIterator {
             let token = this.tokenList[pos];
             let tt = token.tt;
             if (tt == TokenType.semicolon || tt == TokenType.assignment) break;
-            if (TokenIterator.possibleTokensInsideVariableDeclaration.indexOf(tt) < 0) return false;
+            if(tt == TokenType.leftBracket){
+                if(isCodeOutsideClassdeclarations){
+                    nonSpaceTokenTypesFound.push(tt);
+                    break;
+                } 
+                return "statement";
+            } 
+            if (TokenIterator.possibleTokensInsideVariableDeclaration.indexOf(tt) < 0) return "statement";
             if (TokenIterator.spaceTokenTypes.indexOf(tt) < 0) nonSpaceTokenTypesFound.push(tt);
             pos++;
         }
 
         let length = nonSpaceTokenTypesFound.length;
-        if (length < 2) return false;
+        if (length < 2) return "statement";
 
-        if ([TokenType.identifier, TokenType.leftRightSquareBracket].indexOf(nonSpaceTokenTypesFound[length - 1]) < 0) return false;
+        let lastToken1 = nonSpaceTokenTypesFound[length - 1];
+        let lastToken2 = nonSpaceTokenTypesFound[length - 2];
+        let lastToken3 = length < 3 ? TokenType.endofSourcecode : nonSpaceTokenTypesFound[length - 3];
 
-        if ([TokenType.identifier, TokenType.greater, TokenType.leftRightSquareBracket, TokenType.keywordVar, TokenType.comma].indexOf(nonSpaceTokenTypesFound[length - 2]) < 0) {
-            return false;
+        if(isCodeOutsideClassdeclarations){
+            if(lastToken1 == TokenType.leftBracket && lastToken2 == TokenType.identifier 
+                && [TokenType.greater, TokenType.identifier, TokenType.leftRightSquareBracket, 
+                TokenType.keywordVoid].indexOf(lastToken3) >= 0){
+                    return "methoddeclaration"
+                }            
         }
 
-        return true;
+        if ([TokenType.identifier, TokenType.leftRightSquareBracket].indexOf(lastToken1) < 0) return "statement";
+
+        if ([TokenType.identifier, TokenType.greater, TokenType.leftRightSquareBracket, TokenType.keywordVar, TokenType.comma].indexOf(lastToken2) < 0) {
+            return "statement";
+        }
+
+        return "variabledeclaration";
 
     }
 

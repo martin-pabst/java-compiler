@@ -33,7 +33,7 @@ export class JavaSymbolTable extends BaseSymbolTable {
 
         if(withStackFrame){
             // inside non-static java-methods: 1st element on stack is this
-            this.stackframe = new BaseStackframe(classContext && !methodContext?.isStatic ? 1 : 0);    
+            this.stackframe = new BaseStackframe(classContext ? 1 : 0);    
         }
     }
 

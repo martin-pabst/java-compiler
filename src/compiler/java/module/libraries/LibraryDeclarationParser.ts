@@ -503,7 +503,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                     let isEllipsis = this.comesToken(TokenType.ellipsis, true);
                     if (isEllipsis) type = new ArrayType(type, 1, module, EmptyRange.instance);
                     let id = this.expectIdentifier();
-                    m.parameters.push(new Parameter(id, EmptyRange.instance, module, type, isFinal, isEllipsis));
+                    m.parameters.push(new Parameter(id, EmptyRange.instance, module, type, isFinal, isEllipsis, false));
                 } while (this.comesToken(TokenType.comma, true));
             }
 

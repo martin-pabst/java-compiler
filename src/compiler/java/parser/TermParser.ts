@@ -1,3 +1,4 @@
+import { EmptyRange } from "../../common/range/Range.ts";
 import { TokenType } from "../TokenType.ts";
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
@@ -434,6 +435,19 @@ export abstract class TermParser extends TokenIterator {
 
     }
 
+
+    buildBaseType(identifier: string): ASTTypeNode {
+        let type: ASTTypeNode;
+        if(identifier == "void"){
+            type = this.nodeFactory.buildVoidTypeNode(EmptyRange.instance);
+        } else {
+            type = this.nodeFactory.buildBaseTypeNode(identifier, EmptyRange.instance);
+        }
+
+        this.module.ast?.collectedTypeNodes.push(type);
+
+        return type;
+    }
 
 
     parseCastedObject(): ASTCastNode | undefined {

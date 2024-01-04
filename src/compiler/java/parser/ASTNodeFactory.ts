@@ -144,7 +144,8 @@ export class ASTNodeFactory {
             classOrInterfaceOrEnumDefinitions: [],
             annotations: [],
             resolvedType: undefined,
-            module: this.parser.module
+            module: this.parser.module, 
+            isAnonymousInnerType: false
         }
 
         if (annotations.length > 0) {
@@ -180,7 +181,8 @@ export class ASTNodeFactory {
             isDefault: modifiers.isDefault,
             resolvedType: undefined,
             classOrInterfaceOrEnumDefinitions: [],
-            module: this.parser.module
+            module: this.parser.module, 
+            isAnonymousInnerType: false
         }
 
         if (annotations.length > 0) {
@@ -229,7 +231,8 @@ export class ASTNodeFactory {
             fieldsOrInstanceInitializers: [], // only static fields and static initializers...,
             resolvedType: undefined,
             classOrInterfaceOrEnumDefinitions: [],
-            module: this.parser.module
+            module: this.parser.module, 
+            isAnonymousInnerType: false
         }
 
         if (annotations.length > 0) {
@@ -322,7 +325,8 @@ export class ASTNodeFactory {
             identifierRange: identifier.range,
             type: type,
             isEllipsis: isEllipsis,
-            isFinal: isFinal
+            isFinal: isFinal,
+            trackMissingReadAccess: true
         }
     }
 

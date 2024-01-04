@@ -1,9 +1,10 @@
 import { Error } from "../../common/Error";
 import { Program, Step } from "../../common/interpreter/Program";
+import { Thread } from "../../common/interpreter/Thread.ts";
 import { File } from "../../common/module/File";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable.ts";
 import { TokenList } from "../lexer/Token";
-import { ASTClassDefinitionNode, ASTGlobalNode } from "../parser/AST";
+import { ASTBlockNode, ASTClassDefinitionNode, ASTGlobalNode } from "../parser/AST";
 import { JavaType } from "../types/JavaType";
 import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
@@ -18,8 +19,9 @@ export class JavaCompiledModule extends JavaBaseModule {
     sourceCode: string = "";
 
     tokens?: TokenList;
+
     ast?: ASTGlobalNode;
-    mainProgram?: Program;
+    mainClass?: ASTClassDefinitionNode;
 
     usedTypesFromOtherModules: Map<JavaType, boolean> = new Map();
 
@@ -42,12 +44,14 @@ export class JavaCompiledModule extends JavaBaseModule {
     }
 
     findSteps(line: number): Step[] {
-        if(this.mainProgram){
-            let step = this.mainProgram.findStep(line);
-            if(step) return [step];
+
+        let types = this.types;
+        if(this.mainClass){
+            types = this.types.slice();
+            types.push(this.mainClass.resolvedType!);
         }
 
-        for(let type of this.types){
+        for(let type of types){
 
             if(type instanceof NonPrimitiveType){
 
@@ -117,8 +121,35 @@ export class JavaCompiledModule extends JavaBaseModule {
         }
     }
 
-    getMainProgram(): Program | undefined {
-        return this.mainProgram;
+    hasMainProgram(): boolean {
+        if(!this.mainClass) return false;
+        let mainMethod = this.mainClass.methods.find( m => m.isStatic && m.identifier == "main")
+
+        if(mainMethod){
+            let statements = mainMethod.statement as ASTBlockNode;
+            return statements.statements.length > 0;
+        }
+
+        return false;
+
+    }
+
+    startMainProgram(thread: Thread): boolean {
+        let mainRuntimeClass = this.mainClass?.resolvedType?.runtimeClass;
+        if(!mainRuntimeClass) return false;
+        let mainMethod = this.mainClass?.resolvedType?.methods.find(m => m.getSignature() == "void main(String[])" && m.isStatic);
+
+        if(!mainMethod) return false;
+
+        let methodStub = mainRuntimeClass[mainMethod.getInternalNameWithGenericParameterIdentifiers("java")];
+        if(!methodStub) return false;
+
+        let THIS = mainRuntimeClass;
+        
+        methodStub.call(THIS, thread, []);
+
+        return true;
+
     }
 
 }

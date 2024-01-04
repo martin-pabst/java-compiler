@@ -86,7 +86,11 @@ export class MissingStatementManager {
     beginMethodBody(parameters: Parameter[]){
         this.stack = [];
         let missingStatements = new MissingStatements();
-        for(let parameter of parameters) missingStatements.addSymbolDeclaration(parameter, true);
+        for(let parameter of parameters) {
+            if(parameter.trackMissingReadAccess){
+                missingStatements.addSymbolDeclaration(parameter, true);
+            }
+        }
         this.stack.push(missingStatements);
     }
     

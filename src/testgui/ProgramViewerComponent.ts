@@ -76,6 +76,17 @@ export class ProgramViewerComponent {
 
         for (let module of moduleManager.modules) {
             this.addModuleNode(module, modulesElement);
+
+            let mainClassType = module.mainClass?.resolvedType;
+            if(mainClassType && module.types.indexOf(mainClassType) < 0){
+                let id = mainClassType.identifier;
+                if(mainClassType.identifier == ""){
+                    mainClassType.identifier = "Main Class";
+                }
+                this.addClassNode(mainClassType, classesElement);
+                mainClassType.identifier = id;
+            }
+
             for(let type of module.types){
                 if(type instanceof JavaClass){
                     this.addClassNode(type, classesElement);
@@ -85,6 +96,7 @@ export class ProgramViewerComponent {
                     this.addInterfaceNode(type, interfacesElement);                    
                 }
             }
+
         }
 
         this.treeview.initialRenderAll();
@@ -172,8 +184,7 @@ export class ProgramViewerComponent {
                 `/**\n * Module ${module.file.filename}\n */\n\n` + 
                  `/* classes: ${module.types.filter(type => type instanceof IJavaClass).map(klass => klass.identifier).join(", ")} */\n` +
                  `/* enums: ${module.types.filter(type => type instanceof JavaEnum).map(klass => klass.identifier).join(", ")} */\n` +
-                 `/* interfaces: ${module.types.filter(type => type instanceof IJavaInterface).map(klass => klass.identifier).join(", ")} /*\n` +
-                 "\n/* Main Program: */\n" + module.mainProgram?.getSourcecode()
+                 `/* interfaces: ${module.types.filter(type => type instanceof IJavaInterface).map(klass => klass.identifier).join(", ")} /*\n` 
         }
 
         this.treeview.addNode(false, module.file.filename, undefined, node, node, parent);

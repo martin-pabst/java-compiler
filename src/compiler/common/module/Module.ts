@@ -1,5 +1,6 @@
 import { Error } from "../Error";
 import { Program } from "../interpreter/Program";
+import { Thread } from "../interpreter/Thread";
 import { File } from "./File";
 
 export abstract class Module {
@@ -17,10 +18,12 @@ export abstract class Module {
 
     }
 
-    abstract getMainProgram(): Program | undefined;
+    abstract hasMainProgram(): boolean;
+
+    abstract startMainProgram(thread: Thread): boolean;
 
     isStartable(): boolean {
-        if(this.getMainProgram()){ 
+        if(this.hasMainProgram()){ 
             return !this.hasErrors();
         }
         

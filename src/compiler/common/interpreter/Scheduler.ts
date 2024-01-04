@@ -203,8 +203,9 @@ export class Scheduler {
         let mainModule = executable.mainModule;
 
         if(mainModule){
-            let mainProgram = mainModule.getMainProgram();
-            if (mainProgram) mainThread.pushProgram(mainProgram);
+            if(!mainModule.startMainProgram(mainThread)){
+                // TODO: Error "Main program not startable"
+            }
         }
 
         for(let staticInitStep of executable.staticInitializationSequence){

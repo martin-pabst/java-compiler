@@ -1,4 +1,4 @@
-import { Range } from "../../common/range/Range.ts";
+import { EmptyRange, Range } from "../../common/range/Range.ts";
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType";
@@ -6,13 +6,15 @@ import { JavaType } from "../types/JavaType.ts";
 import {
     ASTAnnotationNode,
     ASTAnonymousClassNode,
+    ASTBaseTypeNode,
+    ASTBlockNode,
     ASTClassDefinitionNode,
     ASTEnumDefinitionNode,
     ASTEnumValueNode,
     ASTGenericParameterDeclarationNode,
     ASTInterfaceDefinitionNode, ASTMethodDeclarationNode,
     ASTNewObjectNode,
-    ASTNodeWithModifiers, ASTTypeNode, TypeScope
+    ASTNodeWithModifiers, ASTStatementNode, ASTTypeNode, TypeScope
 } from "./AST.ts";
 import { StatementParser } from "./StatementParser.ts";
 
@@ -30,24 +32,55 @@ export class Parser extends StatementParser {
 
     collectedAnnotations: ASTAnnotationNode[] = [];
 
+    mainMethodStatements: ASTStatementNode[] = [];
+
     constructor(module: JavaCompiledModule) {
         super(module);
         this.initializeAST();
     }
 
     initializeAST() {
+        let globalRange = {
+            startLineNumber: 0, startColumn: 0,
+            endLineNumber: this.endToken.range.endLineNumber, endColumn: this.endToken.range.endColumn
+        };
+
         this.module.ast = {
             kind: TokenType.global,
-            range: {
-                startLineNumber: 0, startColumn: 0,
-                endLineNumber: this.endToken.range.endLineNumber, endColumn: this.endToken.range.endColumn
-            },
+            range: globalRange,
             classOrInterfaceOrEnumDefinitions: [],
             mainProgramNode: this.nodeFactory.buildMainProgramNode(this.cct),
             collectedTypeNodes: [],
             path: ""
         }
 
+        this.module.mainClass = this.nodeFactory.buildClassNode(this.nodeFactory.buildNodeWithModifiers(EmptyRange.instance),
+            undefined, this.module.ast!, []);
+
+        let mainMethod = this.nodeFactory.buildMethodNode(undefined, false, this.nodeFactory.buildNodeWithModifiers(EmptyRange.instance),
+            { tt: TokenType.identifier, value: "main", range: EmptyRange.instance }, globalRange, [], this.module.mainClass);
+
+        mainMethod.isStatic = true;
+
+        let mainStatement: ASTBlockNode = {
+            kind: TokenType.block,
+            range: globalRange,
+            statements: []
+        }
+
+        mainMethod.statement = mainStatement;
+        this.mainMethodStatements = mainStatement.statements;
+
+        
+        let stringArrayType = this.nodeFactory.buildArrayTypeNode(this.buildBaseType("String"));
+        this.module.ast?.collectedTypeNodes.push(stringArrayType);
+        let parameter = this.nodeFactory.buildParameterNode(EmptyRange.instance, { tt: TokenType.identifier, value: "args", range: EmptyRange.instance }, stringArrayType, false, true);
+        parameter.trackMissingReadAccess = false;
+
+        mainMethod.parameters.push(parameter);
+        mainMethod.returnParameterType = this.buildBaseType("void");
+
+        this.module.mainClass.methods.push(mainMethod);
     }
 
     parse() {
@@ -70,6 +103,29 @@ export class Parser extends StatementParser {
             }
         }
 
+    }
+
+    parseMainProgramFragment() {
+
+        /**
+         * Map<String, Integer> test(ArrayList<String> list){...} // -> static method
+         * 
+         * others: statements of main method
+         */
+
+        this.isCodeOutsideClassdeclarations = true;
+        while (!this.isEnd() && Parser.visibilityModifiersOrTopLevelTypeDeclaration.indexOf(this.tt) < 0) {
+            let pos = this.pos;
+            let statement = this.parseStatementOrExpression();
+            
+            if (statement) {
+                this.mainMethodStatements.push(statement);
+            }
+            
+            if (pos == this.pos) this.nextToken(); // prevent endless loop
+        }
+        this.isCodeOutsideClassdeclarations = false;
+        
     }
 
     parseClassOrInterfaceOrEnum(parent: TypeScope, modifiers?: ASTNodeWithModifiers) {
@@ -203,13 +259,13 @@ export class Parser extends StatementParser {
             if (this.lookahead(1).tt == TokenType.leftBracket) {
                 this.parseMethodDeclaration(classASTNode, modifiers, false, type, genericParameters);
             } else {
-                if(genericParameters.length > 0){
+                if (genericParameters.length > 0) {
                     this.pushError("Vor Attributen kann keine Definition generischer Parameter stehen.", "error", genericParameters[0].range);
                 }
                 do {
                     this.parseFieldDeclaration(classASTNode, modifiers, type);
                 } while (this.comesToken(TokenType.comma, true));
- 
+
                 this.expectSemicolon(true, true);
 
             }
@@ -218,15 +274,15 @@ export class Parser extends StatementParser {
 
     }
 
-    parseMethodDeclaration(parentNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers, 
+    parseMethodDeclaration(parentNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers,
         isContructor: boolean, returnType: ASTTypeNode | undefined, genericParameters: ASTGenericParameterDeclarationNode[]) {
         let rangeStart = modifiers.range;
         let identifier = this.expectAndSkipIdentifierAsToken();
         let methodNode = this.nodeFactory.buildMethodNode(returnType, isContructor, modifiers, identifier,
             rangeStart, this.collectedAnnotations, parentNode);
-        
+
         this.currentMethod = methodNode;
-        if(returnType){
+        if (returnType) {
             returnType.parentTypeScope = methodNode;
         }
 
@@ -263,7 +319,7 @@ export class Parser extends StatementParser {
         let type = this.parseType();
 
         let isEllipsis = this.comesToken(TokenType.ellipsis, true);
-        
+
         let identifier = this.expectAndSkipIdentifierAsToken();
 
         if (type != null && identifier.value != "") {
@@ -494,22 +550,6 @@ export class Parser extends StatementParser {
         return genericParameterDefinitions;
     }
 
-
-    parseMainProgramFragment() {
-
-        while (!this.isEnd() && Parser.visibilityModifiersOrTopLevelTypeDeclaration.indexOf(this.tt) < 0) {
-            let pos = this.pos;
-            let statement = this.parseStatementOrExpression();
-
-            if (statement) {
-                this.module.ast!.mainProgramNode.statements.push(statement);
-            }
-
-            if (pos == this.pos) this.nextToken(); // prevent endless loop
-        }
-
-    }
-
     parseAnnotation() {
         this.nextToken(); // skip @
         let identifier = this.expectAndSkipIdentifierAsToken();
@@ -523,6 +563,7 @@ export class Parser extends StatementParser {
         let parent: TypeScope = this.currentClassOrInterface || this.module.ast!;
 
         let classNode = this.nodeFactory.buildClassNode(this.nodeFactory.buildNodeWithModifiers(this.cct.range), undefined, parent, []);
+        classNode.isAnonymousInnerType = true;
 
         this.parseClassBody(classNode);
         classNode.extends = newObjectNode.type;     // type maybe interface... we correct this later on in TypeResolver

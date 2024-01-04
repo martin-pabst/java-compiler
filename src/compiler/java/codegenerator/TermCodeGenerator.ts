@@ -302,6 +302,11 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         return snippet;
     }
 
+    pushSymbolTable(symbolTable: JavaSymbolTable){
+        this.symbolTableStack.push(symbolTable);
+        this.currentSymbolTable = symbolTable;
+    }
+
     pushAndGetNewSymbolTable(range: IRange, withStackframe: boolean, classContext?: JavaClass | JavaEnum | JavaInterface | undefined, methodContext?: Method): JavaSymbolTable {
         let newSymbolTable = new JavaSymbolTable(this.module, range, withStackframe, classContext, methodContext);
         if (this.currentSymbolTable) {
@@ -928,7 +933,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             }
         } else {
             if (method.isStatic) {
-                objectTemplate = `§1.constructor.${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}(`
+                //objectTemplate = `§1.constructor.${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}(`
+                objectTemplate = `§1.${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}(`
             } else {
                 objectTemplate = `§1${outerTypeTemplate}.${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}(`
             }

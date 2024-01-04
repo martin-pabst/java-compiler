@@ -88,8 +88,10 @@ export class TypeResolver {
             resolvedType.isStatic = klassNode.isStatic;
             resolvedType._isAbstract = klassNode.isAbstract;
 
-            this.moduleManager.typestore.addType(resolvedType);
-            klassNode.module.types.push(klassNode.resolvedType);
+            if(klassNode.identifier != ""){
+                this.moduleManager.typestore.addType(resolvedType);
+                klassNode.module.types.push(klassNode.resolvedType); 
+            }
 
             if (klassNode.parent?.kind != TokenType.global) declarationNodesWithClassParent.push(klassNode);
 
@@ -476,7 +478,7 @@ export class TypeResolver {
                     let type = p.isEllipsis ? new ArrayType(p.type.resolvedType, 1, module, p.type.range) : p.type.resolvedType;
 
                     let parameter = new Parameter(p.identifier, p.identifierRange,
-                        module, type, p.isFinal, p.isEllipsis);
+                        module, type, p.isFinal, p.isEllipsis, p.trackMissingReadAccess);
                     method.parameters.push(parameter);
                 }
             }
