@@ -15,7 +15,7 @@ export type ShowProgramPointerCallback = (showHide: "show" | "hide", _textPositi
 
 export class Interpreter {
 
-    maxStepsPerSecond = 1e6;
+    maxStepsPerSecond = 1e9;
 
     loadController: LoadController;
     scheduler: Scheduler;

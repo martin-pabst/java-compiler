@@ -16,7 +16,7 @@ export class SpeedControl {
     gripWidth: number = 10;
     overallWidth: number = 100;
 
-    intervalBorders = [1, 10, 100, 1000, 10000, 100000, 1e6];
+    intervalBorders = [1, 10, 100, 1e3, 1e5, 1e7, 1e9];
     maxSpeed = 1e10;
     initialSpeed = this.maxSpeed;
 

@@ -42,6 +42,7 @@ export class Scheduler {
         if(this.state != SchedulerState.running) return;
 
         let stepsPerThread = Math.ceil(numberOfStepsMax / this.runningThreads.length);
+
         let numberOfStepsInThisRun = 0;
         if (this.runningThreads.length == 0) return;
 
@@ -149,9 +150,10 @@ export class Scheduler {
         thread.unmarkStep();
     }
 
-    createThread(program: Program, initialStack: any[] = [], callbackAfterFinished?: () => void) {
+    createThread(initialStack: any[] = []): Thread {
         let thread = new Thread(this, initialStack);
-        thread.pushProgram(program);
+        this.runningThreads.push(thread);
+        return thread;
     }
 
     suspendThread(thread: Thread) {

@@ -278,6 +278,10 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
      */
     parseType(module: JavaBaseModule): JavaType {
         let id = this.expectIdentifier();
+        while(this.comesToken(TokenType.dot, true)){
+            id += "." + this.expectIdentifier();
+        }
+
         if (id == "") return this.currentTypeStore.getType("void")!;
 
         if (id == "?") {

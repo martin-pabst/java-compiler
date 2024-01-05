@@ -1,4 +1,26 @@
 export var testPrograms = {
+threadTest:`
+for(int n = 0; n < 10; n++){
+   Thread t = new Thread(new Runnable(){
+      void run(){
+         for(int i = 0; i < 1000000; i++){
+            if(i % 100000 == 0){
+               println("Thread " + n + ": " + i);
+            }
+         }
+      }
+   });
+
+   t.start();
+}
+
+
+for(int i = 0; i < 1000000; i++){
+   if(i % 100000 == 0){
+      println(i);
+   }
+}
+`,
 sortTest:`
 ArrayList<String> list = new ArrayList<>();
 

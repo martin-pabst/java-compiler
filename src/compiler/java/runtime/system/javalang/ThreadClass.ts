@@ -54,10 +54,18 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
     stacktrace: Stacktrace = [];
     range?: IRange;
 
+    state: ThreadState = ThreadState.NEW;
+    thread?: Thread;
+    runnable?: RunnableInterface;
+    callbackWhenThreadFinished?: CallbackFunction;
+
     static __javaDeclarations: LibraryDeclarations = [
-        { type: "declaration", signature: "class Thread extends Object" },
+        { type: "declaration", signature: "class Thread extends Object implements Runnable" },
         { type: "method", signature: "public Thread()", java: ThreadClass.prototype._jconstructor },
         { type: "method", signature: "public Thread(Runnable runnable)", java: ThreadClass.prototype._jconstructor },
+        { type: "method", signature: "public Thread.State getState()", java: ThreadClass.prototype._mj$getState$Thread_State$ },
+        { type: "method", signature: "public void run()", java: ThreadClass.prototype._mj$run$void$ },
+        { type: "method", signature: "public void start()", java: ThreadClass.prototype._mj$start$void$ },
     ]
 
 
@@ -68,13 +76,38 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
     }
 
     _jconstructor(t: Thread, runnable?: RunnableInterface) {
+        t.s.push(this);        
+        this.runnable = runnable;
+    }
 
+    _mj$getState$Thread_State$(t: Thread, callback: CallbackFunction){
+        t.s.push(this.state);
+        if(callback) callback;
     }
 
     _mj$run$void$(t: Thread, callback: CallbackFunction): void {
-        throw new Error("Method not implemented.");
+        if(callback) callback();   // do nothing!
     }
 
+    _mj$start$void$(t: Thread, callback: CallbackFunction): void {
+        
+        if(this.state == ThreadState.NEW){
+
+            let runnable = this.runnable;
+            if(!runnable) runnable = this;
+
+            this.thread = t.scheduler.createThread([]);
+            
+            let that = this;
+            runnable._mj$run$void$(this.thread, () => {
+                if(that.callbackWhenThreadFinished) that.callbackWhenThreadFinished();
+            })
+
+            this.thread.start();
+        }
+
+        if(callback) callback(); 
+    }
 
     _toString() {
         return new StringClass(this.getClassName() + ": ");
