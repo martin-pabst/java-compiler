@@ -307,7 +307,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         this.currentSymbolTable = symbolTable;
     }
 
-    pushAndGetNewSymbolTable(range: IRange, withStackframe: boolean, classContext?: JavaClass | JavaEnum | JavaInterface | undefined, methodContext?: Method): JavaSymbolTable {
+    pushAndGetNewSymbolTable(range: IRange, withStackframe: boolean, classContext?: JavaClass | JavaEnum | JavaInterface | StaticNonPrimitiveType | undefined, methodContext?: Method): JavaSymbolTable {
         let newSymbolTable = new JavaSymbolTable(this.module, range, withStackframe, classContext, methodContext);
         if (this.currentSymbolTable) {
             this.currentSymbolTable.addChildTable(newSymbolTable);
@@ -835,7 +835,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             return undefined;
         }
 
-        let method = this.searchMethod(node.identifier, objectSnippet.type, parameterValueSnippet.map(p => p?.type), methodIsConstructor, objectSnippet instanceof StaticNonPrimitiveType, true, node.range);
+        let method = this.searchMethod(node.identifier, objectSnippet.type, parameterValueSnippet.map(p => p?.type), methodIsConstructor, objectSnippet.type instanceof StaticNonPrimitiveType, true, node.range);
 
         if (node.identifier == "assertCodeReached" && (!method || objectSnippet.type.identifier == "Assertions")) {
             return this.registerCodeReachedAssertion(node, parameterValueSnippet);
@@ -860,7 +860,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         if (!method) {
-            let invisibleMethod = this.searchMethod(node.identifier, objectSnippet.type, parameterValueSnippet.map(p => p?.type), false, objectSnippet instanceof StaticNonPrimitiveType, false, node.range);
+            let invisibleMethod = this.searchMethod(node.identifier, objectSnippet.type, parameterValueSnippet.map(p => p?.type), false, objectSnippet.type instanceof StaticNonPrimitiveType, false, node.range);
 
             if (invisibleMethod) {
                 this.pushError("Die Methode " + node.identifier + " hat die Sichtbarkeit " + TokenTypeReadable[invisibleMethod.visibility] + ", daher kann hier nicht auf sie zugegriffen werden.", "error", node);
@@ -934,7 +934,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         } else {
             if (method.isStatic) {
                 //objectTemplate = `§1.constructor.${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}(`
-                objectTemplate = `§1.${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}(`
+                objectTemplate = `§1.${objectSnippet instanceof StaticNonPrimitiveType ? "" : "constructor."}${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}(`
             } else {
                 objectTemplate = `§1${outerTypeTemplate}.${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}(`
             }

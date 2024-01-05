@@ -13,6 +13,7 @@ import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
 import { JavaType } from "../types/JavaType.ts";
+import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { CodeSnippetContainer } from "./CodeSnippetKinds.ts";
 import { OneParameterTemplate } from "./CodeTemplate.ts";
@@ -38,29 +39,6 @@ export class CodeGenerator extends StatementCodeGenerator {
         this.compileClassesEnumsAndInterfaces(this.module.ast);
         // this.compileMainProgram();
     }
-
-    // compileMainProgram() {
-    //     let ast = this.module.ast!;
-    //     this.pushAndGetNewSymbolTable(ast.range, true).classContext = undefined;
-
-    //     this.missingStatementManager.beginMethodBody([]);
-
-    //     let snippets: CodeSnippet[] = [];
-
-    //     for (let statement of ast.mainProgramNode.statements) {
-    //         let snippet = this.compileStatementOrTerm(statement);
-    //         if (snippet) snippets.push(snippet);
-    //     }
-
-    //     this.missingStatementManager.endMethodBody(undefined, this.module.errors);
-
-    //     let endOfProgramSnippet = new CodeSnippetContainer(new StringCodeSnippet(`${Helpers.exit}();`, { startLineNumber: -1, startColumn: -1, endLineNumber: -1, endColumn: -1 }));
-    //     endOfProgramSnippet.enforceNewStepBeforeSnippet();
-
-    //     snippets.push(endOfProgramSnippet);
-
-    //     this.popSymbolTable();
-    // }
 
 
     compileClassesEnumsAndInterfaces(typeScope: TypeScope | undefined) {
@@ -151,88 +129,6 @@ export class CodeGenerator extends StatementCodeGenerator {
         }
 
     }
-
-    // compileClassesEnumsAndInterfacesOld(typeScope: TypeScope | undefined) {
-    //     if (!typeScope) return;
-
-    //     for (let cdef of typeScope.classOrInterfaceOrEnumDefinitions) {
-    //         if (cdef.isAnonymousInnerType) continue;     // anonymous inner class
-    //         switch (cdef.kind) {
-    //             case TokenType.keywordClass:
-    //                 this.compileClassDeclaration(cdef);
-    //                 break;
-    //             case TokenType.keywordEnum:
-    //                 this.compileEnumDeclaration(cdef);
-    //                 break;
-    //             case TokenType.keywordInterface:
-    //                 this.compileInterfaceDeclaration(cdef);
-    //                 break;
-    //         }
-
-    //     }
-    // }
-
-    // compileClassDeclaration(cdef: ASTClassDefinitionNode) {
-    //     let type = cdef.resolvedType;
-    //     if (!type || !cdef.resolvedType) return;
-    //     let classContext = <JavaClass>cdef.resolvedType;
-
-    //     this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
-
-    //     // first step: static fields and static initializers
-    //     this.compileStaticFieldsAndInitializerAndEnumValues(classContext, cdef);
-
-    //     // second step: non-static fields and instance initializers
-    //     this.compileInstanceFieldsAndInitializer(cdef, classContext);
-
-    //     this.compileMethodsAndConstructors(cdef, classContext);
-
-    //     this.compileClassesEnumsAndInterfaces(cdef);        // compile named inner classes
-
-    //     this.popSymbolTable();
-
-    // }
-
-    // compileInterfaceDeclaration(cdef: ASTInterfaceDefinitionNode) {
-    //     let type = cdef.resolvedType;
-    //     if (!type || !cdef.resolvedType) return;
-    //     let classContext = <JavaInterface>cdef.resolvedType;
-
-    //     this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
-
-    //     // first step: static fields and static initializers
-    //     this.compileStaticFieldsAndInitializerAndEnumValues(classContext, cdef);
-
-    //     this.compileMethodsAndConstructors(cdef, classContext);
-
-    //     this.compileClassesEnumsAndInterfaces(cdef);        // compile named inner classes
-
-    //     this.popSymbolTable();
-
-    // }
-
-    // compileEnumDeclaration(cdef: ASTEnumDefinitionNode) {
-    //     let type = cdef.resolvedType;
-    //     if (!type || !cdef.resolvedType) return;
-    //     let classContext = <JavaEnum>cdef.resolvedType;
-
-    //     this.pushAndGetNewSymbolTable(cdef.range, false, classContext);
-
-    //     // first step: static fields and static initializers
-    //     this.compileStaticFieldsAndInitializerAndEnumValues(classContext, cdef);
-
-    //     // second step: non-static fields and instance initializers
-    //     this.compileInstanceFieldsAndInitializer(cdef, classContext);
-
-    //     this.compileMethodsAndConstructors(cdef, classContext);
-
-    //     this.compileClassesEnumsAndInterfaces(cdef);        // compile named inner classes
-
-    //     this.popSymbolTable();
-
-    // }
-
-
 
     private compileMethods(cdef: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, classContext: JavaClass | JavaEnum | JavaInterface) {
         let constructorFound: boolean = false;
@@ -537,7 +433,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     }
 
-    compileMethodDeclaration(methodNode: ASTMethodDeclarationNode, classContext: JavaClass | JavaEnum | JavaInterface) {
+    compileMethodDeclaration(methodNode: ASTMethodDeclarationNode, classContext: JavaClass | JavaEnum | JavaInterface ) {
 
         const method = methodNode.method;
         if (!method) return;
@@ -549,7 +445,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             }
         }
 
-        let symbolTable = this.pushAndGetNewSymbolTable(methodNode.range, true, classContext, method);
+        let symbolTable = this.pushAndGetNewSymbolTable(methodNode.range, true, method.isStatic ? new StaticNonPrimitiveType(classContext) : classContext, method);
 
         if (method.hasOuterClassParameter) {
             this.currentSymbolTable.insertInvisibleParameter(); // make room for __outer-Parameter
@@ -878,9 +774,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         this.outerClassFieldAccessTracker.startTracking();
 
-        this.pushAndGetNewSymbolTable(node.range, false, klass);
         this.compileMethodDeclaration(methodNode, klass);
-        this.popSymbolTable();
 
         let outerClassFieldAccessHappened = this.outerClassFieldAccessTracker.hasAccessHappened();
 

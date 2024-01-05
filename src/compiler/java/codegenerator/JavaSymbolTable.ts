@@ -7,6 +7,7 @@ import { JavaEnum } from "../types/JavaEnum";
 import { JavaInterface } from "../types/JavaInterface.ts";
 import { JavaType } from "../types/JavaType.ts";
 import { Method } from "../types/Method.ts";
+import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { Visibility } from "../types/Visibility.ts";
 import { JavaLocalVariable } from "./JavaLocalVariable";
 
@@ -25,7 +26,7 @@ export class JavaSymbolTable extends BaseSymbolTable {
     declare identifierToSymbolMap: Map<string, JavaLocalVariable>;
 
     constructor(public module: JavaCompiledModule, range: IRange, withStackFrame: boolean,
-        public classContext?: JavaClass | JavaEnum | JavaInterface | undefined,
+        public classContext?: JavaClass | JavaEnum | JavaInterface | StaticNonPrimitiveType | undefined,
         public methodContext?: Method){
         super(range, module.file);
         
