@@ -1,6 +1,7 @@
 import { ErrorLevel, QuickFix } from "../../common/Error";
 import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { EmptyRange, IRange } from "../../common/range/Range";
+import { JCM } from "../JavaCompilerMessages";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
@@ -98,12 +99,12 @@ export abstract class BinopCastCodeGenerator {
         if (!leftSnippet || !rightSnippet) return leftSnippet; // there had been an error before...
 
         if (!leftSnippet.type) {
-            this.pushError("Der Typ des linken Operanden kann nicht bestimmt werden.", "error", leftSnippet.range!);
+            this.pushError(JCM.typeLeftOperandNotFound(), "error", leftSnippet.range!);
             return undefined;
         }
 
         if (!rightSnippet.type) {
-            this.pushError("Der Typ des rechten Operanden kann nicht bestimmt werden.", "error", rightSnippet.range!);
+            this.pushError(JCM.typeRightOperandNotFound(), "error", rightSnippet.range!);
             return undefined;
         }
 
@@ -134,13 +135,13 @@ export abstract class BinopCastCodeGenerator {
         // both operators are unboxed and operation is not in [==, !=]
         if (lTypeIndex == nString || rTypeIndex == nString) return this.compileBinaryOperationWithStrings(leftSnippet, rightSnippet, lTypeIndex, rTypeIndex, lIdentifier, rIdentifier, <LogicOperator>operator, operatorRange, wholeRange);
         if (lTypeIndex == nOtherClass || rTypeIndex == nOtherClass) {
-            this.pushError("Der Operator " + operatorIdentifier + " ist für die Typen " + lIdentifier + " und " + rIdentifier + " nicht geeignet.", "error", operatorRange);
+            this.pushError(JCM.operatorNotFeasibleForOperands(operatorIdentifier, lIdentifier, rIdentifier), "error", operatorRange);
         }
 
         // now both types are in [boolean, char, byte, short, int, long, float, double]
         if (logicOperators.indexOf(operator) >= 0) return this.compileLogicOperation(leftSnippet, rightSnippet, lTypeIndex, rTypeIndex, lIdentifier, rIdentifier, <LogicOperator>operator, operatorRange, wholeRange)
         if (lTypeIndex == nBoolean || rTypeIndex == nBoolean) {
-            this.pushError("Der Operator " + operatorIdentifier + " ist für die Typen " + lIdentifier + " und " + rIdentifier + " nicht geeignet.", "error", operatorRange);
+            this.pushError(JCM.operatorNotFeasibleForOperands(operatorIdentifier, lIdentifier, rIdentifier), "error", operatorRange);
         }
 
         // now both types are in [char, byte, short, int, long, float, double] 
@@ -164,7 +165,7 @@ export abstract class BinopCastCodeGenerator {
         // operators are +, -, *, /, %, ShiftOperations 
         if (shiftOperators.indexOf(operator) >= 0) {
             if (lTypeIndex >= nFloat || rTypeIndex >= nFloat) {
-                this.pushError("Der Operator " + operatorIdentifier + " ist für die Typen " + lIdentifier + " und " + rIdentifier + " nicht geeignet.", "error", operatorRange);
+                this.pushError(JCM.operatorNotFeasibleForOperands(operatorIdentifier, lIdentifier, rIdentifier), "error", operatorRange);
                 return undefined;
             }
             return new BinaryOperatorTemplate(operatorIdentifier, false).applyToSnippet(leftType, wholeRange, leftSnippet, rightSnippet);
@@ -183,7 +184,7 @@ export abstract class BinopCastCodeGenerator {
      */
     compileLogicOperation(leftSnippet: CodeSnippet, rightSnippet: CodeSnippet, lTypeIndex: number, rTypeIndex: number, lIdentifier: string, rIdentifier: string, operator: LogicOperator, operatorRange: IRange, wholeRange: IRange): CodeSnippet | undefined {
         if (lTypeIndex != nBoolean || rTypeIndex != nBoolean) {
-            this.pushError("Der Operator " + TokenTypeReadable[operator] + " ist für die Typen " + lIdentifier + " und " + rIdentifier + " nicht geeignet.", "error", operatorRange);
+            this.pushError(JCM.operatorNotFeasibleForOperands(TokenTypeReadable[operator], lIdentifier, rIdentifier), "error", operatorRange);
             return undefined;
         }
 
@@ -229,7 +230,7 @@ export abstract class BinopCastCodeGenerator {
      */
     compileBinaryOperationWithStrings(leftSnippet: CodeSnippet, rightSnippet: CodeSnippet, lTypeIndex: number, rTypeIndex: number, lIdentifier: string, rIdentifier: string, operator: BinaryOperator, operatorRange: IRange, wholeRange: IRange): CodeSnippet | undefined {
         if (operator != TokenType.plus && comparisonOperators.indexOf(operator) < 0) {
-            this.pushError("Der Operator " + TokenTypeReadable[operator] + " ist für die Typen " + lIdentifier + " und " + rIdentifier + " nicht geeignet.", "error", operatorRange);
+            this.pushError(JCM.operatorNotFeasibleForOperands(TokenTypeReadable[operator], lIdentifier, rIdentifier), "error", operatorRange);
             return undefined;
         }
 
@@ -282,7 +283,7 @@ export abstract class BinopCastCodeGenerator {
     compileAssignment(leftSnippet: CodeSnippet, rightSnippet: CodeSnippet, lTypeIndex: number, rTypeIndex: number, lIdentifier: string, rIdentifier: string, operator: BinaryOperator, operatorRange: IRange, wholeRange: IRange): CodeSnippet | undefined {
 
         if (!leftSnippet.isLefty) {
-            this.pushError("Dem Term auf der linken Seite des Zuweisungsoperators kann nichts zugewiesen werden.", "error", operatorRange);
+            this.pushError(JCM.cantAssignValueToTerm(), "error", operatorRange);
             return;
         }
 
@@ -296,14 +297,14 @@ export abstract class BinopCastCodeGenerator {
         if (!leftSnippet.type!.isPrimitive) {
             if (leftSnippet.type == this.stringNonPrimitiveType && operator == TokenType.plusAssignment) {
                 if (!this.canCastTo(rightSnippet.type, this.stringType, "implicit")) {
-                    this.pushError("Der Term auf der rechten Seite des Zuweisungsoperators kann nicht in den Typ String umgewandelt werden.", "error", rightSnippet.range!);
+                    this.pushError(JCM.cantCastRightSideToString(), "error", rightSnippet.range!);
                     return undefined;
                 }
                 rightSnippet = this.compileCast(rightSnippet, this.stringType, "implicit");
                 return new TwoParameterTemplate(`§1 = ${Helpers.checkNPE('§1', leftSnippet.range!)}.add(§2)`).applyToSnippet(leftSnippet.type, wholeRange, leftSnippet, rightSnippet);
             }
 
-            this.pushError("Mit dem Attribut/der Variablen auf der linken Seite des Zuweisungsoperators kann die Berechnung " + operatorAsString + " nicht durchgeführt werden.", "error", operatorRange);
+            this.pushError(JCM.leftOperatorNotFitForAttribute(operatorAsString), "error", operatorRange);
             return leftSnippet;
         }
 
@@ -320,19 +321,19 @@ export abstract class BinopCastCodeGenerator {
         }
 
         if (!rightTypeIndex) {
-            this.pushError("Mit dem Attribut/der Variablen auf der rechten Seite des Zuweisungsoperators kann die Berechnung " + operatorAsString + " nicht durchgeführt werden.", "error", operatorRange);
+            this.pushError(JCM.rightOperatorNotFitForAttribute(operatorAsString), "error", operatorRange);
             return leftSnippet;
         }
 
         if (leftTypeIndex < nByte || leftTypeIndex > nDouble) {
-            this.pushError("Mit dem Attribut/der Variablen auf der linken Seite des Zuweisungsoperators kann die Berechnung " + operatorAsString + " nicht durchgeführt werden.", "error", operatorRange);
+            this.pushError(JCM.leftOperatorNotFitForAttribute(operatorAsString), "error", operatorRange);
             return leftSnippet;
         }
 
         if (rightTypeIndex == nChar) rightSnippet = this.convertCharToNumber(rightSnippet);
 
         if (leftTypeIndex < rightTypeIndex) {
-            this.pushError("Der Wert des Datentyps auf der rechten Seite des Operators " + operatorAsString + " kann mit der Variablen/dem Attribut auf der linken Seite nicht verrechnet werden.", "error", operatorRange);
+            this.pushError(JCM.cantUseOperatorForLeftRightTypes(operatorAsString), "error", operatorRange);
             return leftSnippet;
         }
 
@@ -357,7 +358,7 @@ export abstract class BinopCastCodeGenerator {
                     snippet = this.unbox(snippet);
                     // continue below...
                 } else {
-                    this.pushError("Der Typ " + type.identifier + " kann nicht in den Typ " + castTo.identifier + " gecastet werden.", "error", snippet.range!);
+                    this.pushError(JCM.cantCastType(type.identifier, castTo.identifier), "error", snippet.range!);
                     return snippet;
                 }
             } else {
@@ -365,7 +366,7 @@ export abstract class BinopCastCodeGenerator {
                 if (castType == "explicit" && this.canCastTo(snippet.type, castTo, "explicit") || castType == "implicit" && this.canCastTo(snippet.type, castTo, "implicit")) {
                     return snippet;
                 }
-                this.pushError("Der Typ " + type.identifier + " kann nicht in den Typ " + castTo.identifier + " gecastet werden.", "error", snippet.range!);
+                this.pushError(JCM.cantCastType(type.identifier, castTo.identifier), "error", snippet.range!);
                 return snippet;
             }
         }
@@ -381,7 +382,7 @@ export abstract class BinopCastCodeGenerator {
             return this.box(snippet);
             // }
 
-            this.pushError("Der Typ " + type.identifier + " kann nicht in den Typ " + castTo.identifier + " gecastet werden.", "error", snippet.range!);
+            this.pushError(JCM.cantCastType(type.identifier, castTo.identifier), "error", snippet.range!);
             return snippet;
         }
 
@@ -390,7 +391,7 @@ export abstract class BinopCastCodeGenerator {
         let snippetTypeIndex = primitiveTypeMap[type.identifier]!;
         let castToTypeIndex = primitiveTypeMap[castTo.identifier]!;
         if (snippetTypeIndex == castToTypeIndex) {
-            if (castType == "explicit") this.pushError("Unnötiges Casten", "info", snippet.range!);
+            if (castType == "explicit") this.pushError(JCM.unneccessaryCast(), "info", snippet.range!);
             return snippet;
         }
 
@@ -399,7 +400,7 @@ export abstract class BinopCastCodeGenerator {
             if (castToTypeIndex >= nByte && castToTypeIndex <= nDouble) {
                 return this.convertCharToNumber(snippet);
             }
-            this.pushError("Der Typ " + type.identifier + " kann nicht in den Typ " + castTo.identifier + " gecastet werden.", "error", snippet.range!);
+            this.pushError(JCM.cantCastType(type.identifier, castTo.identifier), "error", snippet.range!);
             return snippet;
         }
 
@@ -407,7 +408,7 @@ export abstract class BinopCastCodeGenerator {
             if ([nByte, nShort, nInteger, nLong].indexOf(snippetTypeIndex) >= 0) {
                 return this.convertNumberToChar(snippet);
             }
-            this.pushError("Der Typ " + type.identifier + " kann nicht in den Typ " + castTo.identifier + " gecastet werden.", "error", snippet.range!);
+            this.pushError(JCM.cantCastType(type.identifier, castTo.identifier), "error", snippet.range!);
             return snippet;
         }
 
@@ -418,7 +419,7 @@ export abstract class BinopCastCodeGenerator {
 
         // no cast from string, no cast from/to void, boolean
         if (snippetTypeIndex == nString || snippetTypeIndex == nVoid || castToTypeIndex == nVoid || snippetTypeIndex == nBoolean || castToTypeIndex == nBoolean) {
-            this.pushError("Der Typ " + type.identifier + " kann nicht in den Typ " + castTo.identifier + " gecastet werden.", "error", snippet.range!);
+            this.pushError(JCM.cantCastType(type.identifier, castTo.identifier), "error", snippet.range!);
             return snippet;
         }
 
@@ -427,7 +428,7 @@ export abstract class BinopCastCodeGenerator {
         if (snippetTypeIndex <= castToTypeIndex) return snippet;
 
         if (castType == "implicit") {
-            this.pushError("Der Typ " + type.identifier + " kann nicht in den Typ " + castTo.identifier + " gecastet werden.", "error", snippet.range!);
+            this.pushError(JCM.cantCastType(type.identifier, castTo.identifier), "error", snippet.range!);
             return snippet;
         }
 
@@ -516,11 +517,11 @@ export abstract class BinopCastCodeGenerator {
 
     anyOperandHasVoidType(lTypeIndex: number, rTypeIndex: number, operator: TokenType, operatorRange: IRange): boolean {
         if (lTypeIndex == nVoid) {
-            this.pushError("Der Term auf der linken Seite des '" + TokenTypeReadable[operator] + "' - Operators hat keinen Datentyp. ", "error", operatorRange);
+            this.pushError(JCM.leftExpressionHasNoType(TokenTypeReadable[operator]), "error", operatorRange);
             return true;
         }
         if (rTypeIndex == nVoid) {
-            this.pushError("Der Term auf der rechten Seite des '" + TokenTypeReadable[operator] + "' - Operators hat keinen Datentyp. ", "error", operatorRange);
+            this.pushError(JCM.rightExpressionHasNoType(TokenTypeReadable[operator]), "error", operatorRange);
             return true;
         }
         return false;
@@ -596,7 +597,7 @@ export abstract class BinopCastCodeGenerator {
     compileUnaryOperator(operand: CodeSnippet | undefined, operator: TokenType): CodeSnippet | undefined {
         if (!operand) return undefined;
         if (!operand.type) {
-            this.pushError("Der Typ des Terms kann nicht bestimmt werden.", "error", operand.range!);
+            this.pushError(JCM.cantGetTypeOfExpression(), "error", operand.range!);
             return;
         }
 
@@ -605,27 +606,27 @@ export abstract class BinopCastCodeGenerator {
 
         let primitiveIndex = primitiveTypeMap[operand.type!.identifier];
         if (!primitiveIndex) {
-            this.pushError("Der Operator " + operatorAsString + " ist nicht für den Operanden des Typs " + operand.type!.identifier + "geeignet.", "error", operand.range!);
+            this.pushError(JCM.operatorNotUsableForOperands(operatorAsString, operand.type!.identifier), "error", operand.range!);
             return;
         }
-
+        
         if (operator == TokenType.not) {
             if (primitiveIndex == nBoolean) {
                 return this.applyUnaryOperatorConsideringConstantFolding("!", this.booleanType, operand.range!, operand);
             }
-            this.pushError("Der Operator ! (not) ist nur für boolesche Operanden geeignet, nicht für Operanden des Typs " + operand.type!.identifier + ".", "error", operand.range!);
+            this.pushError(JCM.notOperatorNeedsBooleanOperands(operand.type!.identifier), "error", operand.range!);
             return operand;
         }
-
+        
         if ([TokenType.plusPlus, TokenType.minusMinus].indexOf(operator) >= 0) {
             if (!operand.isLefty) {
-                this.pushError("Der Operator " + operatorAsString + " ist nur für Variablen/Attribute geeignet, deren Wert verändert werden kann.", "error", operand.range!);
+                this.pushError(JCM.plusPlusMinusMinusOnlyForLeftyOperands(operatorAsString), "error", operand.range!);
                 return;
             }
             if (primitiveIndex >= nByte && primitiveIndex <= nDouble) {
                 return new OneParameterTemplate(operatorAsString + "§1").applyToSnippet(operand.type!, operand.range!, operand);
             }
-            this.pushError("Der Operator " + operatorAsString + " ist nicht für den Operanden des Typs " + operand.type!.identifier + "geeignet.", "error", operand.range!);
+            this.pushError(JCM.operatorNotUsableForOperands(operatorAsString, operand.type!.identifier), "error", operand.range!);
             return;
         }
 
@@ -633,7 +634,7 @@ export abstract class BinopCastCodeGenerator {
             if (primitiveIndex >= nByte && primitiveIndex <= nDouble) {
                 return this.applyUnaryOperatorConsideringConstantFolding(operatorAsString, operand.type!, operand.range!, operand);
             }
-            this.pushError("Der Operator " + operatorAsString + " ist nicht für den Operanden des Typs " + operand.type!.identifier + "geeignet.", "error", operand.range!);
+            this.pushError(JCM.operatorNotUsableForOperands(operatorAsString, operand.type!.identifier), "error", operand.range!);
             return;
         }
 
@@ -642,7 +643,7 @@ export abstract class BinopCastCodeGenerator {
             return this.applyUnaryOperatorConsideringConstantFolding(operatorAsString, operand.type!, operand.range!, operand);
         }
 
-        this.pushError("Der Operator " + operatorAsString + " ist nicht für den Operanden des Typs " + operand.type!.identifier + "geeignet.", "error", operand.range!);
+        this.pushError(JCM.operatorNotUsableForOperands(operatorAsString, operand.type!.identifier), "error", operand.range!);
         return;
 
 
