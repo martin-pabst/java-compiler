@@ -1,6 +1,7 @@
 import { Helpers, Klass, StepParams } from "../../../common/interpreter/StepFunction";
 import { EmptyRange, IRange } from "../../../common/range/Range";
 import { TokenType } from "../../TokenType";
+import { EnumClass } from "../../runtime/system/javalang/EnumClass";
 import { ArrayType } from "../../types/ArrayType";
 import { Field } from "../../types/Field";
 import { GenericTypeParameters, GenericTypeParameter } from "../../types/GenericTypeParameter";
@@ -15,7 +16,7 @@ import { Visibility } from "../../types/Visibility";
 import { JavaBaseModule } from "../JavaBaseModule";
 import { JavaTypeStore } from "../JavaTypeStore";
 import { LibraryAttributeDeclaration, LibraryMethodDeclaration, LibraryMethodOrAttributeDeclaration } from "./DeclareType";
-import { LibraryKlassType, JavaTypeMap } from "./JavaLibraryModule";
+import { LibraryKlassType, JavaTypeMap, JavaLibraryModule } from "./JavaLibraryModule";
 import { LdToken, LibraryDeclarationLexer } from "./LibraryDeclarationLexer";
 
 type ModifiersAndType = {
@@ -64,11 +65,17 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         let modifiersAndType = this.parseModifiersAndType(true);
 
-        let identifier: string = "";
-        if (this.expect(TokenType.identifier, false)) {
-            identifier = this.cct.value;
+        let path: string[] = [];
+        do {
+            this.expect(TokenType.identifier, false);
+            path.push(this.cct.value);
             this.nextToken();
-        }
+        } while(this.comesToken(TokenType.dot, true));
+        
+        let pathAndIdentifier = path.join(".");
+        let identifier: string = path.pop()!;
+
+        let parentPath = path.length > 0 ? path.join(".") : undefined;
 
         let npt: NonPrimitiveType;
 
@@ -81,12 +88,12 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 npt1.isStatic = modifiersAndType.static;
                 npt1._isFinal = modifiersAndType.final;
                 npt1._isAbstract = modifiersAndType.abstract;
-                npt1.pathAndIdentifier = npt1.identifier;
+                npt1.pathAndIdentifier = pathAndIdentifier;
                 break;
             case TokenType.keywordInterface:
                 npt = new JavaInterface(identifier, LibraryDeclarationParser.nullRange, "", module);
                 npt.isLibraryType = true;
-                npt.pathAndIdentifier = npt.identifier;
+                npt.pathAndIdentifier = pathAndIdentifier;
                 npt.runtimeClass = klass;
                 break;
             case TokenType.keywordEnum:
@@ -94,15 +101,22 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 npt.isLibraryType = true;
                 let npt2 = <JavaEnum>npt;
                 npt2.runtimeClass = klass;
-                npt2.pathAndIdentifier = npt2.identifier;
+                npt2.pathAndIdentifier = pathAndIdentifier;
+                this.initEnumValues(npt as JavaEnum, klass, module);
                 break;
         }
 
         klass.type = npt;
 
+        if(parentPath){
+            let parent = this.currentTypeStore.getType(parentPath);
+            if(parent){
+                npt.outerType = parent as JavaClass;
+            }
+        }
+
         return npt;
     }
-
 
     parseClassOrInterfaceDeclarationGenericsAndExtendsImplements(klass: Klass & LibraryKlassType, typestore: JavaTypeStore, module: JavaBaseModule) {
 
@@ -605,4 +619,21 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         this.genericParameterMapStack.pop();
 
     }
+
+    initEnumValues(enumType: JavaEnum, klass: Klass & LibraryKlassType, module: JavaBaseModule) {
+        let values: EnumClass[] = klass.values;
+        for(let value of values){
+            // attribute
+            let a = new Field(value.name, EmptyRange.instance, module, enumType, TokenType.keywordPublic);
+            a.isStatic = true;
+            a.isFinal = true;
+            a.classEnum = enumType;
+            a.initialValueIsConstant = true;
+            a.initialValue = value;
+            a.internalName = value.name;
+
+            enumType.fields.push(a);
+        }
+    }
 }
+

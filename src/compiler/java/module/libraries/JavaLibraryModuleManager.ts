@@ -33,6 +33,8 @@ export class JavaLibraryModuleManager {
         let ldp: LibraryDeclarationParser = new LibraryDeclarationParser();
         this.typestore.empty;
         this.javaTypes = [];
+
+        ldp.currentTypeStore = this.typestore;
     
         for(let module of this.libraryModules){
             for (let klass of module.classes) {

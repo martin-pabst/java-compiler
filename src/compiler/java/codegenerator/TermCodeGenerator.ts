@@ -733,6 +733,12 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         let field = objectType.getField(node.attributeIdentifier, TokenType.keywordPublic);
+
+        if(!field && objectType instanceof StaticNonPrimitiveType){
+            let innerType = objectType.nonPrimitiveType.innerTypes.find(type => type.identifier == node.attributeIdentifier) as NonPrimitiveType;
+            if(innerType) return new StringCodeSnippet(`${Helpers.classes}["${innerType.pathAndIdentifier}"]`, node.range, new StaticNonPrimitiveType(innerType));
+        }
+
         if (!field) {
             let invisibleField = objectType.getField(node.attributeIdentifier, Number.MAX_SAFE_INTEGER);
 
@@ -747,7 +753,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         field.usagePositions.push({ file: this.module.file, range: node.range });
 
-        if (field.isFinal && field.initialValueIsConstant) {
+        if (field.isFinal && field.initialValueIsConstant && !(field.type instanceof NonPrimitiveType)) {
             let constantValue = field.initialValue!;
             let constantValueAsString = typeof constantValue == "string" ? `"${constantValue}"` : "" + constantValue;
             return new StringCodeSnippet(constantValueAsString, range, field.type, constantValue);
@@ -755,7 +761,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
 
         if (field.isStatic) {
-            let classIdentifier = field.classEnum.identifier;
+            let classIdentifier = field.classEnum.pathAndIdentifier;
             let snippet = new OneParameterTemplate(`${Helpers.classes}["${classIdentifier}"].${field.getInternalName()}`)
                 .applyToSnippet(field.type, range, objectSnippet);
             snippet.isLefty = !field.isFinal;

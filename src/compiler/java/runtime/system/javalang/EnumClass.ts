@@ -1,3 +1,5 @@
+import { CallbackFunction } from "../../../../common/interpreter/StepFunction";
+import { Thread } from "../../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
 import { ObjectClass, StringClass } from "./ObjectClassStringClass";
@@ -8,6 +10,7 @@ export class EnumClass extends ObjectClass {
         {type: "declaration", signature: "class Enum extends Object"},
         {type: "method", signature: "public String name()", native: EnumClass.prototype._name},
         {type: "method", signature: "public int ordinal()", native: EnumClass.prototype._ordinal},
+        {type: "method", signature: "public String toString()", java: EnumClass.prototype._mj$toString$String$},
     ]
 
     public name: string;
@@ -31,4 +34,8 @@ export class EnumClass extends ObjectClass {
         return this.ordinal;
     }
 
+    _mj$toString$String$(t: Thread, callback: CallbackFunction) {
+        t.s.push(new StringClass(this.name));
+        if(callback) callback;
+    }
 }

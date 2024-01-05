@@ -129,6 +129,7 @@ export class TypeResolver {
         for (let node of declarationNodesWithClassParent) {
             //@ts-ignore
             node.resolvedType!.outerType = node.parent.resolvedType;
+            
         }
 
     }
@@ -290,7 +291,7 @@ export class TypeResolver {
         }
 
         type = this.moduleManager.typestore.getType(identifer);
-        if (identifer.indexOf(".") >= 0) {
+        if (type && identifer.indexOf(".") >= 0) {
             if (!(type instanceof NonPrimitiveType)) return type; // should'nt be possible because primitive type identifiers don't contain dots
             if (type.visibility == TokenType.keywordPublic) return type;
             type = undefined;

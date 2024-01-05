@@ -31,12 +31,14 @@
   * Instantiate object of generic type without specifying generic parameters, like List<String> list = new ArrayList<>();
   * simplified for-loop over Iterable or array
   * varArgs-parameters (== ellipsis)
+  * compiler messages in different languages (at least: german and english)
 
 ## working status on current issue:
 
 ### fine-grained next todos on current issue:
 
 ## next todos
+  * classes Thread and Runnable
   * generics (status: need more testing)
   * anonymous inner classes (status: need more testing)
   * Lambda Functions (status: need more testing)
