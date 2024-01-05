@@ -2,9 +2,10 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTAnonymousClassNode, ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ConstantType, ASTAttributeDereferencingNode, ASTSymbolNode, ASTContinueNode, ASTLocalVariableDeclarations, ASTArrayLiteralNode, ASTNewObjectNode, ASTEnhancedForLoopNode } from "../parser/AST"; import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
+import { ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ASTAttributeDereferencingNode, ASTSymbolNode, ASTContinueNode, ASTLocalVariableDeclarations, ASTArrayLiteralNode, ASTEnhancedForLoopNode } from "../parser/AST";
+import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
-import { CodeSnippetContainer, EmptyPart } from "./CodeSnippetKinds.ts";
+import { CodeSnippetContainer } from "./CodeSnippetKinds.ts";
 import { CodeSnippet as CodeSnippet, StringCodeSnippet } from "./CodeSnippet.ts";
 import { BinaryOperatorTemplate, OneParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
 import { JavaLocalVariable } from "./JavaLocalVariable";
@@ -14,16 +15,14 @@ import { TermCodeGenerator } from "./TermCodeGenerator";
 import { Method } from "../types/Method.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { CatchBlockInfo } from "../../common/interpreter/ExceptionInfo.ts";
-import { IntPrimitiveType } from "../runtime/system/primitiveTypes/IntPrimitiveType.ts";
-import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
-import { Field } from "../types/Field.ts";
 import { EmptyRange, IRange } from "../../common/range/Range.ts";
 import { ExceptionTree } from "./ExceptionTree.ts";
 import { ArrayType } from "../types/ArrayType.ts";
-import { GenericVariantOfJavaClass, IJavaClass, JavaClass } from "../types/JavaClass.ts";
-import { GenericVariantOfJavaInterface, IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
+import { GenericVariantOfJavaClass, IJavaClass } from "../types/JavaClass.ts";
+import { GenericVariantOfJavaInterface, IJavaInterface } from "../types/JavaInterface.ts";
 import { SystemCollection } from "../runtime/system/collections/SystemCollection.ts";
+import { JCM } from "../JavaCompilerMessages.ts";
 
 export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
@@ -96,7 +95,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
     compileBreakStatement(node: ASTBreakNode): CodeSnippet | undefined {
         let label = this.breakStack[this.breakStack.length - 1];
         if (!label) {
-            this.pushError("An dieser Stelle kann kein break stehen, da der Ausdruck nicht innerhalb einer Schleife (for, while, do) oder switch-case Anweisung steht.", "error", node);
+            this.pushError(JCM.breakNotExpected(), "error", node);
             return undefined;
         }
         let snippet = new JumpToLabelCodeSnippet(label);
@@ -107,7 +106,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
     compileContinueStatement(node: ASTContinueNode): CodeSnippet | undefined {
         let label = this.continueStack[this.continueStack.length - 1];
         if (!label) {
-            this.pushError("An dieser Stelle kann kein continue stehen, da der Ausdruck nicht innerhalb einer Schleife (for, while, do) oder switch-case Anweisung steht.", "error", node);
+            this.pushError(JCM.continueNotExpected(), "error", node);
             return undefined;
         }
         let snippet = new JumpToLabelCodeSnippet(label);
@@ -124,14 +123,14 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
         let method: Method | undefined = this.currentSymbolTable.getMethodContext();
         if (!method) {
-            this.pushError("Eine return-Anweisung ist nur innerhalb einer Methode sinnvoll.", "error", node.range);
+            this.pushError(JCM.returnNotExpected(), "error", node.range);
             return undefined;
         }
 
         if (node.term) {
 
             if (!method.returnParameterType || method.returnParameterType == this.voidType) {
-                this.pushError("Die Methode erwartet keinen Rückgabewert, hier ist aber einer angegeben.", "error", node.range);
+                this.pushError(JCM.returnValueNotExpected(), "error", node.range);
                 return undefined;
             }
 
@@ -139,7 +138,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             if (!termSnippet) return undefined;
 
             if (!this.canCastTo(termSnippet.type, method.returnParameterType, "implicit")) {
-                this.pushError("Die Methode erwartet einen Rückgabewert vom Typ " + method.returnParameterType.identifier + ", der Wert des Terms hat aber den Datentyp " + termSnippet.type?.identifier + ".", "error", node.keywordReturnRange);
+                this.pushError(JCM.wrongReturnValueType(method.returnParameterType.identifier, termSnippet.type?.identifier || "(---)"), "error", node.keywordReturnRange);
                 return undefined;
             }
 
@@ -149,7 +148,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
         } else {
             if (method.returnParameterType && method.returnParameterType != this.voidType) {
-                this.pushError("Die Methode erwartet einen Rückgabewert vom Typ " + method.returnParameterType.identifier + ", hier wird aber keiner übergeben.", "error", node.range);
+                this.pushError(JCM.returnValueExpected(method.returnParameterType.identifier), "error", node.range);
                 return undefined;
             }
 
@@ -213,7 +212,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             collectionElementType = collectionType.elementType;
             if (node.elementType.kind != TokenType.varType) {
                 if (!this.typesAreIdentical(elementType!, collectionElementType)) {
-                    this.pushError(`Der Typ ${elementType!.toString()} des Elements ${node.elementIdentifier} muss mit dem Elementtyp des Arrays (${collectionElementType}) übereinstimmen. Tipp: Verwende das var-Schlüsselwort, also for(var element: array){...}`, "error", node.elementIdentifierPosition);
+                    this.pushError(JCM.wrongArrayElementType(elementType!.toString(), node.elementIdentifier, collectionElementType.toString()), "error", node.elementIdentifierPosition);
                 }
             }
             elementType = collectionElementType;
@@ -253,14 +252,14 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             if (collectionType instanceof GenericVariantOfJavaClass) {
                 let firstGenericParametersType = collectionType.getFirstTypeParametersType();
                 if (!firstGenericParametersType) {
-                    this.pushError(`Der Elementtyp der Collection ${collectionType.toString()} kann nicht bestimmt werden.`, "error", node.collection.range);
+                    this.pushError(JCM.cantComputeArrayElementType(collectionType.toString()), "error", node.collection.range);
                 } else {
                     collectionElementType = firstGenericParametersType;
                 }
             }
             if (node.elementType.kind != TokenType.varType) {
                 if (!this.typesAreIdentical(elementType!, collectionElementType)) {
-                    this.pushError(`Der Typ ${elementType!.toString()} des Elements ${node.elementIdentifier} muss mit dem Elementtyp der Collection (${collectionElementType.toString()}) übereinstimmen. Tipp: Verwende das var-Schlüsselwort, also for(var element: array){...}`, "error", node.elementIdentifierPosition);
+                    this.pushError(JCM.wrongCollectionElementType(elementType!.toString(), node.elementIdentifier, collectionElementType.toString()), "error", node.elementIdentifierPosition);
                 }
             }
             elementType = collectionElementType;
@@ -304,7 +303,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             
             let iterableInterface = nptCollectionType.findImplementedInterface("Iterable");
             if(!iterableInterface){
-                this.pushError(`Der Elementtyp der Collection ${collectionType.toString()} kann nicht bestimmt werden.`, "error", node.collection.range);
+                this.pushError(JCM.cantComputeCollectionElementType(collectionType.toString()), "error", node.collection.range);
             } else {
                 if(iterableInterface instanceof GenericVariantOfJavaInterface){
                     collectionElementType = iterableInterface.typeMap.get(iterableInterface.isGenericVariantOf.genericTypeParameters![0])!;
@@ -313,7 +312,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
             if (node.elementType.kind != TokenType.varType) {
                 if (!this.typesAreIdentical(elementType!, collectionElementType)) {
-                    this.pushError(`Der Typ ${elementType!.toString()} des Elements ${node.elementIdentifier} muss mit dem Elementtyp des Iterables(${collectionElementType.toString()}) übereinstimmen. Tipp: Verwende das var-Schlüsselwort, also for(var element: array){...}`, "error", node.elementIdentifierPosition);
+                    this.pushError(JCM.elementTypeDoesntFitToIterable(elementType!.toString(), node.elementIdentifier, collectionElementType.toString()), "error", node.elementIdentifierPosition);
                 }
             }
             elementType = collectionElementType;
@@ -344,7 +343,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             forLoopSnippet.addParts(breakLabel);
 
         } else {
-            this.pushError("Die vereinfachte for-loop kann nur über Arrays iterieren oder über Klassen, die das Interface Iterable implementieren.", "error", node.collection.range);
+            this.pushError(JCM.enhancedForLoopOnlyForArraysCollectionsIterables(), "error", node.collection.range);
         }
 
 
@@ -495,7 +494,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
     printErrorifValueNotBoolean(type: JavaType | undefined, node: ASTNode) {
         if (!type) return;
         if (type.identifier != "boolean") {
-            this.pushError("Hier wird eine Bedingung erwartet, deren Wert true oder false ergibt. Der Datentyp dieses Terms ist " + type.identifier, "error", node);
+            this.pushError(JCM.booleanTermExpected(type.identifier), "error", node);
         }
     }
 
@@ -600,7 +599,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             }
             let enumIndex = enumType.fields.findIndex(field => field.identifier == enumIdentifier);
             if (enumIndex < 0) {
-                this.pushError(`Der Enum-Typ ${enumType.identifier} hat kein Element mit dem Bezeichner ${enumIdentifier}.`, "error", node.constant.range);
+                this.pushError(JCM.enumIdentifierUnknown(enumType.identifier, enumIdentifier), "error", node.constant.range);
                 return undefined;
             }
             enumType.fields[enumIndex].usagePositions.push({
@@ -617,16 +616,16 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         let caseStatementSnippet = new CodeSnippetContainer([], node.range);
 
         if (!constant) {
-            this.pushError("Der Ausdruck konnte nicht ausgewertet werden.", "error", node.constant);
+            this.pushError(JCM.valueNotComputable(), "error", node.constant);
             return undefined;
         }
         if (!constant.isConstant()) {
-            this.pushError("Nach case dürfen nur konstante Ausdrücke stehen, z.B. eine feste Zahl oder Zeichenkette. Wenn du an dieser Stelle etwas anderes (einen Term oder eine Variable) verwenden möchtest, informiere dich über sogenannten constant expressions in Java.", "error", node.constant.range);
+            this.pushError(JCM.constantValueExpectedAfterCase(), "error", node.constant.range);
         }
 
 
         if (!constant.type || constant.type.identifier.toLowerCase() != typeId?.toLowerCase()) {
-            this.pushError(`Ich erwarte hier einen Ausdruck vom Typ ${typeId} - dem Datentyp des Switch-Ausdrucks - bekomme aber einen Ausdruck vom Typ ${constant.type?.identifier}.`, "error", node.constant.range);
+            this.pushError(JCM.caseValueDoesntFitToSwitchValue(typeId || "---", constant.type!.identifier), "error", node.constant.range);
             return undefined;
         }
 
@@ -673,7 +672,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         }
 
         if (!(enumType || type.identifier && ["byte", "short", "int", "char", "String"].includes(type.identifier))) {
-            this.pushError("Die Anweisung switch(x) ist nur möglich, wenn x den Typ int, String, oder enum hat.", "error", node.term.range);
+            this.pushError(JCM.switchOnlyFeasibleForTypes(), "error", node.term.range);
         }
 
         if (!type) return undefined;
@@ -875,7 +874,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
                     if (type1 && type1 instanceof ArrayType) {
                         initValueSnippet = this.compileArrayLiteral(type1.elementType, <ASTArrayLiteralNode>initializationNode);
                     } else {
-                        this.pushError(`Der Typ der deklarierten Variable ist kein Array, daher kann ihr auch kein Array-Literal zugewiesen werden.`, "error", initializationNode);
+                        this.pushError(JCM.cantAssignArrayLiteralToNonArrayVariable(), "error", initializationNode);
                     }
                     break;
                 default:
@@ -900,7 +899,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
                 }
 
                 if (!this.canCastTo(initValueSnippet.type, destinationType, "implicit")) {
-                    this.pushError("Der Term auf der rechten Seite des Zuweisungsoperators hat den Datentyp " + initValueSnippet.type.toString() + " und kann daher der Variablen auf der linken Seite (Datentyp " + destinationType.toString() + ") nicht zugewiesen werden.", "error", initializationNode);
+                    this.pushError(JCM.localVariableDeclarationWrongInitializerType(initValueSnippet.type.toString(), destinationType.toString()), "error", initializationNode);
                     return undefined;
                 }
 

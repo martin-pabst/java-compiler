@@ -27,7 +27,7 @@ export type BinaryOperator = AssignmentOperator |
 
 export type UnaryPrefixOperator = TokenType.negation | TokenType.not | TokenType.tilde | TokenType.plus | TokenType.plusPlus | TokenType.minusMinus;
 
-export type ConstantType = TokenType.shortConstant | TokenType.integerConstant | TokenType.longConstant | TokenType.charConstant | TokenType.stringConstant | TokenType.booleanConstant;
+export type ConstantType = TokenType.shortConstant | TokenType.integerLiteral | TokenType.longConstant | TokenType.charLiteral | TokenType.stringLiteral | TokenType.booleanLiteral;
 
 export interface ASTNode {
     kind: TokenType;

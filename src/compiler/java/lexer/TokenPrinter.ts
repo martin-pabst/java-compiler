@@ -7,9 +7,9 @@ import '/include/css/tokenprinter.css';
 export class TokenPrinter {
 
     static typesWithContent: TokenType[] = [
-        TokenType.identifier, TokenType.stringConstant,
-        TokenType.floatConstant, TokenType.integerConstant,
-        TokenType.charConstant
+        TokenType.identifier, TokenType.stringLiteral,
+        TokenType.floatLiteral, TokenType.integerLiteral,
+        TokenType.charLiteral
     ]
 
     public static print(tokens: TokenList, parentDiv: HTMLElement){

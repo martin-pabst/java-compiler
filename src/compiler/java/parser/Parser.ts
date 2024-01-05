@@ -1,4 +1,5 @@
 import { EmptyRange, Range } from "../../common/range/Range.ts";
+import { JCM } from "../JavaCompilerMessages.ts";
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType";
@@ -98,7 +99,7 @@ export class Parser extends StatementParser {
             }
 
             if (pos == this.pos) {
-                this.pushError("Mit dem Token " + this.cct.value + " kann der Compiler nichts anfangen.", "warning");
+                this.pushError(JCM.unexpectedToken("" + this.cct.value), "warning");
                 this.nextToken();   // last safety net to prevent getting stuck in an endless loop
             }
         }
@@ -260,7 +261,7 @@ export class Parser extends StatementParser {
                 this.parseMethodDeclaration(classASTNode, modifiers, false, type, genericParameters);
             } else {
                 if (genericParameters.length > 0) {
-                    this.pushError("Vor Attributen kann keine Definition generischer Parameter stehen.", "error", genericParameters[0].range);
+                    this.pushError(JCM.fieldDefinitionDoesntStartWithGenericParamter(), "error", genericParameters[0].range);
                 }
                 do {
                     this.parseFieldDeclaration(classASTNode, modifiers, type);
@@ -380,7 +381,7 @@ export class Parser extends StatementParser {
         } while (foundModifier);
 
         if (visibilityModifiers.length > 1) {
-            this.pushError(`Es ist nicht zulässig, mehrere visibility-modifiers gleichzeitig zu setzen (hier: ${visibilityModifiers.map(vm => vm.value).join(", ")})`, "warning", Range.lift(visibilityModifiers[0].range).plusRange(visibilityModifiers.pop()!.range));
+            this.pushError(JCM.multipleVisibilityModifiers(visibilityModifiers.map(vm => vm.value).join(", ")), "warning", Range.lift(visibilityModifiers[0].range).plusRange(visibilityModifiers.pop()!.range));
         }
 
         return astNodeWithModifiers;

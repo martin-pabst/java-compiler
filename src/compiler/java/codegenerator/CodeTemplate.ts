@@ -1,5 +1,6 @@
 import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { IRange } from "../../common/range/Range";
+import { JCM } from "../JavaCompilerMessages";
 import { JavaType } from "../types/JavaType";
 import { CodeSnippet, ConstantValue, StringCodeSnippet } from "./CodeSnippet";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";
@@ -244,7 +245,7 @@ export class BinaryOperatorTemplate extends CodeTemplate {
                      _range, _resultType);
                 } else {
                     snippet = new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " (" + snippets[1].getPureTerm() + 
-                    `|| ${Helpers.throwAE}("Teilen durch 0", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`,
+                    `|| ${Helpers.throwAE}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`,
                      _range, _resultType);
                 }
             } else {
@@ -275,7 +276,7 @@ export class BinaryOperatorTemplate extends CodeTemplate {
 
             switch (this.operator) {
                 case '-': snippetContainer.addStringPart(`-${StepParams.stack}.pop() + ${StepParams.stack}.pop()`, _range); break;
-                case '/': snippetContainer.addStringPart(`1/(${StepParams.stack}.pop() || ${Helpers.throwAE}("Teilen durch 0", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn})) * ${StepParams.stack}.pop()`, _range); break;
+                case '/': snippetContainer.addStringPart(`1/(${StepParams.stack}.pop() || ${Helpers.throwAE}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn})) * ${StepParams.stack}.pop()`, _range); break;
                 case '<': snippetContainer.addStringPart(`${StepParams.stack}.pop() > ${StepParams.stack}.pop()`, _range); break;
                 case '>': snippetContainer.addStringPart(`${StepParams.stack}.pop() < ${StepParams.stack}.pop()`, _range); break;
                 case '<=': snippetContainer.addStringPart(`${StepParams.stack}.pop() >= ${StepParams.stack}.pop()`, _range); break;
@@ -290,7 +291,7 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         snippetContainer.addParts(snippets[1]);
         snippetContainer.addParts(snippets[0]);
         if(this.operator == '%'){
-            snippetContainer.addStringPart(`pop() ${this.operator} (pop() || ${Helpers.throwAE}("Teilen durch 0", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`, _range);
+            snippetContainer.addStringPart(`pop() ${this.operator} (pop() || ${Helpers.throwAE}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`, _range);
         } else {
             snippetContainer.addStringPart(`pop() ${this.operator} pop()`, _range);
         }

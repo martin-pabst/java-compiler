@@ -1,18 +1,10 @@
 import { Program, Step } from "../../common/interpreter/Program";
-import { JavaBaseModule } from "../module/JavaBaseModule";
+import { JCM } from "../JavaCompilerMessages";
 
 export class CodePrinter{
 
-    formatCode(module: JavaBaseModule): string {
-        let code: string = "";
-        code += this.getJavaDocHeading("Main Program:");
-        code += this.printProgram(module.getMainProgram());
-
-        return code;
-    }
-
     printProgram(p: Program | undefined): string {
-        if(!p) return "//Kein Hauptprogramm vorhanden.";
+        if(!p) return JCM.missingProgram();
         let s = "";
         for(let i = 0; i < p.stepsSingle.length; i++){
             let step = p.stepsSingle[i];

@@ -1,7 +1,7 @@
 import { BaseSymbol } from "../../common/BaseSymbolTable";
 import { Error } from "../../common/Error";
 import { IRange } from "../../common/range/Range";
-import { JavaType } from "../types/JavaType";
+import { JCM } from "../JavaCompilerMessages";
 import { Method } from "../types/Method";
 import { Parameter } from "../types/Parameter";
 
@@ -40,7 +40,7 @@ class MissingStatements {
         let i = this.symbols.indexOf(symbol);
         if(i >= 0) {
             if(!this.symbolWriteHappened[i]){
-                errors.push({message: "Die Variable/der Parameter " + symbol.identifier + " is vor diesem lesenden Zugriff noch nicht initialisiet worden.", level: "error", range: range});
+                errors.push({message: JCM.variableNotInitialized(symbol.identifier), level: "error", range: range});
             }
             this.symbolReadHappened[i] = true;
         }
@@ -71,7 +71,7 @@ class MissingStatements {
 
         for(let i = start; i < this.symbolReadHappened.length; i++){
             if(!this.symbolReadHappened[i]){
-                errors.push({message: "Auf die Variable/den Parameter " + this.symbols[i].identifier + " wird nie lesend zugegriffen.", level: "info", range: this.symbols[i].identifierRange});                    
+                errors.push({message: JCM.noReadAccessForVariable(this.symbols[i].identifier), level: "info", range: this.symbols[i].identifierRange});                    
             }   
         }
         
@@ -117,7 +117,7 @@ export class MissingStatementManager {
         
         if(method && method.returnParameterType && method.returnParameterType.identifier != "void"){
             if(!currentMissingStatements.returnHappened && !method.isConstructor){
-                errors.push({message: "Die Methode " + method.identifier + " muss einen Wert vom Typ " + method.returnParameterType.identifier + " zurückliefern. In einem der Ausführungszweige fehlt ein entsprechendes return-statement.", level: "error", range: method.identifierRange});                    
+                errors.push({message: JCM.returnStatementMissing(method.identifier, method.returnParameterType.identifier), level: "error", range: method.identifierRange});                    
             }
         }
 

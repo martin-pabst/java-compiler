@@ -4,6 +4,7 @@ import { ColorHelper } from "./ColorHelper.js";
 import { Error, ErrorLevel } from "../../common/Error.js";
 import { EscapeSequenceList, TokenType, TokenTypeReadable, keywordList as KeywordList, specialCharList } from "../TokenType.js";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.js";
+import { JCM } from "../JavaCompilerMessages.js";
 
 
 
@@ -92,7 +93,7 @@ export class Lexer {
         this.tokenList.push({
             range: {startLineNumber: this.line, startColumn: this.column, endLineNumber: this.line, endColumn: this.column},
             tt: TokenType.endofSourcecode,
-            value: "das Ende des Programms"
+            value: "program end"
         })
 
         this.module.tokens = this.tokenList;
@@ -114,8 +115,8 @@ export class Lexer {
 
             if (previousToken?.tt == TokenType.keywordNew) {
                 let nextTokens = this.getNextNonSpaceTokens(colorIndex, 7);
-                if (this.compareTokenTypes(nextTokens, [TokenType.leftBracket, TokenType.integerConstant, TokenType.comma,
-                TokenType.integerConstant, TokenType.comma, TokenType.integerConstant,
+                if (this.compareTokenTypes(nextTokens, [TokenType.leftBracket, TokenType.integerLiteral, TokenType.comma,
+                TokenType.integerLiteral, TokenType.comma, TokenType.integerLiteral,
                 TokenType.rightBracket])) {
                     this.colorInformation.push({
                         color: {
@@ -355,7 +356,7 @@ export class Lexer {
                         this.next();
                         return;
                     } else if (this.isDigit(this.nextChar, 10) && !
-                        ([TokenType.identifier, TokenType.integerConstant, TokenType.floatConstant, TokenType.charConstant, TokenType.rightBracket, TokenType.rightSquareBracket].indexOf(this.nonSpaceLastTokenType!) >= 0)
+                        ([TokenType.identifier, TokenType.integerLiteral, TokenType.floatLiteral, TokenType.charLiteral, TokenType.rightBracket, TokenType.rightSquareBracket].indexOf(this.nonSpaceLastTokenType!) >= 0)
                     ) {
                         this.lexNumber();
                         return;
@@ -435,7 +436,7 @@ export class Lexer {
                         return;
                     }
                     else if (this.isDigit(this.nextChar, 10) && !
-                        ([TokenType.identifier, TokenType.integerConstant, TokenType.floatConstant, TokenType.stringConstant, TokenType.rightBracket, TokenType.rightSquareBracket].indexOf(this.nonSpaceLastTokenType!) >= 0)
+                        ([TokenType.identifier, TokenType.integerLiteral, TokenType.floatLiteral, TokenType.stringLiteral, TokenType.rightBracket, TokenType.rightSquareBracket].indexOf(this.nonSpaceLastTokenType!) >= 0)
                     ) {
                         this.lexNumber();
                         return;
@@ -631,12 +632,12 @@ export class Lexer {
         }
         this.next();
         if (this.currentChar != "'") {
-            this.pushError("Das Ende der char-Konstante wird erwartet (').", 1);
+            this.pushError(JCM.expectingEndOfCharConstant(), 1);
         } else {
             this.next();
         }
 
-        this.pushToken(TokenType.charConstant, char, line, column, this.line, this.column);
+        this.pushToken(TokenType.charLiteral, char, line, column, this.line, this.column);
 
     }
 
@@ -657,14 +658,14 @@ export class Lexer {
                 this.next();
                 break;
             } else if (char == "\n" || char == endChar) {
-                this.pushError('Innerhalb einer String-Konstante wurde das Zeilenende erreicht.', text.length + 1, "error", line, column);
+                this.pushError(JCM.endOfLineInsideStringLiteral(), text.length + 1, "error", line, column);
                 break;
             }
             text += char;
             this.next();
         }
 
-        this.pushToken(TokenType.stringConstant, text, line, column, this.line, this.column);
+        this.pushToken(TokenType.stringLiteral, text, line, column, this.line, this.column);
 
         let color = this.colorLexer.getColorInfo(text);
 
@@ -696,7 +697,7 @@ export class Lexer {
 
         restOfLine = restOfLine.trim();
         if (restOfLine.length > 0 && !restOfLine.startsWith("//") && !restOfLine.startsWith("/*")) {
-            this.pushError('Eine Java-Multiline-Stringkonstante beginnt immer mit """ und einem nachfolgenden Zeilenumbruch. Alle nach """ folgenden Zeichen werden überlesen!', restOfLine.length + 3);
+            this.pushError(JCM.charactersAfterMultilineStringLiteralStart(), restOfLine.length + 3);
         }
 
         if (this.currentChar == '\r') {
@@ -724,7 +725,7 @@ export class Lexer {
             } else if (char == endChar) {
                 let length = 0;
                 for (let s of StringLines) length += s.length;
-                this.pushError('Innerhalb einer String-Konstante wurde das Textende erreicht.', length, "error", line, column);
+                this.pushError(JCM.endOfTextInsideStringLiteral(), length, "error", line, column);
                 StringLines.push(currentStringLine);
                 break;
             } else
@@ -753,7 +754,7 @@ export class Lexer {
         let text: string = "";
         text = StringLines.map(s => s.substring(indent)).join("\n");
 
-        this.pushToken(TokenType.stringConstant, text, line, column, this.line, this.column);
+        this.pushToken(TokenType.stringLiteral, text, line, column, this.line, this.column);
 
     }
 
@@ -767,7 +768,7 @@ export class Lexer {
                 this.next();
             }
             if (hex.length < 4) {
-                this.pushError('Die Escape-Sequenz \\u' + hex + ' gibt es nicht.', 1 + hex.length);
+                this.pushError(JCM.unknownEscapeSequence("u" + hex), 1 + hex.length);
                 return "";
             } else {
                 return String.fromCodePoint(parseInt(hex, 16));
@@ -777,7 +778,7 @@ export class Lexer {
             this.next();
             return c;
         } else {
-            this.pushError('Die Escape-Sequenz \\' + this.currentChar + ' gibt es nicht.', 2);
+            this.pushError(JCM.unknownEscapeSequence(this.currentChar), 2);
             this.next();
             return "";
         }
@@ -802,7 +803,7 @@ export class Lexer {
                 break;
             }
             if (char == endChar) {
-                this.pushError("Innerhalb eines Mehrzeilenkommentars (/*... */) wurde das Dateiende erreicht.", 1);
+                this.pushError(JCM.endOfTextInsideJavadocComment(), 1);
                 break;
             }
             if (char == "\n") {
@@ -883,7 +884,7 @@ export class Lexer {
             this.next();
         }
 
-        let tt = TokenType.integerConstant;
+        let tt = TokenType.integerLiteral;
 
         let exponent: number = 0;
         let base: string = "";
@@ -895,7 +896,7 @@ export class Lexer {
         } else {
 
             if (this.currentChar == ".") {
-                tt = TokenType.floatConstant;
+                tt = TokenType.floatLiteral;
 
                 this.next();
                 while (this.isDigit(this.currentChar, 10)) {
@@ -904,7 +905,7 @@ export class Lexer {
 
 
                 if (radix != 10) {
-                    this.pushError("Eine float/double-Konstante darf nicht mit 0, 0b oder 0x beginnen.", this.pos - posStart, "error", this.line, this.column - (this.pos - posStart));
+                    this.pushError(JCM.wrongFloatConstantBegin(), this.pos - posStart, "error", this.line, this.column - (this.pos - posStart));
                 }
 
             }
@@ -927,24 +928,24 @@ export class Lexer {
                     this.next();
                 }
                 if (radix != 10) {
-                    this.pushError("Eine float/double-Konstante darf nicht mit 0, 0b oder 0x beginnen.", this.pos - posStart, "error", this.line, this.column - (this.pos - posStart));
+                    this.pushError(JCM.wrongFloatConstantBegin(), this.pos - posStart, "error", this.line, this.column - (this.pos - posStart));
                 }
                 let exponentString = this.input.substring(posExponentStart, this.pos);
                 exponent = Number.parseInt(exponentString);
             }
 
             if (this.currentChar == 'd' || this.currentChar == 'f') {
-                tt = TokenType.floatConstant;
+                tt = TokenType.floatLiteral;
                 if(this.currentChar == 'd') tt = TokenType.doubleConstant;
                 this.next();
                 if (radix != 10) {
-                    this.pushError("Eine float/double-Konstante darf nicht mit 0, 0b oder 0x beginnen.", this.pos - posStart, "error", this.line, this.column - (this.pos - posStart));
+                    this.pushError(JCM.wrongFloatConstantBegin(), this.pos - posStart, "error", this.line, this.column - (this.pos - posStart));
                 }
             }
         }
 
 
-        let value: number = (tt == TokenType.integerConstant) ? Number.parseInt(base, radix) : Number.parseFloat(base);
+        let value: number = (tt == TokenType.integerLiteral) ? Number.parseInt(base, radix) : Number.parseFloat(base);
         value *= sign;
         if (exponent != 0) value *= Math.pow(10, exponent);
 
@@ -1006,10 +1007,10 @@ export class Lexer {
 
             switch (tt) {
                 case TokenType.true:
-                    this.pushToken(TokenType.booleanConstant, true, line, column, this.line, this.column);
+                    this.pushToken(TokenType.booleanLiteral, true, line, column, this.line, this.column);
                     break;
                 case TokenType.false:
-                    this.pushToken(TokenType.booleanConstant, false, line, column, this.line, this.column);
+                    this.pushToken(TokenType.booleanLiteral, false, line, column, this.line, this.column);
                     break;
                 case TokenType.keywordPrint:
                 case TokenType.keywordPrintln:

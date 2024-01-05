@@ -1,4 +1,5 @@
 import { EmptyRange } from "../../common/range/Range.ts";
+import { JCM } from "../JavaCompilerMessages.ts";
 import { TokenType } from "../TokenType.ts";
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
@@ -175,13 +176,13 @@ export abstract class TermParser extends TokenIterator {
                     case TokenType.keywordThis:
                     case TokenType.keywordSuper:
                     case TokenType.shortConstant:
-                    case TokenType.integerConstant:
+                    case TokenType.integerLiteral:
                     case TokenType.longConstant:
-                    case TokenType.floatConstant:
+                    case TokenType.floatLiteral:
                     case TokenType.doubleConstant:
-                    case TokenType.booleanConstant:
-                    case TokenType.stringConstant:
-                    case TokenType.charConstant:
+                    case TokenType.booleanLiteral:
+                    case TokenType.stringLiteral:
+                    case TokenType.charLiteral:
                     case TokenType.true:
                     case TokenType.false:
 
@@ -218,7 +219,7 @@ export abstract class TermParser extends TokenIterator {
                         node = this.parseNewArray();
                         break;
                     default:
-                        this.pushError("Es wird die Syntax new Klasse(Parameter...) oder new Typ[ArrayLänge]... erwartet.", "error");
+                        this.pushError(JCM.wrongSyntaxAfterKeywordNew(), "error");
                         this.skipTokensTillEndOfLineOr([TokenType.semicolon, TokenType.comma, TokenType.rightBracket], false);
                         break;
                 }
@@ -228,11 +229,11 @@ export abstract class TermParser extends TokenIterator {
                 node = this.parsePrintStatement();
                 break;
             case TokenType.shortConstant:
-            case TokenType.integerConstant:
+            case TokenType.integerLiteral:
             case TokenType.longConstant:
-            case TokenType.charConstant:
-            case TokenType.stringConstant:
-            case TokenType.booleanConstant:
+            case TokenType.charLiteral:
+            case TokenType.stringLiteral:
+            case TokenType.booleanLiteral:
                 node = this.nodeFactory.buildConstantNode(this.getAndSkipToken());
                 break;
             case TokenType.keywordThis:
@@ -283,7 +284,7 @@ export abstract class TermParser extends TokenIterator {
 
     parseAttributeOrMethodCall(node: ASTTermNode | undefined): ASTTermNode | undefined {
         if (!node) {
-            this.pushError("Der Punkt-Operator kann nur nach einem Bezeichner (identifier) kommen.", "error");
+            this.pushError(JCM.dotOperatorNotExpected(), "error");
             return undefined;
         } else {
             if (this.lookahead(1).tt == TokenType.leftBracket) {
@@ -503,7 +504,7 @@ export abstract class TermParser extends TokenIterator {
             }
 
         } else {
-            this.pushError("[ oder [] erwartet.", "error", startToken.range);
+            this.pushError(JCM.squareBracketExpected(), "error", startToken.range);
             return undefined;
         }
 

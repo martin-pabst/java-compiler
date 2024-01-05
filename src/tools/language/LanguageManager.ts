@@ -1,4 +1,4 @@
-export var currentLanguage: string = "de";
+export var currentLanguage: string = "en";
 export var fallbackLanguages: string[] = ["en", "de"];
 
 export function le(map: Record<string, string>): string {

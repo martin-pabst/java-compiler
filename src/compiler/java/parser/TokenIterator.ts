@@ -1,5 +1,6 @@
 import { ErrorLevel, QuickFix } from "../../common/Error";
 import { IRange } from "../../common/range/Range";
+import { JCM } from "../JavaCompilerMessages";
 import { Token, TokenList } from "../lexer/Token";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { TokenType, TokenTypeReadable } from "../TokenType";
@@ -137,7 +138,7 @@ export class TokenIterator {
     }
 
     pushErrorAndSkipToken() {
-        this.pushError("Das Token '" + this.cct.value + "' wird hier nicht erwartet.", "error");
+        this.pushError(JCM.unexpectedToken("" + this.cct.value), "error");
         this.nextToken();
     }
 
@@ -171,7 +172,7 @@ export class TokenIterator {
                 if (skipIfTrue) this.nextToken();
                 return true;
             }
-            this.pushError("Erwartet wird: " + TokenTypeReadable[tt] + " - Gefunden wurde: " + this.cct.value, "error");
+            this.pushError(JCM.expectedOtherToken(TokenTypeReadable[tt], "" + this.cct.value), "error");
             return false;
         }
 
@@ -182,7 +183,7 @@ export class TokenIterator {
 
         let tokenListReadable = tt.map(tt1 => TokenTypeReadable[tt1]).join(", ");
 
-        this.pushError("Erwartet wird eines der Token (" + tokenListReadable + ") - Gefunden wurde: " + TokenTypeReadable[this.tt], "error");
+        this.pushError(JCM.expectedOtherTokens(tokenListReadable, TokenTypeReadable[this.tt]), "error");
         return false;
     }
 
@@ -214,7 +215,7 @@ export class TokenIterator {
                     if (!this.isOperatorOrDot(this.lastToken.tt)
                     ) {
                         quickFix = {
-                            title: 'Strichpunkt hier einfügen',
+                            title: JCM.insertSemicolonHere(),
                             editsProvider: (uri) => {
                                 return [{
                                     resource: uri,
@@ -245,7 +246,7 @@ export class TokenIterator {
 
 
 
-            this.pushError("Erwartet wird ein Strichpunkt (Semicolon). Gefunden wurde: " + TokenTypeReadable[this.tt], "error",
+            this.pushError(JCM.semicolonExpected(TokenTypeReadable[this.tt]), "error",
                 range, quickFix);
             return false;
         }
@@ -275,18 +276,18 @@ export class TokenIterator {
             return identifier;
         }
 
-        this.pushError("Erwartet wird ein Bezeichner (engl.: 'identifier'), d.h. der Name einer Klasse, Variable, ... - Gefunden wurde: " + this.cct.value);
+        this.pushError(JCM.identifierExpected("" + this.cct.value));
         return "";
     }
-
+    
     expectAndSkipIdentifierAsToken(): Token {
         if (this.tt == TokenType.identifier) {
             let t = this.cct;
             this.nextToken();
             return t;
         }
-
-        this.pushError("Erwartet wird ein Bezeichner (engl.: 'identifier'), d.h. der Name einer Klasse, Variable, ... - Gefunden wurde: " + this.cct.value);
+        
+        this.pushError(JCM.identifierExpected("" + this.cct.value));
 
         return {
             tt: TokenType.identifier,

@@ -1,4 +1,5 @@
 import { EmptyRange } from "../../common/range/Range.ts";
+import { JCM } from "../JavaCompilerMessages.ts";
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType.ts";
@@ -238,7 +239,7 @@ export abstract class StatementParser extends TermParser {
         let statementToRepeat = this.parseStatementOrExpression(false);
 
         if (!statementToRepeat) {
-            this.pushError("Hier wird eine Anweisung oder ein Anweisungsblock (in geschweiften Klammern) erwartet.");
+            this.pushError(JCM.statementOrBlockExpected());
             return undefined;
         }
 
@@ -256,7 +257,7 @@ export abstract class StatementParser extends TermParser {
         let statementToRepeat = this.parseStatementOrExpression();
 
         if (!statementToRepeat) {
-            this.pushError("Hier wird eine Anweisung oder ein Anweisungsblock (in geschweiften Klammern) erwartet.");
+            this.pushError(JCM.statementOrBlockExpected());
             return undefined;
         }
 

@@ -30,6 +30,7 @@ import { UsagePosition } from "../../common/UsagePosition.ts";
 import { OuterClassFieldAccessTracker } from "./OuterClassFieldAccessTracker.ts";
 import { LabelCodeSnippet } from "./LabelManager.ts";
 import { CodeReacedAssertion, CodeReachedAssertions } from "../../common/interpreter/CodeReachedAssertions.ts";
+import { JCM } from "../JavaCompilerMessages.ts";
 
 export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
@@ -103,7 +104,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     compileKeywordSuper(node: ASTSuperNode): CodeSnippet | undefined {
         let classContext = this.currentSymbolTable.classContext;
         if(!classContext || !(classContext instanceof IJavaClass || classContext instanceof JavaEnum)){
-            this.pushError(`Das Schlüsselwort super ist nur innerhalb einer Klasse oder eines Enum sinnvoll.`, "error", node);
+            this.pushError(JCM.superOnlyInClassesOrEnums(), "error", node);
             return undefined;
         }
 
@@ -116,8 +117,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     
     compileKeywordThis(node: ASTThisNode): CodeSnippet | undefined {
         let classContext = this.currentSymbolTable.classContext;
-        if(!classContext || !(classContext instanceof IJavaClass)){
-            this.pushError(`Das Schlüsselwort this ist nur innerhalb einer Klasse sinnvoll.`, "error", node);
+        if(!classContext || !(classContext instanceof IJavaClass || classContext instanceof JavaEnum )){
+            this.pushError(JCM.thisOnlyInClassesOrEnums(), "error", node);
             return undefined;
         }
 
@@ -145,12 +146,12 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
     compileExplicitCastFromObjectToObject(node: ASTCastNode, objectSnippet: CodeSnippet, sourceType: NonPrimitiveType, destType: NonPrimitiveType): CodeSnippet | undefined {
         if (sourceType.fastExtendsImplements(destType.identifier)) {
-            this.pushError(`Unnötiger Cast`, "info", node);
+            this.pushError(JCM.unneccessaryCast(), "info", node);
             return objectSnippet;
         }
 
         if (!destType.fastExtendsImplements(sourceType.identifier)) {
-            this.pushError(`Casten von ${sourceType.identifier} nach ${destType.identifier} ist nicht möglich.`, "error", node);
+            this.pushError(JCM.cantCastFromTo(sourceType.identifier, destType.identifier), "error", node);
             return objectSnippet;
         }
 
@@ -185,7 +186,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let method = this.searchMethod(klassType.identifier, klassType, parameterValues.map(p => p?.type), true, false, true, node.range);
 
         if (!method) {
-            this.pushError("Es konnte kein passender Konstruktor mit dieser Signatur gefunden werden.", "error", node.range);
+            this.pushError(JCM.cantFindConstructor(), "error", node.range);
             return undefined;
         }
 
@@ -280,7 +281,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             }
 
             if(!objectType || !this.canCastTo(objectType, klassType.outerType, "implicit")){
-                this.pushError(`Zum Instanzieren eines Objekts der Klasse ${klassType.identifier} wird ein Objektkontext der Klasse ${klassType.outerType!.identifier} benötigt.`, "error", node);
+                this.pushError(JCM.objectContextNeededForInstantiation(klassType.identifier, klassType.outerType!.identifier), "error", node);
             }
 
         }
@@ -327,13 +328,12 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let arraySnippet = this.compileTerm(node.array);
         let arrayType = arraySnippet?.type;
         if (!arraySnippet || !arrayType || !(arrayType instanceof ArrayType)) {
-            let t = arrayType ? "Dieser Term hat aber den Typ " + arrayType.identifier + "." : "";
-            this.pushError("Vor [ muss ein Array stehen." + t, "error", node.array);
+            this.pushError(JCM.noArrayBracketAfterType(arrayType?.identifier || "---"), "error", node.array)
             return undefined;
         }
 
         if (arrayType.dimension < node.indices.length) {
-            this.pushError("Das Array hat die Dimension " + arrayType.dimension + ", hier stehen aber " + node.indices.length + " [...].", "error", node);
+            this.pushError(JCM.wrongArrayDimensionCount(arrayType.dimension, node.indices.length), "error", node);
             return undefined;
         }
 
@@ -346,7 +346,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             let indsnip = this.compileTerm(index);
 
             if (!(indsnip?.type?.isUsableAsIndex())) {
-                if (indsnip) this.pushError("Als Array-Index wird ein ganzzahliger Wert erwartet.", "error", index);
+                if (indsnip) this.pushError(JCM.indexMustHaveIntegerValue(), "error", index);
                 indsnip = new StringCodeSnippet('0', index.range, this.intType);
             }
 
@@ -387,7 +387,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             }
         }
 
-        this.pushError("Hier wird eine Ganzzahl erwartet (Datentypen byte, short, int, long). Gefunden wurde " + dimensionTerm?.type?.identifier, "error", dimensionNode);
+        this.pushError(JCM.integerValueExpected(dimensionTerm?.type?.identifier || "---"), "error", dimensionNode);
         return new StringCodeSnippet('1', dimensionNode.range, this.intType);   // return plausible dummy to get on compiling...
 
     }
@@ -406,7 +406,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                     literalType.dimension = node.dimensionCount || 1;
                 } else {
                     if (node.dimensionCount && literalType.dimension != node.dimensionCount) {
-                        this.pushError(`Die Dimension ${node.dimensionCount} bei der Deklaration des Arrays stimmt nicht mit der des Array-Literals (${literalType.dimension} überein.)`, "error", node.range);
+                        this.pushError(JCM.declaredArrayDimensionDoesNotFitArrayLiteral(node.dimensionCount, literalType.dimension), "error", node.range);
                     }
                 }
             }
@@ -434,7 +434,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                     let snippetDimension = snippet.type instanceof ArrayType ? snippet.type.dimension : 0;
                     if (dimension !== null) {
                         if (snippetDimension >= 0 && dimension != snippetDimension + 1) {
-                            this.pushError(`Die Elemente des Array-Literals haben unterschiedliche Dimension.`, "error", node.range);
+                            this.pushError(JCM.arrayLiteralElementsNotSameDimension(), "error", node.range);
                             return undefined;
                         }
                     } else {
@@ -450,14 +450,14 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                         elementSnippets.push(elementSnippet);
                         if (dimension != null) {
                             if (dimension != 1) {
-                                this.pushError(`Die Elemente des Array-Literals haben unterschiedliche Dimension.`, "error", node.range);
+                                this.pushError(JCM.arrayLiteralElementsNotSameDimension(), "error", node.range);
                                 return undefined;
                             }
                         } else {
                             dimension = 1;
                         }
                     } else {
-                        this.pushError(`Der Term kann nicht in den Typ ${elementType.toString()} umgewandelt werden.`, "error", elementNode.range);
+                        this.pushError(JCM.cantCastTermTo(elementType.toString()), "error", elementNode.range);
                         return undefined;
                     }
                 }
@@ -516,7 +516,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 let field = <Field>symbol;
 
                 if (this.classOfCurrentlyCompiledStaticInitialization && !field.isStatic) {
-                    this.pushError("Zum Initialisieren eines statischen Attributs können keine nichtstatischen Attribute benutzt werden.", "error", node);
+                    this.pushError(JCM.cantUseNonstaticFieldsToInitializeStaticOne(), "error", node);
                 }
 
                 return this.compileFieldAccess(symbol, node.range, symbolInformation.outerClassLevel);
@@ -560,12 +560,12 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         if (this.currentSymbolTable.classContext) {
             let invisibleField = this.currentSymbolTable.classContext.getField(node.identifier, Number.MAX_SAFE_INTEGER);
             if (invisibleField) {
-                this.pushError("Das Attribut " + node.identifier + " hat die Sichtbarkeit " + TokenTypeReadable[invisibleField.visibility] + " und kann daher hier nicht verwendet werden.", "error", node);
+                this.pushError(JCM.attributeHasWrongVisibility(node.identifier, TokenTypeReadable[invisibleField.visibility]), "error", node);
                 return undefined;
             }
         }
 
-        this.pushError("Der Compiler kennt den Bezeichner " + node.identifier + " an dieser Stelle nicht.", "error", node);
+        this.pushError(JCM.identifierNotKnown(node.identifier), "error", node);
         return undefined;
 
     }
@@ -642,8 +642,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let valueAsString: string;
 
         switch (node.constantType) {
-            case TokenType.charConstant:
-            case TokenType.stringConstant:
+            case TokenType.charLiteral:
+            case TokenType.stringLiteral:
                 valueAsString = JSON.stringify(node.value);
                 break;
             default: valueAsString = "" + node.value;
@@ -678,12 +678,12 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         if (operand && operand.type) {
 
             if (!operand.isLefty) {
-                this.pushError("Die Operatoren ++ und -- können nur bei Variablen benutzt werden, die veränderbar sind.", "error", ast);
+                this.pushError(JCM.plusPlusMinusMinusOnlyForVariables(), "error", ast);
                 return undefined;
             }
 
             if (!this.isNumberPrimitiveType(operand.type)) {
-                this.pushError("Die Operatoren ++ und -- können nur bei Variablen mit den Datentypen byte, short, int, long, float und double benutzt werden.", "error", ast);
+                this.pushError(JCM.plusPlusMinusMinusOnlyForTypes(), "error", ast);
             }
 
             let template: CodeTemplate = new OneParameterTemplate("§1++");
@@ -696,13 +696,13 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     }
 
     initConstantTypeToTypeMap() {
-        this.constantTypeToTypeMap[TokenType.booleanConstant] = this.libraryTypestore.getType("boolean")!;
-        this.constantTypeToTypeMap[TokenType.charConstant] = this.libraryTypestore.getType("char")!;
-        this.constantTypeToTypeMap[TokenType.integerConstant] = this.libraryTypestore.getType("int")!;
+        this.constantTypeToTypeMap[TokenType.booleanLiteral] = this.libraryTypestore.getType("boolean")!;
+        this.constantTypeToTypeMap[TokenType.charLiteral] = this.libraryTypestore.getType("char")!;
+        this.constantTypeToTypeMap[TokenType.integerLiteral] = this.libraryTypestore.getType("int")!;
         this.constantTypeToTypeMap[TokenType.longConstant] = this.libraryTypestore.getType("long")!;
-        this.constantTypeToTypeMap[TokenType.floatConstant] = this.libraryTypestore.getType("float")!;
+        this.constantTypeToTypeMap[TokenType.floatLiteral] = this.libraryTypestore.getType("float")!;
         this.constantTypeToTypeMap[TokenType.doubleConstant] = this.libraryTypestore.getType("double")!;
-        this.constantTypeToTypeMap[TokenType.stringConstant] = this.libraryTypestore.getType("string")!;
+        this.constantTypeToTypeMap[TokenType.stringLiteral] = this.libraryTypestore.getType("string")!;
     }
 
     compileDereferenceAttribute(node: ASTAttributeDereferencingNode): CodeSnippet | undefined {
@@ -719,7 +719,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         if (objectSnippet.type instanceof ArrayType) {
             if (node.attributeIdentifier != 'length') {
-                this.pushError("Arrays haben nur das Attribut length. Das Attribut " + node.attributeIdentifier + " ist bei Arrays nicht vorhanden.", "error", node);
+                this.pushError(JCM.arraysOnlyHaveLengthField(node.attributeIdentifier), "error", node);
                 return undefined;
             }
             return new OneParameterTemplate(`(§1 || ${Helpers.throwNPE}(${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn})).length`)
@@ -728,7 +728,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         let objectType = objectSnippet.type;
         if (!(objectType instanceof NonPrimitiveType || objectType instanceof StaticNonPrimitiveType)) {
-            this.pushError('Der Datentyp ' + objectSnippet.type.identifier + " hat keine Attribute.", "error", node);
+            this.pushError(JCM.typeHasNoFields(objectSnippet.type.identifier), "error", node);
             return undefined;
         }
 
@@ -737,9 +737,9 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             let invisibleField = objectType.getField(node.attributeIdentifier, Number.MAX_SAFE_INTEGER);
 
             if (invisibleField) {
-                this.pushError("Das Attribut " + node.attributeIdentifier + " hat die Sichtbarkeit " + TokenTypeReadable[invisibleField.visibility] + " und kann daher hier nicht verwendet werden.", "error", node);
+                this.pushError(JCM.attributeHasWrongVisibility(node.attributeIdentifier, TokenTypeReadable[invisibleField.visibility]), "error", node);
             } else {
-                this.pushError("Das Objekt hat kein Attribut mit dem Bezeichner " + node.attributeIdentifier, "error", node);
+                this.pushError(JCM.fieldUnknown(node.attributeIdentifier), "error", node);
             }
 
             return undefined;
@@ -823,7 +823,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                         return this.registerCodeReachedAssertion(node, parameterValueSnippet);
                     }
                 } else {
-                    this.pushError("Außerhalb einer Klasse kann eine Methode nur mit Punktschreibweise (Object.Methode(...)) aufgerufen werden.", "error", node);
+                    this.pushError(JCM.methodCallOutsideClassNeedsDotSyntax(), "error", node);
                     return undefined;
                 }
 
@@ -863,9 +863,9 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             let invisibleMethod = this.searchMethod(node.identifier, objectSnippet.type, parameterValueSnippet.map(p => p?.type), false, objectSnippet.type instanceof StaticNonPrimitiveType, false, node.range);
 
             if (invisibleMethod) {
-                this.pushError("Die Methode " + node.identifier + " hat die Sichtbarkeit " + TokenTypeReadable[invisibleMethod.visibility] + ", daher kann hier nicht auf sie zugegriffen werden.", "error", node);
+                this.pushError(JCM.methodHasWrongVisibility(node.identifier, TokenTypeReadable[invisibleMethod.visibility]), "error", node);
             } else {
-                this.pushError("Es konnte keine passende Methode mit diesem Bezeichner/mit dieser Signatur gefunden werden.", "error", node.range);
+                this.pushError(JCM.cantFindMethod(), "error", node.range);
             }
             return undefined;
         }
@@ -965,7 +965,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
     registerCodeReachedAssertion(node: ASTMethodCallNode, parameterValues: (CodeSnippet | undefined)[]): CodeSnippet | undefined {
         if (parameterValues.length != 1 || parameterValues[0]?.type != this.stringType || !parameterValues[0].isConstant()) {
-            this.pushError("Die Methode assertCodeReached benötigt genau einen konstanten Parameter vom Typ String.", "error", node);
+            this.pushError(JCM.assertCodeReachedNeedsStringParameter(), "error", node);
             return undefined;
         }
         let message = <string>parameterValues[0].getConstantValue();
@@ -1077,8 +1077,4 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     }
 
 
-}
-
-function compileThisConstructorCall(node: ASTMethodCallNode): CodeSnippet | undefined {
-    throw new Error("Function not implemented.");
 }

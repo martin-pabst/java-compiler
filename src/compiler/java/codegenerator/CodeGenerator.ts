@@ -2,6 +2,7 @@ import { Program } from "../../common/interpreter/Program";
 import { CallbackFunction, Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 import { Thread } from "../../common/interpreter/Thread.ts";
 import { EmptyRange } from "../../common/range/Range.ts";
+import { JCM } from "../JavaCompilerMessages.ts";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
@@ -138,7 +139,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                 constructorFound = true;
                 if (cdef.kind == TokenType.keywordEnum) {
                     if (method.visibility != TokenType.keywordPrivate) {
-                        this.pushError("Konstruktoren von enums müssen die Sichtbarkeit private haben.", "error", method.range);
+                        this.pushError(JCM.enumConstructorsMustBePrivate(), "error", method.range);
                     }
                 }
             }
@@ -180,7 +181,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                 case TokenType.fieldDeclaration:
                     if (!fieldOrInitializer.isStatic) {
                         if (classContext instanceof JavaInterface) {
-                            this.pushError("Interfaces können nur statische Attribute besitzen.", "error", cdef);
+                            this.pushError(JCM.interfaceFieldsMustBeStatic(), "error", cdef);
                         }
                         continue;
                     }
@@ -225,7 +226,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
                 let constructor = this.searchMethod(javaEnum.identifier, javaEnum, parameterSnippets.map(sn => sn!.type!), true, false, false, enumDeclNode.range);
                 if (!constructor) {
-                    this.pushError("Es konnte kein passender Konstruktor gefunden werden ", "error", enumDeclNode);
+                    this.pushError(JCM.cantFindConstructor(), "error", enumDeclNode);
                     continue;
                 }
 
@@ -366,7 +367,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         if (classContext instanceof JavaInterface) {
             if (!fieldNode.isStatic || !fieldNode.isFinal) {
-                this.pushError("Attribute von Interfaces müssen static und final sein.", "error", fieldNode);
+                this.pushError(JCM.interfaceFieldsMustBeStatic(), "error", fieldNode);
             }
         }
 
@@ -464,7 +465,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         if (method.isConstructor) {
 
             if (classContext instanceof JavaInterface) {
-                this.pushError("Interfaces haben keinen Konstruktor.", "error", methodNode);
+                this.pushError(JCM.interfacesDontHaveConstructors(), "error", methodNode);
                 this.popSymbolTable();
                 return undefined;
             }
@@ -483,7 +484,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         }
 
         if (methodNode.statement) {
-            if (method.isAbstract) this.pushError("Eine abstrakte Methode kann keinen Methodenrumpf besitzen.", "error", methodNode);
+            if (method.isAbstract) this.pushError(JCM.abstractMethodsDontHaveMethodBodies(), "error", methodNode);
             if (classContext instanceof JavaInterface && !(method.isAbstract || method.isDefault)) this.pushError("In Interfaces können nur default-Methoden und abstrakte Methoden einen Methodenrumpf haben.", "error", methodNode);
 
             let msm = this.missingStatementManager;
@@ -502,7 +503,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                     if (baseClass instanceof IJavaClass) {
                         let parameterlessConstructors = baseClass.getPossibleMethods(baseClass.identifier, 0, true, false);
                         if (parameterlessConstructors.length == 0) {
-                            this.pushError(`Da die Oberklasse ${baseClass.identifier} keinen parameterlosen Konstruktor hat, muss in jedem Konstruktor einer Unterklasse gleich zu Beginn der Aufruf eines Konstruktors der Oberklasse erfolgen (super(...)).`, "error", methodNode.identifierRange);
+                            this.pushError(JCM.superCallInConstructorMissing(baseClass.identifier), "error", methodNode.identifierRange);
                         } else {
                             let parameterlessConstructor = parameterlessConstructors[0];
                             if (parameterlessConstructor.hasImplementationWithNativeCallingConvention) {
@@ -704,7 +705,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         if (!node || !expectedType) return undefined;
 
         if (!this.isFunctionalInterface(expectedType)) {
-            this.pushError("Eine Lambda-Funktion darf nur an einer Stelle im Code stehen, an der ein functional interface (d.h. ein Interface mit genau einer Methode) erwartet wird.", "error", node.range);
+            this.pushError(JCM.lambdaFunctionHereNotPossible(), "error", node.range);
             return undefined;
         }
 
@@ -714,7 +715,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         let methodToImplement = functionalInterface.getOwnMethods().find(m => !m.isDefault)!;
 
         if (node.parameters.length != methodToImplement.parameters.length) {
-            this.pushError(`Die Anzahl der Parameter der Lambda-Funktion (${node.parameters.length}) stimmt nicht mit der des functional interfaces ${functionalInterface.identifier} (${methodToImplement.parameters.length}) überein.`, "error", node.range);
+            this.pushError(JCM.lambdaFunctionWrongParameterCount(node.parameters.length, methodToImplement.parameters.length, functionalInterface.identifier), "error", node.range);
             return;
         }
 
@@ -732,7 +733,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             let fiParameterType = methodToImplementParameterTypes[i];
             if (lambdaParameter.type && lambdaParameter.type.resolvedType) {
                 if (!this.canCastTo(fiParameterType, lambdaParameter.type.resolvedType, "implicit")) {
-                    this.pushError(`Der Datentyp des Parameters ${lambdaParameter.identifier} passt nicht zum Datentyp des erwarteten Parameters (${fiParameterType.toString()}).`, "error", lambdaParameter.range);
+                    this.pushError(JCM.lambdaFunctionWrongParameterType(lambdaParameter.identifier, fiParameterType.toString()), "error", lambdaParameter.range);
                 }
             }
         }

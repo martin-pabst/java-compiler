@@ -1,14 +1,16 @@
+import { JCM } from "./JavaCompilerMessages";
+
 export enum TokenType {
     identifier,
     // constants
     shortConstant,
-    integerConstant,
+    integerLiteral,
     longConstant,
-    floatConstant,
+    floatLiteral,
     doubleConstant,
-    booleanConstant,
-    stringConstant,
-    charConstant,
+    booleanLiteral,
+    stringLiteral,
+    charLiteral,
     true,
     false,
     // keywords
@@ -190,11 +192,11 @@ export enum TokenType {
 export var TokenTypeReadable: { [tt: number]: string } = {
     [TokenType.identifier]: "Bezeichner",
     // constants
-    [TokenType.integerConstant]: "Integer-Konstante",
-    [TokenType.floatConstant]: "Fließkomma-Konstante",
-    [TokenType.booleanConstant]: "boolesche Konstante",
-    [TokenType.stringConstant]: "Zeichenketten-Konstante",
-    [TokenType.charConstant]: "char-Konstante",
+    [TokenType.integerLiteral]: JCM.identifier(),
+    [TokenType.floatLiteral]: JCM.floatingPointLiteral(),
+    [TokenType.booleanLiteral]: JCM.booleanLiteral(),
+    [TokenType.stringLiteral]: JCM.stringLiteral(),
+    [TokenType.charLiteral]: JCM.charLiteral(),
     [TokenType.true]: "true",
     [TokenType.false]: "false",
     // keywords
@@ -225,7 +227,7 @@ export var TokenTypeReadable: { [tt: number]: string } = {
     [TokenType.keywordReturn]: "return",
     [TokenType.keywordBreak]: "break",
     [TokenType.keywordContinue]: "continue",
-    [TokenType.keywordNull]: "null",
+    [TokenType.keywordNull]: "null", 
     [TokenType.keywordFinal]: "final",
     [TokenType.keywordInstanceof]: "instanceof",
     [TokenType.keywordThrow]: "throw",
@@ -312,19 +314,19 @@ export var TokenTypeReadable: { [tt: number]: string } = {
     [TokenType.at]: "@",
 
     // whitespace
-    [TokenType.space]: "Leerzeichen",
-    [TokenType.tab]: "Tabulatorzeichen",
+    [TokenType.space]: JCM.space(),
+    [TokenType.tab]: JCM.tab(),
 
     // newline
-    [TokenType.newline]: "ein Zeilenumbruch",
+    [TokenType.newline]: JCM.linebreak(),
 
     // only lexer-internal
-    [TokenType.identifierChar]: "eines der Zeichen a..z, A..Z, _",  // none of the special chars above a..zA..Z_Äö...
+    [TokenType.identifierChar]: JCM.aToZ(),  // none of the special chars above a..zA..Z_Äö...
 
     // Comment
-    [TokenType.comment]: "ein Kommentar",
+    [TokenType.comment]: JCM.comment(),
 
-    [TokenType.endofSourcecode]: "das Ende des Programmes"
+    [TokenType.endofSourcecode]: JCM.endOfText(),
 
 }
 
