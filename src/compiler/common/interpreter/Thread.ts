@@ -1,5 +1,4 @@
 import { Program, Step } from "./Program";
-import { Semaphor } from "./Semaphor";
 import { Scheduler, SchedulerState } from "./Scheduler";
 import { EmptyRange, IRange } from "../range/Range.ts";
 import { CallbackFunction, KlassObjectRegistry } from "./StepFunction.ts";
@@ -53,8 +52,6 @@ export class Thread {
     currentProgramState!: ProgramState;  // also lies on top of programStack
 
     lastRange?: IRange;
-
-    currentlyHeldSemaphors: Semaphor[] = [];
 
     private _state: ThreadState = ThreadState.new;
     public get state() { return this._state } // setter: see below
@@ -315,11 +312,6 @@ export class Thread {
         this.currentProgramState.exceptionInfoList.pop();
     }
 
-    aquireSemaphor(semaphor: Semaphor) {
-        if (!semaphor.aquire(this)) {
-            this.state = ThreadState.blocked;
-        }
-    }
 
     /**
      * return is called from within the step function

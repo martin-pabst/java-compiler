@@ -5,7 +5,6 @@ import { Module } from "../module/Module";
 import { IRange } from "../range/Range";
 import { Interpreter } from "./Interpreter";
 import { Program, Step } from "./Program";
-import { Semaphor } from "./Semaphor";
 import { KlassObjectRegistry, Klass } from "./StepFunction.ts";
 import { Thread, ThreadState } from "./Thread";
 
@@ -81,10 +80,6 @@ export class Scheduler {
             if (threadState.state == ThreadState.terminated || threadState.state == ThreadState.terminatedWithException) {
 
                     // TODO: Print Exception if present
-
-                    for (let semaphor of currentThread.currentlyHeldSemaphors) {
-                        semaphor.release(currentThread);
-                    }
 
                     this.runningThreads.splice(this.currentThreadIndex, 1);
                     if(this.currentThreadIndex > this.runningThreads.length - 1){

@@ -41,6 +41,7 @@ import { IndexOutOfBoundsExceptionClass } from "./javalang/IndexOutOfBoundsExcep
 import { ThreadClass, ThreadStateClass as ThreadStateEnum } from "./javalang/ThreadClass.ts";
 import { RunnableInterface } from "./javalang/RunnableInterface.ts";
 import { IllegalMonitorStateExceptionClass } from "./javalang/IllegalMonitorSateExceptionClass.ts";
+import { SemaphoreClass } from "./javalang/SemaphoreClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -80,7 +81,7 @@ export class SystemModule extends JavaLibraryModule {
             IteratorInterface, IterableInterface, CollectionInterface, ListInterface, ArrayListClass,
 
             // Thread
-            RunnableInterface, ThreadClass, ThreadStateEnum, 
+            RunnableInterface, ThreadClass, ThreadStateEnum, SemaphoreClass,
 
             // Assertions
             AssertionsClass
