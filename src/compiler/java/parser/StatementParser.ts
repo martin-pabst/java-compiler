@@ -4,7 +4,7 @@ import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType.ts";
 import { ArrayType } from "../types/ArrayType.ts";
-import { ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLocalVariableDeclarations, ASTReturnNode, ASTEnhancedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTNodeWithModifiers } from "./AST.ts";
+import { ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLocalVariableDeclarations, ASTReturnNode, ASTEnhancedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTNodeWithModifiers, ASTSynchronizedBlockNode } from "./AST.ts";
 import { TermParser } from "./TermParser.ts";
 
 export abstract class StatementParser extends TermParser {
@@ -43,6 +43,8 @@ export abstract class StatementParser extends TermParser {
             case TokenType.semicolon:
                 this.nextToken();
                 return undefined;
+            case TokenType.keywordSynchronized:
+                return this.parseSynchronizedBlock();
             default:
                 let statement = this.parseVariableDeclarationOrMethodDeclarationTerm(expectSemicolonAfterStatement);
 
@@ -50,6 +52,22 @@ export abstract class StatementParser extends TermParser {
         }
 
     }
+
+    parseSynchronizedBlock(): ASTSynchronizedBlockNode | undefined {
+        let synchronizedToken = this.getAndSkipToken();
+        if (!this.expect(TokenType.leftBracket, true)) return undefined;
+        let lockObject = this.parseTermUnary();
+        this.expect(TokenType.rightBracket, true);
+        if (this.expect(TokenType.leftCurlyBracket, false)) {
+            let block = this.parseBlock();
+            if (lockObject && block) return this.nodeFactory.buildSynchronizedBlockNode(synchronizedToken, lockObject, block);
+        }
+
+        return undefined;
+
+    }
+
+
 
     parseVariableDeclarationOrMethodDeclarationTerm(expectSemicolonAfterStatement: boolean): ASTStatementNode | undefined {
         let type = this.analyzeIfVariableDeclarationOrMethodDeclarationAhead(this.isCodeOutsideClassdeclarations);

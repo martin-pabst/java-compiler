@@ -2,7 +2,7 @@ import { EmptyRange, IRange, Range } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { Token } from "../lexer/Token.ts";
 import { ArrayType } from "../types/ArrayType.ts";
-import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTEnhancedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope as ASTTypeScope, ASTNewArrayNode, ASTInstanceInitializerNode, ASTStaticInitializerNode, ASTAnonymousClassNode, ASTWildcardTypeNode, ASTVoidTypeNode, ASTArrayTypeNode, ASTGenericTypeInstantiationNode, ASTBaseTypeNode, ASTArrayLiteralNode, TypeScope, ASTVarTypeNode } from "./AST";
+import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTEnhancedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope as ASTTypeScope, ASTNewArrayNode, ASTInstanceInitializerNode, ASTStaticInitializerNode, ASTAnonymousClassNode, ASTWildcardTypeNode, ASTVoidTypeNode, ASTArrayTypeNode, ASTGenericTypeInstantiationNode, ASTBaseTypeNode, ASTArrayLiteralNode, TypeScope, ASTVarTypeNode, ASTSynchronizedBlockNode } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
 export class ASTNodeFactory {
@@ -138,6 +138,7 @@ export class ASTNodeFactory {
             isStatic: modifiers.isStatic,
             isAbstract: modifiers.isAbstract,
             isDefault: modifiers.isDefault,
+            isSynchronized: modifiers.isSynchronized,
             genericParameterDeclarations: [],
             fieldsOrInstanceInitializers: [],
             methods: [],
@@ -179,6 +180,7 @@ export class ASTNodeFactory {
             isFinal: false,
             isStatic: false,
             isDefault: modifiers.isDefault,
+            isSynchronized: modifiers.isSynchronized,
             resolvedType: undefined,
             classOrInterfaceOrEnumDefinitions: [],
             module: this.parser.module, 
@@ -225,6 +227,7 @@ export class ASTNodeFactory {
             isStatic: modifiers.isStatic,
             isAbstract: modifiers.isAbstract,
             isDefault: modifiers.isDefault,
+            isSynchronized: modifiers.isSynchronized,
             genericParameterDeclarations: [],
             methods: [],
             annotations: [],
@@ -259,6 +262,7 @@ export class ASTNodeFactory {
             isAbstract: modifiers.isAbstract,
             isContructor: isContructor,
             isDefault: modifiers.isDefault,
+            isSynchronized: modifiers.isSynchronized,
             parameters: [],
             returnParameterType: returnParameterType,
             statement: undefined,
@@ -294,6 +298,7 @@ export class ASTNodeFactory {
             isStatic: modifiers.isStatic,
             isAbstract: modifiers.isAbstract,
             isDefault: modifiers.isDefault,
+            isSynchronized: modifiers.isSynchronized,
             annotations: []
         }
 
@@ -313,7 +318,8 @@ export class ASTNodeFactory {
             isFinal: false,
             isStatic: false,
             isAbstract: false,
-            isDefault: false
+            isDefault: false,
+            isSynchronized: false,
         }
     }
 
@@ -520,6 +526,15 @@ export class ASTNodeFactory {
         return {
             kind: TokenType.keywordSuper,
             range: token.range
+        }
+    }
+
+    buildSynchronizedBlockNode(synchronizedToken: Token, lockObject: ASTTermNode, block: ASTBlockNode): ASTSynchronizedBlockNode {
+        return {
+            kind: TokenType.synchronizedBlock,
+            range: synchronizedToken.range,
+            lockObject: lockObject,
+            block: block
         }
     }
 

@@ -12,11 +12,6 @@ export class NullPointerExceptionClass extends RuntimeExceptionClass {
 
     static __javaDeclarations: LibraryDeclarations = [
         {type: "declaration", signature: "class NullPointerException extends RuntimeException"},
-        {type: "method", signature: "public NullPointerException()", native: ExceptionClass.prototype._constructor},
-        {type: "method", signature: "public NullPointerException(String message)", native: ThrowableClass.prototype._constructor_m},
-        {type: "method", signature: "public NullPointerException(Throwable cause)", native: ThrowableClass.prototype._constructor_c},
-        {type: "method", signature: "public NullPointerException(String message, Throwable cause)", native: ThrowableClass.prototype._constructor_m_c},
-        {type: "method", signature: "public String toString()", native: ThrowableClass.prototype._toString}
     ]
 
 

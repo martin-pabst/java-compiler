@@ -21,6 +21,8 @@ export type ProgramPointerPositionInfo = {
 
 export class Scheduler {
     runningThreads: Thread[] = [];
+    suspendedThreads: Thread[] = [];
+
     currentThreadIndex: number = 0;
     state!: SchedulerState;
 
@@ -59,6 +61,15 @@ export class Scheduler {
             }
 
             let currentThread = this.runningThreads[this.currentThreadIndex];
+            if(!currentThread){
+                if(this.runningThreads.length > 0){
+                    this.currentThreadIndex = 0;
+                    currentThread = this.runningThreads[0];
+                    lastStoredStepsInThisRun = -1;
+                } else {
+                    return;
+                }
+            }
 
             /**
              * Let thread run!
@@ -114,8 +125,17 @@ export class Scheduler {
                     let stepsPerSecond = Math.round(this.stepCountSinceStartOfProgram/dt*1000);
                     this.interpreter.printManager.print("Duration: " + Math.round(dt * 100)/100 + " ms, " + this.stepCountSinceStartOfProgram + " steps, " + SpeedControl.printMillions(stepsPerSecond) + " steps/s", true, undefined);
                 }
+                this.terminateAllThreads();
             }
             this.state = newState;
+    }
+
+    terminateAllThreads(){
+        this.runningThreads.forEach(t => t.state = ThreadState.terminated);
+        this.suspendedThreads.forEach(t => t.state = ThreadState.terminated);
+
+         this.runningThreads.length = 0;
+        this.suspendedThreads.length = 0;
     }
 
     runSingleStepKeepingThread(stepInto: boolean, callback: () => void) {
@@ -149,7 +169,7 @@ export class Scheduler {
      * when pause-button is clicked while thread executes a single step then 
      * cancel this single-step execution
      */
-    unmarkStep() {
+    unmarkCurrentlyExecutedSingleStep() {
         let thread = this.runningThreads[this.currentThreadIndex];
         thread.unmarkStep();
     }
@@ -168,12 +188,22 @@ export class Scheduler {
                 this.currentThreadIndex--;
             }
         }
+        this.suspendedThreads.push(thread);
     }
 
     restoreThread(thread: Thread) {
         thread.state = ThreadState.runnable;
+        let index = this.suspendedThreads.indexOf(thread);
+        if (index >= 0) {
+            this.suspendedThreads.splice(index, 1);
+        }
+
+        if(thread.state >= ThreadState.terminated) return;
+
         this.runningThreads.push(thread);
     }
+
+
 
     /**
      * for displaying next program position in editor
@@ -184,7 +214,7 @@ export class Scheduler {
         let programState = currentThread.currentProgramState;
         let step = programState.currentStepList[programState.stepIndex];
         if(!step) return undefined;
-
+        
         return {
             module: programState.program.module,
             //@ts-ignore
@@ -193,17 +223,18 @@ export class Scheduler {
             program: programState.program
         }
     }
-
+    
     init(executable: Executable) {
-
+        
         this.classObjectRegistry = executable.classObjectRegistry;
         this.libraryTypeStore = executable.libraryModuleManager.typestore;
-
+        
         this.runningThreads = [];
         this.currentThreadIndex = 0;
+
         this.keepThread = false;
 
-        let mainThread = new Thread(this, []);
+        let mainThread = this.createThread();
 
         let mainModule = executable.mainModule;
 
@@ -217,34 +248,8 @@ export class Scheduler {
             mainThread.pushProgram(staticInitStep.program);
         }
 
+        mainThread.state = ThreadState.runnable; // this statement actually makes the program run
 
-        // TODO: Initialize static variables for all classes
-
-
-        // TODO!!
-
-        // Instantiate enum value-objects; initialize static attributes; call static constructors
-
-        // this.programStack.push({
-        //     program: this.mainModule.mainProgram,
-        //     programPosition: 0,
-        //     textPosition: { line: 1, column: 1, length: 0 },
-        //     method: "Hauptprogramm",
-        //     callbackAfterReturn: null,
-        //     isCalledFromOutside: "Hauptprogramm"
-
-        // })
-
-        // for (let m of this.moduleStore.getModules(false)) {
-        //     this.initializeEnums(m);
-        //     this.initializeClasses(m);
-        // }
-
-        // this.popProgram();
-        mainThread.state = ThreadState.runnable;
-
-        this.runningThreads.push(mainThread);
-        this.currentThreadIndex = 0;
     }
     
 }

@@ -1,8 +1,7 @@
-import { IThrowable, Stacktrace } from "../../../../common/interpreter/ThrowableType.ts";
+import { Stacktrace } from "../../../../common/interpreter/ThrowableType.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { ExceptionClass } from "./ExceptionClass.ts";
-import { ObjectClass, StringClass } from "./ObjectClassStringClass.ts";
 import { ThrowableClass } from "./ThrowableClass.ts";
 
 export class RuntimeExceptionClass extends ExceptionClass {

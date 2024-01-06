@@ -70,6 +70,7 @@ export interface ASTNodeWithModifiers {
     isStatic: boolean;
     isAbstract: boolean;
     isDefault: boolean;
+    isSynchronized: boolean;
 }
 
 
@@ -244,6 +245,13 @@ export interface ASTEnumDefinitionNode
 /**
  * Nodes for Program, statements
  */
+
+export interface ASTSynchronizedBlockNode extends ASTStatementNode {
+    kind: TokenType.synchronizedBlock,
+    lockObject: ASTTermNode,
+    block: ASTBlockNode
+}
+
 
 export interface ASTBlockNode extends ASTStatementNode {
     kind: TokenType.block;

@@ -23,6 +23,8 @@ export class Method {
 
     isDefault: boolean = false;
 
+    isSynchronized: boolean = false;
+
     program?: Program;
 
     parameters: Parameter[] = [];

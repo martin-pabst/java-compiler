@@ -38,8 +38,9 @@ import { LongClass } from "./primitiveTypes/wrappers/LongClass.ts";
 import { NumberClass } from "./primitiveTypes/wrappers/NumberClass";
 import { ShortClass } from "./primitiveTypes/wrappers/ShortClass.ts";
 import { IndexOutOfBoundsExceptionClass } from "./javalang/IndexOutOfBoundsExceptionClass.ts";
-import { ThreadClass, ThreadState as ThreadStateEnum } from "./javalang/ThreadClass.ts";
+import { ThreadClass, ThreadStateClass as ThreadStateEnum } from "./javalang/ThreadClass.ts";
 import { RunnableInterface } from "./javalang/RunnableInterface.ts";
+import { IllegalMonitorStateExceptionClass } from "./javalang/IllegalMonitorSateExceptionClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -73,7 +74,7 @@ export class SystemModule extends JavaLibraryModule {
 
             MathClass,
             ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass, 
-            ClassCastExceptionClass, IndexOutOfBoundsExceptionClass,
+            ClassCastExceptionClass, IndexOutOfBoundsExceptionClass, IllegalMonitorStateExceptionClass,
 
             // Collections
             IteratorInterface, IterableInterface, CollectionInterface, ListInterface, ArrayListClass,

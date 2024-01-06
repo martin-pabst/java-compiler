@@ -503,7 +503,7 @@ export class JCM {
     })
 
     /**
-     * Runtime classes
+     * Exceptions
      */
 
     static charIndexOutOfBounds = () => le({
@@ -516,7 +516,15 @@ export class JCM {
         "en": `division by zero not allowed`,
     })
 
+    static threadWantsToWaitAndHasNoLockOnObject = () => le({
+        "de": `Es wurde wait für ein Objekt aufgerufen, für das der aktuelle Thread kein Lock besitzt.`,
+        "en": `Wait called on Object for which thread holds no lock.`
+    })
 
+    static threadWantsToNotifyAndHasNoLockOnObject = () => le({
+        "de": `Es wurde notify für ein Objekt aufgerufen, für das der aktuelle Thread kein Lock besitzt.`,
+        "en": `Notify called on Object for which thread holds no lock.`
+    })
     /**
      * TokenType
      */

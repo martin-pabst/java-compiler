@@ -48,7 +48,6 @@ export class LoadController {
     }
 
     setStepsPerSecond(value: number) {
-        console.log(value);
         this.stepsPerSecondGoal = value;
         this.timeBetweenStepsGoal = 1000 / value;
     }

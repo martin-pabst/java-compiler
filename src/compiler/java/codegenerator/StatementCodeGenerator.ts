@@ -2,7 +2,7 @@ import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ASTAttributeDereferencingNode, ASTSymbolNode, ASTContinueNode, ASTLocalVariableDeclarations, ASTArrayLiteralNode, ASTEnhancedForLoopNode } from "../parser/AST";
+import { ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ASTAttributeDereferencingNode, ASTSymbolNode, ASTContinueNode, ASTLocalVariableDeclarations, ASTArrayLiteralNode, ASTEnhancedForLoopNode, ASTSynchronizedBlockNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType.ts";
 import { CodeSnippetContainer } from "./CodeSnippetKinds.ts";
@@ -23,6 +23,7 @@ import { GenericVariantOfJavaClass, IJavaClass } from "../types/JavaClass.ts";
 import { GenericVariantOfJavaInterface, IJavaInterface } from "../types/JavaInterface.ts";
 import { SystemCollection } from "../runtime/system/collections/SystemCollection.ts";
 import { JCM } from "../JavaCompilerMessages.ts";
+import { ObjectClass } from "../runtime/system/javalang/ObjectClassStringClass.ts";
 
 export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
@@ -55,7 +56,10 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             case TokenType.keywordSwitch:
                 snippet = this.compileSwitchCaseStatement(<ASTSwitchCaseNode>ast); break;
             case TokenType.block:
-                snippet = this.compileBlockNode(<ASTBlockNode>ast); break;
+                snippet = this.compileBlockNode(<ASTBlockNode>ast, undefined); break;
+            case TokenType.synchronizedBlock:
+                let block = <ASTSynchronizedBlockNode>ast;
+                snippet = this.compileBlockNode(block.block, block.lockObject); break;
             case TokenType.keywordWhile:
                 snippet = this.compileWhileStatement(<ASTWhileNode>ast); break;
             case TokenType.keywordDo:
@@ -300,12 +304,12 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
             collectionElementType = this.objectType;
             let nptCollectionType = collectionType as (IJavaClass | IJavaInterface);
-            
+
             let iterableInterface = nptCollectionType.findImplementedInterface("Iterable");
-            if(!iterableInterface){
+            if (!iterableInterface) {
                 this.pushError(JCM.cantComputeCollectionElementType(collectionType.toString()), "error", node.collection.range);
             } else {
-                if(iterableInterface instanceof GenericVariantOfJavaInterface){
+                if (iterableInterface instanceof GenericVariantOfJavaInterface) {
                     collectionElementType = iterableInterface.typeMap.get(iterableInterface.isGenericVariantOf.genericTypeParameters![0])!;
                 }
             }
@@ -325,11 +329,11 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
             forLoopSnippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(stackIndexForCollection)}._mj$hasNext$boolean$(${StepParams.thread}, undefined);\n`, node.collection.range));
             forLoopSnippet.addNextStepMark();
-            
+
             forLoopSnippet.addParts(new StringCodeSnippet(`if(!${Helpers.threadStack}.pop()){\n   `, node.collection.range));
             forLoopSnippet.addParts(breakJumpSnippet);
             forLoopSnippet.addParts(new StringCodeSnippet(`}\n`));
-            
+
             forLoopSnippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(stackIndexForCollection)}._mj$next$E$(${StepParams.thread}, undefined);\n`, node.collection.range));
             forLoopSnippet.addNextStepMark();
             forLoopSnippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(elementVariable.stackframePosition!)} = ${Helpers.threadStack}.pop();\n`, node.collection.range));
@@ -380,7 +384,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         conditionNode = negationResult.newNode;
 
         let condition = this.compileTerm(conditionNode);
-        if(!condition) condition = new StringCodeSnippet('true', node.range, this.booleanType);
+        if (!condition) condition = new StringCodeSnippet('true', node.range, this.booleanType);
 
         let labelBeforeCheckingCondition = new LabelCodeSnippet();
         let jumpToLabelBeforeCheckingCondition = new JumpToLabelCodeSnippet(labelBeforeCheckingCondition);
@@ -403,7 +407,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         }
         let forSnippet = new CodeSnippetContainer([], node.range, this.voidType);
 
-        if(firstStatement){
+        if (firstStatement) {
             forSnippet.addParts(firstStatement);
             forSnippet.addNextStepMark();
         }
@@ -417,7 +421,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
         forSnippet.addNextStepMark();
         forSnippet.addParts(labelBeforeLastStatement);
-        if(lastStatement){
+        if (lastStatement) {
             forSnippet.addParts(lastStatement);
         } else {
             jumpToLabelBeforeCheckingCondition.range = {
@@ -478,13 +482,28 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         return doWhileSnippet;
     }
 
-    compileBlockNode(node: ASTBlockNode): CodeSnippetContainer | undefined {
+    compileBlockNode(node: ASTBlockNode, lockObject: ASTTermNode | undefined): CodeSnippetContainer | undefined {
         this.pushAndGetNewSymbolTable(node.range, false);
 
         let snippet = new CodeSnippetContainer([], node.range);
+
+        if (lockObject) {
+            let getLockObjectSnippet = this.compileTerm(lockObject);
+            if (getLockObjectSnippet) {
+                let enterSynchronizedBlockStatement = SnippetFramer.frame(getLockObjectSnippet, `§1.${ObjectClass.prototype.enterSynchronizedBlock.name}(${StepParams.thread}, true);\n`);
+                snippet.addParts(enterSynchronizedBlockStatement);
+            }
+        }
+
+
         for (let statementNode of node.statements) {
             let statementSnippet = this.compileStatementOrTerm(statementNode);
             if (statementSnippet) snippet.addParts(statementSnippet);
+        }
+
+        if (lockObject) {
+            let leaveSynchronizedBlockStatement = new StringCodeSnippet(`${StepParams.stack}.pop().${ObjectClass.prototype.leaveSynchronizedBlock.name}(${StepParams.thread});\n`);
+            snippet.addParts(leaveSynchronizedBlockStatement);
         }
 
         this.popSymbolTable();

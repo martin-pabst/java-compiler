@@ -158,7 +158,7 @@ export class Interpreter {
 
     pause() {
         this.setState(SchedulerState.paused);
-        this.scheduler.unmarkStep();
+        this.scheduler.unmarkCurrentlyExecutedSingleStep();
         this.showProgramPointer(this.scheduler.getNextStepPosition());
     }
 
@@ -168,7 +168,7 @@ export class Interpreter {
 
         // this.inputManager.hide();
         this.setState(SchedulerState.stopped);
-        this.scheduler.unmarkStep();
+        this.scheduler.unmarkCurrentlyExecutedSingleStep();
 
         this.eventManager.fire("stop");
 

@@ -372,6 +372,9 @@ export class Parser extends StatementParser {
                 case TokenType.keywordDefault:
                     astNodeWithModifiers.isDefault = true;
                     break;
+                case TokenType.keywordSynchronized:
+                    astNodeWithModifiers.isSynchronized = true;
+                    break;
                 default:
                     foundModifier = false;
             }

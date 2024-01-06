@@ -6,12 +6,12 @@ import { ObjectClass, StringClass } from "./ObjectClassStringClass.ts";
 import { RuntimeExceptionClass } from "./RuntimeException.ts";
 import { ThrowableClass } from "./ThrowableClass.ts";
 
-export class ClassCastExceptionClass extends RuntimeExceptionClass {
+export class IllegalMonitorStateExceptionClass extends RuntimeExceptionClass {
 
     stacktrace: Stacktrace = [];
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "declaration", signature: "class ClassCastException extends RuntimeException"},
+        {type: "declaration", signature: "class IllegalMonitorStateException extends RuntimeException"},
     ]
 
 

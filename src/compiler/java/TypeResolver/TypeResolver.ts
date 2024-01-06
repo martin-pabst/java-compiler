@@ -471,6 +471,7 @@ export class TypeResolver {
             method.classEnumInterface = type;
             method.isConstructor = methodNode.isContructor;
             method.isDefault = methodNode.isDefault;
+            method.isSynchronized = methodNode.isSynchronized;
 
             method.returnParameterType = methodNode.isContructor ? type : methodNode.returnParameterType?.resolvedType;
             for (let p of methodNode.parameters) {

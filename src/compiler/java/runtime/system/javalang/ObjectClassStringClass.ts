@@ -1,12 +1,10 @@
 import { Program } from "../../../../common/interpreter/Program";
 import { Scheduler } from "../../../../common/interpreter/Scheduler.ts";
 import { CallbackFunction, Helpers } from "../../../../common/interpreter/StepFunction.ts";
-import { Thread } from "../../../../common/interpreter/Thread";
+import { Thread, ThreadState } from "../../../../common/interpreter/Thread";
 import { JCM } from "../../../JavaCompilerMessages.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
-import { IndexOutOfBoundsExceptionClass } from "./IndexOutOfBoundsExceptionClass.ts";
-import { NullPointerExceptionClass } from "./NullPointerExceptionClass.ts";
 
 export class ObjectClass {
     
@@ -17,14 +15,92 @@ export class ObjectClass {
         {type: "method", signature: "public Object()", native: ObjectClass.prototype._constructor},
         {type: "method", signature: "public String toString()", native: ObjectClass.prototype._nToString},
         {type: "method", signature: "public boolean equals(Object otherObject)", native: ObjectClass.prototype._nEquals},
+        {type: "method", signature: "public final void wait()", java: ObjectClass.prototype._mj$wait$void$},
+        {type: "method", signature: "public final void wait(int milliseconds)", java: ObjectClass.prototype._mj$wait$void$},
+        {type: "method", signature: "public final void notify()", java: ObjectClass.prototype._mj$notify$void$},
+        {type: "method", signature: "public final void notifyAll()", java: ObjectClass.prototype._mj$notifyAll$void$},
     ]
 
     // declare __programs: Program[]; // only for compatibility with java classes; not used in library classes
 
     static type: NonPrimitiveType;
 
+    private waitingThreads?: Thread[];
+    private threadHoldingLockToThisObject?: Thread;
+    private reentranceCounter?: number;                 // == 1 when thread first entered synchronized block
+
     constructor(){
 
+    }
+
+    _mj$wait$void$(t: Thread, callback: CallbackFunction, milliseconds?: number){
+        if(this.threadHoldingLockToThisObject != t){
+            this.throwIllegalMonitorException(t, JCM.threadWantsToWaitAndHasNoLockOnObject());
+        }
+
+        let that = this;
+
+        if(milliseconds){
+            setTimeout(() => {
+                if(t.state == ThreadState.timed_waiting) t.state = ThreadState.blocked; 
+            }, milliseconds);
+
+            t.state = ThreadState.timed_waiting;
+        } else {
+            t.state = ThreadState.waiting;
+        }
+
+        if(!that.waitingThreads) that.waitingThreads = [];
+        if(that.waitingThreads.indexOf(t) < 0) that.waitingThreads.push(t);
+        
+        t.scheduler.suspendThread(t);
+
+        if(callback) callback();
+    }
+
+
+    _mj$notify$void$(t: Thread, callback: CallbackFunction){
+        if(this.threadHoldingLockToThisObject != t){
+            this.throwIllegalMonitorException(t, JCM.threadWantsToNotifyAndHasNoLockOnObject());
+        }
+        if(this.waitingThreads ){
+            for(let i = 0; i < this.waitingThreads.length; i++){
+                if([ThreadState.waiting, ThreadState.timed_waiting].indexOf(this.waitingThreads[i].state) >= 0 ){
+                    this.waitingThreads[i].state = ThreadState.blocked;
+                    break;
+                }
+            }
+        }
+        if(callback) callback();
+    }
+    
+    _mj$notifyAll$void$(t: Thread, callback: CallbackFunction){
+        if(this.threadHoldingLockToThisObject != t){
+            this.throwIllegalMonitorException(t, JCM.threadWantsToNotifyAndHasNoLockOnObject());
+        }
+        if(this.waitingThreads){
+            for(let t of this.waitingThreads){
+                t.state = ThreadState.blocked;
+            }
+        }
+        if(callback) callback();
+    }
+
+    restoreOneBlockedThread(){
+        if(this.waitingThreads){
+            for(let i = 0; i < this.waitingThreads.length - 1; i++){
+                let t = this.waitingThreads[i];
+                if(t.state == ThreadState.blocked){
+                    this.waitingThreads.splice(i, 1);
+                    t.scheduler.restoreThread(t);
+                    break;
+                }
+            }
+        }
+    }
+
+    throwIllegalMonitorException(t: Thread, message: string){
+        throw new t.classes["IllegalMonitorException"](message);
     }
 
     _constructor() {
@@ -48,6 +124,35 @@ export class ObjectClass {
 
     _nEquals(otherObject: ObjectClass){
         return this == otherObject;
+    }
+
+    enterSynchronizedBlock(t: Thread, pushLockObject: boolean = false){
+
+        if(pushLockObject) t.s.push(this);       
+
+        if(!this.threadHoldingLockToThisObject){
+            this.threadHoldingLockToThisObject = t;
+            this.reentranceCounter = 1;
+        } else {
+            if(this.threadHoldingLockToThisObject == t){
+                this.reentranceCounter!++;
+            } else {
+                t.state == ThreadState.blocked;
+                t.scheduler.suspendThread(t);
+            }
+        }
+    }
+
+    leaveSynchronizedBlock(t: Thread){
+        if(this.threadHoldingLockToThisObject == t){
+            this.reentranceCounter!--;
+            if(this.reentranceCounter == 0){
+                this.threadHoldingLockToThisObject = undefined;
+                this.reentranceCounter = undefined;
+                this._mj$notifyAll$void$(t, undefined);
+                this.restoreOneBlockedThread();
+            }
+        }
     }
 
 }

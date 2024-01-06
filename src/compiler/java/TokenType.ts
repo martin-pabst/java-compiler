@@ -29,6 +29,7 @@ export enum TokenType {
     keywordPrivate,
     keywordTransient,
     keywordStatic,
+    keywordSynchronized,
     keywordExtends,
     keywordImplements,
     keywordWhile,
@@ -160,6 +161,7 @@ export enum TokenType {
     global,
     program,
     block,    // block of statements
+    synchronizedBlock,
     multiNode,  // used for debugging output
     plusPlusMinusMinusSuffix,
     genericParameterDefinition,
@@ -213,6 +215,7 @@ export var TokenTypeReadable: { [tt: number]: string } = {
     [TokenType.keywordPrivate]: "private",
     [TokenType.keywordTransient]: "transient",
     [TokenType.keywordStatic]: "static",
+    [TokenType.keywordSynchronized]: "synchronized",
     [TokenType.keywordExtends]: "extends",
     [TokenType.keywordImplements]: "implements",
     [TokenType.keywordWhile]: "while",
@@ -389,6 +392,7 @@ export var keywordList: { [keyword: string]: TokenType } = {
     "private": TokenType.keywordPrivate,
     "transient": TokenType.keywordTransient,
     "static": TokenType.keywordStatic,
+    "synchronized": TokenType.keywordSynchronized,
     "extends": TokenType.keywordExtends,
     "implements": TokenType.keywordImplements,
     "while": TokenType.keywordWhile,
