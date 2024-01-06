@@ -16,8 +16,8 @@ export class SpeedControl {
     gripWidth: number = 10;
     overallWidth: number = 100;
 
-    intervalBorders = [1, 10, 100, 1e3, 1e5, 1e7, 1e9];
-    maxSpeed = 1e10;
+    intervalBorders = [1, 10, 100, 1e3, 5e4, 1e6, 5e7];
+    maxSpeed = this.intervalBorders[this.intervalBorders.length - 1];
     initialSpeed = this.maxSpeed;
 
 // <div id="speedcontrol-outer" title="Geschwindigkeitsregler" draggable="false">
@@ -158,8 +158,8 @@ export class SpeedControl {
 
         let speed = intervalMin + (intervalMax - intervalMin) * factorInsideInterval;
 
-        if(speed >= this.interpreter.maxStepsPerSecond - 10){
-            speed = this.maxSpeed;
+        if(speed >= this.intervalBorders[this.intervalBorders.length - 1] - 10){
+            speed = 1e11;
         }
 
         this.setInterpreterSpeed(speed);
@@ -169,17 +169,25 @@ export class SpeedControl {
     }
     
     setInterpreterSpeed(stepsPerSecond: number){
+        
+        let speedString = "" + SpeedControl.printMillions(stepsPerSecond);
+        if(stepsPerSecond >= this.intervalBorders[this.intervalBorders.length - 1] - 10 - 10){
+            speedString = "maximum speed";
+        }
+        
+        this.$display.html(speedString + " steps/s");
+
         this.interpreter.loadController.setStepsPerSecond(stepsPerSecond);
 
         this.interpreter.hideProgrampointerPosition();
-
-        let speedString = "" + Math.ceil(stepsPerSecond);
-        if(stepsPerSecond >= this.interpreter.maxStepsPerSecond - 10){
-            speedString = "Maximale Geschwindigkeit";
-        }
-
-        this.$display.html(speedString + " Schritte/s");
     }
 
+    static printMillions(n: number): string {
+        if(n < 1e6) return "" + Math.trunc(n);
+
+        n = Math.trunc(n/1e3)*1e3/1e6;
+
+        return n + " million";
+    }
 
 }

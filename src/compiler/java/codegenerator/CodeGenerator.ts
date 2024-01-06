@@ -757,7 +757,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         // build class...
         //
-        let outerClass = this.currentSymbolTable.classContext;
+        let outerClass = this.currentSymbolTable.classContext!;
         let klass = new JavaClass("", node.range, "", this.module);
         klass.outerType = outerClass;
         klass.setExtends(this.objectType);

@@ -11,6 +11,8 @@ export class NumberClass extends ObjectClass {
 
     value: number = 0;
 
+    static isPrimitiveTypeWrapper: boolean = true;
+
     static __javaDeclarations: LibraryDeclarations = [
         {type: "declaration", signature: "abstract class Number extends Object"},
         {type: "method", signature: "public byte byteValue()", native: NumberClass.prototype.byteValue},

@@ -9,7 +9,6 @@ export class Semaphor {
 
     constructor(private scheduler: Scheduler, private _capacity: number) {
         this.counter = this._capacity;
-        scheduler.semaphors.push(this);
     }
 
     aquire(thread: Thread): boolean {

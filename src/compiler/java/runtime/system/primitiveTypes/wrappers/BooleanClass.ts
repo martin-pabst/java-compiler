@@ -12,6 +12,8 @@ export class BooleanClass extends ObjectClass {
     static FALSE: BooleanClass = new BooleanClass(false);
     static TRUE: BooleanClass = new BooleanClass(true);
 
+    static isPrimitiveTypeWrapper: boolean = true;
+
     static __javaDeclarations: LibraryDeclarations = [
         {type: "declaration", signature: "class Boolean extends Object implements Comparable<Boolean>"},
         {type: "field", signature: "static final boolean FALSE", constantValue: BooleanClass.FALSE},

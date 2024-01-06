@@ -753,7 +753,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         field.usagePositions.push({ file: this.module.file, range: node.range });
 
-        if (field.isFinal && field.initialValueIsConstant && !(field.type instanceof NonPrimitiveType)) {
+        if (field.isFinal && field.initialValueIsConstant) {
             let constantValue = field.initialValue!;
             let constantValueAsString = typeof constantValue == "string" ? `"${constantValue}"` : "" + constantValue;
             return new StringCodeSnippet(constantValueAsString, range, field.type, constantValue);

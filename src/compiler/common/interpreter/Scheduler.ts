@@ -1,3 +1,4 @@
+import { SpeedControl } from "../../../testgui/SpeedControl.ts";
 import { JavaTypeStore } from "../../java/module/JavaTypeStore.ts";
 import { Executable } from "../Executable.ts";
 import { Module } from "../module/Module";
@@ -21,7 +22,6 @@ export type ProgramPointerPositionInfo = {
 export class Scheduler {
     runningThreads: Thread[] = [];
     currentThreadIndex: number = 0;
-    semaphors: Semaphor[] = [];
     state!: SchedulerState;
 
     keepThread: boolean = false;    // for single step mode
@@ -76,6 +76,10 @@ export class Scheduler {
                     }
 
                     this.runningThreads.splice(this.currentThreadIndex, 1);
+                    if(this.currentThreadIndex > this.runningThreads.length - 1){
+                        this.currentThreadIndex = -1;
+                        this.keepThread = false;
+                    }
 
                     if (this.runningThreads.length == 0) {
                         this.stepCountSinceStartOfProgram += numberOfStepsInThisRun;
@@ -83,7 +87,7 @@ export class Scheduler {
                         return;
                     }
 
-                    return;
+                    
             }
 
             if (!this.keepThread) {
@@ -108,7 +112,7 @@ export class Scheduler {
                 if(this.state == SchedulerState.running){
                     let dt = performance.now() - this.timeStampProgramStarted;
                     let stepsPerSecond = Math.round(this.stepCountSinceStartOfProgram/dt*1000);
-                    this.interpreter.printManager.print("Duration: " + Math.round(dt * 100)/100 + " ms, " + this.stepCountSinceStartOfProgram + " Steps, " + stepsPerSecond + " steps/s", true, undefined);
+                    this.interpreter.printManager.print("Duration: " + Math.round(dt * 100)/100 + " ms, " + this.stepCountSinceStartOfProgram + " steps, " + SpeedControl.printMillions(stepsPerSecond) + " steps/s", true, undefined);
                 }
             }
             this.state = newState;
@@ -196,7 +200,6 @@ export class Scheduler {
         this.libraryTypeStore = executable.libraryModuleManager.typestore;
 
         this.runningThreads = [];
-        this.semaphors = [];
         this.currentThreadIndex = 0;
         this.keepThread = false;
 

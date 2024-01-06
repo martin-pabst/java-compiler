@@ -54,6 +54,8 @@ export class ObjectClass {
 
 export class StringClass extends ObjectClass {
 
+    static isPrimitiveTypeWrapper: boolean = true;
+
     static __javaDeclarations: LibraryDeclarations = [
         {type: "declaration", signature: "class String extends Object implements Comparable<String>"},
         {type: "method", signature: "public String()", native: StringClass.prototype._emptyConstructor},

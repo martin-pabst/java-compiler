@@ -29,57 +29,60 @@ export abstract class NonPrimitiveType extends JavaType {
     
     abstract getField(identifier: string, uptoVisibility: Visibility, forceStatic?: boolean): Field | undefined;
     
+    
     visibility: Visibility = TokenType.keywordPublic;
     isStatic: boolean = false; // static inner classes behave differently from non-static inner classes
-
+    
     private _outerType?: NonPrimitiveType | StaticNonPrimitiveType;      // a local class defined inside a static method has a StaticNonPrimitiveType outerType
+    
+    public isPrimitiveTypeWrapper: boolean = false;
 
     set outerType(ot: NonPrimitiveType | StaticNonPrimitiveType){
         this._outerType = ot;
         ot.innerTypes.push(this);
     }
     
-    get OuterType(): NonPrimitiveType | StaticNonPrimitiveType  | undefined {
+    get outerType(): NonPrimitiveType | StaticNonPrimitiveType  | undefined {
         return this._outerType;
     }
-
+    
     innerTypes: (NonPrimitiveType | StaticNonPrimitiveType)[] = [];
     
     runtimeClass?: Klass;
-
+    
     isLibraryType: boolean = false;
-
+    
     private extendsImplements: Record<string, boolean> = {};
-
+    
     staticInitializer?: Program;
-
+    
     staticConstructorsDependOn: Map<NonPrimitiveType, boolean> = new Map();
-
+    
     public pathAndIdentifier: string;
-
+    
     constructor(identifier: string, identifierRange: IRange, pathAndIdentifier: string, module: JavaBaseModule){
         super(identifier, identifierRange, module);
         this.isPrimitive = false;
         this.pathAndIdentifier = pathAndIdentifier || identifier;
         this.extendsImplements[this.pathAndIdentifier] = true;
     }
-
+    
     clearUsagePositions(){
         super.clearUsagePositions();
     }
-
+    
     getExtendedImplementedIdentifiers(): string[] {
         return Object.getOwnPropertyNames(this.extendsImplements);
     }
-
+    
     fastExtendsImplements(identifier: string){
         return this.extendsImplements[identifier] ? true : false;
     }
-
+    
     registerChildType(childType: NonPrimitiveType){
         childType.extendsImplements[this.pathAndIdentifier] = true;
     }
-
+    
     getDefaultValue() {
         return null;
     }

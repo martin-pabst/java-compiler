@@ -9,6 +9,8 @@ import { NumberClass } from "./NumberClass";
  */
 export class LongClass extends NumberClass {
 
+    static isPrimitiveTypeWrapper: boolean = true;
+
     static __javaDeclarations: LibraryDeclarations = [
         {type: "declaration", signature: "class Long extends Number implements Comparable<Long>"},
         {type: "field", signature: "static final int MAX_VALUE", constantValue: Number.MAX_SAFE_INTEGER}, 

@@ -89,6 +89,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 npt1._isFinal = modifiersAndType.final;
                 npt1._isAbstract = modifiersAndType.abstract;
                 npt1.pathAndIdentifier = pathAndIdentifier;
+                if(klass["isPrimitiveTypeWrapper"]) npt.isPrimitiveTypeWrapper = true;
                 break;
             case TokenType.keywordInterface:
                 npt = new JavaInterface(identifier, LibraryDeclarationParser.nullRange, "", module);
