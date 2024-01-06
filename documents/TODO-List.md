@@ -32,13 +32,16 @@
   * simplified for-loop over Iterable or array
   * varArgs-parameters (== ellipsis)
   * compiler messages in different languages (at least: german and english)
+  * class Thread and Runnable
+  * synchronized methods/blocks
+  * class Semaphor
 
 ## working status on current issue:
 
 ### fine-grained next todos on current issue:
 
 ## next todos
-  * classes Thread and Runnable
+  * if thread is inside synchronize block and leaves it due to exception, then lock must get released...
   * generics (status: need more testing)
   * anonymous inner classes (status: need more testing)
   * Lambda Functions (status: need more testing)
