@@ -147,7 +147,8 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
         if(milliseconds){
 
             setTimeout(() => {
-                that.threadsToJoinWhenFinished.splice(that.threadsToJoinWhenFinished.indexOf(t), 1);
+                let index = that.threadsToJoinWhenFinished.indexOf(t);
+                if(index >= 0) that.threadsToJoinWhenFinished.splice(index, 1);
                 t.scheduler.restoreThread(t);
             }, milliseconds);
 

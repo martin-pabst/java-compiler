@@ -35,13 +35,13 @@
   * class Thread and Runnable
   * synchronized methods/blocks
   * class Semaphor
+  * automatic tests for compiler errors
 
 ## working status on current issue:
 
 ### fine-grained next todos on current issue:
 
 ## next todos
-  * if thread is inside synchronize block and leaves it due to exception, then lock must get released...
   * generics (status: need more testing)
   * anonymous inner classes (status: need more testing)
   * Lambda Functions (status: need more testing)

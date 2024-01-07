@@ -29,7 +29,7 @@ export class ArrayListClass extends SystemCollection {
         { type: "method", signature: "boolean contains(Object o)", native: ArrayListClass.prototype._contains, template: "(§1.elements.indexOf(§2) >= 0)" },
         { type: "method", signature: "boolean containsAll(Collection<?> c)", java: ArrayListClass.prototype._containsAll },
         { type: "method", signature: "boolean isEmpty()", native: ArrayListClass.prototype._isEmpty, template: "(§1.elements.length == 0)" },
-        { type: "method", signature: "boolean remove(Object o)", native: ArrayListClass.prototype._remove, template: "(§1.elements.splice(§1.elements.indexOf(§2), 1))" },
+        { type: "method", signature: "boolean remove(Object o)", native: ArrayListClass.prototype._remove },
         { type: "method", signature: "boolean removeAll(Collection<?> c)", java: ArrayListClass.prototype._removeAll },
         { type: "method", signature: "int size()", native: ArrayListClass.prototype._size, template: "§1.elements.length" },
 

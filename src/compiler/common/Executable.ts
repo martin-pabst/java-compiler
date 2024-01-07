@@ -79,8 +79,8 @@ export class Executable {
                             program: cti.staticInitializer
                         })
                     }
-
-                    classesToInitialize.splice(classesToInitialize.indexOf(cti), 1);
+                    let index = classesToInitialize.indexOf(cti);
+                    if(index >= 0) classesToInitialize.splice(index, 1);
                     i--;    // i++ follows immediately (end of for-loop)
                     done = false;
                 }

@@ -317,7 +317,8 @@ export class Treeview<E> {
     }
 
     removeNode(node: TreeviewNode<E>) {
-        this.nodes.splice(this.nodes.indexOf(node), 1);
+        let index = this.nodes.indexOf(node);
+        if(index >= 0) this.nodes.splice(index, 1);
         node.destroy(false);
     }
 

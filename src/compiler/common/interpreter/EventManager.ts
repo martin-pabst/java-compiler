@@ -27,7 +27,8 @@ export class EventManager<EventType extends string> {
 
         let callbackList = this.eventTypeToCallbackMap.get(evenType);
         if(!callbackList) return;
-        callbackList?.splice(callbackList.indexOf(callback), 1);
+        let index = callbackList.indexOf(callback);
+        if(index >= 0) callbackList.splice(index, 1);
         if(callbackList.length == 0) this.eventTypeToCallbackMap.delete(evenType);
     }
 

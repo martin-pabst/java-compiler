@@ -577,7 +577,8 @@ export class TreeviewNode<E> {
     }
 
     public remove(child: TreeviewNode<E>) {
-        this.children.splice(this.children.indexOf(child), 1);
+        let index = this.children.indexOf(child);
+        if(index >= 0) this.children.splice(index, 1);
     }
 
     public sort(comparator: (e1: E, e2: E) => number) {
