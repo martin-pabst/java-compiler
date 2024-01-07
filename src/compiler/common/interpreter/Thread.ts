@@ -300,10 +300,12 @@ export class Thread {
             this.exception = exception;
             this.state = ThreadState.terminatedWithException;
             console.log(exception);
+            //@ts-ignore
+            this.currentProgramState = undefined;
         } else {
             while (newProgramStates.length > 0) this.programStack.push(newProgramStates.pop()!);
+            this.currentProgramState = this.programStack[this.programStack.length - 1];
         }
-        this.currentProgramState = this.programStack[this.programStack.length - 1];
     }
 
     getExceptionAndTrimStack(removeException: boolean): Exception | undefined {
