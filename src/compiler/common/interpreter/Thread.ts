@@ -25,6 +25,8 @@ type ProgramState = {
 
     recentlyThrownException?: Exception;
     afterExceptionTrimStackToSize?: number;     // stack size when entering try {...} block
+
+    aquiredObjectLocks?: ObjectClass[];
 }
 
 type ThreadStateInfoAfterRun = {
@@ -242,6 +244,11 @@ export class Thread {
 
             while (ps?.exceptionInfoList.length > 0) {
                 let exInfo = ps.exceptionInfoList.pop()!;
+
+                if(exInfo.aquiredObjectLocks){
+                    while(exInfo.aquiredObjectLocks.length > 0) this.leaveSynchronizedBlock(exInfo.aquiredObjectLocks.pop()!);
+                }
+    
                 for (let cn of classNames) {
                     for (let catchBlockInfo of exInfo.catchBlockInfos) {
                         if (catchBlockInfo.exceptionTypes[cn]) {
@@ -277,6 +284,10 @@ export class Thread {
                         newProgramStates.push(ps2);
                     }
                 }
+            }
+
+            if(ps.aquiredObjectLocks){
+                while(ps.aquiredObjectLocks.length > 0) this.leaveSynchronizedBlock(ps.aquiredObjectLocks.pop()!);
             }
 
             stackTrace.push(ps);
@@ -482,6 +493,22 @@ export class Thread {
 
     registerCodeReached(key: string) {
         this.scheduler.interpreter.registerCodeReached(key);
+    }
+
+    registerEnteringSynchronizedBlock(aquiredLock: ObjectClass){
+        let ps = this.programStack[this.programStack.length - 1];
+        if(ps.exceptionInfoList.length > 0){
+            let ei = ps.exceptionInfoList[ps.exceptionInfoList.length - 1];
+            if(!ei.aquiredObjectLocks) ei.aquiredObjectLocks = [];
+            ei.aquiredObjectLocks.push(aquiredLock);
+        } else {
+            if(!ps.aquiredObjectLocks) ps.aquiredObjectLocks = [];
+            ps.aquiredObjectLocks.push(aquiredLock);
+        }
+    }
+
+    leaveSynchronizedBlock(aquiredLock: ObjectClass){
+        aquiredLock.leaveSynchronizedBlock(this);
     }
 
 }

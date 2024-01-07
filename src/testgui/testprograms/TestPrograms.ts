@@ -1,4 +1,20 @@
 export var testPrograms = {
+synchronizedTest: `
+new A().test();
+
+
+class A {
+   synchronized void test(){
+      println("Hier");
+      synchronized(this){
+         for(int i = 0; i < 10; i++){
+            println(i);
+            if(i == 5) return;
+         }
+      }
+      println("Hallo!");
+   }
+}`,
 switchCaseWithConstant:`
 public class A {
    public static final String a = "ABC";

@@ -525,6 +525,12 @@ export class CodeGenerator extends StatementCodeGenerator {
             
             if(method.isSynchronized){
                 snippets.unshift(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${ObjectClass.prototype.enterSynchronizedBlock.name}(${StepParams.thread});\n`));
+
+                let beforeEnteringSynchronizedBlockStatement = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${ObjectClass.prototype.beforeEnteringSynchronizedBlock.name}(${StepParams.thread});\n`);
+                let sn = new CodeSnippetContainer([beforeEnteringSynchronizedBlockStatement]);
+                sn.addNextStepMark();
+                snippets.unshift(sn);
+
             }
 
             if (!this.missingStatementManager.hasReturnHappened() && !methodNode.isContructor) {

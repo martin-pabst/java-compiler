@@ -27,6 +27,9 @@ import { ObjectClass } from "../runtime/system/javalang/ObjectClassStringClass.t
 
 export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
+    synchronizedBlockCount: number = 0;
+
+
     constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore,
         protected exceptionTree: ExceptionTree) {
         super(module, libraryTypestore, compiledTypesTypestore);
@@ -56,10 +59,10 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             case TokenType.keywordSwitch:
                 snippet = this.compileSwitchCaseStatement(<ASTSwitchCaseNode>ast); break;
             case TokenType.block:
-                snippet = this.compileBlockNode(<ASTBlockNode>ast, undefined); break;
+                snippet = this.compileBlockNode(<ASTBlockNode>ast, undefined, undefined); break;
             case TokenType.synchronizedBlock:
                 let block = <ASTSynchronizedBlockNode>ast;
-                snippet = this.compileBlockNode(block.block, block.lockObject); break;
+                snippet = this.compileBlockNode(block.block, block.lockObject, block.range); break;
             case TokenType.keywordWhile:
                 snippet = this.compileWhileStatement(<ASTWhileNode>ast); break;
             case TokenType.keywordDo:
@@ -131,7 +134,13 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             return undefined;
         }
 
-        if(this.currentSymbolTable.methodContext?.isSynchronized){
+        if(this.synchronizedBlockCount > 0){
+            for(let i = 0; i < this.synchronizedBlockCount; i++){
+                snippet.addParts(new StringCodeSnippet(`${StepParams.stack}.pop().${ObjectClass.prototype.leaveSynchronizedBlock.name}(${StepParams.thread});\n`));
+            }
+        }
+
+        if(this.currentSymbolTable.getMethodContext()?.isSynchronized){
             snippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${ObjectClass.prototype.leaveSynchronizedBlock.name}(${StepParams.thread});\n`));
         }
 
@@ -487,15 +496,20 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         return doWhileSnippet;
     }
 
-    compileBlockNode(node: ASTBlockNode, lockObject: ASTTermNode | undefined): CodeSnippetContainer | undefined {
+    compileBlockNode(node: ASTBlockNode, lockObject: ASTTermNode | undefined, synchronizedTokenRange: IRange | undefined): CodeSnippetContainer | undefined {
         this.pushAndGetNewSymbolTable(node.range, false);
 
         let snippet = new CodeSnippetContainer([], node.range);
 
         if (lockObject) {
+            this.synchronizedBlockCount++;
             let getLockObjectSnippet = this.compileTerm(lockObject);
             if (getLockObjectSnippet) {
-                let enterSynchronizedBlockStatement = SnippetFramer.frame(getLockObjectSnippet, `§1.${ObjectClass.prototype.enterSynchronizedBlock.name}(${StepParams.thread}, true);\n`);
+                let beforeEnteringSynchronizedBlockStatement = SnippetFramer.frame(getLockObjectSnippet, `§1.${ObjectClass.prototype.beforeEnteringSynchronizedBlock.name}(${StepParams.thread}, true);\n`);
+                snippet.addParts(beforeEnteringSynchronizedBlockStatement);
+                snippet.addNextStepMark();
+
+                let enterSynchronizedBlockStatement = new StringCodeSnippet(`${StepParams.stack}.pop().${ObjectClass.prototype.enterSynchronizedBlock.name}(${StepParams.thread}, true);\n`, synchronizedTokenRange);
                 snippet.addParts(enterSynchronizedBlockStatement);
             }
         }
@@ -509,6 +523,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         if (lockObject) {
             let leaveSynchronizedBlockStatement = new StringCodeSnippet(`${StepParams.stack}.pop().${ObjectClass.prototype.leaveSynchronizedBlock.name}(${StepParams.thread});\n`);
             snippet.addParts(leaveSynchronizedBlockStatement);
+            this.synchronizedBlockCount--;
         }
 
         this.popSymbolTable();
