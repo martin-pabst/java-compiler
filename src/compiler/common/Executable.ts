@@ -1,3 +1,4 @@
+import { JCM } from "../java/JavaCompilerMessages.ts";
 import { JavaModuleManager } from "../java/module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "../java/module/libraries/JavaLibraryModuleManager.ts";
 import { JavaTypeWithInstanceInitializer } from "../java/types/JavaTypeWithInstanceInitializer";
@@ -90,7 +91,8 @@ export class Executable {
 
         if (classesToInitialize.length > 0) {
             // cyclic references! => stop with error message
-            errors.push({ message: "Die Initialisierung mehrerer statischer Variablen aus verschiedenen Klassen ist zyklisch: " + classesToInitialize.map(c => c.identifier).join(", "), level: "error", range: EmptyRange.instance });
+            let errorWithId = JCM.cyclicReferencesAmongStaticVariables(classesToInitialize.map(c => c.identifier).join(", "));
+            errors.push({ message: errorWithId.message, id: errorWithId.id , level: "error", range: EmptyRange.instance });
         }
 
 
@@ -117,6 +119,16 @@ export class Executable {
         return this.moduleManager.modules.find(m => m.file == file);
     }
 
+    getAllErrors(): Error[] {
 
+        let errors: Error[] = this.globalErrors;
+
+        for(let module of this.moduleManager.modules){
+            errors = errors.concat(module.errors);
+        }
+
+        return errors;
+
+    }
 
 }

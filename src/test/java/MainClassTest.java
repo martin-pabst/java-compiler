@@ -1,6 +1,6 @@
 /**::
  * Test methods outside class definition
- * @ExpectOutput: "Success!\n"
+ * { "expectOutput": "Success!\n" }
  */
 test();
 

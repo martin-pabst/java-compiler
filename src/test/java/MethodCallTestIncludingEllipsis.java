@@ -1,6 +1,6 @@
 /**::
  * Test ellipsis
- * @ExpectOutput: "12\nNick\nEmma\n14\n"
+ * { "expectOutput": "12\nNick\nEmma\n14\n" }
  */
 
 new A().test(12, "Nick", "Emma",14);

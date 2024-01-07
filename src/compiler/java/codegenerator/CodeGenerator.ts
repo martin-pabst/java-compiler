@@ -486,7 +486,7 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         if (methodNode.statement) {
             if (method.isAbstract) this.pushError(JCM.abstractMethodsDontHaveMethodBodies(), "error", methodNode);
-            if (classContext instanceof JavaInterface && !(method.isAbstract || method.isDefault)) this.pushError("In Interfaces können nur default-Methoden und abstrakte Methoden einen Methodenrumpf haben.", "error", methodNode);
+            if (classContext instanceof JavaInterface && !(method.isAbstract || method.isDefault)) this.pushError(JCM.interfaceOnlyDefaultMethodsHaveBody(), "error", methodNode);
 
             let msm = this.missingStatementManager;
             this.missingStatementManager = new MissingStatementManager();

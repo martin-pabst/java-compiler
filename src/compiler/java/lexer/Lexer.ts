@@ -5,6 +5,7 @@ import { Error, ErrorLevel } from "../../common/Error.js";
 import { EscapeSequenceList, TokenType, TokenTypeReadable, keywordList as KeywordList, specialCharList } from "../TokenType.js";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.js";
 import { JCM } from "../JavaCompilerMessages.js";
+import { ErrormessageWithId } from "../../../tools/language/LanguageManager.js";
 
 
 
@@ -566,7 +567,7 @@ export class Lexer {
         this.tokenList.push(t);
     }
 
-    pushError(text: string, length: number, errorLevel: ErrorLevel = "error",
+    pushError(messageWithId: ErrormessageWithId, length: number, errorLevel: ErrorLevel = "error",
         startLineNumber: number = this.line, startColumn: number = this.column,
         endLineNumber?: number, endColumn?: number) {
 
@@ -574,7 +575,8 @@ export class Lexer {
             if(!endColumn) endColumn = startColumn + length ;
 
         this.module.errors.push({
-            message: text,
+            message: messageWithId.message,
+            id: messageWithId.id,
             range: {
                 startLineNumber: startLineNumber,
                 startColumn: startColumn,
@@ -620,7 +622,7 @@ export class Lexer {
         if (char == "\\") {
             let escapeChar = EscapeSequenceList[this.nextChar];
             if (escapeChar == null) {
-                this.pushError('Die Escape-Sequenz \\' + this.nextChar + ' gibt es nicht.', 2);
+                this.pushError(JCM.unknownEscapeSequence(this.nextChar), 2);
                 if (this.nextChar != "'") {
                     char = this.nextChar;
                     this.next();

@@ -1,6 +1,6 @@
 /**::
  * Test assertions
- * @ExpectOutput: "Here!"
+ * { "expectOutput": "Here!" }
  */
 
 Assertions.assertTrue(1 == 1, "1 == 1 should be true");

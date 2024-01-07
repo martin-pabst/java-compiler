@@ -1,4 +1,4 @@
-import { le } from "../../tools/language/LanguageManager"
+import { le, lm } from "../../tools/language/LanguageManager"
 
 /**
  * Java compiler's messages
@@ -92,6 +92,11 @@ export class JCM {
     /**
      * Messages for Java CodeGenerator 
      */
+
+    static interfaceOnlyDefaultMethodsHaveBody = () => le({
+        "de": `In Interfaces können nur default-Methoden einen Methodenrumpf haben.`,
+        "en": `In interfaces only default methods have a method body. `
+    })
 
     static enumConstructorsMustBePrivate = () => le({
         "de": "Konstruktoren von enums müssen die Sichtbarkeit private haben.",
@@ -268,8 +273,10 @@ export class JCM {
     })
 
     static localVariableDeclarationWrongInitializerType = (actual: string, expected: string) => le({
+        "id": "cantAssignValueToLocalVariable",
         "de": "Der Term auf der rechten Seite des Zuweisungsoperators hat den Datentyp " + actual + " und kann daher der Variablen auf der linken Seite (Datentyp " + expected + ") nicht zugewiesen werden.",
         "en": `Can't assign value of type ${actual} to local variable of type ${expected}.`,
+
     })
 
     /**
@@ -487,7 +494,7 @@ export class JCM {
         "en": `Expected tokens: ${expected} - Found: ${actual}`,
     })
 
-    static insertSemicolonHere = () => le({
+    static insertSemicolonHere = () => lm({
         "de": `Strichpunkt hier einfügen`,
         "en": `Insert semicolon here`,
     })
@@ -503,25 +510,34 @@ export class JCM {
     })
 
     /**
+     * class Executable
+     */
+
+    static cyclicReferencesAmongStaticVariables = (variables: string) => le({
+        "de": `Die Initialisierung mehrerer statischer Attribute aus verschiedenen Klassen ist zyklisch: ${variables}`,
+        "en": `Initialization of several static fields is cyclic: ${variables}`
+    })
+
+    /**
      * Exceptions
      */
 
-    static charIndexOutOfBounds = () => le({
+    static charIndexOutOfBounds = () => lm({
         "de": `Zugriff auf Zeichen außerhalb des zulässingen Bereichs`,
         "en": `char index out of bounds`,
     })
 
-    static divideByZero = () => le({
+    static divideByZero = () => lm({
         "de": `Teilen durch 0 nicht möglich`,
         "en": `division by zero not allowed`,
     })
 
-    static threadWantsToWaitAndHasNoLockOnObject = () => le({
+    static threadWantsToWaitAndHasNoLockOnObject = () => lm({
         "de": `Es wurde wait für ein Objekt aufgerufen, für das der aktuelle Thread kein Lock besitzt.`,
         "en": `Wait called on Object for which thread holds no lock.`
     })
 
-    static threadWantsToNotifyAndHasNoLockOnObject = () => le({
+    static threadWantsToNotifyAndHasNoLockOnObject = () => lm({
         "de": `Es wurde notify für ein Objekt aufgerufen, für das der aktuelle Thread kein Lock besitzt.`,
         "en": `Notify called on Object for which thread holds no lock.`
     })
@@ -529,62 +545,62 @@ export class JCM {
      * TokenType
      */
 
-    static identifier = () => le({
+    static identifier = () => lm({
         "de": `Bezeichner (engl.: identifier)`,
         "en": `identifier`,
     })
 
-    static floatingPointLiteral = () => le({
+    static floatingPointLiteral = () => lm({
         "de": `Fließkomma-Konstante`,
         "en": `floating point literal`,
     })
 
-    static booleanLiteral = () => le({
+    static booleanLiteral = () => lm({
         "de": `boolesche Konstante (d.h. true oder false)`,
         "en": `boolean literal (that is: true or false)`,
     })
 
-    static stringLiteral = () => le({
+    static stringLiteral = () => lm({
         "de": `Zeichenketten-Konstante`,
         "en": `String literal`,
     })
 
-    static charLiteral = () => le({
+    static charLiteral = () => lm({
         "de": `Char-Konstante`,
         "en": `char literal`,
     })
 
-    static space = () => le({
+    static space = () => lm({
         "de": `ein Leerzeichen`,
         "en": `space character`,
     })
 
-    static tab = () => le({
+    static tab = () => lm({
         "de": `ein Tabulatorzeichen`,
         "en": `tab character`,
     })
 
-    static linebreak = () => le({
+    static linebreak = () => lm({
         "de": `ein Zeilenumbruch`,
         "en": `line break`,
     })
 
-    static aToZ = () => le({
+    static aToZ = () => lm({
         "de": `eines der Zeichen a..z, A..Z, _`,
         "en": `one of a..z, A..Z, _`,
     })
 
-    static comment = () => le({
+    static comment = () => lm({
         "de": `eine Kommentar`,
         "en": `a comment`,
     })
 
-    static endOfText = () => le({
+    static endOfText = () => lm({
         "de": `das Ende des Programms`,
         "en": `end of sourcecode`,
     })
 
-    static dd = () => le({
+    static dd = () => lm({
         "de": ``,
         "en": ``,
     })

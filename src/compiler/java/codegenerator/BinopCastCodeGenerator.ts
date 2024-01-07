@@ -1,3 +1,4 @@
+import { ErrormessageWithId } from "../../../tools/language/LanguageManager";
 import { ErrorLevel, QuickFix } from "../../common/Error";
 import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { EmptyRange, IRange } from "../../common/range/Range";
@@ -527,13 +528,14 @@ export abstract class BinopCastCodeGenerator {
         return false;
     }
 
-    pushError(message: string, errorLevel: ErrorLevel = "error", nodeOrRange: ASTNode | IRange, quickFix?: QuickFix) {
+    pushError(messageWithId: ErrormessageWithId, errorLevel: ErrorLevel = "error", nodeOrRange: ASTNode | IRange, quickFix?: QuickFix) {
 
         //@ts-ignore
         let range: IRange = nodeOrRange["kind"] ? nodeOrRange.range : nodeOrRange;
 
         this.module.errors.push({
-            message: message,
+            message: messageWithId.message,
+            id: messageWithId.id,
             range: range,
             quickFix: quickFix,
             level: errorLevel

@@ -1,3 +1,4 @@
+import { ErrormessageWithId } from "../../../tools/language/LanguageManager";
 import { ErrorLevel, QuickFix } from "../../common/Error";
 import { IRange } from "../../common/range/Range";
 import { JCM } from "../JavaCompilerMessages";
@@ -155,10 +156,11 @@ export class TokenIterator {
     }
 
 
-    pushError(message: string, errorLevel: ErrorLevel = "error", range?: IRange, quickFix?: QuickFix) {
+    pushError(messageWithId: ErrormessageWithId, errorLevel: ErrorLevel = "error", range?: IRange, quickFix?: QuickFix) {
         if (range == null) range = Object.assign({}, this.cct.range);
         this.module.errors.push({
-            message: message,
+            message: messageWithId.message,
+            id: messageWithId.id,
             range: range,
             quickFix: quickFix,
             level: errorLevel

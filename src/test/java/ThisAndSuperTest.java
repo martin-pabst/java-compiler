@@ -75,7 +75,7 @@ class C extends B {
 
 /**::
  * This and super to call other constructors
- * @ExpectOutput: "B: 14\nA: 12\nA1\n"
+ * { "expectOutput": "B: 14\nA: 12\nA1\n" }
  */
 new A();
 

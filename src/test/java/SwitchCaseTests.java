@@ -1,6 +1,6 @@
 /**::
  * test switch case with int
- * @ExpectOutput: "Here!"
+ * { "expectOutput": "Here!" }
  */
     int x = 1;
 
@@ -16,7 +16,7 @@
 
 /**::
  * Test switch case with constant
- * @ExpectOutput: "Here!"
+ * { "expectOutput": "Here!" }
  */
 
   public class A {

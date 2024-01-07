@@ -10,6 +10,7 @@ export type ErrorLevel = "info" | "error" | "warning";
 export type Error = {
     range: IRange,
     message: string,
+    id: string,
     quickFix?: QuickFix,
     level: ErrorLevel
 }
