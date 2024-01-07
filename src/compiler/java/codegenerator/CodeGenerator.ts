@@ -520,14 +520,17 @@ export class CodeGenerator extends StatementCodeGenerator {
 
             }
 
+            
+            method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
+            
             if(method.isSynchronized){
                 snippets.unshift(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${ObjectClass.prototype.enterSynchronizedBlock.name}(${StepParams.thread});\n`));
-                snippets.push(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${ObjectClass.prototype.leaveSynchronizedBlock.name}(${StepParams.thread});\n`));
             }
 
-            method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
-
             if (!this.missingStatementManager.hasReturnHappened() && !methodNode.isContructor) {
+                if(method.isSynchronized){
+                    snippets.push(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${ObjectClass.prototype.leaveSynchronizedBlock.name}(${StepParams.thread});\n`));
+                }
                 snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
             }
 

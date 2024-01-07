@@ -131,6 +131,11 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             return undefined;
         }
 
+        if(this.currentSymbolTable.methodContext?.isSynchronized){
+            snippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${ObjectClass.prototype.leaveSynchronizedBlock.name}(${StepParams.thread});\n`));
+        }
+
+
         if (node.term) {
 
             if (!method.returnParameterType || method.returnParameterType == this.voidType) {
