@@ -12,6 +12,7 @@ import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility";
 import { CallbackFunction, Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 import { Thread } from "../../common/interpreter/Thread.ts";
+import { JCM } from "../JavaCompilerMessages.ts";
 
 export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     isPrimitive: false;
@@ -155,10 +156,12 @@ export class JavaClass extends IJavaClass {
         if (!this._isAbstract) {
             let abstractMethodsNotYetImplemented: Method[] = this.getAbstractMethodsNotYetImplemented();
             if (abstractMethodsNotYetImplemented.length > 0) {
+                let jc = JCM.abstractMethodsNotImplemented(this.identifier, abstractMethodsNotYetImplemented.map(m => m.getSignature()).join(", "));
                 this.module.errors.push({
-                    message: "Die Klasse " + this.identifier + " muss noch folgende Methoden ihrer abstrakten Oberklassen implementieren: " + abstractMethodsNotYetImplemented.map(m => m.getSignature()).join(", "),
+                    message: jc.message,
+                    id: jc.id,
                     level: "error",
-                    range: this.identifierRange
+                    range: this.identifierRange,
                 })
             }
         }
@@ -177,8 +180,10 @@ export class JavaClass extends IJavaClass {
                 let baseMethod = baseMethods[0];
                 m.takeInternalJavaNameWithGenericParamterIdentifiersFrom(baseMethod);
                 if(baseMethod.isFinal){
+                    let jc = JCM.methodOverridesFinalMethod(m.getSignature(), baseMethod.classEnumInterface.identifier);
                     m.classEnumInterface.module.errors.push({
-                        message: `Die Methode ${m.getSignature()} überschreibt eine als final gekennzeichnete Methode der Oberklasse ${baseMethod.classEnumInterface.identifier}.`,
+                        message: jc.message,
+                        id: jc.id,
                         level: "error",
                         range: m.identifierRange
                     })
@@ -226,8 +231,10 @@ export class JavaClass extends IJavaClass {
             }
 
             if (notImplementedMethods.length > 0) {
+                let jc = JCM.interfaceMethodsNotImplemented(this.identifier, javaInterface.identifier, notImplementedMethods.map(m => m.getSignature()).join(", "));
                 this.module.errors.push({
-                    message: "Die Klasse " + this.identifier + " muss noch folgende Methoden des Interfaces " + javaInterface.identifier + " implementieren: " + notImplementedMethods.map(m => m.getSignature()).join(", "),
+                    message: jc.message,
+                    id: jc.id,
                     level: "error",
                     range: this.identifierRange
                 })

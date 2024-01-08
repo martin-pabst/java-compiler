@@ -510,6 +510,24 @@ export class JCM {
     })
 
     /**
+     * class JavaClass
+     */
+    static abstractMethodsNotImplemented = (identifier: string, methods: string) => le({
+        "de": "Die Klasse " + identifier + " muss noch folgende Methoden ihrer abstrakten Oberklassen implementieren: " + methods,
+        "en": "Class " + identifier + " has to implement methods of it's abstract base class: " + methods,
+    })
+
+    static interfaceMethodsNotImplemented = (identifier: string, interf: string, methods: string) => le({
+        "de": "Die Klasse " + identifier + " muss noch folgende Methoden des Interfaces " + interf + "implementieren: " + methods,
+        "en": "Class " + identifier + " has to implement methods of interface " + interf + ": " + methods,
+    })
+
+    static methodOverridesFinalMethod = (identifier: string, baseClass: string) => le({
+        "de": `Die Methode ${identifier} überschreibt eine als final gekennzeichnete Methode der Oberklasse ${baseClass}.`,
+        "en": `Method ${identifier} overrides final method of base class ${baseClass}.`
+    })
+
+    /**
      * class Executable
      */
 
