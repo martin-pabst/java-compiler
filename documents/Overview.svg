@@ -24,9 +24,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="0.82713787"
-     inkscape:cx="1020.9906"
-     inkscape:cy="391.7122"
+     inkscape:zoom="1.1697496"
+     inkscape:cx="1168.1987"
+     inkscape:cy="283.82143"
      inkscape:window-width="1920"
      inkscape:window-height="1137"
      inkscape:window-x="-8"
@@ -126,6 +126,27 @@
          id="path153" />
     </marker>
   </defs>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="color layer"
+     sodipodi:insensitive="true">
+    <rect
+       style="fill:#ececec;stroke:none;stroke-width:0.665001;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.665001, 1.33;paint-order:fill markers stroke;stop-color:#000000"
+       id="rect1251"
+       width="208.24068"
+       height="75.491241"
+       x="2.5590253"
+       y="107.79894" />
+    <rect
+       style="fill:#f3fef0;fill-opacity:1;stroke:none;stroke-width:0.642271;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.642271, 1.28454;paint-order:fill markers stroke;stop-color:#000000"
+       id="rect1279"
+       width="208.24068"
+       height="75.491241"
+       x="2.5590253"
+       y="107.79894"
+       transform="matrix(1,0,0,1.0720339,0,-88.674948)" />
+  </g>
   <g
      inkscape:label="Ebene 1"
      inkscape:groupmode="layer"
@@ -1421,7 +1442,7 @@
        x="215.55588"
        y="16.16678"
        id="text1"
-       transform="translate(-0.95963445)"><tspan
+       transform="translate(-0.95963445,-2.5590252)"><tspan
          id="tspan1"
          x="215.55588"
          y="16.16678"
@@ -1442,5 +1463,116 @@
          x="236.14029"
          y="49.76136"
          style="stroke-width:0.264583" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:5.64444px;line-height:1.25;font-family:Consolas;-inkscape-font-specification:Consolas;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="309.64203"
+       y="24.950493"
+       id="text1937"><tspan
+         sodipodi:role="line"
+         id="tspan1935"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="24.950493">println(&quot;Hello world!&quot;);</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="32.006042"
+         id="tspan1955">A a = new A();</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="39.061592"
+         id="tspan1984">B b = a.new A.B();</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="46.117142"
+         id="tspan1982" /><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="53.172695"
+         id="tspan1957">class A {</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="60.228241"
+         id="tspan1945">   int a1;</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="67.283791"
+         id="tspan1947">   void testA(){ </tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="74.339348"
+         id="tspan1967">      for(int i = 0; i &lt; 10; i++){</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="81.394897"
+         id="tspan1969">         println(i);</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="88.450447"
+         id="tspan1971">      }</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="95.505997"
+         id="tspan1965">   }</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="102.56155"
+         id="tspan1939">   </tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="109.6171"
+         id="tspan1949">   class B {</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="116.67265"
+         id="tspan1953">      String b1;</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="123.7282"
+         id="tspan1951">      void testB(){ ... }</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="130.78375"
+         id="tspan1943">   }</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.264583"
+         x="309.64203"
+         y="137.83929"
+         id="tspan1941">}</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect1986"
+       width="49.542492"
+       height="27.14209"
+       x="214.55418"
+       y="20.092476"
+       ry="1.9192688"
+       rx="1.919269" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="217.5406"
+       y="24.837141"
+       id="text1990"><tspan
+         sodipodi:role="line"
+         id="tspan1988"
+         x="217.5406"
+         y="24.837141"
+         style="font-size:4.23333px;stroke-width:0.264583">: JavaCompiledModule</tspan></text>
   </g>
 </svg>
