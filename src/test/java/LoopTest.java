@@ -256,3 +256,36 @@ class A implements Iterable<String> {
 }
 
 new A().forEach((s) -> {println(s);});
+
+/**::
+ * Primzahlzwillinge
+ */
+int max = 10000;
+boolean[] isPrime = new boolean[max];
+for(int i = 0; i < max; i++) {
+   isPrime[i] = true;
+}
+
+int i = 2;
+while(i < max) {
+   // Vielfache von i streichen
+   int j = 2 * i;
+   while(j < max) {
+      isPrime[j] = false;
+      j += i;
+   }
+
+   i++;
+   while(i < max && !isPrime[i]) {
+      i++;
+   }
+}
+
+int k = 0;
+for(int i = 0; i < max - 2; i++) {
+   if(isPrime[i] && isPrime[i + 2]) { 
+      k++;
+   }
+}
+
+assertEquals(207, k, "Suche nach Primzahlzwillingen gescheitert")
