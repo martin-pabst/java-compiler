@@ -27,15 +27,6 @@ body, html, #main {
     position: relative;
 }
 
-#editortabs {
-    width: 100%;
-}
-
-#editor {
-    flex: 1;
-    width: 100%;
-}
-
 #insighttabs {
     grid-area: 1/2;
 
