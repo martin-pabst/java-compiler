@@ -1,6 +1,8 @@
+import { ErrormessageWithId } from "../../../tools/language/LanguageManager.ts";
 import { ErrorLevel } from "../../common/Error";
 import { Helpers, Klass, StepParams } from "../../common/interpreter/StepFunction";
 import { IRange } from "../../common/range/Range";
+import { JCM } from "../JavaCompilerMessages.ts";
 import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
@@ -177,11 +179,11 @@ export class TypeResolver {
                 let baseType = genericTypeNode.baseType.resolvedType;
                 if (!baseType) return undefined;
                 if (!baseType.hasGenericParameters()) {
-                    this.pushError("Der Datentyp " + baseType.toString() + " ist nicht generisch.", typeNode.range, module);
+                    this.pushError(JCM.typeIsNotGeneric(baseType.toString()), typeNode.range, module);
                     return undefined;
                 }
                 if (genericTypeNode.actualTypeArguments.length != baseType.genericTypeParameters?.length) {
-                    this.pushError("Der Datentyp " + baseType.toString() + " hat " + baseType.genericTypeParameters!.length + " generische Parameter, hier werden aber " + genericTypeNode.actualTypeArguments.length + " konkrete Datentypen dafür angegeben.", genericTypeNode.range, module);
+                    this.pushError(JCM.wrongNumberOfGenericParameters(baseType.toString(), baseType.genericTypeParameters!.length, genericTypeNode.actualTypeArguments.length), genericTypeNode.range, module);
                     return undefined;
                 }
                 let typeMap: Map<GenericTypeParameter, NonPrimitiveType> = new Map();
@@ -191,7 +193,7 @@ export class TypeResolver {
                     let gpType = this.resolveTypeNode(gpNode, module);
                     if (gpType) {
                         if (gpType.isPrimitive) {
-                            this.pushError("Als konkreter Typ für einen generischen Typparameter kann kein primitiver Datentyp (hier: " + baseType.identifier + ") verwendet werden.", typeNode.range, module);
+                            this.pushError(JCM.noPrimitiveTypeForGenericParameter(baseType.identifier), typeNode.range, module);
                         } else {
                             typeMap.set(gp, <NonPrimitiveType>gpType);
                         }
@@ -220,7 +222,7 @@ export class TypeResolver {
                 for (let ubNode of wildcardTypeNode.extends) {
                     let upperBound = this.resolveTypeNode(ubNode, module);
                     if (!(upperBound instanceof IJavaClass || upperBound instanceof IJavaInterface)) {
-                        this.pushError("Als upper bounds eines generischen Wildcardtyps sind nur Klassen oder Interfaces möglich.", ubNode.range, module);
+                        this.pushError(JCM.onlyClassesOrInterfacesAsUpperBounds(), ubNode.range, module);
                     } else if (upperBound) {
                         upperBounds.push(upperBound);
                     }
@@ -230,7 +232,7 @@ export class TypeResolver {
                 if (wildcardTypeNode.super) {
                     let lowerBound = this.resolveTypeNode(wildcardTypeNode.super, module);
                     if (!(lowerBound instanceof IJavaClass)) {
-                        this.pushError("Als lower bounds eines generischen Wildcardtyps sind nur Klassen oder Interfaces möglich.", wildcardTypeNode.range, module);
+                        this.pushError(JCM.onlyClassesOrInterfacesAsLowerBounds(), wildcardTypeNode.range, module);
                     } else {
                         type.lowerBound = lowerBound;
                     }
@@ -302,7 +304,7 @@ export class TypeResolver {
         }
 
         if (!type) {
-            this.pushError("Der Datentyp " + identifer + " ist nicht definiert.", typeNode.range, module);
+            this.pushError(JCM.typeNotDefined(identifer), typeNode.range, module);
         }
 
         return type;
@@ -345,7 +347,7 @@ export class TypeResolver {
                     declNode.implements.push(declNode.extends);
                     declNode.extends = undefined;
                 } else {
-                    this.pushError("Hinter extends muss eine Klasse stehen.", declNode.extends.range, module);
+                    this.pushError(JCM.afterExtendsClassNeeded(), declNode.extends.range, module);
                 }
             }
         }
@@ -359,7 +361,7 @@ export class TypeResolver {
             if (implType instanceof IJavaInterface) {
                 resolvedType1.addImplements(implType);
             } else {
-                this.pushError("Hinter implements können nur Interfaces stehen.", implNode.range, module);
+                this.pushError(JCM.onlyInterfacesAfterImplements(), implNode.range, module);
             }
         }
     }
@@ -370,7 +372,7 @@ export class TypeResolver {
             if (implType instanceof IJavaInterface) {
                 resolvedType1.addExtends(implType);
             } else {
-                this.pushError("Hinter extends können nur Interfaces stehen.", implNode.range, module);
+                this.pushError(JCM.onlyInterfacesAfterExtends(), implNode.range, module);
             }
         }
     }
@@ -386,7 +388,7 @@ export class TypeResolver {
                         if (extType instanceof IJavaClass || extType instanceof IJavaInterface) {
                             gpType.upperBounds.push(extType);
                         } else {
-                            this.pushError("Als upper bound eines generischen Typparameters sind nur classes und interfaces zugelassen.", extNode.range, module);
+                            this.pushError(JCM.onlyClassesOrInterfacesAsUpperBounds(), extNode.range, module);
                         }
                     }
                 }
@@ -396,7 +398,7 @@ export class TypeResolver {
                         if (superType instanceof IJavaClass) {
                             gpType.lowerBound = superType;
                         } else {
-                            this.pushError("Als lower bound eines generischen Typparameters ist nur eine Klasse möglich.", gpNode.super.range, module);
+                            this.pushError(JCM.onlyClassesOrInterfacesAsLowerBounds(), gpNode.super.range, module);
                         }
 
                     }
@@ -405,9 +407,10 @@ export class TypeResolver {
         }
     }
 
-    pushError(message: string, range: IRange, module: JavaBaseModule, level: ErrorLevel = "error") {
+    pushError(messageWithId: ErrormessageWithId, range: IRange, module: JavaBaseModule, level: ErrorLevel = "error") {
         module.errors.push({
-            message: message,
+            message: messageWithId.message,
+            id: messageWithId.id,
             range: range,
             level: level
         })

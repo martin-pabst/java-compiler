@@ -510,6 +510,57 @@ export class JCM {
     })
 
     /**
+     * TypeResolver
+    */
+
+    static typeIsNotGeneric = (type: string) => le({
+        "de": `Der Datentyp ${type} ist nicht generisch, daher können keine Typparameter in <...> angegeben werden.`,
+        "en": `Type ${type} is not generic, therefore type parameters in <...> are not possible.`,
+    })
+
+    static wrongNumberOfGenericParameters = (type: string, expected: number, actual: number) => le({
+        "de": `Der Datentyp ${type} hat ${expected} generische Parameter, hier werden aber ${actual} konkrete Datentypen dafür angegeben.`,
+        "en": `Type ${type} has ${expected} generic parameters. Found: ${actual} types.`,
+    })
+
+    static noPrimitiveTypeForGenericParameter = (type: string) => le({
+        "de": `Als konkreter Typ für einen generischen Typparameter kann kein primitiver Datentyp (hier: ${type}) verwendet werden.`,
+        "en": `Can't use primitive Type ${type} for generic parameter.`,
+    })
+
+
+    static onlyClassesOrInterfacesAsUpperBounds = () => le({
+        "de": `Nur Klassen und Interfaces können als upper bound für einen generischen Typparameter verwendet werden.`,
+        "en": `Only classes and interfaces can be used as upper bound for generic parameter.`,
+    })
+
+    static onlyClassesOrInterfacesAsLowerBounds = () => le({
+        "de": `Nur Klassen und Interfaces können als lower bound für einen generischen Typparameter verwendet werden.`,
+        "en": `Only classes and interfaces can be used as lower bound for generic parameter.`,
+    })
+
+    static afterExtendsClassNeeded = () => le({
+        "de": `Hinter extends muss eine Klasse stehen.`,
+        "en": `After extends a class identifier is needed.`,
+    })
+
+    static onlyInterfacesAfterImplements = () => le({
+        "de": `Hinter implements können nur Interfaces stehen.`,
+        "en": `Only interface identifiers are allowed after implements.`,
+    })
+
+    static onlyInterfacesAfterExtends = () => le({
+        "de": `Hinter extends können nur Interfaces stehen.`,
+        "en": `Only interface identifiers are allowed after extends.`,
+    })
+
+    static typeNotDefined = (type: string) => le({
+        "de": `Der Datentyp ${type}) ist hier nicht definiert.`,
+        "en": `Type ${type} is not defined here.`,
+    })
+
+
+    /**
      * class JavaClass
      */
     static abstractMethodsNotImplemented = (identifier: string, methods: string) => le({
