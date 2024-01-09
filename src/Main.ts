@@ -31,7 +31,7 @@ export class Main {
   language: Language;
   inputEditor: Editor;
 
-  tabManager: TabManager;
+  insightTabsManager: TabManager;
 
   tokenDiv: HTMLDivElement;
   astDiv: HTMLDivElement;
@@ -64,17 +64,17 @@ export class Main {
     let testProgram: string = testPrograms.primzahlzwillinge.trim();
     this.inputEditor.setValue(testProgram);
 
-    this.tabManager = new TabManager(document.getElementById('tabs')!,
+    this.insightTabsManager = new TabManager(document.getElementById('insighttabs')!,
       ['token', 'ast', 'code', 'errors']);
 
-    this.tabManager.setBodyElementClass('tabBodyElement');
-    this.tokenDiv = this.tabManager.getBodyElement(0);
+    this.insightTabsManager.setBodyElementClass('tabBodyElement');
+    this.tokenDiv = this.insightTabsManager.getBodyElement(0);
     this.tokenDiv.style.overflow = 'auto';
-    this.astDiv = this.tabManager.getBodyElement(1);
-    this.codeOutputDiv = this.tabManager.getBodyElement(2);
+    this.astDiv = this.insightTabsManager.getBodyElement(1);
+    this.codeOutputDiv = this.insightTabsManager.getBodyElement(2);
     this.codeOutputDiv.classList.add('codeOutput');
     this.astDiv.classList.add('astOutput');
-    this.errorDiv = this.tabManager.getBodyElement(3);
+    this.errorDiv = this.insightTabsManager.getBodyElement(3);
 
     this.astComponent = new AstComponent(this.astDiv);
     this.programViewerCompoment = new ProgramViewerComponent(this.codeOutputDiv);
