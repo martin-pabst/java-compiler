@@ -447,7 +447,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             }
         }
 
-        let symbolTable = this.pushAndGetNewSymbolTable(methodNode.range, true, method.isStatic ? new StaticNonPrimitiveType(classContext) : classContext, method);
+        let symbolTable = this.pushAndGetNewSymbolTable(methodNode.range, true, method.isStatic ? classContext.staticType : classContext, method);
 
         if (method.hasOuterClassParameter) {
             this.currentSymbolTable.insertInvisibleParameter(); // make room for __outer-Parameter
