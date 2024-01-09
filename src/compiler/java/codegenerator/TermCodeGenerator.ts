@@ -538,6 +538,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         if (type != null && type instanceof NonPrimitiveType) {
 
+            type.usagePositions.push({ file: this.module.file, range: node.range })
+
             let staticType = new StaticNonPrimitiveType(type);
             return new StringCodeSnippet(`${Helpers.classes}["${type.identifier}"]`, node.range, staticType);
         }
