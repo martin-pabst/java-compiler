@@ -4,17 +4,24 @@ This compiler/interpreter combo (work in progress...) understands a fairly large
 ## Features (done)
   * primitive types (int, long, double, ...)
   * classes, interfaces, enums, records, arrays
+  * classes String, Math
   * for, while, if...else
+  * break, continue
+  * switch statement
+  * simplified for-loop over collections
+  * class ArrayList
   * try...catch...finally (exceptions)
+  * generics (with wildcard-operator!)
+  * named inner classes
+  * anonymous classes
+  * lambda functions
+  * function declarations in main program
+  * class Thread/multithreaded execution
+  * locking, wait, notify
+  * synchronized methods/blocks
+  * semaphors (not yet tested)
 
 ## Features (in progress)
-  * switch statement
-  * simplified for-loop over collecitons
-  * break, continue
-  * generics (needs testing)
-  * lambda functions
-  * multi threaded execution (50 %)
-  * locks, semaphors (50 %)
   * [REPL](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop)-mode
   * port whole Onlne-IDE API to new compiler (2 %)
   * rich semantic support for editing sourcecode in the [monaco editor](https://microsoft.github.io/monaco-editor/)
