@@ -20,16 +20,15 @@ import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { BinopCastCodeGenerator } from "./BinopCastCodeGenerator.ts";
 import { GenericMethod, Method } from "../types/Method.ts";
-import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { MissingStatementManager } from "./MissingStatementsManager.ts";
 import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
-import { UsagePosition } from "../../common/UsagePosition.ts";
 import { OuterClassFieldAccessTracker } from "./OuterClassFieldAccessTracker.ts";
 import { LabelCodeSnippet } from "./LabelManager.ts";
 import { CodeReacedAssertion, CodeReachedAssertions } from "../../common/interpreter/CodeReachedAssertions.ts";
 import { JCM } from "../JavaCompilerMessages.ts";
+import { JavaLibraryModule } from "../module/libraries/JavaLibraryModule.ts";
 
 export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
@@ -501,7 +500,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
             if (symbolInformation.outerClassLevel > 0) this.outerClassFieldAccessTracker.onAccessHappened();
 
-            symbol.usagePositions.push({ file: this.module.file, range: node.range });
+            this.registerUsagePosition(symbol, node.range);
 
             if (symbol.onStackframe()) {
                 if (symbolInformation.outerClassLevel == 0) {
@@ -537,7 +536,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         if (type != null && type instanceof NonPrimitiveType) {
 
-            type.usagePositions.push({ file: this.module.file, range: node.range })
+            this.registerUsagePosition(type, node.range);
 
             let staticType = type.staticType;
             return new StringCodeSnippet(`${Helpers.classes}["${type.identifier}"]`, node.range, staticType);
@@ -625,12 +624,10 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
         snippet.isLefty = !field.isFinal;
 
-        let usagePosition: UsagePosition = { file: this.module.file, range: range };
-
         if (field.isInnerClassCopyOfOuterClassLocalVariable) {
-            field.isInnerClassCopyOfOuterClassLocalVariable.usagePositions.push(usagePosition);
+            this.registerUsagePosition(field.isInnerClassCopyOfOuterClassLocalVariable, range);
         } else {
-            field.usagePositions.push()
+            this.registerUsagePosition(field, range);
         }
 
         return snippet;
@@ -752,7 +749,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             return undefined;
         }
 
-        field.usagePositions.push({ file: this.module.file, range: node.range });
+        this.registerUsagePosition(field, node.range);
 
         if (field.isFinal && field.initialValueIsConstant) {
             let constantValue = field.initialValue!;
@@ -907,7 +904,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention || method.template ? "native" : "java";
         if(callingConvention == "native"){
-            let isFinalOrStatic = (objectSnippet.type instanceof IJavaClass && objectSnippet.type.isFinal()) || method.isFinal || method.isStatic;
+            let isFinalOrStatic = (objectSnippet.type instanceof IJavaClass && objectSnippet.type.isFinal) || method.isFinal || method.isStatic;
             if(!isFinalOrStatic){
                 if(method.classEnumInterface instanceof IJavaInterface){
                     callingConvention = "java";
@@ -1083,5 +1080,12 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         return undefined;
     }
 
+    registerUsagePosition(symbol: BaseSymbol, range: IRange){
+        if(symbol.module instanceof JavaLibraryModule){
+            this.module.systemSymbolsUsageTracker.registerUsagePosition(symbol, this.module.file, range);
+        } else {
+            this.module.compiledSymbolsUsageTracker.registerUsagePosition(symbol, this.module.file, range);
+        }
+    }
 
 }

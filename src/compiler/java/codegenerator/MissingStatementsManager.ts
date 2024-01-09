@@ -40,7 +40,8 @@ class MissingStatements {
         let i = this.symbols.indexOf(symbol);
         if(i >= 0) {
             if(!this.symbolWriteHappened[i]){
-                errors.push({message: JCM.variableNotInitialized(symbol.identifier), level: "error", range: range});
+                let error = JCM.variableNotInitialized(symbol.identifier);
+                errors.push({message: error.message, id: error.id, level: "error", range: range});
             }
             this.symbolReadHappened[i] = true;
         }
@@ -71,7 +72,8 @@ class MissingStatements {
 
         for(let i = start; i < this.symbolReadHappened.length; i++){
             if(!this.symbolReadHappened[i]){
-                errors.push({message: JCM.noReadAccessForVariable(this.symbols[i].identifier), level: "info", range: this.symbols[i].identifierRange});                    
+                let error = JCM.noReadAccessForVariable(this.symbols[i].identifier)
+                errors.push({message: error.message, id: error.id , level: "info", range: this.symbols[i].identifierRange});                    
             }   
         }
         
@@ -117,7 +119,8 @@ export class MissingStatementManager {
         
         if(method && method.returnParameterType && method.returnParameterType.identifier != "void"){
             if(!currentMissingStatements.returnHappened && !method.isConstructor){
-                errors.push({message: JCM.returnStatementMissing(method.identifier, method.returnParameterType.identifier), level: "error", range: method.identifierRange});                    
+                let error = JCM.returnStatementMissing(method.identifier, method.returnParameterType.identifier);
+                errors.push({message: error.message, id: error.id, level: "error", range: method.identifierRange});                    
             }
         }
 

@@ -64,10 +64,5 @@ export class JavaLibraryModuleManager {
         }
     }
 
-    clearUsagePositionsAndInheritanceInformation(){
-        for(let type of this.javaTypes){
-            type.clearUsagePositions();
-        }
-    }
 
 }

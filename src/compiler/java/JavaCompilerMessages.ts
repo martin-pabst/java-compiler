@@ -579,6 +579,29 @@ export class JCM {
     })
 
     /**
+     * class GenericTypeParameter
+     */
+    static parameterNotDefined = (identifier: string) => le({
+        "de": `Der generische Parameter ${identifier} ist bei diesem Methodenaufruf unbestimmt.`,
+        "en": `Generic parameter ${identifier} is not bound in this method invocation.`
+    })
+
+    static parameterContradictoryBound = (identifier: string, bounds: string) => le({
+        "de": `Der generische Parameter ${identifier} hat bei diesem Methodenaufruf widersprüchliche Ausprägungen: ${bounds}`,
+        "en": `Generic parameter ${identifier} is bound in a contradictory way in this method call.`
+    })
+
+    /**
+     * class CycleFinder
+     */
+    static cycleInInheritenceHierarchy = (cycle: string) => le({
+        "de": `In der Vererbungshierarchie gibt es einen Zyklus: ${cycle} + " Daher kann leider nicht weiterkompiliert werden.`,
+        "en": `There's a inheritence-cycle: ${cycle}   ... => compilation had to be cancelled.`
+    })
+
+
+
+    /**
      * class Executable
      */
 

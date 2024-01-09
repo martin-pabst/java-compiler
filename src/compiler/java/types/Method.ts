@@ -1,5 +1,4 @@
 import { Error } from "../../common/Error";
-import { UsagePosition } from "../../common/UsagePosition";
 import { Program } from "../../common/interpreter/Program";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
@@ -44,8 +43,6 @@ export class Method {
     public hasImplementationWithNativeCallingConvention: boolean = false;
 
     classEnumInterface!: IJavaClass | JavaEnum | IJavaInterface;
-
-    usagePositions: UsagePosition[] = [];
 
     programStub?: string;       // only for debugging purposes
 
@@ -143,11 +140,6 @@ export class Method {
         this.signatureCacheWithGenericParameterIdentifiers["java"] = method.getInternalNameWithGenericParameterIdentifiers("java");
     }
 
-
-    clearUsagePositions(): void {
-        this.usagePositions = [];
-        this.parameters.forEach(p => p.usagePositions = []);
-    }
 
     getSignature(){
         if(this.isConstructor){

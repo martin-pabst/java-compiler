@@ -1,7 +1,7 @@
 import { Error } from "../../common/Error.ts";
-import { UsagePosition } from "../../common/UsagePosition";
 import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
+import { JCM } from "../JavaCompilerMessages.ts";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { IJavaClass } from "./JavaClass";
@@ -17,7 +17,6 @@ export class GenericTypeParameter extends NonPrimitiveType {
 
     private fieldCache?: Field[];
     private methodCache?: Method[];
-    public usagePositions: UsagePosition[] = [];
 
     // only used for generic type parameters of generic methods:
     public catches?: NonPrimitiveType[];
@@ -149,8 +148,10 @@ export class GenericTypeParameter extends NonPrimitiveType {
 
     checkCatches(errors: Error[], methodCallPosition: IRange) {
         if(!this.catches || this.catches.length == 0){
+            let error = JCM.parameterNotDefined(this.identifier);
             errors.push({
-                message: `Der generische Parameter ${this.identifier} ist bei diesem Methodenaufruf unbestimmt.`,
+                message: error.message,
+                id: error.id,
                 level: "error",
                 range: methodCallPosition
             })
@@ -168,8 +169,10 @@ export class GenericTypeParameter extends NonPrimitiveType {
         }
 
         if(!allEqual){
+            let error = JCM.parameterContradictoryBound(this.identifier, catchesAsString.join(", "));
             errors.push({
-                message: `Der generische Parameter ${this.identifier} hat bei diesem Methodenaufruf unterschiedliche Ausprägungen: ${catchesAsString.join(", ")}`,
+                message: error.message,
+                id: error.id,
                 level: "error",
                 range: methodCallPosition
             })

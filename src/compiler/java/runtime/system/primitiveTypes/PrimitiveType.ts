@@ -23,7 +23,7 @@ export abstract class PrimitiveType extends JavaType {
 
     public identifierRange: IRange = { startLineNumber: 0, startColumn: 0, endLineNumber: 0, endColumn: 0 };
 
-    constructor(public identifier: string, public module: JavaBaseModule) {
+    constructor(identifier: string, module: JavaBaseModule) {
         super(identifier, EmptyRange.instance, module)
         this.isPrimitive = true;
         this.myIndex = PrimitiveType.typeIdentifiers.indexOf(this.identifier);
@@ -50,10 +50,6 @@ export abstract class PrimitiveType extends JavaType {
         let index = PrimitiveType.boxedTypeIdentifiers.indexOf(type.identifier);
         if (index >= 0) return index;
         return this.typeIdentifiers.indexOf(type.identifier);
-    }
-
-    clearUsagePositions(): void {
-        this.usagePositions = [];
     }
 
    toString(): string {

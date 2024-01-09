@@ -95,27 +95,20 @@ export class JavaCompiledModule extends JavaBaseModule {
 
 
     clearAndRegisterTypeUsagePositions(): void {
-        this.clearTypeUsagePositions();
         this.registerTypeUsagePositions();
     }
 
-    clearTypeUsagePositions(): void {
-        if(this.ast?.classOrInterfaceOrEnumDefinitions){
-            for(let def of this.ast?.classOrInterfaceOrEnumDefinitions){
-                if(def.resolvedType) def.resolvedType?.clearUsagePositions();
-            }
-        }        
-    }
 
     registerTypeUsagePositions(): void {
         if(this.ast?.collectedTypeNodes){
             for(let typeNode of this.ast!.collectedTypeNodes){
                 let resolvedType = typeNode.resolvedType;
                 if(resolvedType && resolvedType instanceof NonPrimitiveType && !resolvedType.isGenericVariant()){                    
-                    resolvedType.usagePositions.push({
-                        file: this.file,
-                        range: typeNode.range
-                    })
+                    if(resolvedType.module.isLibraryModule){
+                        this.systemSymbolsUsageTracker.registerUsagePosition(resolvedType, this.file, typeNode.range);
+                    } else {
+                        this.compiledSymbolsUsageTracker.registerUsagePosition(resolvedType, this.file, typeNode.range);
+                    }
                 }
             }
         }

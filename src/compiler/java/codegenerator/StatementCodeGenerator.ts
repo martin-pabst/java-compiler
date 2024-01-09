@@ -641,10 +641,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
                 this.pushError(JCM.enumIdentifierUnknown(enumType.identifier, enumIdentifier), "error", node.constant.range);
                 return undefined;
             }
-            enumType.fields[enumIndex].usagePositions.push({
-                file: this.module.file,
-                range: enumIdentifierRange
-            })
+            this.registerUsagePosition(enumType.fields[enumIndex], enumIdentifierRange);
             constant = new StringCodeSnippet(enumIndex + "", enumIdentifierRange, this.intType, enumIndex);
         } else {
             constant = this.compileTerm(node.constant);

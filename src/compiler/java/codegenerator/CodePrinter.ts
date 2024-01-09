@@ -4,7 +4,7 @@ import { JCM } from "../JavaCompilerMessages";
 export class CodePrinter{
 
     printProgram(p: Program | undefined): string {
-        if(!p) return JCM.missingProgram();
+        if(!p) return JCM.missingProgram().message;
         let s = "";
         for(let i = 0; i < p.stepsSingle.length; i++){
             let step = p.stepsSingle[i];

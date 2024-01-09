@@ -32,6 +32,7 @@ export abstract class NonPrimitiveType extends JavaType {
     
     visibility: Visibility = TokenType.keywordPublic;
     isStatic: boolean = false; // static inner classes behave differently from non-static inner classes
+    isFinal: boolean = false;
     
     private _outerType?: NonPrimitiveType | StaticNonPrimitiveType;      // a local class defined inside a static method has a StaticNonPrimitiveType outerType
     
@@ -68,10 +69,6 @@ export abstract class NonPrimitiveType extends JavaType {
         this.pathAndIdentifier = pathAndIdentifier || identifier;
         this.extendsImplements[this.pathAndIdentifier] = true;
         this.staticType = new StaticNonPrimitiveType(this);
-    }
-    
-    clearUsagePositions(){
-        super.clearUsagePositions();
     }
     
     getExtendedImplementedIdentifiers(): string[] {

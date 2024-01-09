@@ -10,7 +10,7 @@ import { JavaType } from "./JavaType";
 export class ArrayType extends JavaType {
 
     constructor(public elementType: JavaType, public dimension: number,
-        public module: JavaBaseModule, public identifierRange: IRange) {
+        module: JavaBaseModule, identifierRange: IRange) {
         super(elementType.identifier + "[]".repeat(dimension), identifierRange, module);
         this.isPrimitive = false;
         this.genericTypeParameters = undefined;
@@ -22,10 +22,6 @@ export class ArrayType extends JavaType {
 
     getCastFunction(_destType: JavaType): CodeTemplate | undefined {
         return undefined;  // you can't cast arrays in java (to my knowledge...).
-    }
-
-    clearUsagePositions(): void {
-        this.usagePositions = [];
     }
 
     getCopyWithConcreteType(_typeMap: Map<GenericTypeParameter, JavaType>): JavaType {

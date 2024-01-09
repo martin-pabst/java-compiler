@@ -1,5 +1,4 @@
 import { BaseSymbol } from "../../common/BaseSymbolTable";
-import { UsagePosition } from "../../common/UsagePosition";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaLocalVariable } from "../codegenerator/JavaLocalVariable";
@@ -14,12 +13,11 @@ import { Visibility } from "./Visibility";
 export class Field extends BaseSymbol {
 
     isStatic: boolean = false;
+    isFinal: boolean = false;
 
     classEnum!: JavaClass | JavaEnum | JavaInterface;
 
     internalName?: string;
-
-    usagePositions: UsagePosition[] = [];
 
     initialValue?: any;
     initialValueIsConstant: boolean = false;    // enables us to resolve values of final variables as constants

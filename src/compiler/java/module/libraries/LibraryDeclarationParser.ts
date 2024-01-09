@@ -86,7 +86,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 let npt1 = <JavaClass>npt;
                 npt1.runtimeClass = klass;
                 npt1.isStatic = modifiersAndType.static;
-                npt1._isFinal = modifiersAndType.final;
+                npt1.isFinal = modifiersAndType.final;
                 npt1._isAbstract = modifiersAndType.abstract;
                 npt1.pathAndIdentifier = pathAndIdentifier;
                 if(klass["isPrimitiveTypeWrapper"]) npt.isPrimitiveTypeWrapper = true;

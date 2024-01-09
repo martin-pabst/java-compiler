@@ -1,30 +1,17 @@
-import { BaseType } from "./BaseType";
-import { UsagePosition } from "./UsagePosition";
 import { File } from "./module/File";
 import { Module } from "./module/Module.ts";
-import { EmptyRange, IRange } from "./range/Range";
+import { IRange } from "./range/Range";
 
 /**
  * Fields, parameters and local variables
  */
 export abstract class BaseSymbol {
-
-    usagePositions: UsagePosition[] = [];
-
-    
-    public isFinal: boolean = false;
     
     constructor(public identifier: string, public identifierRange: IRange, public module: Module) {
         
     }
-    
-    getLastUsagePosition(): IRange {
-        if(this.usagePositions.length == 0) return EmptyRange.instance;
-        return this.usagePositions[this.usagePositions.length - 1].range;
-    }
-    
-    
-    onStackframe(): boolean {
+        
+     onStackframe(): boolean {
         return false;
     }
     
@@ -32,7 +19,8 @@ export abstract class BaseSymbol {
 
 export abstract class SymbolOnStackframe extends BaseSymbol {
     public stackframePosition?: number;
-    
+    public isFinal: boolean = false;
+
     onStackframe(): boolean {
         return true;
     }

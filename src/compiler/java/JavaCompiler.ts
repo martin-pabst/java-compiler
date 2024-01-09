@@ -42,8 +42,6 @@ export class JavaCompiler {
 
         LabelCodeSnippet.resetCount();
 
-        this.libraryModuleManager.clearUsagePositionsAndInheritanceInformation();
-
         this.moduleManager.setupModulesBeforeCompiliation(files);
         this.moduleManager.setDirtyFlags();
 

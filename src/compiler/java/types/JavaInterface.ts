@@ -1,4 +1,3 @@
-import { UsagePosition } from "../../common/UsagePosition";
 import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
@@ -71,8 +70,6 @@ export class JavaInterface extends IJavaInterface {
     fields: Field[] = [];               // A interface may have fields, but they must be static final
 
     private extends: IJavaInterface[] = [];
-
-    public usagePositions: UsagePosition[] = [];
 
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
         super(identifier, identifierRange, path, module);
@@ -186,11 +183,6 @@ export class JavaInterface extends IJavaInterface {
         return false;
     }
 
-    clearUsagePositions(): void {
-        this.usagePositions = [];
-        this.genericTypeParameters!.forEach(gi => gi.usagePositions = []);
-        this.methods.forEach(m => m.clearUsagePositions());
-    }
 }
 
 
@@ -199,8 +191,6 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
     private cachedMethods?: Method[];
 
     private cachedExtends?: IJavaInterface[];
-
-    public usagePositions: UsagePosition[] = [];
 
     constructor(public isGenericVariantOf: JavaInterface, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
         super(isGenericVariantOf.identifier, isGenericVariantOf.identifierRange, isGenericVariantOf.pathAndIdentifier, isGenericVariantOf.module);
@@ -357,10 +347,6 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
         }
 
         return null;
-    }
-
-    clearUsagePositions(): void {
-        this.usagePositions = [];
     }
 
 }

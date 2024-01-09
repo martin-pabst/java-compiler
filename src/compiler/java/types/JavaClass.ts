@@ -1,4 +1,3 @@
-import { UsagePosition } from "../../common/UsagePosition";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
@@ -27,8 +26,6 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 
     abstract getExtends(): IJavaClass | undefined;
     abstract getImplements(): IJavaInterface[];
-
-    abstract isFinal(): boolean;
 
     findImplementedInterface(identifier: string): IJavaInterface | undefined {
 
@@ -77,7 +74,6 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 export class JavaClass extends IJavaClass {
 
     isStatic: boolean = false;
-    _isFinal: boolean = false;
     _isAbstract: boolean = false;
 
     fields: Field[] = [];
@@ -89,10 +85,6 @@ export class JavaClass extends IJavaClass {
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
         super(identifier, identifierRange, path, module);
         this.genericTypeParameters = [];
-    }
-
-    isFinal(): boolean {
-        return this._isFinal;
     }
 
     getAbstractMethodsNotYetImplemented(): Method[] {
@@ -368,12 +360,6 @@ export class JavaClass extends IJavaClass {
 
     }
 
-    clearUsagePositions(): void {
-        this.usagePositions = [];
-        this.genericTypeParameters?.forEach(gi => gi.usagePositions = []);
-        this.methods.forEach(m => m.clearUsagePositions());
-        this.fields.forEach(f => f.usagePositions = []);
-    }
 }
 
 export class GenericVariantOfJavaClass extends IJavaClass {
@@ -385,15 +371,10 @@ export class GenericVariantOfJavaClass extends IJavaClass {
 
     private cachedImplements?: IJavaInterface[];
 
-    public usagePositions: UsagePosition[] = [];
-
     constructor(public isGenericVariantOf: JavaClass, public typeMap: Map<GenericTypeParameter, NonPrimitiveType>) {
         super(isGenericVariantOf.identifier, isGenericVariantOf.identifierRange, isGenericVariantOf.pathAndIdentifier, isGenericVariantOf.module);
         this.runtimeClass = this.isGenericVariantOf.runtimeClass;
-    }
-
-    isFinal(): boolean {
-        return this.isGenericVariantOf._isFinal;
+        this.isFinal = this.isGenericVariantOf.isFinal;
     }
 
     toString(): string {
@@ -621,9 +602,5 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         return null;
     }
 
-    clearUsagePositions(): void {
-        this.usagePositions = [];
-
-    }
 
 }

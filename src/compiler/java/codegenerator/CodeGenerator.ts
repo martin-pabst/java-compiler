@@ -797,7 +797,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         klass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods();
 
         let outerLocalVariables = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.isInnerClassCopyOfOuterClassLocalVariable);
-        outerLocalVariables.forEach(v => this.missingStatementManager.onSymbolRead(v!, v!.getLastUsagePosition(), this.module.errors));
+        outerLocalVariables.forEach(v => this.missingStatementManager.onSymbolRead(v!, EmptyRange.instance, this.module.errors));
         let invisibleFieldIdentifiers = klass.fields.filter(f => f.isInnerClassCopyOfOuterClassLocalVariable).map(f => f.getInternalName());
 
         // final version of runtime class:

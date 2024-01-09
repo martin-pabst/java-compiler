@@ -1,18 +1,14 @@
-import { UsagePosition } from "./UsagePosition";
-import { File } from "./module/File";
+import { BaseSymbol } from "./BaseSymbolTable";
+import { Module } from "./module/Module";
 import { IRange } from "./range/Range";
 
 /**
  * encapsultes methods for debugger
  */
-export class BaseType {
-    usagePositions: UsagePosition[] = [];
+export class BaseType extends BaseSymbol {
 
-    constructor(public identifier: string, public identifierRange: IRange, public file: File){
-
+    constructor(identifier: string, identifierRange: IRange, module: Module) {
+        super(identifier, identifierRange, module);
     }
 
-    clearUsagePositions(): void {
-        this.usagePositions = [];
-    }
 }

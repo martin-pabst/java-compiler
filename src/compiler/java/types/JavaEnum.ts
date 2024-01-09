@@ -1,4 +1,3 @@
-import { UsagePosition } from "../../common/UsagePosition";
 import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType.ts";
@@ -18,8 +17,6 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
     fields: Field[] = [];
     methods: Method[] = [];
-
-    public usagePositions: UsagePosition[] = [];
 
     private implements: JavaInterface[] = [];
 

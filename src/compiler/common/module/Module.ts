@@ -1,4 +1,5 @@
 import { Error } from "../Error";
+import { UsageTracker } from "../UsagePosition";
 import { Program } from "../interpreter/Program";
 import { Thread } from "../interpreter/Thread";
 import { File } from "./File";
@@ -14,8 +15,9 @@ export abstract class Module {
     programsToCompileToFunctions: Program[] = [];
 
     
-
-
+    compiledSymbolsUsageTracker: UsageTracker = new UsageTracker();
+    
+    systemSymbolsUsageTracker: UsageTracker = new UsageTracker();
 
     constructor(public file: File, public isLibraryModule: boolean){
 

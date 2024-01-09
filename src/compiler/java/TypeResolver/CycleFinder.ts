@@ -1,3 +1,4 @@
+import { JCM } from "../JavaCompilerMessages";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaModuleManager } from "../module/JavaModuleManager";
 import { JavaClass } from "../types/JavaClass";
@@ -33,12 +34,13 @@ export class CycleFinder {
     private static reportError(cycle: ClassOrInterface[], extendsImplements: "extends" | "implements"){
         cycle.push(cycle[0]);
 
-        let message: string = `In der Vererbungshierarchie gibt es einen Zyklus: ${cycle.map(type => type.identifier).join(" " + extendsImplements + " ")}. Daher kann nicht weiterkompiliert werden.`;
+        let error = JCM.cycleInInheritenceHierarchy(cycle.map(type => type.identifier).join(" " + extendsImplements + " "));
         for(let type of cycle){
             let module = type.module;
             if(module instanceof JavaBaseModule){
                 module.errors.push({
-                    message: message,
+                    message: error.message,
+                    id: error.id,
                     level: "error",
                     range: type.identifierRange
                 })
