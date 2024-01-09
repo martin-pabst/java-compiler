@@ -3,7 +3,7 @@ import { UsagePosition } from "./UsagePosition";
 import { File } from "./module/File";
 import { EmptyRange, IRange } from "./range/Range";
 
-export enum SymbolKind { localVariable, parameter, field, staticField }
+export enum SymbolKind { localVariable, parameter, field, staticField, type }
 
 /**
  * Fields, parameters and local variables
