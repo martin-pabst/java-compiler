@@ -3,7 +3,7 @@ import { Main } from "../../Main";
 export class Editor {
     editor: monaco.editor.IStandaloneCodeEditor;
 
-    constructor(public main: Main, element: HTMLElement) {
+    constructor(element: HTMLElement) {
 
         monaco.editor.defineTheme('myCustomThemeDark', {
             base: 'vs-dark', // can also be vs-dark or hc-black

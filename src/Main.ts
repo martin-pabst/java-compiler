@@ -25,13 +25,14 @@ import { JavaBaseModule } from "./compiler/java/module/JavaBaseModule.ts";
 import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts";
 import { ProgramViewerComponent } from "./testgui/ProgramViewerComponent.ts";
 import { ProgramPointerPositionInfo } from "./compiler/common/interpreter/Scheduler.ts";
+import { TabbedEditorManager } from "./tools/TabbedEditorManager.ts";
 
 export class Main {
 
   language: Language;
-  inputEditor: Editor;
 
-  tabManager: TabManager;
+  insightTabsManager: TabManager;
+  tabbedEditorManager: TabbedEditorManager;
 
   tokenDiv: HTMLDivElement;
   astDiv: HTMLDivElement;
@@ -45,7 +46,7 @@ export class Main {
 
   programViewerCompoment: ProgramViewerComponent;
 
-  file: File;
+  files: File[] = [];
 
   compiler: JavaCompiler;
   interpreter: Interpreter;
@@ -56,31 +57,33 @@ export class Main {
     this.language = new JavaLanguage();
     this.language.registerLanguageAtMonacoEditor();
 
-    this.inputEditor = new Editor(this, document.getElementById('editor')!);
 
     /*
      * Test program:
      */
     let testProgram: string = testPrograms.primzahlzwillinge.trim();
-    this.inputEditor.setValue(testProgram);
+    
+    this.insightTabsManager = new TabManager(document.getElementById('insighttabs')!,
+    ['token', 'ast', 'code', 'errors']);
 
-    this.tabManager = new TabManager(document.getElementById('tabs')!,
-      ['token', 'ast', 'code', 'errors']);
-
-    this.tabManager.setBodyElementClass('tabBodyElement');
-    this.tokenDiv = this.tabManager.getBodyElement(0);
+    this.insightTabsManager.setBodyElementClass('tabBodyElement');
+    this.tokenDiv = this.insightTabsManager.getBodyElement(0);
     this.tokenDiv.style.overflow = 'auto';
-    this.astDiv = this.tabManager.getBodyElement(1);
-    this.codeOutputDiv = this.tabManager.getBodyElement(2);
+    this.astDiv = this.insightTabsManager.getBodyElement(1);
+    this.codeOutputDiv = this.insightTabsManager.getBodyElement(2);
     this.codeOutputDiv.classList.add('codeOutput');
     this.astDiv.classList.add('astOutput');
-    this.errorDiv = this.tabManager.getBodyElement(3);
-
+    this.errorDiv = this.insightTabsManager.getBodyElement(3);
+    
     this.astComponent = new AstComponent(this.astDiv);
     this.programViewerCompoment = new ProgramViewerComponent(this.codeOutputDiv);
-
-    this.file = new File("Test");
-    this.file.monacoModel = this.inputEditor.editor.getModel()!;
+    
+    for(let i = 0; i < 3; i++){
+      this.files.push(new File("module " + i));
+    }
+    this.files[0].setText(testProgram);
+    this.tabbedEditorManager = new TabbedEditorManager(document.getElementById('editorOuter')!,
+    this.files);
 
     this.compiler = new JavaCompiler();
 
@@ -99,7 +102,7 @@ export class Main {
 
           let range = new monaco.Range(lineNumber, positionInfo?.range.startColumn || 1, lineNumber, positionInfo?.range.endColumn || 100)
 
-          this.decorations = this.inputEditor.editor.createDecorationsCollection([{
+          this.decorations = this.tabbedEditorManager.editor.editor.createDecorationsCollection([{
             range: range,
             options: {
               isWholeLine: true,
@@ -152,9 +155,9 @@ export class Main {
 
   compile() {
 
-    let executable = this.compiler.compile([this.file], this.file);
+    let executable = this.compiler.compile(this.files, this.tabbedEditorManager.getCurrentlyOpenedFile());
 
-    let module = this.compiler.moduleManager.getModuleFromFile(this.file)!;
+    let module = this.compiler.moduleManager.getModuleFromFile(this.tabbedEditorManager.getCurrentlyOpenedFile())!;
 
 
     if (module) {
@@ -186,7 +189,7 @@ export class Main {
       }
     })
 
-    monaco.editor.setModelMarkers(this.inputEditor.editor.getModel()!, "martin", markers);
+    monaco.editor.setModelMarkers(this.tabbedEditorManager.editor.editor.getModel()!, "martin", markers);
 
   }
 

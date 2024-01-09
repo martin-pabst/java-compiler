@@ -10,7 +10,7 @@ body, html, #main {
 
 #main {
     display:grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 2fr 3fr;
     grid-template-rows: minmax(0,3fr) minmax(0,1fr);
     width: 100%;
     height: 100%;
@@ -20,11 +20,14 @@ body, html, #main {
     border: 1px solid #a0a0a0;
 }
 
-#editor {
+#editorOuter {
     grid-area: 1/1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
 }
 
-#tabs {
+#insighttabs {
     grid-area: 1/2;
 
 }
