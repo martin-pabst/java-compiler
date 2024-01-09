@@ -1,4 +1,4 @@
-import { BaseStackframe, BaseSymbol, BaseSymbolTable, SymbolKind } from "../../common/BaseSymbolTable";
+import { BaseStackframe, BaseSymbol, BaseSymbolTable, SymbolOnStackframe as SymbolOnStack } from "../../common/BaseSymbolTable";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
@@ -7,6 +7,7 @@ import { JavaEnum } from "../types/JavaEnum";
 import { JavaInterface } from "../types/JavaInterface.ts";
 import { JavaType } from "../types/JavaType.ts";
 import { Method } from "../types/Method.ts";
+import { Parameter } from "../types/Parameter.ts";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { Visibility } from "../types/Visibility.ts";
 import { JavaLocalVariable } from "./JavaLocalVariable";
@@ -82,10 +83,10 @@ export class JavaSymbolTable extends BaseSymbolTable {
         return undefined;
     }   
 
-    public addSymbol(symbol: BaseSymbol): void {
+    public addSymbol(symbol: SymbolOnStack): void {
         super.addSymbol(symbol);
         if(symbol.onStackframe()){
-            this.getStackFrame()?.addSymbol(symbol);
+            this.getStackFrame()?.addSymbol(symbol, symbol instanceof Parameter ? "parameter" : "localVariable");
         }
     }
 
@@ -119,4 +120,6 @@ export class JavaSymbolTable extends BaseSymbolTable {
 
 
 }
+
+
 

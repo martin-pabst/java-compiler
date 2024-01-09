@@ -13,6 +13,9 @@ export abstract class Module {
 
     programsToCompileToFunctions: Program[] = [];
 
+    
+
+
 
     constructor(public file: File, public isLibraryModule: boolean){
 

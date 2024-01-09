@@ -1,4 +1,4 @@
-import { BaseSymbol, SymbolKind } from "../../common/BaseSymbolTable";
+import { BaseSymbol } from "../../common/BaseSymbolTable";
 import { UsagePosition } from "../../common/UsagePosition";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
@@ -24,13 +24,11 @@ export class Field extends BaseSymbol {
     initialValue?: any;
     initialValueIsConstant: boolean = false;    // enables us to resolve values of final variables as constants
 
-    declare type: JavaType;
-
     isInnerClassCopyOfOuterClassLocalVariable?: JavaLocalVariable;
 
     constructor(identifier: string, identifierRange: IRange, public module: JavaBaseModule,
-         type: JavaType, public visibility: Visibility = TokenType.keywordPublic){
-            super(identifier, identifierRange, type, SymbolKind.field);
+         public type: JavaType, public visibility: Visibility = TokenType.keywordPublic){
+            super(identifier, identifierRange, module);
     }
 
     getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, JavaType>): Field {

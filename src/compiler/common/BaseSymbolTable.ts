@@ -1,9 +1,8 @@
 import { BaseType } from "./BaseType";
 import { UsagePosition } from "./UsagePosition";
 import { File } from "./module/File";
+import { Module } from "./module/Module.ts";
 import { EmptyRange, IRange } from "./range/Range";
-
-export enum SymbolKind { localVariable, parameter, field, staticField, type }
 
 /**
  * Fields, parameters and local variables
@@ -12,28 +11,35 @@ export abstract class BaseSymbol {
 
     usagePositions: UsagePosition[] = [];
 
-    public stackframePosition?: number;
-
+    
     public isFinal: boolean = false;
-
-    constructor(public identifier: string, public identifierRange: IRange, public type: BaseType, public kind: SymbolKind) {
-
+    
+    constructor(public identifier: string, public identifierRange: IRange, public module: Module) {
+        
     }
-
+    
     getLastUsagePosition(): IRange {
         if(this.usagePositions.length == 0) return EmptyRange.instance;
         return this.usagePositions[this.usagePositions.length - 1].range;
     }
-
-    // mouseover in debugger-mode => show value ...
-    abstract getValue(stack: any, stackframeStart: number): any;
-
+    
+    
     onStackframe(): boolean {
-        return this.kind == SymbolKind.localVariable || this.kind == SymbolKind.parameter;
+        return false;
     }
-
+    
 }
 
+export abstract class SymbolOnStackframe extends BaseSymbol {
+    public stackframePosition?: number;
+    
+    onStackframe(): boolean {
+        return true;
+    }
+    
+    // mouseover in debugger-mode => show value ...
+    abstract getValue(stack: any, stackframeStart: number): any;
+}
 
 /**
  * For a given program position the debugger has to know what to expect on the current stackframe
@@ -75,12 +81,12 @@ export class BaseStackframe {
         this.numberOfThisObjects = firstFreePosition;
     }
 
-    addSymbol(symbol: BaseSymbol){
-        switch(symbol.kind){
-            case SymbolKind.parameter:
+    addSymbol(symbol: SymbolOnStackframe, parameterOrLocalVariable: "parameter" | "localVariable"){
+        switch(parameterOrLocalVariable){
+            case "parameter":
                 this.numberOfParameters++;
                 break;
-            case SymbolKind.localVariable:
+            case "localVariable":
                 this.numberOfLocalVariables++;
                 break;
         }

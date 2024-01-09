@@ -1,5 +1,4 @@
-import { BaseSymbol, SymbolKind } from "../../common/BaseSymbolTable";
-import { ErrorLevel, QuickFix } from "../../common/Error";
+import { BaseSymbol, SymbolOnStackframe } from "../../common/BaseSymbolTable";
 import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
@@ -512,7 +511,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                     return this.compileOuterClassLocalVariableAccess(symbol, node.range);
                 }
             }
-            if (symbol.kind == SymbolKind.field) {
+            if (symbol instanceof Field) {
                 let field = <Field>symbol;
 
                 if (this.classOfCurrentlyCompiledStaticInitialization && !field.isStatic) {
@@ -585,7 +584,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         return snippet;
     }
 
-    compileSymbolOnStackframeAccess(symbol: BaseSymbol, range: IRange): CodeSnippet | undefined {
+    compileSymbolOnStackframeAccess(symbol: SymbolOnStackframe, range: IRange): CodeSnippet | undefined {
         let type = (<JavaLocalVariable | Parameter>symbol).type;
         let snippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(symbol.stackframePosition!)}`, range, type);
         snippet.isLefty = !symbol.isFinal;
