@@ -94,4 +94,8 @@ export class JavaModuleManager {
         return true;
     }
 
+
+    findModuleByFile(file: File){
+        return this.modules.find(m => m.file == file);
+    }
 }

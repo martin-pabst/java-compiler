@@ -55,12 +55,12 @@ export class UsageTracker {
         }
     }
 
-    findSymbolOnPosition(position: Position): BaseSymbol | undefined {
+    findSymbolAtPosition(position: Position): UsagePosition | undefined {
         let usagePositionsOnLine = this.lineToUsagePositionListMap.get(position.lineNumber);
         if(!usagePositionsOnLine) return undefined;
 
         for(let up of usagePositionsOnLine){
-            if(Range.containsPosition(up.range, position)) return up.symbol;
+            if(Range.containsPosition(up.range, position)) return up;
         }
 
         return undefined;

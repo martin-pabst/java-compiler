@@ -93,27 +93,6 @@ export class JavaCompiledModule extends JavaBaseModule {
         this.sourceCode = this.file.getText();
     }
 
-
-    clearAndRegisterTypeUsagePositions(): void {
-        this.registerTypeUsagePositions();
-    }
-
-
-    registerTypeUsagePositions(): void {
-        if(this.ast?.collectedTypeNodes){
-            for(let typeNode of this.ast!.collectedTypeNodes){
-                let resolvedType = typeNode.resolvedType;
-                if(resolvedType && resolvedType instanceof NonPrimitiveType && !resolvedType.isGenericVariant()){                    
-                    if(resolvedType.module.isLibraryModule){
-                        this.systemSymbolsUsageTracker.registerUsagePosition(resolvedType, this.file, typeNode.range);
-                    } else {
-                        this.compiledSymbolsUsageTracker.registerUsagePosition(resolvedType, this.file, typeNode.range);
-                    }
-                }
-            }
-        }
-    }
-
     hasMainProgram(): boolean {
         if(!this.mainClass) return false;
         let mainMethod = this.mainClass.methods.find( m => m.isStatic && m.identifier == "main")

@@ -1,4 +1,4 @@
-import { EmptyRange } from "../../common/range/Range.ts";
+import { EmptyRange, IRange } from "../../common/range/Range.ts";
 import { JCM } from "../JavaCompilerMessages.ts";
 import { TokenType } from "../TokenType.ts";
 import { Token } from "../lexer/Token.ts";
@@ -400,13 +400,16 @@ export abstract class TermParser extends TokenIterator {
                 returnedType = wildcardType;
                 break;
             case TokenType.identifier:
+                let range: IRange = this.cct.range;
                 let identifier = this.expectAndSkipIdentifierAsString();
 
                 while (this.comesToken(TokenType.dot, true)) {
                     identifier += "." + this.expectAndSkipIdentifierAsString();
                 }
 
-                let type: ASTTypeNode = this.nodeFactory.buildBaseTypeNode(identifier);
+                let type: ASTTypeNode = this.nodeFactory.buildBaseTypeNode(identifier, range);
+
+                this.setEndOfRange(type);
 
                 if (this.comesToken(TokenType.lower, true)) {     // generic parameter invocation?
                     type = this.nodeFactory.buildGenericTypeInstantiationNode(type, type.range);
@@ -415,15 +418,15 @@ export abstract class TermParser extends TokenIterator {
                         if (actualTypeArgument) (<ASTGenericTypeInstantiationNode>type).actualTypeArguments.push(actualTypeArgument);
                     } while (this.comesToken(TokenType.comma, true))
                     this.expect(TokenType.greater, true);
+                    this.setEndOfRange(type);
                 }
-
+                
                 if (this.comesToken(TokenType.leftRightSquareBracket, true)) {
                     type = this.nodeFactory.buildArrayTypeNode(type, type.range);
                     // [][][] at the end of type
                     while (this.comesToken(TokenType.leftRightSquareBracket, true)) (<ASTArrayTypeNode>type).arrayDimensions++;
+                    this.setEndOfRange(type);
                 }
-
-                this.setEndOfRange(type);
 
                 returnedType = type;
         }

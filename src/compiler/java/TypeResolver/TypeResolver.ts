@@ -74,6 +74,7 @@ export class TypeResolver {
                     this.enumDeclarationNodes.push(tdn);
                     break;
             }
+
             this.gatherTypeDefinitionNodesRecursively(tdn);
         }
     }
@@ -83,6 +84,7 @@ export class TypeResolver {
         let declarationNodesWithClassParent: (ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode)[] = [];
 
         for (let klassNode of this.classDeclarationNodes) {
+            let module = klassNode.module;
             let resolvedType = new JavaClass(klassNode.identifier, klassNode.identifierRange, klassNode.path, klassNode.module);
             this.generateGenericParameters(klassNode, <JavaClass>resolvedType);
             klassNode.resolvedType = resolvedType;
@@ -92,40 +94,49 @@ export class TypeResolver {
 
             if(klassNode.identifier != ""){
                 this.moduleManager.typestore.addType(resolvedType);
-                klassNode.module.types.push(klassNode.resolvedType); 
+                module.types.push(klassNode.resolvedType); 
             }
 
             if (klassNode.parent?.kind != TokenType.global) declarationNodesWithClassParent.push(klassNode);
 
-            this.generateMethodGenerics(klassNode.methods, klassNode.module);
+            module.compiledSymbolsUsageTracker.registerUsagePosition(resolvedType, module.file, klassNode.identifierRange);
+
+            this.generateMethodGenerics(klassNode.methods, module);
         }
 
         for (let interfaceNode of this.interfaceDeclarationNodes) {
             let resolvedType = new JavaInterface(interfaceNode.identifier, interfaceNode.identifierRange, interfaceNode.path, interfaceNode.module);
+            let module = interfaceNode.module;
             this.generateGenericParameters(interfaceNode, <JavaInterface>resolvedType);
             interfaceNode.resolvedType = resolvedType;
             resolvedType.visibility = interfaceNode.visibility;
             this.moduleManager.typestore.addType(resolvedType);
-            interfaceNode.module.types.push(interfaceNode.resolvedType);
+            module.types.push(interfaceNode.resolvedType);
 
             if (interfaceNode.parent?.kind != TokenType.global) declarationNodesWithClassParent.push(interfaceNode);
 
-            this.generateMethodGenerics(interfaceNode.methods, interfaceNode.module);
+            module.compiledSymbolsUsageTracker.registerUsagePosition(resolvedType, module.file, interfaceNode.identifierRange);
+
+            this.generateMethodGenerics(interfaceNode.methods, module);
         }
 
         let baseEnumClass = <JavaClass><any>this.libraryModuleManager.typestore.getType("Enum");
 
         for (let enumNode of this.enumDeclarationNodes) {
             let resolvedType = new JavaEnum(enumNode.identifier, enumNode.identifierRange, enumNode.path, enumNode.module, baseEnumClass);
+            let module = enumNode.module;
             enumNode.resolvedType = resolvedType;
             resolvedType.visibility = enumNode.visibility;
             resolvedType.isStatic = true;                       // "Nested enum types are implicitly static. It is permissible to explicitly declare a nested enum type to be static.", see https://docs.oracle.com/javase/specs/jls/se7/html/jls-8.html#jls-8.9
             this.moduleManager.typestore.addType(resolvedType);
-            enumNode.module.types.push(enumNode.resolvedType);
+            module.types.push(enumNode.resolvedType);
 
             if (enumNode.parent?.kind != TokenType.global) declarationNodesWithClassParent.push(enumNode);
 
-            this.generateMethodGenerics(enumNode.methods, enumNode.module);
+            module.compiledSymbolsUsageTracker.registerUsagePosition(resolvedType, module.file, enumNode.identifierRange);
+
+
+            this.generateMethodGenerics(enumNode.methods, module);
         }
 
         for (let node of declarationNodesWithClassParent) {
@@ -168,7 +179,14 @@ export class TypeResolver {
         if(typeNode.resolvedType) return typeNode.resolvedType;
 
         switch (typeNode.kind) {
-            case TokenType.baseType: return typeNode.resolvedType = this.findPrimaryTypeByIdentifier(<ASTBaseTypeNode>typeNode, module);
+            case TokenType.baseType: {
+                let type = this.findPrimaryTypeByIdentifier(<ASTBaseTypeNode>typeNode, module);
+                if(type){
+                    typeNode.resolvedType = type;
+                    module.registerType(type, typeNode.range);
+                }
+                return type;
+            }
             case TokenType.genericTypeInstantiation:
                 let genericTypeNode = <ASTGenericTypeInstantiationNode>typeNode;
                 this.resolveTypeNode(genericTypeNode.baseType, module);

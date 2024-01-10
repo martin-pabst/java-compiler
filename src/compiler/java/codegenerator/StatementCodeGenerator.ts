@@ -877,6 +877,8 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         variable.isFinal = node.isFinal;
         this.currentSymbolTable.addSymbol(variable);    // sets stackOffset
 
+        this.module.compiledSymbolsUsageTracker.registerUsagePosition(variable, this.module.file, node.identifierRange);
+
         this.missingStatementManager.addSymbolDeclaration(variable, node.initialization ? true : false);
 
         let accesLocalVariableSnippet = this.compileSymbolOnStackframeAccess(variable, node.identifierRange);

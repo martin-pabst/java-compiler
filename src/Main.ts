@@ -23,8 +23,12 @@ import { testPrograms } from "./testgui/testprograms/TestPrograms.ts";
 import { TabbedEditorManager } from "./tools/TabbedEditorManager.ts";
 
 import '/include/css/main.css';
+import { JavaMainClass } from "./compiler/java/MainInterface.ts";
+import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts";
+import { Executable } from "./compiler/common/Executable.ts";
+import { JavaHoverProvider } from "./compiler/java/monacoproviders/JavaHoverProvider.ts";
 
-export class Main {
+export class Main implements JavaMainClass {
 
   language: Language;
 
@@ -44,6 +48,7 @@ export class Main {
   programViewerCompoment: ProgramViewerComponent;
 
   files: File[] = [];
+  lastCompiledExecutable?: Executable;
 
   compiler: JavaCompiler;
   interpreter: Interpreter;
@@ -53,7 +58,6 @@ export class Main {
   constructor() {
     this.language = new JavaLanguage();
     this.language.registerLanguageAtMonacoEditor();
-
 
     /*
      * Test program:
@@ -126,13 +130,22 @@ export class Main {
             this.decorations?.clear();
             break;
       }
-
       // let nextStep = positionInfo?.program.stepsSingle[positionInfo.nextStepIndex];
       // console.log(nextStep?.codeAsString);
     }
 
+    this.registerMonacoProviders();
 
+  }
 
+  getModuleForMonacoModel(model: monaco.editor.ITextModel): JavaCompiledModule | undefined {
+    for(let file of this.files){
+      if(file.monacoModel == model){
+        return this.lastCompiledExecutable?.moduleManager.findModuleByFile(file);
+      }
+    }
+
+    return undefined;
   }
 
   initButtons() {
@@ -156,6 +169,8 @@ export class Main {
   compile() {
 
     let executable = this.compiler.compile(this.files, this.tabbedEditorManager.getCurrentlyOpenedFile());
+
+    if(executable) this.lastCompiledExecutable = executable;
 
     let module = this.compiler.moduleManager.getModuleFromFile(this.tabbedEditorManager.getCurrentlyOpenedFile())!;
 
@@ -213,6 +228,10 @@ export class Main {
       errorText.textContent = error.message;
     }
 
+  }
+
+  registerMonacoProviders(){
+    monaco.languages.registerHoverProvider('myJava', new JavaHoverProvider(this.tabbedEditorManager.editor, this));
   }
 
 }

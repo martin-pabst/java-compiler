@@ -4,7 +4,7 @@ import { JavaCompiledModule } from "./module/JavaCompiledModule.ts";
 
 export interface JavaMainClass {
 
-    getModuleForMonacoModel(model: monaco.editor.ITextModel): JavaCompiledModule;
+    getModuleForMonacoModel(model: monaco.editor.ITextModel): JavaCompiledModule | undefined;
     
 
 }
