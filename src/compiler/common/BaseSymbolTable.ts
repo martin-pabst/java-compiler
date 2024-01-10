@@ -37,19 +37,18 @@ export class BaseSymbolTable {
     symbols: BaseSymbol[] = [];
     childTables: BaseSymbolTable[] = [];
 
-    parent?: BaseSymbolTable;
+    stackframe?: BaseStackframe;
 
     identifierToSymbolMap: Map<string, BaseSymbol> = new Map();
 
-    stackframe?: BaseStackframe;
-
-    constructor(public range: IRange, public file: File) { }
+    constructor(public parent?: BaseSymbolTable) {
+        if(parent) parent.childTables.push(this);
+    }
 
     addSymbol(symbol: BaseSymbol){
         this.symbols.push(symbol);
         this.identifierToSymbolMap.set(symbol.identifier, symbol);
     }
-
 
 }
 

@@ -2,12 +2,11 @@ export class File {
 
     public filename: string;
     private _text: string = "";
-    monacoModel: monaco.editor.ITextModel;
+    monacoModel?: monaco.editor.ITextModel;
 
 
     constructor(filename?: string){
         this.filename = filename || "";
-        this.monacoModel = monaco.editor.createModel("", "myJava");
     }
 
     getText(){

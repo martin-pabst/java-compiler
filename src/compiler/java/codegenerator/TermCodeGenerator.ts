@@ -101,21 +101,21 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
     compileKeywordSuper(node: ASTSuperNode): CodeSnippet | undefined {
         let classContext = this.currentSymbolTable.classContext;
-        if(!classContext || !(classContext instanceof IJavaClass || classContext instanceof JavaEnum)){
+        if (!classContext || !(classContext instanceof IJavaClass || classContext instanceof JavaEnum)) {
             this.pushError(JCM.superOnlyInClassesOrEnums(), "error", node);
             return undefined;
         }
 
-        
+
 
         let snippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}`, node.range, classContext.getExtends());
         snippet.isSuperKeywordWithLevel = 1;
         return snippet;
     }
-    
+
     compileKeywordThis(node: ASTThisNode): CodeSnippet | undefined {
         let classContext = this.currentSymbolTable.classContext;
-        if(!classContext || !(classContext instanceof IJavaClass || classContext instanceof JavaEnum )){
+        if (!classContext || !(classContext instanceof IJavaClass || classContext instanceof JavaEnum)) {
             this.pushError(JCM.thisOnlyInClassesOrEnums(), "error", node);
             return undefined;
         }
@@ -126,17 +126,17 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     compileExplicitCast(node: ASTCastNode): CodeSnippet | undefined {
 
         let objectSnippet = this.compileTerm(node.objectToCast);
-        
+
         let sourceType = objectSnippet?.type;
         let destType = node.castType.resolvedType;
 
         if (!objectSnippet || !sourceType || !destType) return undefined;
 
-        if(sourceType instanceof NonPrimitiveType && destType instanceof NonPrimitiveType){
-            return this.compileExplicitCastFromObjectToObject(node, objectSnippet, sourceType, destType);            
+        if (sourceType instanceof NonPrimitiveType && destType instanceof NonPrimitiveType) {
+            return this.compileExplicitCastFromObjectToObject(node, objectSnippet, sourceType, destType);
         }
 
-        if(this.canCastTo(sourceType, destType, "explicit")){
+        if (this.canCastTo(sourceType, destType, "explicit")) {
             return this.compileCast(objectSnippet, destType, "explicit");
         }
 
@@ -156,7 +156,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let range = node.range;
         return SnippetFramer.frame(objectSnippet, `${Helpers.checkCast}(§1, "${destType.pathAndIdentifier}", ${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn})`
             , destType)
-    }    
+    }
 
 
     compileNewObjectNode(node: ASTNewObjectNode, newObjectSnippet?: CodeSnippet): CodeSnippet | undefined {
@@ -165,7 +165,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         let parameterValues: (CodeSnippet | undefined)[] | undefined = this.getParameterValueSnippets(node);
 
-        if(!parameterValues) return undefined;
+        if (!parameterValues) return undefined;
 
         let klassType = <IJavaClass>node.type.resolvedType;
         /*
@@ -195,7 +195,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 if (!snippet) return undefined;
                 parameterValues[i] = snippet;
             } else {
-                if(!parameterValues[i]){
+                if (!parameterValues[i]) {
                     return undefined;
                 }
             }
@@ -217,20 +217,20 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         for (let i = 0; i < parameterValues.length; i++) {
 
             let destinationType = ellipsisType;
-            if(!destinationType){
+            if (!destinationType) {
                 let parameter = method.parameters[i];
-                if(parameter.isEllipsis){
+                if (parameter.isEllipsis) {
                     destinationType = (<ArrayType>parameter.type).elementType;
                     ellipsisType = destinationType;
                 } else {
                     destinationType = parameter.type;
-                }                
+                }
             }
 
             castParameters.push(this.compileCast(parameterValues[i]!, destinationType, "implicit"));
         }
 
-        if(!ellipsisType) return castParameters;
+        if (!ellipsisType) return castParameters;
 
         let methodParameterCountMinusOne = method.parameters.length - 1;
 
@@ -247,7 +247,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     protected invokeConstructor(parameterValues: CodeSnippet[], method: Method, klassType: IJavaClass | JavaEnum,
         node: ASTNewObjectNode | ASTEnumValueNode, newObjectSnippet: CodeSnippet | undefined,
         enumValueIdentifier?: string, enumValueIndex?: number) {
-        
+
         parameterValues = this.castParameterValuesAndPackEllipsis(parameterValues, method);
 
         let classHasOuterType: boolean = (klassType.outerType && !klassType.isStatic) ? true : false;
@@ -278,7 +278,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 objectType = this.currentSymbolTable.classContext;
             }
 
-            if(!objectType || !this.canCastTo(objectType, klassType.outerType, "implicit")){
+            if (!objectType || !this.canCastTo(objectType, klassType.outerType, "implicit")) {
                 this.pushError(JCM.objectContextNeededForInstantiation(klassType.identifier, klassType.outerType!.identifier), "error", node);
             }
 
@@ -301,20 +301,23 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         return snippet;
     }
 
-    pushSymbolTable(symbolTable: JavaSymbolTable){
+    pushSymbolTable(symbolTable: JavaSymbolTable) {
         this.symbolTableStack.push(symbolTable);
         this.currentSymbolTable = symbolTable;
     }
 
-    pushAndGetNewSymbolTable(range: IRange, withStackframe: boolean, classContext?: JavaClass | JavaEnum | JavaInterface | StaticNonPrimitiveType | undefined, methodContext?: Method): JavaSymbolTable {
-        let newSymbolTable = new JavaSymbolTable(this.module, range, withStackframe, classContext, methodContext);
-        if (this.currentSymbolTable) {
-            this.currentSymbolTable.addChildTable(newSymbolTable);
-            if (!classContext) newSymbolTable.classContext = this.currentSymbolTable.classContext;
-        }
+    pushAndGetNewSymbolTable(range: IRange, withStackframe: boolean,
+        classContext?: JavaClass | JavaEnum | JavaInterface | StaticNonPrimitiveType | undefined, methodContext?: Method): JavaSymbolTable {
+
+        let newSymbolTable = new JavaSymbolTable(this.module, range, withStackframe,
+            this.currentSymbolTable,
+            classContext, methodContext);
+
         this.symbolTableStack.push(newSymbolTable);
         this.currentSymbolTable = newSymbolTable;
+
         return newSymbolTable;
+
     }
 
     popSymbolTable() {
@@ -709,7 +712,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         if (!objectSnippet || !objectSnippet.type) return undefined;
         let range = node.range;
 
-        if(objectSnippet.isSuperKeywordWithLevel && node.attributeIdentifier == "super"){
+        if (objectSnippet.isSuperKeywordWithLevel && node.attributeIdentifier == "super") {
             objectSnippet.isSuperKeywordWithLevel++;
             objectSnippet.type = (<IJavaClass>objectSnippet.type).getExtends();
             return objectSnippet;
@@ -732,9 +735,9 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         let field = objectType.getField(node.attributeIdentifier, TokenType.keywordPublic);
 
-        if(!field && objectType instanceof StaticNonPrimitiveType){
+        if (!field && objectType instanceof StaticNonPrimitiveType) {
             let innerType = objectType.nonPrimitiveType.innerTypes.find(type => type.identifier == node.attributeIdentifier) as NonPrimitiveType;
-            if(innerType) return new StringCodeSnippet(`${Helpers.classes}["${innerType.pathAndIdentifier}"]`, node.range, innerType.staticType);
+            if (innerType) return new StringCodeSnippet(`${Helpers.classes}["${innerType.pathAndIdentifier}"]`, node.range, innerType.staticType);
         }
 
         if (!field) {
@@ -797,13 +800,13 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     // c) compute actual type for return parameter
 
     compileMethodCall(node: ASTMethodCallNode): CodeSnippet | undefined {
-                
+
         let parameterValueSnippet: (CodeSnippet | undefined)[] | undefined = this.getParameterValueSnippets(node);
-        if(!parameterValueSnippet) return undefined;
+        if (!parameterValueSnippet) return undefined;
 
         let methodIsConstructor = false;
-        if(node.nodeToGetObject &&[TokenType.keywordThis, TokenType.keywordSuper].indexOf(node.nodeToGetObject?.kind) >= 0){
-            if(node.identifier == ""){
+        if (node.nodeToGetObject && [TokenType.keywordThis, TokenType.keywordSuper].indexOf(node.nodeToGetObject?.kind) >= 0) {
+            if (node.identifier == "") {
                 methodIsConstructor = true;
             }
         }
@@ -813,12 +816,12 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             objectSnippet = this.compileTerm(node.nodeToGetObject);
             if (!objectSnippet) return undefined;
             let range = node.nodeToGetObject.range;
-            if (!(objectSnippet.type instanceof JavaEnum) && objectSnippet.type != this.stringType 
-            && !(objectSnippet.type instanceof StaticNonPrimitiveType) && !objectSnippet.isSuperKeywordWithLevel) {
+            if (!(objectSnippet.type instanceof JavaEnum) && objectSnippet.type != this.stringType
+                && !(objectSnippet.type instanceof StaticNonPrimitiveType) && !objectSnippet.isSuperKeywordWithLevel) {
                 objectSnippet = SnippetFramer.frame(objectSnippet, `${Helpers.checkNPE('§1', range)}`);
             }
         } else {
-            let classContext = this.currentSymbolTable.getClassContext();
+            let classContext = this.currentSymbolTable.classContext;
             if (!classContext) {
 
                 if (node.identifier.startsWith("assert") || node.identifier.startsWith("fail")) {
@@ -881,7 +884,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 if (!snippet) return undefined;
                 parameterValueSnippet[i] = snippet;
             } else {
-                if(!parameterValueSnippet[i]){
+                if (!parameterValueSnippet[i]) {
                     return undefined;
                 }
             }
@@ -903,22 +906,22 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention || method.template ? "native" : "java";
-        if(callingConvention == "native"){
+        if (callingConvention == "native") {
             let isFinalOrStatic = (objectSnippet.type instanceof IJavaClass && objectSnippet.type.isFinal) || method.isFinal || method.isStatic;
-            if(!isFinalOrStatic){
-                if(method.classEnumInterface instanceof IJavaInterface){
+            if (!isFinalOrStatic) {
+                if (method.classEnumInterface instanceof IJavaInterface) {
                     callingConvention = "java";
-                } else if(this.module.moduleManager.overriddenOrImplementedMethodPaths[method.getPathWithMethodIdentifier()]){
+                } else if (this.module.moduleManager.overriddenOrImplementedMethodPaths[method.getPathWithMethodIdentifier()]) {
                     callingConvention = "java";
                 }
             }
-        } 
-        
+        }
+
         // For library functions like Math.sin, Math.abs, ... we use templates to compile to nativ javascript functions:
         if (method.template) {
             if (method.isStatic) {
                 return new SeveralParameterTemplate(method.template).applyToSnippet(returnParameter, node.range, ...(<CodeSnippet[]>parameterValueSnippet));
-            } else if(callingConvention == "native") {
+            } else if (callingConvention == "native") {
                 return new SeveralParameterTemplate(method.template).applyToSnippet(returnParameter, node.range, objectSnippet, ...(<CodeSnippet[]>parameterValueSnippet));
             }
         }
@@ -927,13 +930,13 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let objectTemplate: string;
         if (objectSnippet.type instanceof StaticNonPrimitiveType) {
             objectTemplate = `§1.${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}(`
-        } else if(objectSnippet.isSuperKeywordWithLevel && !method.isConstructor){   // constructors of class and base class have distinct names as they include class identifier
+        } else if (objectSnippet.isSuperKeywordWithLevel && !method.isConstructor) {   // constructors of class and base class have distinct names as they include class identifier
             let classIdentifier = (<IJavaClass>objectSnippet.type).pathAndIdentifier;
-            if(method.isStatic){
+            if (method.isStatic) {
                 objectTemplate = `${Helpers.classes}["${classIdentifier}"].${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}(`
             } else {
-                objectTemplate = `${Helpers.classes}["${classIdentifier}"].prototype`  
-                 + `.${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}.call(§1,`;
+                objectTemplate = `${Helpers.classes}["${classIdentifier}"].prototype`
+                    + `.${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}.call(§1,`;
             }
         } else {
             if (method.isStatic) {
@@ -943,7 +946,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 objectTemplate = `§1${outerTypeTemplate}.${method.getInternalNameWithGenericParameterIdentifiers(callingConvention)}(`
             }
         }
-        
+
         if (callingConvention == "java") {
             objectTemplate += `${StepParams.thread}` +
                 (method.isStatic ? '' : `, undefined`) +     // non-static methods have callback-function as second parameter
@@ -1025,24 +1028,24 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             let suitable: boolean = true;
             for (let i = 0; i < parameterTypes.length; i++) {
                 let fromType = parameterTypes[i];
-                if(!fromType) continue;
-                
+                if (!fromType) continue;
+
                 let toType = ellipsisType;
-                if(!toType){
+                if (!toType) {
                     let parameter = method.parameters[i];
-                    if(parameter.isEllipsis){
+                    if (parameter.isEllipsis) {
                         toType = (<ArrayType>parameter.type).elementType;
                         ellipsisType = toType;
                     } else {
                         toType = parameter.type;
                     }
-                } 
+                }
 
-                if(fromType != toType){
-                    if(fromType?.toString() != toType.toString()){
+                if (fromType != toType) {
+                    if (fromType?.toString() != toType.toString()) {
                         if (this.canCastTo(fromType, toType, "implicit")) {
                             castsNeeded++;
-                            if(castsNeeded >= castsNeededWithBestMethodSoFar){
+                            if (castsNeeded >= castsNeededWithBestMethodSoFar) {
                                 suitable = false;
                                 break;
                             }
@@ -1055,14 +1058,14 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 }
             }
             if (suitable) {
-                
+
                 bestMethodSoFar = method;
                 castsNeededWithBestMethodSoFar = castsNeeded;
 
             }
         }
 
-        if(bestMethodSoFar){
+        if (bestMethodSoFar) {
             if (!(bestMethodSoFar instanceof GenericMethod)) {
                 return bestMethodSoFar;
             }
@@ -1080,8 +1083,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         return undefined;
     }
 
-    registerUsagePosition(symbol: BaseSymbol, range: IRange){
-        if(symbol.module instanceof JavaLibraryModule){
+    registerUsagePosition(symbol: BaseSymbol, range: IRange) {
+        if (symbol.module instanceof JavaLibraryModule) {
             this.module.systemSymbolsUsageTracker.registerUsagePosition(symbol, this.module.file, range);
         } else {
             this.module.compiledSymbolsUsageTracker.registerUsagePosition(symbol, this.module.file, range);

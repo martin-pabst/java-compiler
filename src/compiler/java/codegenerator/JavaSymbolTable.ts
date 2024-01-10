@@ -5,7 +5,6 @@ import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaClass } from "../types/JavaClass";
 import { JavaEnum } from "../types/JavaEnum";
 import { JavaInterface } from "../types/JavaInterface.ts";
-import { JavaType } from "../types/JavaType.ts";
 import { Method } from "../types/Method.ts";
 import { Parameter } from "../types/Parameter.ts";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
@@ -26,11 +25,18 @@ export class JavaSymbolTable extends BaseSymbolTable {
 
     declare identifierToSymbolMap: Map<string, JavaLocalVariable>;
 
-    constructor(public module: JavaCompiledModule, range: IRange, withStackFrame: boolean,
+    constructor(public module: JavaCompiledModule, public range: IRange, withStackFrame: boolean,
+        parent?: BaseSymbolTable,
         public classContext?: JavaClass | JavaEnum | JavaInterface | StaticNonPrimitiveType | undefined,
         public methodContext?: Method){
-        super(range, module.file);
+
+        super(parent);
         
+        if(parent && parent instanceof JavaSymbolTable){
+            if(!classContext) this.classContext = parent.classContext;
+            if(!methodContext) this.methodContext = parent.methodContext;
+        }
+
         module.symbolTables.push(this);
 
         if(withStackFrame){
@@ -39,16 +45,6 @@ export class JavaSymbolTable extends BaseSymbolTable {
         }
     }
 
-    getChildTable(range: IRange, withStackFrame: boolean, classContext?: JavaClass | JavaEnum | undefined){
-        let childTable = new JavaSymbolTable(this.module, range, withStackFrame, classContext);
-        this.childTables.push(childTable);
-        childTable.parent = this;
-    }
-
-    addChildTable(childTable: JavaSymbolTable) {
-        this.childTables.push(childTable);
-        childTable.parent = this;
-    }
 
     findSymbol(identifier: string): LocalVariableInformation | undefined {
         return this.findSymbolIntern(identifier, TokenType.keywordPrivate, true, 0);
@@ -83,9 +79,9 @@ export class JavaSymbolTable extends BaseSymbolTable {
         return undefined;
     }   
 
-    public addSymbol(symbol: SymbolOnStack): void {
+    public addSymbol(symbol: BaseSymbol): void {
         super.addSymbol(symbol);
-        if(symbol.onStackframe()){
+        if(symbol instanceof SymbolOnStack){
             this.getStackFrame()?.addSymbol(symbol, symbol instanceof Parameter ? "parameter" : "localVariable");
         }
     }
@@ -101,23 +97,6 @@ export class JavaSymbolTable extends BaseSymbolTable {
         }
         return st.stackframe;
     }
-
-    getClassContext(): JavaType | undefined {
-        let st: JavaSymbolTable = this;
-        while(!st.classContext && st.parent){
-            st = st.parent;
-        }
-        return st.classContext;
-    }
-
-    getMethodContext(): Method | undefined {
-        let st: JavaSymbolTable = this;
-        while(!st.methodContext && st.parent){
-            st = st.parent;
-        }
-        return st.methodContext;
-    }
-
 
 }
 

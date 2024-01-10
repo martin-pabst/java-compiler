@@ -128,7 +128,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
         let snippet = new CodeSnippetContainer([], node.range);
 
-        let method: Method | undefined = this.currentSymbolTable.getMethodContext();
+        let method: Method | undefined = this.currentSymbolTable.methodContext;
         if (!method) {
             this.pushError(JCM.returnNotExpected(), "error", node.range);
             return undefined;
@@ -140,7 +140,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             }
         }
 
-        if(this.currentSymbolTable.getMethodContext()?.isSynchronized){
+        if(this.currentSymbolTable.methodContext?.isSynchronized){
             snippet.addParts(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${ObjectClass.prototype.leaveSynchronizedBlock.name}(${StepParams.thread});\n`));
         }
 

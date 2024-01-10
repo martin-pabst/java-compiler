@@ -1,4 +1,3 @@
-import { AstComponent } from "./testgui/AstComponent.ts";
 import { ErrorLevel } from "./compiler/common/Error.ts";
 import { Language } from "./compiler/common/Language.ts";
 import { File } from "./compiler/common/module/File.ts";
@@ -7,25 +6,23 @@ import { JavaCompiler } from "./compiler/java/JavaCompiler.ts";
 import { JavaLanguage } from "./compiler/java/JavaLanguage.ts";
 import { CodePrinter } from "./compiler/java/codegenerator/CodePrinter.ts";
 import { TokenPrinter } from "./compiler/java/lexer/TokenPrinter.ts";
-import { JavaLibraryModuleManager } from "./compiler/java/module/libraries/JavaLibraryModuleManager.ts";
-import { Editor } from "./testgui/editor/Editor.ts";
+import { AstComponent } from "./testgui/AstComponent.ts";
 import { Button } from "./tools/Button.ts";
 import { DOM } from "./tools/DOM.ts";
 import { TabManager } from "./tools/TabManager.ts";
 
-import '/include/css/main.css';
-import { ProgramControlButtons } from "./testgui/ProgramControlButtons.ts";
 import { Interpreter } from "./compiler/common/interpreter/Interpreter.ts";
+import { ProgramControlButtons } from "./testgui/ProgramControlButtons.ts";
 import { TestPrintManager } from "./testgui/TestPrintManager.ts";
 
 import jQuery from "jquery";
-import { ActionManager } from "./testgui/ActionManager.ts";
-import { testPrograms } from "./testgui/testprograms/TestPrograms.ts";
-import { JavaBaseModule } from "./compiler/java/module/JavaBaseModule.ts";
-import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts";
-import { ProgramViewerComponent } from "./testgui/ProgramViewerComponent.ts";
 import { ProgramPointerPositionInfo } from "./compiler/common/interpreter/Scheduler.ts";
+import { ActionManager } from "./testgui/ActionManager.ts";
+import { ProgramViewerComponent } from "./testgui/ProgramViewerComponent.ts";
+import { testPrograms } from "./testgui/testprograms/TestPrograms.ts";
 import { TabbedEditorManager } from "./tools/TabbedEditorManager.ts";
+
+import '/include/css/main.css';
 
 export class Main {
 
@@ -79,7 +76,10 @@ export class Main {
     this.programViewerCompoment = new ProgramViewerComponent(this.codeOutputDiv);
     
     for(let i = 0; i < 3; i++){
-      this.files.push(new File("module " + i));
+      let file = new File("module " + i);
+      file.monacoModel = monaco.editor.createModel("", "myJava");
+
+      this.files.push(file);
     }
     this.files[0].setText(testProgram);
     this.tabbedEditorManager = new TabbedEditorManager(document.getElementById('editorOuter')!,

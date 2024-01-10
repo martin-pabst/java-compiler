@@ -57,7 +57,7 @@ export class TabbedEditorManager {
         this.activeIndex = this.headingDivs.indexOf(heading);
         let file = this.files[this.activeIndex];
 
-        this.editor.editor.setModel(file.monacoModel);
+        this.editor.editor.setModel(file.monacoModel!);
 
     }
 

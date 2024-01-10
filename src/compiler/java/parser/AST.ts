@@ -32,7 +32,6 @@ export type ConstantType = TokenType.shortConstant | TokenType.integerLiteral | 
 export interface ASTNode {
     kind: TokenType;
     range: IRange;
-    symbolTable?: JavaSymbolTable;
 }
 
 export interface ASTDebugProgram extends ASTNode {
@@ -42,8 +41,11 @@ export interface ASTDebugProgram extends ASTNode {
 
 export interface TypeScope {
     kind: TokenType.keywordClass | TokenType.keywordInterface | TokenType.keywordEnum | TokenType.global | TokenType.methodDeclaration;
+    
     classOrInterfaceOrEnumDefinitions: (ASTClassDefinitionNode | ASTInterfaceDefinitionNode | ASTEnumDefinitionNode)[];
     path: string;
+    symbolTable?: JavaSymbolTable;
+
 }
 
 export interface ASTGlobalNode extends ASTNode, TypeScope {
