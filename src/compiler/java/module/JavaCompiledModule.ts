@@ -86,6 +86,8 @@ export class JavaCompiledModule extends JavaBaseModule {
         this.types = [];
         this.usedTypesFromOtherModules = new Map();
         this.errors = [];
+        this.compiledSymbolsUsageTracker.clear();
+        this.systemSymbolsUsageTracker.clear();
     }
 
     setDirtyIfProgramCodeChanged(){

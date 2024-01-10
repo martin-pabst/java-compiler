@@ -362,6 +362,8 @@ export class CodeGenerator extends StatementCodeGenerator {
         let field = classContext.fields.find(f => f.identifier == fieldNode.identifier);
         if (!field) return undefined;
 
+        this.registerUsagePosition(field, fieldNode.range);
+
         // this.currentSymbolTable.addSymbol(field);
 
         field.initialValue = field.type instanceof PrimitiveType ? field.type.getDefaultValue() : null;
