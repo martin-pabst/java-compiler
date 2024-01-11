@@ -360,6 +360,10 @@ export class JavaClass extends IJavaClass {
 
     }
 
+    getDeclaration(): string {
+        
+    }
+
 }
 
 export class GenericVariantOfJavaClass extends IJavaClass {

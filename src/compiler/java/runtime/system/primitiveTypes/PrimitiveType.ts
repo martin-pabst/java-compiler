@@ -60,4 +60,8 @@ export abstract class PrimitiveType extends JavaType {
         return this.identifier;
     }
 
+    getDeclaration(): string {
+        return this.identifier;
+    }
+
 }

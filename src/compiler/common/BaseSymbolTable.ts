@@ -6,15 +6,17 @@ import { IRange } from "./range/Range";
  * Fields, parameters and local variables
  */
 export abstract class BaseSymbol {
-    
+
     constructor(public identifier: string, public identifierRange: IRange, public module: Module) {
-        
+
     }
-        
-     onStackframe(): boolean {
+
+    onStackframe(): boolean {
         return false;
     }
-    
+
+    abstract getDeclaration(): string;
+
 }
 
 export abstract class SymbolOnStackframe extends BaseSymbol {
@@ -24,7 +26,7 @@ export abstract class SymbolOnStackframe extends BaseSymbol {
     onStackframe(): boolean {
         return true;
     }
-    
+
     // mouseover in debugger-mode => show value ...
     abstract getValue(stack: any, stackframeStart: number): any;
 }
@@ -41,10 +43,10 @@ export class BaseSymbolTable {
     identifierToSymbolMap: Map<string, BaseSymbol> = new Map();
 
     constructor(public parent?: BaseSymbolTable) {
-        if(parent) parent.childTables.push(this);
+        if (parent) parent.childTables.push(this);
     }
 
-    addSymbol(symbol: BaseSymbol){
+    addSymbol(symbol: BaseSymbol) {
         this.identifierToSymbolMap.set(symbol.identifier, symbol);
     }
 
@@ -66,8 +68,8 @@ export class BaseStackframe {
         this.numberOfThisObjects = firstFreePosition;
     }
 
-    addSymbol(symbol: SymbolOnStackframe, parameterOrLocalVariable: "parameter" | "localVariable"){
-        switch(parameterOrLocalVariable){
+    addSymbol(symbol: SymbolOnStackframe, parameterOrLocalVariable: "parameter" | "localVariable") {
+        switch (parameterOrLocalVariable) {
             case "parameter":
                 this.numberOfParameters++;
                 break;
@@ -82,7 +84,7 @@ export class BaseStackframe {
 
     }
 
-    insertInvisibleParameter(){
+    insertInvisibleParameter() {
         this.numberOfParameters++;
     }
 

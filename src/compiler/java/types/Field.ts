@@ -60,4 +60,11 @@ export class Field extends BaseSymbol {
         throw new Error("Method not implemented.");
     }
 
+    getDeclaration(): string {
+        let decl: string = TokenType[this.visibility] + " ";
+        if(this.isStatic) decl += "static ";
+        if(this.isFinal) decl += "final ";
+        return decl + this.type.toString() + " " + this.identifier;
+    }
+
 }

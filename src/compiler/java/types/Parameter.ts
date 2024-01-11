@@ -30,4 +30,8 @@ export class Parameter extends SymbolOnStackframe {
         return new Parameter(this.identifier, this.identifierRange, this.module, this.type, this.isFinal, this.isEllipsis, this.trackMissingReadAccess);
     }
 
+    getDeclaration(): string {
+        return this.type.toString() + " " + this.identifier;
+    }
+
 }
