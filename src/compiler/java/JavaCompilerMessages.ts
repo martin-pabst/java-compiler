@@ -559,6 +559,15 @@ export class JCM {
         "en": `Type ${type} is not defined here.`,
     })
 
+    static typeHasNoSubtype = (type: string, subtype: string) => le({
+        "de": `Der Datentyp ${type} hat keinen Unterdatentyp ${subtype}.`,
+        "en": `Type ${type} has no subtype ${subtype}.`
+    })
+
+    static typeIsNotVisible = (type: string) => le({
+        "de": `Der Datentyp ${type} ist an dieser Stelle nicht sichtbar, da er nicht die Sichtbarkeit public besitzt.`,
+        "en": `Type ${type} is not visible here.`
+    })
 
     /**
      * class JavaClass

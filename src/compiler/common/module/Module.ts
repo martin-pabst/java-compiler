@@ -49,7 +49,7 @@ export abstract class Module {
         return this.systemSymbolsUsageTracker.findSymbolAtPosition(position);
     }
 
-    registerType(type: JavaType, range: IRange) {
+    registerTypeUsage(type: JavaType, range: IRange) {
         if (type.module.isLibraryModule) {
             this.systemSymbolsUsageTracker.registerUsagePosition(type, this.file,
                 range);

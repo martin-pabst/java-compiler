@@ -93,7 +93,10 @@ export class ASTNodeFactory {
         return {
             kind: TokenType.baseType,
             range: startRange,
-            identifier: identifier,
+            identifiers: [{
+                identifier: identifier,
+                identifierRange: startRange
+            }],
             parentTypeScope: parentTypeScope
         }
     }

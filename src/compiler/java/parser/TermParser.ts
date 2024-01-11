@@ -3,7 +3,7 @@ import { JCM } from "../JavaCompilerMessages.ts";
 import { TokenType } from "../TokenType.ts";
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
-import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode, ASTMethodDeclarationNode, ASTWildcardTypeNode, ASTGenericTypeInstantiationNode, ASTArrayTypeNode, ASTArrayLiteralNode, ASTMethodCallNode } from "./AST.ts";
+import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode, ASTMethodDeclarationNode, ASTWildcardTypeNode, ASTGenericTypeInstantiationNode, ASTArrayTypeNode, ASTArrayLiteralNode, ASTMethodCallNode, ASTBaseTypeNode } from "./AST.ts";
 import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator.ts";
 
@@ -402,12 +402,19 @@ export abstract class TermParser extends TokenIterator {
             case TokenType.identifier:
                 let range: IRange = this.cct.range;
                 let identifier = this.expectAndSkipIdentifierAsString();
+                let type: ASTTypeNode = this.nodeFactory.buildBaseTypeNode(identifier, range);
 
                 while (this.comesToken(TokenType.dot, true)) {
-                    identifier += "." + this.expectAndSkipIdentifierAsString();
+                    let stringToken = this.expectAndSkipIdentifierAsToken();
+                    if(stringToken){
+                        (<ASTBaseTypeNode>type).identifiers.push({
+                            identifier: <string>stringToken.value,
+                            identifierRange: stringToken.range
+                        });
+                        this.setEndOfRange(type);
+                    }
                 }
 
-                let type: ASTTypeNode = this.nodeFactory.buildBaseTypeNode(identifier, range);
 
                 this.setEndOfRange(type);
 

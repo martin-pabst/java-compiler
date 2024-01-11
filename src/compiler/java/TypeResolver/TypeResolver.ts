@@ -183,7 +183,7 @@ export class TypeResolver {
                 let type = this.findPrimaryTypeByIdentifier(<ASTBaseTypeNode>typeNode, module);
                 if(type){
                     typeNode.resolvedType = type;
-                    module.registerType(type, typeNode.range);
+                    module.registerTypeUsage(type, typeNode.range);
                 }
                 return type;
             }
@@ -263,7 +263,7 @@ export class TypeResolver {
 
 
     findPrimaryTypeByIdentifier(typeNode: ASTBaseTypeNode, module: JavaBaseModule): JavaType | undefined {
-        let identifer = typeNode.identifier;
+        let identifer = typeNode.identifiers[0].identifier;
 
         let type: JavaType | undefined;
 
@@ -289,40 +289,59 @@ export class TypeResolver {
                     if (gp && gp.identifier == identifer) return gp;
                 }
                 for (let innerclass of classOrInterfaceNode.classOrInterfaceOrEnumDefinitions) {
-                    if (innerclass.identifier == identifer && innerclass.resolvedType) return innerclass.resolvedType;
-                }
-            }
-
-            if (typeNode.identifier.indexOf(".") >= 0) {
-                let parentTypeScope1: TypeScope | undefined = parentTypeScope;
-                while (parentTypeScope1) {
-                    let path: string = parentTypeScope1.path;
-
-                    if (path != "") {
-                        type = this.moduleManager.typestore.getType(path + "." + typeNode.identifier);
-                        if (type) return type;
+                    if (innerclass.identifier == identifer && innerclass.resolvedType) {
+                        type = innerclass.resolvedType;
                     }
-
-                    //@ts-ignore
-                    parentTypeScope1 = parentTypeScope1.parentTypeScope;
                 }
             }
 
+            // if (typeNode.identifiers.indexOf(".") >= 0) {
+            //     let parentTypeScope1: TypeScope | undefined = parentTypeScope;
+            //     while (parentTypeScope1) {
+            //         let path: string = parentTypeScope1.path;
+
+            //         if (path != "") {
+            //             type = this.moduleManager.typestore.getType(path + "." + typeNode.identifiers);
+            //             if (type) return type;
+            //         }
+
+            //         //@ts-ignore
+            //         parentTypeScope1 = parentTypeScope1.parentTypeScope;
+            //     }
+            // }
+
         }
 
-        type = this.moduleManager.typestore.getType(identifer);
-        if (type && identifer.indexOf(".") >= 0) {
-            if (!(type instanceof NonPrimitiveType)) return type; // should'nt be possible because primitive type identifiers don't contain dots
-            if (type.visibility == TokenType.keywordPublic) return type;
-            type = undefined;
+        if(!type){
+            type = this.moduleManager.typestore.getType(identifer);
+            if(!type){
+                type = this.libraryModuleManager.typestore.getType(identifer);
+            }
         }
 
-        if (!type) {
-            type = this.libraryModuleManager.typestore.getType(identifer);
+        if(type){
+            module.registerTypeUsage(type, typeNode.identifiers[0].identifierRange);
         }
 
-        if (!type) {
-            this.pushError(JCM.typeNotDefined(identifer), typeNode.range, module);
+        let i = 1;
+        while(i < typeNode.identifiers.length && type){
+            let id = typeNode.identifiers[i];
+            if(type instanceof NonPrimitiveType){
+                let innerType = type.innerTypes.find(it => it.identifier == id.identifier) as NonPrimitiveType;
+                if(innerType){
+                    module.registerTypeUsage(innerType, id.identifierRange);
+                    if(innerType.visibility != TokenType.keywordPublic){
+                        this.pushError(JCM.typeIsNotVisible(innerType.identifier), id.identifierRange, module, "error");
+                    }
+                    type = innerType;
+                } else {
+                    this.pushError(JCM.typeNotDefined(id.identifier), typeNode.range, module);
+                }
+            } else {
+                this.pushError(JCM.typeHasNoSubtype(type.identifier, id.identifier), id.identifierRange, module, "error");
+                break;
+            }  
+            i++;
         }
 
         return type;

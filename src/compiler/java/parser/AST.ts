@@ -159,7 +159,7 @@ export interface ASTGenericTypeInstantiationNode extends ASTTypeNode {
 
 export interface ASTBaseTypeNode extends ASTTypeNode {
     kind: TokenType.baseType,
-    identifier: string
+    identifiers: ASTNodeWithIdentifier[]
 }
 
 // e.g. public int getValue(String key)
