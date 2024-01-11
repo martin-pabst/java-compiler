@@ -24,9 +24,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="1.6542757"
-     inkscape:cx="1416.9343"
-     inkscape:cy="938.17494"
+     inkscape:zoom="0.58487478"
+     inkscape:cx="1567.857"
+     inkscape:cy="836.07639"
      inkscape:window-width="1920"
      inkscape:window-height="1137"
      inkscape:window-x="-8"
@@ -2014,7 +2014,7 @@
        xml:space="preserve"
        transform="scale(0.26458333)"
        id="text7"
-       style="fill:#0000ff;-inkscape-font-specification:Consolas;font-family:Consolas;font-size:21.33333333px;letter-spacing:0.3px;line-height:1.13;stroke-width:0.75590551;stroke-linejoin:round;stroke-linecap:round;stroke:#917c6f;white-space:pre;shape-inside:url(#rect7)" />
+       style="font-size:21.3333px;line-height:1.13;font-family:Consolas;-inkscape-font-specification:Consolas;letter-spacing:0.3px;white-space:pre;shape-inside:url(#rect7);display:inline;fill:#0000ff;stroke:#917c6f;stroke-width:0.755906;stroke-linecap:round;stroke-linejoin:round" />
     <text
        xml:space="preserve"
        style="font-size:5.64444px;line-height:1.25;font-family:Consolas;-inkscape-font-specification:Consolas;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
@@ -2229,7 +2229,7 @@
          id="tspan1418"
          x="270.76062"
          y="317.50955"
-         style="font-size:4.23333px;stroke-width:0.264583">testA: ASTMethodDeclarationNode</tspan></text>
+         style="font-size:4.23333px;stroke-width:0.264583">testB: ASTMethodDeclarationNode</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 262.19622,297.46159 v 18.55214 h 4.87883"
@@ -2267,7 +2267,7 @@
          id="tspan1430"
          x="270.53442"
          y="329.04514"
-         style="font-size:4.23333px;stroke-width:0.264583">a1: ASTFieldDeclarationNode</tspan></text>
+         style="font-size:4.23333px;stroke-width:0.264583">b1: ASTFieldDeclarationNode</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 256.9982,297.46159 v 30.14772 h 9.91691"
@@ -2335,9 +2335,10 @@
          y="16.16678"
          style="stroke-width:0.264583">Type System</tspan></text>
     <path
-       style="fill:none;stroke:#0000ff;stroke-width:0.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow5);stroke-dasharray:1.39500001, 1.39500001;stroke-dashoffset:0"
-       d="M 255.42271,212.71897 H 364.6611"
-       id="path1456" />
+       style="fill:none;stroke:#0000ff;stroke-width:0.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.395, 1.395;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow5)"
+       d="m 255.42271,212.71897 108.44673,0"
+       id="path1456"
+       sodipodi:nodetypes="cc" />
     <rect
        style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
        id="rect2339"
@@ -2356,6 +2357,196 @@
          id="tspan2341"
          x="373.79846"
          y="214.56456"
-         style="font-size:4.23333px;stroke-width:0.264583">: ASTGlobalNode</tspan></text>
+         style="font-size:4.23333px;stroke-width:0.264583">JavaTypeStore</tspan></text>
+    <path
+       style="fill:none;stroke:#0000ff;stroke-width:0.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.395, 1.395;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow5)"
+       d="m 293.80809,232.87129 70.56024,0"
+       id="path5159"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#0000ff;stroke-width:0.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.395, 1.395;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow5)"
+       d="m 335.87906,255.94247 28.48927,0"
+       id="path5171"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#0000ff;stroke-width:0.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.395, 1.395;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow5)"
+       d="m 335.87906,267.25187 h 28.48927"
+       id="path5175"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#0000ff;stroke-width:0.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.395, 1.395;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow5)"
+       d="m 335.87906,279.23983 h 28.48927"
+       id="path5179"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#0000ff;stroke-width:0.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.395, 1.395;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow5)"
+       d="m 321.17684,292.13255 43.19149,0"
+       id="path5183"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#0000ff;stroke-width:0.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.395, 1.395;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow5)"
+       d="m 348.54559,316.56085 15.82274,0"
+       id="path5189"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#0000ff;stroke-width:0.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.395, 1.395;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow5)"
+       d="m 348.54559,327.41787 h 15.82274"
+       id="path5193"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect5197"
+       width="10.12096"
+       height="39.667645"
+       x="227.84605"
+       y="-410.04727"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="373.79846"
+       y="234.24292"
+       id="text5201"><tspan
+         sodipodi:role="line"
+         id="tspan5199"
+         x="373.79846"
+         y="234.24292"
+         style="font-size:4.23333px;stroke-width:0.264583">JavaClass</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect5203"
+       width="10.12096"
+       height="39.667645"
+       x="250.69104"
+       y="-410.04727"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="373.79846"
+       y="257.08792"
+       id="text5207"><tspan
+         sodipodi:role="line"
+         id="tspan5205"
+         x="373.79846"
+         y="257.08792"
+         style="font-size:4.23333px;stroke-width:0.264583">JavaClass</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect5209"
+       width="10.12096"
+       height="39.667645"
+       x="287.3335"
+       y="-410.04727"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="373.79846"
+       y="293.73038"
+       id="text5213"><tspan
+         sodipodi:role="line"
+         id="tspan5211"
+         x="373.79846"
+         y="293.73038"
+         style="font-size:4.23333px;stroke-width:0.264583">JavaClass</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect5215"
+       width="10.12096"
+       height="39.667645"
+       x="262.22662"
+       y="-410.04727"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="373.79846"
+       y="268.6235"
+       id="text5219"><tspan
+         sodipodi:role="line"
+         id="tspan5217"
+         x="373.79846"
+         y="268.6235"
+         style="font-size:4.23333px;stroke-width:0.264583">Method</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect5221"
+       width="10.12096"
+       height="39.667645"
+       x="273.53601"
+       y="-410.04727"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="373.79846"
+       y="279.93289"
+       id="text5225"><tspan
+         sodipodi:role="line"
+         id="tspan5223"
+         x="373.79846"
+         y="279.93289"
+         style="font-size:4.23333px;stroke-width:0.264583">Field</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect5227"
+       width="10.12096"
+       height="39.667645"
+       x="311.53561"
+       y="-410.04727"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="373.79846"
+       y="317.9325"
+       id="text5231"><tspan
+         sodipodi:role="line"
+         id="tspan5229"
+         x="373.79846"
+         y="317.9325"
+         style="font-size:4.23333px;stroke-width:0.264583">Method</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect5233"
+       width="10.12096"
+       height="39.667645"
+       x="322.845"
+       y="-410.04727"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="373.79846"
+       y="329.24188"
+       id="text5237"><tspan
+         sodipodi:role="line"
+         id="tspan5235"
+         x="373.79846"
+         y="329.24188"
+         style="font-size:4.23333px;stroke-width:0.264583">Field</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:0;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="215.55588"
+       y="16.16678"
+       id="text5241"
+       transform="translate(60.297031,186.80885)"><tspan
+         id="tspan5239"
+         x="215.55588"
+         y="16.16678"
+         style="font-size:4.23333px;fill:#0000ff;stroke-width:0.264583">TypeResolver (creates Types)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:0;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="215.55588"
+       y="16.16678"
+       id="text5245"
+       transform="translate(60.297031,192.56666)"><tspan
+         id="tspan5243"
+         x="215.55588"
+         y="16.16678"
+         style="font-size:4.23333px;fill:#0000ff;stroke-width:0.264583">CodeGenerator (enriches Types with code)</tspan></text>
   </g>
 </svg>
