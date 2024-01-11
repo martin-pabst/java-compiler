@@ -442,6 +442,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         const method = methodNode.method;
         if (!method) return;
 
+        this.registerUsagePosition(method, methodNode.identifierRange);
 
         if (methodNode.isContructor) {
             if (classContext.outerType && !classContext.isStatic) {

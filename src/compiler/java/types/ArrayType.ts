@@ -55,6 +55,12 @@ export class ArrayType extends JavaType {
         return s;
     }
 
+    getDeclaration(): string {
+        let s: string = this.elementType.getDeclaration();
+        for(let i = 0; i < this.dimension; i++) s += "[]";
+        return s;
+    }
+
     getReifiedIdentifier(): string {
         return this.toString();
     }

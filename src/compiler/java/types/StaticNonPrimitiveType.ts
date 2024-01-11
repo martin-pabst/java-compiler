@@ -55,4 +55,8 @@ export class StaticNonPrimitiveType extends JavaType {
         throw new Error("Method not implemented.");
     }
 
+    getDeclaration(): string {
+        return this.nonPrimitiveType.getDeclaration();
+    }
+
 }

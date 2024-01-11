@@ -14,4 +14,10 @@ export class JavaLocalVariable extends SymbolOnStackframe {
         // TODO
     }
 
+    getDeclaration(): string {
+        let decl: string = "";
+        if(this.isFinal) decl += "final ";
+        return decl + this.type.toString() + " " + this.identifier;
+    }
+
 }

@@ -1,6 +1,6 @@
 import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
-import { TokenType } from "../TokenType";
+import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter";
@@ -29,10 +29,10 @@ export abstract class IJavaInterface extends NonPrimitiveType {
     abstract isFunctionalInterface(): boolean;
 
     findImplementedInterface(identifier: string): IJavaInterface | undefined {
-        if(this.identifier == identifier) return this;
-        for(let ext of this.getExtends()){
+        if (this.identifier == identifier) return this;
+        for (let ext of this.getExtends()) {
             let intf = ext.findImplementedInterface(identifier);
-            if(intf) return intf;
+            if (intf) return intf;
         }
         return undefined;
     }
@@ -41,17 +41,17 @@ export abstract class IJavaInterface extends NonPrimitiveType {
         let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
         if (field) return field;
         if (uptoVisibility == TokenType.keywordPrivate) uptoVisibility = TokenType.keywordProtected;
-        for(let interf of this.getExtends()){
+        for (let interf of this.getExtends()) {
             field = interf.getField(identifier, uptoVisibility, forceStatic);
-            if(field) return field
+            if (field) return field
         }
         return undefined;
     }
 
     toString(): string {
         let s: string = this.identifier;
-        
-        if(this.genericTypeParameters && this.genericTypeParameters.length > 0){
+
+        if (this.genericTypeParameters && this.genericTypeParameters.length > 0) {
             s += "<" + this.genericTypeParameters.map(gi => gi.toString()).join(", ") + ">";
         }
         return s;
@@ -123,20 +123,20 @@ export class JavaInterface extends IJavaInterface {
 
     public getAllMethods(): Method[] {
         let methods: Method[] = this.methods;
-        for(let impl of this.extends){
+        for (let impl of this.extends) {
             methods = methods.concat(impl.getAllMethods());
-        }    
+        }
         return methods;
     }
 
     private getAllInheritedMethodsHelper(alreadyFoundSignatureMap: Map<string, Method>) {
-        for(let m of this.methods){
+        for (let m of this.methods) {
             let signature = m.getInternalName("java");
-            if(!alreadyFoundSignatureMap.get(signature)){
+            if (!alreadyFoundSignatureMap.get(signature)) {
                 alreadyFoundSignatureMap.set(signature, m);
             }
         }
-        for(let intf of this.extends){
+        for (let intf of this.extends) {
             (<JavaInterface>intf).getAllInheritedMethodsHelper(alreadyFoundSignatureMap);
         }
     }
@@ -150,12 +150,12 @@ export class JavaInterface extends IJavaInterface {
     }
 
     canImplicitlyCastTo(otherType: JavaType): boolean {
-        if(otherType instanceof GenericTypeParameter){
-            for(let ext of otherType.upperBounds){
-                if(!this.canImplicitlyCastTo(ext)) return false;
+        if (otherType instanceof GenericTypeParameter) {
+            for (let ext of otherType.upperBounds) {
+                if (!this.canImplicitlyCastTo(ext)) return false;
             }
 
-            if(otherType.catches) otherType.catches.push(this);
+            if (otherType.catches) otherType.catches.push(this);
 
             return true;
         }
@@ -168,7 +168,7 @@ export class JavaInterface extends IJavaInterface {
             if (intf.canImplicitlyCastTo(otherType)) return true;
         }
 
-        if(otherType.identifier == 'Object') return true;
+        if (otherType.identifier == 'Object') return true;
 
 
         return false;
@@ -182,6 +182,25 @@ export class JavaInterface extends IJavaInterface {
 
         return false;
     }
+
+    getDeclaration(): string {
+        let decl: string = TokenTypeReadable[this.visibility] + " ";
+        decl += "interface " + this.identifier;
+
+        if (this.genericTypeParameters && this.genericTypeParameters.length > 0) {
+            decl += "<" + this.genericTypeParameters.map(gi => {
+                return gi.getDeclaration();
+            }).join(", ") + ">";
+        }
+
+        if(this.getExtends().length > 0){
+            decl += " extends " + this.getExtends().map(ext => ext.toString()).join(", ");
+        }
+
+        return decl;
+
+    }
+
 
 }
 
@@ -199,7 +218,7 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
 
     getFirstTypeParametersType(): JavaType | undefined {
         let genericInformation = this.isGenericVariantOf.genericTypeParameters;
-        if(genericInformation && genericInformation.length > 0){
+        if (genericInformation && genericInformation.length > 0) {
             return this.typeMap.get(genericInformation[0]);
         }
         return undefined;
@@ -213,14 +232,35 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
         let s: string = this.identifier;
 
         let genericTypeParameters = this.isGenericVariantOf.genericTypeParameters;
-        
-        if(genericTypeParameters && genericTypeParameters.length > 0){
+
+        if (genericTypeParameters && genericTypeParameters.length > 0) {
             s += "<" + genericTypeParameters.map(gi => {
                 let type = this.typeMap.get(gi);
                 return type?.toString();
             }).join(", ") + ">";
         }
         return s;
+    }
+
+    getDeclaration(): string {
+        let decl: string = TokenTypeReadable[this.visibility] + " ";
+        if (this.isStatic) decl += "static ";
+        decl += "interface " + this.identifier;
+
+        let genericInformation = this.isGenericVariantOf.genericTypeParameters;
+        if (genericInformation && genericInformation.length > 0) {
+            decl += "<" + genericInformation.map(gi => {
+                let type = this.typeMap.get(gi);
+                return type?.getDeclaration();
+            }).join(", ") + ">";
+        }
+
+        if(this.getExtends().length > 0){
+            decl += " extends " + this.getExtends().map(ext => ext.toString()).join(", ");
+        }
+
+        return decl;
+
     }
 
     isGenericVariant(): boolean {
@@ -259,9 +299,9 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
 
     public getAllMethods(): Method[] {
         let methods: Method[] = this.getOwnMethods();
-        for(let impl of this.getExtends()){
+        for (let impl of this.getExtends()) {
             methods = methods.concat(impl.getAllMethods());
-        }    
+        }
         return methods;
     }
 
@@ -285,12 +325,12 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
 
     canImplicitlyCastTo(otherType: JavaType): boolean {
 
-        if(otherType instanceof GenericTypeParameter){
-            for(let ext of otherType.upperBounds){
-                if(!this.canImplicitlyCastTo(ext)) return false;
+        if (otherType instanceof GenericTypeParameter) {
+            for (let ext of otherType.upperBounds) {
+                if (!this.canImplicitlyCastTo(ext)) return false;
             }
 
-            if(otherType.catches) otherType.catches.push(this);
+            if (otherType.catches) otherType.catches.push(this);
 
             return true;
         }
@@ -322,11 +362,11 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
             let myType = smgvo.typeMap.get(genericParameter);
             let othersType = ot1.typeMap.get(genericParameter);
 
-            if(!myType || !othersType) return false;
+            if (!myType || !othersType) return false;
 
             let othersTypeIsGenericWildcardParameter = othersType instanceof GenericTypeParameter && othersType.isWildcard;
 
-            if(!(myType.canImplicitlyCastTo(othersType) && (othersTypeIsGenericWildcardParameter || othersType.canImplicitlyCastTo(myType)))) {
+            if (!(myType.canImplicitlyCastTo(othersType) && (othersTypeIsGenericWildcardParameter || othersType.canImplicitlyCastTo(myType)))) {
                 return false;
             }
 

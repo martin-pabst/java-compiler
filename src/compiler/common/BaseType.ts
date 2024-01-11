@@ -5,7 +5,7 @@ import { IRange } from "./range/Range";
 /**
  * encapsultes methods for debugger
  */
-export class BaseType extends BaseSymbol {
+export abstract class BaseType extends BaseSymbol {
 
     constructor(identifier: string, identifierRange: IRange, module: Module) {
         super(identifier, identifierRange, module);

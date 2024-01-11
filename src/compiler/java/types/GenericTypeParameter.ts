@@ -37,6 +37,10 @@ export class GenericTypeParameter extends NonPrimitiveType {
         return undefined;
     }
 
+    getDeclaration(): string {
+        return this.toString();        
+    }
+
     toString(): string {
         return this.identifier + 
         (this.lowerBound ? " super " + this.lowerBound?.toString() : "") + 

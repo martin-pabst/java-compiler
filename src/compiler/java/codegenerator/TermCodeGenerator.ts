@@ -877,6 +877,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             return undefined;
         }
 
+        this.registerUsagePosition(method, node.identifierRange);
+
         for (let i = 0; i < node.parameterValues.length; i++) {
             let pv = node.parameterValues[i];
             if (pv.kind == TokenType.lambdaOperator) {

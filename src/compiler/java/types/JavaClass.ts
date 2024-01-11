@@ -1,5 +1,5 @@
 import { IRange } from "../../common/range/Range";
-import { TokenType } from "../TokenType";
+import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter.ts";
@@ -29,12 +29,12 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 
     findImplementedInterface(identifier: string): IJavaInterface | undefined {
 
-        for(let ext of this.getImplements()){
+        for (let ext of this.getImplements()) {
             let intf = ext.findImplementedInterface(identifier);
-            if(intf) return intf;
+            if (intf) return intf;
         }
 
-        if(this.getExtends()) return this.getExtends()?.findImplementedInterface(identifier);
+        if (this.getExtends()) return this.getExtends()?.findImplementedInterface(identifier);
 
         return undefined;
     }
@@ -115,18 +115,18 @@ export class JavaClass extends IJavaClass {
         let otherMethodsIdentifier = otherMethod.identifier;
         let otherMethodsParameterCount = otherMethod.parameters.length;
         for (let method of this.methods) {
-            if (method.identifier == otherMethodsIdentifier && method.parameters.length == otherMethodsParameterCount){
+            if (method.identifier == otherMethodsIdentifier && method.parameters.length == otherMethodsParameterCount) {
                 let parameterTypesCompatible: boolean = true;
-                for(let i = 0; i < otherMethodsParameterCount; i++){
+                for (let i = 0; i < otherMethodsParameterCount; i++) {
                     let methodsParameterType = method.parameters[i].type;
                     let otherMethodsParameterType = otherMethod.parameters[i].type;
-                    if(methodsParameterType && otherMethodsParameterType){
-                        if(methodsParameterType.toString() != otherMethodsParameterType.toString()){
-                            if(!(otherMethodsParameterType instanceof NonPrimitiveType && methodsParameterType instanceof NonPrimitiveType)){
+                    if (methodsParameterType && otherMethodsParameterType) {
+                        if (methodsParameterType.toString() != otherMethodsParameterType.toString()) {
+                            if (!(otherMethodsParameterType instanceof NonPrimitiveType && methodsParameterType instanceof NonPrimitiveType)) {
                                 parameterTypesCompatible = false;
                                 break;
                             } else {
-                                if(!methodsParameterType.canImplicitlyCastTo(otherMethodsParameterType)){
+                                if (!methodsParameterType.canImplicitlyCastTo(otherMethodsParameterType)) {
                                     parameterTypesCompatible = false;
                                     break;
                                 }
@@ -134,8 +134,8 @@ export class JavaClass extends IJavaClass {
                         }
                     }
                 }
-                if(parameterTypesCompatible) return method;
-            } 
+                if (parameterTypesCompatible) return method;
+            }
         }
         if (this.extends) {
             return (<JavaClass>this.extends).findMethodWithSignature(otherMethod);
@@ -163,15 +163,15 @@ export class JavaClass extends IJavaClass {
 
         let baseClass = this.getExtends();
         let allBaseClassMethods = baseClass?.getAllMethods();
-        if(!allBaseClassMethods) return;
+        if (!allBaseClassMethods) return;
 
-        for(let m of this.methods){
+        for (let m of this.methods) {
             let internalName = m.getInternalName("java");
             let baseMethods = allBaseClassMethods?.filter(m1 => m1.getInternalName("java") == internalName);
-            if(baseMethods.length > 0){
+            if (baseMethods.length > 0) {
                 let baseMethod = baseMethods[0];
                 m.takeInternalJavaNameWithGenericParamterIdentifiersFrom(baseMethod);
-                if(baseMethod.isFinal){
+                if (baseMethod.isFinal) {
                     let jc = JCM.methodOverridesFinalMethod(m.getSignature(), baseMethod.classEnumInterface.identifier);
                     m.classEnumInterface.module.errors.push({
                         message: jc.message,
@@ -181,7 +181,7 @@ export class JavaClass extends IJavaClass {
                     })
                 }
             }
-            baseMethods.forEach( m => overriddenOrImplementedMethodPaths[m.getPathWithMethodIdentifier()] = true);
+            baseMethods.forEach(m => overriddenOrImplementedMethodPaths[m.getPathWithMethodIdentifier()] = true);
         }
 
     }
@@ -207,7 +207,7 @@ export class JavaClass extends IJavaClass {
                             runtimeClass.prototype[functionIdentifier] = otherRuntimeClass.prototype[functionIdentifier];
                         }
 
-                        if(this.isLibraryType){
+                        if (this.isLibraryType) {
                             f();
                         } else {
                             method.callbackAfterCodeGeneration.push(f);
@@ -278,7 +278,7 @@ export class JavaClass extends IJavaClass {
     }
 
     public getAllMethods(): Method[] {
-        if(this.extends){
+        if (this.extends) {
             return this.methods.concat(this.extends?.getAllMethods());
         } else {
             return this.methods;
@@ -301,16 +301,16 @@ export class JavaClass extends IJavaClass {
 
         if (bType == this) return true;                   // A can cast to A.
 
-        if(bType instanceof GenericTypeParameter){
-            for(let ext of bType.upperBounds){
-                if(!this.canImplicitlyCastTo(ext)) return false;
+        if (bType instanceof GenericTypeParameter) {
+            for (let ext of bType.upperBounds) {
+                if (!this.canImplicitlyCastTo(ext)) return false;
             }
 
-            if(bType.lowerBound){
-                if(!bType.lowerBound.canImplicitlyCastTo(this)) return false;
+            if (bType.lowerBound) {
+                if (!bType.lowerBound.canImplicitlyCastTo(this)) return false;
             }
 
-            if(bType.catches) bType.catches.push(this);
+            if (bType.catches) bType.catches.push(this);
 
             return true;
         }
@@ -319,8 +319,8 @@ export class JavaClass extends IJavaClass {
             for (let x of this.implements) {                 // A implements X
                 if (x.canImplicitlyCastTo(bType)) return true;  // if x can cast to BI, then A can cast, too
             }
-            
-            if(this.extends) return this.extends.canImplicitlyCastTo(bType);
+
+            if (this.extends) return this.extends.canImplicitlyCastTo(bType);
 
             return false;
         }
@@ -331,13 +331,13 @@ export class JavaClass extends IJavaClass {
             return this.extends.canImplicitlyCastTo(bType); // A extends C; if C can cast to B, then also A can
         }
 
-        if(bType instanceof GenericTypeParameter){
-            for(let ext of bType.upperBounds){
-                if(!this.canImplicitlyCastTo(ext)) return false;
+        if (bType instanceof GenericTypeParameter) {
+            for (let ext of bType.upperBounds) {
+                if (!this.canImplicitlyCastTo(ext)) return false;
             }
 
-            if(bType.lowerBound && !bType.lowerBound.canImplicitlyCastTo(this)) return false;
-            
+            if (bType.lowerBound && !bType.lowerBound.canImplicitlyCastTo(this)) return false;
+
             return true;
         }
 
@@ -358,6 +358,21 @@ export class JavaClass extends IJavaClass {
 
         return false;
 
+    }
+
+    getDeclaration(): string {
+        let decl: string = TokenTypeReadable[this.visibility] + " ";
+        if (this.isStatic) decl += "static ";
+        if (this.isAbstract()) decl += "abstract ";
+        decl += "class " + this.identifier;
+        if (this.genericTypeParameters && this.genericTypeParameters.length > 0) {
+            decl += "<" + this.genericTypeParameters.map(gp => gp.getDeclaration()) + ">";
+        }
+        if(this.extends) decl += " extends " + this.extends.toString();
+        if(this.implements.length > 0){
+            decl += " implements " + this.implements.map(impl => impl.toString()).join(", ");
+        }
+        return decl;
     }
 
 }
@@ -381,7 +396,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         let s: string = this.identifier;
 
         let genericInformation = this.isGenericVariantOf.genericTypeParameters;
-        
+
         if (genericInformation && genericInformation.length > 0) {
             s += "<" + genericInformation.map(gi => {
                 let type = this.typeMap.get(gi);
@@ -390,10 +405,32 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         }
         return s;
     }
-    
+
+    getDeclaration(): string {
+        let decl: string = TokenTypeReadable[this.visibility] + " ";
+        if (this.isStatic) decl += "static ";
+        if (this.isAbstract()) decl += "abstract ";
+        decl += "class " + this.identifier;
+
+        let genericInformation = this.isGenericVariantOf.genericTypeParameters;
+        if (genericInformation && genericInformation.length > 0) {
+            decl += "<" + genericInformation.map(gi => {
+                let type = this.typeMap.get(gi);
+                return type?.toString();
+            }).join(", ") + ">";
+        }
+        if(this.getExtends()) decl += " extends " + this.getExtends()!.toString();
+        if(this.getImplements().length > 0){
+            decl += " implements " + this.getImplements().map(impl => impl.toString()).join(", ");
+        }
+
+        return decl;
+    }
+
+
     getFirstTypeParametersType(): JavaType | undefined {
         let genericInformation = this.isGenericVariantOf.genericTypeParameters;
-        if(genericInformation && genericInformation.length > 0){
+        if (genericInformation && genericInformation.length > 0) {
             return this.typeMap.get(genericInformation[0]);
         }
         return undefined;
@@ -449,7 +486,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
 
     public getAllMethods(): Method[] {
         let extend = this.getExtends();
-        if(extend){
+        if (extend) {
             return this.getOwnMethods().concat(extend.getAllMethods());
         } else {
             return this.getOwnMethods();
@@ -474,12 +511,12 @@ export class GenericVariantOfJavaClass extends IJavaClass {
 
     canImplicitlyCastTo(otherType: JavaType): boolean {
 
-        if(otherType instanceof GenericTypeParameter){
-            for(let ext of otherType.upperBounds){
-                if(!this.canImplicitlyCastTo(ext)) return false;
+        if (otherType instanceof GenericTypeParameter) {
+            for (let ext of otherType.upperBounds) {
+                if (!this.canImplicitlyCastTo(ext)) return false;
             }
 
-            if(otherType.catches) otherType.catches.push(this);
+            if (otherType.catches) otherType.catches.push(this);
 
             return true;
         }

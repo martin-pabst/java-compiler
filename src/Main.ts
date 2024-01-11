@@ -62,7 +62,7 @@ export class Main implements JavaMainClass {
     /*
      * Test program:
      */
-    let testProgram: string = testPrograms.primzahlzwillinge.trim();
+    let testProgram: string = testPrograms.arrayListTest.trim();
     
     this.insightTabsManager = new TabManager(document.getElementById('insighttabs')!,
     ['token', 'ast', 'code', 'errors']);

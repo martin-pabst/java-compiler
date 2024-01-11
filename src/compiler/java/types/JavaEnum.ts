@@ -1,6 +1,6 @@
 import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
-import { TokenType } from "../TokenType.ts";
+import { TokenType, TokenTypeReadable } from "../TokenType.ts";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { Field } from "./Field";
 import { GenericTypeParameter } from "./GenericTypeParameter";
@@ -103,6 +103,13 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
     toString(): string {
         return this.identifier;
+    }
+
+    getDeclaration(): string {
+        let decl: string = TokenTypeReadable[this.visibility] + " ";
+        if (this.isStatic) decl += "static ";
+        decl += "enum " + this.identifier;
+        return decl;
     }
 
     getReifiedIdentifier(): string {
