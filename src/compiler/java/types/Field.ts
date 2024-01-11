@@ -1,6 +1,6 @@
 import { BaseSymbol } from "../../common/BaseSymbolTable";
 import { IRange } from "../../common/range/Range";
-import { TokenType } from "../TokenType";
+import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaLocalVariable } from "../codegenerator/JavaLocalVariable";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { GenericTypeParameter } from "./GenericTypeParameter";
@@ -61,7 +61,7 @@ export class Field extends BaseSymbol {
     }
 
     getDeclaration(): string {
-        let decl: string = TokenType[this.visibility] + " ";
+        let decl: string = TokenTypeReadable[this.visibility] + " ";
         if(this.isStatic) decl += "static ";
         if(this.isFinal) decl += "final ";
         return decl + this.type.toString() + " " + this.identifier;

@@ -94,7 +94,7 @@ export class JavaHoverProvider {
 
         if (usagePosition && symbol && symbol.identifier != "var") {
             if (symbol instanceof NonPrimitiveType || symbol instanceof Method) {
-                declarationAsString = symbol.toString();
+                declarationAsString = "```\n" + symbol.getDeclaration() + "\n```";
                 return {
                     range: usagePosition.range,
                     contents: [{ value: declarationAsString }],
@@ -107,15 +107,8 @@ export class JavaHoverProvider {
                 }
             } else if(symbol instanceof JavaLocalVariable || symbol instanceof Field) {
                 // Variable
-                let typeIdentifier: string = symbol.type.toString();
                 
-                if (!typeIdentifier) {
-                    typeIdentifier = "";
-                } else {
-                    typeIdentifier += " ";
-                }
-
-                declarationAsString = typeIdentifier + symbol.identifier;
+                declarationAsString =  symbol.getDeclaration() ;
             }
         } else {
             let word = this.getWordUnderCursor(model, position);

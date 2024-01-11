@@ -2,7 +2,7 @@ import { BaseSymbol } from "../../common/BaseSymbolTable.ts";
 import { Error } from "../../common/Error";
 import { Program } from "../../common/interpreter/Program";
 import { IRange } from "../../common/range/Range";
-import { TokenType } from "../TokenType";
+import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter";
@@ -155,7 +155,7 @@ export class Method extends BaseSymbol {
     }
 
     getDeclaration(): string {
-        let decl: string = TokenType[this.visibility] + " ";
+        let decl: string = TokenTypeReadable[this.visibility] + " ";
         if(this.isStatic) decl += "static ";
         if(this.isFinal) decl += "final ";
         decl += this.returnParameterType?.toString() + " " + this.identifier;
@@ -204,7 +204,7 @@ export class GenericMethod extends Method {
     }
 
     getDeclaration(): string {
-        let decl: string = TokenType[this.visibility] + " ";
+        let decl: string = TokenTypeReadable[this.visibility] + " ";
         if(this.isStatic) decl += "static ";
         if(this.isFinal) decl += "final ";
         decl += "<" + this.genericTypeParameters.map(p => p.identifier).join(", ") + "> ";
