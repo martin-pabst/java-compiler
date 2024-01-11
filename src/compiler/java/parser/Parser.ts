@@ -49,7 +49,7 @@ export class Parser extends StatementParser {
         this.module.ast = {
             kind: TokenType.global,
             range: globalRange,
-            classOrInterfaceOrEnumDefinitions: [],
+            innerTypes: [],
             mainProgramNode: this.nodeFactory.buildMainProgramNode(this.cct),
             collectedTypeNodes: [],
             path: ""

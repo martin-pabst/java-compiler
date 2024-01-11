@@ -145,7 +145,7 @@ export class ASTNodeFactory {
             genericParameterDeclarations: [],
             fieldsOrInstanceInitializers: [],
             methods: [],
-            classOrInterfaceOrEnumDefinitions: [],
+            innerTypes: [],
             annotations: [],
             resolvedType: undefined,
             module: this.parser.module, 
@@ -157,7 +157,7 @@ export class ASTNodeFactory {
             annotations.splice(0, annotations.length);
         }
 
-        parent.classOrInterfaceOrEnumDefinitions.push(node);
+        parent.innerTypes.push(node);
         return node;
 
     }
@@ -185,7 +185,7 @@ export class ASTNodeFactory {
             isDefault: modifiers.isDefault,
             isSynchronized: modifiers.isSynchronized,
             resolvedType: undefined,
-            classOrInterfaceOrEnumDefinitions: [],
+            innerTypes: [],
             module: this.parser.module, 
             isAnonymousInnerType: false
         }
@@ -195,7 +195,7 @@ export class ASTNodeFactory {
             annotations.splice(0, annotations.length);
         }
 
-        parent.classOrInterfaceOrEnumDefinitions.push(node);
+        parent.innerTypes.push(node);
         return node;
 
     }
@@ -236,7 +236,7 @@ export class ASTNodeFactory {
             annotations: [],
             fieldsOrInstanceInitializers: [], // only static fields and static initializers...,
             resolvedType: undefined,
-            classOrInterfaceOrEnumDefinitions: [],
+            innerTypes: [],
             module: this.parser.module, 
             isAnonymousInnerType: false
         }
@@ -246,7 +246,7 @@ export class ASTNodeFactory {
             annotations.splice(0, annotations.length);
         }
 
-        parent.classOrInterfaceOrEnumDefinitions.push(node);
+        parent.innerTypes.push(node);
         return node;
 
     }
@@ -271,7 +271,7 @@ export class ASTNodeFactory {
             statement: undefined,
             annotations: [],
             parentTypeScope: parent,
-            classOrInterfaceOrEnumDefinitions: [],
+            innerTypes: [],
             path: parent.path + "." + <string>identifier.value,
             genericParameterDeclarations: []
         }

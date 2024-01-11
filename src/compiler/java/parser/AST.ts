@@ -42,7 +42,7 @@ export interface ASTDebugProgram extends ASTNode {
 export interface TypeScope {
     kind: TokenType.keywordClass | TokenType.keywordInterface | TokenType.keywordEnum | TokenType.global | TokenType.methodDeclaration;
     
-    classOrInterfaceOrEnumDefinitions: (ASTClassDefinitionNode | ASTInterfaceDefinitionNode | ASTEnumDefinitionNode)[];
+    innerTypes: (ASTClassDefinitionNode | ASTInterfaceDefinitionNode | ASTEnumDefinitionNode)[];
     path: string;
     symbolTable?: JavaSymbolTable;
 
@@ -174,7 +174,7 @@ export interface ASTMethodDeclarationNode extends ASTNode, ASTNodeWithModifiers,
     method?: Method;
     program?: Program,       // only for debugging purposes
     parentTypeScope: TypeScope,   // class or interface or enum containing this method
-    classOrInterfaceOrEnumDefinitions: (ASTClassDefinitionNode | ASTInterfaceDefinitionNode | ASTEnumDefinitionNode)[];
+    innerTypes: (ASTClassDefinitionNode | ASTInterfaceDefinitionNode | ASTEnumDefinitionNode)[];
     path: string;
 }
 

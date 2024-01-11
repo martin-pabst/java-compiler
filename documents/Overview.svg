@@ -7,7 +7,7 @@
    viewBox="0 0 420 297"
    version="1.1"
    id="svg5"
-   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
    sodipodi:docname="Overview.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -25,12 +25,12 @@
      inkscape:document-units="mm"
      showgrid="true"
      inkscape:zoom="1.6542757"
-     inkscape:cx="1011.0165"
-     inkscape:cy="513.51778"
-     inkscape:window-width="3840"
-     inkscape:window-height="2054"
-     inkscape:window-x="-11"
-     inkscape:window-y="-11"
+     inkscape:cx="1416.9343"
+     inkscape:cy="938.17494"
+     inkscape:window-width="1920"
+     inkscape:window-height="1137"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1">
     <inkscape:grid
@@ -47,6 +47,25 @@
   </sodipodi:namedview>
   <defs
      id="defs2">
+    <marker
+       style="overflow:visible"
+       id="Arrow5"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Arrow5"
+       markerWidth="5.8874264"
+       markerHeight="6.6094756"
+       viewBox="0 0 5.8874262 6.6094758"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="m 6,0 c -3,1 -7,3 -9,5 0,0 0,-4 2,-5 -2,-1 -2,-5 -2,-5 2,2 6,4 9,5 z"
+         id="path8893" />
+    </marker>
     <rect
        x="1080.231"
        y="796.72328"
@@ -1501,7 +1520,7 @@
          id="tspan1"
          x="215.55588"
          y="16.16678"
-         style="stroke-width:0.264583">Symbol tables</tspan></text>
+         style="stroke-width:0.264583">Symbol tables </tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 59.564153,236.54988 v 2.97259 H 33.244594 v 17.39845"
@@ -1548,7 +1567,7 @@
          style="stroke-width:0.264583"
          x="279.89337"
          y="70.815361"
-         id="tspan1957">class A {</tspan><tspan
+         id="tspan1957">class A extends ArrayList&lt;String&gt; {</tspan><tspan
          sodipodi:role="line"
          style="stroke-width:0.264583"
          x="279.89337"
@@ -1996,5 +2015,347 @@
        transform="scale(0.26458333)"
        id="text7"
        style="fill:#0000ff;-inkscape-font-specification:Consolas;font-family:Consolas;font-size:21.33333333px;letter-spacing:0.3px;line-height:1.13;stroke-width:0.75590551;stroke-linejoin:round;stroke-linecap:round;stroke:#917c6f;white-space:pre;shape-inside:url(#rect7)" />
+    <text
+       xml:space="preserve"
+       style="font-size:5.64444px;line-height:1.25;font-family:Consolas;-inkscape-font-specification:Consolas;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="272.85605"
+       y="13.115004"
+       id="text1179"><tspan
+         sodipodi:role="line"
+         id="tspan1177"
+         x="272.85605"
+         y="13.115004"
+         style="stroke-width:0.264583">(for local variables, fields and parameters)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:8.46667px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:0;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="215.55588"
+       y="16.16678"
+       id="text1183"
+       transform="translate(-0.95963445,186.48897)"><tspan
+         id="tspan1181"
+         x="215.55588"
+         y="16.16678"
+         style="stroke-width:0.264583">AST</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect1185"
+       width="10.12096"
+       height="39.667645"
+       x="208.16769"
+       y="-253.46692"
+       ry="1.9192688"
+       rx="1.9192688"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="217.21811"
+       y="214.56456"
+       id="text1189"><tspan
+         sodipodi:role="line"
+         id="tspan1187"
+         x="217.21811"
+         y="214.56456"
+         style="font-size:4.23333px;stroke-width:0.264583">: ASTGlobalNode</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect1191"
+       width="10.12096"
+       height="66.357826"
+       x="228.07224"
+       y="-291.46649"
+       ry="1.9192688"
+       rx="1.9192688"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="228.52751"
+       y="234.4691"
+       id="text1195"><tspan
+         sodipodi:role="line"
+         id="tspan1193"
+         x="228.52751"
+         y="234.4691"
+         style="font-size:4.23333px;stroke-width:0.264583">: ASTClassDefinitionNode  (A)</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect1197"
+       width="10.12096"
+       height="79.929108"
+       x="262.85114"
+       y="-333.35617"
+       ry="1.9192688"
+       rx="1.9192688"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="257.00586"
+       y="269.08804"
+       id="text1202"><tspan
+         sodipodi:role="line"
+         id="tspan1200"
+         x="257.00586"
+         y="269.08804"
+         style="font-size:4.23333px;stroke-width:0.264583">testA: ASTMethodDeclarationNode</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect1204"
+       width="10.12096"
+       height="66.357826"
+       x="287.39389"
+       y="-319.17453"
+       ry="1.9192688"
+       rx="1.9192688"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="256.23553"
+       y="293.79077"
+       id="text1208"><tspan
+         sodipodi:role="line"
+         id="tspan1206"
+         x="256.23553"
+         y="293.79077"
+         style="font-size:4.23333px;stroke-width:0.264583">B: ASTClassDefinitionNode</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 219.85475,218.15834 v 14.47603 h 5.20232"
+       id="path1279" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 231.39034,238.13807 v 54.43921 h 7.80348 l 13.65332,0"
+       id="path1283"
+       sodipodi:nodetypes="cccc" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.9756px;line-height:1.25;font-family:Consolas;-inkscape-font-specification:Consolas;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="-235.58316"
+       y="218.17825"
+       id="text1343"
+       transform="rotate(-90)"><tspan
+         sodipodi:role="line"
+         id="tspan1341"
+         x="-235.58316"
+         y="218.17825"
+         style="stroke-width:0.264583">innerTypes</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 241.76891,238.16421 v 29.428 l 11.77756,0"
+       id="path1345"
+       sodipodi:nodetypes="ccc" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.9756px;line-height:1.25;font-family:Consolas;-inkscape-font-specification:Consolas;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="-255.73549"
+       y="229.53392"
+       id="text1349"
+       transform="rotate(-90)"><tspan
+         sodipodi:role="line"
+         id="tspan1347"
+         x="-255.73549"
+         y="229.53392"
+         style="stroke-width:0.264583">innerTypes</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:2.9756px;line-height:1.25;font-family:Consolas;-inkscape-font-specification:Consolas;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="-251.00356"
+       y="240.51485"
+       id="text1353"
+       transform="rotate(-90)"><tspan
+         sodipodi:role="line"
+         id="tspan1351"
+         x="-251.00356"
+         y="240.51485"
+         style="stroke-width:0.264583">methods</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect1355"
+       width="10.12096"
+       height="79.929108"
+       x="274.38672"
+       y="-333.12997"
+       ry="1.9192688"
+       rx="1.9192688"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="256.77966"
+       y="280.62363"
+       id="text1359"><tspan
+         sodipodi:role="line"
+         id="tspan1357"
+         x="256.77966"
+         y="280.62363"
+         style="font-size:4.23333px;stroke-width:0.264583">a1: ASTFieldDeclarationNode</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 236.57089,238.16421 v 41.02358 l 16.58946,0"
+       id="path1361"
+       sodipodi:nodetypes="ccc" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.9756px;line-height:1.25;font-family:Consolas;-inkscape-font-specification:Consolas;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="-249.40416"
+       y="235.31683"
+       id="text1365"
+       transform="rotate(-90)"><tspan
+         sodipodi:role="line"
+         id="tspan1363"
+         x="-249.40416"
+         y="235.31683"
+         style="stroke-width:0.264583">fields</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect1416"
+       width="10.12096"
+       height="79.929108"
+       x="311.27264"
+       y="-347.11093"
+       ry="1.9192688"
+       rx="1.9192688"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="270.76062"
+       y="317.50955"
+       id="text1420"><tspan
+         sodipodi:role="line"
+         id="tspan1418"
+         x="270.76062"
+         y="317.50955"
+         style="font-size:4.23333px;stroke-width:0.264583">testA: ASTMethodDeclarationNode</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 262.19622,297.46159 v 18.55214 h 4.87883"
+       id="path1422"
+       sodipodi:nodetypes="ccc" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.9756px;line-height:1.25;font-family:Consolas;-inkscape-font-specification:Consolas;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="-310.30093"
+       y="260.94217"
+       id="text1426"
+       transform="rotate(-90)"><tspan
+         sodipodi:role="line"
+         id="tspan1424"
+         x="-310.30093"
+         y="260.94217"
+         style="stroke-width:0.264583">methods</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect1428"
+       width="10.12096"
+       height="79.929108"
+       x="322.80823"
+       y="-346.88474"
+       ry="1.9192688"
+       rx="1.9192688"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="270.53442"
+       y="329.04514"
+       id="text1432"><tspan
+         sodipodi:role="line"
+         id="tspan1430"
+         x="270.53442"
+         y="329.04514"
+         style="font-size:4.23333px;stroke-width:0.264583">a1: ASTFieldDeclarationNode</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 256.9982,297.46159 v 30.14772 h 9.91691"
+       id="path1434"
+       sodipodi:nodetypes="ccc" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.9756px;line-height:1.25;font-family:Consolas;-inkscape-font-specification:Consolas;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="-308.70154"
+       y="255.74414"
+       id="text1438"
+       transform="rotate(-90)"><tspan
+         sodipodi:role="line"
+         id="tspan1436"
+         x="-308.70154"
+         y="255.74414"
+         style="stroke-width:0.264583">fields</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 247.6498,238.16421 -0.11309,17.77932 5.89667,0"
+       id="path1440"
+       sodipodi:nodetypes="ccc" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.9756px;line-height:1.25;font-family:Consolas;-inkscape-font-specification:Consolas;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="-251.00356"
+       y="246.39574"
+       id="text1444"
+       transform="rotate(-90)"><tspan
+         sodipodi:role="line"
+         id="tspan1442"
+         x="-251.00356"
+         y="246.39574"
+         style="stroke-width:0.264583">extends</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect1446"
+       width="10.12096"
+       height="79.929108"
+       x="251.20245"
+       y="-333.35617"
+       ry="1.9192688"
+       rx="1.9192688"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="257.00586"
+       y="257.43936"
+       id="text1450"><tspan
+         sodipodi:role="line"
+         id="tspan1448"
+         x="257.00586"
+         y="257.43936"
+         style="font-size:4.23333px;stroke-width:0.264583">ArrayList: ASTClassDefinitionNode</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:8.46667px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;inline-size:0;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="215.55588"
+       y="16.16678"
+       id="text1454"
+       transform="translate(149.06322,186.48897)"><tspan
+         id="tspan1452"
+         x="215.55588"
+         y="16.16678"
+         style="stroke-width:0.264583">Type System</tspan></text>
+    <path
+       style="fill:none;stroke:#0000ff;stroke-width:0.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow5);stroke-dasharray:1.39500001, 1.39500001;stroke-dashoffset:0"
+       d="M 255.42271,212.71897 H 364.6611"
+       id="path1456" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.265;stroke-linecap:square;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect2339"
+       width="10.12096"
+       height="39.667645"
+       x="208.16769"
+       y="-410.04727"
+       transform="rotate(90)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="373.79846"
+       y="214.56456"
+       id="text2343"><tspan
+         sodipodi:role="line"
+         id="tspan2341"
+         x="373.79846"
+         y="214.56456"
+         style="font-size:4.23333px;stroke-width:0.264583">: ASTGlobalNode</tspan></text>
   </g>
 </svg>

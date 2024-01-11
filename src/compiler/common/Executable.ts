@@ -50,7 +50,7 @@ export class Executable {
 
         for (let module of this.moduleManager.modules) {
             if (!module.ast) continue;
-            for (let cdef of module.ast.classOrInterfaceOrEnumDefinitions) {
+            for (let cdef of module.ast.innerTypes) {
                 if(cdef.resolvedType)
                 classesToInitialize.push(cdef.resolvedType);
             }

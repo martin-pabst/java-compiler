@@ -62,7 +62,7 @@ export class TypeResolver {
     }
 
     gatherTypeDefinitionNodesRecursively(typeScope: TypeScope) {
-        for (let tdn of typeScope.classOrInterfaceOrEnumDefinitions) {
+        for (let tdn of typeScope.innerTypes) {
             switch (tdn.kind) {
                 case TokenType.keywordClass:
                     this.classDeclarationNodes.push(tdn);
@@ -288,7 +288,7 @@ export class TypeResolver {
                     let gp = gpType.resolvedType;
                     if (gp && gp.identifier == identifer) return gp;
                 }
-                for (let innerclass of classOrInterfaceNode.classOrInterfaceOrEnumDefinitions) {
+                for (let innerclass of classOrInterfaceNode.innerTypes) {
                     if (innerclass.identifier == identifer && innerclass.resolvedType) {
                         type = innerclass.resolvedType;
                     }

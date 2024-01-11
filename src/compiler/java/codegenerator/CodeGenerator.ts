@@ -58,7 +58,7 @@ export class CodeGenerator extends StatementCodeGenerator {
     compileInstanceFieldsInitializersAndStandardConstructorsRecursively(typeScope: TypeScope | undefined) {
         if (!typeScope) return;
 
-        for (let cdef of typeScope.classOrInterfaceOrEnumDefinitions) {
+        for (let cdef of typeScope.innerTypes) {
             if (cdef.isAnonymousInnerType) continue;     // anonymous inner class
             if(cdef.kind != TokenType.keywordClass && cdef.kind != TokenType.keywordEnum) continue;
 
@@ -87,7 +87,7 @@ export class CodeGenerator extends StatementCodeGenerator {
     compileStaticFieldsAndInitializerAndEnumValuesRecursive(typeScope: TypeScope | undefined) {
         if (!typeScope) return;
 
-        for (let cdef of typeScope.classOrInterfaceOrEnumDefinitions) {
+        for (let cdef of typeScope.innerTypes) {
             if (cdef.isAnonymousInnerType) continue;     // anonymous inner class
 
             let type = cdef.resolvedType;
@@ -111,7 +111,7 @@ export class CodeGenerator extends StatementCodeGenerator {
     compileMethodsRecursively(typeScope: TypeScope | undefined) {
         if (!typeScope) return;
 
-        for (let cdef of typeScope.classOrInterfaceOrEnumDefinitions) {
+        for (let cdef of typeScope.innerTypes) {
             if (cdef.isAnonymousInnerType) continue;     // anonymous inner class
 
             let type = cdef.resolvedType;
