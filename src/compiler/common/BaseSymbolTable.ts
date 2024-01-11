@@ -34,7 +34,6 @@ export abstract class SymbolOnStackframe extends BaseSymbol {
  */
 export class BaseSymbolTable {
 
-    symbols: BaseSymbol[] = [];
     childTables: BaseSymbolTable[] = [];
 
     stackframe?: BaseStackframe;
@@ -46,7 +45,6 @@ export class BaseSymbolTable {
     }
 
     addSymbol(symbol: BaseSymbol){
-        this.symbols.push(symbol);
         this.identifierToSymbolMap.set(symbol.identifier, symbol);
     }
 
