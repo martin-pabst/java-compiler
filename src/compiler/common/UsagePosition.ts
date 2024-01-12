@@ -1,6 +1,12 @@
 import { JavaCompiledModule } from "../java/module/JavaCompiledModule";
 import { JavaLibraryModule } from "../java/module/libraries/JavaLibraryModule";
 import { SystemModule } from "../java/runtime/system/SystemModule";
+import { Field } from "../java/types/Field.ts";
+import { GenericVariantOfJavaClass } from "../java/types/JavaClass.ts";
+import { GenericVariantOfJavaInterface } from "../java/types/JavaInterface.ts";
+import { Method } from "../java/types/Method.ts";
+import { NonPrimitiveType } from "../java/types/NonPrimitiveType.ts";
+import { StaticNonPrimitiveType } from "../java/types/StaticNonPrimitiveType.ts";
 import { BaseSymbol } from "./BaseSymbolTable";
 import { File } from "./module/File";
 import { Module } from "./module/Module";
@@ -11,6 +17,75 @@ export class UsagePosition {
     constructor(public symbol: BaseSymbol, public file: File, public range: IRange){}
 }
 
+export class NonPrimitiveTypeUsage {
+    declaration: string;
+    symbolDeclarations: Map<string, boolean> = new Map();
+
+    constructor(type: NonPrimitiveType){
+        if(type instanceof GenericVariantOfJavaClass || type instanceof GenericVariantOfJavaInterface){
+            type = type.isGenericVariantOf;
+        }
+
+        this.declaration = type.getDeclaration();
+    }
+}
+
+export class ModuleUsage {
+
+    typeUsage: Map<string, NonPrimitiveTypeUsage> = new Map();
+
+    constructor(private usageTracker: UsageTracker){
+        
+    }
+
+    private addTypeWithSymbol(symbol: BaseSymbol, type: NonPrimitiveType){
+        if(type.isLibraryType) return;
+
+        let tu = this.typeUsage.get(type.pathAndIdentifier);
+        if(!tu){
+            tu = new NonPrimitiveTypeUsage(type);
+            this.typeUsage.set(type.pathAndIdentifier, tu);
+        }
+    }
+
+    private addType(type: NonPrimitiveType){
+        if(type.isLibraryType) return;
+        let tu = this.typeUsage.get(type.pathAndIdentifier);
+        if(!tu){
+            tu = new NonPrimitiveTypeUsage(type);
+        }
+   }
+
+    public addSymbol(symbol: BaseSymbol, file: File, range: IRange){
+        if(symbol instanceof Field){
+            return this.addTypeWithSymbol(symbol, symbol.classEnum);
+        }
+        
+        if(symbol instanceof Method){
+            let originalType = symbol.classEnumInterface;
+            if(symbol.isCopyOf){
+                this.addType(originalType);
+                while((<Method>symbol).isCopyOf) symbol = (<Method>symbol).isCopyOf!;
+                let otherType = (<Method>symbol).classEnumInterface;
+                if(otherType && !otherType.isLibraryType){
+                    otherType.module.compiledSymbolsUsageTracker.registerUsagePosition(symbol, file, range);
+                }
+            } else {
+                this.addTypeWithSymbol(symbol, originalType);
+            }
+            return;
+        }
+
+        if(symbol instanceof StaticNonPrimitiveType){
+            this.addType(symbol.nonPrimitiveType);
+            return;
+        }
+
+        if(symbol instanceof NonPrimitiveType){
+            this.addType(symbol);
+        }
+    }
+}
 
 /**
  *  - for onHover or code completion we have to search for symbols by given sourcecode position
@@ -23,7 +98,7 @@ export class UsageTracker {
 
     private symbolToUsagePositionListMap: Map<BaseSymbol, UsagePosition[]> = new Map();
 
-    private dependsOnModules: Map<Module, boolean> = new Map();
+    private dependsOnModules: Map<Module, ModuleUsage> = new Map();
 
     clear(){
         this.lineToUsagePositionListMap.clear();
@@ -52,7 +127,12 @@ export class UsageTracker {
         upList.push(up);
 
         if(!symbol.module.isLibraryModule){
-            this.dependsOnModules.set(symbol.module, true);
+            let moduleUsage = this.dependsOnModules.get(symbol.module);
+            if(!moduleUsage){
+                moduleUsage = new ModuleUsage();
+                this.dependsOnModules.set(symbol.module, moduleUsage);
+            }
+            moduleUsage.addSymbol(symbol);
         }
     }
 

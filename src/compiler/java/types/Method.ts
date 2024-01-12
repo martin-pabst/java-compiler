@@ -52,6 +52,8 @@ export class Method extends BaseSymbol {
 
     callbackAfterCodeGeneration: (() => void)[] = [];
 
+    isCopyOf?: Method;
+
     constructor(identifier: string, identifierRange: IRange, module: JavaBaseModule,
           public visibility: Visibility = TokenType.keywordPublic){
             super(identifier, identifierRange, module);
@@ -97,6 +99,7 @@ export class Method extends BaseSymbol {
         newMethod.hasImplementationWithNativeCallingConvention = this.hasImplementationWithNativeCallingConvention;
         newMethod.template = this.template;
         newMethod.classEnumInterface = genericClassOrInterfaceOrEnum;
+        newMethod.isCopyOf = this;
 
         this.getInternalName("java");
         this.getInternalName("native");
@@ -117,6 +120,7 @@ export class Method extends BaseSymbol {
         newMethod.isAbstract = this.isAbstract;
         newMethod.returnParameterType = this.returnParameterType;
         newMethod.parameters = newParameters;
+        newMethod.isCopyOf = this;
         
         return newMethod;
 
