@@ -84,7 +84,8 @@ export class Interpreter {
 
     }
 
-    setExecutable(executable: Executable){
+    setExecutable(executable: Executable | undefined){
+        if(!executable) return;
         this.executable = executable;
         if(executable.mainModule){
             executable.compileToJavascript();

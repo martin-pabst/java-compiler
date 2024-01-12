@@ -98,7 +98,7 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
         file.setText(program);
 
         let compiler = new JavaCompiler();
-        let executable = compiler.compile(file);
+        let executable = compiler.compileIfDirty(file);
 
         let allErrors = executable.getAllErrors().filter(error => error.level == "error");
 

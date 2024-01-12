@@ -48,7 +48,6 @@ export class Main implements JavaMainClass {
   programViewerCompoment: ProgramViewerComponent;
 
   files: File[] = [];
-  lastCompiledExecutable?: Executable;
 
   compiler: JavaCompiler;
   interpreter: Interpreter;
@@ -141,7 +140,7 @@ export class Main implements JavaMainClass {
   getModuleForMonacoModel(model: monaco.editor.ITextModel): JavaCompiledModule | undefined {
     for(let file of this.files){
       if(file.monacoModel == model){
-        return this.lastCompiledExecutable?.moduleManager.findModuleByFile(file);
+        return this.compiler.lastCompiledExecutable?.moduleManager.findModuleByFile(file);
       }
     }
 
@@ -168,9 +167,7 @@ export class Main implements JavaMainClass {
 
   compile() {
 
-    let executable = this.compiler.compile(this.files, this.tabbedEditorManager.getCurrentlyOpenedFile());
-
-    if(executable) this.lastCompiledExecutable = executable;
+    let executable = this.compiler.compileIfDirty(this.files, this.tabbedEditorManager.getCurrentlyOpenedFile());
 
     let module = this.compiler.moduleManager.getModuleFromFile(this.tabbedEditorManager.getCurrentlyOpenedFile())!;
 
