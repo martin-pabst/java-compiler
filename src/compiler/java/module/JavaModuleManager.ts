@@ -31,6 +31,9 @@ export class JavaModuleManager {
     setupModulesBeforeCompiliation(files: File[]){
         this.removeUnusedModules(files);
         this.createNewModules(files);
+    }
+
+    emptyTypeStore() {
         this.typestore.empty();
     }
 
@@ -42,12 +45,11 @@ export class JavaModuleManager {
             done = true;
             for(let module of this.modules){
                 if(module.dirty) continue;
-                for(const [type, _b] of module.usedTypesFromOtherModules){
-                    if(type.module.dirty){
-                        module.dirty = true;
-                        done = false;
-                        break;
-                    }
+                // does module depend on dirty other module?
+                if(module.dependsOnOtherDirtyModule()){
+                    module.dirty = true;
+                    done = false;
+                    break;
                 }
             }
         }

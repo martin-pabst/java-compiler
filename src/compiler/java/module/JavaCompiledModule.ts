@@ -23,8 +23,6 @@ export class JavaCompiledModule extends JavaBaseModule {
     ast?: ASTGlobalNode;
     mainClass?: ASTClassDefinitionNode;
 
-    usedTypesFromOtherModules: Map<JavaType, boolean> = new Map();
-
     errors: Error[] = [];
 
     symbolTables: JavaSymbolTable[] = [];  // contains one symbol table for main program and one for each class/interface/enum in global scope    
@@ -84,7 +82,6 @@ export class JavaCompiledModule extends JavaBaseModule {
         this.tokens = undefined;
         this.ast = undefined;
         this.types = [];
-        this.usedTypesFromOtherModules = new Map();
         this.errors = [];
         this.compiledSymbolsUsageTracker.clear();
         this.systemSymbolsUsageTracker.clear();
@@ -124,6 +121,11 @@ export class JavaCompiledModule extends JavaBaseModule {
 
         return true;
 
+    }
+
+
+    dependsOnOtherDirtyModule(): boolean {
+        return this.compiledSymbolsUsageTracker.existsDependencyToOtherDirtyModule();
     }
 
 }

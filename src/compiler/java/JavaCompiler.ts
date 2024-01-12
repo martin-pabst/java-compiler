@@ -39,6 +39,9 @@ export class JavaCompiler {
     compileIfDirty(files: File | File[], currentlyOpenFile?: File): Executable | undefined {
         if(!Array.isArray(files)) files = [files];
 
+        /**
+         * if no module has changed, return as fast as possible
+         */
         this.moduleManager.setDirtyFlags();
         this.moduleManager.setupModulesBeforeCompiliation(files);
         let newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
@@ -46,6 +49,7 @@ export class JavaCompiler {
 
         this.errors = [];
 
+        this.moduleManager.emptyTypeStore();
 
         LabelCodeSnippet.resetCount();
 

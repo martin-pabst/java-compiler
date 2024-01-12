@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { JavaCompiledModule } from "../java/module/JavaCompiledModule";
 import { JavaLibraryModule } from "../java/module/libraries/JavaLibraryModule";
 import { SystemModule } from "../java/runtime/system/SystemModule";
@@ -28,17 +29,39 @@ export class NonPrimitiveTypeUsage {
 
         this.declaration = type.getDeclaration();
     }
+
+    toString(): string {
+        let str: string = "   " + this.declaration + "\n";
+        this.symbolDeclarations.forEach((v, decl) => {
+            str += "      " + decl + "\n";
+        })
+        return str;
+    }
+
 }
 
 export class ModuleUsage {
 
     typeUsage: Map<string, NonPrimitiveTypeUsage> = new Map();
 
-    constructor(private usageTracker: UsageTracker){
+    constructor(private usageTracker: UsageTracker, private module: Module){
         
     }
 
+    toString() : string {
+        let str = chalk.blue(this.module.file.filename) + ":\n";
+
+        if(this.typeUsage.size == 0) return "";
+
+        this.typeUsage.forEach((usage, typePath) => {
+            str += "   " + typePath + ":\n";
+            str += usage.toString();
+        })
+        return str;
+    }
+
     private addTypeWithSymbol(symbol: BaseSymbol, type: NonPrimitiveType){
+        if(type.module == this.usageTracker.module) return;
         if(type.isLibraryType) return;
 
         let tu = this.typeUsage.get(type.pathAndIdentifier);
@@ -46,9 +69,12 @@ export class ModuleUsage {
             tu = new NonPrimitiveTypeUsage(type);
             this.typeUsage.set(type.pathAndIdentifier, tu);
         }
+
+        tu.symbolDeclarations.set(symbol.getDeclaration(), true);
     }
 
     private addType(type: NonPrimitiveType){
+        if(type.module == this.usageTracker.module) return;
         if(type.isLibraryType) return;
         let tu = this.typeUsage.get(type.pathAndIdentifier);
         if(!tu){
@@ -56,7 +82,7 @@ export class ModuleUsage {
         }
    }
 
-    public addSymbol(symbol: BaseSymbol, file: File, range: IRange){
+    public addSymbol(symbol: BaseSymbol){
         if(symbol instanceof Field){
             return this.addTypeWithSymbol(symbol, symbol.classEnum);
         }
@@ -68,7 +94,7 @@ export class ModuleUsage {
                 while((<Method>symbol).isCopyOf) symbol = (<Method>symbol).isCopyOf!;
                 let otherType = (<Method>symbol).classEnumInterface;
                 if(otherType && !otherType.isLibraryType){
-                    otherType.module.compiledSymbolsUsageTracker.registerUsagePosition(symbol, file, range);
+                    this.addTypeWithSymbol(symbol, otherType);
                 }
             } else {
                 this.addTypeWithSymbol(symbol, originalType);
@@ -100,6 +126,10 @@ export class UsageTracker {
 
     private dependsOnModules: Map<Module, ModuleUsage> = new Map();
 
+    constructor(public module: Module){
+
+    }
+
     clear(){
         this.lineToUsagePositionListMap.clear();
         this.symbolToUsagePositionListMap.clear();
@@ -129,7 +159,7 @@ export class UsageTracker {
         if(!symbol.module.isLibraryModule){
             let moduleUsage = this.dependsOnModules.get(symbol.module);
             if(!moduleUsage){
-                moduleUsage = new ModuleUsage();
+                moduleUsage = new ModuleUsage(this, symbol.module);
                 this.dependsOnModules.set(symbol.module, moduleUsage);
             }
             moduleUsage.addSymbol(symbol);
@@ -157,6 +187,33 @@ export class UsageTracker {
         this.dependsOnModules.forEach((v, module) => {modules.push(module)});
 
         return modules;
+    }
+
+    getDependsOnModulesDebugInformation(): string {
+        let str: string = chalk.red("");
+
+        this.dependsOnModules.forEach((moduleUsage, module) => {
+            let mu: string = moduleUsage.toString();
+            if(mu.length > 0){
+                str += chalk.blue("Depends on module " + module.file.filename + ":\n");
+                str += chalk.white(moduleUsage.toString());
+            }
+        })
+
+        return str;
+    }
+
+    existsDependencyToOtherDirtyModule(): boolean {
+        
+        for(let entry of this.dependsOnModules.entries()){
+            // TODO: analyze if used signatures are available
+
+            if(entry[0].dirty){
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

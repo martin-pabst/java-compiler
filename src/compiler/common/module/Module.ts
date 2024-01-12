@@ -19,9 +19,9 @@ export abstract class Module {
     programsToCompileToFunctions: Program[] = [];
 
 
-    compiledSymbolsUsageTracker: UsageTracker = new UsageTracker();
+    compiledSymbolsUsageTracker: UsageTracker = new UsageTracker(this);
 
-    systemSymbolsUsageTracker: UsageTracker = new UsageTracker();
+    systemSymbolsUsageTracker: UsageTracker = new UsageTracker(this);
 
     constructor(public file: File, public isLibraryModule: boolean) {
 

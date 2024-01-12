@@ -27,6 +27,7 @@ import { JavaMainClass } from "./compiler/java/MainInterface.ts";
 import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts";
 import { Executable } from "./compiler/common/Executable.ts";
 import { JavaHoverProvider } from "./compiler/java/monacoproviders/JavaHoverProvider.ts";
+import chalk from "chalk";
 
 export class Main implements JavaMainClass {
 
@@ -185,6 +186,13 @@ export class Main implements JavaMainClass {
 
     this.interpreter.setExecutable(executable);
     this.programViewerCompoment.buildTreeView(this.compiler.moduleManager);
+
+    if(executable){
+      for(let m of executable.moduleManager.modules){
+        console.log(chalk.red("Module " + m.file.filename + ":"));
+        console.log(m.compiledSymbolsUsageTracker.getDependsOnModulesDebugInformation());
+      }
+    }
 
   }
 
