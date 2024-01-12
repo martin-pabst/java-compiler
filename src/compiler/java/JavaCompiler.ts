@@ -29,12 +29,17 @@ export class JavaCompiler {
 
     private errors: Error[] = [];
 
+    public lastCompiledExecutable?: Executable;
+
     constructor(){
         this.libraryModuleManager = new JavaLibraryModuleManager();
         this.moduleManager = new JavaModuleManager();
     }
 
-    compile(files: File | File[], currentlyOpenFile?: File): Executable {
+    compile(files: File | File[], currentlyOpenFile?: File): Executable | undefined {
+        this.moduleManager.setDirtyFlags();
+        let newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
+        if(newOrDirtyModules.length == 0) return this.lastCompiledExecutable;
 
         this.errors = [];
 
@@ -43,12 +48,9 @@ export class JavaCompiler {
         LabelCodeSnippet.resetCount();
 
         this.moduleManager.setupModulesBeforeCompiliation(files);
-        this.moduleManager.setDirtyFlags();
 
         let cleanModules = this.moduleManager.getUnChangedModules();
         cleanModules.forEach(cm => cm.registerTypesAtTypestore(this.moduleManager.typestore))
-
-        let newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
         
         for(let module of newOrDirtyModules){
             
