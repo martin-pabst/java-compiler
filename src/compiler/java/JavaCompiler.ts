@@ -36,7 +36,7 @@ export class JavaCompiler {
         this.moduleManager = new JavaModuleManager();
     }
 
-    compile(files: File | File[], currentlyOpenFile?: File): Executable | undefined {
+    compileIfDirty(files: File | File[], currentlyOpenFile?: File): Executable | undefined {
         this.moduleManager.setDirtyFlags();
         let newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
         if(newOrDirtyModules.length == 0) return this.lastCompiledExecutable;
