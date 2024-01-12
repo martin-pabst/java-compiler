@@ -99,6 +99,7 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
 
         let compiler = new JavaCompiler();
         let executable = compiler.compileIfDirty(file);
+        if(!executable)  return;
 
         let allErrors = executable.getAllErrors().filter(error => error.level == "error");
 

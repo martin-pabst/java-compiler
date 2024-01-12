@@ -37,17 +37,17 @@ export class JavaCompiler {
     }
 
     compileIfDirty(files: File | File[], currentlyOpenFile?: File): Executable | undefined {
+        if(!Array.isArray(files)) files = [files];
+
         this.moduleManager.setDirtyFlags();
+        this.moduleManager.setupModulesBeforeCompiliation(files);
         let newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
         if(newOrDirtyModules.length == 0) return this.lastCompiledExecutable;
 
         this.errors = [];
 
-        if(!Array.isArray(files)) files = [files];
 
         LabelCodeSnippet.resetCount();
-
-        this.moduleManager.setupModulesBeforeCompiliation(files);
 
         let cleanModules = this.moduleManager.getUnChangedModules();
         cleanModules.forEach(cm => cm.registerTypesAtTypestore(this.moduleManager.typestore))

@@ -32,6 +32,7 @@ export class UsageTracker {
     }
 
     registerUsagePosition(symbol: BaseSymbol, file: File, range: IRange){
+        if(!range) return;
         let up = new UsagePosition(symbol, file, range);
 
         for(let line = range.startLineNumber; line <= range.endLineNumber; line++){

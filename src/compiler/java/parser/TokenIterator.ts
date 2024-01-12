@@ -1,6 +1,6 @@
 import { ErrormessageWithId } from "../../../tools/language/LanguageManager";
 import { ErrorLevel, QuickFix } from "../../common/Error";
-import { IRange } from "../../common/range/Range";
+import { EmptyRange, IRange } from "../../common/range/Range";
 import { JCM } from "../JavaCompilerMessages";
 import { Token, TokenList } from "../lexer/Token";
 import { JavaBaseModule } from "../module/JavaBaseModule";
@@ -57,9 +57,16 @@ export class TokenIterator {
 
 
     constructor(private tokenList: TokenList, protected module: JavaBaseModule) {
+        if(tokenList.length == 0){
+            tokenList.push({
+                tt: TokenType.endofSourcecode,
+                value: "",
+                range: EmptyRange.instance
+            })
+        }
         this.endToken = tokenList[tokenList.length - 1];
         this.pos = -1;
-        this.nextToken(); // fetch first non-space token
+        if(tokenList.length > 0) this.nextToken(); // fetch first non-space token
     }
 
 
