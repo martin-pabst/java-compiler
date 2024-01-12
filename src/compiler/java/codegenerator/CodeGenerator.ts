@@ -418,7 +418,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                 } else {
                     let assignmentTemplate = `${Helpers.elementRelativeToStackbase(0)}.${field.getInternalName()} = §1;\n`;
 
-                    snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, fieldNode.initialization!.range, snippet);
+                    snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, snippet.range!, snippet);
 
                     snippet = new CodeSnippetContainer(snippet);
                     (<CodeSnippetContainer>snippet).addNextStepMark();
