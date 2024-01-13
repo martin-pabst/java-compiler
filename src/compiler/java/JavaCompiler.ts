@@ -15,11 +15,20 @@ import { CodeGenerator } from "./codegenerator/CodeGenerator";
 import { ExceptionTree } from "./codegenerator/ExceptionTree.ts";
 import { LabelCodeSnippet } from "./codegenerator/LabelManager.ts";
 import { Lexer } from "./lexer/Lexer";
+import { JavaCompiledModule } from "./module/JavaCompiledModule.ts";
 import { JavaModuleManager } from "./module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "./module/libraries/JavaLibraryModuleManager";
 import { Parser } from "./parser/Parser";
 import { Assertions } from "./runtime/unittests/Assertions.ts";
 import { NonPrimitiveType } from "./types/NonPrimitiveType.ts";
+
+
+enum CompilerState {
+    compilingPeriodically, stopped
+}
+
+type CompiliationFinishedCallback = (lastCompiledExecutable?: Executable) => void;
+type AskBeforeCompilingCallback = () => boolean;
 
 export class JavaCompiler {
 
@@ -31,21 +40,35 @@ export class JavaCompiler {
 
     public lastCompiledExecutable?: Executable;
 
-    constructor(){
+    public currentlyOpenFile?: File;
+
+    public files: File[] = [];
+    
+    public compilationFinishedCallback?: CompiliationFinishedCallback;
+    public askBeforeCompilingCallback?: AskBeforeCompilingCallback;
+    
+    public state: CompilerState = CompilerState.stopped;
+    private maxMsBetweenRuns: number = 100;
+
+
+    constructor() {
         this.libraryModuleManager = new JavaLibraryModuleManager();
         this.moduleManager = new JavaModuleManager();
     }
 
-    compileIfDirty(files: File | File[], currentlyOpenFile?: File): Executable | undefined {
-        if(!Array.isArray(files)) files = [files];
+    compileIfDirty() {
+
+        if(this.askBeforeCompilingCallback && !this.askBeforeCompilingCallback()) return;
 
         /**
          * if no module has changed, return as fast as possible
          */
         this.moduleManager.setDirtyFlags();
-        this.moduleManager.setupModulesBeforeCompiliation(files);
+        this.moduleManager.setupModulesBeforeCompiliation(this.files);
         let newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
-        if(newOrDirtyModules.length == 0) return this.lastCompiledExecutable;
+        if (newOrDirtyModules.length == 0) return this.lastCompiledExecutable;
+
+        console.log("Dirty state => compiling...");
 
         this.errors = [];
 
@@ -55,54 +78,121 @@ export class JavaCompiler {
 
         let cleanModules = this.moduleManager.getUnChangedModules();
         cleanModules.forEach(cm => cm.registerTypesAtTypestore(this.moduleManager.typestore))
-        
-        for(let module of newOrDirtyModules){
-            
+
+        for (let module of newOrDirtyModules) {
+
             module.resetBeforeCompilation();
 
             let lexer = new Lexer(module);
             lexer.lex();
-            
+
             let parser = new Parser(module);
             parser.parse();
-            
+
         }
 
         let typeResolver = new TypeResolver(this.moduleManager, this.libraryModuleManager);
-        
+
         // resolve returns false if cyclic references are found. In this case we don't continue compiling.
-        if(typeResolver.resolve()){
+        if (typeResolver.resolve()) {
             this.moduleManager.typestore.initFastExtendsImplementsLookup();
-    
+
             let exceptionTree = new ExceptionTree(this.libraryModuleManager.typestore, this.moduleManager.typestore);
-    
-            for(let module of newOrDirtyModules){
-                let codegenerator = new CodeGenerator(module, this.libraryModuleManager.typestore, 
+
+            for (let module of newOrDirtyModules) {
+                let codegenerator = new CodeGenerator(module, this.libraryModuleManager.typestore,
                     this.moduleManager.typestore, exceptionTree);
                 codegenerator.start();
             }
-                
-            
+
         }
-        
-        let klassObjectRegistry: KlassObjectRegistry = {}; 
-        
+
+        let klassObjectRegistry: KlassObjectRegistry = {};
+
         this.libraryModuleManager.typestore.populateClassObjectRegistry(klassObjectRegistry);
-        
+
         this.moduleManager.typestore.populateClassObjectRegistry(klassObjectRegistry);
-        
-        let executable = new Executable(klassObjectRegistry, 
+
+        let executable = new Executable(klassObjectRegistry,
             this.moduleManager, this.libraryModuleManager,
-            this.errors, this.lastOpenedFile, currentlyOpenFile);
-            
-            if(executable.mainModule){
-                this.lastOpenedFile = executable.mainModule.file;
-            }
-                
-        return executable;
+            this.errors, this.lastOpenedFile, this.currentlyOpenFile);
+
+        if (executable.mainModule) {
+            this.lastOpenedFile = executable.mainModule.file;
+        }
+
+        this.lastCompiledExecutable = executable;
+
+        if(this.compilationFinishedCallback){
+            this.compilationFinishedCallback(executable);
+        }
 
     }
 
+    /**
+     * If user presses . or <ctrl> + <space> then we assume that only 
+     * currently edited file is dirty, therefore it suffices to compile only this module.
+     */
+    updateSingleFileForCodeCompletion(module: JavaCompiledModule): "success" | "completeCompilingNecessary" {
+        if (!module) return "completeCompilingNecessary";
 
+        let moduleManagerCopy = this.moduleManager.copy(module);
+        
+        module.dirty = true;
+        module.compiledSymbolsUsageTracker.clear();
+        module.systemSymbolsUsageTracker.clear();
+
+        module.resetBeforeCompilation();
+
+        let lexer = new Lexer(module);
+        lexer.lex();
+
+        let parser = new Parser(module);
+        parser.parse();
+
+        let typeResolver = new TypeResolver(moduleManagerCopy, this.libraryModuleManager);
+
+        // resolve returns false if cyclic references are found. In this case we don't continue compiling.
+        if (!typeResolver.resolve()) {
+            return "completeCompilingNecessary";
+        }
+
+        // this.moduleManager.typestore.initFastExtendsImplementsLookup();
+
+        let exceptionTree = new ExceptionTree(this.libraryModuleManager.typestore, this.moduleManager.typestore);
+
+        let codegenerator = new CodeGenerator(module, this.libraryModuleManager.typestore,
+            this.moduleManager.typestore, exceptionTree);
+        codegenerator.start();
+
+        /**
+         * The compilation run we did is not sufficient to produce a up to date executable,
+         * so we mark module as dirty to force new compilation
+         */
+        module.sourceCode = "";
+
+        return "success";
+
+    }
+
+    startCompilingPeriodically(maxMsBetweenRuns?: number){
+        if(maxMsBetweenRuns) this.maxMsBetweenRuns = maxMsBetweenRuns;
+        if(this.state == CompilerState.compilingPeriodically) return;
+        
+        this.state = CompilerState.compilingPeriodically;
+
+        let f = () => {
+            if(this.state == CompilerState.compilingPeriodically){
+                this.compileIfDirty();
+                setTimeout(f, this.maxMsBetweenRuns);
+            }
+        }
+
+        f();
+    }
+
+    stopCompilingPeriodically(){
+        this.state = CompilerState.stopped;
+    }
 
 }

@@ -18,100 +18,100 @@ export class UsagePosition {
     constructor(public symbol: BaseSymbol, public file: File, public range: IRange){}
 }
 
-export class NonPrimitiveTypeUsage {
-    declaration: string;
-    symbolDeclarations: Map<string, boolean> = new Map();
+// export class NonPrimitiveTypeUsage {
+//     declaration: string;
+//     symbolDeclarations: Map<string, boolean> = new Map();
 
-    constructor(type: NonPrimitiveType){
-        if(type instanceof GenericVariantOfJavaClass || type instanceof GenericVariantOfJavaInterface){
-            type = type.isGenericVariantOf;
-        }
+//     constructor(type: NonPrimitiveType){
+//         if(type instanceof GenericVariantOfJavaClass || type instanceof GenericVariantOfJavaInterface){
+//             type = type.isGenericVariantOf;
+//         }
 
-        this.declaration = type.getDeclaration();
-    }
+//         this.declaration = type.getDeclaration();
+//     }
 
-    toString(): string {
-        let str: string = "   " + this.declaration + "\n";
-        this.symbolDeclarations.forEach((v, decl) => {
-            str += "      " + decl + "\n";
-        })
-        return str;
-    }
+//     toString(): string {
+//         let str: string = "   " + this.declaration + "\n";
+//         this.symbolDeclarations.forEach((v, decl) => {
+//             str += "      " + decl + "\n";
+//         })
+//         return str;
+//     }
 
-}
+// }
 
-export class ModuleUsage {
+// export class ModuleUsage {
 
-    typeUsage: Map<string, NonPrimitiveTypeUsage> = new Map();
+//     typeUsage: Map<string, NonPrimitiveTypeUsage> = new Map();
 
-    constructor(private usageTracker: UsageTracker, private module: Module){
+//     constructor(private usageTracker: UsageTracker, private module: Module){
         
-    }
+//     }
 
-    toString() : string {
-        let str = chalk.blue(this.module.file.filename) + ":\n";
+//     toString() : string {
+//         let str = chalk.blue(this.module.file.filename) + ":\n";
 
-        if(this.typeUsage.size == 0) return "";
+//         if(this.typeUsage.size == 0) return "";
 
-        this.typeUsage.forEach((usage, typePath) => {
-            str += "   " + typePath + ":\n";
-            str += usage.toString();
-        })
-        return str;
-    }
+//         this.typeUsage.forEach((usage, typePath) => {
+//             str += "   " + typePath + ":\n";
+//             str += usage.toString();
+//         })
+//         return str;
+//     }
 
-    private addTypeWithSymbol(symbol: BaseSymbol, type: NonPrimitiveType){
-        if(type.module == this.usageTracker.module) return;
-        if(type.isLibraryType) return;
+//     private addTypeWithSymbol(symbol: BaseSymbol, type: NonPrimitiveType){
+//         if(type.module == this.usageTracker.module) return;
+//         if(type.isLibraryType) return;
 
-        let tu = this.typeUsage.get(type.pathAndIdentifier);
-        if(!tu){
-            tu = new NonPrimitiveTypeUsage(type);
-            this.typeUsage.set(type.pathAndIdentifier, tu);
-        }
+//         let tu = this.typeUsage.get(type.pathAndIdentifier);
+//         if(!tu){
+//             tu = new NonPrimitiveTypeUsage(type);
+//             this.typeUsage.set(type.pathAndIdentifier, tu);
+//         }
 
-        tu.symbolDeclarations.set(symbol.getDeclaration(), true);
-    }
+//         tu.symbolDeclarations.set(symbol.getDeclaration(), true);
+//     }
 
-    private addType(type: NonPrimitiveType){
-        if(type.module == this.usageTracker.module) return;
-        if(type.isLibraryType) return;
-        let tu = this.typeUsage.get(type.pathAndIdentifier);
-        if(!tu){
-            tu = new NonPrimitiveTypeUsage(type);
-        }
-   }
+//     private addType(type: NonPrimitiveType){
+//         if(type.module == this.usageTracker.module) return;
+//         if(type.isLibraryType) return;
+//         let tu = this.typeUsage.get(type.pathAndIdentifier);
+//         if(!tu){
+//             tu = new NonPrimitiveTypeUsage(type);
+//         }
+//    }
 
-    public addSymbol(symbol: BaseSymbol){
-        if(symbol instanceof Field){
-            return this.addTypeWithSymbol(symbol, symbol.classEnum);
-        }
+//     public addSymbol(symbol: BaseSymbol){
+//         if(symbol instanceof Field){
+//             return this.addTypeWithSymbol(symbol, symbol.classEnum);
+//         }
         
-        if(symbol instanceof Method){
-            let originalType = symbol.classEnumInterface;
-            if(symbol.isCopyOf){
-                this.addType(originalType);
-                while((<Method>symbol).isCopyOf) symbol = (<Method>symbol).isCopyOf!;
-                let otherType = (<Method>symbol).classEnumInterface;
-                if(otherType && !otherType.isLibraryType){
-                    this.addTypeWithSymbol(symbol, otherType);
-                }
-            } else {
-                this.addTypeWithSymbol(symbol, originalType);
-            }
-            return;
-        }
+//         if(symbol instanceof Method){
+//             let originalType = symbol.classEnumInterface;
+//             if(symbol.isCopyOf){
+//                 this.addType(originalType);
+//                 while((<Method>symbol).isCopyOf) symbol = (<Method>symbol).isCopyOf!;
+//                 let otherType = (<Method>symbol).classEnumInterface;
+//                 if(otherType && !otherType.isLibraryType){
+//                     this.addTypeWithSymbol(symbol, otherType);
+//                 }
+//             } else {
+//                 this.addTypeWithSymbol(symbol, originalType);
+//             }
+//             return;
+//         }
 
-        if(symbol instanceof StaticNonPrimitiveType){
-            this.addType(symbol.nonPrimitiveType);
-            return;
-        }
+//         if(symbol instanceof StaticNonPrimitiveType){
+//             this.addType(symbol.nonPrimitiveType);
+//             return;
+//         }
 
-        if(symbol instanceof NonPrimitiveType){
-            this.addType(symbol);
-        }
-    }
-}
+//         if(symbol instanceof NonPrimitiveType){
+//             this.addType(symbol);
+//         }
+//     }
+// }
 
 /**
  *  - for onHover or code completion we have to search for symbols by given sourcecode position
@@ -124,7 +124,7 @@ export class UsageTracker {
 
     private symbolToUsagePositionListMap: Map<BaseSymbol, UsagePosition[]> = new Map();
 
-    private dependsOnModules: Map<Module, ModuleUsage> = new Map();
+    private dependsOnModules: Map<Module, boolean> = new Map();
 
     constructor(public module: Module){
 
@@ -157,12 +157,13 @@ export class UsageTracker {
         upList.push(up);
 
         if(!symbol.module.isLibraryModule){
-            let moduleUsage = this.dependsOnModules.get(symbol.module);
-            if(!moduleUsage){
-                moduleUsage = new ModuleUsage(this, symbol.module);
-                this.dependsOnModules.set(symbol.module, moduleUsage);
-            }
-            moduleUsage.addSymbol(symbol);
+            this.dependsOnModules.set(symbol.module, true);
+            // let moduleUsage = this.dependsOnModules.get(symbol.module);
+            // if(!moduleUsage){
+            //     moduleUsage = new ModuleUsage(this, symbol.module);
+            //     this.dependsOnModules.set(symbol.module, moduleUsage);
+            // }
+            // moduleUsage.addSymbol(symbol);
         }
     }
 

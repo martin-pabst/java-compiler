@@ -62,7 +62,7 @@ export class Main implements JavaMainClass {
     /*
      * Test program:
      */
-    let testProgram: string = testPrograms.arrayListTest.trim();
+    let testProgram: string = testPrograms.primzahlzwillinge.trim();
     
     this.insightTabsManager = new TabManager(document.getElementById('insighttabs')!,
     ['token', 'ast', 'code', 'errors']);
@@ -90,12 +90,14 @@ export class Main implements JavaMainClass {
     this.files);
 
     this.compiler = new JavaCompiler();
+    this.compiler.files = this.files;
 
     this.actionManager = new ActionManager();
 
     this.interpreter = new Interpreter(new TestPrintManager(), this.actionManager);
 
     this.initButtons();
+    this.initCompiler();
 
     this.interpreter.showProgramPointerCallback = (showHide: "show" | "hide", positionInfo?: ProgramPointerPositionInfo) => {
       switch (showHide) {
@@ -151,13 +153,8 @@ export class Main implements JavaMainClass {
   initButtons() {
     let buttonDiv = document.getElementById('buttons')!;
     let firstRow = DOM.makeDiv(buttonDiv);
-    new Button(firstRow, 'compile', '#30c030', () => {
-      this.compile()
-
-      setInterval(() => {
-      }, 500)
-
-
+    new Button(firstRow, 'update tree', '#30c030', () => {
+      this.programViewerCompoment.buildTreeView(this.compiler.moduleManager);
     }, 'myButton');
 
     let programControlButtonDiv = DOM.makeDiv(buttonDiv, "programControlbuttons");
@@ -168,33 +165,46 @@ export class Main implements JavaMainClass {
 
   compile() {
 
-    let executable = this.compiler.compileIfDirty(this.files, this.tabbedEditorManager.getCurrentlyOpenedFile());
+    // let executable = this.compiler.compileIfDirty(this.files, this.tabbedEditorManager.getCurrentlyOpenedFile());
 
-    let module = this.compiler.moduleManager.getModuleFromFile(this.tabbedEditorManager.getCurrentlyOpenedFile())!;
+    // let module = this.compiler.moduleManager.getModuleFromFile(this.tabbedEditorManager.getCurrentlyOpenedFile())!;
 
 
-    if (module) {
-      TokenPrinter.print(module.tokens!, this.tokenDiv);
-      this.astComponent.buildTreeView(module.ast);
+    // if (module) {
+    //   TokenPrinter.print(module.tokens!, this.tokenDiv);
+    //   this.astComponent.buildTreeView(module.ast);
 
-      this.markErrors(module);
-      this.printErrors(module);
+    //   this.markErrors(module);
+    //   this.printErrors(module);
 
-      let codePrinter = new CodePrinter();
+    //   let codePrinter = new CodePrinter();
 
-    }
+    // }
 
-    this.interpreter.setExecutable(executable);
-    this.programViewerCompoment.buildTreeView(this.compiler.moduleManager);
-
-    if(executable){
-      for(let m of executable.moduleManager.modules){
-        console.log(chalk.red("Module " + m.file.filename + ":"));
-        console.log(m.compiledSymbolsUsageTracker.getDependsOnModulesDebugInformation());
+    // this.interpreter.setExecutable(executable);
+    // this.programViewerCompoment.buildTreeView(this.compiler.moduleManager);
+    
+  }
+  
+  initCompiler(){
+    this.compiler.compilationFinishedCallback = (executable) => {
+      this.interpreter.setExecutable(executable);
+      if(executable){
+        for(let module of executable.moduleManager.modules){
+          this.markErrors(module);
+          this.printErrors(module);
+        }
       }
     }
 
+    this.compiler.askBeforeCompilingCallback = () => {
+      return !this.interpreter.isRunningOrPaused();
+    }
+
+    this.compiler.startCompilingPeriodically();
+
   }
+
 
   markErrors(module: Module) {
 
@@ -209,7 +219,7 @@ export class Main implements JavaMainClass {
       }
     })
 
-    monaco.editor.setModelMarkers(this.tabbedEditorManager.editor.editor.getModel()!, "martin", markers);
+    monaco.editor.setModelMarkers(module.file.monacoModel!, "martin", markers);
 
   }
 

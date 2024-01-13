@@ -20,6 +20,14 @@ export class JavaModuleManager {
         this.typestore = new JavaTypeStore();
     }
 
+    copy(excludeTypesOfModule?: JavaCompiledModule): JavaModuleManager {
+        let mm = new JavaModuleManager();
+        mm.modules = this.modules.slice();
+        mm.typestore = this.typestore.copy(excludeTypesOfModule);
+
+        return mm;
+    }
+
     addModule(module: JavaCompiledModule){
         this.modules.push(module);
     }

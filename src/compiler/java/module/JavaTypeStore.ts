@@ -3,6 +3,7 @@ import { PrimitiveStringClass } from "../runtime/system/javalang/PrimitiveString
 import { JavaClass } from "../types/JavaClass";
 import { JavaType } from "../types/JavaType";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
+import { JavaCompiledModule } from "./JavaCompiledModule";
 import { LibraryKlassType } from "./libraries/JavaLibraryModule";
 
 export class JavaTypeStore {
@@ -11,6 +12,16 @@ export class JavaTypeStore {
     
     constructor(){
 
+    }
+
+    copy(excludeTypesOfModule?: JavaCompiledModule): JavaTypeStore {
+        let jts = new JavaTypeStore();
+        if(excludeTypesOfModule){
+            this.typeMap.forEach((value, key) => {if(value.module !== excludeTypesOfModule) jts.typeMap.set(key, value)});
+        } else {
+            this.typeMap.forEach((value, key) => {jts.typeMap.set(key, value)});
+        }
+        return jts;
     }
 
     empty(){

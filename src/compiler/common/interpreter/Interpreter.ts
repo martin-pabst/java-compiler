@@ -366,5 +366,9 @@ export class Interpreter {
         this.codeReachedAssertions.registerAssertionReached(key);
     }
 
+    isRunningOrPaused(): boolean {
+        return this.scheduler.state == SchedulerState.running || 
+            this.scheduler.state == SchedulerState.paused;
+    }
 
 }

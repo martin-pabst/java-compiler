@@ -1,4 +1,5 @@
 export var testPrograms = {
+t1: `new`,
 synchronizedTest: `
 new A().test();
 
