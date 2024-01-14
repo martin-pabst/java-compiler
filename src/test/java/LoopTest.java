@@ -134,7 +134,7 @@ assertEquals(6, n, "Test continue in do..while-loop");
 
 /**::
  * for-loop with ArrayList as iterator
- * { "expectOutput": "12\n13\n14\n" }
+ * { "expectOutput": "12\n13\n14\n" } 
  */
 
 var list = new ArrayList<Integer>();

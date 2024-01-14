@@ -25,19 +25,23 @@ class StoreOutputPrintManager implements PrintManager {
 
 }
 
-let javaDir: string = __dirname + "/java";
+try {
 
-let files = fs.readdirSync(javaDir);
-files.forEach(function (file) {
-    if (file && file.endsWith(".java")) {
-        let data = fs.readFileSync(javaDir + '/' + file, 'utf8');
-        test1(data, file);
-    }
-});
+    let javaDir: string = __dirname + "/java";
+
+    let files = fs.readdirSync(javaDir);
+    files.forEach(function (file) {
+        if (file && file.endsWith(".java")) {
+            let data = fs.readFileSync(javaDir + '/' + file, 'utf8');
+            test1(data, file);
+        }
+    });
+} catch (ex){
+    console.error(ex);
+}
 
 
-
-type ExpectedError = { id: string, line?: number, found?: boolean}
+type ExpectedError = { id: string, line?: number, found?: boolean }
 
 type TestInfo = {
     expectedOutput?: string,
@@ -66,20 +70,20 @@ function test1(sourcecode: string, file: string) {
         let code = sourcecode.substring(testBegin, testEnd);
 
         let headerEnd = sourcecode.indexOf("*/", testBegin);
-        
+
         let expectedOutput: string | undefined;
         let expectedErrors: ExpectedError[] = [];
 
         let leftCurlyBraceIndex = sourcecode.indexOf("{", testBegin);
-        if(leftCurlyBraceIndex >= 0 && leftCurlyBraceIndex < headerEnd){
+        if (leftCurlyBraceIndex >= 0 && leftCurlyBraceIndex < headerEnd) {
             let infoText = sourcecode.substring(leftCurlyBraceIndex, headerEnd);
             infoText = infoText.replace(/\s*\s/g, "");
 
             let testInfo: TestInfo = JSON.parse(infoText);
-            if(testInfo){
+            if (testInfo) {
                 expectedOutput = testInfo.expectedOutput;
-                if(testInfo.expectedCompilationError) expectedErrors.push(testInfo.expectedCompilationError);
-                if(testInfo.expectedCompilationErrors) expectedErrors = expectedErrors.concat(testInfo.expectedCompilationErrors);
+                if (testInfo.expectedCompilationError) expectedErrors.push(testInfo.expectedCompilationError);
+                if (testInfo.expectedCompilationErrors) expectedErrors = expectedErrors.concat(testInfo.expectedCompilationErrors);
             }
         }
 
@@ -102,13 +106,13 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
         let compiler = new JavaCompiler();
         compiler.files = [file];
         let executable = compiler.compileIfDirty();
-        if(!executable)  return;
+        if (!executable) return;
 
         let allErrors = executable.getAllErrors().filter(error => error.level == "error");
 
         let allNotExpectedErrors = allErrors.filter(error => {
             let expectedError = expectedCompiliationErrors.find(expectedError => expectedError.id == error.id && (!expectedError.line || expectedError.line == error.range.startLineNumber));
-            if(expectedError) expectedError.found = true;
+            if (expectedError) expectedError.found = true;
             return !expectedError;
         })
 
@@ -117,12 +121,12 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
             for (let error of allNotExpectedErrors) {
 
                 let expectedError = expectedCompiliationErrors.find(expectedError => expectedError.id == error.id && (!expectedError.line || expectedError.line == error.range.startLineNumber + lineOffset));
-                if(expectedError){
+                if (expectedError) {
                     expectedError.found = true;
                 } else {
                     console.log(chalk.white("Line ") +
-                        chalk.blue(error.range.startLineNumber + lineOffset) + 
-                        chalk.gray("(relative: " + error.range.startLineNumber + ")") 
+                        chalk.blue(error.range.startLineNumber + lineOffset) +
+                        chalk.gray("(relative: " + error.range.startLineNumber + ")")
                         + chalk.white(", Column ") +
                         chalk.blue(error.range.startColumn) + chalk.white(": " + error.message));
                     printCode(program, error.range.startLineNumber, lineOffset);
@@ -133,7 +137,7 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
             //@ts-ignore
             context.task.fails = 1;
 
-        } else if(allErrors.length == 0) {
+        } else if (allErrors.length == 0) {
 
             let printManager = new StoreOutputPrintManager();
 
@@ -178,20 +182,20 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
 
             }
 
-            
+
         }
 
-        for(let expectedError of expectedCompiliationErrors.filter(e => !e.found)){
+        for (let expectedError of expectedCompiliationErrors.filter(e => !e.found)) {
             let message = chalk.red("Expected Error") + " with id " + chalk.blue(expectedError.id);
-            if(expectedError.line){
+            if (expectedError.line) {
                 message += " on line " + chalk.blue(expectedError.line);
                 console.error(message);
                 printCode(program, expectedError.line, lineOffset);
             } else {
                 console.error(message);
             }
-                //@ts-ignore
-                context.task.fails = 1;
+            //@ts-ignore
+            context.task.fails = 1;
         }
 
     });
