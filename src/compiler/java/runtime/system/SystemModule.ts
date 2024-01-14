@@ -43,6 +43,7 @@ import { RunnableInterface } from "./javalang/RunnableInterface.ts";
 import { IllegalMonitorStateExceptionClass } from "./javalang/IllegalMonitorSateExceptionClass.ts";
 import { SemaphoreClass } from "./javalang/SemaphoreClass.ts";
 import { RandomClass } from "./javalang/RandomClass.ts";
+import { DecimalFormatClass } from "./javalang/DecimalFormatClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -74,7 +75,7 @@ export class SystemModule extends JavaLibraryModule {
 
             NumberClass, IntegerClass, LongClass, FloatClass, DoubleClass, ShortClass, BooleanClass,  // boxed primitive types
 
-            MathClass, RandomClass,
+            MathClass, RandomClass, DecimalFormatClass,
             ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass, 
             ClassCastExceptionClass, IndexOutOfBoundsExceptionClass, IllegalMonitorStateExceptionClass,
 
