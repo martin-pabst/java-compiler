@@ -1,7 +1,9 @@
 import { Error } from "../../common/Error";
+import { UsagePosition } from "../../common/UsagePosition.ts";
 import { Program, Step } from "../../common/interpreter/Program";
 import { Thread } from "../../common/interpreter/Thread.ts";
 import { File } from "../../common/module/File";
+import { Position } from "../../common/range/Position.ts";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable.ts";
 import { TokenList } from "../lexer/Token";
 import { ASTBlockNode, ASTClassDefinitionNode, ASTGlobalNode } from "../parser/AST";
@@ -126,6 +128,23 @@ export class JavaCompiledModule extends JavaBaseModule {
 
     dependsOnOtherDirtyModule(): boolean {
         return this.compiledSymbolsUsageTracker.existsDependencyToOtherDirtyModule();
+    }
+
+    findSymbolTableAtPosition(position: Position): JavaSymbolTable | undefined {
+        let tableWithSmallestNumberOfLines: JavaSymbolTable | undefined;
+        let smallestNumberOfLines: number = Number.MAX_SAFE_INTEGER;
+        for(let table of this.symbolTables){
+            let t1: JavaSymbolTable | undefined = table.findSymbolTableAtPosition(position);
+            if(t1){
+                let lineCount = t1.range.endLineNumber - t1.range.startLineNumber + 1;
+                if(lineCount < smallestNumberOfLines){
+                    smallestNumberOfLines = lineCount;
+                    tableWithSmallestNumberOfLines = t1;
+                }
+            }
+        }
+
+        return tableWithSmallestNumberOfLines;
     }
 
 }

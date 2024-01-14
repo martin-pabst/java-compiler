@@ -140,6 +140,14 @@ export class Main implements JavaMainClass {
 
   }
 
+  getCompiler(): JavaCompiler {
+    return this.compiler;
+  }
+
+  ensureModuleIsCompiled(module: JavaCompiledModule): void {
+    this.compiler.updateSingleModuleForCodeCompletion(module);
+  }
+
   getModuleForMonacoModel(model: monaco.editor.ITextModel): JavaCompiledModule | undefined {
     for(let file of this.files){
       if(file.monacoModel == model){
@@ -194,6 +202,15 @@ export class Main implements JavaMainClass {
           this.markErrors(module);
           this.printErrors(module);
         }
+
+        if(executable.mainModule){
+          let jcm = <JavaCompiledModule>executable.mainModule;
+          this.astComponent.buildTreeView(jcm.ast);
+          TokenPrinter.print(jcm.tokens!, this.tokenDiv);
+        }
+
+        this.programViewerCompoment.buildTreeView(this.compiler.moduleManager);
+
       }
     }
 

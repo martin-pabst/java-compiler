@@ -1,5 +1,6 @@
 import { BaseStackframe, BaseSymbol, BaseSymbolTable, SymbolOnStackframe as SymbolOnStack } from "../../common/BaseSymbolTable";
-import { IRange } from "../../common/range/Range";
+import { Position } from "../../common/range/Position.ts";
+import { IRange, Range } from "../../common/range/Range";
 import { TokenType } from "../TokenType.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaClass } from "../types/JavaClass";
@@ -18,9 +19,9 @@ export type LocalVariableInformation = {
 
 
 export class JavaSymbolTable extends BaseSymbolTable {
-
+    
     declare childTables: JavaSymbolTable[];
-
+    
     declare parent?: JavaSymbolTable;
 
     declare identifierToSymbolMap: Map<string, JavaLocalVariable>;
@@ -67,7 +68,7 @@ export class JavaSymbolTable extends BaseSymbolTable {
             }
             
         }
-
+        
         if(this.parent){
             if(this.parent.classContext == this.classContext){
                 return this.parent.findSymbolIntern(identifier, upToVisibility, false, outerClassLevel);
@@ -78,7 +79,7 @@ export class JavaSymbolTable extends BaseSymbolTable {
 
         return undefined;
     }   
-
+    
     public addSymbol(symbol: BaseSymbol): void {
         super.addSymbol(symbol);
         if(symbol instanceof SymbolOnStack){
@@ -89,7 +90,7 @@ export class JavaSymbolTable extends BaseSymbolTable {
     public insertInvisibleParameter(){
         this.getStackFrame()?.insertInvisibleParameter();
     }
-
+    
     getStackFrame(): BaseStackframe | undefined {
         let st: JavaSymbolTable = this;
         while(!st.stackframe && st.parent){
@@ -97,7 +98,17 @@ export class JavaSymbolTable extends BaseSymbolTable {
         }
         return st.stackframe;
     }
+    
+    findSymbolTableAtPosition(position: Position): JavaSymbolTable | undefined {
+        if(!Range.containsPosition(this.range, position)) return undefined;
+        let bestTable: JavaSymbolTable = this;
+        for(let child of this.childTables){
+            let t1 = child.findSymbolTableAtPosition(position);
+            if(t1) bestTable = child;
+        }
 
+        return bestTable;
+    }
 }
 
 

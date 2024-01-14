@@ -706,4 +706,13 @@ export class JCM {
         "en": ``,
     })
 
+    /**
+     * JavaTypeStore
+     */
+    static primitiveType = () => lm({
+        "de": "Primitiver Datentyp",
+        "en": "primitive type"
+    })
+
+
 }            

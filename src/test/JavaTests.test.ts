@@ -35,6 +35,8 @@ files.forEach(function (file) {
     }
 });
 
+
+
 type ExpectedError = { id: string, line?: number, found?: boolean}
 
 type TestInfo = {
@@ -98,7 +100,8 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
         file.setText(program);
 
         let compiler = new JavaCompiler();
-        let executable = compiler.compileIfDirty(file);
+        compiler.files = [file];
+        let executable = compiler.compileIfDirty();
         if(!executable)  return;
 
         let allErrors = executable.getAllErrors().filter(error => error.level == "error");

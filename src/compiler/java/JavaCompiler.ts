@@ -32,9 +32,9 @@ type AskBeforeCompilingCallback = () => boolean;
 
 export class JavaCompiler {
 
-    moduleManager: JavaModuleManager;
+    public moduleManager: JavaModuleManager;
     lastOpenedFile?: File;
-    private libraryModuleManager: JavaLibraryModuleManager;
+    public libraryModuleManager: JavaLibraryModuleManager;
 
     private errors: Error[] = [];
 
@@ -56,7 +56,7 @@ export class JavaCompiler {
         this.moduleManager = new JavaModuleManager();
     }
 
-    compileIfDirty() {
+    compileIfDirty():Executable | undefined {
 
         if(this.askBeforeCompilingCallback && !this.askBeforeCompilingCallback()) return;
 
@@ -67,8 +67,6 @@ export class JavaCompiler {
         this.moduleManager.setupModulesBeforeCompiliation(this.files);
         let newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
         if (newOrDirtyModules.length == 0) return this.lastCompiledExecutable;
-
-        console.log("Dirty state => compiling...");
 
         this.errors = [];
 
@@ -127,13 +125,17 @@ export class JavaCompiler {
             this.compilationFinishedCallback(executable);
         }
 
+        if(executable.mainModule){
+            return executable;
+        }        
+
     }
 
     /**
      * If user presses . or <ctrl> + <space> then we assume that only 
      * currently edited file is dirty, therefore it suffices to compile only this module.
      */
-    updateSingleFileForCodeCompletion(module: JavaCompiledModule): "success" | "completeCompilingNecessary" {
+    updateSingleModuleForCodeCompletion(module: JavaCompiledModule): "success" | "completeCompilingNecessary" {
         if (!module) return "completeCompilingNecessary";
 
         let moduleManagerCopy = this.moduleManager.copy(module);

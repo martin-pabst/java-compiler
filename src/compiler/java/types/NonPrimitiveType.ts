@@ -134,5 +134,16 @@ export abstract class NonPrimitiveType extends JavaType {
         return methods;
     }
 
+    isVisibleFrom(classContext: NonPrimitiveType | undefined) {
+        if(this.visibility == TokenType.keywordPublic || !classContext) return true;
+        if(this.outerType == classContext || this.innerTypes.includes(classContext)) return true;
+        if(this.visibility == TokenType.keywordProtected){
+            if(this.outerType && classContext.extendsImplements[(<NonPrimitiveType>this.outerType).pathAndIdentifier]){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }
