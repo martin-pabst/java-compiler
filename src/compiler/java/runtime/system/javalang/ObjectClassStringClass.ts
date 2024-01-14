@@ -215,7 +215,7 @@ export class StringClass extends ObjectClass {
         { type: "method", signature: "public final string matches(string regex)", native: StringClass.prototype._nMatches, template: "(§1.value.match(new RegExp(§2, 'g')) != null)" },
         { type: "method", signature: "public final string replaceFirst(string regex, string replacement)", native: StringClass.prototype._nReplaceFirst, template: "§1.value.replace(new RegExp(§2, ''), §3)" },
         { type: "method", signature: "public final String[] split(string regex)", native: StringClass.prototype._nSplit },
-
+        { type: "method", signature: "public final int hashCode()", native: StringClass.prototype._nHashCode, template: `Array.from(§1.value).reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0)`},
     ]
 
     public value: string;
@@ -355,5 +355,10 @@ export class StringClass extends ObjectClass {
         //if(otherString === null) throw new NullPointerExceptionClass("compareTo called with argument null");
         t.s.push(this.value.localeCompare(otherString.value));
         if (callback) callback;
+    }
+
+    _nHashCode() {
+        // taken from https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0
+        return Array.from(this.value).reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0)
     }
 }

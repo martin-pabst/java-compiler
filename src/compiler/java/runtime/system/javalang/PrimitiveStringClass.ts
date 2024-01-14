@@ -35,7 +35,9 @@ export class PrimitiveStringClass extends ObjectClass {
         {type: "method", signature: "public final string replaceAll(string regex, string replacement)", template: "§1.replace(new RegExp(§2, 'g'), §3)", constantFoldingFunction: (obj, target, replacement) => obj.replace(new RegExp(target, 'g'), replacement)},
         {type: "method", signature: "public final boolean matches(string regex)", template: "(§1.match(new RegExp(§2, 'g')) != null)", constantFoldingFunction: (obj, target) => (obj.match(new RegExp(target, 'g')) != null)},
         {type: "method", signature: "public final string replaceFirst(string regex, string replacement)", template: "§1.replace(new RegExp(§2, ''), §3)", constantFoldingFunction: (obj, target, replacement) => obj.replace(new RegExp(target, ''), replacement)},
-        {type: "method", signature: "public final String[] split(string regex)", template: `§1.split(new RegExp(§2, '')).map((s) => new ${Helpers.classes}['String'](s))`}
+        {type: "method", signature: "public final String[] split(string regex)", template: `§1.split(new RegExp(§2, '')).map((s) => new ${Helpers.classes}['String'](s))`},
+        { type: "method", signature: "public final int hashCode()", template: `Array.from(§1).reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0)`, constantFoldingFunction: (obj: string) => {return Array.from(obj).reduce((s: number, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0)} },
+
     ]
 
     static type: NonPrimitiveType;
