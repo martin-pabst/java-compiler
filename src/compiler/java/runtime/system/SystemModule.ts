@@ -42,6 +42,7 @@ import { ThreadClass, ThreadStateClass as ThreadStateEnum } from "./javalang/Thr
 import { RunnableInterface } from "./javalang/RunnableInterface.ts";
 import { IllegalMonitorStateExceptionClass } from "./javalang/IllegalMonitorSateExceptionClass.ts";
 import { SemaphoreClass } from "./javalang/SemaphoreClass.ts";
+import { RandomClass } from "./javalang/RandomClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -73,7 +74,7 @@ export class SystemModule extends JavaLibraryModule {
 
             NumberClass, IntegerClass, LongClass, FloatClass, DoubleClass, ShortClass, BooleanClass,  // boxed primitive types
 
-            MathClass,
+            MathClass, RandomClass,
             ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass, 
             ClassCastExceptionClass, IndexOutOfBoundsExceptionClass, IllegalMonitorStateExceptionClass,
 
