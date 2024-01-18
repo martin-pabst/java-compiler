@@ -133,7 +133,7 @@ export class TokenIterator {
         let pos = this.pos;
         let token = this.cct;
 
-        while (k > 0 && pos < this.tokenList.length) {
+        while (k > 0 && pos < this.tokenList.length - 1) {
             pos++;
             let t: Token = this.tokenList[pos];
             if (TokenIterator.spaceTokenTypes.indexOf(t.tt) < 0) {
