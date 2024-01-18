@@ -216,6 +216,7 @@ export class StringClass extends ObjectClass {
         { type: "method", signature: "public final string replaceFirst(string regex, string replacement)", native: StringClass.prototype._nReplaceFirst, template: "§1.value.replace(new RegExp(§2, ''), §3)" },
         { type: "method", signature: "public final String[] split(string regex)", native: StringClass.prototype._nSplit },
         { type: "method", signature: "public final int hashCode()", native: StringClass.prototype._nHashCode, template: `Array.from(§1.value).reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0)`},
+        { type: "method", signature: "public final char[] toCharArray()", native: StringClass.prototype._nToCharArray, template: `Array.from(§1.value)`},
     ]
 
     public value: string;
@@ -360,5 +361,9 @@ export class StringClass extends ObjectClass {
     _nHashCode() {
         // taken from https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0
         return Array.from(this.value).reduce((s, c) => Math.imul(31, s) + c.charCodeAt(0) | 0, 0)
+    }
+
+    _nToCharArray() {
+        return Array.from(this.value);
     }
 }
