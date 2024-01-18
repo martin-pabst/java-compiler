@@ -946,6 +946,8 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
 
         } else {
+            if(!destinationType) return undefined;
+            
             let defaultValue: string = destinationType.isPrimitive ? (<PrimitiveType>destinationType).defaultValueAsString : "null";
             initValueSnippet = new StringCodeSnippet(defaultValue, EmptyRange.instance, destinationType);
         }
