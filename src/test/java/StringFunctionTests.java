@@ -74,6 +74,8 @@ String alpha = "Alpha";
 String other = "beta";
 assertEquals("Alpha".concat(other), "Alphabeta", "String object concat not working.");
 
+assertEquals('h', alpha.toCharArray()[3], "String.toCharArray() doesn't work.");
+
 assertTrue(alpha.contains("ph"), "String object contains not working.");
 assertFalse(alpha.contains("Ph"), "String object contains not working.");
 assertTrue(alpha.endsWith("pha"), "String object endsWith not working.");
