@@ -43,10 +43,10 @@ export class JavaCompiler {
     public currentlyOpenFile?: File;
 
     public files: File[] = [];
-    
+
     public compilationFinishedCallback?: CompiliationFinishedCallback;
     public askBeforeCompilingCallback?: AskBeforeCompilingCallback;
-    
+
     public state: CompilerState = CompilerState.stopped;
     private maxMsBetweenRuns: number = 100;
 
@@ -56,9 +56,9 @@ export class JavaCompiler {
         this.moduleManager = new JavaModuleManager();
     }
 
-    compileIfDirty():Executable | undefined {
+    compileIfDirty(): Executable | undefined {
 
-        if(this.askBeforeCompilingCallback && !this.askBeforeCompilingCallback()) return;
+        if (this.askBeforeCompilingCallback && !this.askBeforeCompilingCallback()) return;
 
         /**
          * if no module has changed, return as fast as possible
@@ -121,13 +121,11 @@ export class JavaCompiler {
 
         this.lastCompiledExecutable = executable;
 
-        if(this.compilationFinishedCallback){
+        if (this.compilationFinishedCallback) {
             this.compilationFinishedCallback(executable);
         }
 
-        if(executable.mainModule){
-            return executable;
-        }        
+        return executable;
 
     }
 
@@ -139,7 +137,7 @@ export class JavaCompiler {
         if (!module) return "completeCompilingNecessary";
 
         let moduleManagerCopy = this.moduleManager.copy(module);
-        
+
         module.dirty = true;
         module.compiledSymbolsUsageTracker.clear();
         module.systemSymbolsUsageTracker.clear();
@@ -177,14 +175,14 @@ export class JavaCompiler {
 
     }
 
-    startCompilingPeriodically(maxMsBetweenRuns?: number){
-        if(maxMsBetweenRuns) this.maxMsBetweenRuns = maxMsBetweenRuns;
-        if(this.state == CompilerState.compilingPeriodically) return;
-        
+    startCompilingPeriodically(maxMsBetweenRuns?: number) {
+        if (maxMsBetweenRuns) this.maxMsBetweenRuns = maxMsBetweenRuns;
+        if (this.state == CompilerState.compilingPeriodically) return;
+
         this.state = CompilerState.compilingPeriodically;
 
         let f = () => {
-            if(this.state == CompilerState.compilingPeriodically){
+            if (this.state == CompilerState.compilingPeriodically) {
                 this.compileIfDirty();
                 setTimeout(f, this.maxMsBetweenRuns);
             }
@@ -193,7 +191,7 @@ export class JavaCompiler {
         f();
     }
 
-    stopCompilingPeriodically(){
+    stopCompilingPeriodically() {
         this.state = CompilerState.stopped;
     }
 
