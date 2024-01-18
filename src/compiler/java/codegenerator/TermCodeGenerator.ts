@@ -902,7 +902,19 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             if (allParametersConstant && (method.isStatic || objectSnippet.isConstant())) {
                 let constantValues = parameterValueSnippet.map(p => p!.getConstantValue());
                 let result = method.isStatic ? method.constantFoldingFunction(...constantValues) : method.constantFoldingFunction(objectSnippet.getConstantValue(), ...constantValues);
-                let resultAsString = method.returnParameterType == this.stringType ? `"${result}"` : "" + result;
+                
+                let resultAsString: string = "";
+
+                if(method.returnParameterType instanceof ArrayType && Array.isArray(result)){
+                    if(this.isStringOrChar(method.returnParameterType.elementType)){
+                        resultAsString = "[" + result.map(r => `"${r}"`).join(", ") + "]";
+                    } else {
+                        resultAsString = "[" + result.map(r => "" + r).join(", ") + "]";
+                    }
+                } else {
+                    resultAsString = typeof result == "string" ? `"${result}"` : "" + result;
+                }
+                
                 return new StringCodeSnippet(resultAsString, node.range, returnParameter, result);
             }
         }
@@ -970,6 +982,10 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         return snippet;
+    }
+
+    isStringOrChar(type: JavaType){
+        return type == this.stringType || type == this.charType;
     }
 
     registerCodeReachedAssertion(node: ASTMethodCallNode, parameterValues: (CodeSnippet | undefined)[]): CodeSnippet | undefined {
