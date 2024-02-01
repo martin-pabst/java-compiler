@@ -64,5 +64,9 @@ export class JavaLibraryModuleManager {
         }
     }
 
+    getTypeCompletionItems(rangeToReplace: monaco.IRange): monaco.languages.CompletionItem[] {
+        return this.typestore.getTypeCompletionItems(undefined, rangeToReplace, false, true);
+    }
+
 
 }

@@ -5,6 +5,7 @@
 // import { JavaCompiledModule } from "../module/JavaCompiledModule";
 // import { JavaClass } from "../types/JavaClass";
 // import { NonPrimitiveType } from "../types/NonPrimitiveType";
+// import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType";
 
 // export class MyCompletionItemProvider implements monaco.languages.CompletionItemProvider {
 
@@ -227,7 +228,7 @@
 //         });
 //     }
 
-//     getCompletionItemsInsideIdentifier(varOrClassMatch: RegExpMatchArray, position: monaco.Position, module: JavaCompiledModule, identifierAndBracketAfterCursor: string, classContext: Klass | StaticClass,
+//     getCompletionItemsInsideIdentifier(varOrClassMatch: RegExpMatchArray, position: monaco.Position, module: JavaCompiledModule, identifierAndBracketAfterCursor: string, classContext: JavaClass,
 //         leftBracketAlreadyThere: boolean, symbolTable: JavaSymbolTable | undefined): monaco.languages.ProviderResult<monaco.languages.CompletionList> {
         
 //         if(!symbolTable){
@@ -244,14 +245,12 @@
 //             endLineNumber: position.lineNumber, endColumn: position.column + identifierAndBracketAfterCursor.length
 //         }
 
-
-
 //         let completionItems: monaco.languages.CompletionItem[] = [];
 
 //         if (symbolTable.classContext && !symbolTable.methodContext && symbolTable.classContext instanceof JavaClass) {
 //             completionItems = completionItems.concat(this.getOverridableMethodsCompletion(symbolTable.classContext));
 //         }
-
+        
 //         if (symbolTable != null) {
 //             completionItems = completionItems.concat(symbolTable.getLocalVariableCompletionItems(rangeToReplace).map(ci => {
 //                 ci.sortText = "aaa" + ci.label;
@@ -259,7 +258,8 @@
 //             }));
 //         }
 
-//         completionItems = completionItems.concat(this.main.getCurrentWorkspace().moduleStore.getTypeCompletionItems(module, rangeToReplace));
+//         completionItems = completionItems.concat(this.main.getCompiler().libraryModuleManager.getTypeCompletionItems(rangeToReplace));
+//         completionItems = completionItems.concat(this.main.getCompiler().moduleManager.getTypeCompletionItems(module, rangeToReplace, classContext));
 
 //         if (classContext != null && symbolTable?.method != null) {
 //             completionItems = completionItems.concat(

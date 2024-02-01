@@ -3,6 +3,7 @@ import { JavaTypeStore } from "./JavaTypeStore";
 import { JavaCompiledModule as JavaCompiledModule } from "./JavaCompiledModule";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer";
+import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType";
 
 
 /**
@@ -108,4 +109,9 @@ export class JavaModuleManager {
     findModuleByFile(file: File){
         return this.modules.find(m => m.file == file);
     }
+
+    getTypeCompletionItems(module: JavaCompiledModule, rangeToReplace: monaco.IRange, classContext: NonPrimitiveType | StaticNonPrimitiveType| undefined): monaco.languages.CompletionItem[] {
+        return this.typestore.getTypeCompletionItems(classContext, rangeToReplace, false, false);
+    }
+
 }

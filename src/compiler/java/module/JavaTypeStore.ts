@@ -8,6 +8,7 @@ import { JavaEnum } from "../types/JavaEnum";
 import { IJavaInterface, JavaInterface } from "../types/JavaInterface";
 import { JavaType } from "../types/JavaType";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
+import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType";
 import { JavaCompiledModule } from "./JavaCompiledModule";
 import { LibraryKlassType } from "./libraries/JavaLibraryModule";
 
@@ -84,7 +85,7 @@ export class JavaTypeStore {
     }
 
 
-    getTypeCompletionItems(classContext: NonPrimitiveType | undefined, rangeToReplace: monaco.IRange,
+    getTypeCompletionItems(classContext: NonPrimitiveType | StaticNonPrimitiveType | undefined, rangeToReplace: monaco.IRange,
         afterNew: boolean, withPrimitiveTypes: boolean): monaco.languages.CompletionItem[] {
 
         let completionItems: monaco.languages.CompletionItem[] = [];
@@ -110,7 +111,7 @@ export class JavaTypeStore {
                 })
             } else {
                 let npt = <NonPrimitiveType>type;
-                if (!npt.isVisibleFrom(classContext)) return;
+                if (classContext instanceof NonPrimitiveType && !npt.isVisibleFrom(classContext)) return;
 
                 let kind: monaco.languages.CompletionItemKind = monaco.languages.CompletionItemKind.Class;
                 if (type instanceof IJavaInterface) kind = monaco.languages.CompletionItemKind.Interface;

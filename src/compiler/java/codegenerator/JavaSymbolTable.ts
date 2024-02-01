@@ -109,6 +109,26 @@ export class JavaSymbolTable extends BaseSymbolTable {
 
         return bestTable;
     }
+
+    getLocalVariableCompletionItems(rangeToReplace: monaco.IRange): monaco.languages.CompletionItem[] {
+        let items: monaco.languages.CompletionItem[] = [];
+        this.identifierToSymbolMap.forEach((symbol, identifier) => {
+            items.push({
+                label: symbol.identifier,
+                kind: monaco.languages.CompletionItemKind.Variable,
+                insertText: symbol.identifier,
+                range: rangeToReplace
+            })
+        })
+
+        if(this.parent){
+            items = items.concat(this.parent.getLocalVariableCompletionItems(rangeToReplace));
+        }
+
+        return items;
+    }
+
+
 }
 
 
