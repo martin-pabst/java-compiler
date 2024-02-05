@@ -336,12 +336,17 @@ export class TypeResolver {
                     type = innerType;
                 } else {
                     this.pushError(JCM.typeNotDefined(id.identifier), typeNode.range, module);
+                    return undefined;
                 }
             } else {
                 this.pushError(JCM.typeHasNoSubtype(type.identifier, id.identifier), id.identifierRange, module, "error");
-                break;
+                return undefined;
             }  
             i++;
+        }
+
+        if(!type){
+            this.pushError(JCM.typeNotDefined(identifer), typeNode.range, module);
         }
 
         return type;

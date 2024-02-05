@@ -485,6 +485,8 @@ export class CodeGenerator extends StatementCodeGenerator {
                 snippets.push(storeOuterClassReferenceSnippet);
             }
 
+        } else if(method.identifier == classContext.identifier && method.returnParameterType){
+            this.pushError(JCM.methodImitatesConstructor(method.identifier), "warning", method.identifierRange);
         }
 
         if (methodNode.statement) {

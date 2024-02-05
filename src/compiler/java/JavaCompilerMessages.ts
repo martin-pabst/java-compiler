@@ -118,6 +118,12 @@ export class JCM {
         "en": `Interfaces don't have construtctors.`,
     })
 
+    static methodImitatesConstructor = (identifier: string) => le({
+        "de": "Die Methode " + identifier + " trägt denselben Bezeichner wie die Klasse, hat aber einen Rückgabewert und ist damit KEIN Konstruktor. Das ist irreführend.",
+        "en": "Method " + identifier + " has same identifier as class and an return type. Therefore it is no constructor. This is irritating."
+        
+    })
+
     static abstractMethodsDontHaveMethodBodies = () => le({
         "de": "Eine abstrakte Methode kann keinen Methodenrumpf besitzen.",
         "en": `Abstract methods don't have method bodies.`,
