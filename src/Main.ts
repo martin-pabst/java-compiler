@@ -16,11 +16,12 @@ import { ProgramControlButtons } from "./testgui/ProgramControlButtons.ts";
 import { TestPrintManager } from "./testgui/TestPrintManager.ts";
 
 import jQuery from "jquery";
-import { ProgramPointerPositionInfo } from "./compiler/common/interpreter/Scheduler.ts";
+import { ProgramPointerPositionInfo, SchedulerState } from "./compiler/common/interpreter/Scheduler.ts";
 import { ActionManager } from "./testgui/ActionManager.ts";
 import { ProgramViewerComponent } from "./testgui/ProgramViewerComponent.ts";
-import { testPrograms } from "./testgui/testprograms/TestPrograms.ts";
+import { testProgramsList } from "./testgui/testprograms/TestPrograms.ts";
 import { TabbedEditorManager } from "./tools/TabbedEditorManager.ts";
+import { TestResultViewer } from "./testgui/TestResultViewer.ts";
 
 import '/include/css/main.css';
 import { JavaMainClass } from "./compiler/java/MainInterface.ts";
@@ -28,6 +29,12 @@ import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts
 import { Executable } from "./compiler/common/Executable.ts";
 import { JavaHoverProvider } from "./compiler/java/monacoproviders/JavaHoverProvider.ts";
 import chalk from "chalk";
+import { DummyAssertions } from "./compiler/java/runtime/unittests/Assertions.ts";
+import { GUITestAssertions } from "./test/lib/GUITestAssertions.ts";
+import { GUITestRunner } from "./test/lib/GUITestRunner.ts";
+import { TerminalPrintManager } from "./testgui/TerminalPrintManager.ts";
+import { OptionView } from "./testgui/OptionView.ts";
+
 
 export class Main implements JavaMainClass {
 
@@ -35,11 +42,13 @@ export class Main implements JavaMainClass {
 
   insightTabsManager: TabManager;
   tabbedEditorManager: TabbedEditorManager;
+  testResultViewer : TestResultViewer;
 
   tokenDiv: HTMLDivElement;
   astDiv: HTMLDivElement;
   codeOutputDiv: HTMLDivElement;
   errorDiv: HTMLDivElement;
+  testDiv: HTMLDivElement;
 
   programControlButtons!: ProgramControlButtons;
   actionManager: ActionManager;
@@ -62,10 +71,10 @@ export class Main implements JavaMainClass {
     /*
      * Test program:
      */
-    let testProgram: string = testPrograms.primzahlzwillinge.trim();
-    
+    //let testProgram: string = testPrograms.listeVorlage.trim();
+
     this.insightTabsManager = new TabManager(document.getElementById('insighttabs')!,
-    ['token', 'ast', 'code', 'errors']);
+      ['token', 'ast', 'code', 'errors', 'tests']);
 
     this.insightTabsManager.setBodyElementClass('tabBodyElement');
     this.tokenDiv = this.insightTabsManager.getBodyElement(0);
@@ -75,26 +84,42 @@ export class Main implements JavaMainClass {
     this.codeOutputDiv.classList.add('codeOutput');
     this.astDiv.classList.add('astOutput');
     this.errorDiv = this.insightTabsManager.getBodyElement(3);
-    
+    this.testDiv = this.insightTabsManager.getBodyElement(4);
+
+    this.testResultViewer = new TestResultViewer();
+
+    this.testResultViewer.addEventListener('run-all-tests', 
+      (e) => {if(e.type == "run-all-tests") this.runTest();});
+      
+    this.testDiv.appendChild(this.testResultViewer);
     this.astComponent = new AstComponent(this.astDiv);
+
+
     this.programViewerCompoment = new ProgramViewerComponent(this.codeOutputDiv);
-    
-    for(let i = 0; i < 3; i++){
+
+    for (let i = 0; i < 3; i++) {
       let file = new File("module " + i);
       file.monacoModel = monaco.editor.createModel("", "myJava");
 
       this.files.push(file);
     }
-    this.files[0].setText(testProgram);
+    let file = new File("Tests");
+    file.monacoModel = monaco.editor.createModel("", "myJava");
+    //file.setText(testPrograms.testFuerListe.trim());
+    this.files.push(file);
+
+    
     this.tabbedEditorManager = new TabbedEditorManager(document.getElementById('editorOuter')!,
-    this.files);
+      this.files);
+
+    this.setProgram("listeVorlage");
 
     this.compiler = new JavaCompiler();
     this.compiler.files = this.files;
 
     this.actionManager = new ActionManager();
 
-    this.interpreter = new Interpreter(new TestPrintManager(), this.actionManager);
+    this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager);
 
     this.initButtons();
     this.initCompiler();
@@ -128,9 +153,9 @@ export class Main implements JavaMainClass {
             options: { beforeContentClassName: 'jo_revealProgramPointerBefore' }
           }])
           break;
-          case "hide":
-            this.decorations?.clear();
-            break;
+        case "hide":
+          this.decorations?.clear();
+          break;
       }
       // let nextStep = positionInfo?.program.stepsSingle[positionInfo.nextStepIndex];
       // console.log(nextStep?.codeAsString);
@@ -149,8 +174,8 @@ export class Main implements JavaMainClass {
   }
 
   getModuleForMonacoModel(model: monaco.editor.ITextModel): JavaCompiledModule | undefined {
-    for(let file of this.files){
-      if(file.monacoModel == model){
+    for (let file of this.files) {
+      if (file.monacoModel == model) {
         return this.compiler.lastCompiledExecutable?.moduleManager.findModuleByFile(file);
       }
     }
@@ -165,10 +190,57 @@ export class Main implements JavaMainClass {
       this.programViewerCompoment.buildTreeView(this.compiler.moduleManager);
     }, 'myButton');
 
+    let programNames = testProgramsList.map((value) => value[0])
+    
+    let optionView = new OptionView();
+    optionView.setAttribute('programs', JSON.stringify(programNames));
+
+    optionView.addEventListener('set-program', 
+    (e:any) => {if(e.type == "set-program") this.setProgram(e!.detail!.programName);});
+    firstRow.appendChild(optionView);
+    
     let programControlButtonDiv = DOM.makeDiv(buttonDiv, "programControlbuttons");
 
     this.programControlButtons = new ProgramControlButtons(jQuery(programControlButtonDiv), this.interpreter, this.actionManager);
 
+  }
+
+  runTest() {
+    this.compiler.files = this.files;
+    let executable = this.compiler.compileIfDirty();
+    if (!executable) {
+      return;
+    }
+    let testMethods = executable.getTestMethods();
+
+    let testRunner = new GUITestRunner();
+    this.interpreter.setAssertions(new GUITestAssertions(testRunner));
+    for (let testMethode of testMethods) {
+      let classEnumInterface = testMethode.classEnumInterface;
+      let className = classEnumInterface.identifier;
+      let methodName = testMethode.identifier;
+
+      testRunner.startTest(methodName, "");
+
+      let file = new File("TEST_FILE"); //TODO: Change to unique name 
+      file.setText(`${className} testObject = new ${className}(); testObject.${methodName}();`);
+      this.compiler.files.push(file);
+      executable = this.compiler.compileIfDirty();
+      if(executable?.isCompiledToJavascript == false) {
+        testRunner.endTest(true);
+        continue;
+      }
+      this.interpreter.setTestExecutable(executable);
+      this.interpreter.runMainProgramSynchronously();
+      // TODO: When programm crashes, the test should fail.
+      //let executionError = this.interpreter.scheduler.state != SchedulerState.error;
+      testRunner.endTest(false);
+      this.compiler.files = this.compiler.files.filter(f => f.filename != "TEST_FILE");
+    }
+
+    let testResults = testRunner.getTestResults();
+    
+    this.testResultViewer.setAttribute('results', JSON.stringify(testResults));
   }
 
   compile() {
@@ -191,19 +263,19 @@ export class Main implements JavaMainClass {
 
     // this.interpreter.setExecutable(executable);
     // this.programViewerCompoment.buildTreeView(this.compiler.moduleManager);
-    
+
   }
-  
-  initCompiler(){
+
+  initCompiler() {
     this.compiler.compilationFinishedCallback = (executable) => {
       this.interpreter.setExecutable(executable);
-      if(executable){
-        for(let module of executable.moduleManager.modules){
+      if (executable) {
+        for (let module of executable.moduleManager.modules) {
           this.markErrors(module);
           this.printErrors(module);
         }
 
-        if(executable.mainModule){
+        if (executable.mainModule) {
           let jcm = <JavaCompiledModule>executable.mainModule;
           this.astComponent.buildTreeView(jcm.ast);
           TokenPrinter.print(jcm.tokens!, this.tokenDiv);
@@ -262,8 +334,18 @@ export class Main implements JavaMainClass {
 
   }
 
-  registerMonacoProviders(){
+  registerMonacoProviders() {
     monaco.languages.registerHoverProvider('myJava', new JavaHoverProvider(this.tabbedEditorManager.editor, this));
+  }
+
+  setProgram(programName: string) {
+    for (let program of testProgramsList) {
+      if (program[0] == programName) {
+        let currentTab = this.tabbedEditorManager.activeIndex;
+        this.files[currentTab].setText(program[1]);
+        return;
+      }
+    }
   }
 
 }

@@ -1,7 +1,10 @@
+import { test } from "vitest";
 import { JCM } from "../java/JavaCompilerMessages.ts";
 import { JavaModuleManager } from "../java/module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "../java/module/libraries/JavaLibraryModuleManager.ts";
+import { JavaClass } from "../java/types/JavaClass.ts";
 import { JavaTypeWithInstanceInitializer } from "../java/types/JavaTypeWithInstanceInitializer";
+import { Method } from "../java/types/Method.ts";
 import { NonPrimitiveType } from "../java/types/NonPrimitiveType";
 import { Error } from "./Error";
 import { Program } from "./interpreter/Program";
@@ -20,24 +23,31 @@ export class Executable {
     staticInitializationSequence: StaticInitializationStep[] = [];
 
     mainModule?: Module;
+    testModule?: Module;
 
     isCompiledToJavascript: boolean = false;
 
-    constructor(public classObjectRegistry: KlassObjectRegistry, 
+    constructor(public classObjectRegistry: KlassObjectRegistry,
         public moduleManager: JavaModuleManager,
         public libraryModuleManager: JavaLibraryModuleManager,
         public globalErrors: Error[],
         lastOpenedFile?: File, currentlyOpenedFile?: File) {
 
-        this.findMainModule(lastOpenedFile, currentlyOpenedFile);
+        this.findMainModule(false, lastOpenedFile, currentlyOpenedFile);
+
+        this.findAllMethods();
 
         this.setupStaticInitializationSequence(globalErrors);
 
     }
 
-    compileToJavascript(){
-        if(!this.isCompiledToJavascript){
-            if(this.moduleManager.compileModulesToJavascript()){
+    findAllMethods() {
+        let modules = this.libraryModuleManager.libraryModules;
+    }
+
+    compileToJavascript() {
+        if (!this.isCompiledToJavascript) {
+            if (this.moduleManager.compileModulesToJavascript()) {
                 this.isCompiledToJavascript = true;
             }
         }
@@ -51,8 +61,8 @@ export class Executable {
         for (let module of this.moduleManager.modules) {
             if (!module.ast) continue;
             for (let cdef of module.ast.innerTypes) {
-                if(cdef.resolvedType)
-                classesToInitialize.push(cdef.resolvedType);
+                if (cdef.resolvedType)
+                    classesToInitialize.push(cdef.resolvedType);
             }
         }
 
@@ -80,7 +90,7 @@ export class Executable {
                         })
                     }
                     let index = classesToInitialize.indexOf(cti);
-                    if(index >= 0) classesToInitialize.splice(index, 1);
+                    if (index >= 0) classesToInitialize.splice(index, 1);
                     i--;    // i++ follows immediately (end of for-loop)
                     done = false;
                 }
@@ -92,13 +102,37 @@ export class Executable {
         if (classesToInitialize.length > 0) {
             // cyclic references! => stop with error message
             let errorWithId = JCM.cyclicReferencesAmongStaticVariables(classesToInitialize.map(c => c.identifier).join(", "));
-            errors.push({ message: errorWithId.message, id: errorWithId.id , level: "error", range: EmptyRange.instance });
+            errors.push({ message: errorWithId.message, id: errorWithId.id, level: "error", range: EmptyRange.instance });
         }
 
 
     }
 
-    findMainModule(lastOpenedFile?: File, currentlyOpenedFile?: File) {
+    getTestMethods() {
+        let testMethods: Method[] = [];
+        for (let module of this.moduleManager.modules) {
+            for (let type of module.types) {
+                if (type instanceof JavaClass) {
+                    let testMethods2 = type.getOwnMethods()
+                        .filter(m => !m.isConstructor && m.hasAnnotation("Test") && m.returnParameterType?.identifier == "void" && m.parameters.length == 0);
+                    testMethods = [...testMethods, ...testMethods2];
+                }
+            }
+        }
+
+        return testMethods;
+    }
+
+    findMainModule(test: boolean, lastOpenedFile?: File, currentlyOpenedFile?: File) {
+        if (test) {
+            let testModule = this.moduleManager.modules.find(m => m.file.filename == "TEST_FILE");
+            if (testModule) {
+                this.mainModule = testModule;
+
+                return;
+            }
+
+        }
         let currentModule = this.findModuleByFile(currentlyOpenedFile);
         if (currentModule?.isStartable()) {
             this.mainModule = currentModule;
@@ -114,6 +148,12 @@ export class Executable {
 
     }
 
+    setTestExecutable() {
+        this.findMainModule(true);
+
+    }
+
+
     findModuleByFile(file?: File): Module | undefined {
         if (!file) return undefined;
         return this.moduleManager.modules.find(m => m.file == file);
@@ -123,7 +163,7 @@ export class Executable {
 
         let errors: Error[] = this.globalErrors;
 
-        for(let module of this.moduleManager.modules){
+        for (let module of this.moduleManager.modules) {
             errors = errors.concat(module.errors);
         }
 

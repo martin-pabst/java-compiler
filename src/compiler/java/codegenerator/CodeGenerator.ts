@@ -6,7 +6,7 @@ import { JCM } from "../JavaCompilerMessages.ts";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTAnonymousClassNode, ASTBlockNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTMethodCallNode, ASTMethodDeclarationNode, ASTStatementNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
+import { ASTAnnotationNode, ASTAnonymousClassNode, ASTBlockNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTMethodCallNode, ASTMethodDeclarationNode, ASTStatementNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
 import { ObjectClass } from "../runtime/system/javalang/ObjectClassStringClass.ts";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
 import { Field } from "../types/Field.ts";
@@ -389,8 +389,11 @@ export class CodeGenerator extends StatementCodeGenerator {
                 }
 
                 let assignmentTemplate = `${Helpers.classes}.${classContext.identifier}.${field.getInternalName()} = §1;\n`;
+               
+                let initRange = fieldNode.initialization ? fieldNode.initialization.range : EmptyRange.instance;
 
-                snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, fieldNode.initialization!.range, snippet);
+                snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, initRange, snippet);
+                
 
                 snippet = new CodeSnippetContainer(snippet);
                 (<CodeSnippetContainer>snippet).addNextStepMark();
@@ -442,6 +445,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         const method = methodNode.method;
         if (!method) return;
 
+        method.setAnnotations(methodNode.annotations.map(this.compileAnnotation));
         this.registerUsagePosition(method, methodNode.identifierRange);
 
         if (methodNode.isContructor) {
@@ -578,6 +582,9 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         this.popSymbolTable();
 
+    }
+    compileAnnotation(node: ASTAnnotationNode): string {
+        return node.identifier;
     }
 
     checkIfSuperconstructorCallPresent(statement: ASTStatementNode | undefined): [boolean, boolean] {
@@ -772,7 +779,8 @@ export class CodeGenerator extends StatementCodeGenerator {
             isContructor: false,
             identifier: method.identifier,
             method: method,
-            program: undefined
+            program: undefined,
+            annotations : []
         }
 
         // build class...

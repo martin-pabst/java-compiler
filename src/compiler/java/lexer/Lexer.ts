@@ -975,6 +975,9 @@ export class Lexer {
         let posStart = this.pos;
 
         this.next(); // consume @
+
+        this.pushToken(TokenType.at, "@", line, column, this.line, column+1);
+
         let char = this.currentChar;
 
         while (specialCharList[char] == null && !this.isSpace(char) && !(char == endChar)) {
@@ -984,8 +987,10 @@ export class Lexer {
 
         let posEnd = this.pos;
 
-        let text = this.input.substring(posStart, posEnd);
-        this.pushToken(TokenType.at, text, line, column, this.line, this.column);
+        let text = this.input.substring(posStart+1, posEnd);
+
+        // TODO: Check if valid indentifier?
+        this.pushToken(TokenType.identifier, text, line, column, this.line, this.column);
     }
 
     lexIdentifierOrKeyword() {

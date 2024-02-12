@@ -8,7 +8,7 @@ import { Program, Step } from "./Program";
 import { KlassObjectRegistry, Klass } from "./StepFunction.ts";
 import { Thread, ThreadState } from "./Thread";
 
-export enum SchedulerState { not_initialized, running, paused, stopped }
+export enum SchedulerState { not_initialized, running, paused, stopped, error }
 
 export type ProgramPointerPositionInfo = {
     module: Module,
@@ -90,6 +90,9 @@ export class Scheduler {
                     if (this.runningThreads.length == 0 || threadState.state == ThreadState.terminatedWithException) {
                         this.stepCountSinceStartOfProgram += numberOfStepsInThisRun;
                         this.interpreter.setState(SchedulerState.stopped);
+                        if (threadState.state == ThreadState.terminatedWithException) {
+                            this.interpreter.setState(SchedulerState.error);
+                        }
                         return;
                     }
 
@@ -114,7 +117,7 @@ export class Scheduler {
             this.timeStampProgramStarted = performance.now();
             this.stepCountSinceStartOfProgram = 0;
             break;
-            case SchedulerState.stopped:
+            case SchedulerState.stopped, SchedulerState.error:
                 if(this.state == SchedulerState.running){
                     let dt = performance.now() - this.timeStampProgramStarted;
                     let stepsPerSecond = Math.round(this.stepCountSinceStartOfProgram/dt*1000);
