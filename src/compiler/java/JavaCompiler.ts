@@ -19,7 +19,7 @@ import { JavaCompiledModule } from "./module/JavaCompiledModule.ts";
 import { JavaModuleManager } from "./module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "./module/libraries/JavaLibraryModuleManager";
 import { Parser } from "./parser/Parser";
-import { Assertions } from "./runtime/unittests/Assertions.ts";
+import { AssertionHandler } from "./runtime/unittests/Assertions.ts";
 import { NonPrimitiveType } from "./types/NonPrimitiveType.ts";
 
 

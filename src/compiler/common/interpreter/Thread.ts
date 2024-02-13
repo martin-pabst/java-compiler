@@ -8,7 +8,7 @@ import { SystemException } from "./SystemException.ts";
 import { IThrowable } from "./ThrowableType.ts";
 import { ArithmeticExceptionClass } from "../../java/runtime/system/javalang/ArithmeticExceptionClass.ts";
 import { NullPointerExceptionClass } from "../../java/runtime/system/javalang/NullPointerExceptionClass.ts";
-import { Assertions, DummyAssertions } from "../../java/runtime/unittests/Assertions.ts";
+import { AssertionHandler, DummyAssertionHandler } from "../../java/runtime/unittests/Assertions.ts";
 import { ObjectClass, StringClass } from "../../java/runtime/system/javalang/ObjectClassStringClass.ts";
 import { NonPrimitiveType } from "../../java/types/NonPrimitiveType.ts";
 import { ClassCastExceptionClass } from "../../java/runtime/system/javalang/ClassCastExceptionClass.ts";
@@ -70,17 +70,17 @@ export class Thread {
 
     classes: KlassObjectRegistry;
 
-    _dummyAssertions: Assertions;
+    _dummyAssertions: AssertionHandler;
 
     get assertions() {
-        if (this.scheduler.interpreter.assertions) return this.scheduler.interpreter.assertions;
+        if (this.scheduler.interpreter.assertionHandler) return this.scheduler.interpreter.assertionHandler;
         return this._dummyAssertions;
     }
 
     constructor(public scheduler: Scheduler, initialStack: any[]) {
         this.s = initialStack;
         this.classes = scheduler.classObjectRegistry;
-        this._dummyAssertions = new DummyAssertions();
+        this._dummyAssertions = new DummyAssertionHandler();
     }
 
     /**

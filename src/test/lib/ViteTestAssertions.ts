@@ -1,12 +1,12 @@
 import { Thread } from "../../compiler/common/interpreter/Thread";
-import { Assertions } from "../../compiler/java/runtime/unittests/Assertions";
+import { AssertionHandler } from "../../compiler/java/runtime/unittests/Assertions";
 import { TestContext, assert, expect, it, test } from 'vitest';
 import chalk from 'chalk';
 import { createLogger } from "vite";
 import { Step } from "../../compiler/common/interpreter/Program";
 import { getLine, threeDez } from "../../tools/StringTools";
 
-export class ViteTestAssertions implements Assertions {
+export class ViteTestAssertions implements AssertionHandler {
 
     check = '\xB7';
 

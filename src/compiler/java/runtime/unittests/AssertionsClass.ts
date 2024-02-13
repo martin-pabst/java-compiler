@@ -3,11 +3,11 @@ import { Helpers, StepParams } from "../../../common/interpreter/StepFunction";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { ObjectClass } from "../system/javalang/ObjectClassStringClass";
-import { DummyAssertions } from "./Assertions";
-import { Assertions } from "./Assertions";
+import { DummyAssertionHandler } from "./Assertions";
+import { AssertionHandler } from "./Assertions";
 
 /**
- * Java wrapper class to call methods from {@link Assertions}-object inside {@link Interpreter.assertions}
+ * Java wrapper class to call methods from {@link AssertionHandler}-object inside {@link Interpreter.assertionHandler}
  */
 export class AssertionsClass extends ObjectClass {
 
@@ -21,23 +21,23 @@ export class AssertionsClass extends ObjectClass {
         },
         {
             type: "method", signature: "public static void assertTrue(boolean condition, string message)",
-            template: `${Helpers.assertions}.${DummyAssertions.prototype.assertTrue.name}(${StepParams.thread}, this, §1, §2)`
+            template: `${Helpers.assertions}.${DummyAssertionHandler.prototype.assertTrue.name}(${StepParams.thread}, this, §1, §2)`
         },
         {
             type: "method", signature: "public static void assertFalse(boolean condition, string message)",
-            template: `${Helpers.assertions}.${DummyAssertions.prototype.assertFalse.name}(${StepParams.thread}, this, §1, §2)`
+            template: `${Helpers.assertions}.${DummyAssertionHandler.prototype.assertFalse.name}(${StepParams.thread}, this, §1, §2)`
         },
         {
             type: "method", signature: "public static void assertEquals(int expected, int actual, string message)",
-            template: `${Helpers.assertions}.${DummyAssertions.prototype.assertEqualsNumber.name}(${StepParams.thread}, this, §1, §2, §3)`
+            template: `${Helpers.assertions}.${DummyAssertionHandler.prototype.assertEqualsNumber.name}(${StepParams.thread}, this, §1, §2, §3)`
         },
         {
             type: "method", signature: "public static void assertEquals(string expected, string actual, string message)",
-            template: `${Helpers.assertions}.${DummyAssertions.prototype.assertEqualsString.name}(${StepParams.thread}, this, §1, §2, §3)`
+            template: `${Helpers.assertions}.${DummyAssertionHandler.prototype.assertEqualsString.name}(${StepParams.thread}, this, §1, §2, §3)`
         },
         {
             type: "method", signature: "public static void fail(string message)",
-            template: `${Helpers.assertions}.${DummyAssertions.prototype.fail.name}(${StepParams.thread}, this, §1)`
+            template: `${Helpers.assertions}.${DummyAssertionHandler.prototype.fail.name}(${StepParams.thread}, this, §1)`
         },
     ]
 

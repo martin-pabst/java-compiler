@@ -1,7 +1,7 @@
 import { Step } from "../../../common/interpreter/Program";
 import { Thread } from "../../../common/interpreter/Thread";
 
-export interface Assertions {
+export interface AssertionHandler {
     assertTrue(thread: Thread, step: Step, condition: boolean, message: string): void;
     assertFalse(thread: Thread, step: Step, condition: boolean, message: string): void;
     assertEqualsNumber(thread: Thread, step: Step, expected: number, actual: number, message: string): void;
@@ -9,7 +9,7 @@ export interface Assertions {
     fail(thread: Thread, step: Step, message: string): void;
 }
 
-export class DummyAssertions implements Assertions {
+export class DummyAssertionHandler implements AssertionHandler {
     
     assertTrue(thread: Thread, step: Step, condition: boolean, message: string): void {
     }
