@@ -1,12 +1,12 @@
 import { Thread } from "../../compiler/common/interpreter/Thread";
-import { AssertionHandler } from "../../compiler/java/runtime/unittests/Assertions";
+import { AssertionObserver } from "../../compiler/java/runtime/unittests/AssertionObserver";
 import { TestContext, assert, expect, it, test } from 'vitest';
 import chalk from 'chalk';
 import { createLogger } from "vite";
 import { Step } from "../../compiler/common/interpreter/Program";
 import { getLine, threeDez } from "../../tools/StringTools";
 
-export class ViteTestAssertions implements AssertionHandler {
+export class ViteTestAssertions implements AssertionObserver {
 
     check = '\xB7';
 
@@ -14,27 +14,28 @@ export class ViteTestAssertions implements AssertionHandler {
 
     }
     
-    assertTrue(thread: Thread, step: Step, condition: boolean, message: string): void {
+    notifyOnAssertTrue(thread: Thread, step: Step, condition: boolean, message: string): void {
         if(condition !== true){
             this.logFailedTest(thread, step, message, "Expected: " + chalk.green("true") + ", actual: " + chalk.yellow("false"));
         }
         // expect(condition).to.equal(true, message);
     }
     
-    assertFalse(thread: Thread, step: Step, condition: boolean, message: string): void {
+    notifyOnAssertFalse(thread: Thread, step: Step, condition: boolean, message: string): void {
         if(condition !== false){
             this.logFailedTest(thread, step, message, "Expected: " + chalk.green("false") + ", actual: " + chalk.yellow("true"));
         }
         // expect(condition).to.equal(true, message);
     }
     
-    assertEqualsNumber(thread: Thread, step: Step, expected: number, actual: number, message: string): void {
+    notifyOnAssertEqualsNumber(thread: Thread, step: Step, expected: number, actual: number, message: string): void {
         if(Math.abs(expected - actual) > 1e-20){
             this.logFailedTest(thread, step, message, "Expected: " + chalk.green(expected) + ", actual: " + chalk.yellow(actual));
         }
         // expect(actual).to.approximately(expected, 1e-20, message);
     }
-    assertEqualsString(thread: Thread, step: Step, expected: string, actual: string, message: string): void {
+    
+    notifyOnAssertEqualsString(thread: Thread, step: Step, expected: string, actual: string, message: string): void {
         if(expected != actual){
             this.logFailedTest(thread, step, message, "Expected: " + chalk.green(expected) + ", actual: " + chalk.yellow(actual));
         }
@@ -42,7 +43,7 @@ export class ViteTestAssertions implements AssertionHandler {
         // assert.equal(actual, expected, message);
     }
 
-    fail(thread: Thread, step: Step, message: string): void {
+    notifyOnFail(thread: Thread, step: Step, message: string): void {
         this.logFailedTest(thread, step, "Intentional fail", message);
     }
 

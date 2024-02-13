@@ -1,5 +1,5 @@
 import { ActionManager } from "../../../testgui/ActionManager.ts";
-import { AssertionHandler } from "../../java/runtime/unittests/AssertionHandler.ts";
+import { AssertionObserver } from "../../java/runtime/unittests/AssertionObserver.ts";
 import { Executable } from "../Executable.ts";
 import { Module } from "../module/Module";
 import { CodeReachedAssertions } from "./CodeReachedAssertions.ts";
@@ -24,7 +24,7 @@ export class Interpreter {
 
     executable?: Executable;
 
-    assertionHandler?: AssertionHandler;
+    assertionObserverList: AssertionObserver[] = [];
     codeReachedAssertions: CodeReachedAssertions = new CodeReachedAssertions();
 
     // inputManager: InputManager;
@@ -100,8 +100,8 @@ export class Interpreter {
         }
     }
 
-    setAssertions(assertions: AssertionHandler){
-        this.assertionHandler = assertions;
+    attachAssertionObserver(observer: AssertionObserver){
+        this.assertionObserverList.push(observer);
     }
 
     initTimer() {

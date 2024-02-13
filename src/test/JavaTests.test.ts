@@ -152,7 +152,7 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
                 return;
             }
 
-            interpreter.setAssertions(new ViteTestAssertions(context, lineOffset));
+            interpreter.attachAssertionObserver(new ViteTestAssertions(context, lineOffset));
 
             interpreter.runMainProgramSynchronously();
 

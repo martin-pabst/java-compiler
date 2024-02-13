@@ -3,11 +3,10 @@ import { Helpers, StepParams } from "../../../common/interpreter/StepFunction";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { ObjectClass } from "../system/javalang/ObjectClassStringClass";
-import { DummyAssertionHandler } from "./Assertions";
-import { AssertionHandler } from "./Assertions";
+import { DummyAssertionObserver } from "./AssertionObserver";
 
 /**
- * Java wrapper class to call methods from {@link AssertionHandler}-object inside {@link Interpreter.assertionHandler}
+ * Java wrapper class to call methods from {@link AssertionHandler}-object inside {@link Interpreter.assertionObserverList}
  */
 export class AssertionsClass extends ObjectClass {
 
@@ -21,23 +20,23 @@ export class AssertionsClass extends ObjectClass {
         },
         {
             type: "method", signature: "public static void assertTrue(boolean condition, string message)",
-            template: `${Helpers.assertions}.${DummyAssertionHandler.prototype.assertTrue.name}(${StepParams.thread}, this, §1, §2)`
+            template: `for(__ao of ${Helpers.assertionObservers}){__ao.${DummyAssertionObserver.prototype.notifyOnAssertTrue.name}(${StepParams.thread}, this, §1, §2);}`
         },
         {
             type: "method", signature: "public static void assertFalse(boolean condition, string message)",
-            template: `${Helpers.assertions}.${DummyAssertionHandler.prototype.assertFalse.name}(${StepParams.thread}, this, §1, §2)`
+            template: `for(__ao of ${Helpers.assertionObservers}){__ao.${DummyAssertionObserver.prototype.notifyOnAssertFalse.name}(${StepParams.thread}, this, §1, §2);}`
         },
         {
             type: "method", signature: "public static void assertEquals(int expected, int actual, string message)",
-            template: `${Helpers.assertions}.${DummyAssertionHandler.prototype.assertEqualsNumber.name}(${StepParams.thread}, this, §1, §2, §3)`
+            template: `for(__ao of ${Helpers.assertionObservers}){__ao.${DummyAssertionObserver.prototype.notifyOnAssertEqualsNumber.name}(${StepParams.thread}, this, §1, §2, §3);}`
         },
         {
             type: "method", signature: "public static void assertEquals(string expected, string actual, string message)",
-            template: `${Helpers.assertions}.${DummyAssertionHandler.prototype.assertEqualsString.name}(${StepParams.thread}, this, §1, §2, §3)`
+            template: `for(__ao of ${Helpers.assertionObservers}){__ao.${DummyAssertionObserver.prototype.notifyOnAssertEqualsString.name}(${StepParams.thread}, this, §1, §2, §3);}`
         },
         {
             type: "method", signature: "public static void fail(string message)",
-            template: `${Helpers.assertions}.${DummyAssertionHandler.prototype.fail.name}(${StepParams.thread}, this, §1)`
+            template: `for(__ao of ${Helpers.assertionObservers}){__ao.${DummyAssertionObserver.prototype.notifyOnFail.name}(${StepParams.thread}, this, §1);}`
         },
     ]
 
