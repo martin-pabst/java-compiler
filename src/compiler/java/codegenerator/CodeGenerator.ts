@@ -390,7 +390,9 @@ export class CodeGenerator extends StatementCodeGenerator {
 
                 let assignmentTemplate = `${Helpers.classes}.${classContext.identifier}.${field.getInternalName()} = §1;\n`;
 
-                snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, fieldNode.initialization!.range, snippet);
+                let initRange = fieldNode.initialization ? fieldNode.initialization.range : EmptyRange.instance;
+
+                snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, initRange, snippet);
 
                 snippet = new CodeSnippetContainer(snippet);
                 (<CodeSnippetContainer>snippet).addNextStepMark();
