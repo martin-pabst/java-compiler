@@ -5,6 +5,7 @@ import { IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
+import { ArrayType } from "./ArrayType.ts";
 import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter";
 import { IJavaClass, JavaClass } from "./JavaClass";
 import { JavaEnum } from "./JavaEnum";
@@ -216,5 +217,36 @@ export class GenericMethod extends Method {
         return decl + "(" + this.parameters.map(p => p.getDeclaration()).join(", ") + ")";
     }
 
+    getCompletionLabel() {
+
+        let label = "";
+
+        if (this.returnParameterType != null && this.returnParameterType.identifier != "void") {
+            label += this.returnParameterType.toString() + " ";
+        }
+
+        label += this.identifier + "(";
+
+        let parameters = this.parameters;
+        for (let i = 0; i < parameters.length; i++) {
+
+            let p = parameters[i];
+            if(p.isEllipsis){
+                let arrayType: ArrayType = <any>p.type;
+                label += arrayType.elementType.toString() + "... " + p.identifier;
+            } else {
+                label += p.type.toString() + " " + p.identifier;
+            }
+
+            if (i < parameters.length - 1) {
+                label += ", ";
+            }
+
+        }
+
+        label += ")";
+
+        return label;
+    }
 
 }

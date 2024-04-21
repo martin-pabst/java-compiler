@@ -27,6 +27,83 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     abstract getExtends(): IJavaClass | undefined;
     abstract getImplements(): IJavaInterface[];
 
+
+    getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, 
+        rangeToReplace: monaco.IRange, methodContext: Method): monaco.languages.CompletionItem[] {
+
+        let itemList: monaco.languages.CompletionItem[] = [];
+
+        for (let field of this.getFields().filter(f => f.visibility <= visibilityUpTo)) {
+            itemList.push({
+                label: field.identifier + "",
+                kind: monaco.languages.CompletionItemKind.Field,
+                insertText: field.identifier,
+                range: rangeToReplace,
+                documentation: field.documentation == null ? undefined : {
+                    value: field.documentation
+                }
+            });
+        }
+
+        for (let method of this.getAllMethods().filter( m => m.classEnumInterface == this || m.visibility != TokenType.keywordPrivate)) {
+            if (method.isConstructor) {
+                if (methodContext?.isConstructor && methodContext != method && method.classEnumInterface == this.getExtends()) {
+                    this.pushSuperCompletionItem(itemList, method, leftBracketAlreadyThere, rangeToReplace);
+                    continue;
+                } else {
+                    continue;
+                }
+            }
+
+            itemList.push({
+                label: method.getCompletionLabel(),
+                filterText: method.identifier,
+                command: {
+                    id: "editor.action.triggerParameterHints",
+                    title: '123',
+                    arguments: []
+                },
+                kind: monaco.languages.CompletionItemKind.Method,
+                insertText: method.getCompletionSnippet(leftBracketAlreadyThere),
+                range: rangeToReplace,
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                documentation: method.documentation == null ? undefined : {
+                    value: method.documentation
+                }
+            });
+        }
+
+        itemList = itemList.concat(this.staticClass.getCompletionItems(visibilityUpTo,
+            leftBracketAlreadyThere, identifierAndBracketAfterCursor,
+            rangeToReplace));
+
+        return itemList;
+
+
+    }
+
+    pushSuperCompletionItem(itemList: monaco.languages.CompletionItem[], method: Method, leftBracketAlreadyThere: boolean,
+        rangeToReplace: monaco.IRange) {
+        itemList.push({
+            label: method.getCompletionLabel().replace(method.identifier, "super"),
+            filterText: "super",
+            command: {
+                id: "editor.action.triggerParameterHints",
+                title: '123',
+                arguments: []
+            },
+            kind: monaco.languages.CompletionItemKind.Method,
+            insertText: method.getCompletionSnippet(leftBracketAlreadyThere).replace(method.identifier, "super"),
+            range: rangeToReplace,
+            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            documentation: method.documentation == null ? undefined : {
+                value: method.documentation
+            }
+        });
+
+    }
+
+
     findImplementedInterface(identifier: string): IJavaInterface | undefined {
 
         for (let ext of this.getImplements()) {
@@ -72,7 +149,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 
 
 export class JavaClass extends IJavaClass {
-
+    
     isStatic: boolean = false;
     _isAbstract: boolean = false;
 
@@ -81,12 +158,12 @@ export class JavaClass extends IJavaClass {
 
     private extends?: IJavaClass;
     private implements: IJavaInterface[] = [];
-
+    
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
         super(identifier, identifierRange, path, module);
         this.genericTypeParameters = [];
     }
-
+    
     getAbstractMethodsNotYetImplemented(): Method[] {
 
         let abstractMethods: Method[] = [];
