@@ -1,6 +1,6 @@
 import { BaseSymbol, SymbolOnStackframe } from "../../common/BaseSymbolTable";
 import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
-import { EmptyRange, IRange } from "../../common/range/Range";
+import { EmptyRange, IRange, Range } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
@@ -47,11 +47,11 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     breakStack: LabelCodeSnippet[] = [];
     continueStack: LabelCodeSnippet[] = [];
 
+    
     constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore) {
         super(module, libraryTypestore, compiledTypesTypestore);
 
         this.initConstantTypeToTypeMap();
-
     }
 
     compileTerm(ast: ASTTermNode | undefined, isWriteAccess: boolean = false): CodeSnippet | undefined {
@@ -68,27 +68,43 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             case TokenType.plusPlusMinusMinusSuffix:
                 snippet = this.compilePlusPlusMinusMinusSuffixOperator(<ASTPlusPlusMinusMinusSuffixNode>ast); break;
             case TokenType.literal:
-                snippet = this.compileLiteralNode(<ASTLiteralNode>ast); break;
+                snippet = this.compileLiteralNode(<ASTLiteralNode>ast);
+                this.addTypePosition(snippet);
+                 break;
             case TokenType.symbol:
-                snippet = this.compileSymbolNode(<ASTSymbolNode>ast, isWriteAccess); break;
+                snippet = this.compileSymbolNode(<ASTSymbolNode>ast, isWriteAccess); 
+                this.addTypePosition(snippet);
+                break;
             case TokenType.methodCall:
-                snippet = this.compileMethodCall(<ASTMethodCallNode>ast); break;
+                snippet = this.compileMethodCall(<ASTMethodCallNode>ast); 
+                this.addTypePosition(snippet);
+                break;
             case TokenType.newArray:
                 snippet = this.compileNewArrayNode(<ASTNewArrayNode>ast); break;
             case TokenType.newObject:
-                snippet = this.compileNewObjectNode(<ASTNewObjectNode>ast); break;
+                snippet = this.compileNewObjectNode(<ASTNewObjectNode>ast); 
+                this.addTypePosition(snippet);
+                break;
             case TokenType.selectArrayElement:
-                snippet = this.compileSelectArrayElement(<ASTSelectArrayElementNode>ast); break;
+                snippet = this.compileSelectArrayElement(<ASTSelectArrayElementNode>ast); 
+                this.addTypePosition(snippet);
+                break;
             case TokenType.dereferenceAttribute:
-                snippet = this.compileDereferenceAttribute(<ASTAttributeDereferencingNode>ast); break;
+                snippet = this.compileDereferenceAttribute(<ASTAttributeDereferencingNode>ast); 
+                this.addTypePosition(snippet);
+                break;
             case TokenType.anonymousClass:
                 snippet = this.compileAnonymousInnerClass(<ASTAnonymousClassNode>ast); break;
             case TokenType.castValue:
                 snippet = this.compileExplicitCast(<ASTCastNode>ast); break;
             case TokenType.keywordThis:
-                snippet = this.compileKeywordThis(<ASTThisNode>ast); break;
+                snippet = this.compileKeywordThis(<ASTThisNode>ast); 
+                this.addTypePosition(snippet);
+                break;
             case TokenType.keywordSuper:
-                snippet = this.compileKeywordSuper(<ASTSuperNode>ast); break;
+                snippet = this.compileKeywordSuper(<ASTSuperNode>ast); 
+                this.addTypePosition(snippet);
+                break;
 
         }
 
@@ -97,6 +113,18 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         return snippet;
+    }
+
+    addTypePosition(snippet: CodeSnippet | undefined){
+        if(!snippet) return;
+        let type = snippet.type;
+        if(!type) return;
+        if(type.identifier == "string"){
+            type = this.libraryTypestore.getType("String")!;
+        }
+        if(snippet.range){
+            this.module.addTypePosition(Range.getEndPosition(snippet.range), type);
+        }
     }
 
     compileKeywordSuper(node: ASTSuperNode): CodeSnippet | undefined {

@@ -25,7 +25,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
     first: boolean = true;
     provideCompletionItems(model: monaco.editor.ITextModel, position: monaco.Position, context: monaco.languages.CompletionContext, token: monaco.CancellationToken): monaco.languages.ProviderResult<monaco.languages.CompletionList> {
 
-        setTimeout(() => {
+        // setTimeout(() => {
             //@ts-ignore
             // let sw = this.editor._contentWidgets["editor.widget.suggestWidget"]?.widget;
             // if (sw != null && sw._widget != null && this.first) {
@@ -36,7 +36,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
             // this.main.monaco.trigger('keyboard', 'editor.action.toggleSuggestionDetails', {});
             // this.main.monaco.trigger('keyboard', 'editor.action.triggerSuggest', {});
             // this.main.monaco.trigger(monaco.KeyMod.CtrlCmd + monaco.KeyCode.Space, 'type', {});
-        }, 300);
+        // }, 300);
 
         // let consoleModel = this.main.getBottomDiv()?.console?.editor?.getModel();
         // this.isConsole = model == consoleModel;

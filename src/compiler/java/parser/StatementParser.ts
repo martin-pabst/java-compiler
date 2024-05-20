@@ -72,6 +72,7 @@ export abstract class StatementParser extends TermParser {
     parseVariableDeclarationOrMethodDeclarationTerm(expectSemicolonAfterStatement: boolean): ASTStatementNode | undefined {
         let type = this.analyzeIfVariableDeclarationOrMethodDeclarationAhead(this.isCodeOutsideClassdeclarations);
         let statement: ASTStatementNode | undefined;
+        let line = this.cct.range.endLineNumber;
         switch (type) {
             case "variabledeclaration": statement = this.parseLocalVariableDeclaration();
                 break;
@@ -87,7 +88,9 @@ export abstract class StatementParser extends TermParser {
 
         if ((expectSemicolonAfterStatement && !this.expectSemicolon(true, true))
             || !statement) {
-            this.skipTillNextTokenAfter([TokenType.semicolon, TokenType.newline, TokenType.rightCurlyBracket]);
+            if(this.cct.range.startLineNumber == line){
+                this.skipTillNextTokenAfter([TokenType.semicolon, TokenType.newline, TokenType.rightCurlyBracket]);
+            }
         }
 
         return statement;

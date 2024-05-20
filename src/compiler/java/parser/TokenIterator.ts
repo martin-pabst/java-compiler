@@ -265,7 +265,6 @@ export class TokenIterator {
     skipTillNextTokenAfter(tt: TokenType[]) {
 
         while (this.pos < this.tokenList.length - 1) {
-            this.pos++;
             let token = this.tokenList[this.pos];
             if (TokenIterator.spaceTokenTypes.indexOf(token.tt) < 0) {
                 this.lastToken = this.cct;
@@ -275,6 +274,7 @@ export class TokenIterator {
                 this.nextToken();
                 return;
             }
+            this.pos++;
         }
     }
 

@@ -7,6 +7,7 @@ import { Position } from "../../common/range/Position.ts";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable.ts";
 import { TokenList } from "../lexer/Token";
 import { ASTBlockNode, ASTClassDefinitionNode, ASTGlobalNode } from "../parser/AST";
+import { ArrayType } from "../types/ArrayType.ts";
 import { JavaType } from "../types/JavaType";
 import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
@@ -37,19 +38,23 @@ export class JavaCompiledModule extends JavaBaseModule {
         super(file, false);
     }
 
-    addTypePosition(position: Position, type: NonPrimitiveType | StaticNonPrimitiveType){
-        let list = this.typePositions[position.lineNumber];
-        if(list == null){
-            list = [];
-            this.typePositions[position.lineNumber] = list;
+    addTypePosition(position: Position, type: JavaType){
+
+
+        if(type instanceof NonPrimitiveType || type instanceof StaticNonPrimitiveType || type instanceof ArrayType){
+            let list = this.typePositions[position.lineNumber];
+            if(list == null){
+                list = [];
+                this.typePositions[position.lineNumber] = list;
+            }
+            list.push({
+                type: type,
+                position: position
+            })
         }
-        list.push({
-            type: type,
-            position: position
-        })
     }
 
-    getTypeAtPosition(line: number, column: number): NonPrimitiveType | StaticNonPrimitiveType | undefined {
+    getTypeAtPosition(line: number, column: number): NonPrimitiveType | StaticNonPrimitiveType | ArrayType | undefined {
 
         return this.typePositions[line]?.find(tp => tp.position.column == column)?.type;
 

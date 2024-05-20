@@ -661,6 +661,8 @@ export class Lexer {
                 break;
             } else if (char == "\n" || char == endChar) {
                 this.pushError(JCM.endOfLineInsideStringLiteral(), text.length + 1, "error", line, column);
+                text += " "; // make open string literal longer so that JavaCompletionItemProvider realizes that cursor is inside string literal  
+                this.next();
                 break;
             }
             text += char;
