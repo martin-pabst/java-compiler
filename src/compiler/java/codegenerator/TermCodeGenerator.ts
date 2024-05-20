@@ -167,6 +167,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         if (!parameterValues) return undefined;
 
+        if (!node.type.resolvedType) return;
+        
         let klassType = <IJavaClass>node.type.resolvedType;
         /*
           consider inner classes:
@@ -422,7 +424,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         if (node.elements.length == 0) {
             // Empty array gets dimension == -1
-            return new StringCodeSnippet("[]", node.range, new ArrayType(elementType, -1, this.module, node.range));
+            return new StringCodeSnippet("[]", node.range, new ArrayType(elementType, 1, this.module, node.range));
         }
 
         let elementSnippets: CodeSnippet[] = [];
@@ -687,7 +689,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 this.pushError(JCM.plusPlusMinusMinusOnlyForTypes(), "error", ast);
             }
 
-            let template: CodeTemplate = new OneParameterTemplate("§1++");
+            let template: CodeTemplate = ast.operator == TokenType.plusPlus ? new OneParameterTemplate("§1++"): new OneParameterTemplate("§1--");
 
             return template.applyToSnippet(operand.type, ast.range, operand);
         }

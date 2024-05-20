@@ -44,6 +44,8 @@ import { IllegalMonitorStateExceptionClass } from "./javalang/IllegalMonitorSate
 import { SemaphoreClass } from "./javalang/SemaphoreClass.ts";
 import { RandomClass } from "./javalang/RandomClass.ts";
 import { DecimalFormatClass } from "./javalang/DecimalFormatClass.ts";
+import { OptionalClass } from "./javalang/OptionalClass.ts";
+import { FunctionInterface } from "./functional/FunctionInterface.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -71,9 +73,11 @@ export class SystemModule extends JavaLibraryModule {
             
 
             // Functional
-            ConsumerInterface,
+            ConsumerInterface, FunctionInterface,
 
             NumberClass, IntegerClass, LongClass, FloatClass, DoubleClass, ShortClass, BooleanClass,  // boxed primitive types
+
+            OptionalClass,
 
             MathClass, RandomClass, DecimalFormatClass,
             ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass, 

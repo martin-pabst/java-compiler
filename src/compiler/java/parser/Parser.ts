@@ -93,7 +93,7 @@ export class Parser extends StatementParser {
                 this.parseClassOrInterfaceOrEnum(this.module.ast!);
                 this.currentClassOrInterface = undefined;
             } else if (this.tt == TokenType.at) {
-                this.parseAnnotation();
+                this.maybeParseAndSkipAnnotation();
             } else {
                 this.parseMainProgramFragment();
             }
@@ -136,6 +136,8 @@ export class Parser extends StatementParser {
 
         if (this.expect(Parser.classOrInterfaceOrEnum, true)) {
 
+            //let annotation = this.maybeParseAndSkipAnnotation();
+            
             let identifier = this.expectAndSkipIdentifierAsToken();
 
             // back up current class before entering child class
@@ -144,7 +146,7 @@ export class Parser extends StatementParser {
             if (identifier.value != "") {
                 switch (tt) {
                     case TokenType.keywordClass:
-                        this.parseClassDeclaration(modifiers, identifier, parent);
+                        this.parseClassDeclaration(modifiers, identifier, parent, this.collectedAnnotations);
                         break;
                     case TokenType.keywordEnum:
                         this.parseEnumDeclaration(modifiers, identifier, parent);
@@ -160,8 +162,9 @@ export class Parser extends StatementParser {
         }
 
     }
+    
 
-    parseClassDeclaration(modifiers: ASTNodeWithModifiers, identifier: Token, parent: TypeScope) {
+    parseClassDeclaration(modifiers: ASTNodeWithModifiers, identifier: Token, parent: TypeScope, annotation: ASTAnnotationNode[]) {
         let classASTNode = this.nodeFactory.buildClassNode(modifiers, identifier, parent, this.collectedAnnotations);
         this.currentClassOrInterface = classASTNode;
 
@@ -196,7 +199,7 @@ export class Parser extends StatementParser {
                         this.parseClassOrInterfaceOrEnum(classASTNode, modifiers);
                         break;
                     case TokenType.at:
-                        this.parseAnnotation();
+                        this.maybeParseAndSkipAnnotation();
                         break;
                     case TokenType.leftCurlyBracket:
                         this.parseInstanceInitializer(classASTNode);
@@ -418,7 +421,7 @@ export class Parser extends StatementParser {
                         this.parseFieldOrMethodDeclaration(enumNode, modifiers);
                         break;
                     case TokenType.at:
-                        this.parseAnnotation();
+                        this.maybeParseAndSkipAnnotation();
                         break;
                     case TokenType.leftCurlyBracket:
                         this.parseInstanceInitializer(enumNode);
@@ -483,7 +486,7 @@ export class Parser extends StatementParser {
                         // if (returnType) this.parseMethodDeclaration(interfaceNode, modifiers, false, returnType);
                         break;
                     case TokenType.at:
-                        this.parseAnnotation();
+                        this.maybeParseAndSkipAnnotation();
                         break;
                     default:
                         this.pushErrorAndSkipToken();
@@ -554,11 +557,12 @@ export class Parser extends StatementParser {
         return genericParameterDefinitions;
     }
 
-    parseAnnotation() {
+    maybeParseAndSkipAnnotation() {
         this.nextToken(); // skip @
         let identifier = this.expectAndSkipIdentifierAsToken();
         if (identifier) {
             this.collectedAnnotations.push(this.nodeFactory.buildAnnotationNode(identifier));
+            return identifier;
         }
     }
 

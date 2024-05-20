@@ -17,6 +17,7 @@ import { Visibility } from "./Visibility";
 
 export class Method extends BaseSymbol {
 
+
     isStatic: boolean = false;
     isFinal: boolean = false;
     isAbstract: boolean = false;
@@ -26,6 +27,8 @@ export class Method extends BaseSymbol {
     isDefault: boolean = false;
 
     isSynchronized: boolean = false;
+
+    annotations : String[] = [];
 
     program?: Program;
 
@@ -207,6 +210,14 @@ export class Method extends BaseSymbol {
         return snippet;
     }
 
+
+    hasAnnotation(annotation: string) {
+        return this.annotations.includes(annotation);
+    }
+
+    setAnnotations(annotations: string[]) {
+        this.annotations = annotations;
+    }
 
 }
 

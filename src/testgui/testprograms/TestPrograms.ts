@@ -1,6 +1,6 @@
-export var testPrograms = {
-t1: `new`,
-synchronizedTest: `
+export var testProgramsList = [
+['t1', `new`],
+['synchronizedTest', `
 new A().test();
 
 
@@ -15,8 +15,8 @@ class A {
       }
       println("Hallo!");
    }
-}`,
-switchCaseWithConstant:`
+}`],
+['switchCaseWithConstant',`
 public class A {
    public static final String a = "ABC";
    public static final int x = 5;
@@ -38,8 +38,8 @@ public class A {
 
  print("Here!");
 
-`,
-threadTest:`
+`],
+['threadTest',`
 for(int n = 0; n < 10; n++){
    Thread t = new Thread(new Runnable(){
       void run(){
@@ -60,8 +60,8 @@ for(int i = 0; i < 1000000; i++){
       print("M: " + i/100000 + ", ");
    }
 }
-`,
-sortTest:`
+`],
+['sortTest',`
 ArrayList<String> list = new ArrayList<>();
 
 list.add("c");
@@ -78,8 +78,8 @@ class StringComparator implements Comparator<String> {
 
 list.sort(new StringComparator());
 
-list.forEach((s) -> {println(s);})`,
-ellipsisTest:`
+list.forEach((s) -> {println(s);})`],
+['ellipsisTest',`
 new A().test(12, "Nick", "Emma");
 
 
@@ -91,8 +91,8 @@ class A {
          println(names[i]);
       }
    }
-}`,
-consumerTestWithLambda:`
+}`],
+['consumerTestWithLambda',`
 var list = new ArrayList<String>();
 
 list.add("first");
@@ -103,8 +103,8 @@ list.add("third");
 list.forEach((e) -> {println(e);});
 
 println("Fertig!");
-`,
-   consumerTest:`
+`],
+['consumerTest',`
 var list = new ArrayList<String>();
 
 list.add("first");
@@ -119,8 +119,8 @@ var consumer = new Consumer<String>(){
 
 
 list.forEach(consumer);
-`,
-iteratorTest:`
+`],
+['iteratorTest',`
 class A implements Iterable<String> {
    Iterator<String> iterator(){
       return new Iterator<String>() {
@@ -139,8 +139,8 @@ class A implements Iterable<String> {
 for(var n: new A()){
    println(n);
 }
-`,
-   forLoopWithIterator:`
+`],
+   ['forLoopWithIterator',`
 var list = new ArrayList<Integer>();
 
 list.add(12);
@@ -149,8 +149,8 @@ list.add(14);
 
 for (Iterator<Integer> i = list.iterator(); i.hasNext(); ) {
     println(i.next());
-}`,
-enhancedForLoopTest:`
+}`],
+['enhancedForLoopTest',`
 int[] array = {1, 2, 3, 4};
 
 for(var n: array){
@@ -165,8 +165,8 @@ list.add(14);
 
 for(var n: list){
    println(n);
-}`,
-   dynamicCallingConvention:`
+}`],
+   ['dynamicCallingConvention',`
 ArrayList<String> arrayList = new ArrayList<String>();
 arrayList.add("First");
 
@@ -182,14 +182,14 @@ class A<E> extends ArrayList<E> {
    }
 
 
-}`,
-charAtError: `
+}`],
+['charAtError', `
 String s3 = "Das ist ein Test und noch ein Test";
 println(s3.charAt(2));
 
 //assertEquals(s3.charAt(2), 's', "String object charAt not working.");
-`,
-callingConventions:`
+`],
+['callingConventions',`
 ArrayList<String> arrayList = new ArrayList<String>();
 arrayList.add("First");
 
@@ -202,8 +202,8 @@ class A<E> extends ArrayList<E> {
       super.add(e);
    }
 }
-`,
-   superconstructorCall: `
+`],
+   ['superconstructorCall', `
 new A();
 
 class A {
@@ -218,8 +218,8 @@ class B {
       println("B's constructor called.");
    }
 }
-`,
-   super: `
+`],
+   ['super', `
 new C().test();
 
 
@@ -246,8 +246,9 @@ class C extends B {
       super.super.printName();
    }
 
-}`,
-   arrayLiteral: `
+}`],
+
+   ['arrayLiteral', `
 new A().test();
 
 class A {
@@ -258,8 +259,8 @@ class A {
    }
 
 }
-`,
-   cast: `
+`],
+   ['cast', `
 interface A {}
 
 class B implements A { }
@@ -276,8 +277,8 @@ A a = c;
 
 C c2 = (C)a;
 
-println("Fertig");`,
-   switch_case_with_enums: `
+println("Fertig");`],
+   ['switch_case_with_enums', `
 enum Test {
    eins, zwei, drei
 }
@@ -289,8 +290,8 @@ switch(t){
    case Test.zwei: println("zwei!");
 }
 
-println("Fertig");`,
-   switch_case: `
+println("Fertig");`],
+   ['switch_case', `
 class A {
    static final int x = 5;
    static final String y= "XYZ";
@@ -306,7 +307,8 @@ switch(t) {
    case A.x: break;
    default: println("C");
 }
-`, arrayListTest: `
+`], 
+['arrayListTest', `
 ArrayList<String> list = new ArrayList<String>();
 
 list.add("one");
@@ -320,7 +322,8 @@ String[] list2 = new String[1];
 String[] list3 = list.toArray(list2);
 
 println(list3[2]);
-`, genericParameterTest: `
+`],
+['genericParameterTest', `
 interface I1<T> {
    void doIt(T t);
 }
@@ -334,8 +337,8 @@ class C1 implements I1<String> {
 C1 x = new C1();
 I1 y = x;
 
-y.doIt("Test");`,
-   genericMethodTest1: `
+y.doIt("Test");`],
+   ['genericMethodTest1', `
 Test te = new Test();
 Integer i = Integer.valueOf(10);
 
@@ -346,8 +349,8 @@ class Test <T super Integer> {
       
       y.toString();
    }
-} `,
-   lambdaTest2: `
+} `],
+   ['lambdaTest2', `
 interface TestInterface {
    int foo(int n);
 }
@@ -362,8 +365,8 @@ class TestClass {
       println(t.foo(10));
    }
 }
-`,
-   lambdaTest: `
+`],
+   ['lambdaTest', `
 interface TestInterface {
    int foo(int n);
 }
@@ -371,8 +374,8 @@ interface TestInterface {
 TestInterface t = (x) -> { return x * 2; };
 
 println(t.foo(3));
- `,
-   anonymousInnerClassTest: `
+ `],
+   ['anonymousInnerClassTest', `
 A a = new A();
 Test t = a.test();
 t.doIt();
@@ -399,8 +402,8 @@ class A {
 interface Test {
    void doIt();
 }
-    `,
-   innerClassesTest: `
+    `],
+   ['innerClassesTest', `
    A a = new A();
    A.B b = a.getB();
    println(b.getOuterI());
@@ -441,8 +444,8 @@ interface Test {
    
    
    }
-`,
-   simpleGenericsTest: `
+`],
+   ['simpleGenericsTest', `
 A<String> a = new A<String>();
 a.set("Test");
 println(a.get());
@@ -459,8 +462,8 @@ class A<T> {
    }
 }
 
-`,
-   staticFieldsTest: `
+`],
+   ['staticFieldsTest', `
 A a = new A();
 a.test();
 
@@ -472,8 +475,8 @@ class A {
       println("x: " + x + ", y: " + y);
    }
 }
-`,
-   interfaceTest: `
+`],
+['interfaceTest', `
 T t = new T();
 t.def();
 
@@ -499,8 +502,8 @@ class S implements Test {
    int doIt(String s){
       return 20;
    }
-}`,
-   enumTest: `
+}`],
+   ['enumTest', `
 println(Test.eins.x);
 
 enum Test {
@@ -510,8 +513,8 @@ enum Test {
       x = wert;
    }
 }
-`,
-   singleStepTest: `
+`],
+   ['singleStepTest', `
 println("A");
 println("B");
 println("C");
@@ -521,8 +524,8 @@ println("F");
 println("G");
 println("H");
 println("I");
-`,
-   fieldTest: `
+`],
+['fieldTest', `
 
 A a = new A();
 a.privateA = 12;
@@ -550,8 +553,8 @@ class B {
       publicA = 10;
    }
 }
-`,
-   tryCatchTest: `
+`],
+['tryCatchTest', `
 A a = new A();
 a.testA();
 println("Main program continues...");
@@ -589,8 +592,8 @@ class MyException extends Exception {
 
 }
 
-`,
-   stringTest: `
+`],
+['stringTest', `
 String s = "A";
 
 new StringTest().test(s);
@@ -606,8 +609,8 @@ class StringTest {
       println("y" + s1);
    }
 } 
-`,
-   hanoi: `
+`],
+['hanoi', `
 Hanoi h = new Hanoi();
 h.erkläreLösung(1, 3, 4);    // Erkläre, wie man 4 Scheiben von Turm 1 zu Turm 3 bringt.
 
@@ -625,8 +628,8 @@ class Hanoi {
       erkläreLösung(übrigerTurmNummer, zielTurmNummer, n - 1);
    }
 
-}`,
-   simpleClass: `
+}`],
+['simpleClass', `
 Test m = new Test();
 int i = m.doIt("Hier!");
 
@@ -640,8 +643,8 @@ class Test {
       return j;
    }
 }
-`,
-   simpleWhileLoops: `
+`],
+['simpleWhileLoops', `
 int i = 0;
 while(i < 10000){
     int j = 0;
@@ -653,18 +656,18 @@ while(i < 10000){
     print(i + "; ");
     }
 }
-`,
-   arrayIndices: `
+`],
+['arrayIndices', `
 int[] test = new int[10];
 test[5] = 2;
 println(test[5]);
-`,
-   forLoop: `
+`],
+['forLoop', `
 for(int i = 0; i < 10; i++){
     print(i + ", ");
 }
-`,
-   primzahlzwillinge: `int max = 100000;
+`],
+['primzahlzwillinge', `int max = 100000;
 boolean[] isPrime = new boolean[max];
 for(int i = 0; i < max; i++) {
    isPrime[i] = true;
@@ -697,5 +700,70 @@ for(int i = 0; i < max - 2; i++) {
 }
 
 println();
-println(k + " Primzahlzwillinge gefunden!");`
-}
+println(k + " Primzahlzwillinge gefunden!");`],
+
+   ['testFuerListe', `class Test {
+      @Test
+      void leereListe() {
+         MyList l = new MyList();
+         assertEquals(0,l.size(), "Leere Liste hat Länge 0.");
+      }
+   
+      @Test
+      void zweiElemente() {
+         MyList l = new MyList();
+         l.push("ABC");
+         l.push("DEF");
+         assertEquals(2,l.size(), "Liste hat Länge 2.");
+      }
+   
+      @Test
+      void firstInFirstOut() {
+         MyList l = new MyList();
+         l.push("A");
+         l.push("B");
+         l.push("C");
+         assertEquals("A",l.poll().orElse(""), "A wurde zuerst eingefügt.");
+         assertEquals("B",l.poll().orElse(""), "Nach A wurde B eingefügt.");
+         assertEquals("C",l.poll().orElse(""), "Nach B wurde C eingefügt.");
+      }
+   
+      @Test
+      void pushPollSizeTest() {
+         MyList l = new MyList();
+         for(int i=0; i<20;i++) {
+            l.push("A");
+         }
+         for(int i=0; i<15;i++) {
+            l.poll();
+         }
+         assertEquals(5,l.size(),"20-15=5");
+      }
+   
+   }`],
+['listeVorlage', 
+`// Ergänze die folgende Vorlage, so dass die Klasse eine Liste nach dem FIFO - Prinzip implmentiert.
+class MyList {
+   int size;
+   // Ergänze weitere Attribute
+
+   MyList() {
+      // Hier soll eine leere Liste erzeugt werden.
+   }
+
+   // Diese Methode fügt der Liste "hinten" ein Element an.
+   void push (String e) {
+
+   }
+
+   // Diese Methode entnimmt der Liste "vorne" ein Element.
+   Optional<String> poll () {
+      return Optional.empty();
+   }
+
+   // Gibt die Länge der Liste zurück.
+   int size() {
+      return 0; // TODO: Füge korrekte Implementierung ein. 
+   }
+} 
+`]];

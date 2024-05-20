@@ -591,7 +591,11 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                         console.log(`${LibraryDeclarationParser.name}: Method ${mdecl.java.name} should have identifier ${m.getInternalName("java")}.`);
                     }
                 } else {
-                    klass.prototype[m.getInternalName("java")] = mdecl.java;
+                    if (m.isStatic) {
+                        klass[m.getInternalName("java")] = mdecl.java;
+                    } else {
+                        klass.prototype[m.getInternalName("java")] = mdecl.java;
+                    }
                 }
             }
 

@@ -8,6 +8,8 @@ import { LoadController } from "./LoadController";
 import { DummyPrintManager, PrintManager } from "./PrintManager";
 import { ProgramPointerPositionInfo, Scheduler, SchedulerState } from "./Scheduler";
 import { KlassObjectRegistry } from "./StepFunction.ts";
+import { File } from "../module/File.ts";
+
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
 
@@ -82,6 +84,24 @@ export class Interpreter {
         this.initTimer();
         this.setState(SchedulerState.not_initialized);
 
+    }
+
+    setTestExecutable(executable: Executable | undefined){
+        if(!executable) return;
+
+        executable.setTestExecutable();
+        this.executable = executable;
+        if(executable.testModule){
+            executable.compileToJavascript();
+            if(executable.isCompiledToJavascript){                
+                this.init(executable);
+                this.setState(SchedulerState.stopped);
+            } else {
+                this.setState(SchedulerState.not_initialized);
+            }
+        } else {
+            this.setState(SchedulerState.not_initialized);
+        }
     }
 
     setExecutable(executable: Executable | undefined){
@@ -211,7 +231,7 @@ export class Interpreter {
 
     runMainProgramSynchronously(){
         this.start();
-        while(this.scheduler.state != SchedulerState.stopped){
+        while(this.scheduler.state != SchedulerState.stopped && this.scheduler.state != SchedulerState.error){
             this.scheduler.run(100);
         }
     }
