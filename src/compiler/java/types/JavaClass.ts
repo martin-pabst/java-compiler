@@ -29,11 +29,11 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 
 
     getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, 
-        rangeToReplace: monaco.IRange, methodContext: Method): monaco.languages.CompletionItem[] {
+        rangeToReplace: monaco.IRange, methodContext: Method | undefined, onlyStatic?: false): monaco.languages.CompletionItem[] {
 
         let itemList: monaco.languages.CompletionItem[] = [];
 
-        for (let field of this.getFields().filter(f => f.visibility <= visibilityUpTo)) {
+        for (let field of this.getFields().filter(f => f.visibility <= visibilityUpTo && (f.isStatic || !onlyStatic))) {
             itemList.push({
                 label: field.identifier + "",
                 kind: monaco.languages.CompletionItemKind.Field,
@@ -45,7 +45,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
             });
         }
 
-        for (let method of this.getAllMethods().filter( m => m.classEnumInterface == this || m.visibility != TokenType.keywordPrivate)) {
+        for (let method of this.getAllMethods().filter( m => (m.classEnumInterface == this || m.visibility != TokenType.keywordPrivate) && (m.isStatic || !onlyStatic))) {
             if (method.isConstructor) {
                 if (methodContext?.isConstructor && methodContext != method && method.classEnumInterface == this.getExtends()) {
                     this.pushSuperCompletionItem(itemList, method, leftBracketAlreadyThere, rangeToReplace);
@@ -72,10 +72,6 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
                 }
             });
         }
-
-        itemList = itemList.concat(this.staticClass.getCompletionItems(visibilityUpTo,
-            leftBracketAlreadyThere, identifierAndBracketAfterCursor,
-            rangeToReplace));
 
         return itemList;
 
@@ -144,6 +140,14 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     }
 
     abstract isAbstract(): boolean;
+
+    hasAncestorOrIs(objectType: NonPrimitiveType): boolean {
+        if(this == objectType) return true;
+        let ext = this.getExtends();
+        if(ext == null) return false;
+        if(ext == objectType) return true;
+        return ext.hasAncestorOrIs(objectType);
+    }
 
 }
 
@@ -715,6 +719,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
 
         return null;
     }
+
 
 
 }

@@ -14,17 +14,17 @@ import { Visibility } from "./Visibility.ts";
 
 
 export class JavaEnum extends JavaTypeWithInstanceInitializer {
-
+    
     fields: Field[] = [];
     methods: Method[] = [];
-
+    
     private implements: JavaInterface[] = [];
-
+    
     
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule, public baseEnumClass: JavaClass) {
         super(identifier, identifierRange, path, module);
     }
-
+    
     getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): Field | undefined {
         let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
         if (field) return field;
@@ -114,6 +114,48 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
     getReifiedIdentifier(): string {
         return this.identifier;
+    }
+
+    getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, 
+        rangeToReplace: monaco.IRange, methodContext: Method, onlyStatic?: false): monaco.languages.CompletionItem[] {
+
+        let itemList: monaco.languages.CompletionItem[] = [];
+
+        for (let field of this.getFields().filter(f => f.visibility <= visibilityUpTo && (f.isStatic || !onlyStatic))) {
+            itemList.push({
+                label: field.identifier + "",
+                kind: monaco.languages.CompletionItemKind.Field,
+                insertText: field.identifier,
+                range: rangeToReplace,
+                documentation: field.documentation == null ? undefined : {
+                    value: field.documentation
+                }
+            });
+        }
+
+        for (let method of this.getAllMethods().filter( m => (m.classEnumInterface == this || m.visibility != TokenType.keywordPrivate) && (m.isStatic || !onlyStatic))) {
+
+            itemList.push({
+                label: method.getCompletionLabel(),
+                filterText: method.identifier,
+                command: {
+                    id: "editor.action.triggerParameterHints",
+                    title: '123',
+                    arguments: []
+                },
+                kind: monaco.languages.CompletionItemKind.Method,
+                insertText: method.getCompletionSnippet(leftBracketAlreadyThere),
+                range: rangeToReplace,
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                documentation: method.documentation == null ? undefined : {
+                    value: method.documentation
+                }
+            });
+        }
+
+        return itemList;
+
+
     }
 
 

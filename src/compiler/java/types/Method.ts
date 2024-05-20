@@ -171,6 +171,43 @@ export class Method extends BaseSymbol {
         return this.classEnumInterface.pathAndIdentifier + "." + this.getInternalNameWithGenericParameterIdentifiers("java");
     }
 
+    getCompletionLabel() {
+        return this.getDeclaration();
+    }
+
+    getCompletionSnippet(leftBracketAlreadyThere: boolean) {
+
+        if (leftBracketAlreadyThere) return this.identifier + "($0";
+
+        let snippet = "";
+
+        snippet += this.identifier + "(";
+
+        let isVoidReturn = this.returnParameterType == null || this.returnParameterType.identifier == "void";
+        let isVoidReturnDelta = isVoidReturn ? 1 : 0;
+
+        let parameters = this.parameters;
+        for (let i = 0; i < parameters.length; i++) {
+
+            let p = parameters[i];
+            snippet += "${" + ((i + 1) % (parameters.length + isVoidReturnDelta)) + ":" + p.identifier + "}";
+
+            if (i < parameters.length - 1) {
+                snippet += ", ";
+            }
+
+        }
+
+        snippet += ")";
+
+        if(this.returnParameterType == null || this.returnParameterType.identifier == "void"){
+            snippet += ";$0";
+        }
+
+        return snippet;
+    }
+
+
 }
 
 

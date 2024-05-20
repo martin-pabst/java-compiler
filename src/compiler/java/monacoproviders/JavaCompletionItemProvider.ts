@@ -3,9 +3,14 @@ import { JavaMainClass } from "../MainInterface";
 import { TokenType } from "../TokenType";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
-import { JavaClass } from "../types/JavaClass";
+import { ArrayType } from "../types/ArrayType";
+import { IJavaClass, JavaClass } from "../types/JavaClass";
+import { JavaEnum } from "../types/JavaEnum";
+import { IJavaInterface, JavaInterface } from "../types/JavaInterface";
+import { Method } from "../types/Method";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType";
+import { getVisibilityUpTo } from "../types/VisibilityTools";
 
 export class MyCompletionItemProvider implements monaco.languages.CompletionItemProvider {
 
@@ -22,11 +27,11 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
 
         setTimeout(() => {
             //@ts-ignore
-            let sw = this.editor._contentWidgets["editor.widget.suggestWidget"]?.widget;
-            if (sw != null && sw._widget != null && this.first) {
-                sw._widget.toggleDetails();
-                this.first = false;
-            }
+            // let sw = this.editor._contentWidgets["editor.widget.suggestWidget"]?.widget;
+            // if (sw != null && sw._widget != null && this.first) {
+            //     sw._widget.toggleDetails();
+            //     this.first = false;
+            // }
             // sw.toggleSuggestionDetails();
             // this.main.monaco.trigger('keyboard', 'editor.action.toggleSuggestionDetails', {});
             // this.main.monaco.trigger('keyboard', 'editor.action.triggerSuggest', {});
@@ -50,7 +55,8 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
         }
 
         let symbolTable = module.findSymbolTableAtPosition(position);
-        let classContext = symbolTable == null ? null : symbolTable.classContext;
+        let classContext = symbolTable == null ? undefined : symbolTable.classContext;
+        if(classContext?.identifier == '') classContext = undefined;    // auto generated main class
 
         let zeroLengthRange: IRange = Range.fromPositions(position);
 
@@ -83,6 +89,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
             return null;
         }
 
+        // Cursor inside identifier, optionally followed by left bracket?
         let ibMatch = textAfterPosition.match(/^([\wöäüÖÄÜß]*\(?)/);
         let identifierAndBracketAfterCursor = "";
         if (ibMatch != null && ibMatch.length > 0) {
@@ -102,7 +109,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
 
             this.main.ensureModuleIsCompiled(module);
             symbolTable = module.findSymbolTableAtPosition(position);
-            classContext = symbolTable == null ? null : symbolTable.classContext;
+            classContext = symbolTable == null ? undefined : symbolTable.classContext;
         }
 
         // let symbolTable = this.isConsole ? this.main.getDebugger().lastSymboltable : module.findSymbolTableAtPosition(position.lineNumber, position.column);
@@ -112,6 +119,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                 identifierAndBracketAfterCursor, classContext, leftBracketAlreadyThere);
         }
 
+        // inside variable or class identifier?
         let varOrClassMatch = textUntilPosition.match(/.*[^\wöäüÖÄÜß]([\wöäüÖÄÜß]*)$/);
 
         if (varOrClassMatch == null) {
@@ -151,14 +159,14 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
             let t = tokenList[pos];
             let p = t.range;
 
-            if(position.lineNumber > p.endLineNumber || position.lineNumber == p.endLineNumber && position.column > p.endColumn){
+            if (position.lineNumber > p.endLineNumber || position.lineNumber == p.endLineNumber && position.column > p.endColumn) {
                 posMin = pos;
                 continue;
             }
 
             if (position.lineNumber < p.startLineNumber || position.lineNumber == p.startLineNumber && position.column < p.startColumn) {
                 posMax = pos;
-                continue;                
+                continue;
             }
 
             return t.tt == TokenType.stringLiteral;
@@ -229,10 +237,10 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
     }
 
     getCompletionItemsInsideIdentifier(varOrClassMatch: RegExpMatchArray, position: monaco.Position, module: JavaCompiledModule, identifierAndBracketAfterCursor: string,
-        classContext: NonPrimitiveType,
+        classContext: NonPrimitiveType | StaticNonPrimitiveType | undefined,
         leftBracketAlreadyThere: boolean, symbolTable: JavaSymbolTable | undefined): monaco.languages.ProviderResult<monaco.languages.CompletionList> {
-        
-        if(!symbolTable){
+
+        if (!symbolTable) {
             return Promise.resolve({
                 suggestions: []
             });
@@ -248,10 +256,10 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
 
         let completionItems: monaco.languages.CompletionItem[] = [];
 
-        if (symbolTable.classContext && !symbolTable.methodContext && symbolTable.classContext instanceof JavaClass) {
-            completionItems = completionItems.concat(this.getOverridableMethodsCompletion(symbolTable.classContext));
+        if (symbolTable.classContext && !symbolTable.methodContext && symbolTable.classContext instanceof IJavaClass) {
+            completionItems = completionItems.concat(this.getOverridableMethodsCompletion(symbolTable.classContext, rangeToReplace));
         }
-        
+
         if (symbolTable != null) {
             completionItems = completionItems.concat(symbolTable.getLocalVariableCompletionItems(rangeToReplace).map(ci => {
                 ci.sortText = "aaa" + ci.label;
@@ -278,21 +286,21 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     detail: "Aufruf einer Methode einer Basisklasse",
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined,
+                    range: Range.fromPositions(position),
                     command: {
                         id: "editor.action.triggerSuggest",
                         title: '123',
                         arguments: []
-                    }    
+                    }
                 }
             )
         } else {
             // Use filename to generate completion-item for class ... ?
-            let name = module.file?.name;
+            let name = module.file?.filename;
             if (name != null) {
-                if (name.endsWith(".java")) name = name.substr(0, name.indexOf(".java"));
+                if (name.endsWith(".java")) name = name.substring(0, name.indexOf(".java"));
                 let m = name.match(/([\wöäüÖÄÜß]*)$/);
-                if (module.classDefinitionsAST.length == 0 && m != null && m.length > 0 && m[0] == name && name.length > 0) {
+                if (module.types.find(t => t.identifier == name) == null && m != null && m.length > 0 && m[0] == name && name.length > 0) {
                     name = name.charAt(0).toUpperCase() + name.substring(1);
                     completionItems.push({
                         label: "class " + name,
@@ -301,14 +309,14 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                         detail: "Definition der Klasse " + name,
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         kind: monaco.languages.CompletionItemKind.Snippet,
-                        range: undefined
+                        range: Range.fromPositions(position)
                     },
                     )
                 }
             }
         }
 
-        completionItems = completionItems.concat(this.getKeywordCompletion(symbolTable));
+        completionItems = completionItems.concat(this.getKeywordCompletion(symbolTable, Range.fromPositions(position)));
 
 
         // console.log("Complete variable/Class/Keyword " + text);
@@ -318,47 +326,36 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
         });
     }
 
-    getCompletionItemsAfterDot(dotMatch: RegExpMatchArray, position: monaco.Position, module: Module,
-        identifierAndBracketAfterCursor: string, classContext: Klass | StaticClass,
+    getCompletionItemsAfterDot(dotMatch: RegExpMatchArray, position: monaco.Position, module: JavaCompiledModule,
+        identifierAndBracketAfterCursor: string, classContext: NonPrimitiveType | StaticNonPrimitiveType | undefined,
         leftBracketAlreadyThere: boolean): monaco.languages.ProviderResult<monaco.languages.CompletionList> {
+
         let textAfterDot = dotMatch[2];
         let dotColumn = position.column - textAfterDot.length - 1;
-        let tStatic = module.getTypeAtPosition(position.lineNumber, dotColumn);
+        let type = module.getTypeAtPosition(position.lineNumber, dotColumn);
         let rangeToReplace: monaco.IRange =
         {
             startLineNumber: position.lineNumber, startColumn: position.column - textAfterDot.length,
             endLineNumber: position.lineNumber, endColumn: position.column + identifierAndBracketAfterCursor.length
         }
 
-        if (tStatic == null) return null;
-
-        let { type, isStatic } = tStatic;
-
-
         // console.log("Complete element.praefix; praefix: " + textAfterDot + ", Type: " + (type == null ? null : type.identifier));
 
 
-        if (type instanceof Klass) {
+        if (type instanceof IJavaClass) {
 
             let visibilityUpTo = getVisibilityUpTo(type, classContext);
 
-            if (isStatic) {
-                return Promise.resolve({
-                    suggestions: type.staticClass.getCompletionItems(visibilityUpTo, leftBracketAlreadyThere,
-                        identifierAndBracketAfterCursor, rangeToReplace)
-                });
-            } else {
-                return Promise.resolve({
-                    suggestions: type.getCompletionItems(visibilityUpTo, leftBracketAlreadyThere,
-                        identifierAndBracketAfterCursor, rangeToReplace, null)
-                });
-            }
+            return Promise.resolve({
+                suggestions: type.getCompletionItems(visibilityUpTo, leftBracketAlreadyThere,
+                    identifierAndBracketAfterCursor, rangeToReplace, undefined)
+            });
         }
 
-        if (type instanceof Interface) {
+        if (type instanceof IJavaInterface) {
             return Promise.resolve({
-                suggestions: type.getCompletionItems(leftBracketAlreadyThere,
-                    identifierAndBracketAfterCursor, rangeToReplace)
+                suggestions: type.getCompletionItems(TokenType.keywordPublic, leftBracketAlreadyThere,
+                    identifierAndBracketAfterCursor, rangeToReplace, undefined)
             });
         }
 
@@ -382,9 +379,9 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
         return null;
     }
 
-    getKeywordCompletion(symbolTable: SymbolTable): monaco.languages.CompletionItem[] {
+    getKeywordCompletion(symbolTable: JavaSymbolTable, range: Range): monaco.languages.CompletionItem[] {
         let keywordCompletionItems: monaco.languages.CompletionItem[] = [];
-        if (!this.isConsole && (symbolTable?.classContext == null || symbolTable?.method != null))
+        if (!this.isConsole && (symbolTable?.classContext == null || symbolTable?.methodContext != null))
             keywordCompletionItems = keywordCompletionItems.concat([
                 {
                     label: "while(Bedingung){Anweisungen}",
@@ -399,7 +396,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     },
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
                 {
                     label: "for(){}",
@@ -414,7 +411,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     // },    
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
                 {
                     label: "for(int i = 0; i < 10; i++){}",
@@ -429,7 +426,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     // },    
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
                 {
                     label: "switch(){case...}",
@@ -444,7 +441,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     },
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
                 {
                     label: "if(){}",
@@ -459,7 +456,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     // },
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
                 {
                     label: "if(){} else {}",
@@ -473,7 +470,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     // },
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
                 {
                     label: "else {}",
@@ -483,11 +480,11 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     sortText: 'aelse',
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
             ]);
 
-        if (symbolTable?.classContext == null || symbolTable?.method != null) {
+        if (symbolTable?.classContext == null || symbolTable?.methodContext != null) {
 
             keywordCompletionItems = keywordCompletionItems.concat([
                 {
@@ -496,7 +493,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     detail: "instanceof-Operator",
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
                 {
                     label: "print",
@@ -509,7 +506,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     },
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
                 {
                     label: "println",
@@ -522,7 +519,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     },
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
 
             ]);
@@ -537,7 +534,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     detail: "Klassendefinition",
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
                 {
                     label: "public class",
@@ -546,11 +543,11 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     detail: "Öffentliche Klassendefinition",
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 }
 
             ]);
-        } else if (!this.isConsole && symbolTable?.method == null) {
+        } else if (!this.isConsole && symbolTable?.methodContext == null) {
             keywordCompletionItems = keywordCompletionItems.concat([
                 {
                     label: "public",
@@ -559,7 +556,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     detail: "Schlüsselwort public",
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
                 {
                     label: "public void method(){}",
@@ -568,7 +565,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     detail: "Methodendefinition",
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
                 {
                     label: "protected",
@@ -577,7 +574,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     detail: "Schlüsselwort protected",
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
                 {
                     label: "static",
@@ -586,7 +583,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     detail: "Schlüsselwort static",
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 },
                 {
                     label: "private",
@@ -595,12 +592,12 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     detail: "Schlüsselwort private",
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 }
             ]);
         }
 
-        if (symbolTable != null && symbolTable.method != null) {
+        if (symbolTable != null && symbolTable.methodContext != null) {
             keywordCompletionItems = keywordCompletionItems.concat([
                 {
                     label: "return",
@@ -609,7 +606,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     detail: "Schlüsselwort return",
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 }
             ]);
         }
@@ -618,32 +615,32 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
 
     }
 
-    getOverridableMethodsCompletion(classContext: Klass) {
+    getOverridableMethodsCompletion(classContext: IJavaClass, range: IRange) {
 
         let keywordCompletionItems: monaco.languages.CompletionItem[] = [];
 
         let methods: Method[] = [];
-        let c = classContext.baseClass;
+        let c = classContext.getExtends();
         while (c != null) {
-            methods = methods.concat(c.methods.filter((m) => {
-                if (m.isAbstract || (m.program == null && m.invoke == null) || m.identifier.startsWith('onMouse') || m.identifier.startsWith('onKey')
-                || m.identifier.startsWith('onChange')) {
+            methods = methods.concat(c.getOwnMethods().filter((m) => {
+                if (m.isAbstract || m.program == null || m.identifier.startsWith('onMouse') || m.identifier.startsWith('onKey')
+                    || m.identifier.startsWith('onChange')) {
                     return true;
                 }
                 return false;
             }));
-            c = c.baseClass;
+            c = c.getExtends();
         }
 
-        for (let i of classContext.implements) {
-            methods = methods.concat(i.getMethods());
+        for (let i of classContext.getImplements()) {
+            methods = methods.concat(i.getAllMethods());
         }
 
         for (let m of methods) {
 
             let alreadyImplemented = false;
-            for (let m1 of classContext.methods) {
-                if (m1.signature == m.signature) {
+            for (let m1 of classContext.getOwnMethods()) {
+                if (m1.getSignature() == m.getSignature()) {
                     alreadyImplemented = true;
                     break;
                 }
@@ -653,15 +650,8 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
 
             let label: string = (m.isAbstract ? "implement " : "override ") + m.getCompletionLabel();
             let filterText = m.identifier;
-            let insertText = Visibility[m.visibility] + " " + (m.getReturnType() == null ? "void" : m.getReturnType().identifier) + " ";
-            insertText += m.identifier + "(";
-            for (let i = 0; i < m.getParameterList().parameters.length; i++) {
-                let p = m.getParameterList().parameters[i];
-                insertText += m.getParameterType(i).identifier + " " + p.identifier;
-                if (i < m.getParameterCount() - 1) {
-                    insertText += ", ";
-                }
-            }
+            let insertText = TokenType[m.visibility] + " " + (m.returnParameterType == null ? "void" : m.returnParameterType.getDeclaration()) + " ";
+            insertText += m.identifier + "(" + m.parameters.map(p => p.type.getDeclaration() + " " + p.identifier).join(", ");
             insertText += ") {\n\t$0\n}";
 
             keywordCompletionItems.push(
@@ -672,7 +662,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                     insertText: insertText,
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: undefined
+                    range: range
                 }
             );
 

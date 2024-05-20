@@ -22,6 +22,15 @@ export class StaticNonPrimitiveType extends JavaType {
         super(nonPrimitiveType.identifier, nonPrimitiveType.identifierRange, nonPrimitiveType.module);
     }
 
+    getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, 
+        rangeToReplace: monaco.IRange, methodContext: Method): monaco.languages.CompletionItem[]{
+
+            return this.nonPrimitiveType.getCompletionItems(visibilityUpTo, leftBracketAlreadyThere, identifierAndBracketAfterCursor,
+                rangeToReplace, methodContext, true);
+
+        } 
+
+
     fastExtendsImplements(identifier: string) {
         return this.nonPrimitiveType.fastExtendsImplements(identifier);
     }

@@ -30,7 +30,7 @@ export abstract class NonPrimitiveType extends JavaType {
     abstract getField(identifier: string, uptoVisibility: Visibility, forceStatic?: boolean): Field | undefined;
 
     abstract getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, 
-        rangeToReplace: monaco.IRange, methodContext: Method): monaco.languages.CompletionItem[]; 
+        rangeToReplace: monaco.IRange, methodContext: Method | undefined, onlyStatic?: boolean): monaco.languages.CompletionItem[]; 
     
     visibility: Visibility = TokenType.keywordPublic;
     isStatic: boolean = false; // static inner classes behave differently from non-static inner classes

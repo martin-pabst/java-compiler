@@ -28,6 +28,7 @@ import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts
 import { Executable } from "./compiler/common/Executable.ts";
 import { JavaHoverProvider } from "./compiler/java/monacoproviders/JavaHoverProvider.ts";
 import chalk from "chalk";
+import { MyCompletionItemProvider } from "./compiler/java/monacoproviders/JavaCompletionItemProvider.ts";
 
 export class Main implements JavaMainClass {
 
@@ -264,6 +265,7 @@ export class Main implements JavaMainClass {
 
   registerMonacoProviders(){
     monaco.languages.registerHoverProvider('myJava', new JavaHoverProvider(this.tabbedEditorManager.editor, this));
+    monaco.languages.registerCompletionItemProvider('myJava', new MyCompletionItemProvider(this.tabbedEditorManager.editor, this));
   }
 
 }

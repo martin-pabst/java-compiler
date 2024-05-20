@@ -10,8 +10,10 @@ import { ASTBlockNode, ASTClassDefinitionNode, ASTGlobalNode } from "../parser/A
 import { JavaType } from "../types/JavaType";
 import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
+import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { JavaBaseModule } from "./JavaBaseModule";
 import { JavaModuleManager } from "./JavaModuleManager";
+import { TypePosition } from "./TypePosition.ts";
 
 /**
  * A JavaModule represents a compiled Java Sourcecode File.
@@ -29,9 +31,30 @@ export class JavaCompiledModule extends JavaBaseModule {
 
     symbolTables: JavaSymbolTable[] = [];  // contains one symbol table for main program and one for each class/interface/enum in global scope    
 
+    typePositions: {[line: number]: TypePosition[]} = {};
+
     constructor(file: File, public moduleManager: JavaModuleManager){
         super(file, false);
     }
+
+    addTypePosition(position: Position, type: NonPrimitiveType | StaticNonPrimitiveType){
+        let list = this.typePositions[position.lineNumber];
+        if(list == null){
+            list = [];
+            this.typePositions[position.lineNumber] = list;
+        }
+        list.push({
+            type: type,
+            position: position
+        })
+    }
+
+    getTypeAtPosition(line: number, column: number): NonPrimitiveType | StaticNonPrimitiveType | undefined {
+
+        return this.typePositions[line]?.find(tp => tp.position.column == column)?.type;
+
+    }
+
 
     setBreakpoint(line: number){
         let steps = this.findSteps(line);

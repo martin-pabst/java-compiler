@@ -61,6 +61,37 @@ export abstract class IJavaInterface extends NonPrimitiveType {
         return this.identifier;
     }
 
+    getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, 
+        rangeToReplace: monaco.IRange, methodContext: Method | undefined, onlyStatic?: false): monaco.languages.CompletionItem[] {
+
+        let itemList: monaco.languages.CompletionItem[] = [];
+
+        for (let method of this.getAllMethods().filter( m => (m.classEnumInterface == this || m.visibility != TokenType.keywordPrivate) && (m.isStatic || !onlyStatic))) {
+
+            itemList.push({
+                label: method.getCompletionLabel(),
+                filterText: method.identifier,
+                command: {
+                    id: "editor.action.triggerParameterHints",
+                    title: '123',
+                    arguments: []
+                },
+                kind: monaco.languages.CompletionItemKind.Method,
+                insertText: method.getCompletionSnippet(leftBracketAlreadyThere),
+                range: rangeToReplace,
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                documentation: method.documentation == null ? undefined : {
+                    value: method.documentation
+                }
+            });
+        }
+
+        return itemList;
+
+
+    }
+
+
 }
 
 
