@@ -11,7 +11,7 @@ export class JavaDefinitionProvider implements monaco.languages.DefinitionProvid
     provideDefinition(model: monaco.editor.ITextModel, position: monaco.Position, token: monaco.CancellationToken): monaco.languages.ProviderResult<monaco.languages.Definition> {
         let usagePosition = this.getUsagePosition(position);
         
-        let uri = usagePosition?.symbol.module.file.monacoModel?.uri;
+        let uri = usagePosition?.symbol.module.file.getMonacoModel()?.uri;
 
         if(!uri) return;
 

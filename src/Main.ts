@@ -39,6 +39,7 @@ import { JavaSymbolMarker } from "./compiler/java/monacoproviders/JavaSymbolMark
 import { JavaRenameProvider } from "./compiler/java/monacoproviders/JavaRenameProvider.ts";
 import { JavaDefinitionProvider } from "./compiler/java/monacoproviders/JavaDefinitionProvider.ts";
 import { Range } from "./compiler/common/range/Range.ts";
+import { JavaReferenceProvider } from "./compiler/java/monacoproviders/JavaReferenceProvider.ts";
 
 export class Main implements MainClass {
 
@@ -103,12 +104,12 @@ export class Main implements MainClass {
 
     for (let i = 0; i < 3; i++) {
       let file = new File("module " + i);
-      file.monacoModel = monaco.editor.createModel("", "myJava");
+      file.createMonacolModel();
 
       this.files.push(file);
     }
     let file = new File("Tests");
-    file.monacoModel = monaco.editor.createModel("", "myJava");
+    file.createMonacolModel();
     //file.setText(testPrograms.testFuerListe.trim());
     this.files.push(file);
 
@@ -181,7 +182,7 @@ export class Main implements MainClass {
     if (model == null) return undefined;
 
     for (let file of this.files) {
-      if (file.monacoModel == model) {
+      if (file.getMonacoModel() == model) {
         return this.compiler.lastCompiledExecutable?.moduleManager.findModuleByFile(file);
       }
     }
@@ -314,7 +315,7 @@ export class Main implements MainClass {
       }
     })
 
-    monaco.editor.setModelMarkers(module.file.monacoModel!, "martin", markers);
+    monaco.editor.setModelMarkers(module.file.getMonacoModel()!, "martin", markers);
 
   }
 
@@ -346,16 +347,17 @@ export class Main implements MainClass {
     monaco.languages.registerCompletionItemProvider('myJava', new JavaCompletionItemProvider(editor, this));
     monaco.languages.registerRenameProvider('myJava', new JavaRenameProvider(editor, this));
     monaco.languages.registerDefinitionProvider('myJava', new JavaDefinitionProvider(editor, this));
+    monaco.languages.registerReferenceProvider('myJava', new JavaReferenceProvider(editor, this));
     new JavaSymbolMarker(this.tabbedEditorManager.editor.editor, this);
 
     let that = this;
     monaco.editor.registerEditorOpener({
       openCodeEditor(source: monaco.editor.ICodeEditor, resource: monaco.Uri, selectionOrPosition?: monaco.IRange | monaco.IPosition): boolean | Promise<boolean> {
         
-        let module = that.getCompiler().moduleManager.modules.find(m => m.file.monacoModel?.uri == resource);
+        let module = that.getCompiler().moduleManager.modules.find(m => m.file.getMonacoModel()?.uri == resource);
 
         if(module){
-          let model = module.file.monacoModel;
+          let model = module.file.getMonacoModel();
           if(model){
             editor.setModel(model);
             editor.setPosition(Range.getStartPosition(<monaco.IRange>selectionOrPosition));

@@ -27,10 +27,10 @@ export class JavaRenameProvider implements monaco.languages.RenameProvider {
     
     
             for(let up of allUsagePositions){
-                if(!up.file.monacoModel?.uri) continue;
+                if(!up.file.getMonacoModel()!?.uri) continue;
                 edits.push({
-                    resource: up.file.monacoModel?.uri,
-                    versionId: up.file.monacoModel.getVersionId(),
+                    resource: up.file.getMonacoModel()!.uri,
+                    versionId: up.file.getMonacoModel()!.getVersionId(),
                     textEdit: {range: up.range, text: newName}
                 })
                 up.file.isSaved = false;
