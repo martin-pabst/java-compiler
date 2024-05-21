@@ -1,6 +1,6 @@
 import { IRange, Range } from "../../common/range/Range";
 import { JavaCompiler } from "../JavaCompiler.ts";
-import { JavaMainClass } from "../MainInterface";
+import { MainClass } from "../MainInterface";
 import { TokenType } from "../TokenType";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
@@ -12,14 +12,14 @@ import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType";
 import { getVisibilityUpTo } from "../types/VisibilityTools";
 
-export class MyCompletionItemProvider implements monaco.languages.CompletionItemProvider {
+export class JavaCompletionItemProvider implements monaco.languages.CompletionItemProvider {
 
     isConsole: boolean = false;
 
     public triggerCharacters: string[] = ['.', 'abcdefghijklmnopqrstuvwxyzäöüß_ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ', ' '];
 
     constructor(private editor: monaco.editor.IStandaloneCodeEditor,
-        private main: JavaMainClass) {
+        private main: MainClass) {
     }
 
     first: boolean = true;

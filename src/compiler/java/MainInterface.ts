@@ -1,7 +1,7 @@
 import { Compiler } from "../common/Compiler.ts";
 import { Module } from "../common/module/Module.ts";
 
-export interface JavaMainClass {
+export interface MainClass {
 
     getModuleForMonacoModel(model: monaco.editor.ITextModel | null): Module | undefined;
     
@@ -9,4 +9,5 @@ export interface JavaMainClass {
 
     getCompiler(): Compiler;
 
+    getAllModules(): Module[];
 }

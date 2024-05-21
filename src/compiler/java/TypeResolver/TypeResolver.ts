@@ -319,10 +319,6 @@ export class TypeResolver {
             }
         }
 
-        if(type){
-            module.registerTypeUsage(type, typeNode.identifiers[0].identifierRange);
-        }
-
         let i = 1;
         while(i < typeNode.identifiers.length && type){
             let id = typeNode.identifiers[i];

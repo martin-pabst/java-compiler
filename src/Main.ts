@@ -24,7 +24,7 @@ import { TabbedEditorManager } from "./tools/TabbedEditorManager.ts";
 import { TestResultViewer } from "./testgui/TestResultViewer.ts";
 
 import '/include/css/main.css';
-import { JavaMainClass } from "./compiler/java/MainInterface.ts";
+import { MainClass } from "./compiler/java/MainInterface.ts";
 import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts";
 import { Executable } from "./compiler/common/Executable.ts";
 import { JavaHoverProvider } from "./compiler/java/monacoproviders/JavaHoverProvider.ts";
@@ -34,16 +34,17 @@ import { GUITestRunner } from "./test/lib/GUITestRunner.ts";
 import { TerminalPrintManager } from "./testgui/TerminalPrintManager.ts";
 import { OptionView } from "./testgui/OptionView.ts";
 
-import { MyCompletionItemProvider as JavaCompletionItemProvider } from "./compiler/java/monacoproviders/JavaCompletionItemProvider.ts";
+import { JavaCompletionItemProvider as JavaCompletionItemProvider } from "./compiler/java/monacoproviders/JavaCompletionItemProvider.ts";
 import { JavaSymbolMarker } from "./compiler/java/monacoproviders/JavaSymbolMarker.ts";
+import { JavaRenameProvider } from "./compiler/java/monacoproviders/JavaRenameProvider.ts";
 
-export class Main implements JavaMainClass {
+export class Main implements MainClass {
 
   language: Language;
 
   insightTabsManager: TabManager;
   tabbedEditorManager: TabbedEditorManager;
-  testResultViewer : TestResultViewer;
+  testResultViewer: TestResultViewer;
 
   tokenDiv: HTMLDivElement;
   astDiv: HTMLDivElement;
@@ -89,9 +90,9 @@ export class Main implements JavaMainClass {
 
     this.testResultViewer = new TestResultViewer();
 
-    this.testResultViewer.addEventListener('run-all-tests', 
-      (e) => {if(e.type == "run-all-tests") this.runTest();});
-      
+    this.testResultViewer.addEventListener('run-all-tests',
+      (e) => { if (e.type == "run-all-tests") this.runTest(); });
+
     this.testDiv.appendChild(this.testResultViewer);
     this.astComponent = new AstComponent(this.astDiv);
 
@@ -109,7 +110,7 @@ export class Main implements JavaMainClass {
     //file.setText(testPrograms.testFuerListe.trim());
     this.files.push(file);
 
-    
+
     this.tabbedEditorManager = new TabbedEditorManager(document.getElementById('editorOuter')!,
       this.files);
 
@@ -175,7 +176,7 @@ export class Main implements JavaMainClass {
   }
 
   getModuleForMonacoModel(model: monaco.editor.ITextModel | null): JavaCompiledModule | undefined {
-    if(model == null) return undefined;
+    if (model == null) return undefined;
 
     for (let file of this.files) {
       if (file.monacoModel == model) {
@@ -194,14 +195,14 @@ export class Main implements JavaMainClass {
     }, 'myButton');
 
     let programNames = testProgramsList.map((value) => value[0])
-    
+
     let optionView = new OptionView();
     optionView.setAttribute('programs', JSON.stringify(programNames));
 
-    optionView.addEventListener('set-program', 
-    (e:any) => {if(e.type == "set-program") this.setProgram(e!.detail!.programName);});
+    optionView.addEventListener('set-program',
+      (e: any) => { if (e.type == "set-program") this.setProgram(e!.detail!.programName); });
     firstRow.appendChild(optionView);
-    
+
     let programControlButtonDiv = DOM.makeDiv(buttonDiv, "programControlbuttons");
 
     this.programControlButtons = new ProgramControlButtons(jQuery(programControlButtonDiv), this.interpreter, this.actionManager);
@@ -229,7 +230,7 @@ export class Main implements JavaMainClass {
       file.setText(`${className} testObject = new ${className}(); testObject.${methodName}();`);
       this.compiler.files.push(file);
       executable = this.compiler.compileIfDirty();
-      if(executable?.isCompiledToJavascript == false) {
+      if (executable?.isCompiledToJavascript == false) {
         testRunner.endTest(true);
         continue;
       }
@@ -242,7 +243,7 @@ export class Main implements JavaMainClass {
     }
 
     let testResults = testRunner.getTestResults();
-    
+
     this.testResultViewer.setAttribute('results', JSON.stringify(testResults));
   }
 
@@ -338,8 +339,10 @@ export class Main implements JavaMainClass {
   }
 
   registerMonacoProviders() {
-    monaco.languages.registerHoverProvider('myJava', new JavaHoverProvider(this.tabbedEditorManager.editor.editor, this));
-    monaco.languages.registerCompletionItemProvider('myJava', new JavaCompletionItemProvider(this.tabbedEditorManager.editor.editor, this));
+    let editor = this.tabbedEditorManager.editor.editor;
+    monaco.languages.registerHoverProvider('myJava', new JavaHoverProvider(editor, this));
+    monaco.languages.registerCompletionItemProvider('myJava', new JavaCompletionItemProvider(editor, this));
+    monaco.languages.registerRenameProvider('myJava', new JavaRenameProvider(editor, this));
     new JavaSymbolMarker(this.tabbedEditorManager.editor.editor, this);
   }
 
@@ -351,6 +354,10 @@ export class Main implements JavaMainClass {
         return;
       }
     }
+  }
+
+  getAllModules(): Module[] {
+    return this.getCompiler().moduleManager.modules;
   }
 
 }

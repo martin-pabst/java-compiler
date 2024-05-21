@@ -1,5 +1,5 @@
 import { Module } from "../../common/module/Module.ts";
-import { JavaMainClass } from "../MainInterface.ts";
+import { MainClass } from "../MainInterface.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 
 export class JavaSymbolMarker {
@@ -7,7 +7,7 @@ export class JavaSymbolMarker {
     decorations?: monaco.editor.IEditorDecorationsCollection;
 
     constructor(private editor: monaco.editor.IStandaloneCodeEditor,
-        private main: JavaMainClass) {
+        private main: MainClass) {
 
             editor.onDidChangeCursorPosition((event) => {
                 this.onDidChangeCursorPosition(event);

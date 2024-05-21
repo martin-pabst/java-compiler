@@ -4,6 +4,8 @@ export class File {
     private _text: string = "";
     monacoModel?: monaco.editor.ITextModel;
 
+    isSaved: boolean = true;
+
 
     constructor(filename?: string){
         this.filename = filename || "";
