@@ -4,5 +4,19 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"workbench.colorCustomizations": {
+			"titleBar.activeBackground": "#0cc115",
+			"titleBar.activeForeground": "#000000",
+			"titleBar.inactiveBackground": "#69ef70",
+			"titleBar.inactiveForeground": "#000000",
+			"titleBar.border": "#0cc115",
+			"activityBar.foreground": "#69ef70",
+			"tab.activeBorder": "#69ef70",
+			"iLoveWorkSpaceColors": true,
+			"iLoveWorkSpaceRandom": false,
+			"useWorkspaceLite": true
+			}
+
+	}
 }
