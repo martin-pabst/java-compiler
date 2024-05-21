@@ -29,7 +29,6 @@ import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts
 import { Executable } from "./compiler/common/Executable.ts";
 import { JavaHoverProvider } from "./compiler/java/monacoproviders/JavaHoverProvider.ts";
 import chalk from "chalk";
-import { DummyAssertions } from "./compiler/java/runtime/unittests/Assertions.ts";
 import { GUITestAssertions } from "./test/lib/GUITestAssertions.ts";
 import { GUITestRunner } from "./test/lib/GUITestRunner.ts";
 import { TerminalPrintManager } from "./testgui/TerminalPrintManager.ts";
@@ -215,7 +214,7 @@ export class Main implements JavaMainClass {
     let testMethods = executable.getTestMethods();
 
     let testRunner = new GUITestRunner();
-    this.interpreter.setAssertions(new GUITestAssertions(testRunner));
+    this.interpreter.attachAssertionObserver(new GUITestAssertions(testRunner));
     for (let testMethode of testMethods) {
       let classEnumInterface = testMethode.classEnumInterface;
       let className = classEnumInterface.identifier;
@@ -336,8 +335,8 @@ export class Main implements JavaMainClass {
   }
 
   registerMonacoProviders() {
-    monaco.languages.registerHoverProvider('myJava', new JavaHoverProvider(this.tabbedEditorManager.editor, this));
-    monaco.languages.registerCompletionItemProvider('myJava', new MyCompletionItemProvider(this.tabbedEditorManager.editor, this));
+    monaco.languages.registerHoverProvider('myJava', new JavaHoverProvider(this.tabbedEditorManager.editor.editor, this));
+    monaco.languages.registerCompletionItemProvider('myJava', new MyCompletionItemProvider(this.tabbedEditorManager.editor.editor, this));
   }
 
   setProgram(programName: string) {
