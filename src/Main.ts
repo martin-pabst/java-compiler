@@ -34,7 +34,7 @@ import { GUITestRunner } from "./test/lib/GUITestRunner.ts";
 import { TerminalPrintManager } from "./testgui/TerminalPrintManager.ts";
 import { OptionView } from "./testgui/OptionView.ts";
 
-import { MyCompletionItemProvider } from "./compiler/java/monacoproviders/JavaCompletionItemProvider.ts";
+import { MyCompletionItemProvider as JavaCompletionItemProvider } from "./compiler/java/monacoproviders/JavaCompletionItemProvider.ts";
 import { JavaSymbolMarker } from "./compiler/java/monacoproviders/JavaSymbolMarker.ts";
 
 export class Main implements JavaMainClass {
@@ -339,7 +339,7 @@ export class Main implements JavaMainClass {
 
   registerMonacoProviders() {
     monaco.languages.registerHoverProvider('myJava', new JavaHoverProvider(this.tabbedEditorManager.editor.editor, this));
-    monaco.languages.registerCompletionItemProvider('myJava', new MyCompletionItemProvider(this.tabbedEditorManager.editor.editor, this));
+    monaco.languages.registerCompletionItemProvider('myJava', new JavaCompletionItemProvider(this.tabbedEditorManager.editor.editor, this));
     new JavaSymbolMarker(this.tabbedEditorManager.editor.editor, this);
   }
 

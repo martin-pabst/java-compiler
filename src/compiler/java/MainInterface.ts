@@ -1,15 +1,12 @@
-import { JavaBaseModule } from "./module/JavaBaseModule.ts";
+import { Compiler } from "../common/Compiler.ts";
 import { Module } from "../common/module/Module.ts";
-import { JavaCompiledModule } from "./module/JavaCompiledModule.ts";
-import { Executable } from "../common/Executable.ts";
-import { JavaCompiler } from "./JavaCompiler.ts";
 
 export interface JavaMainClass {
 
-    getModuleForMonacoModel(model: monaco.editor.ITextModel | null): JavaCompiledModule | undefined;
+    getModuleForMonacoModel(model: monaco.editor.ITextModel | null): Module | undefined;
     
-    ensureModuleIsCompiled(module: JavaCompiledModule): void;
+    ensureModuleIsCompiled(module: Module): void;
 
-    getCompiler(): JavaCompiler;
+    getCompiler(): Compiler;
 
 }

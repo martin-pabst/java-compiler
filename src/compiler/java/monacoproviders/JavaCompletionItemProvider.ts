@@ -1,4 +1,5 @@
 import { IRange, Range } from "../../common/range/Range";
+import { JavaCompiler } from "../JavaCompiler.ts";
 import { JavaMainClass } from "../MainInterface";
 import { TokenType } from "../TokenType";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable";
@@ -48,7 +49,9 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
         // let module: Module = this.isConsole ? this.main.getBottomDiv()?.console?.compiler.module :
         //     this.main.getCurrentWorkspace().getModuleByMonacoModel(model);
 
-        let module = this.main.getModuleForMonacoModel(model);
+        if(model.getLanguageId() != 'myJava') return;
+
+        let module = <JavaCompiledModule>this.main.getModuleForMonacoModel(model);
 
         if (module == null) {
             return null;
@@ -178,8 +181,10 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
     getCompletionItemsAfterNew(module: JavaCompiledModule, classContext: NonPrimitiveType | undefined, range: IRange): monaco.languages.ProviderResult<monaco.languages.CompletionList> {
         let completionItems: monaco.languages.CompletionItem[] = [];
 
-        completionItems = completionItems.concat(this.main.getCompiler().libraryModuleManager.typestore.getTypeCompletionItems(classContext, range, true, false));
-        completionItems = completionItems.concat(this.main.getCompiler().moduleManager.typestore.getTypeCompletionItems(classContext, range, true, false));
+        let compiler = <JavaCompiler>this.main.getCompiler();
+
+        completionItems = completionItems.concat(compiler.libraryModuleManager.typestore.getTypeCompletionItems(classContext, range, true, false));
+        completionItems = completionItems.concat(compiler.moduleManager.typestore.getTypeCompletionItems(classContext, range, true, false));
 
 
         return Promise.resolve({
@@ -267,8 +272,10 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
             }));
         }
 
-        completionItems = completionItems.concat(this.main.getCompiler().libraryModuleManager.getTypeCompletionItems(rangeToReplace));
-        completionItems = completionItems.concat(this.main.getCompiler().moduleManager.getTypeCompletionItems(module, rangeToReplace, classContext));
+        let compiler = <JavaCompiler>this.main.getCompiler();
+
+        completionItems = completionItems.concat(compiler.libraryModuleManager.getTypeCompletionItems(rangeToReplace));
+        completionItems = completionItems.concat(compiler.moduleManager.getTypeCompletionItems(module, rangeToReplace, classContext));
 
         if (symbolTable?.methodContext != null) {
 
@@ -347,7 +354,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
         // console.log("Complete element.praefix; praefix: " + textAfterDot + ", Type: " + (type == null ? null : type.identifier));
 
 
-        if (type instanceof IJavaClass) {
+        if (type instanceof IJavaClass || type instanceof StaticNonPrimitiveType) {
 
             let visibilityUpTo = getVisibilityUpTo(type, classContext);
 

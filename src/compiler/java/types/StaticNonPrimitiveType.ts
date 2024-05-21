@@ -23,7 +23,7 @@ export class StaticNonPrimitiveType extends JavaType {
     }
 
     getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, 
-        rangeToReplace: monaco.IRange, methodContext: Method): monaco.languages.CompletionItem[]{
+        rangeToReplace: monaco.IRange, methodContext: Method | undefined): monaco.languages.CompletionItem[]{
 
             return this.nonPrimitiveType.getCompletionItems(visibilityUpTo, leftBracketAlreadyThere, identifierAndBracketAfterCursor,
                 rangeToReplace, methodContext, true);

@@ -6,6 +6,7 @@
  * a former compilation run.
  */
 
+import { Compiler } from "../common/Compiler.ts";
 import { Error } from "../common/Error.ts";
 import { Executable } from "../common/Executable.ts";
 import { KlassObjectRegistry } from "../common/interpreter/StepFunction.ts";
@@ -19,8 +20,6 @@ import { JavaCompiledModule } from "./module/JavaCompiledModule.ts";
 import { JavaModuleManager } from "./module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "./module/libraries/JavaLibraryModuleManager";
 import { Parser } from "./parser/Parser";
-import { AssertionHandler } from "./runtime/unittests/Assertions.ts";
-import { NonPrimitiveType } from "./types/NonPrimitiveType.ts";
 
 
 enum CompilerState {
@@ -30,7 +29,7 @@ enum CompilerState {
 type CompiliationFinishedCallback = (lastCompiledExecutable?: Executable) => void;
 type AskBeforeCompilingCallback = () => boolean;
 
-export class JavaCompiler {
+export class JavaCompiler implements Compiler {
 
     public moduleManager: JavaModuleManager;
     lastOpenedFile?: File;

@@ -1,5 +1,6 @@
 import { Module } from "../../common/module/Module.ts";
 import { JavaMainClass } from "../MainInterface.ts";
+import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 
 export class JavaSymbolMarker {
 
@@ -19,7 +20,7 @@ export class JavaSymbolMarker {
 
         this.clearDecorations();
 
-        let module = this.main.getModuleForMonacoModel(this.editor.getModel());
+        let module = <JavaCompiledModule>this.main.getModuleForMonacoModel(this.editor.getModel());
         if(!module) return;
 
         let usagePosition = module.findSymbolAtPosition(event.position);
