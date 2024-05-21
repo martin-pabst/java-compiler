@@ -28,7 +28,7 @@ export class Method extends BaseSymbol {
 
     isSynchronized: boolean = false;
 
-    annotations : String[] = [];
+    annotations: String[] = [];
 
     program?: Program;
 
@@ -36,7 +36,7 @@ export class Method extends BaseSymbol {
     hasOuterClassParameter: boolean = false;            // constructors of non-static inner classes have invisible first parameter with identifier outerClassAttributeIdentifier
 
     template?: string;      // only for library Methods, i.e. Math.sin
-    constantFoldingFunction?: (...parms: any) => any; 
+    constantFoldingFunction?: (...parms: any) => any;
 
     /**
      * undefined, if null
@@ -45,8 +45,8 @@ export class Method extends BaseSymbol {
 
     declare module: JavaCompiledModule;
 
-    private signatureCache: {[callingConvention: string]: string} = {}
-    private signatureCacheWithGenericParameterIdentifiers: {[callingConvention: string]: string} = {}
+    private signatureCache: { [callingConvention: string]: string } = {}
+    private signatureCacheWithGenericParameterIdentifiers: { [callingConvention: string]: string } = {}
 
     public hasImplementationWithNativeCallingConvention: boolean = false;
 
@@ -59,14 +59,14 @@ export class Method extends BaseSymbol {
     isCopyOf?: Method;
 
     constructor(identifier: string, identifierRange: IRange, module: JavaBaseModule,
-          public visibility: Visibility = TokenType.keywordPublic){
-            super(identifier, identifierRange, module);
+        public visibility: Visibility = TokenType.keywordPublic) {
+        super(identifier, identifierRange, module);
 
     }
 
-    canTakeNumberOfParameters(n: number){
-        if(this.parameters.length == 0) return n == 0;
-        if(this.parameters[this.parameters.length - 1].isEllipsis){
+    canTakeNumberOfParameters(n: number) {
+        if (this.parameters.length == 0) return n == 0;
+        if (this.parameters[this.parameters.length - 1].isEllipsis) {
             return n >= this.parameters.length - 1;
         } else {
             return n == this.parameters.length;
@@ -77,20 +77,20 @@ export class Method extends BaseSymbol {
 
         let copyNeeded: boolean = false;
         let newParameters: Parameter[] = [];
-        for(let p of this.parameters){
+        for (let p of this.parameters) {
             let copy = p.getCopyWithConcreteType(typeMap);
             newParameters.push(copy);
-            if(copy != p) copyNeeded = true;
+            if (copy != p) copyNeeded = true;
         }
 
         let newReturnParameter = this.returnParameterType;
-        if(this.returnParameterType && !this.returnParameterType.isPrimitive){
+        if (this.returnParameterType && !this.returnParameterType.isPrimitive) {
             newReturnParameter = (<NonPrimitiveType>this.returnParameterType).getCopyWithConcreteType(typeMap);
         }
 
-        if(newReturnParameter != this.returnParameterType) copyNeeded = true;
+        if (newReturnParameter != this.returnParameterType) copyNeeded = true;
 
-        if(!copyNeeded) return this;
+        if (!copyNeeded) return this;
 
         let newMethod = new Method(this.identifier, this.identifierRange, this.module, this.visibility);
         newMethod.isConstructor = this.isConstructor;
@@ -116,7 +116,7 @@ export class Method extends BaseSymbol {
     getCopy(): Method {
 
         let newParameters: Parameter[] = [];
-        for(let p of this.parameters) newParameters.push(p.getCopy());
+        for (let p of this.parameters) newParameters.push(p.getCopy());
 
         let newMethod = new Method(this.identifier, this.identifierRange, this.module, this.visibility);
         newMethod.isConstructor = this.isConstructor;
@@ -125,15 +125,15 @@ export class Method extends BaseSymbol {
         newMethod.returnParameterType = this.returnParameterType;
         newMethod.parameters = newParameters;
         newMethod.isCopyOf = this;
-        
+
         return newMethod;
 
     }
 
     getInternalName(callingConvention: CallingConvention): string {
-        if(!this.signatureCache[callingConvention]){
+        if (!this.signatureCache[callingConvention]) {
             let cc = callingConvention == "java" ? "j" : "n";
-    
+
             let shorthand = this.isConstructor ? 'c' : 'm';
             let s = `_${shorthand}${cc}$${this.isConstructor ? "_constructor_" : this.identifier.replace(/\./g, "_")}$${this.returnParameterType ? this.returnParameterType.getInternalName() : 'void'}$`;
             s += this.parameters.map(p => p.type.getInternalName()).join("$");
@@ -143,7 +143,7 @@ export class Method extends BaseSymbol {
     }
 
     getInternalNameWithGenericParameterIdentifiers(callingConvention: CallingConvention): string {
-        if(!this.signatureCacheWithGenericParameterIdentifiers[callingConvention]){
+        if (!this.signatureCacheWithGenericParameterIdentifiers[callingConvention]) {
             this.signatureCacheWithGenericParameterIdentifiers[callingConvention] = this.getInternalName(callingConvention);
         }
         return this.signatureCacheWithGenericParameterIdentifiers[callingConvention];
@@ -154,8 +154,8 @@ export class Method extends BaseSymbol {
     }
 
 
-    getSignature(){
-        if(this.isConstructor){
+    getSignature() {
+        if (this.isConstructor) {
             return this.identifier + "(" + this.parameters.map(p => p.type.getReifiedIdentifier()).join(", ") + ")";
         } else {
             return this.returnParameterType?.getReifiedIdentifier() + " " + this.identifier + "(" + this.parameters.map(p => p.type.getReifiedIdentifier()).join(", ") + ")";
@@ -164,8 +164,8 @@ export class Method extends BaseSymbol {
 
     getDeclaration(): string {
         let decl: string = TokenTypeReadable[this.visibility] + " ";
-        if(this.isStatic) decl += "static ";
-        if(this.isFinal) decl += "final ";
+        if (this.isStatic) decl += "static ";
+        if (this.isFinal) decl += "final ";
         decl += this.returnParameterType?.toString() + " " + this.identifier;
         return decl + "(" + this.parameters.map(p => p.getDeclaration()).join(", ") + ")";
     }
@@ -175,7 +175,35 @@ export class Method extends BaseSymbol {
     }
 
     getCompletionLabel() {
-        return this.getDeclaration();
+        
+        let label = "";
+        
+        if (this.returnParameterType != null && this.returnParameterType.identifier != "void") {
+            label += this.returnParameterType.toString() + " ";
+        }
+
+        label += this.identifier + "(";
+
+        let parameters = this.parameters;
+        for (let i = 0; i < parameters.length; i++) {
+
+            let p = parameters[i];
+            if (p.isEllipsis) {
+                let arrayType: ArrayType = <any>p.type;
+                label += arrayType.elementType.toString() + "... " + p.identifier;
+            } else {
+                label += p.type.toString() + " " + p.identifier;
+            }
+
+            if (i < parameters.length - 1) {
+                label += ", ";
+            }
+
+        }
+
+        label += ")";
+
+        return label;
     }
 
     getCompletionSnippet(leftBracketAlreadyThere: boolean) {
@@ -203,7 +231,7 @@ export class Method extends BaseSymbol {
 
         snippet += ")";
 
-        if(this.returnParameterType == null || this.returnParameterType.identifier == "void"){
+        if (this.returnParameterType == null || this.returnParameterType.identifier == "void") {
             snippet += ";$0";
         }
 
@@ -223,22 +251,22 @@ export class Method extends BaseSymbol {
 
 
 export class GenericMethod extends Method {
-    
+
     constructor(identifier: string, identifierRange: IRange, module: JavaBaseModule,
-        visibility: Visibility = TokenType.keywordPublic, public genericTypeParameters: GenericTypeParameters){
-            super(identifier, identifierRange, module, visibility);
+        visibility: Visibility = TokenType.keywordPublic, public genericTypeParameters: GenericTypeParameters) {
+        super(identifier, identifierRange, module, visibility);
 
-        }
+    }
 
-    initCatches(){
-        for(let p of this.genericTypeParameters){
+    initCatches() {
+        for (let p of this.genericTypeParameters) {
             p.catches = [];
         }
     }
 
     checkCatches(methodCallPosition: IRange): Error[] {
         let errors: Error[] = [];
-        for(let gp of this.genericTypeParameters){
+        for (let gp of this.genericTypeParameters) {
             gp.checkCatches(errors, methodCallPosition);
         }
         return errors;
@@ -248,53 +276,22 @@ export class GenericMethod extends Method {
 
         let typeMap: Map<GenericTypeParameter, NonPrimitiveType> = new Map();
 
-        for(let gp of this.genericTypeParameters){
+        for (let gp of this.genericTypeParameters) {
             typeMap.set(gp, gp.catches![0]);
         }
 
         return this.getCopyWithConcreteType(typeMap, this.classEnumInterface);
- 
+
     }
 
     getDeclaration(): string {
         let decl: string = TokenTypeReadable[this.visibility] + " ";
-        if(this.isStatic) decl += "static ";
-        if(this.isFinal) decl += "final ";
+        if (this.isStatic) decl += "static ";
+        if (this.isFinal) decl += "final ";
         decl += "<" + this.genericTypeParameters.map(p => p.identifier).join(", ") + "> ";
         decl += this.returnParameterType?.toString() + " " + this.identifier;
         return decl + "(" + this.parameters.map(p => p.getDeclaration()).join(", ") + ")";
     }
 
-    getCompletionLabel() {
-
-        let label = "";
-
-        if (this.returnParameterType != null && this.returnParameterType.identifier != "void") {
-            label += this.returnParameterType.toString() + " ";
-        }
-
-        label += this.identifier + "(";
-
-        let parameters = this.parameters;
-        for (let i = 0; i < parameters.length; i++) {
-
-            let p = parameters[i];
-            if(p.isEllipsis){
-                let arrayType: ArrayType = <any>p.type;
-                label += arrayType.elementType.toString() + "... " + p.identifier;
-            } else {
-                label += p.type.toString() + " " + p.identifier;
-            }
-
-            if (i < parameters.length - 1) {
-                label += ", ";
-            }
-
-        }
-
-        label += ")";
-
-        return label;
-    }
 
 }

@@ -53,14 +53,14 @@ export class JavaHoverProvider {
         "var": "```\nvar\n```  \nWird einer Variable beim Deklarieren sofort ein Startwert zugewiesen (z.B. Circle c = new Circle(100, 100, 10)), so kann statt des Datentyps das Schlüsselwort ```var``` verwendet werden (also var c = new Circle(100, 100, 10)).",
     }
 
-    constructor(private editor: Editor, private main: JavaMainClass) {
+    constructor(private editor: monaco.editor.IStandaloneCodeEditor, private main: JavaMainClass) {
 
     }
 
     provideHover(model: monaco.editor.ITextModel, position: monaco.Position, token: monaco.CancellationToken):
         monaco.languages.ProviderResult<monaco.languages.Hover> {
 
-        let selection: monaco.Selection | null = this.editor.editor.getSelection();
+        let selection: monaco.Selection | null = this.editor.getSelection();
 
         // if cursor is inside current selection then don't show hover, because editor.onDidChangeCursorPosition evaluates selected Text 
         // (see class Editor).

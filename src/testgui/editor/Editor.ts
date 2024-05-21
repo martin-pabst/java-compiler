@@ -69,7 +69,8 @@ export class Editor {
             suggestLineHeight: 22,
             suggest: {
                 localityBonus: true,
-                insertMode: "replace"
+                insertMode: "replace",
+                preview: true
                 // snippetsPreventQuickSuggestions: false
             },
             parameterHints: { enabled: true, cycle: true },

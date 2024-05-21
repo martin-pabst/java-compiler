@@ -129,7 +129,7 @@ export class JavaTypeStore {
 
                 completionItems.push({
                     label: type.identifier,
-                    detail: JCM.primitiveType(),
+                    detail: isGeneric ? JCM.genericType() : "",
                     insertText: npt.pathAndIdentifier + suffix,
                     kind: kind,
                     range: rangeToReplace,

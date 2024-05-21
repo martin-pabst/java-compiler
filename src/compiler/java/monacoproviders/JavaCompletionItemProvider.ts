@@ -24,7 +24,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
 
     first: boolean = true;
     provideCompletionItems(model: monaco.editor.ITextModel, position: monaco.Position, context: monaco.languages.CompletionContext, token: monaco.CancellationToken): monaco.languages.ProviderResult<monaco.languages.CompletionList> {
-
+        
         // setTimeout(() => {
             //@ts-ignore
             // let sw = this.editor._contentWidgets["editor.widget.suggestWidget"]?.widget;
@@ -56,7 +56,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
 
         let symbolTable = module.findSymbolTableAtPosition(position);
         let classContext = symbolTable == null ? undefined : symbolTable.classContext;
-        if(classContext?.identifier == '') classContext = undefined;    // auto generated main class
+        
 
         let zeroLengthRange: IRange = Range.fromPositions(position);
 
@@ -270,30 +270,35 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
         completionItems = completionItems.concat(this.main.getCompiler().libraryModuleManager.getTypeCompletionItems(rangeToReplace));
         completionItems = completionItems.concat(this.main.getCompiler().moduleManager.getTypeCompletionItems(module, rangeToReplace, classContext));
 
-        if (classContext != null && symbolTable?.methodContext != null) {
-            completionItems = completionItems.concat(
-                classContext.getCompletionItems(TokenType.keywordPrivate, leftBracketAlreadyThere, identifierAndBracketAfterCursor, rangeToReplace, symbolTable.methodContext)
-                    .map(ci => {
-                        ci.sortText = "aa" + ci.label;
-                        return ci;
-                    })
-            );
-            completionItems.push(
-                {
-                    label: "super",
-                    filterText: "super",
-                    insertText: "super.",
-                    detail: "Aufruf einer Methode einer Basisklasse",
-                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    kind: monaco.languages.CompletionItemKind.Snippet,
-                    range: Range.fromPositions(position),
-                    command: {
-                        id: "editor.action.triggerSuggest",
-                        title: '123',
-                        arguments: []
+        if (symbolTable?.methodContext != null) {
+
+            // don't show class completion items (methods, fields) in main class
+            if(classContext!= null && classContext.identifier != ''){
+                completionItems = completionItems.concat(
+                    classContext.getCompletionItems(TokenType.keywordPrivate, leftBracketAlreadyThere, identifierAndBracketAfterCursor, rangeToReplace, symbolTable.methodContext)
+                        .map(ci => {
+                            ci.sortText = "aa" + ci.label;
+                            return ci;
+                        })
+                );
+                completionItems.push(
+                    {
+                        label: "super",
+                        filterText: "super",
+                        insertText: "super.",
+                        detail: "Aufruf einer Methode einer Basisklasse",
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        kind: monaco.languages.CompletionItemKind.Snippet,
+                        range: rangeToReplace,
+                        command: {
+                            id: "editor.action.triggerSuggest",
+                            title: '123',
+                            arguments: []
+                        }
                     }
-                }
-            )
+                )
+            }
+
         } else {
             // Use filename to generate completion-item for class ... ?
             let name = module.file?.filename;
@@ -309,14 +314,14 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
                         detail: "Definition der Klasse " + name,
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         kind: monaco.languages.CompletionItemKind.Snippet,
-                        range: Range.fromPositions(position)
+                        range: rangeToReplace
                     },
                     )
                 }
             }
         }
 
-        completionItems = completionItems.concat(this.getKeywordCompletion(symbolTable, Range.fromPositions(position)));
+        completionItems = completionItems.concat(this.getKeywordCompletion(symbolTable, rangeToReplace));
 
 
         // console.log("Complete variable/Class/Keyword " + text);
@@ -379,7 +384,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
         return null;
     }
 
-    getKeywordCompletion(symbolTable: JavaSymbolTable, range: Range): monaco.languages.CompletionItem[] {
+    getKeywordCompletion(symbolTable: JavaSymbolTable, range: monaco.IRange): monaco.languages.CompletionItem[] {
         let keywordCompletionItems: monaco.languages.CompletionItem[] = [];
         if (!this.isConsole && (symbolTable?.classContext == null || symbolTable?.methodContext != null))
             keywordCompletionItems = keywordCompletionItems.concat([
@@ -597,7 +602,7 @@ export class MyCompletionItemProvider implements monaco.languages.CompletionItem
             ]);
         }
 
-        if (symbolTable != null && symbolTable.methodContext != null) {
+        if (symbolTable != null && symbolTable.methodContext != null && symbolTable.classContext?.identifier != '') {
             keywordCompletionItems = keywordCompletionItems.concat([
                 {
                     label: "return",

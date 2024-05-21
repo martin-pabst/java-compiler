@@ -720,5 +720,10 @@ export class JCM {
         "en": "primitive type"
     })
 
+    static genericType = () => lm({
+        "de": "Generischer Datentyp",
+        "en": "generic type"
+    })
+
 
 }            
