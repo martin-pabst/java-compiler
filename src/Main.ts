@@ -37,6 +37,8 @@ import { OptionView } from "./testgui/OptionView.ts";
 import { JavaCompletionItemProvider as JavaCompletionItemProvider } from "./compiler/java/monacoproviders/JavaCompletionItemProvider.ts";
 import { JavaSymbolMarker } from "./compiler/java/monacoproviders/JavaSymbolMarker.ts";
 import { JavaRenameProvider } from "./compiler/java/monacoproviders/JavaRenameProvider.ts";
+import { JavaDefinitionProvider } from "./compiler/java/monacoproviders/JavaDefinitionProvider.ts";
+import { Range } from "./compiler/common/range/Range.ts";
 
 export class Main implements MainClass {
 
@@ -343,7 +345,27 @@ export class Main implements MainClass {
     monaco.languages.registerHoverProvider('myJava', new JavaHoverProvider(editor, this));
     monaco.languages.registerCompletionItemProvider('myJava', new JavaCompletionItemProvider(editor, this));
     monaco.languages.registerRenameProvider('myJava', new JavaRenameProvider(editor, this));
+    monaco.languages.registerDefinitionProvider('myJava', new JavaDefinitionProvider(editor, this));
     new JavaSymbolMarker(this.tabbedEditorManager.editor.editor, this);
+
+    let that = this;
+    monaco.editor.registerEditorOpener({
+      openCodeEditor(source: monaco.editor.ICodeEditor, resource: monaco.Uri, selectionOrPosition?: monaco.IRange | monaco.IPosition): boolean | Promise<boolean> {
+        
+        let module = that.getCompiler().moduleManager.modules.find(m => m.file.monacoModel?.uri == resource);
+
+        if(module){
+          let model = module.file.monacoModel;
+          if(model){
+            editor.setModel(model);
+            editor.setPosition(Range.getStartPosition(<monaco.IRange>selectionOrPosition));
+            return true;
+          }
+        }
+        
+        return false;
+      }
+    })
   }
 
   setProgram(programName: string) {
