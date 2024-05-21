@@ -35,6 +35,7 @@ import { TerminalPrintManager } from "./testgui/TerminalPrintManager.ts";
 import { OptionView } from "./testgui/OptionView.ts";
 
 import { MyCompletionItemProvider } from "./compiler/java/monacoproviders/JavaCompletionItemProvider.ts";
+import { JavaSymbolMarker } from "./compiler/java/monacoproviders/JavaSymbolMarker.ts";
 
 export class Main implements JavaMainClass {
 
@@ -173,7 +174,9 @@ export class Main implements JavaMainClass {
     this.compiler.updateSingleModuleForCodeCompletion(module);
   }
 
-  getModuleForMonacoModel(model: monaco.editor.ITextModel): JavaCompiledModule | undefined {
+  getModuleForMonacoModel(model: monaco.editor.ITextModel | null): JavaCompiledModule | undefined {
+    if(model == null) return undefined;
+
     for (let file of this.files) {
       if (file.monacoModel == model) {
         return this.compiler.lastCompiledExecutable?.moduleManager.findModuleByFile(file);
@@ -337,6 +340,7 @@ export class Main implements JavaMainClass {
   registerMonacoProviders() {
     monaco.languages.registerHoverProvider('myJava', new JavaHoverProvider(this.tabbedEditorManager.editor.editor, this));
     monaco.languages.registerCompletionItemProvider('myJava', new MyCompletionItemProvider(this.tabbedEditorManager.editor.editor, this));
+    new JavaSymbolMarker(this.tabbedEditorManager.editor.editor, this);
   }
 
   setProgram(programName: string) {

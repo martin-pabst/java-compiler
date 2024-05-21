@@ -1,3 +1,4 @@
+import { BaseSymbol } from "../../common/BaseSymbolTable.ts";
 import { Error } from "../../common/Error";
 import { UsagePosition } from "../../common/UsagePosition.ts";
 import { Program, Step } from "../../common/interpreter/Program";
@@ -174,5 +175,10 @@ export class JavaCompiledModule extends JavaBaseModule {
 
         return tableWithSmallestNumberOfLines;
     }
+
+    getUsagePositionsForSymbol(symbol: BaseSymbol): UsagePosition[] | undefined {
+        return this.compiledSymbolsUsageTracker.getUsagePositionsForSymbol(symbol) || this.systemSymbolsUsageTracker.getUsagePositionsForSymbol(symbol);
+    }
+
 
 }

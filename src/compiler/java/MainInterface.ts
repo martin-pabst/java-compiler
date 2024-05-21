@@ -6,7 +6,7 @@ import { JavaCompiler } from "./JavaCompiler.ts";
 
 export interface JavaMainClass {
 
-    getModuleForMonacoModel(model: monaco.editor.ITextModel): JavaCompiledModule | undefined;
+    getModuleForMonacoModel(model: monaco.editor.ITextModel | null): JavaCompiledModule | undefined;
     
     ensureModuleIsCompiled(module: JavaCompiledModule): void;
 

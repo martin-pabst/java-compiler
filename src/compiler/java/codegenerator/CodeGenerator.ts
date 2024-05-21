@@ -362,7 +362,7 @@ export class CodeGenerator extends StatementCodeGenerator {
         let field = classContext.fields.find(f => f.identifier == fieldNode.identifier);
         if (!field) return undefined;
 
-        this.registerUsagePosition(field, fieldNode.range);
+        this.registerUsagePosition(field, fieldNode.identifierRange);
 
         // this.currentSymbolTable.addSymbol(field);
 

@@ -10,6 +10,7 @@
     --scrollbar-thumb-hover: #5e5e5e;
     --scrollbar-thumb-active: #7e7e7e;
 
+    --reveal-syntaxelement: rgb(85,85,85);
 }   
 
 
@@ -56,4 +57,8 @@
 
 .jo_scrollable::-webkit-scrollbar-thumb:active {
     background-color: var(--scrollbar-thumb-active);
+}
+
+.jo_revealSyntaxElement {
+    background-color: var(--reveal-syntaxelement);
 }
