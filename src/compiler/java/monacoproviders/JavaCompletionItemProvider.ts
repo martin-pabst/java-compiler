@@ -6,7 +6,6 @@ import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { ArrayType } from "../types/ArrayType";
 import { IJavaClass, JavaClass } from "../types/JavaClass";
-import { JavaEnum } from "../types/JavaEnum";
 import { IJavaInterface, JavaInterface } from "../types/JavaInterface";
 import { Method } from "../types/Method";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
