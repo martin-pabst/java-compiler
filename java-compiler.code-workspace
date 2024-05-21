@@ -6,17 +6,19 @@
 	],
 	"settings": {
 		"workbench.colorCustomizations": {
-			"titleBar.activeBackground": "#0cc115",
+			"titleBar.activeBackground": "#c8d11f",
 			"titleBar.activeForeground": "#000000",
-			"titleBar.inactiveBackground": "#69ef70",
+			"titleBar.inactiveBackground": "#c8d11f",
 			"titleBar.inactiveForeground": "#000000",
-			"titleBar.border": "#0cc115",
-			"activityBar.foreground": "#69ef70",
-			"tab.activeBorder": "#69ef70",
-			"iLoveWorkSpaceColors": true,
-			"iLoveWorkSpaceRandom": false,
-			"useWorkspaceLite": true
-			}
-
+			"titleBar.border": "#c8d11f",
+			"activityBar.background": "#c8d11f",
+			"activityBar.foreground": "#000000",
+			"statusBar.background": "#c8d11f",
+			"statusBar.foreground": "#000000",
+			"statusBar.debuggingBackground": "#c8d11f",
+			"statusBar.debuggingForeground": "#000000",
+			"tab.activeBorder": "#c8d11f"
+		}
+	
 	}
 }

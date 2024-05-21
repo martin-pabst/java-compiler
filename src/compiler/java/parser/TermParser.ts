@@ -1,4 +1,4 @@
-import { EmptyRange, IRange } from "../../common/range/Range.ts";
+import { EmptyRange, IRange, Range } from "../../common/range/Range.ts";
 import { JCM } from "../JavaCompilerMessages.ts";
 import { TokenType } from "../TokenType.ts";
 import { Token } from "../lexer/Token.ts";
@@ -312,9 +312,13 @@ export abstract class TermParser extends TokenIterator {
             do {
                 let termNode = this.parseTerm();
                 if (termNode) methodCallNode.parameterValues.push(termNode);
+                if(this.comesToken(TokenType.comma, false)){
+                    methodCallNode.commaPositions.push(Range.getStartPosition(this.cct.range));
+                }
             } while (this.comesToken(TokenType.comma, true));
         }
 
+        methodCallNode.rightBracketPosition = Range.getStartPosition(this.cct.range);
         this.expect(TokenType.rightBracket, true);
         this.setEndOfRange(methodCallNode);
         return methodCallNode;
@@ -542,9 +546,15 @@ export abstract class TermParser extends TokenIterator {
                 do {
                     let termNode = this.parseTerm();
                     if (termNode) newObjectNode.parameterValues.push(termNode);
+
+                    if(this.comesToken(TokenType.comma, false)){
+                        newObjectNode.commaPositions.push(Range.getStartPosition(this.getCurrentRangeCopy()));
+                    }
+
                 } while (this.comesToken(TokenType.comma, true));
             }
 
+            newObjectNode.rightBracketPosition = Range.getStartPosition(this.getCurrentRangeCopy());
             this.expect(TokenType.rightBracket, true);
         }
 
@@ -584,6 +594,8 @@ export abstract class TermParser extends TokenIterator {
     parsePrintStatement() {
         let printlnStatement = this.nodeFactory.buildPrintStatement(this.cct, this.tt == TokenType.keywordPrintln);
 
+        let printTokenRange = this.getCurrentRangeCopy();
+
         this.nextToken();
 
 
@@ -593,9 +605,15 @@ export abstract class TermParser extends TokenIterator {
             }
 
             if (this.comesToken(TokenType.comma, true)) {
+                printlnStatement.commaPositions.push(Range.getStartPosition(this.lastToken.range));
                 printlnStatement.secondParameter = this.parseTerm();
             }
 
+            printlnStatement.rightBracketPosition = Range.getStartPosition(this.cct.range);
+            this.module.pushMethodCallPosition(printTokenRange, printlnStatement.commaPositions, 
+                printlnStatement.isPrintln ? "println" : "print", printlnStatement.rightBracketPosition!
+            );
+            
             this.expect(TokenType.rightBracket, true);
         }
 

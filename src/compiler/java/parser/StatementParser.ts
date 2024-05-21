@@ -1,4 +1,4 @@
-import { EmptyRange } from "../../common/range/Range.ts";
+import { EmptyRange, Range } from "../../common/range/Range.ts";
 import { JCM } from "../JavaCompilerMessages.ts";
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
@@ -143,22 +143,25 @@ export abstract class StatementParser extends TermParser {
 
     parseWhile(): ASTWhileNode | undefined {
 
+        let whileTokenRange = this.getCurrentRangeCopy();
+        
         let whileToken = this.getAndSkipToken();
-
+        
         if (this.comesToken(TokenType.leftBracket, true)) {
             let condition = this.parseTerm();
             this.expect(TokenType.rightBracket);
-
+            
             let statementToRepeat = this.parseStatementOrExpression();
-
+            
             if (condition && statementToRepeat) {
-
+                
                 return this.nodeFactory.buildWhileNode(whileToken,
                     this.cct, condition, statementToRepeat);
-
-            }
-
-        } else {
+                    
+                }
+                
+            } else {
+            this.module.pushMethodCallPosition(whileTokenRange, [], "while", Range.getStartPosition(this.cct.range));
             this.skipTokensTillEndOfLineOr([TokenType.rightBracket]);
         }
 
@@ -195,10 +198,15 @@ export abstract class StatementParser extends TermParser {
 
     parseIf(): ASTIfNode | undefined {
 
+        let ifTokenRange = this.getCurrentRangeCopy();
+
         let ifToken = this.getAndSkipToken();
 
         if (this.comesToken(TokenType.leftBracket, true)) {
             let condition = this.parseTerm();
+
+            this.module.pushMethodCallPosition(ifTokenRange, [], "if", Range.getStartPosition(this.cct.range));
+
             this.expect(TokenType.rightBracket);
 
             let statementIfTrue = this.parseStatementOrExpression();
@@ -241,6 +249,10 @@ export abstract class StatementParser extends TermParser {
     }
 
     parseFor(): ASTForLoopNode | ASTEnhancedForLoopNode | undefined {
+        
+        let forTokenRange = this.getCurrentRangeCopy();
+        let semicolonPositions: monaco.IPosition[] = [];
+        
         let tokenFor = this.getAndSkipToken();  // preserve first token to compute range later on
 
         if (!this.expect(TokenType.leftBracket, true)) return undefined;
@@ -251,12 +263,18 @@ export abstract class StatementParser extends TermParser {
         if (colonFound) return this.parseEnhancedForLoop(tokenFor);
 
         let firstStatement = this.parseStatementOrExpression(false);
+        semicolonPositions.push(Range.getStartPosition(this.cct.range));
         this.expect(TokenType.semicolon, true);
         let condition = this.parseTerm();
         if (!condition) this.skipTokensTillEndOfLineOr(TokenType.semicolon)
+            semicolonPositions.push(Range.getStartPosition(this.cct.range));
         this.expect(TokenType.semicolon, true);
         let lastStatement = this.parseTerm();
+        let rightBracketPosition = Range.getStartPosition(this.cct.range);
         this.expect(TokenType.rightBracket, true);
+
+        this.module.pushMethodCallPosition(forTokenRange, semicolonPositions, "for", rightBracketPosition);
+
         let statementToRepeat = this.parseStatementOrExpression(false);
 
         if (!statementToRepeat) {
@@ -290,9 +308,15 @@ export abstract class StatementParser extends TermParser {
     }
 
     parseSwitch(): ASTSwitchCaseNode | undefined {
+
+        let switchTokenRange = this.getCurrentRangeCopy();
+
         let switchToken = this.getAndSkipToken(); // preserve for later to compute range
         if (!this.expect(TokenType.leftBracket, true)) return;
         let term = this.parseTerm();
+
+        this.module.pushMethodCallPosition(switchTokenRange, [], "switch", Range.getStartPosition(this.cct.range));
+
         this.expect(TokenType.rightBracket, true);
         if (!this.expect(TokenType.leftCurlyBracket, true) || !term) return undefined;
 

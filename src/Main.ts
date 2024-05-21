@@ -40,6 +40,7 @@ import { JavaRenameProvider } from "./compiler/java/monacoproviders/JavaRenamePr
 import { JavaDefinitionProvider } from "./compiler/java/monacoproviders/JavaDefinitionProvider.ts";
 import { Range } from "./compiler/common/range/Range.ts";
 import { JavaReferenceProvider } from "./compiler/java/monacoproviders/JavaReferenceProvider.ts";
+import { JavaSignatureHelpProvider } from "./compiler/java/monacoproviders/JavaSignatureHelpProvider.ts";
 
 export class Main implements MainClass {
 
@@ -348,6 +349,7 @@ export class Main implements MainClass {
     monaco.languages.registerRenameProvider('myJava', new JavaRenameProvider(editor, this));
     monaco.languages.registerDefinitionProvider('myJava', new JavaDefinitionProvider(editor, this));
     monaco.languages.registerReferenceProvider('myJava', new JavaReferenceProvider(editor, this));
+    monaco.languages.registerSignatureHelpProvider('myJava', new JavaSignatureHelpProvider(editor, this));
     new JavaSymbolMarker(this.tabbedEditorManager.editor.editor, this);
 
     let that = this;

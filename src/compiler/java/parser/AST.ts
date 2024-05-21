@@ -326,6 +326,8 @@ export interface ASTMethodCallNode extends ASTNodeWithIdentifier, ASTTermNode {
     kind: TokenType.methodCall;
     nodeToGetObject: ASTTermNode | undefined; // undefined if method is called inside class
     parameterValues: ASTTermNode[];
+    commaPositions: monaco.IPosition[];
+    rightBracketPosition?: monaco.IPosition;
 }
 
 export interface ASTAttributeDereferencingNode extends ASTTermNode {
@@ -339,6 +341,8 @@ export interface ASTNewObjectNode extends ASTTermNode {
     type: ASTTypeNode;
     parameterValues: ASTTermNode[];
     object?: ASTTermNode;
+    commaPositions: monaco.IPosition[];
+    rightBracketPosition?: monaco.IPosition;
 }
 
 export interface ASTAnonymousClassNode extends ASTTermNode {
@@ -369,7 +373,9 @@ export interface ASTPrintStatementNode extends ASTTermNode {
     kind: TokenType.print,
     isPrintln: boolean,
     firstParameter: ASTTermNode | undefined,
-    secondParameter: ASTTermNode | undefined
+    secondParameter: ASTTermNode | undefined,
+    commaPositions: monaco.IPosition[],
+    rightBracketPosition?: monaco.IPosition
 }
 
 export interface ASTLiteralNode extends ASTTermNode {

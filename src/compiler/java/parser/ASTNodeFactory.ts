@@ -378,7 +378,9 @@ export class ASTNodeFactory {
             identifierRange: identifier.range,
             range: identifier.range,
             nodeToGetObject: nodeToGetObject,
-            parameterValues: []
+            parameterValues: [], 
+            commaPositions: [],
+            rightBracketPosition: undefined
         }
     }
 
@@ -414,7 +416,9 @@ export class ASTNodeFactory {
             range: startToken.range,
             parameterValues: [],
             type: type,
-            object: object
+            object: object,
+            commaPositions: [],
+            rightBracketPosition: undefined
         }
     }
 
@@ -505,7 +509,9 @@ export class ASTNodeFactory {
             range: beginToken.range,
             isPrintln: isPrintln,
             firstParameter: undefined,
-            secondParameter: undefined
+            secondParameter: undefined,
+            commaPositions:  [],
+            rightBracketPosition: undefined
         }
     }
 

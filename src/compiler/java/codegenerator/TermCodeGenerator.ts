@@ -211,7 +211,12 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         */
 
 
-        let method = this.searchMethod(klassType.identifier, klassType, parameterValues.map(p => p?.type), true, false, true, node.range);
+        let methods = this.searchMethod(klassType.identifier, klassType, parameterValues.map(p => p?.type), true, false, true, node.range);
+        let method = methods.best;
+
+        this.module.pushMethodCallPosition(node.range, node.commaPositions, methods.possible,
+            node.rightBracketPosition!
+        )
 
         if (!method) {
             this.pushError(JCM.cantFindConstructor(), "error", node.range);
@@ -872,14 +877,16 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             return undefined;
         }
 
-        let method = this.searchMethod(node.identifier, objectSnippet.type, parameterValueSnippet.map(p => p?.type), methodIsConstructor, objectSnippet.type instanceof StaticNonPrimitiveType, true, node.range);
+        let methods = this.searchMethod(node.identifier, objectSnippet.type, parameterValueSnippet.map(p => p?.type), methodIsConstructor, objectSnippet.type instanceof StaticNonPrimitiveType, true, node.identifierRange);
+        let method = methods?.best;
 
         if (node.identifier == "assertCodeReached" && (!method || objectSnippet.type.identifier == "Assertions")) {
             return this.registerCodeReachedAssertion(node, parameterValueSnippet);
         }
 
         if (!method && node.identifier.startsWith("assert") || node.identifier.startsWith("fail")) {
-            method = this.searchMethod(node.identifier, this.assertionsType, parameterValueSnippet.map(p => p?.type), false, objectSnippet instanceof StaticNonPrimitiveType, true, node.range);
+            methods = this.searchMethod(node.identifier, this.assertionsType, parameterValueSnippet.map(p => p?.type), false, objectSnippet instanceof StaticNonPrimitiveType, true, node.identifierRange);
+            method = methods?.best;
         }
 
         let outerTypeTemplate: string = "";
@@ -888,7 +895,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             let outerType: NonPrimitiveType | StaticNonPrimitiveType | undefined = this.currentSymbolTable.classContext?.outerType;
             while (outerType && outerType instanceof NonPrimitiveType) {
                 outerTypeTemplate += "." + Helpers.outerClassAttributeIdentifier;
-                method = this.searchMethod(node.identifier, objectSnippet.type, parameterValueSnippet.map(p => p?.type), false, objectSnippet instanceof StaticNonPrimitiveType, true, node.range);
+                methods = this.searchMethod(node.identifier, objectSnippet.type, parameterValueSnippet.map(p => p?.type), false, objectSnippet instanceof StaticNonPrimitiveType, true, node.identifierRange);
+                method = methods.best;
                 if (method) {
                     break;
                 }
@@ -896,8 +904,13 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             }
         }
 
+        if(node.rightBracketPosition){
+            this.module.pushMethodCallPosition(node.identifierRange, 
+                node.commaPositions, methods.possible, node.rightBracketPosition);
+        }
+
         if (!method) {
-            let invisibleMethod = this.searchMethod(node.identifier, objectSnippet.type, parameterValueSnippet.map(p => p?.type), false, objectSnippet.type instanceof StaticNonPrimitiveType, false, node.range);
+            let invisibleMethod = this.searchMethod(node.identifier, objectSnippet.type, parameterValueSnippet.map(p => p?.type), false, objectSnippet.type instanceof StaticNonPrimitiveType, false, node.identifierRange).best;
 
             if (invisibleMethod) {
                 this.pushError(JCM.methodHasWrongVisibility(node.identifier, TokenTypeReadable[invisibleMethod.visibility]), "error", node);
@@ -1032,7 +1045,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
     searchMethod(identifier: string, objectType: JavaType, parameterTypes: (JavaType | undefined)[],
         isConstructor: boolean, hasToBeStatic: boolean, takingVisibilityIntoAccount: boolean,
-        methodCallPosition: IRange): Method | undefined {
+        methodCallPosition: IRange): {best: Method | undefined, possible: Method[]} {
 
         if (objectType == this.stringType) objectType = this.primitiveStringClass.type;
 
@@ -1043,7 +1056,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         } else if (objectType instanceof NonPrimitiveType) {
             possibleMethods = objectType.getPossibleMethods(identifier, parameterTypes.length, isConstructor, hasToBeStatic);
         } else {
-            return undefined;
+            return {best: undefined, possible: []};
         }
 
         if (takingVisibilityIntoAccount) {
@@ -1115,20 +1128,20 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         if (bestMethodSoFar) {
             if (!(bestMethodSoFar instanceof GenericMethod)) {
-                return bestMethodSoFar;
+                return {best: bestMethodSoFar, possible: possibleMethods};
             }
 
             let errors = bestMethodSoFar.checkCatches(methodCallPosition);
             if (errors.length > 0) {
                 this.module.errors.push(...errors);
-                return undefined;
+                return {best: undefined, possible: possibleMethods};
             }
-
-            return bestMethodSoFar.getCopyWithConcreteTypes();
-
+            
+            return {best: bestMethodSoFar.getCopyWithConcreteTypes(), possible: possibleMethods};
+            
         }
-
-        return undefined;
+        
+        return {best: undefined, possible: possibleMethods};
     }
 
     registerUsagePosition(symbol: BaseSymbol, range: IRange) {

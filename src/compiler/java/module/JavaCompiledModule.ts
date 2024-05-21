@@ -11,11 +11,19 @@ import { ASTBlockNode, ASTClassDefinitionNode, ASTGlobalNode } from "../parser/A
 import { ArrayType } from "../types/ArrayType.ts";
 import { JavaType } from "../types/JavaType";
 import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
+import { Method } from "../types/Method.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { JavaBaseModule } from "./JavaBaseModule";
 import { JavaModuleManager } from "./JavaModuleManager";
 import { TypePosition } from "./TypePosition.ts";
+
+export type JavaMethodCallPosition = {
+    identifierRange: monaco.IRange,
+    possibleMethods: Method[] | string, // string for print, println, ...
+    commaPositions: monaco.IPosition[],
+    rightBracketPosition: monaco.IPosition
+}
 
 /**
  * A JavaModule represents a compiled Java Sourcecode File.
@@ -34,6 +42,8 @@ export class JavaCompiledModule extends JavaBaseModule {
     symbolTables: JavaSymbolTable[] = [];  // contains one symbol table for main program and one for each class/interface/enum in global scope    
 
     typePositions: {[line: number]: TypePosition[]} = {};
+
+    methodCallPositions: {[line: number]: JavaMethodCallPosition[]} = {};
 
     constructor(file: File, public moduleManager: JavaModuleManager){
         super(file, false);
@@ -116,6 +126,8 @@ export class JavaCompiledModule extends JavaBaseModule {
         this.errors = [];
         this.compiledSymbolsUsageTracker.clear();
         this.systemSymbolsUsageTracker.clear();
+        this.typePositions = {};
+        this.methodCallPositions = {};
     }
 
     setDirtyIfProgramCodeChanged(){
@@ -180,5 +192,33 @@ export class JavaCompiledModule extends JavaBaseModule {
         return this.compiledSymbolsUsageTracker.getUsagePositionsForSymbol(symbol) || this.systemSymbolsUsageTracker.getUsagePositionsForSymbol(symbol);
     }
 
+    pushMethodCallPosition(identifierRange: monaco.IRange, commaPositions: monaco.IPosition[],
+        possibleMethods: Method[] | string, rightBracketPosition: monaco.IPosition) {
+
+        let lines: number[] = [];
+        lines.push(identifierRange.startLineNumber);
+        for (let cp of commaPositions) {
+            if (lines.indexOf(cp.lineNumber) < 0) {
+                lines.push(cp.lineNumber);
+            }
+        }
+
+        let mcp: JavaMethodCallPosition = {
+            identifierRange: identifierRange,
+            commaPositions: commaPositions,
+            possibleMethods: possibleMethods,
+            rightBracketPosition: rightBracketPosition
+        };
+
+        for (let line of lines) {
+            let mcpList = this.methodCallPositions[line];
+            if (mcpList == null) {
+                this.methodCallPositions[line] = [];
+                mcpList = this.methodCallPositions[line];
+            }
+            mcpList.push(mcp);
+        }
+
+    }
 
 }
