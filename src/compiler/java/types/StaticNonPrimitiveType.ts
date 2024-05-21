@@ -44,8 +44,8 @@ export class StaticNonPrimitiveType extends JavaType {
         throw new Error("Method not implemented.");
     }
 
-    getPossibleMethods(identifier: string, length: number, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
-        return this.nonPrimitiveType.getPossibleMethods(identifier, length, isConstructor, hasToBeStatic);
+    getPossibleMethods(identifier: string, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
+        return this.nonPrimitiveType.getPossibleMethods(identifier, isConstructor, hasToBeStatic);
     }
 
     getField(identifier: string, uptoVisibility: Visibility): Field | undefined {

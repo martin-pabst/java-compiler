@@ -83,15 +83,21 @@ export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelp
 
         let signatureInformationList: monaco.languages.SignatureInformation[] = [];
 
+        let activeSignature: number = 0;
+
         if ((typeof methodCallPosition.possibleMethods) == "string") {
             signatureInformationList = signatureInformationList.concat(this.makeIntrinsicSignatureInformation(<string>(methodCallPosition.possibleMethods), parameterIndex));
         } else {
+            let i = 0;
             for (let method of methodCallPosition.possibleMethods) {
                 let m = <Method>method;
                 if (m.parameters.length > parameterIndex) {
 
-                    signatureInformationList = signatureInformationList.concat(this.makeSignatureInformation(m));
-
+                    signatureInformationList.push(this.makeSignatureInformation(m));
+                    if(m == methodCallPosition.bestMethod){
+                        activeSignature = i;
+                    }
+                    i++;
                 }
             }
         }
@@ -99,7 +105,7 @@ export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelp
         return Promise.resolve({
             value: {
                 activeParameter: parameterIndex,
-                activeSignature: 0,
+                activeSignature: activeSignature,
                 signatures: signatureInformationList
             },
             dispose: () => { }
@@ -209,7 +215,7 @@ export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelp
     }
 
 
-    makeSignatureInformation(method: Method): monaco.languages.SignatureInformation[] {
+    makeSignatureInformation(method: Method): monaco.languages.SignatureInformation {
 
         let label: string = "";
 
@@ -253,11 +259,11 @@ export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelp
 
         label += ")";
 
-        return [{
+        return {
             label: label,
             parameters: parameterInformationList,
             documentation: method.documentation == null ? "" : method.documentation
-        }]
+        }
 
     }
 

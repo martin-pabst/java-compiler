@@ -22,7 +22,8 @@ export type JavaMethodCallPosition = {
     identifierRange: monaco.IRange,
     possibleMethods: Method[] | string, // string for print, println, ...
     commaPositions: monaco.IPosition[],
-    rightBracketPosition: monaco.IPosition
+    rightBracketPosition: monaco.IPosition,
+    bestMethod?: Method
 }
 
 /**
@@ -193,7 +194,8 @@ export class JavaCompiledModule extends JavaBaseModule {
     }
 
     pushMethodCallPosition(identifierRange: monaco.IRange, commaPositions: monaco.IPosition[],
-        possibleMethods: Method[] | string, rightBracketPosition: monaco.IPosition) {
+        possibleMethods: Method[] | string, rightBracketPosition: monaco.IPosition,
+    bestMethod?: Method) {
 
         let lines: number[] = [];
         lines.push(identifierRange.startLineNumber);
@@ -207,7 +209,8 @@ export class JavaCompiledModule extends JavaBaseModule {
             identifierRange: identifierRange,
             commaPositions: commaPositions,
             possibleMethods: possibleMethods,
-            rightBracketPosition: rightBracketPosition
+            rightBracketPosition: rightBracketPosition,
+            bestMethod: bestMethod
         };
 
         for (let line of lines) {

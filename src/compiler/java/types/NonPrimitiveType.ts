@@ -96,15 +96,14 @@ export abstract class NonPrimitiveType extends JavaType {
          };
     }
 
-    getPossibleMethods(identifier: string, numberOfParameters: number, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
-        let methods: Method[] = [];
+    getPossibleMethods(identifier: string, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
+        let methodsWithArbitraryParameterCount: Method[] = [];
 
         if (isConstructor) {
             let type: NonPrimitiveType | undefined = this;
             while (type) {
-                methods = methods.concat(type.getOwnMethods().filter(m => 
-                    m.canTakeNumberOfParameters(numberOfParameters) && m.isConstructor
-                ));
+                methodsWithArbitraryParameterCount = methodsWithArbitraryParameterCount
+                .concat(type.getOwnMethods().filter(m => m.isConstructor));
                 //@ts-ignore
                 if (type["getExtends"] && type.getOwnMethods().filter(m => m.isConstructor).length == 0){
                     //@ts-ignore
@@ -113,12 +112,11 @@ export abstract class NonPrimitiveType extends JavaType {
                     break;
                 }
             }
+
         } else {
 
-            methods = this.getOwnMethods().filter(m => 
-                m.canTakeNumberOfParameters(numberOfParameters) && !m.isConstructor && m.identifier == identifier
-                && (!hasToBeStatic || m.isStatic)
-            )
+            methodsWithArbitraryParameterCount = this.getOwnMethods()
+            .filter(m => !m.isConstructor && m.identifier == identifier && (!hasToBeStatic || m.isStatic))
 
             //@ts-ignore
             let ext = this.getExtends() as NonPrimitiveType | NonPrimitiveType[] | undefined;        // is array if this instanceOf JavaInterface
@@ -127,13 +125,14 @@ export abstract class NonPrimitiveType extends JavaType {
                 if(!Array.isArray(ext)) ext = [ext];
     
                 for(let type of ext){
-                    methods = methods.concat(type.getPossibleMethods(identifier, numberOfParameters, isConstructor, hasToBeStatic));
+                    methodsWithArbitraryParameterCount = methodsWithArbitraryParameterCount
+                    .concat(type.getPossibleMethods(identifier, isConstructor, hasToBeStatic));
                 }
             }
 
         }
 
-        return methods;
+        return methodsWithArbitraryParameterCount;
     }
 
     isVisibleFrom(classContext: NonPrimitiveType | undefined) {

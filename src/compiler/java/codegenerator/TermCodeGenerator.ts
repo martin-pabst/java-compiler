@@ -215,7 +215,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let method = methods.best;
 
         this.module.pushMethodCallPosition(node.range, node.commaPositions, methods.possible,
-            node.rightBracketPosition!
+            node.rightBracketPosition!, method
         )
 
         if (!method) {
@@ -906,7 +906,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         if(node.rightBracketPosition){
             this.module.pushMethodCallPosition(node.identifierRange, 
-                node.commaPositions, methods.possible, node.rightBracketPosition);
+                node.commaPositions, methods.possible, node.rightBracketPosition,
+            method);
         }
 
         if (!method) {
@@ -1052,9 +1053,9 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let possibleMethods: Method[];
 
         if (objectType instanceof StaticNonPrimitiveType) {
-            possibleMethods = objectType.getPossibleMethods(identifier, parameterTypes.length, isConstructor, hasToBeStatic);
+            possibleMethods = objectType.getPossibleMethods(identifier, isConstructor, hasToBeStatic);
         } else if (objectType instanceof NonPrimitiveType) {
-            possibleMethods = objectType.getPossibleMethods(identifier, parameterTypes.length, isConstructor, hasToBeStatic);
+            possibleMethods = objectType.getPossibleMethods(identifier, isConstructor, hasToBeStatic);
         } else {
             return {best: undefined, possible: []};
         }
@@ -1081,6 +1082,9 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let castsNeededWithBestMethodSoFar: number = Number.MAX_SAFE_INTEGER;
 
         for (let method of possibleMethods) {
+
+            if(!method.canTakeNumberOfParameters(parameterTypes.length)) continue;
+
             if (method instanceof GenericMethod) method.initCatches();
 
             let castsNeeded: number = 0;
