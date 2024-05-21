@@ -512,7 +512,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                     // Has base class a parameterless super constructor?
                     let baseClass = classContext.getExtends();
                     if (baseClass instanceof IJavaClass) {
-                        let parameterlessConstructors = baseClass.getPossibleMethods(baseClass.identifier, 0, true, false);
+                        let parameterlessConstructors = baseClass.getPossibleMethods(baseClass.identifier, true, false).filter(m => m.parameters.length == 0);
                         if (parameterlessConstructors.length == 0) {
                             this.pushError(JCM.superCallInConstructorMissing(baseClass.identifier), "error", methodNode.identifierRange);
                         } else {
