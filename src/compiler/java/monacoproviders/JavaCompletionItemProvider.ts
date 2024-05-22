@@ -280,13 +280,12 @@ export class JavaCompletionItemProvider implements monaco.languages.CompletionIt
 
             // don't show class completion items (methods, fields) in main class
             if(classContext!= null && classContext.identifier != ''){
-                completionItems = completionItems.concat(
-                    classContext.getCompletionItems(TokenType.keywordPrivate, leftBracketAlreadyThere, identifierAndBracketAfterCursor, rangeToReplace, symbolTable.methodContext)
-                        .map(ci => {
-                            ci.sortText = "aa" + ci.label;
-                            return ci;
-                        })
-                );
+                let fieldsAndMethods = classContext.getCompletionItems(TokenType.keywordPrivate, leftBracketAlreadyThere, identifierAndBracketAfterCursor, rangeToReplace, symbolTable.methodContext)
+                .map(ci => {
+                    ci.sortText = "aa" + ci.label;
+                    return ci;
+                }).filter(newItem => completionItems.findIndex(oldItem => oldItem.insertText == newItem.insertText) < 0);
+                completionItems = completionItems.concat(fieldsAndMethods);
                 completionItems.push(
                     {
                         label: "super",

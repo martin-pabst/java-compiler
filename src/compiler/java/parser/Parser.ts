@@ -57,6 +57,7 @@ export class Parser extends StatementParser {
 
         this.module.mainClass = this.nodeFactory.buildClassNode(this.nodeFactory.buildNodeWithModifiers(EmptyRange.instance),
             undefined, this.module.ast!, []);
+        this.module.mainClass.range = globalRange;
 
         let mainMethod = this.nodeFactory.buildMethodNode(undefined, false, this.nodeFactory.buildNodeWithModifiers(EmptyRange.instance),
             { tt: TokenType.identifier, value: "main", range: EmptyRange.instance }, globalRange, [], this.module.mainClass);

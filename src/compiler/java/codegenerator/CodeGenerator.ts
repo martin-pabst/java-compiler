@@ -133,11 +133,9 @@ export class CodeGenerator extends StatementCodeGenerator {
     }
 
     private compileMethods(cdef: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, classContext: JavaClass | JavaEnum | JavaInterface) {
-        let constructorFound: boolean = false;
         for (let method of cdef.methods) {
             this.compileMethodDeclaration(method, classContext);
             if (method.isContructor) {
-                constructorFound = true;
                 if (cdef.kind == TokenType.keywordEnum) {
                     if (method.visibility != TokenType.keywordPrivate) {
                         this.pushError(JCM.enumConstructorsMustBePrivate(), "error", method.range);

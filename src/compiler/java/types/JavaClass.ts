@@ -35,7 +35,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 
         for (let field of this.getFields().filter(f => f.visibility <= visibilityUpTo && (f.isStatic || !onlyStatic))) {
             itemList.push({
-                label: field.identifier + "",
+                label: field.getDeclaration(),
                 kind: monaco.languages.CompletionItemKind.Field,
                 insertText: field.identifier,
                 range: rangeToReplace,
@@ -63,6 +63,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
                     title: '123',
                     arguments: []
                 },
+                detail: method.returnParameterType ? method.returnParameterType.getDeclaration() : "void",
                 kind: monaco.languages.CompletionItemKind.Method,
                 insertText: method.getCompletionSnippet(leftBracketAlreadyThere),
                 range: rangeToReplace,

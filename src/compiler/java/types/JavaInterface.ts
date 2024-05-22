@@ -78,6 +78,7 @@ export abstract class IJavaInterface extends NonPrimitiveType {
                 },
                 kind: monaco.languages.CompletionItemKind.Method,
                 insertText: method.getCompletionSnippet(leftBracketAlreadyThere),
+                detail: method.returnParameterType ? method.returnParameterType.getDeclaration() : "void",
                 range: rangeToReplace,
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                 documentation: method.documentation == null ? undefined : {

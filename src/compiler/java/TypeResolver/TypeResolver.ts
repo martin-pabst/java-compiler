@@ -522,6 +522,7 @@ export class TypeResolver {
 
                     let parameter = new Parameter(p.identifier, p.identifierRange,
                         module, type, p.isFinal, p.isEllipsis, p.trackMissingReadAccess);
+                    module.compiledSymbolsUsageTracker.registerUsagePosition(parameter, module.file, p.identifierRange);
                     method.parameters.push(parameter);
                 }
             }

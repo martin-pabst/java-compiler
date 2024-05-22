@@ -123,7 +123,7 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
         for (let field of this.getFields().filter(f => f.visibility <= visibilityUpTo && (f.isStatic || !onlyStatic))) {
             itemList.push({
-                label: field.identifier + "",
+                label: field.getDeclaration(),
                 kind: monaco.languages.CompletionItemKind.Field,
                 insertText: field.identifier,
                 range: rangeToReplace,
@@ -146,6 +146,7 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
                 kind: monaco.languages.CompletionItemKind.Method,
                 insertText: method.getCompletionSnippet(leftBracketAlreadyThere),
                 range: rangeToReplace,
+                detail: method.returnParameterType ? method.returnParameterType.getDeclaration() : "void",
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                 documentation: method.documentation == null ? undefined : {
                     value: method.documentation

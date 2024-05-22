@@ -129,6 +129,7 @@ export class JavaCompiledModule extends JavaBaseModule {
         this.systemSymbolsUsageTracker.clear();
         this.typePositions = {};
         this.methodCallPositions = {};
+        this.symbolTables = [];
     }
 
     setDirtyIfProgramCodeChanged(){

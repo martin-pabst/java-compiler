@@ -33,12 +33,14 @@ export class JavaSymbolTable extends BaseSymbolTable {
 
         super(parent);
         
-        if(parent && parent instanceof JavaSymbolTable){
-            if(!classContext) this.classContext = parent.classContext;
-            if(!methodContext) this.methodContext = parent.methodContext;
+        if(parent){
+            if(!classContext) this.classContext = (<JavaSymbolTable>parent).classContext;
+            if(!methodContext) this.methodContext = (<JavaSymbolTable>parent).methodContext;
         }
 
-        module.symbolTables.push(this);
+        if(!parent){
+            module.symbolTables.push(this);
+        }
 
         if(withStackFrame){
             // inside non-static java-methods: 1st element on stack is this
@@ -52,10 +54,26 @@ export class JavaSymbolTable extends BaseSymbolTable {
     }
 
     private findSymbolIntern(identifier: string, upToVisibility: Visibility, searchForFields: boolean, outerClassLevel: number): LocalVariableInformation | undefined {
+        // local variable?
         let symbol = this.identifierToSymbolMap.get(identifier);
         if(symbol) return {
             symbol: symbol,
             outerClassLevel: outerClassLevel
+        }
+
+        // parameter?
+        // Topmost Symbol table inside method has parameters...
+        if(this.methodContext != null && this.parent != null){
+            let parent = this.parent;
+            while(parent && parent.parent?.methodContext == this.methodContext){
+                parent = parent.parent;
+            }
+            symbol = parent.identifierToSymbolMap.get(identifier);
+            if(symbol){
+                return {
+                    symbol: symbol,
+                    outerClassLevel: outerClassLevel                        }
+            }
         }
 
         if(this.classContext && searchForFields){
@@ -114,15 +132,17 @@ export class JavaSymbolTable extends BaseSymbolTable {
         let items: monaco.languages.CompletionItem[] = [];
         this.identifierToSymbolMap.forEach((symbol, identifier) => {
             items.push({
-                label: symbol.identifier,
+                label: symbol.getDeclaration(),
                 kind: monaco.languages.CompletionItemKind.Variable,
                 insertText: symbol.identifier,
+                filterText: symbol.identifier,
                 range: rangeToReplace
             })
         })
 
         if(this.parent){
-            items = items.concat(this.parent.getLocalVariableCompletionItems(rangeToReplace));
+            let newItems = this.parent.getLocalVariableCompletionItems(rangeToReplace).filter(newItem => items.findIndex(item => item.insertText == newItem.insertText) == -1);
+            items = items.concat(newItems);
         }
 
         return items;

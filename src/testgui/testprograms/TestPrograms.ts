@@ -1,5 +1,12 @@
 export var testProgramsList = [
-['emptyTest', ``],
+['emptyTest', `
+class Test {
+   int s;
+   
+   void t(String s){
+      s = 10;
+   }
+}`],
 ['ActorTest', `
 for(int i = 0; i < 100; i++){
    new Test(i);
