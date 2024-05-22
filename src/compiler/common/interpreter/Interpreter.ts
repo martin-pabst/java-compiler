@@ -196,8 +196,6 @@ export class Interpreter {
         this.setState(SchedulerState.stopped);
         this.scheduler.unmarkCurrentlyExecutedSingleStep();
 
-        this.eventManager.fire("stop");
-
         // Beware: originally this was after this.getTimerClass().stopTimer();
         // if Bitmap caching doesn't work, we need two events...
         // if (this.worldHelper != null) {
@@ -303,6 +301,7 @@ export class Interpreter {
 
         if (state == SchedulerState.stopped) {
             this.showProgramPointer(undefined);
+            this.eventManager.fire("stop");
             // TODO
             // this.closeAllWebsockets();
         }

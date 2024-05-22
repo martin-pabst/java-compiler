@@ -5,6 +5,7 @@ import { Thread, ThreadState } from "../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { ObjectClass } from "../system/javalang/ObjectClassStringClass";
+import { Interpreter } from '../../../common/interpreter/Interpreter.ts';
 
 
 export class WorldClass extends ObjectClass {
@@ -45,60 +46,144 @@ export class WorldClass extends ObjectClass {
 
     static type: NonPrimitiveType;
 
-    width: number = 800;
-    height: number = 600;
+    width: number = 0;
+    height: number = 0;
 
     app?: PIXI.Application;
 
-    _constructor1(t: Thread, callback: CallbackFunction) {
-        this._constructor2(t, callback, 800, 600)
+    graphicsDiv?: HTMLDivElement;
+
+    _constructor1(t: Thread) {
+        this._constructor2(t, 800, 600)
     }
 
-    _constructor2(t: Thread, callback: CallbackFunction, width: number, height: number) {
-        
+    _constructor2(t: Thread, width: number, height: number) {
+
         let interpreter = t.scheduler.interpreter;
         let existingWorld = <WorldClass>interpreter.objectStore["World"];
-        if(existingWorld){
+        if (existingWorld) {
             t.s.push(existingWorld);
             existingWorld.changeResolution(width, height);
-            if(callback) callback();
+            return;
         }
 
         interpreter.objectStore["World"] = this;
 
-        interpreter.eventManager.on("resetRuntime", () => {
-            this.app?.destroy({removeView: true}, {});
-            delete interpreter.objectStore["World"];
-        })
-
-        let graphicsDiv = interpreter.graphicsManager?.graphicsDiv;
+        this.graphicsDiv = <HTMLDivElement>interpreter.graphicsManager?.graphicsDiv;
+        this.graphicsDiv.style.minWidth = "0";
+        this.graphicsDiv.style.minHeight = "0";
+        this.graphicsDiv.style.overflow = "hidden";
 
         t.state = ThreadState.waiting;
         this.app = new PIXI.Application();
-        this.app.init({background: '#000000', resizeTo: graphicsDiv!}).then(() => {
+        this.app.init({ background: '#000000', width: width, height: height, resizeTo: undefined }).then(() => {
 
-            graphicsDiv?.appendChild(this.app!.canvas);
-            this.app!.stage.setFromMatrix(new PIXI.Matrix(0.5, 0, 0, 1, 0, 0));
-            
+            this.app!.canvas.style.width = "10px";
+            this.app!.canvas.style.height = "10px";
+            this.graphicsDiv?.appendChild(this.app!.canvas);
+
+            window.onresize = () => {
+                this.changeResolution(this.width, this.height);
+            }
+
+            this.app!.stage.setFromMatrix(new PIXI.Matrix(1, 0, 0, 1, 0, 0));
 
             const graphics = new PIXI.Graphics();
 
             // Rectangle
-            graphics.rect(50, 50, 100, 100);
+            graphics.rect(50, 50, 1000, 500);
             graphics.fill(0xde3249);
 
             this.app!.stage.addChild(graphics);
 
+            this.changeResolution(width, height);
+
+            this.addCallbacks(interpreter);
+
             t.state = ThreadState.runnable;
-            if(callback) callback();
         })
     }
 
+    addCallbacks(interpreter: Interpreter) {
+        let onResetRuntimeCallback = () => {
+            this.app?.destroy({ removeView: true }, {});
+            this.app = undefined;
+            delete interpreter.objectStore["World"];
+            interpreter.eventManager.off(onResetRuntimeCallback);
+            interpreter.eventManager.off(onProgramStoppedCallback);
+        }
 
-    changeResolution(width: number, height: number){
-        if(this.width == width && this.height == height) return;
-        // TODO
+        let onProgramStoppedCallback = () => {
+            this.onProgramStopped();
+            interpreter.eventManager.off(onProgramStoppedCallback);
+        }
+
+        interpreter.eventManager.on("resetRuntime", onResetRuntimeCallback)
+        interpreter.eventManager.on("stop", onProgramStoppedCallback)
+
     }
+
+    changeResolution(width: number, height: number) {
+        this.width = width;
+        this.height = height;
+        // prevent graphicsDiv from overflowing
+        this.app!.canvas.style.width = "10px";
+        this.app!.canvas.style.height = "10px";
+
+        this.app?.renderer.resize(width, height, 1);
+
+        let rect = this.graphicsDiv!.getBoundingClientRect();
+        if (rect.width == 0 || rect.height == 0) rect = this.graphicsDiv!.parentElement!.getBoundingClientRect();
+
+        let newCanvasWidth: number;
+        let newCanvasHeight: number;
+        if (width / height > rect.width / rect.height) {
+            newCanvasWidth = rect.width;
+            newCanvasHeight = rect.width / width * height;
+        } else {
+            newCanvasHeight = rect.height;
+            newCanvasWidth = rect.height / height * width;
+        }
+
+        newCanvasHeight = Math.min(newCanvasHeight, rect.height);
+        newCanvasWidth = Math.min(newCanvasWidth, rect.width);
+
+
+        this.app!.canvas.style.width = newCanvasWidth + "px";
+        this.app!.canvas.style.height = newCanvasHeight + "px";
+
+    }
+
+    onProgramStopped() {
+
+        const stageSize = {
+            width: this.app!.screen.width,
+            height: this.app!.screen.height,
+        };
+
+        // Create two render textures... these dynamic textures will be used to draw the scene into itself
+        let renderTexture = PIXI.RenderTexture.create(stageSize);
+        this.app!.renderer.render({
+            container: this.app!.stage,
+            target: renderTexture,
+            clear: false,
+        });
+        setTimeout(() => {
+            let children = this.app!.stage.children.slice();
+            this.app!.stage.removeChildren(0, children.length);
+            children.forEach(c => c.destroy());
+
+            let sprite = new PIXI.Sprite(renderTexture);
+            sprite.x = 0;
+            sprite.y = 0;
+            sprite.anchor = 0;
+            this.app?.stage.addChild(sprite);
+        }, 500)
+
+    }
+
+
+
 
 }
 
