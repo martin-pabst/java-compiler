@@ -320,7 +320,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         if (callingConvention == "java") {
-            template += `${StepParams.thread}` + (parameterValues.length > 0 ? ", " : "");
+            template += `${StepParams.thread}, undefined` + (parameterValues.length > 0 ? ", " : "");
         }
 
         let i = 2;

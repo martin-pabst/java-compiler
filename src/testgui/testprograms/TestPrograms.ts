@@ -1,5 +1,20 @@
 export var testProgramsList = [
-['t1', `new`],
+['emptyTest', ``],
+['ActorTest', `
+for(int i = 0; i < 100; i++){
+   new Test(i);
+}
+
+class Test extends Actor {
+   int n;
+   public Test(int n){
+      this.n = n;
+   }
+   public void act(){
+      println("Hello, I'm " + n);
+   }
+}
+`],
 ['synchronizedTest', `
 new A().test();
 

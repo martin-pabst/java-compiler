@@ -87,7 +87,8 @@ export class Scheduler {
                         this.keepThread = false;
                     }
 
-                    if (this.runningThreads.length == 0 || threadState.state == ThreadState.terminatedWithException) {
+                    if (this.runningThreads.length == 0 && !this.interpreter.hasActors()
+                        || threadState.state == ThreadState.terminatedWithException) {
                         this.stepCountSinceStartOfProgram += numberOfStepsInThisRun;
                         this.interpreter.setState(SchedulerState.stopped);
                         if (threadState.state == ThreadState.terminatedWithException) {

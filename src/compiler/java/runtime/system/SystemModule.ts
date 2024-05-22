@@ -47,6 +47,7 @@ import { DecimalFormatClass } from "./javalang/DecimalFormatClass.ts";
 import { OptionalClass } from "./javalang/OptionalClass.ts";
 import { FunctionInterface } from "./functional/FunctionInterface.ts";
 import { WorldClass } from "../graphic/WorldClass.ts";
+import { ActorClass } from "../graphic/ActorClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -94,7 +95,7 @@ export class SystemModule extends JavaLibraryModule {
             AssertionsClass,
 
             // Graphics
-            WorldClass
+            WorldClass, ActorClass
         )
 
     }

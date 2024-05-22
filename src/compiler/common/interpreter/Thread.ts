@@ -282,7 +282,7 @@ export class Thread {
                 }
             }
 
-            if(ps.aquiredObjectLocks){
+            if(ps?.aquiredObjectLocks){
                 while(ps.aquiredObjectLocks.length > 0) this.leaveSynchronizedBlock(ps.aquiredObjectLocks.pop()!);
             }
 

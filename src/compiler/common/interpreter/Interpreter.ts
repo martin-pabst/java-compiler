@@ -10,6 +10,7 @@ import { ProgramPointerPositionInfo, Scheduler, SchedulerState } from "./Schedul
 import { KlassObjectRegistry } from "./StepFunction.ts";
 import { File } from "../module/File.ts";
 import { GraphicsManager } from "./GraphicsManager.ts";
+import { IWorld } from "../../java/runtime/graphic/IWorld.ts";
 
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
@@ -393,6 +394,12 @@ export class Interpreter {
     isRunningOrPaused(): boolean {
         return this.scheduler.state == SchedulerState.running || 
             this.scheduler.state == SchedulerState.paused;
+    }
+
+    hasActors(): boolean {
+        let world: IWorld = this.objectStore["World"];
+        if(!world) return false;
+        return world.hasActors();
     }
 
 }
