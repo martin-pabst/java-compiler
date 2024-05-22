@@ -9,6 +9,7 @@ import { DummyPrintManager, PrintManager } from "./PrintManager";
 import { ProgramPointerPositionInfo, Scheduler, SchedulerState } from "./Scheduler";
 import { KlassObjectRegistry } from "./StepFunction.ts";
 import { File } from "../module/File.ts";
+import { GraphicsManager } from "./GraphicsManager.ts";
 
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
@@ -39,6 +40,8 @@ export class Interpreter {
     eventManager: EventManager<InterpreterEvents> = new EventManager();
     showProgramPointerCallback?: ShowProgramPointerCallback;
 
+    objectStore: {[key: string]: any} = {};
+
     actions: string[] = ["start", "pause", "stop", "stepOver",
         "stepInto", "stepOut", "restart"];
     //SchedulerLstatus { done, running, paused, not_initialized }
@@ -59,7 +62,9 @@ export class Interpreter {
 
 
 
-    constructor(printManager?: PrintManager, private actionManager?: ActionManager) {
+    constructor(printManager?: PrintManager, private actionManager?: ActionManager, 
+        public graphicsManager?: GraphicsManager
+    ) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {
 
         // this.printManager = new PrintManager($runDiv, this.main);

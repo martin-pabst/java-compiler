@@ -41,6 +41,7 @@ import { JavaDefinitionProvider } from "./compiler/java/monacoproviders/JavaDefi
 import { Range } from "./compiler/common/range/Range.ts";
 import { JavaReferenceProvider } from "./compiler/java/monacoproviders/JavaReferenceProvider.ts";
 import { JavaSignatureHelpProvider } from "./compiler/java/monacoproviders/JavaSignatureHelpProvider.ts";
+import { GraphicsManager } from "./compiler/common/interpreter/GraphicsManager.ts";
 
 export class Main implements MainClass {
 
@@ -55,6 +56,7 @@ export class Main implements MainClass {
   codeOutputDiv: HTMLDivElement;
   errorDiv: HTMLDivElement;
   testDiv: HTMLDivElement;
+  graphicsDiv: HTMLDivElement;
 
   programControlButtons!: ProgramControlButtons;
   actionManager: ActionManager;
@@ -80,7 +82,7 @@ export class Main implements MainClass {
     //let testProgram: string = testPrograms.listeVorlage.trim();
 
     this.insightTabsManager = new TabManager(document.getElementById('insighttabs')!,
-      ['token', 'ast', 'code', 'errors', 'tests']);
+      ['token', 'ast', 'code', 'errors', 'tests', 'graphics']);
 
     this.insightTabsManager.setBodyElementClass('tabBodyElement');
     this.tokenDiv = this.insightTabsManager.getBodyElement(0);
@@ -91,6 +93,7 @@ export class Main implements MainClass {
     this.astDiv.classList.add('astOutput');
     this.errorDiv = this.insightTabsManager.getBodyElement(3);
     this.testDiv = this.insightTabsManager.getBodyElement(4);
+    this.graphicsDiv = this.insightTabsManager.getBodyElement(5);
 
     this.testResultViewer = new TestResultViewer();
 
@@ -125,7 +128,8 @@ export class Main implements MainClass {
 
     this.actionManager = new ActionManager();
 
-    this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager);
+    this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager,
+      new GraphicsManager(this.graphicsDiv));
 
     this.initButtons();
     this.initCompiler();
