@@ -53,12 +53,18 @@ export class ActorManager {
 
         let t = this.interpreter.scheduler.createThread();
         for(let actor of this.actors["act"]){
-            actor._mj$act$void$(t, undefined);
+            if(actor.isActing) actor._mj$act$void$(t, undefined);
         }
         for(let actor of this.actors["actWithTime"]){
-            actor._mj$act$void$double(t, undefined, dt);
+            if(actor.isActing) actor._mj$act$void$double(t, undefined, dt);
         }
-        t.state = ThreadState.runnable;
+
+        if(t.programStack.length > 0){
+            t.state = ThreadState.runnable;
+        } else {
+            this.interpreter.scheduler.removeThread(t);
+        }
+
     }
     
     clear() {

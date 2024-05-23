@@ -15,14 +15,22 @@ export class ActorClass extends ObjectClass implements IActor {
         { type: "method", signature: "void act(double deltaTime)", java: ActorClass.prototype._mj$act$void$double },
         { type: "method", signature: "void onKeyTyped(String key)", java: ActorClass.prototype._mj$onKeyTyped$void$String },
         { type: "method", signature: "void onKeyUp(String key)", java: ActorClass.prototype._mj$onKeyUp$void$String },
-        { type: "method", signature: "void onKeyDown(String key, isShift: boolean, isCtrl: boolean, isAlt: boolean)", java: ActorClass.prototype._mj$onKeyDown$void$String$boolean$boolean$boolean },
+        { type: "method", signature: "void onKeyDown(String key, boolean isShift, boolean isCtrl, boolean isAlt)", java: ActorClass.prototype._mj$onKeyDown$void$String$boolean$boolean$boolean },
         { type: "method", signature: "void destroy()", java: ActorClass.prototype._mj$destroy$void$ },
         { type: "method", signature: "final boolean isKeyUp(string key)", java: ActorClass.prototype._mj$isKeyUp$boolean$string },
         { type: "method", signature: "final boolean isKeyDown(string key)", java: ActorClass.prototype._mj$isKeyDown$boolean$string },
+        { type: "method", signature: "final World getWorld()", java: ActorClass.prototype._mj$getWorld$World },
+        { type: "method", signature: "final boolean isActing()", native: ActorClass.prototype._isActing },
+        { type: "method", signature: "final void stopActing()", native: ActorClass.prototype._stopActing },
+        { type: "method", signature: "final void restartActing()", native: ActorClass.prototype._restartActing },
         
     ]
 
     static type: NonPrimitiveType;
+
+    isActing: boolean = true;
+
+    isDestroyed: boolean = false;
 
     _cj$_constructor_$Actor$(t: Thread){
 
@@ -98,6 +106,22 @@ export class ActorClass extends ObjectClass implements IActor {
             return;
         }
         t.s.push(keyboardManager.isPressed(key));
+    }
+
+    _mj$getWorld$World(t: Thread, callback: CallbackParameter){
+        t.s.push(t.scheduler.interpreter.objectStore["World"]);
+    }
+
+    _isActing(): boolean {
+        return this.isActing;
+    }
+
+    _stopActing(): void {
+        this.isActing = false;
+    }
+
+    _restartActing(): void {
+        this.isActing = true;
     }
 
     destroy(world: IWorld){

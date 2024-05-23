@@ -179,6 +179,10 @@ export class Scheduler {
         return thread;
     }
 
+    removeThread(thread: Thread){
+        this.runningThreads.splice(this.runningThreads.indexOf(thread), 1);
+    }
+
     suspendThread(thread: Thread) {
         let index = this.runningThreads.indexOf(thread);
         if (index >= 0) {

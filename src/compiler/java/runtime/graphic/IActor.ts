@@ -5,6 +5,7 @@ export const ActorTypes = ["act", "actWithTime", "keyPressed", "keyUp", "keyDown
 export type ActorType = typeof ActorTypes[number];
 
 export interface IActor {
+    isActing: boolean;
     _mj$act$void$(t: Thread, callback?: () => {}): void;
     _mj$act$void$double(t: Thread, callback: (() => {}) | undefined, dt: number): void;
     _mj$onKeyTyped$void$String(t: Thread, callback: (() => {}) | undefined, key: StringClass): void;
