@@ -1,7 +1,7 @@
 import { IMain } from "../../common/IMain.ts";
 import { IRange, Range } from "../../common/range/Range";
 import { JavaCompiler } from "../JavaCompiler.ts";
-import { TokenType } from "../TokenType";
+import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { ArrayType } from "../types/ArrayType";
@@ -660,8 +660,8 @@ export class JavaCompletionItemProvider implements monaco.languages.CompletionIt
 
             let label: string = (m.isAbstract ? "implement " : "override ") + m.getCompletionLabel();
             let filterText = m.identifier;
-            let insertText = TokenType[m.visibility] + " " + (m.returnParameterType == null ? "void" : m.returnParameterType.getDeclaration()) + " ";
-            insertText += m.identifier + "(" + m.parameters.map(p => p.type.getDeclaration() + " " + p.identifier).join(", ");
+            let insertText = TokenTypeReadable[m.visibility] + " " + (m.returnParameterType == null ? "void" : m.returnParameterType.getDeclaration()) + " ";
+            insertText += m.identifier + "(" + m.parameters.map(p => p.type.toString() + " " + p.identifier).join(", ");
             insertText += ") {\n\t$0\n}";
 
             keywordCompletionItems.push(
