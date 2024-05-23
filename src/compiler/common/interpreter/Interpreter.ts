@@ -7,7 +7,7 @@ import { LoadController } from "./LoadController";
 import { DummyPrintManager, PrintManager } from "./PrintManager";
 import { ProgramPointerPositionInfo, Scheduler, SchedulerState } from "./Scheduler";
 import { GraphicsManager } from "./GraphicsManager.ts";
-import { IWorld } from "../../java/runtime/graphic/IWorld.ts";
+import { IWorld } from "../../java/runtime/graphics/IWorld.ts";
 import { KeyboardManager } from "./KeyboardManager.ts";
 
 

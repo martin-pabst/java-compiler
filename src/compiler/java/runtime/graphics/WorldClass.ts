@@ -1,14 +1,16 @@
 
 import * as PIXI from 'pixi.js';
-import { CallbackFunction } from "../../../common/interpreter/StepFunction";
-import { Thread, ThreadState } from "../../../common/interpreter/Thread";
-import { LibraryDeclarations } from "../../module/libraries/DeclareType";
-import { NonPrimitiveType } from "../../types/NonPrimitiveType";
-import { ObjectClass } from "../system/javalang/ObjectClassStringClass";
+import { CallbackFunction } from "../../../common/interpreter/StepFunction.ts";
+import { Thread, ThreadState } from "../../../common/interpreter/Thread.ts";
+import { LibraryDeclarations } from "../../module/libraries/DeclareType.ts";
+import { NonPrimitiveType } from "../../types/NonPrimitiveType.ts";
+import { ObjectClass } from "../system/javalang/ObjectClassStringClass.ts";
 import { Interpreter } from '../../../common/interpreter/Interpreter.ts';
 import { ActorType, IActor } from './IActor.ts';
 import { IWorld } from './IWorld.ts';
 import { ActorManager } from './ActorManager.ts';
+import { GroupClass } from './GroupClass.ts';
+import { ShapeClass } from './ShapeClass.ts';
 
 
 export class WorldClass extends ObjectClass implements IWorld {
@@ -25,12 +27,16 @@ export class WorldClass extends ObjectClass implements IWorld {
     width: number = 0;
     height: number = 0;
 
-    app?: PIXI.Application;
+    app!: PIXI.Application;
 
     graphicsDiv?: HTMLDivElement;
     resizeObserver?: ResizeObserver;
 
     actorManager!: ActorManager;
+
+    defaultGroup?: GroupClass;
+
+    shapesWhichBelongToNoGroup: ShapeClass[] = [];
 
     tickerFunction?: (ticker: PIXI.Ticker) => void;
 
@@ -68,14 +74,6 @@ export class WorldClass extends ObjectClass implements IWorld {
             this.resizeObserver.observe(this.graphicsDiv!);
 
             this.app!.stage.setFromMatrix(new PIXI.Matrix(1, 0, 0, 1, 0, 0));
-
-            const graphics = new PIXI.Graphics();
-
-            // Rectangle
-            graphics.rect(50, 50, 1000, 500);
-            graphics.fill(0xde3249);
-
-            this.app!.stage.addChild(graphics);
 
             this.changeResolution(width, height);
 
@@ -125,6 +123,8 @@ export class WorldClass extends ObjectClass implements IWorld {
         this.app?.ticker.remove(this.tickerFunction!);
         interpreter.isExternalTimer = false;
         this.app?.destroy({ removeView: true }, {});
+
+        //@ts-ignore
         this.app = undefined;
         this.resizeObserver?.disconnect();    
     }
@@ -175,6 +175,7 @@ export class WorldClass extends ObjectClass implements IWorld {
             clear: false,
         });
         setTimeout(() => {
+            if(!this.app) return;
             let children = this.app!.stage.children.slice();
             this.app!.stage.removeChildren(0, children.length);
             children.forEach(c => c.destroy());

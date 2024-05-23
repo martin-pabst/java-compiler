@@ -1,24 +1,28 @@
 export var testProgramsList = [
-['emptyTest', `
-class Test {
-   int s;
-   
-   void t(String s){
-      s = 10;
-   }
-}`],
-['ActorTest', `
-new Test();
-class Test extends Actor {
-   
-   void onKeyUp(String key){
-      println(key);
-   }
-   
-   public void act(){
-      
-   }
-}
+['GroupTest', `
+
+Rectangle r = new Rectangle(200, 100, 100, 200);
+r.move(100, 200);
+Rectangle r2 = new Rectangle();
+r2.move(100, 200);
+
+Group g = new Group();
+g.add(r);
+g.add(r2);
+
+g.rotate(30);
+
+
+Group g2 = new Group();
+g2.move(100, 100);
+g2.add(g);
+
+g2.scale(2);
+
+
+g.remove(r);
+
+r.move(10, 10);
 `],
 ['synchronizedTest', `
 new A().test();

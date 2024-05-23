@@ -6,6 +6,10 @@ import { ObjectClass, StringClass } from "../system/javalang/ObjectClassStringCl
 import { IActor } from "./IActor";
 import { IWorld } from "./IWorld";
 
+// TODO: Gampad support
+/**
+ * Base class of all Objects which have a act-method and kan sense keyboard or gamepad
+ */
 export class ActorClass extends ObjectClass implements IActor {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "abstract class Actor" },
@@ -21,6 +25,7 @@ export class ActorClass extends ObjectClass implements IActor {
         { type: "method", signature: "final boolean isKeyDown(string key)", java: ActorClass.prototype._mj$isKeyDown$boolean$string },
         { type: "method", signature: "final World getWorld()", java: ActorClass.prototype._mj$getWorld$World },
         { type: "method", signature: "final boolean isActing()", native: ActorClass.prototype._isActing },
+        { type: "method", signature: "final boolean isDestroyed()", native: ActorClass.prototype._isDestroyed },
         { type: "method", signature: "final void stopActing()", native: ActorClass.prototype._stopActing },
         { type: "method", signature: "final void restartActing()", native: ActorClass.prototype._restartActing },
         
@@ -32,34 +37,36 @@ export class ActorClass extends ObjectClass implements IActor {
 
     isDestroyed: boolean = false;
 
+    world!: IWorld;
+
     _cj$_constructor_$Actor$(t: Thread){
 
-        let world: IWorld = t.scheduler.interpreter.objectStore["World"];
-        if(!world){
-            world = new t.classes["World"]()._cj$_constructor_$World$(t);
+        this.world = t.scheduler.interpreter.objectStore["World"];
+        if(!this.world){
+            this.world = new t.classes["World"]()._cj$_constructor_$World$(t);
         }
 
         if(this._mj$act$void$ != ActorClass.prototype._mj$act$void$){
-            world.registerActor(this, "act");
+            this.world.registerActor(this, "act");
         }
 
         if(this._mj$act$void$double != ActorClass.prototype._mj$act$void$double){
-            world.registerActor(this, "actWithTime");
+            this.world.registerActor(this, "actWithTime");
         }
 
         if(this._mj$onKeyDown$void$String$boolean$boolean$boolean != ActorClass.prototype._mj$onKeyDown$void$String$boolean$boolean$boolean){
-            world.registerActor(this, "keyDown");
+            this.world.registerActor(this, "keyDown");
         }
 
         if(this._mj$onKeyTyped$void$String != ActorClass.prototype._mj$onKeyTyped$void$String){
-            world.registerActor(this, "keyPressed");
+            this.world.registerActor(this, "keyPressed");
         }
 
         if(this._mj$onKeyUp$void$String != ActorClass.prototype._mj$onKeyUp$void$String){
-            world.registerActor(this, "keyUp");
+            this.world.registerActor(this, "keyUp");
         }
 
-
+        t.s.push(this);
     }
 
     _mj$act$void$(t: Thread, callback: () => {}): void{
@@ -88,6 +95,7 @@ export class ActorClass extends ObjectClass implements IActor {
         if(world){
             world.unregisterActor(this);
         }
+        this.isDestroyed = true;
     }
     
     _mj$isKeyUp$boolean$string(t: Thread, callback: CallbackParameter, key: string){
@@ -110,6 +118,10 @@ export class ActorClass extends ObjectClass implements IActor {
 
     _mj$getWorld$World(t: Thread, callback: CallbackParameter){
         t.s.push(t.scheduler.interpreter.objectStore["World"]);
+    }
+
+    _isDestroyed(): boolean {
+        return this.isDestroyed;
     }
 
     _isActing(): boolean {

@@ -23,7 +23,7 @@ export class ActorManager {
     }
     
     keyTypedListener: KeyPressedListener = (key: string) => {
-        this.keyTypedListener(key);
+        this.onKeyPressed(key);
     }
     
     constructor(private interpreter: Interpreter){

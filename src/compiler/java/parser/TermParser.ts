@@ -230,6 +230,8 @@ export abstract class TermParser extends TokenIterator {
                 break;
             case TokenType.shortConstant:
             case TokenType.integerLiteral:
+            case TokenType.floatLiteral:
+            case TokenType.doubleConstant:
             case TokenType.longConstant:
             case TokenType.charLiteral:
             case TokenType.stringLiteral:

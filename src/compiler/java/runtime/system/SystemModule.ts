@@ -46,8 +46,12 @@ import { RandomClass } from "./javalang/RandomClass.ts";
 import { DecimalFormatClass } from "./javalang/DecimalFormatClass.ts";
 import { OptionalClass } from "./javalang/OptionalClass.ts";
 import { FunctionInterface } from "./functional/FunctionInterface.ts";
-import { WorldClass } from "../graphic/WorldClass.ts";
-import { ActorClass } from "../graphic/ActorClass.ts";
+import { WorldClass } from "../graphics/WorldClass.ts";
+import { ActorClass } from "../graphics/ActorClass.ts";
+import { ShapeClass } from "../graphics/ShapeClass.ts";
+import { FilledShapeClass } from "../graphics/FilledShapeClass.ts";
+import { RectangleClass } from "../graphics/RectangleClass.ts";
+import { GroupClass } from "../graphics/GroupClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -95,7 +99,7 @@ export class SystemModule extends JavaLibraryModule {
             AssertionsClass,
 
             // Graphics
-            WorldClass, ActorClass
+            WorldClass, ActorClass, ShapeClass, FilledShapeClass, RectangleClass, GroupClass
         )
 
     }
