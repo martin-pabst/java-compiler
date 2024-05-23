@@ -84,7 +84,7 @@ export class GenericTypeParameter extends NonPrimitiveType {
         return this.getOwnMethods();
     }
 
-    getPossibleMethods(identifier: string, length: number, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
+    getPossibleMethods(identifier: string, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
         return this.getAllMethods().filter(m => m.identifier == identifier && m.isConstructor == isConstructor && (m.isStatic || !hasToBeStatic));
     }
 
@@ -103,6 +103,18 @@ export class GenericTypeParameter extends NonPrimitiveType {
 
         return copy;
     }
+
+    canBeReplacedByConcreteType(gpType: JavaType): boolean {
+        if(!(gpType instanceof NonPrimitiveType)) return false;
+        for(let ub of this.upperBounds){
+            if(!gpType.fastExtendsImplements(ub.identifier)) return false;
+        }
+
+        if(this.lowerBound && !this.lowerBound.fastExtendsImplements(gpType.identifier)) return false;
+
+        return true;
+    }
+
 
     canImplicitlyCastTo(otherType: JavaType): boolean {
         if(otherType.isPrimitive) return false;

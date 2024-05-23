@@ -10,11 +10,16 @@ import { updateWorldTransformRecursively } from './PixiHelper';
 
 export class GroupClass extends ShapeClass {
     static __javaDeclarations: LibraryDeclarations = [
-        { type: "declaration", signature: "class Group extends Shape" },
+        { type: "declaration", signature: "class Group<T extends Shape> extends Shape" },
 
         { type: "method", signature: "Group()", java: GroupClass.prototype._cj$_constructor_$Group$ },
-        { type: "method", signature: "final void add(Shape shape)", native: GroupClass.prototype.add },
-        { type: "method", signature: "final void remove(Shape shape)", native: GroupClass.prototype.remove },
+        { type: "method", signature: "Group(T... shapes)", java: GroupClass.prototype._cj$_constructor_$Group$T },
+        { type: "method", signature: "final void add(T shape)", native: GroupClass.prototype.add },
+        { type: "method", signature: "final void add(T... shapes)", native: GroupClass.prototype.addMultiple },
+        { type: "method", signature: "final void remove(T shape)", native: GroupClass.prototype.remove },
+        { type: "method", signature: "final void remove(int index)", native: GroupClass.prototype.removeWithIndex },
+        { type: "method", signature: "final T get(int index)", native: GroupClass.prototype.get },
+        { type: "method", signature: "final int indexOf(T shape)", native: GroupClass.prototype.indexOf },
         // { type: "method", signature: "Rectangle(double left, double top, double width, double height)", java: GroupClass.prototype._cj$_constructor_$Rectangle$double$double$double$double },
 
     ]
@@ -27,6 +32,40 @@ export class GroupClass extends ShapeClass {
         this._cj$_constructor_$Shape$(t, callback);
         this.container = new PIXI.Container();
         this.world.app.stage.addChild(this.container);
+    }
+
+    _cj$_constructor_$Group$T(t: Thread, callback: CallbackFunction, shapes: ShapeClass[]){
+        this._cj$_constructor_$Group$(t, callback);
+        if(!shapes) return;
+        for(let shape of shapes){
+            this.add(shape);
+        }
+    }
+
+    indexOf(shape: ShapeClass): number {
+        return this.shapes.indexOf(shape);
+    }
+
+    checkIndex(index: number){
+        if(index < 0) throw new RuntimeExceptionClass("Der Index ist kleiner als 0.");
+        if(index >= this.shapes.length) throw new RuntimeExceptionClass("Zugriff auf das Shape mit Index " + index + " einer Gruppe mit " + this.shapes.length + " Elementen.");
+    }
+
+    removeWithIndex(index: number): void {
+        this.checkIndex(index);
+        this.remove(this.shapes[index]);
+    }
+    
+    get(index: number): ShapeClass {
+        this.checkIndex(index);
+        return this.shapes[index];
+    }
+
+
+    addMultiple(shapes: ShapeClass[]){
+        for(let shape of shapes){
+            this.add(shape);
+        }
     }
 
     add(shape: ShapeClass) {

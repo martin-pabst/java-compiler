@@ -534,6 +534,11 @@ export class JCM {
         "en": `Can't use primitive Type ${type} for generic parameter.`,
     })
 
+    static cantReplaceGenericParamterBy = (genericParameter: string, replacedBy: string) => le({
+        "de": `Der generische Typparameter ${genericParameter} kann nicht durch den Typ ${replacedBy} ersetzt werden.`,
+        "en": `Can't replace generic typeparameter ${genericParameter} with type ${replacedBy}.`,
+    })
+
 
     static onlyClassesOrInterfacesAsUpperBounds = () => le({
         "de": `Nur Klassen und Interfaces können als upper bound für einen generischen Typparameter verwendet werden.`,

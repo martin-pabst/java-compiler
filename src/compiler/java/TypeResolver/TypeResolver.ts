@@ -209,10 +209,14 @@ export class TypeResolver {
                     let gp = baseType.genericTypeParameters![i];
                     let gpNode = genericTypeNode.actualTypeArguments[i];
                     let gpType = this.resolveTypeNode(gpNode, module);
+                    // TODO: Check upper/lower bounds of gp against gpType!
                     if (gpType) {
                         if (gpType.isPrimitive) {
                             this.pushError(JCM.noPrimitiveTypeForGenericParameter(baseType.identifier), typeNode.range, module);
                         } else {
+                            if(!gp.canBeReplacedByConcreteType(gpType)){
+                                this.pushError(JCM.cantReplaceGenericParamterBy(gp.getDeclaration(), gpType.toString()), typeNode.range, module);
+                            }
                             typeMap.set(gp, <NonPrimitiveType>gpType);
                         }
                     }

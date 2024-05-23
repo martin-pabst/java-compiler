@@ -253,13 +253,11 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             this.nextToken();
             switch (tt) {
                 case TokenType.keywordExtends:
-                    this.nextToken();
                     do {
                         upperBounds.push(<any>this.parseType(module));
                     } while (this.comesToken(TokenType.ampersand, true))
                     break;
                 case TokenType.keywordImplements:
-                    this.nextToken();
                     lowerBound = <any>this.parseType(module);
                     break;
             }
