@@ -48,7 +48,16 @@ export class ActorManager {
         list.push(actor);
     }
     
+    thread1?: Thread;
+    thread2?: Thread;
     callActMethods(dt: number){
+        while(this.thread1 && this.thread1.state == ThreadState.terminated){
+            this.thread1 = this.thread2;
+            this.thread2 = undefined;
+        }
+
+        if(this.thread2) return;
+
         if(this.actors["act"].length == 0 && this.actors["actWithTime"].length == 0 ) return;
 
         let t = this.interpreter.scheduler.createThread();
@@ -61,6 +70,11 @@ export class ActorManager {
 
         if(t.programStack.length > 0){
             t.state = ThreadState.runnable;
+            if(this.thread1){
+                this.thread2 = t;
+            } else {
+                this.thread1 = t;
+            }
         } else {
             this.interpreter.scheduler.removeThread(t);
         }

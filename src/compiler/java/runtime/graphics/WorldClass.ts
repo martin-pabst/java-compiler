@@ -24,8 +24,14 @@ export class WorldClass extends ObjectClass implements IWorld {
 
     static type: NonPrimitiveType;
 
-    width: number = 0;
-    height: number = 0;
+    width: number = 800;
+    height: number = 600;
+
+    currentLeft: number = 0;
+    currentTop: number = 0;
+    currentWidth: number = 800;
+    currentHeight: number = 600;
+
 
     app!: PIXI.Application;
 
@@ -132,6 +138,11 @@ export class WorldClass extends ObjectClass implements IWorld {
     changeResolution(width: number, height: number) {
         this.width = width;
         this.height = height;
+
+        this.currentLeft = 0;
+        this.currentTop = 0;
+        this.currentWidth = width;
+        this.currentHeight = height;
         // prevent graphicsDiv from overflowing
         this.app!.canvas.style.width = "10px";
         this.app!.canvas.style.height = "10px";

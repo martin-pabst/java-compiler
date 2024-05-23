@@ -26,7 +26,7 @@ export class MathClass extends ObjectClass {
         {type: "method", signature: "public static int ceil(double value)", template: 'Math.ceil(§1)', constantFoldingFunction: (value) => Math.ceil(value)},
         {type: "method", signature: "public static int signum(double value)", template: 'Math.sign(§1)', constantFoldingFunction: (value) => Math.sign(value)},
         {type: "method", signature: "public static double sqrt(double a)", template: 'Math.sqrt(§1)', constantFoldingFunction: (a) => Math.sqrt(a)},
-        {type: "method", signature: "public static double random()", template: 'Math.random()', constantFoldingFunction: (a) => Math.random()},
+        {type: "method", signature: "public static double random()", template: 'Math.random()'},
         {type: "method", signature: "public static double pow(double basis, double exponent)", template: 'Math.pow(§1, §2)', constantFoldingFunction: (a, b) => Math.pow(a, b)},
         {type: "method", signature: "public static double toDegrees(double angleInRad)", template: '(§1 / Math.PI * 180)', constantFoldingFunction: (a) => a/Math.PI*180},
         {type: "method", signature: "public static double toRadians(double angleInDegrees)", template: '(§1 / 180 * Math.PI)', constantFoldingFunction: (a) => a/180*Math.PI},

@@ -1,4 +1,46 @@
 export var testProgramsList = [
+['Particles', `
+println("Verändern Sie die Erzeugungsrate der Rechtecke mit dem Geschwindigkeitsregler!");
+World g = new World(800, 900);
+
+for(int i = 1; i <= 600; i++) {
+   Particle p = new Particle();
+   if(i % 10 == 0) {
+      println(i + " Rechtecke sichtbar.");
+   }
+}
+
+ 
+class Particle extends Rectangle {
+
+   double vx = Math.random() * 8 - 4;
+   double vy = (-1)*Math.random() * 15 - 4;
+   double x = 400;
+   double y = 850;
+   double width = 30;
+   double height = 50;
+   double vw = Math.random() * 20 - 10;
+
+   public Particle() {
+      super(x - width / 2, y - height / 2, width, height);
+      setFillColor(Math.floor(Math.random() * 256 * 256 * 256 - 1), Math.random());
+      // setBorderColor(null);
+   }
+
+   public void act(double time) {
+      move(vx, vy);
+      rotate(vw);
+      scale(1.001);
+      vy += 0.04;
+      // if(isOutsideView()) {
+      //    destroy();
+      //    Particle p = new Particle();
+      // }
+   }
+
+
+}
+`],
 ['GroupTest', `
 
 Rectangle r = new Rectangle(200, 100, 100, 200);

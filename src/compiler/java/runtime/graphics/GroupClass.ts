@@ -45,6 +45,10 @@ export class GroupClass extends ShapeClass {
         }
     }
 
+    render(){
+        
+    }
+
     indexOf(shape: ShapeClass): number {
         return this.shapes.indexOf(shape);
     }

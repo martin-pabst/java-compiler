@@ -12,8 +12,10 @@ export class ColorClass extends ObjectClass {
         { type: "field", signature: "int red" },
         { type: "field", signature: "int green" },
         { type: "field", signature: "int blue" },
+        { type: "field", signature: "double alpha" },
 
         { type: "method", signature: "Color(int red, int green, int blue)", native: ColorClass.prototype._constructorColorClass },
+        { type: "method", signature: "Color(int red, int green, int blue, double alpha)", native: ColorClass.prototype._constructorColorClass1 },
         { type: "method", signature: "static int randomColor()", native: ColorClass._randomColor },
         { type: "method", signature: "static int randomColor(int minimumRGBValue)", native: ColorClass._randomColorMin },
         { type: "method", signature: "static int randomColor(int minimumRGBValue, int maximumRGBValue)", native: ColorClass._randomColorMinMax },
@@ -34,6 +36,8 @@ export class ColorClass extends ObjectClass {
     red!: number;
     green!: number;
     blue!: number;
+
+    alpha: number = 1.0;
 
     static _initPredefinedColors(){
 
@@ -64,6 +68,14 @@ export class ColorClass extends ObjectClass {
         this.red = red;
         this.green = green;
         this.blue = blue;
+        return this;
+    }
+
+    _constructorColorClass1(red: number, green: number, blue: number, alpha: number): ColorClass {
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+        this.alpha = alpha;
         return this;
     }
 
@@ -180,5 +192,13 @@ export class ColorClass extends ObjectClass {
 
     }
 
+    fromIntAndAlpha(color: number | undefined, alpha: number){
+        if(color){
+            this.red = color & 0xff0000/0x10000;
+            this.green = color & 0xff00/0x100;
+            this.blue = color & 0xff;
+        }
+        this.alpha = alpha;
+    }
 
 }

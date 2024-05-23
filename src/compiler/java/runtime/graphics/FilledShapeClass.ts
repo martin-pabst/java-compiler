@@ -5,12 +5,36 @@ import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { ShapeClass } from './ShapeClass';
 import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { FilledShapeDefaults } from './FilledShapeDefaults';
+import { ColorClass } from './ColorClass';
+import { ColorHelper } from '../../lexer/ColorHelper';
 
 export class FilledShapeClass extends ShapeClass {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "abstract class FilledShape extends Shape" },
 
         { type: "method", signature: "FilledShape()", java: FilledShapeClass.prototype._cj$_constructor_$FilledShape$ },
+        { type: "method", signature: "Color getFillColor()", native: FilledShapeClass.prototype._getFillColor },
+        { type: "method", signature: "void setFillColor(int color)", native: FilledShapeClass.prototype._setFillColorInt },
+        { type: "method", signature: "void setFillColor(int color, double alpha)", native: FilledShapeClass.prototype._setFillColorIntDouble },
+        { type: "method", signature: "void setFillColor(string color)", native: FilledShapeClass.prototype._setFillColorString },
+        { type: "method", signature: "void setFillColor(string color, double alpha)", native: FilledShapeClass.prototype._setFillColorStringDouble },
+        { type: "method", signature: "Color getBorderColor()", native: FilledShapeClass.prototype._getBorderColor },
+        { type: "method", signature: "void setBorderColor(int color)", native: FilledShapeClass.prototype._setBorderColorInt },
+        { type: "method", signature: "void setBorderColor(int color, double alpha)", native: FilledShapeClass.prototype._setBorderColorIntDouble },
+        { type: "method", signature: "void setBorderColor(string color)", native: FilledShapeClass.prototype._setBorderColorString },
+        { type: "method", signature: "void setBorderColor(string color, double alpha)", native: FilledShapeClass.prototype._setBorderColorStringDouble },
+        { type: "method", signature: "void setBorderWidth(double width)", native: FilledShapeClass.prototype._setBorderWidth },
+        { type: "method", signature: "double getBorderWidth()", native: FilledShapeClass.prototype._getBorderWidth },
+        { type: "method", signature: "void setAlpha(double alpha)", native: FilledShapeClass.prototype._setAlpha },
+        { type: "method", signature: "double getAlpha()", native: FilledShapeClass.prototype._getAlpha },
+
+        { type: "method", signature: "static void setDefaultBorder(double width, string color)", native: FilledShapeClass._setDefaultBorder },
+        { type: "method", signature: "static void setDefaultBorder(double width, int color, double alpha)", native: FilledShapeClass._setDefaultBorder },
+        { type: "method", signature: "static void setDefaultBorder(string color)", native: FilledShapeClass._setDefaultFillColor },
+        { type: "method", signature: "static void setDefaultBorder(int color, double alpha)", native: FilledShapeClass._setDefaultFillColor },
+
+
+
         // { type: "method", signature: "final boolean isKeyUp(string key)", java: ActorClass.prototype._mj$isKeyUp$boolean$string },
         
     ]
@@ -32,6 +56,10 @@ export class FilledShapeClass extends ShapeClass {
 
     }
 
+    render(){
+        
+    }
+
     copyFrom(otherFilledShape: FilledShapeClass){
         super.copyFrom(otherFilledShape);
         this.fillColor = otherFilledShape.fillColor;
@@ -39,6 +67,114 @@ export class FilledShapeClass extends ShapeClass {
         this.borderColor = otherFilledShape.borderColor;
         this.borderAlpha = otherFilledShape.borderAlpha;
         this.borderWidth = otherFilledShape.borderWidth;
+    }
+
+    _getFillColor(): ColorClass {
+        let c = new ColorClass();
+        c.fromIntAndAlpha(this.fillColor, this.fillAlpha);
+        return c;
+    }
+
+    _getBorderColor(): ColorClass {
+        let c = new ColorClass();
+        c.fromIntAndAlpha(this.borderColor, this.borderAlpha);
+        return c;
+    }
+
+    _setBorderWidth(borderWidth: number) {
+        this.borderWidth = borderWidth;
+        this.render();
+    }
+
+    _getBorderWidth():number {
+        return this.borderWidth;
+    }
+
+    _setAlpha(alpha: number){
+        this.fillAlpha = alpha;
+        this.borderAlpha = alpha;
+        this.render();
+    }
+
+    _getAlpha(): number {
+        return this.fillAlpha;
+    }
+
+    _setFillColorInt(color: number) {
+        this.fillColor = color % 0x1000000;
+        this.render();
+    }
+
+    _setFillColorIntDouble(color: number, alpha: number) {
+        this.fillColor = color % 0x1000000;
+        this.fillAlpha = color;
+        this.render();
+    }
+
+    _setFillColorString(color: string) {
+        let c = ColorHelper.parseColorToOpenGL(color);
+        this.fillColor = c.color!;
+        this.fillAlpha = c.alpha;
+        this.render();
+    }
+
+    _setFillColorStringDouble(color: string, alpha: number) {
+        let c = ColorHelper.parseColorToOpenGL(color);
+        this.fillColor = c.color!;
+        this.fillAlpha = alpha;
+        this.render();
+    }
+
+    _setBorderColorInt(color: number) {
+        this.borderColor = color % 0x1000000;
+        this.render();
+    }
+
+    _setBorderColorIntDouble(color: number, alpha: number) {
+        this.borderColor = color % 0x1000000;
+        this.borderAlpha = color;
+        this.render();
+    }
+
+    _setBorderColorString(color: string) {
+        let c = ColorHelper.parseColorToOpenGL(color);
+        this.borderColor = c.color!;
+        this.borderAlpha = c.alpha;
+        this.render();
+    }
+
+    _setBorderColorStringDouble(color: string, alpha: number) {
+        let c = ColorHelper.parseColorToOpenGL(color);
+        this.borderColor = c.color!;
+        this.borderAlpha = alpha;
+        this.render();
+    }
+
+    static _setDefaultBorder(width: number, color: string | number, alpha?: number){
+        FilledShapeDefaults.defaultBorderWidth = width;
+
+        if (typeof color == "string") {
+            let c = ColorHelper.parseColorToOpenGL(color);
+            FilledShapeDefaults.defaultBorderColor = c.color;
+            FilledShapeDefaults.defaultBorderAlpha = alpha == null ? c.alpha : alpha;
+        } else {
+            FilledShapeDefaults.defaultBorderColor = color;
+            if (alpha != null) FilledShapeDefaults.defaultBorderAlpha = alpha;
+        }
+
+    }
+
+    static _setDefaultFillColor(color: string | number, alpha?: number) {
+
+        if (typeof color == "string") {
+            let c = ColorHelper.parseColorToOpenGL(color);
+            FilledShapeDefaults.defaultFillColor = c.color || 0x303030;
+            FilledShapeDefaults.defaultFillAlpha = alpha == null ? c.alpha : alpha;
+        } else {
+            FilledShapeDefaults.defaultFillColor = color;
+            if (alpha != null) FilledShapeDefaults.defaultFillAlpha = alpha;
+        }
+
     }
 
 }

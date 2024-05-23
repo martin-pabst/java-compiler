@@ -25,7 +25,8 @@ export class ShapeClass extends ActorClass {
         { type: "method", signature: "final void mirrorY()", template: "§1._mirrorXY(1, -1)" },
         { type: "method", signature: "final void defineDirection(double angleInDeg)", native: ShapeClass.prototype._defineDirection },
         { type: "method", signature: "final void forward(double distance)", native: ShapeClass.prototype._forward },
-        
+        { type: "method", signature: "final boolean isOutsideView()", native: ShapeClass.prototype._isOutsideView },
+
     ]
 
     static type: NonPrimitiveType;
@@ -58,7 +59,7 @@ export class ShapeClass extends ActorClass {
     lastMoveDx: number = 0;
     lastMoveDy: number = 0;
 
-    copyFrom(otherShape: ShapeClass){
+    copyFrom(otherShape: ShapeClass) {
         super.copyFrom(otherShape);
         this.centerXInitial = otherShape.centerXInitial;
         this.centerYInitial = otherShape.centerYInitial;
@@ -79,17 +80,28 @@ export class ShapeClass extends ActorClass {
         updateWorldTransformRecursively(otherShape.container, false);
     }
 
+    render(): void { };
 
-    _cj$_constructor_$Shape$(t: Thread, callback: CallbackFunction){
+    _cj$_constructor_$Shape$(t: Thread, callback: CallbackFunction) {
         this._cj$_constructor_$Actor$(t);   // call base class constructor
 
-        if(!this.world.defaultGroup){
+        if (!this.world.defaultGroup) {
             this.world.shapesWhichBelongToNoGroup.push(this);
         }
 
     }
 
-    _move(dx: number, dy: number){
+    _isOutsideView() {
+        let bounds = this.container.getBounds(true);
+        let wh = this.world;
+        return bounds.right < wh.
+            currentLeft || bounds.left > wh.currentLeft + wh.currentWidth
+            || bounds.bottom < wh.currentTop || bounds.top > wh.currentTop + wh.currentHeight;
+    }
+
+
+
+    _move(dx: number, dy: number) {
         if (dx != 0 || dy != 0) {
             this.lastMoveDx = dx;
             this.lastMoveDy = dy;
@@ -101,7 +113,7 @@ export class ShapeClass extends ActorClass {
         this.hitPolygonDirty = true;
     }
 
-    _rotate(angleInDeg: number, cX?: number, cY?: number){
+    _rotate(angleInDeg: number, cX?: number, cY?: number) {
         if (typeof cX == "undefined") {
             let p = new PIXI.Point(this.centerXInitial, this.centerYInitial);
             this.container.localTransform.apply(p, p);
@@ -130,7 +142,7 @@ export class ShapeClass extends ActorClass {
 
     }
 
-    _scale(factor: number, cX?: number, cY?: number){
+    _scale(factor: number, cX?: number, cY?: number) {
         if (typeof cX == "undefined") {
             let p = new PIXI.Point(this.centerXInitial, this.centerYInitial);
             this.container.localTransform.apply(p, p);
@@ -153,23 +165,23 @@ export class ShapeClass extends ActorClass {
         updateWorldTransformRecursively(this.container, true);
 
         this.hitPolygonDirty = true;
-        
+
         this.scaleFactor *= factor;
-        
+
     }
-    
-    _mirrorXY(scaleX: number, scaleY: number){
+
+    _mirrorXY(scaleX: number, scaleY: number) {
         let cX: number, cY: number;
-        
+
         let p = new PIXI.Point(this.centerXInitial, this.centerYInitial);
         this.container.localTransform.apply(p, p);
         cX = p.x;
         cY = p.y;
-        
+
         this.container.localTransform.translate(-cX, -cY);
         this.container.localTransform.scale(scaleX, scaleY);
         this.container.localTransform.translate(cX, cY);
-        
+
         this.container.setFromMatrix(this.container.localTransform);
         this.container.updateLocalTransform();
         updateWorldTransformRecursively(this.container, true);
@@ -251,7 +263,7 @@ export class ShapeClass extends ActorClass {
         if (this.container.tint) {
             this.container.tint = c;
         }
-        
+
     }
 
     public getCenterX(): number {
@@ -272,9 +284,9 @@ export class ShapeClass extends ActorClass {
         return this.container.worldTransform.apply(p, p);
     }
 
-    public destroy(){
-        if(this.isDestroyed) return;
-        if(this.belongsToGroup){
+    public destroy() {
+        if (this.isDestroyed) return;
+        if (this.belongsToGroup) {
             this.belongsToGroup.shapes.splice(this.belongsToGroup.indexOf(this), 1);
             this.belongsToGroup.container.removeChildAt(this.belongsToGroup.container.getChildIndex(this.container))
         }
