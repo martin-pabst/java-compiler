@@ -191,16 +191,18 @@ export class TypeResolver {
                 let genericTypeNode = <ASTGenericTypeInstantiationNode>typeNode;
                 this.resolveTypeNode(genericTypeNode.baseType, module);
                 
-                // ArrayList<> -> ArrayList
-                if(genericTypeNode.actualTypeArguments.length == 0) return typeNode.resolvedType = genericTypeNode.baseType.resolvedType;
-
+                
                 let baseType = genericTypeNode.baseType.resolvedType;
                 if (!baseType) return undefined;
                 if (!baseType.hasGenericParameters()) {
                     this.pushError(JCM.typeIsNotGeneric(baseType.toString()), typeNode.range, module);
                     return undefined;
                 }
-                if (genericTypeNode.actualTypeArguments.length != baseType.genericTypeParameters?.length) {
+                // ArrayList<> -> ArrayList
+                if(genericTypeNode.actualTypeArguments.length == 0) {
+
+                }
+                if (genericTypeNode.actualTypeArguments.length > baseType.genericTypeParameters!.length) {
                     this.pushError(JCM.wrongNumberOfGenericParameters(baseType.toString(), baseType.genericTypeParameters!.length, genericTypeNode.actualTypeArguments.length), genericTypeNode.range, module);
                     return undefined;
                 }
@@ -221,6 +223,17 @@ export class TypeResolver {
                         }
                     }
                 }
+
+                for(let i = genericTypeNode.actualTypeArguments.length; i < baseType.genericTypeParameters!.length; i++){
+                    let gp = baseType.genericTypeParameters![i];
+                    if(gp.upperBounds.length > 0){
+                        typeMap.set(gp, gp.upperBounds[0]);
+                    } else {
+                        typeMap.set(gp, <NonPrimitiveType>this.libraryModuleManager.typestore.getType("Object"))
+                    }
+                }
+
+
                 if (baseType instanceof JavaClass || baseType instanceof JavaInterface) {
                     genericTypeNode.resolvedType = baseType.getCopyWithConcreteType(typeMap);
                 } else {

@@ -12,7 +12,7 @@ import { IWorld } from "./IWorld";
  */
 export class ActorClass extends ObjectClass implements IActor {
     static __javaDeclarations: LibraryDeclarations = [
-        { type: "declaration", signature: "abstract class Actor" },
+        { type: "declaration", signature: "abstract class Actor extends Object" },
 
         { type: "method", signature: "Actor()", java: ActorClass.prototype._cj$_constructor_$Actor$ },
         { type: "method", signature: "void act()", java: ActorClass.prototype._mj$act$void$ },

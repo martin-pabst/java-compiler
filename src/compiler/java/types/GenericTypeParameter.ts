@@ -200,6 +200,10 @@ export class GenericTypeParameter extends NonPrimitiveType {
         return this.identifier;
     }
 
+    getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, rangeToReplace: monaco.IRange, methodContext: Method | undefined, onlyStatic?: boolean | undefined): monaco.languages.CompletionItem[] {
+        return [];
+    }
+
 }
 
 export type GenericTypeParameters  = GenericTypeParameter[];
