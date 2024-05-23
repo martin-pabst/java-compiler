@@ -8,17 +8,15 @@ class Test {
    }
 }`],
 ['ActorTest', `
-for(int i = 0; i < 100; i++){
-   new Test(i);
-}
-
+new Test();
 class Test extends Actor {
-   int n;
-   public Test(int n){
-      this.n = n;
+   
+   void onKeyUp(String key){
+      println(key);
    }
+   
    public void act(){
-      println("Hello, I'm " + n);
+      
    }
 }
 `],

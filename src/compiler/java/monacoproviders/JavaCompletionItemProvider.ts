@@ -1,6 +1,6 @@
+import { IMain } from "../../common/IMain.ts";
 import { IRange, Range } from "../../common/range/Range";
 import { JavaCompiler } from "../JavaCompiler.ts";
-import { MainClass } from "../MainInterface";
 import { TokenType } from "../TokenType";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
@@ -19,7 +19,7 @@ export class JavaCompletionItemProvider implements monaco.languages.CompletionIt
     public triggerCharacters: string[] = ['.', 'abcdefghijklmnopqrstuvwxyzäöüß_ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ', ' '];
 
     constructor(private editor: monaco.editor.IStandaloneCodeEditor,
-        private main: MainClass) {
+        private main: IMain) {
     }
 
     first: boolean = true;

@@ -6,7 +6,8 @@ import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { ObjectClass } from "../system/javalang/ObjectClassStringClass";
 import { Interpreter } from '../../../common/interpreter/Interpreter.ts';
-import { ActorType, IActor, IWorld } from './IWorld.ts';
+import { ActorType, IActor } from './IActor.ts';
+import { IWorld } from './IWorld.ts';
 import { ActorManager } from './ActorManager.ts';
 
 
@@ -29,7 +30,7 @@ export class WorldClass extends ObjectClass implements IWorld {
     graphicsDiv?: HTMLDivElement;
     resizeObserver?: ResizeObserver;
 
-    actorManager: ActorManager = new ActorManager();
+    actorManager!: ActorManager;
 
     tickerFunction?: (ticker: PIXI.Ticker) => void;
 
@@ -47,6 +48,8 @@ export class WorldClass extends ObjectClass implements IWorld {
             existingWorld.changeResolution(width, height);
             return existingWorld;
         }
+
+        this.actorManager = new ActorManager(interpreter);
 
         interpreter.objectStore["World"] = this;
 
@@ -87,8 +90,7 @@ export class WorldClass extends ObjectClass implements IWorld {
             this.app!.ticker.minFPS = 30;
     
             interpreter.isExternalTimer = true;
-    
-
+            
             t.state = ThreadState.runnable;
         })
 
@@ -96,7 +98,7 @@ export class WorldClass extends ObjectClass implements IWorld {
     }
 
     tick(elapsedMS: number, interpreter: Interpreter) {
-        this.actorManager.callActMethods(interpreter, elapsedMS);
+        this.actorManager.callActMethods(elapsedMS);
         interpreter.timerFunction(elapsedMS);
     }
 

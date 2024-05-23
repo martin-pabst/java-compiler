@@ -1,16 +1,14 @@
 import { ActionManager } from "../../../testgui/ActionManager.ts";
 import { AssertionObserver } from "../../java/runtime/unittests/AssertionObserver.ts";
 import { Executable } from "../Executable.ts";
-import { Module } from "../module/Module";
 import { CodeReachedAssertions } from "./CodeReachedAssertions.ts";
 import { EventManager } from "./EventManager";
 import { LoadController } from "./LoadController";
 import { DummyPrintManager, PrintManager } from "./PrintManager";
 import { ProgramPointerPositionInfo, Scheduler, SchedulerState } from "./Scheduler";
-import { KlassObjectRegistry } from "./StepFunction.ts";
-import { File } from "../module/File.ts";
 import { GraphicsManager } from "./GraphicsManager.ts";
 import { IWorld } from "../../java/runtime/graphic/IWorld.ts";
+import { KeyboardManager } from "./KeyboardManager.ts";
 
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
@@ -64,7 +62,7 @@ export class Interpreter {
 
 
     constructor(printManager?: PrintManager, private actionManager?: ActionManager, 
-        public graphicsManager?: GraphicsManager
+        public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager
     ) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {
 

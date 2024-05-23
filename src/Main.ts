@@ -4,7 +4,6 @@ import { File } from "./compiler/common/module/File.ts";
 import { Module } from "./compiler/common/module/Module.ts";
 import { JavaCompiler } from "./compiler/java/JavaCompiler.ts";
 import { JavaLanguage } from "./compiler/java/JavaLanguage.ts";
-import { CodePrinter } from "./compiler/java/codegenerator/CodePrinter.ts";
 import { TokenPrinter } from "./compiler/java/lexer/TokenPrinter.ts";
 import { AstComponent } from "./testgui/AstComponent.ts";
 import { Button } from "./tools/Button.ts";
@@ -13,10 +12,9 @@ import { TabManager } from "./tools/TabManager.ts";
 
 import { Interpreter } from "./compiler/common/interpreter/Interpreter.ts";
 import { ProgramControlButtons } from "./testgui/ProgramControlButtons.ts";
-import { TestPrintManager } from "./testgui/TestPrintManager.ts";
 
 import jQuery from "jquery";
-import { ProgramPointerPositionInfo, SchedulerState } from "./compiler/common/interpreter/Scheduler.ts";
+import { ProgramPointerPositionInfo } from "./compiler/common/interpreter/Scheduler.ts";
 import { ActionManager } from "./testgui/ActionManager.ts";
 import { ProgramViewerComponent } from "./testgui/ProgramViewerComponent.ts";
 import { testProgramsList } from "./testgui/testprograms/TestPrograms.ts";
@@ -24,11 +22,8 @@ import { TabbedEditorManager } from "./tools/TabbedEditorManager.ts";
 import { TestResultViewer } from "./testgui/TestResultViewer.ts";
 
 import '/include/css/main.css';
-import { MainClass } from "./compiler/java/MainInterface.ts";
 import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts";
-import { Executable } from "./compiler/common/Executable.ts";
 import { JavaHoverProvider } from "./compiler/java/monacoproviders/JavaHoverProvider.ts";
-import chalk from "chalk";
 import { GUITestAssertions } from "./test/lib/GUITestAssertions.ts";
 import { GUITestRunner } from "./test/lib/GUITestRunner.ts";
 import { TerminalPrintManager } from "./testgui/TerminalPrintManager.ts";
@@ -42,8 +37,10 @@ import { Range } from "./compiler/common/range/Range.ts";
 import { JavaReferenceProvider } from "./compiler/java/monacoproviders/JavaReferenceProvider.ts";
 import { JavaSignatureHelpProvider } from "./compiler/java/monacoproviders/JavaSignatureHelpProvider.ts";
 import { GraphicsManager } from "./compiler/common/interpreter/GraphicsManager.ts";
+import { IMain } from "./compiler/common/IMain.ts";
+import { KeyboardManager } from "./compiler/common/interpreter/KeyboardManager.ts";
 
-export class Main implements MainClass {
+export class Main implements IMain {
 
   language: Language;
 
@@ -127,9 +124,10 @@ export class Main implements MainClass {
     this.compiler.files = this.files;
 
     this.actionManager = new ActionManager();
+    let keyboardManager = new KeyboardManager(jQuery('#insighttabs'), this);
 
     this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager,
-      new GraphicsManager(this.graphicsDiv));
+      new GraphicsManager(this.graphicsDiv), keyboardManager);
 
     this.initButtons();
     this.initCompiler();
@@ -173,6 +171,18 @@ export class Main implements MainClass {
 
     this.registerMonacoProviders();
 
+  }
+
+  isEmbedded(): boolean {
+    return false;
+  }
+
+  getInterpreter(): Interpreter {
+    return this.interpreter;
+  }
+
+  getEditor(): monaco.editor.IEditor {
+    return this.tabbedEditorManager.editor.editor;
   }
 
   getCompiler(): JavaCompiler {
