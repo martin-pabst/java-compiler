@@ -162,6 +162,13 @@ export class ColorHelper {
         }
     }
 
+    static rgbColorToHexRGB(r: number, g: number, b: number) {
+            let v = r * 0x10000 + g * 0x100 + b;
+            let s: string = v.toString(16);
+            while (s.length < 6) s = "0" + s;
+            return "#" + s;
+    }
+
     static intColorToRGB(color: number) {
         if(color == null) {return "---";} else
         {return "rgb(" + ((color & 0xff0000) >> 16) + ", " + ((color & 0xff00) >> 8) + ", " + (color & 0xff) + ")";}

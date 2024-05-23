@@ -39,6 +39,12 @@ export class ActorClass extends ObjectClass implements IActor {
 
     world!: IWorld;
 
+    copyFrom(otherActor: ActorClass){
+        this.isActing = otherActor.isActing;
+        this.isDestroyed = otherActor.isDestroyed;
+        this.world = otherActor.world;
+    }
+
     _cj$_constructor_$Actor$(t: Thread){
 
         this.world = t.scheduler.interpreter.objectStore["World"];
@@ -136,7 +142,7 @@ export class ActorClass extends ObjectClass implements IActor {
         this.isActing = true;
     }
 
-    destroy(world: IWorld){
-        world.unregisterActor(this);
+    destroy(){
+        this.world.unregisterActor(this);
     }
 }

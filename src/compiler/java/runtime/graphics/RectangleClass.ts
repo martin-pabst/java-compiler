@@ -43,6 +43,14 @@ export class RectangleClass extends FilledShapeClass {
 
     }
 
+    getCopy(t: Thread, callback: CallbackFunction): RectangleClass {
+        let copy = new RectangleClass();
+        copy._cj$_constructor_$Rectangle$double$double$double$double(t, callback, this.left, this.top, this.width, this.height);
+        copy.copyFrom(this);
+        this.render();
+        return this;
+    }
+
     render(): void {
 
         this.hitPolygonInitial = [

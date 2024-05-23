@@ -12,6 +12,7 @@ import { Visibility } from "./Visibility";
 import { CallbackFunction, Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 import { Thread } from "../../common/interpreter/Thread.ts";
 import { JCM } from "../JavaCompilerMessages.ts";
+import { ColorHelper } from "../lexer/ColorHelper.ts";
 
 export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     isPrimitive: false;
@@ -34,9 +35,12 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
         let itemList: monaco.languages.CompletionItem[] = [];
 
         for (let field of this.getFields().filter(f => f.visibility <= visibilityUpTo && (f.isStatic || !onlyStatic))) {
+            let isColor = this.identifier == 'Color' && field.isStatic;
+            
             itemList.push({
-                label: field.getDeclaration(),
-                kind: monaco.languages.CompletionItemKind.Field,
+                label: field.toString(),
+                kind: isColor ? monaco.languages.CompletionItemKind.Color : monaco.languages.CompletionItemKind.Field,
+                detail: isColor ? ColorHelper.intColorToHexRGB(ColorHelper.predefinedColors[field.identifier]) : "",
                 insertText: field.identifier,
                 range: rangeToReplace,
                 documentation: field.documentation == null ? undefined : {

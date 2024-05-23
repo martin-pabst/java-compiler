@@ -67,4 +67,8 @@ export class Field extends BaseSymbol {
         return decl + this.type.toString() + " " + this.identifier;
     }
 
+    toString(): string {
+        return this.type.toString() + " " + this.identifier;
+    }
+
 }

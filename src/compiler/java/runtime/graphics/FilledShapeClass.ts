@@ -32,4 +32,13 @@ export class FilledShapeClass extends ShapeClass {
 
     }
 
+    copyFrom(otherFilledShape: FilledShapeClass){
+        super.copyFrom(otherFilledShape);
+        this.fillColor = otherFilledShape.fillColor;
+        this.fillAlpha = otherFilledShape.fillAlpha;
+        this.borderColor = otherFilledShape.borderColor;
+        this.borderAlpha = otherFilledShape.borderAlpha;
+        this.borderWidth = otherFilledShape.borderWidth;
+    }
+
 }

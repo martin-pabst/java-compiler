@@ -58,6 +58,27 @@ export class ShapeClass extends ActorClass {
     lastMoveDx: number = 0;
     lastMoveDy: number = 0;
 
+    copyFrom(otherShape: ShapeClass){
+        super.copyFrom(otherShape);
+        this.centerXInitial = otherShape.centerXInitial;
+        this.centerYInitial = otherShape.centerYInitial;
+        this.angle = otherShape.angle;
+        this.hitPolygonInitial = otherShape.hitPolygonInitial.slice();
+        this.hitPolygonTransformed = otherShape.hitPolygonTransformed.slice();
+        this.hitPolygonDirty = otherShape.hitPolygonDirty;
+        this.reactToMouseEventsWhenInvisible = otherShape.reactToMouseEventsWhenInvisible;
+        this.mouseLastSeenInsideObject = otherShape.mouseLastSeenInsideObject;
+        this.trackMouseMove = otherShape.trackMouseMove;
+        this.scaleFactor = otherShape.scaleFactor;
+        this.directionRad = otherShape.directionRad;
+        this.lastMoveDx = otherShape.lastMoveDx;
+        this.lastMoveDy = otherShape.lastMoveDy;
+
+        this.container.localTransform.copyFrom(otherShape.container.localTransform);
+        this.container.setFromMatrix(otherShape.container.localTransform);
+        updateWorldTransformRecursively(otherShape.container, false);
+    }
+
 
     _cj$_constructor_$Shape$(t: Thread, callback: CallbackFunction){
         this._cj$_constructor_$Actor$(t);   // call base class constructor
@@ -251,6 +272,14 @@ export class ShapeClass extends ActorClass {
         return this.container.worldTransform.apply(p, p);
     }
 
-
+    public destroy(){
+        if(this.isDestroyed) return;
+        if(this.belongsToGroup){
+            this.belongsToGroup.shapes.splice(this.belongsToGroup.indexOf(this), 1);
+            this.belongsToGroup.container.removeChildAt(this.belongsToGroup.container.getChildIndex(this.container))
+        }
+        this.container.destroy();
+        super.destroy();
+    }
 
 }

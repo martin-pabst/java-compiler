@@ -52,6 +52,7 @@ import { ShapeClass } from "../graphics/ShapeClass.ts";
 import { FilledShapeClass } from "../graphics/FilledShapeClass.ts";
 import { RectangleClass } from "../graphics/RectangleClass.ts";
 import { GroupClass } from "../graphics/GroupClass.ts";
+import { ColorClass } from "../graphics/ColorClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -72,6 +73,8 @@ export class SystemModule extends JavaLibraryModule {
             new VoidPrimitiveType(this)
         )
 
+        ColorClass._initPredefinedColors();
+        
         this.classes.push(
             ComparableInterface, ComparatorInterface,
             
@@ -99,6 +102,7 @@ export class SystemModule extends JavaLibraryModule {
             AssertionsClass,
 
             // Graphics
+            ColorClass,
             WorldClass, ActorClass, ShapeClass, FilledShapeClass, RectangleClass, GroupClass
         )
 

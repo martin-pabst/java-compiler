@@ -20,6 +20,9 @@ export class GroupClass extends ShapeClass {
         { type: "method", signature: "final void remove(int index)", native: GroupClass.prototype.removeWithIndex },
         { type: "method", signature: "final T get(int index)", native: GroupClass.prototype.get },
         { type: "method", signature: "final int indexOf(T shape)", native: GroupClass.prototype.indexOf },
+        { type: "method", signature: "final int size()", template: `&1.shapes.length` },
+        { type: "method", signature: "final void empty()", native: GroupClass.prototype.removeAllChildren },
+        { type: "method", signature: "final void destroyAllChildren()", native: GroupClass.prototype.destroyAllChildren },
         // { type: "method", signature: "Rectangle(double left, double top, double width, double height)", java: GroupClass.prototype._cj$_constructor_$Rectangle$double$double$double$double },
 
     ]
@@ -124,7 +127,13 @@ export class GroupClass extends ShapeClass {
         return false;
     }
 
-    public removeAllChidren() {
+    public destroyAllChildren(){
+        for(let shape of this.shapes){
+            shape.destroy();
+        }
+    }
+
+    public removeAllChildren() {
         let index: number = 0;
         for (let shape of this.shapes) {
             this.deregister(shape, index++);
@@ -179,6 +188,11 @@ export class GroupClass extends ShapeClass {
         this.shapes.splice(index, 0, sh);
     }
 
-
+    public destroy(): void {
+        for(let shape of this.shapes){
+            shape.destroy();
+        }
+        super.destroy();
+    }
 
 }
