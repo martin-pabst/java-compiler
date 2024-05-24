@@ -102,7 +102,7 @@ export class SpeedControl {
     }
 
     getSpeedInStepsPerSecond(): number {
-        return this.interpreter.loadController.getStepsPerSecond();
+        return this.interpreter.getStepsPerSecond();
     }
 
     setSpeedInStepsPerSecond(stepsPerSecond: number | "max"){
@@ -170,14 +170,16 @@ export class SpeedControl {
     
     setInterpreterSpeed(stepsPerSecond: number){
         
+        let isMaxSpeed: boolean = false;
         let speedString = "" + SpeedControl.printMillions(stepsPerSecond);
         if(stepsPerSecond >= this.intervalBorders[this.intervalBorders.length - 1] - 10 - 10){
             speedString = "maximum speed";
+            isMaxSpeed = true;
         }
         
         this.$display.html(speedString + " steps/s");
 
-        this.interpreter.loadController.setStepsPerSecond(stepsPerSecond);
+        this.interpreter.setStepsPerSecond(stepsPerSecond, isMaxSpeed);
 
         this.interpreter.hideProgrampointerPosition();
     }

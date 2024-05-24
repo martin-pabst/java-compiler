@@ -6,17 +6,18 @@ import { IRange } from "../range/Range";
 import { Interpreter } from "./Interpreter";
 import { Program, Step } from "./Program";
 import { KlassObjectRegistry, Klass } from "./StepFunction.ts";
-import { Thread, ThreadState } from "./Thread";
+import { Thread, ThreadState, ThreadStateInfoAfterRun } from "./Thread";
 
 export enum SchedulerState { not_initialized, running, paused, stopped, error }
 
 export type ProgramPointerPositionInfo = {
     module: Module,
-    range: IRange, 
+    range: IRange,
     nextStepIndex: number,
     program: Program
 }
 
+export enum SchedulerExitState { nothingMoreToDo, giveMeAdditionalTime }
 
 export class Scheduler {
     runningThreads: Thread[] = [];
@@ -39,65 +40,85 @@ export class Scheduler {
     }
 
 
-    run(numberOfStepsMax: number) {
-        if(this.state != SchedulerState.running) return;
+    run(numberOfStepsMax: number): SchedulerExitState {
+        if (this.state != SchedulerState.running) return SchedulerExitState.nothingMoreToDo;
 
         let stepsPerThread = Math.ceil(numberOfStepsMax / this.runningThreads.length);
 
         let numberOfStepsInThisRun = 0;
-        if (this.runningThreads.length == 0) return;
+        if (this.runningThreads.length == 0) return SchedulerExitState.nothingMoreToDo;
 
         let lastStoredStepsInThisRun = -1;          // watchdog uses this to decide if there's any runnable thread left
+
+        let threadState: ThreadStateInfoAfterRun = {
+            state: ThreadState.runnable,
+            stepsExecuted: 0
+        };
 
         while (numberOfStepsInThisRun < numberOfStepsMax && this.state == SchedulerState.running) {
 
             // watchdog:
-            if(this.currentThreadIndex == 0){
-                if(lastStoredStepsInThisRun == numberOfStepsInThisRun || this.runningThreads.length == 0){
+            if (this.currentThreadIndex == 0) {
+                if (lastStoredStepsInThisRun == numberOfStepsInThisRun || this.runningThreads.length == 0) {
                     break;
                 }
                 lastStoredStepsInThisRun = numberOfStepsInThisRun;
             }
 
             let currentThread = this.runningThreads[this.currentThreadIndex];
-            if(!currentThread){
-                if(this.runningThreads.length > 0){
+            if (!currentThread) {
+                if (this.runningThreads.length > 0) {
                     this.currentThreadIndex = 0;
                     currentThread = this.runningThreads[0];
                     lastStoredStepsInThisRun = -1;
                 } else {
-                    return;
+                    return SchedulerExitState.nothingMoreToDo;
                 }
             }
 
             /**
              * Let thread run!
              */
-            let threadState = currentThread.run(stepsPerThread);
+            if (currentThread.maxStepsPerSecond) {
+                let t = performance.now();
+                let msPerStep = 1000 / currentThread.maxStepsPerSecond;
+                let elapsedTime = t - currentThread.timeLastStepExecuted;
+                let numberOfSteps = Math.min(elapsedTime / msPerStep, stepsPerThread);
+                if (numberOfSteps > 1) {
+                    threadState = currentThread.run(numberOfSteps);
+                    currentThread.timeLastStepExecuted =
+                        currentThread.timeLastStepExecuted + threadState.stepsExecuted * msPerStep;
+                } else if (this.runningThreads.length == 1) {
+                    return SchedulerExitState.nothingMoreToDo;
+                }
+            } else {
+                threadState = currentThread.run(stepsPerThread);
+            }
 
             numberOfStepsInThisRun += threadState.stepsExecuted;  // to avoid endless loop
 
             if (threadState.state == ThreadState.terminated || threadState.state == ThreadState.terminatedWithException) {
 
-                    // TODO: Print Exception if present
+                // TODO: Print Exception if present
 
-                    this.runningThreads.splice(this.currentThreadIndex, 1);
-                    if(this.currentThreadIndex > this.runningThreads.length - 1){
-                        this.currentThreadIndex = -1;
-                        this.keepThread = false;
+                this.runningThreads.splice(this.currentThreadIndex, 1);
+                if (this.currentThreadIndex > this.runningThreads.length - 1) {
+                    this.currentThreadIndex = -1;
+                    this.keepThread = false;
+                }
+
+                if (this.runningThreads.length == 0 && !this.interpreter.hasActors()
+                    || threadState.state == ThreadState.terminatedWithException) {
+
+                    this.stepCountSinceStartOfProgram += numberOfStepsInThisRun;
+                    this.interpreter.setState(SchedulerState.stopped);
+                    if (threadState.state == ThreadState.terminatedWithException) {
+                        this.interpreter.setState(SchedulerState.error);
                     }
+                    return SchedulerExitState.nothingMoreToDo;
+                }
 
-                    if (this.runningThreads.length == 0 && !this.interpreter.hasActors()
-                        || threadState.state == ThreadState.terminatedWithException) {
-                        this.stepCountSinceStartOfProgram += numberOfStepsInThisRun;
-                        this.interpreter.setState(SchedulerState.stopped);
-                        if (threadState.state == ThreadState.terminatedWithException) {
-                            this.interpreter.setState(SchedulerState.error);
-                        }
-                        return;
-                    }
 
-                    
             }
 
             if (!this.keepThread) {
@@ -110,30 +131,33 @@ export class Scheduler {
 
         this.stepCountSinceStartOfProgram += numberOfStepsInThisRun;
 
-    }
-    
-    setState(newState: SchedulerState) {
-        switch(newState){
-            case SchedulerState.running: 
-            this.timeStampProgramStarted = performance.now();
-            this.stepCountSinceStartOfProgram = 0;
-            break;
-            case SchedulerState.stopped, SchedulerState.error:
-                if(this.state == SchedulerState.running){
-                    let dt = performance.now() - this.timeStampProgramStarted;
-                    let stepsPerSecond = Math.round(this.stepCountSinceStartOfProgram/dt*1000);
-                    this.interpreter.printManager.print("Duration: " + Math.round(dt * 100)/100 + " ms, " + this.stepCountSinceStartOfProgram + " steps, " + SpeedControl.printMillions(stepsPerSecond) + " steps/s", true, undefined);
-                }
-                this.terminateAllThreads();
-            }
-            this.state = newState;
+        console.log(numberOfStepsInThisRun);
+
+        return SchedulerExitState.giveMeAdditionalTime;
     }
 
-    terminateAllThreads(){
+    setState(newState: SchedulerState) {
+        switch (newState) {
+            case SchedulerState.running:
+                this.timeStampProgramStarted = performance.now();
+                this.stepCountSinceStartOfProgram = 0;
+                break;
+            case SchedulerState.stopped, SchedulerState.error:
+                if (this.state == SchedulerState.running) {
+                    let dt = performance.now() - this.timeStampProgramStarted;
+                    let stepsPerSecond = Math.round(this.stepCountSinceStartOfProgram / dt * 1000);
+                    this.interpreter.printManager.print("Duration: " + Math.round(dt * 100) / 100 + " ms, " + this.stepCountSinceStartOfProgram + " steps, " + SpeedControl.printMillions(stepsPerSecond) + " steps/s", true, undefined);
+                }
+                this.terminateAllThreads();
+        }
+        this.state = newState;
+    }
+
+    terminateAllThreads() {
         this.runningThreads.forEach(t => t.state = ThreadState.terminated);
         this.suspendedThreads.forEach(t => t.state = ThreadState.terminated);
 
-         this.runningThreads.length = 0;
+        this.runningThreads.length = 0;
         this.suspendedThreads.length = 0;
     }
 
@@ -170,7 +194,7 @@ export class Scheduler {
      */
     unmarkCurrentlyExecutedSingleStep() {
         let thread = this.runningThreads[this.currentThreadIndex];
-        thread.unmarkStep();
+        if(thread) thread.unmarkStep();
     }
 
     createThread(initialStack: any[] = []): Thread {
@@ -179,7 +203,7 @@ export class Scheduler {
         return thread;
     }
 
-    removeThread(thread: Thread){
+    removeThread(thread: Thread) {
         this.runningThreads.splice(this.runningThreads.indexOf(thread), 1);
     }
 
@@ -201,7 +225,7 @@ export class Scheduler {
             this.suspendedThreads.splice(index, 1);
         }
 
-        if(thread.state >= ThreadState.terminated) return;
+        if (thread.state >= ThreadState.terminated) return;
 
         this.runningThreads.push(thread);
     }
@@ -213,11 +237,11 @@ export class Scheduler {
      */
     getNextStepPosition(): ProgramPointerPositionInfo | undefined {
         let currentThread = this.runningThreads[this.currentThreadIndex];
-        if(!currentThread) return undefined;
+        if (!currentThread) return undefined;
         let programState = currentThread.currentProgramState;
         let step = programState.currentStepList[programState.stepIndex];
-        if(!step) return undefined;
-        
+        if (!step) return undefined;
+
         return {
             module: programState.program.module,
             //@ts-ignore
@@ -226,12 +250,12 @@ export class Scheduler {
             program: programState.program
         }
     }
-    
-    init(executable: Executable) {
-        
+
+    init(executable: Executable): Thread | undefined {
+
         this.classObjectRegistry = executable.classObjectRegistry;
         this.libraryTypeStore = executable.libraryModuleManager.typestore;
-        
+
         this.runningThreads = [];
         this.currentThreadIndex = 0;
 
@@ -241,18 +265,18 @@ export class Scheduler {
 
         let mainModule = executable.mainModule;
 
-        if(mainModule){
-            if(!mainModule.startMainProgram(mainThread)){
+        if (mainModule) {
+            if (!mainModule.startMainProgram(mainThread)) {
                 // TODO: Error "Main program not startable"
+                return undefined
             }
         }
 
-        for(let staticInitStep of executable.staticInitializationSequence){
+        for (let staticInitStep of executable.staticInitializationSequence) {
             mainThread.pushProgram(staticInitStep.program);
         }
 
-        mainThread.state = ThreadState.runnable; // this statement actually makes the program run
-
+        return mainThread;
     }
-    
+
 }

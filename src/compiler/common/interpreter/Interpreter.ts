@@ -9,6 +9,7 @@ import { ProgramPointerPositionInfo, Scheduler, SchedulerState } from "./Schedul
 import { GraphicsManager } from "./GraphicsManager.ts";
 import { IWorld } from "../../java/runtime/graphics/IWorld.ts";
 import { KeyboardManager } from "./KeyboardManager.ts";
+import { Thread, ThreadState } from "./Thread.ts";
 
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
@@ -59,7 +60,9 @@ export class Interpreter {
         "restart": [false, true, true, true]
     }
 
-
+    mainThread?: Thread;
+    private stepsPerSecondGoal: number = 1e8;
+    private isMaxSpeed: boolean = true;
 
     constructor(printManager?: PrintManager, private actionManager?: ActionManager, 
         public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager
@@ -86,8 +89,8 @@ export class Interpreter {
         this.scheduler = new Scheduler(this);
         this.loadController = new LoadController(this.scheduler, this);
         this.initTimer();
+        this.setStepsPerSecond(1e8, true);
         this.setState(SchedulerState.not_initialized);
-
     }
 
     setTestExecutable(executable: Executable | undefined){
@@ -373,9 +376,14 @@ export class Interpreter {
 
 
         this.setState(SchedulerState.stopped);
-        this.scheduler.init(executable);
+        this.mainThread = this.scheduler.init(executable);
+        
+        if(this.mainThread){
+            this.codeReachedAssertions.init(executable.moduleManager);
+            this.mainThread.maxStepsPerSecond = this.stepsPerSecondGoal;
+            this.mainThread.state = ThreadState.runnable; // this statement actually makes the program run
+        }
 
-        this.codeReachedAssertions.init(executable.moduleManager);
 
     }
 
@@ -398,6 +406,18 @@ export class Interpreter {
         let world: IWorld = this.objectStore["World"];
         if(!world) return false;
         return world.hasActors();
+    }
+
+    setStepsPerSecond(value: number, isMaxSpeed: boolean) {
+        this.stepsPerSecondGoal = value;
+        this.isMaxSpeed = isMaxSpeed;
+        if(this.mainThread){
+            this.mainThread.maxStepsPerSecond = isMaxSpeed ? undefined : value;
+        }
+    }
+
+    getStepsPerSecond(): number {
+        return this.stepsPerSecondGoal;
     }
 
 }

@@ -29,7 +29,7 @@ type ProgramState = {
     aquiredObjectLocks?: ObjectClass[];
 }
 
-type ThreadStateInfoAfterRun = {
+export type ThreadStateInfoAfterRun = {
     state: ThreadState,
     stepsExecuted: number;
 }
@@ -69,6 +69,9 @@ export class Thread {
     stepCallback!: () => void;
 
     classes: KlassObjectRegistry;
+
+    maxStepsPerSecond?: number;
+    timeLastStepExecuted: number = performance.now();
 
     get assertionObservers() {
         return this.scheduler.interpreter.assertionObserverList;
