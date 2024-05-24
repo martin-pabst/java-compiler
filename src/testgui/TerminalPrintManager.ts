@@ -13,7 +13,9 @@ export class TerminalPrintManager implements PrintManager {
         }
         
         
-        this.terminal.onLineFeed((a,b) => console.log(a+","+b));
+        this.terminal.onLineFeed((a,b) => {
+            // console.log(a+","+b)
+    });
         this.terminal.onKey((e: { key: string, domEvent: KeyboardEvent }) => {
             const ev = e.domEvent;
             const printable = !ev.altKey && !ev.ctrlKey && !ev.metaKey;

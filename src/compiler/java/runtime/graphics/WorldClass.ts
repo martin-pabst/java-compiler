@@ -102,8 +102,8 @@ export class WorldClass extends ObjectClass implements IWorld {
     }
 
     tick(elapsedMS: number, interpreter: Interpreter) {
-        this.actorManager.callActMethods(elapsedMS);
-        interpreter.timerFunction(elapsedMS);
+        this.actorManager.callActMethods(33);
+        interpreter.timerFunction(33);
     }
 
     addCallbacks(interpreter: Interpreter) {

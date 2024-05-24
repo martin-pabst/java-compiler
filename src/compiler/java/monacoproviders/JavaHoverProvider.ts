@@ -1,7 +1,7 @@
 import { Editor } from "../../../testgui/editor/Editor.ts";
+import { IMain } from "../../common/IMain.ts";
 import { Module } from "../../common/module/Module.ts";
 import { Range } from "../../common/range/Range.ts";
-import { MainClass } from "../MainInterface.ts";
 import { JavaLocalVariable } from "../codegenerator/JavaLocalVariable.ts";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
 import { Field } from "../types/Field.ts";
@@ -53,7 +53,7 @@ export class JavaHoverProvider {
         "var": "```\nvar\n```  \nWird einer Variable beim Deklarieren sofort ein Startwert zugewiesen (z.B. Circle c = new Circle(100, 100, 10)), so kann statt des Datentyps das Schlüsselwort ```var``` verwendet werden (also var c = new Circle(100, 100, 10)).",
     }
 
-    constructor(private editor: monaco.editor.IStandaloneCodeEditor, private main: MainClass) {
+    constructor(private editor: monaco.editor.IStandaloneCodeEditor, private main: IMain) {
 
     }
 

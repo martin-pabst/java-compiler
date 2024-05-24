@@ -1,11 +1,11 @@
+import { IMain } from "../../common/IMain.ts";
 import { UsagePosition } from "../../common/UsagePosition.ts";
-import { MainClass } from "../MainInterface.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 
 export class JavaReferenceProvider implements monaco.languages.ReferenceProvider {
 
     constructor(private editor: monaco.editor.IStandaloneCodeEditor,
-        private main: MainClass) {
+        private main: IMain) {
     }
 
     provideReferences(model: monaco.editor.ITextModel, position: monaco.Position, context: monaco.languages.ReferenceContext, token: monaco.CancellationToken): 

@@ -1,11 +1,11 @@
+import { IMain } from "../../common/IMain.ts";
 import { UsagePosition } from "../../common/UsagePosition.ts";
-import { MainClass } from "../MainInterface.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 
 export class JavaDefinitionProvider implements monaco.languages.DefinitionProvider {
 
     constructor(private editor: monaco.editor.IStandaloneCodeEditor,
-        private main: MainClass) {
+        private main: IMain) {
     }
 
     provideDefinition(model: monaco.editor.ITextModel, position: monaco.Position, token: monaco.CancellationToken): monaco.languages.ProviderResult<monaco.languages.Definition> {

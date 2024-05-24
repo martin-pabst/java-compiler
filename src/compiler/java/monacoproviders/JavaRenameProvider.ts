@@ -1,11 +1,11 @@
+import { IMain } from "../../common/IMain.ts";
 import { UsagePosition } from "../../common/UsagePosition.ts";
-import { MainClass } from "../MainInterface.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 
 export class JavaRenameProvider implements monaco.languages.RenameProvider {
 
     constructor(private editor: monaco.editor.IStandaloneCodeEditor,
-        private main: MainClass) {
+        private main: IMain) {
     }
 
     provideRenameEdits(model: monaco.editor.ITextModel, position: monaco.Position, newName: string, token: monaco.CancellationToken): 

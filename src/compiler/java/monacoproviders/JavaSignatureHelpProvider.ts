@@ -1,5 +1,4 @@
-import { UsagePosition } from "../../common/UsagePosition.ts";
-import { MainClass } from "../MainInterface.ts";
+import { IMain } from "../../common/IMain.ts";
 import { JavaCompiledModule, JavaMethodCallPosition } from "../module/JavaCompiledModule.ts";
 import { ArrayType } from "../types/ArrayType.ts";
 import { Method } from "../types/Method.ts";
@@ -7,7 +6,7 @@ import { Method } from "../types/Method.ts";
 export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelpProvider {
 
     constructor(private editor: monaco.editor.IStandaloneCodeEditor,
-        private main: MainClass) {
+        private main: IMain) {
     }
 
     signatureHelpTriggerCharacters?: readonly string[] = ['(', ',', ';', '<', '>', '=']; // semicolon, <, >, = for for-loop, if, while, ...

@@ -1,9 +1,10 @@
 export var testProgramsList = [
-['Particles', `
+['', ''],
+   ['Particles', `
 println("Verändern Sie die Erzeugungsrate der Rechtecke mit dem Geschwindigkeitsregler!");
 World g = new World(800, 900);
 
-for(int i = 1; i <= 600; i++) {
+for(int i = 1; i <= 6000; i++) {
    Particle p = new Particle();
    if(i % 10 == 0) {
       println(i + " Rechtecke sichtbar.");
@@ -32,10 +33,10 @@ class Particle extends Rectangle {
       rotate(vw);
       scale(1.001);
       vy += 0.04;
-      // if(isOutsideView()) {
-      //    destroy();
-      //    Particle p = new Particle();
-      // }
+       if(isOutsideView()) {
+          destroy();
+          Particle p = new Particle();
+       }
    }
 
 
