@@ -739,6 +739,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         this.constantTypeToTypeMap[TokenType.floatLiteral] = this.libraryTypestore.getType("float")!;
         this.constantTypeToTypeMap[TokenType.doubleConstant] = this.libraryTypestore.getType("double")!;
         this.constantTypeToTypeMap[TokenType.stringLiteral] = this.libraryTypestore.getType("string")!;
+        this.constantTypeToTypeMap[TokenType.keywordNull] = this.libraryTypestore.getType("null")!;
     }
 
     compileDereferenceAttribute(node: ASTAttributeDereferencingNode): CodeSnippet | undefined {
@@ -1028,7 +1029,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         return snippet;
     }
 
-    isStringOrChar(type: JavaType){
+    isStringOrChar(type: JavaType){ 
         return type == this.stringType || type == this.charType;
     }
 

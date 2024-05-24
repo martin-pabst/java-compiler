@@ -236,6 +236,7 @@ export abstract class TermParser extends TokenIterator {
             case TokenType.charLiteral:
             case TokenType.stringLiteral:
             case TokenType.booleanLiteral:
+            case TokenType.keywordNull:
                 node = this.nodeFactory.buildConstantNode(this.getAndSkipToken());
                 break;
             case TokenType.keywordThis:
@@ -255,8 +256,7 @@ export abstract class TermParser extends TokenIterator {
             case TokenType.leftCurlyBracket:
                 node = this.parseArrayLiteral();
                 break;
-
-        }
+            }
 
         if (node) {
             while ([TokenType.dot, TokenType.leftSquareBracket].indexOf(this.tt) >= 0) {

@@ -381,7 +381,7 @@ export interface ASTPrintStatementNode extends ASTTermNode {
 export interface ASTLiteralNode extends ASTTermNode {
     kind: TokenType.literal,
     constantType: TokenType,
-    value: string | boolean | number
+    value: string | boolean | number | null
 }
 
 export interface ASTArrayLiteralNode extends ASTTermNode {

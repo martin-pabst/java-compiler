@@ -53,6 +53,7 @@ import { FilledShapeClass } from "../graphics/FilledShapeClass.ts";
 import { RectangleClass } from "../graphics/RectangleClass.ts";
 import { GroupClass } from "../graphics/GroupClass.ts";
 import { ColorClass } from "../graphics/ColorClass.ts";
+import { NullType } from "./primitiveTypes/NullType.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -70,7 +71,8 @@ export class SystemModule extends JavaLibraryModule {
             new FloatPrimitiveType(this),
             new DoublePrimitiveType(this),
             new StringPrimitiveType(this),
-            new VoidPrimitiveType(this)
+            new VoidPrimitiveType(this),
+            new NullType(this)
         )
 
         ColorClass._initPredefinedColors();

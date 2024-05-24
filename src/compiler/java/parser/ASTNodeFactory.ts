@@ -520,7 +520,7 @@ export class ASTNodeFactory {
             kind: TokenType.literal,
             range: token.range,
             constantType: token.tt,
-            value: token.value
+            value: token.tt == TokenType.keywordNull ? null : token.value
         }
     }
 

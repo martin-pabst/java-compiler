@@ -63,6 +63,7 @@ export abstract class BinopCastCodeGenerator {
     intType: JavaType;
     booleanType: JavaType;
     stringType: JavaType;
+    nullType: JavaType;
     throwableType: JavaType;
     objectType: JavaClass;
     assertionsType: JavaClass;
@@ -84,6 +85,7 @@ export abstract class BinopCastCodeGenerator {
         this.intType = this.libraryTypestore.getType("int")!;
         this.booleanType = this.libraryTypestore.getType("boolean")!;
         this.stringType = this.libraryTypestore.getType("string")!;
+        this.nullType = this.libraryTypestore.getType("null")!;
         this.throwableType = this.libraryTypestore.getType("Throwable")!;
         this.objectType = <JavaClass>this.libraryTypestore.getType("Object")!;
         this.stringNonPrimitiveType = <JavaClass>this.libraryTypestore.getType("String")!;
@@ -349,6 +351,7 @@ export abstract class BinopCastCodeGenerator {
         if (snippet.type == castTo) return snippet;
 
         if (!type.isPrimitive) {
+            if(type == this.nullType) return snippet;
             if (castTo.identifier == "string" || castTo.identifier == "String") {
                 snippet = this.wrapWithToStringCall(snippet, castTo.identifier);
                 return snippet;
@@ -488,6 +491,7 @@ export abstract class BinopCastCodeGenerator {
         if (typeToIndex == nString) return true;
 
         if ((!typeFrom.isPrimitive || typeFrom == this.stringType) && !typeTo.isPrimitive) {
+            if(typeFrom == this.nullType) return true;
             if (typeFrom == this.stringType) typeFrom = this.primitiveStringClass.type;
 
             if (typeFrom instanceof ArrayType || typeTo instanceof ArrayType) {
