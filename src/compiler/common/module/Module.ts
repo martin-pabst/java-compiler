@@ -1,8 +1,7 @@
 import { JavaType } from "../../java/types/JavaType.ts";
-import { BaseSymbol } from "../BaseSymbolTable.ts";
 import { Error } from "../Error";
 import { UsagePosition, UsageTracker } from "../UsagePosition";
-import { Program } from "../interpreter/Program";
+import { Program, Step } from "../interpreter/Program";
 import { Thread } from "../interpreter/Thread";
 import { Position } from "../range/Position.ts";
 import { IRange } from "../range/Range.ts";
@@ -18,10 +17,10 @@ export abstract class Module {
 
     programsToCompileToFunctions: Program[] = [];
 
-
     compiledSymbolsUsageTracker: UsageTracker = new UsageTracker(this);
 
     systemSymbolsUsageTracker: UsageTracker = new UsageTracker(this);
+
 
     constructor(public file: File, public isLibraryModule: boolean) {
 
@@ -58,5 +57,25 @@ export abstract class Module {
                 range);
         }
     }
+
+    findStep(lineNumber: number): Step | undefined {
+        let nearestStep: Step | undefined;
+
+        for(let program of this.programsToCompileToFunctions){
+            let step = program.findStep(lineNumber);
+            if(step){
+                if(nearestStep){
+                    if(Math.abs(step.range.startLineNumber! - lineNumber) < Math.abs(nearestStep.range.startLineNumber! - lineNumber)){
+                        nearestStep = step;
+                    }
+                } else {
+                    nearestStep = step;
+                }
+            }
+        }
+        return nearestStep;
+    }
+
+
 
 }

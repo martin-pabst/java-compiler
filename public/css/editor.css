@@ -11,6 +11,14 @@
     --scrollbar-thumb-active: #7e7e7e;
 
     --reveal-syntaxelement: rgb(85,85,85);
+    
+    /* Breakpoints */
+    --breakpoint-size: 10px;
+    --breakpoint-radius: 10px;
+    --margin-breakpoint: rgba(255, 0, 0, 0.623);    
+    --margin-breakpoint-active: rgba(255, 0, 0, 0.815);    
+    --margin-breakpoint-mousedown: rgba(255, 153, 0, 0.815);    
+
 }   
 
 
@@ -61,4 +69,55 @@
 
 .jo_revealSyntaxElement {
     background-color: var(--reveal-syntaxelement);
+}
+
+/* Breakpoints */
+.jo_decorate_breakpoint {
+    background-color: #580000;
+}
+
+.jo_decorate_breakpoint_inactive {
+    background-color: #4e4e4eab;
+}
+
+
+
+.jo_margin_breakpoint {
+    background: var(--margin-breakpoint-active);
+    width: var(--breakpoint-size) !important;
+    height: var(--breakpoint-size) !important;
+    left: 1px !important;
+    top: 3px;
+    border-radius: var(--breakpoint-radius);
+}
+
+.jo_margin_breakpoint_inactive {
+    background: #4e4e4eab;
+    width: var(--breakpoint-size) !important;
+    height: var(--breakpoint-size) !important;
+    left: 1px !important;
+    top: 3px;
+    border-radius: var(--breakpoint-radius);
+}
+
+.line-numbers:hover::before {
+    content: "";
+    position: absolute;
+    background: var(--margin-breakpoint);
+    width: var(--breakpoint-size) !important;
+    height: var(--breakpoint-size) !important;
+    left: 1px !important;
+    top: 3px;
+    border-radius: var(--breakpoint-radius);
+}
+
+.line-numbers:active::before {
+    content: "";
+    position: absolute;
+    background: var(--margin-breakpoint-mousedown);
+    width: var(--breakpoint-size) !important;
+    height: var(--breakpoint-size) !important;
+    left: 1px !important;
+    top: 3px;
+    border-radius: var(--breakpoint-radius);
 }

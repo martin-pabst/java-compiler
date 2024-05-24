@@ -40,6 +40,7 @@ export type ThreadStateInfoAfterRun = {
 export enum ThreadState {
     new,          // A thread that has not yet started is in this state.
     runnable,     // A thread executing in the Java virtual machine is in this state.
+    stoppedAtBreakpoint,
     blocked,      // A thread that is blocked waiting for a monitor lock (semaphor!) is in this state.
     waiting,
     timed_waiting,
@@ -64,7 +65,7 @@ export class Thread {
     stepEndsWhenProgramstackLengthLowerOrEqual: number = -1;
     stepEndsWhenStepIndexIsNotEqualTo: number = Number.MAX_SAFE_INTEGER;
 
-    haltAtNextBreakpoint: boolean = false;
+    haltAtNextBreakpoint: boolean = true;
 
     stepCallback!: () => void;
 

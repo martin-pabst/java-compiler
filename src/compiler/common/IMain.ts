@@ -1,5 +1,6 @@
 import { Compiler } from "../common/Compiler.ts";
 import { Module } from "../common/module/Module.ts";
+import { JavaBaseModule } from "../java/module/JavaBaseModule.ts";
 import { Interpreter } from "./interpreter/Interpreter.ts";
 
 export interface IMain {
@@ -16,5 +17,7 @@ export interface IMain {
 
     getInterpreter(): Interpreter;
 
-    getEditor(): monaco.editor.IEditor;
+    getEditor(): monaco.editor.IStandaloneCodeEditor;
+
+    getCurrentlyEditedModule(): Module | undefined;
 }

@@ -39,6 +39,7 @@ import { JavaSignatureHelpProvider } from "./compiler/java/monacoproviders/JavaS
 import { GraphicsManager } from "./compiler/common/interpreter/GraphicsManager.ts";
 import { IMain } from "./compiler/common/IMain.ts";
 import { KeyboardManager } from "./compiler/common/interpreter/KeyboardManager.ts";
+import { BreakpointManager } from "./compiler/common/BreakpointManager.ts";
 
 export class Main implements IMain {
 
@@ -57,6 +58,8 @@ export class Main implements IMain {
 
   programControlButtons!: ProgramControlButtons;
   actionManager: ActionManager;
+
+  breakpointManager!: BreakpointManager;
 
   astComponent: AstComponent;
 
@@ -126,8 +129,10 @@ export class Main implements IMain {
     this.actionManager = new ActionManager();
     let keyboardManager = new KeyboardManager(jQuery('#insighttabs'), this);
 
+    this.breakpointManager = new BreakpointManager(this);
+
     this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager,
-      new GraphicsManager(this.graphicsDiv), keyboardManager);
+      new GraphicsManager(this.graphicsDiv), keyboardManager, this.breakpointManager);
 
     this.initButtons();
     this.initCompiler();
@@ -173,6 +178,12 @@ export class Main implements IMain {
 
   }
 
+  getCurrentlyEditedModule(): Module | undefined {
+    let model = this.getEditor().getModel();
+    if(!model) return;
+    return this.getModuleForMonacoModel(model);
+  }
+
   isEmbedded(): boolean {
     return false;
   }
@@ -181,7 +192,7 @@ export class Main implements IMain {
     return this.interpreter;
   }
 
-  getEditor(): monaco.editor.IEditor {
+  getEditor(): monaco.editor.IStandaloneCodeEditor {
     return this.tabbedEditorManager.editor.editor;
   }
 
@@ -306,6 +317,7 @@ export class Main implements IMain {
         this.programViewerCompoment.buildTreeView(this.compiler.moduleManager);
 
       }
+
     }
 
     this.compiler.askBeforeCompilingCallback = () => {

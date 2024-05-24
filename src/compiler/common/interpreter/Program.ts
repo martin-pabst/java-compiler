@@ -16,7 +16,6 @@ export class Step {
 
     originalRun?: StepFunction; // if breakpoint present then this points to run function
 
-    isBreakpoint: boolean = false;
     range!: { startLineNumber?: number, startColumn?: number, endLineNumber?: number, endColumn?: number };
     codeAsString: string = "";
     stopStepOverBeforeStep: boolean = false;
@@ -31,25 +30,27 @@ export class Step {
     }
 
     setBreakpoint() {
-        if (!this.originalRun) return; // breakpoint already set
+
+        let breakpointRunFunction = (thread: Thread, stack: any[], stackBase: number): number => {
+            if (thread.haltAtNextBreakpoint) {
+                thread.state = ThreadState.stoppedAtBreakpoint;
+                thread.haltAtNextBreakpoint = false;
+                return this.index;
+            } else {
+                thread.haltAtNextBreakpoint = true;
+                return this.originalRun!(thread, stack, stackBase);
+            }    
+        }
+
+        if (this.originalRun) return; // breakpoint already set
         this.originalRun = this.run;
-        this.run = this.breakpointRunFunction;
+        this.run = breakpointRunFunction;
     }
 
     clearBreakpoint() {
         if (this.originalRun) {
             this.run = this.originalRun;
             this.originalRun = undefined;
-        }
-    }
-
-    breakpointRunFunction(thread: Thread, stack: any[], stackBase: number): number {
-        if (thread.haltAtNextBreakpoint) {
-            thread.state = ThreadState.blocked;
-            return -1;
-        } else {
-            thread.haltAtNextBreakpoint = true;
-            return this.originalRun!(thread, stack, stackBase);
         }
     }
 
@@ -82,6 +83,10 @@ export class Step {
         // console.log(this.codeAsString);
         // @ts-ignore
         this.run = new Function(StepParams.thread, StepParams.stack, StepParams.stackBase, this.codeAsString);
+    }
+
+    isBreakpoint(): boolean {
+        return this.originalRun ? true : false;
     }
 
 }
@@ -184,14 +189,24 @@ export class Program {
     }
 
     findStep(line: number): Step | undefined {
+
+        let nearestStep: Step | undefined;
+
         for (let step of this.stepsSingle) {
             let range = step.range;
             if (range) {
                 if (range.startLineNumber! <= line && line <= range.endLineNumber!) {
-                    return step;
+                    if(nearestStep){
+                        if(Math.abs(step.range.startLineNumber! - line) < Math.abs(nearestStep.range.startLineNumber! - line)){
+                            nearestStep = step;
+                        }    
+                    } else {
+                        nearestStep = step;
+                    }
                 }
             }
         }
+        return nearestStep;
     }
 
 }

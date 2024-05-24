@@ -34,6 +34,9 @@ export class Scheduler {
     stepCountSinceStartOfProgram: number = 0;
     libraryTypeStore?: JavaTypeStore;
 
+    // if pause button is pressed when there is no thread 
+    // and Program has actors then interpreter sets this callback:
+    onStartingNextThreadCallback?: () => void;
 
     constructor(public interpreter: Interpreter) {
         this.setState(SchedulerState.not_initialized);
@@ -41,6 +44,15 @@ export class Scheduler {
 
 
     run(numberOfStepsMax: number): SchedulerExitState {
+
+        if (this.onStartingNextThreadCallback) {
+            if (this.getNextStepPosition()) {
+                this.onStartingNextThreadCallback();
+                this.onStartingNextThreadCallback = undefined;
+                return SchedulerExitState.giveMeAdditionalTime;
+            }
+        }
+
         if (this.state != SchedulerState.running) return SchedulerExitState.nothingMoreToDo;
 
         let stepsPerThread = Math.ceil(numberOfStepsMax / this.runningThreads.length);
@@ -84,10 +96,15 @@ export class Scheduler {
                 let msPerStep = 1000 / currentThread.maxStepsPerSecond;
                 let elapsedTime = t - currentThread.timeLastStepExecuted;
                 let numberOfSteps = Math.min(elapsedTime / msPerStep, stepsPerThread);
-                if (numberOfSteps > 1) {
+                if (numberOfSteps > 0) {
                     threadState = currentThread.run(numberOfSteps);
                     currentThread.timeLastStepExecuted =
                         currentThread.timeLastStepExecuted + threadState.stepsExecuted * msPerStep;
+                    if (currentThread.maxStepsPerSecond < 20) {
+                        this.interpreter.showProgramPointer(this.getNextStepPosition(currentThread));
+                    } else {
+                        this.interpreter.hideProgrampointerPosition();
+                    }
                 } else if (this.runningThreads.length == 1) {
                     return SchedulerExitState.nothingMoreToDo;
                 }
@@ -97,27 +114,38 @@ export class Scheduler {
 
             numberOfStepsInThisRun += threadState.stepsExecuted;  // to avoid endless loop
 
-            if (threadState.state == ThreadState.terminated || threadState.state == ThreadState.terminatedWithException) {
+            if (threadState.state != ThreadState.runnable) {
+                switch (threadState.state) {
+                    case ThreadState.terminated:
+                    case ThreadState.terminatedWithException:
+                        // TODO: Print Exception if present
 
-                // TODO: Print Exception if present
+                        this.runningThreads.splice(this.currentThreadIndex, 1);
+                        if (this.currentThreadIndex > this.runningThreads.length - 1) {
+                            this.currentThreadIndex = -1;
+                            this.keepThread = false;
+                        }
 
-                this.runningThreads.splice(this.currentThreadIndex, 1);
-                if (this.currentThreadIndex > this.runningThreads.length - 1) {
-                    this.currentThreadIndex = -1;
-                    this.keepThread = false;
+                        if (this.runningThreads.length == 0 && !this.interpreter.hasActors()
+                            || threadState.state == ThreadState.terminatedWithException) {
+
+                            if (currentThread.maxStepsPerSecond) {
+                                this.interpreter.hideProgrampointerPosition();
+                            }
+
+                            this.stepCountSinceStartOfProgram += numberOfStepsInThisRun;
+                            this.interpreter.setState(SchedulerState.stopped);
+                            if (threadState.state == ThreadState.terminatedWithException) {
+                                this.interpreter.setState(SchedulerState.error);
+                            }
+                            return SchedulerExitState.nothingMoreToDo;
+                        }
+                        break;
+                    case ThreadState.stoppedAtBreakpoint:
+                        currentThread.state = ThreadState.runnable;
+                        this.interpreter.pause();
+                        break;
                 }
-
-                if (this.runningThreads.length == 0 && !this.interpreter.hasActors()
-                    || threadState.state == ThreadState.terminatedWithException) {
-
-                    this.stepCountSinceStartOfProgram += numberOfStepsInThisRun;
-                    this.interpreter.setState(SchedulerState.stopped);
-                    if (threadState.state == ThreadState.terminatedWithException) {
-                        this.interpreter.setState(SchedulerState.error);
-                    }
-                    return SchedulerExitState.nothingMoreToDo;
-                }
-
 
             }
 
@@ -130,8 +158,6 @@ export class Scheduler {
         }
 
         this.stepCountSinceStartOfProgram += numberOfStepsInThisRun;
-
-        console.log(numberOfStepsInThisRun);
 
         return SchedulerExitState.giveMeAdditionalTime;
     }
@@ -161,8 +187,22 @@ export class Scheduler {
         this.suspendedThreads.length = 0;
     }
 
+    private ifBreakpointPresentDisableOnce(){
+        let currentThread = this.runningThreads[this.currentThreadIndex];
+        let programState = currentThread.currentProgramState;
+        if (currentThread) {
+            let currentStep = programState.currentStepList[programState.stepIndex];
+            if (currentStep.isBreakpoint()) {
+                currentThread.haltAtNextBreakpoint = false;
+            }
+        }
+    }
+
     runSingleStepKeepingThread(stepInto: boolean, callback: () => void) {
         this.keepThread = true;
+
+        this.ifBreakpointPresentDisableOnce();
+
         if (stepInto) {
             if (this.state == SchedulerState.paused) {
                 this.setState(SchedulerState.running);
@@ -194,7 +234,7 @@ export class Scheduler {
      */
     unmarkCurrentlyExecutedSingleStep() {
         let thread = this.runningThreads[this.currentThreadIndex];
-        if(thread) thread.unmarkStep();
+        if (thread) thread.unmarkStep();
     }
 
     createThread(initialStack: any[] = []): Thread {
@@ -235,8 +275,8 @@ export class Scheduler {
     /**
      * for displaying next program position in editor
      */
-    getNextStepPosition(): ProgramPointerPositionInfo | undefined {
-        let currentThread = this.runningThreads[this.currentThreadIndex];
+    getNextStepPosition(currentThread?: Thread): ProgramPointerPositionInfo | undefined {
+        currentThread = currentThread || this.runningThreads[this.currentThreadIndex];
         if (!currentThread) return undefined;
         let programState = currentThread.currentProgramState;
         let step = programState.currentStepList[programState.stepIndex];

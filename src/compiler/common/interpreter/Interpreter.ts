@@ -10,6 +10,7 @@ import { GraphicsManager } from "./GraphicsManager.ts";
 import { IWorld } from "../../java/runtime/graphics/IWorld.ts";
 import { KeyboardManager } from "./KeyboardManager.ts";
 import { Thread, ThreadState } from "./Thread.ts";
+import { BreakpointManager } from "../BreakpointManager.ts";
 
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
@@ -40,7 +41,7 @@ export class Interpreter {
     eventManager: EventManager<InterpreterEvents> = new EventManager();
     showProgramPointerCallback?: ShowProgramPointerCallback;
 
-    objectStore: {[key: string]: any} = {};
+    objectStore: { [key: string]: any } = {};
 
     actions: string[] = ["start", "pause", "stop", "stepOver",
         "stepInto", "stepOut", "restart"];
@@ -64,8 +65,9 @@ export class Interpreter {
     private stepsPerSecondGoal: number = 1e8;
     private isMaxSpeed: boolean = true;
 
-    constructor(printManager?: PrintManager, private actionManager?: ActionManager, 
-        public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager
+    constructor(printManager?: PrintManager, private actionManager?: ActionManager,
+        public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager,
+        public breakpointManager?: BreakpointManager
     ) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {
 
@@ -86,6 +88,8 @@ export class Interpreter {
 
         this.registerActions();
 
+        if(breakpointManager) breakpointManager.attachToInterpreter(this);
+
         this.scheduler = new Scheduler(this);
         this.loadController = new LoadController(this.scheduler, this);
         this.initTimer();
@@ -93,14 +97,14 @@ export class Interpreter {
         this.setState(SchedulerState.not_initialized);
     }
 
-    setTestExecutable(executable: Executable | undefined){
-        if(!executable) return;
+    setTestExecutable(executable: Executable | undefined) {
+        if (!executable) return;
 
         executable.setTestExecutable();
         this.executable = executable;
-        if(executable.testModule){
+        if (executable.testModule) {
             executable.compileToJavascript();
-            if(executable.isCompiledToJavascript){                
+            if (executable.isCompiledToJavascript) {
                 this.init(executable);
                 this.setState(SchedulerState.stopped);
             } else {
@@ -111,12 +115,12 @@ export class Interpreter {
         }
     }
 
-    setExecutable(executable: Executable | undefined){
-        if(!executable) return;
+    setExecutable(executable: Executable | undefined) {
+        if (!executable) return;
         this.executable = executable;
-        if(executable.mainModule){
+        if (executable.mainModule) {
             executable.compileToJavascript();
-            if(executable.isCompiledToJavascript){                
+            if (executable.isCompiledToJavascript) {
                 this.init(executable);
                 this.setState(SchedulerState.stopped);
             } else {
@@ -127,7 +131,7 @@ export class Interpreter {
         }
     }
 
-    attachAssertionObserver(observer: AssertionObserver){
+    attachAssertionObserver(observer: AssertionObserver) {
         this.assertionObserverList.push(observer);
     }
 
@@ -163,7 +167,6 @@ export class Interpreter {
             this.setState(SchedulerState.paused);
             return;
         }
-
         this.scheduler.runSingleStepKeepingThread(stepInto, () => {
             this.pause();
         });
@@ -173,19 +176,32 @@ export class Interpreter {
     }
 
     showProgramPointer(_textPositionWithModule: ProgramPointerPositionInfo | undefined) {
-        if(this.showProgramPointerCallback){
-            if(_textPositionWithModule?.range){
-                if(_textPositionWithModule.range.startLineNumber >= 0){
+        if (this.showProgramPointerCallback) {
+            if (_textPositionWithModule?.range) {
+                if (_textPositionWithModule.range.startLineNumber >= 0) {
                     this.showProgramPointerCallback("show", _textPositionWithModule);
                 }
             } else {
                 this.showProgramPointerCallback("hide");
             }
-        } 
+        }
     }
 
     pause() {
+        if (this.scheduler.getNextStepPosition()) {
+            this.pauseIntern();
+        } else {
+            if (this.hasActors()) {
+                this.scheduler.onStartingNextThreadCallback = () => {
+                    this.pauseIntern();
+                }
+            }
+        }
+    }
+
+    private pauseIntern() {
         this.setState(SchedulerState.paused);
+        this.scheduler.keepThread = true;
         this.scheduler.unmarkCurrentlyExecutedSingleStep();
         this.showProgramPointer(this.scheduler.getNextStepPosition());
     }
@@ -206,7 +222,7 @@ export class Interpreter {
 
 
         setTimeout(() => {
-            // this.main.hideProgramPointerPosition();
+            this.hideProgrampointerPosition();
             if (restart) {
                 this.start();
             }
@@ -234,9 +250,9 @@ export class Interpreter {
 
     }
 
-    runMainProgramSynchronously(){
+    runMainProgramSynchronously() {
         this.start();
-        while(this.scheduler.state != SchedulerState.stopped && this.scheduler.state != SchedulerState.error){
+        while (this.scheduler.state != SchedulerState.stopped && this.scheduler.state != SchedulerState.error) {
             this.scheduler.run(100);
         }
     }
@@ -308,24 +324,19 @@ export class Interpreter {
             // this.closeAllWebsockets();
         }
 
-        if(this.actionManager){
+        if (this.actionManager) {
             for (let actionId of this.actions) {
                 this.actionManager.setActive("interpreter." + actionId, this.buttonActiveMatrix[actionId][state]);
             }
-    
+
             let buttonStartActive = this.buttonActiveMatrix['start'][state];
-    
+
             this.actionManager.showHideButtons("interpreter.start", buttonStartActive);
             this.actionManager.showHideButtons("interpreter.pause", !buttonStartActive);
         }
 
         if (state == SchedulerState.stopped) {
             this.eventManager.fire("done");
-            // if (this.worldHelper != null) {
-            //     this.worldHelper.clearActorLists();
-            // }
-            // this.gngEreignisbehandlungHelper?.detachEvents();
-            // this.gngEreignisbehandlungHelper = null;
 
         }
 
@@ -355,7 +366,7 @@ export class Interpreter {
         // this.gngEreignisbehandlungHelper = null;
     }
 
-    init(executable: Executable) {
+    private init(executable: Executable) {
 
         // this.main.getBottomDiv()?.console?.clearErrors();
 
@@ -374,11 +385,12 @@ export class Interpreter {
         //     this.main.getBottomDiv()?.console?.detachValues();  // detach values from console entries
         // }
 
+        
 
         this.setState(SchedulerState.stopped);
         this.mainThread = this.scheduler.init(executable);
-        
-        if(this.mainThread){
+
+        if (this.mainThread) {
             this.codeReachedAssertions.init(executable.moduleManager);
             this.mainThread.maxStepsPerSecond = this.stepsPerSecondGoal;
             this.mainThread.state = ThreadState.runnable; // this statement actually makes the program run
@@ -389,7 +401,7 @@ export class Interpreter {
 
     hideProgrampointerPosition() {
 
-        // this.main.hideProgramPointerPosition();
+        if (this.showProgramPointerCallback) this.showProgramPointerCallback("hide");
 
     }
 
@@ -398,21 +410,24 @@ export class Interpreter {
     }
 
     isRunningOrPaused(): boolean {
-        return this.scheduler.state == SchedulerState.running || 
+        return this.scheduler.state == SchedulerState.running ||
             this.scheduler.state == SchedulerState.paused;
     }
 
     hasActors(): boolean {
         let world: IWorld = this.objectStore["World"];
-        if(!world) return false;
+        if (!world) return false;
         return world.hasActors();
     }
 
     setStepsPerSecond(value: number, isMaxSpeed: boolean) {
         this.stepsPerSecondGoal = value;
         this.isMaxSpeed = isMaxSpeed;
-        if(this.mainThread){
+        if (this.mainThread) {
             this.mainThread.maxStepsPerSecond = isMaxSpeed ? undefined : value;
+        }
+        if (!isMaxSpeed && this.stepsPerSecondGoal > 20) {
+            this.hideProgrampointerPosition();
         }
     }
 
