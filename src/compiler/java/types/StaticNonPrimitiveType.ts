@@ -37,11 +37,11 @@ export class StaticNonPrimitiveType extends JavaType {
 
 
     getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, JavaType>): JavaType {
-        throw new Error("Method not implemented.");
+        return this;
     }
 
     getDefaultValue() {
-        throw new Error("Method not implemented.");
+        return null;
     }
 
     getPossibleMethods(identifier: string, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
@@ -57,11 +57,11 @@ export class StaticNonPrimitiveType extends JavaType {
     }
 
     toString(): string {
-        throw new Error("Method not implemented.");
+        return this.nonPrimitiveType.toString();
     }
 
     getReifiedIdentifier(): string {
-        throw new Error("Method not implemented.");
+       return this.nonPrimitiveType.identifier;
     }
 
     getDeclaration(): string {
