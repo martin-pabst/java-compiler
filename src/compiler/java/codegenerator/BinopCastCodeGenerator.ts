@@ -632,7 +632,7 @@ export abstract class BinopCastCodeGenerator {
             return;
         }
 
-        if ([TokenType.negation, TokenType.plus].indexOf(operator) >= 0) {
+        if ([TokenType.minus, TokenType.plus].indexOf(operator) >= 0) {
             if (primitiveIndex >= nByte && primitiveIndex <= nDouble) {
                 return this.applyUnaryOperatorConsideringConstantFolding(operatorAsString, operand.type!, operand.range!, operand);
             }

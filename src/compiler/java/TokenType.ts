@@ -109,9 +109,6 @@ export enum TokenType {
     ellipsis, // ...
 
     not,    // !
-    // used by parser
-    negation,
-
 
     // semicolon
     semicolon, // ;

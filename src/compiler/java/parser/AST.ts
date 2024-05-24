@@ -25,7 +25,7 @@ export type BinaryOperator = AssignmentOperator |
     TokenType.plus | TokenType.minus | TokenType.multiplication | TokenType.division | TokenType.modulo |
     ShiftOperator | LogicOperator | ComparisonOperator;
 
-export type UnaryPrefixOperator = TokenType.negation | TokenType.not | TokenType.tilde | TokenType.plus | TokenType.plusPlus | TokenType.minusMinus;
+export type UnaryPrefixOperator = TokenType.minus | TokenType.not | TokenType.tilde | TokenType.plus | TokenType.plusPlus | TokenType.minusMinus;
 
 export type ConstantType = TokenType.shortConstant | TokenType.integerLiteral | TokenType.longConstant | TokenType.charLiteral | TokenType.stringLiteral | TokenType.booleanLiteral;
 
