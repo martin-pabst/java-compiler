@@ -77,7 +77,7 @@ export class RectangleClass extends FilledShapeClass {
         }
 
         if (this.borderColor != null) {
-            g.setStrokeStyle({
+            g.stroke({
                 width: this.borderWidth,
                 color: this.borderColor,
                 alpha: this.borderAlpha,

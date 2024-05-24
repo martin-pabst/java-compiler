@@ -107,7 +107,7 @@ export class FilledShapeClass extends ShapeClass {
 
     _setFillColorIntDouble(color: number, alpha: number) {
         this.fillColor = color % 0x1000000;
-        this.fillAlpha = color;
+        this.fillAlpha = alpha;
         this.render();
     }
 
