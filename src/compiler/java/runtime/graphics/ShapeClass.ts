@@ -192,8 +192,6 @@ export class ShapeClass extends ActorClass {
         cX = p.x;
         cY = p.y;
 
-        this.container.toGlobal()
-
         this.container.localTransform.translate(-cX, -cY);
         this.container.localTransform.scale(scaleX, scaleY);
         this.container.localTransform.translate(cX, cY);
