@@ -6,6 +6,7 @@ import { Thread } from "../../common/interpreter/Thread.ts";
 import { File } from "../../common/module/File";
 import { Position } from "../../common/range/Position.ts";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable.ts";
+import { LexerOutput } from "../lexer/Lexer.ts";
 import { TokenList } from "../lexer/Token";
 import { ASTBlockNode, ASTClassDefinitionNode, ASTGlobalNode } from "../parser/AST";
 import { ArrayType } from "../types/ArrayType.ts";
@@ -49,6 +50,13 @@ export class JavaCompiledModule extends JavaBaseModule {
     constructor(file: File, public moduleManager: JavaModuleManager){
         super(file, false);
     }
+
+    setLexerOutput(lexerOutput: LexerOutput) {
+        this.tokens = lexerOutput.tokens;
+        this.errors = lexerOutput.errors;
+        this.colorInformation = lexerOutput.colorInformation;
+    }
+
 
     addTypePosition(position: Position, type: JavaType){
 

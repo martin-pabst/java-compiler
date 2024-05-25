@@ -40,6 +40,8 @@ import { GraphicsManager } from "./compiler/common/interpreter/GraphicsManager.t
 import { IMain } from "./compiler/common/IMain.ts";
 import { KeyboardManager } from "./compiler/common/interpreter/KeyboardManager.ts";
 import { BreakpointManager } from "./compiler/common/BreakpointManager.ts";
+import { Formatter as JavaFormatter } from "./compiler/java/monacoproviders/JavaFormatter.ts";
+import { ColorProvider } from "./compiler/common/monacoproviders/ColorProvider.ts";
 
 export class Main implements IMain {
 
@@ -377,6 +379,9 @@ export class Main implements IMain {
     monaco.languages.registerReferenceProvider('myJava', new JavaReferenceProvider(editor, this));
     monaco.languages.registerSignatureHelpProvider('myJava', new JavaSignatureHelpProvider(editor, this));
     new JavaSymbolMarker(this.tabbedEditorManager.editor.editor, this);
+    new ColorProvider(this);
+
+    new JavaFormatter().init();
 
     let that = this;
     monaco.editor.registerEditorOpener({

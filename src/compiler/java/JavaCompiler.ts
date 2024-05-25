@@ -80,8 +80,8 @@ export class JavaCompiler implements Compiler {
 
             module.resetBeforeCompilation();
 
-            let lexer = new Lexer(module);
-            lexer.lex();
+            let lexerOutput = new Lexer().lex(module.file.getText());
+            module.setLexerOutput(lexerOutput);
 
             let parser = new Parser(module);
             parser.parse();
@@ -143,8 +143,8 @@ export class JavaCompiler implements Compiler {
 
         module.resetBeforeCompilation();
 
-        let lexer = new Lexer(module);
-        lexer.lex();
+        let lexerOutput = new Lexer().lex(module.file.getText());
+        module.setLexerOutput(lexerOutput);
 
         let parser = new Parser(module);
         parser.parse();

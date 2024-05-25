@@ -11,14 +11,23 @@ import { ErrormessageWithId } from "../../../tools/language/LanguageManager.js";
 
 var endChar = "►"; // \u10000
 
+export type LexerOutput = {
+    tokens: TokenList, errors: Error[],
+    bracketError: string | undefined,
+    colorInformation: monaco.languages.IColorInformation[]
+}
+
 
 
 export class Lexer {
 
-    tokenList: TokenList;
+    tokens: TokenList;
+    bracketError?: string;
+    colorInformation: monaco.languages.IColorInformation[];
+    errorList: Error[];
+
     nonSpaceLastTokenType?: TokenType;
 
-    colorInformation: monaco.languages.IColorInformation[];
     colorLexer: ColorLexer = new ColorLexer();
 
     pos: number;
@@ -33,7 +42,6 @@ export class Lexer {
     ];
 
     bracketStack: TokenType[];
-    bracketError?: string;
     static correspondingBracket: { [key: number]: TokenType } = {
         [TokenType.leftBracket]: TokenType.rightBracket,
         [TokenType.leftCurlyBracket]: TokenType.rightCurlyBracket,
@@ -47,30 +55,27 @@ export class Lexer {
 
     colorIndices: number[];
 
-    private input: string;
+    private input: string = "";
 
-    constructor(private module: JavaCompiledModule) {
+    constructor() {
 
-        this.input = module.file.getText();
-        this.tokenList = [];
+        this.tokens = [];
         this.bracketError = undefined;
+        this.errorList = [];
+
+        this.colorInformation = [];
         this.bracketStack = [];
         this.pos = 0;
         this.line = 1;
         this.column = 1;
         this.nonSpaceLastTokenType = undefined;
-        this.colorInformation = [];
         this.colorIndices = []; // indices of identifier 'Color' inside tokenList
     }
 
-    lex() {
-
-        if (this.input.length == 0) {
-            this.module.tokens = this.tokenList;
-            this.module.bracketError = this.bracketError;
-            this.module.colorInformation = this.colorInformation;
-
-            return;
+    lex(input: string): LexerOutput {
+        this.input = input;
+        if (input.length == 0) {
+            return { tokens: this.tokens, errors: this.errorList, bracketError: undefined, colorInformation: [] };
         }
 
         this.currentChar = this.input.charAt(0);
@@ -91,15 +96,14 @@ export class Lexer {
 
         this.processColorIndices();
 
-        this.tokenList.push({
-            range: {startLineNumber: this.line, startColumn: this.column, endLineNumber: this.line, endColumn: this.column},
+        this.tokens.push({
+            range: { startLineNumber: this.line, startColumn: this.column, endLineNumber: this.line, endColumn: this.column },
             tt: TokenType.endofSourcecode,
             value: "program end"
         })
 
-        this.module.tokens = this.tokenList;
-        this.module.bracketError = this.bracketError;
-        this.module.colorInformation = this.colorInformation;
+        return { tokens: this.tokens, errors: this.errorList, bracketError: this.bracketError, colorInformation: this.colorInformation };
+
 
     }
 
@@ -111,7 +115,7 @@ export class Lexer {
             // new Color(100, 100, 100)
             // Color.red
 
-            let colorToken = this.tokenList[colorIndex];
+            let colorToken = this.tokens[colorIndex];
             let previousToken = this.getLastNonSpaceToken(colorIndex)
 
             if (previousToken?.tt == TokenType.keywordNew) {
@@ -169,8 +173,8 @@ export class Lexer {
     getNextNonSpaceTokens(tokenIndex: number, count: number): Token[] {
         let tokens: Token[] = [];
         let d = tokenIndex;
-        while (tokens.length < count && d + 1 < this.tokenList.length) {
-            let foundToken = this.tokenList[d + 1];
+        while (tokens.length < count && d + 1 < this.tokens.length) {
+            let foundToken = this.tokens[d + 1];
             if ([TokenType.space, TokenType.newline].indexOf(foundToken.tt) < 0) {
                 tokens.push(foundToken);
             }
@@ -184,7 +188,7 @@ export class Lexer {
     getLastNonSpaceToken(tokenIndex: number) {
         let d = tokenIndex;
         while (d - 1 > 0) {
-            let foundToken = this.tokenList[d - 1];
+            let foundToken = this.tokens[d - 1];
             if ([TokenType.space, TokenType.newline].indexOf(foundToken.tt) < 0) {
                 return foundToken;
             }
@@ -429,7 +433,7 @@ export class Lexer {
                         this.next();
                         this.next();
                         return;
-                    } 
+                    }
                     else if (this.nextChar == '>') {
                         this.pushToken(TokenType.lambdaOperator, '->');
                         this.next();
@@ -564,17 +568,17 @@ export class Lexer {
             this.nonSpaceLastTokenType = tt;
         }
 
-        this.tokenList.push(t);
+        this.tokens.push(t);
     }
 
     pushError(messageWithId: ErrormessageWithId, length: number, errorLevel: ErrorLevel = "error",
         startLineNumber: number = this.line, startColumn: number = this.column,
         endLineNumber?: number, endColumn?: number) {
 
-            if(!endLineNumber) endLineNumber = startLineNumber;
-            if(!endColumn) endColumn = startColumn + length ;
+        if (!endLineNumber) endLineNumber = startLineNumber;
+        if (!endColumn) endColumn = startColumn + length;
 
-        this.module.errors.push({
+        this.errorList.push({
             message: messageWithId.message,
             id: messageWithId.id,
             range: {
@@ -940,7 +944,7 @@ export class Lexer {
 
             if (this.currentChar == 'd' || this.currentChar == 'f') {
                 tt = TokenType.floatLiteral;
-                if(this.currentChar == 'd') tt = TokenType.doubleConstant;
+                if (this.currentChar == 'd') tt = TokenType.doubleConstant;
                 this.next();
                 if (radix != 10) {
                     this.pushError(JCM.wrongFloatConstantBegin(), this.pos - posStart, "error", this.line, this.column - (this.pos - posStart));
@@ -978,7 +982,7 @@ export class Lexer {
 
         this.next(); // consume @
 
-        this.pushToken(TokenType.at, "@", line, column, this.line, column+1);
+        this.pushToken(TokenType.at, "@", line, column, this.line, column + 1);
 
         let char = this.currentChar;
 
@@ -989,7 +993,7 @@ export class Lexer {
 
         let posEnd = this.pos;
 
-        let text = this.input.substring(posStart+1, posEnd);
+        let text = this.input.substring(posStart + 1, posEnd);
 
         // TODO: Check if valid indentifier?
         this.pushToken(TokenType.identifier, text, line, column, this.line, this.column);
@@ -1038,7 +1042,7 @@ export class Lexer {
         }
 
         if (text == 'Color') {
-            this.colorIndices.push(this.tokenList.length);
+            this.colorIndices.push(this.tokens.length);
         }
 
         this.pushToken(TokenType.identifier, text, line, column, this.line, this.column);
