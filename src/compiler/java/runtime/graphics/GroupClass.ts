@@ -100,12 +100,18 @@ export class GroupClass extends ShapeClass {
 
 
         // console.log(shape.container.worldTransform);
+        updateWorldTransformRecursively(this.container, false)
+        updateWorldTransformRecursively(shape.container, false);
         let inverse = new PIXI.Matrix().copyFrom(this.container.worldTransform).invert();
         inverse.append(shape.container.worldTransform);   // A.append(B)   is B * A
-        shape.container.localTransform.copyFrom(inverse);
+        // shape.container.localTransform.copyFrom(inverse);
+        // console.log("before:" + shape.container.localTransform);
+        // console.log("inverse:" + shape.container.localTransform);
         shape.container.setFromMatrix(inverse);
+        shape.container.updateLocalTransform();
+        // console.log("after:" + shape.container.localTransform);
         this.container.addChild(shape.container);
-        updateWorldTransformRecursively(shape.container, false);
+        updateWorldTransformRecursively(shape.container, true);
 
         let count = this.shapes.length;
         // old center of group in world coordinates:
@@ -155,13 +161,17 @@ export class GroupClass extends ShapeClass {
 
     private deregister(shape: ShapeClass, index: number) {
 
+        updateWorldTransformRecursively(shape.container, false)
+        updateWorldTransformRecursively(this.container, false)
+
         this.container.removeChild(shape.container);
         this.world.app.stage.addChild(shape.container);
         
         let inverseStageTransform = new PIXI.Matrix().copyFrom(this.world.app.stage.localTransform).invert();
         inverseStageTransform.append(shape.container.worldTransform);
-        shape.container.localTransform.copyFrom(inverseStageTransform);
+        // shape.container.localTransform.copyFrom(inverseStageTransform);
         shape.container.setFromMatrix(inverseStageTransform);
+        shape.container.updateLocalTransform();
 
         updateWorldTransformRecursively(shape.container, false);
 
@@ -173,14 +183,13 @@ export class GroupClass extends ShapeClass {
 
         let centerOfRemovedShape = shape.getCenter();
 
-        let x: number = (p0.x * (count + 1) - centerOfRemovedShape.x) / (count - 1);
-        let y: number = (p0.y * (count + 1) - centerOfRemovedShape.y) / (count - 1);
+        let x: number = (p0.x * (count + 1) - centerOfRemovedShape.x) / (count);
+        let y: number = (p0.y * (count + 1) - centerOfRemovedShape.y) / (count);
 
         let p1: PIXI.Point =  this.container.worldTransform.applyInverse(new PIXI.Point(x, y));
 
         this.centerXInitial = p1.x;
         this.centerYInitial = p1.y;
-
 
     }
 

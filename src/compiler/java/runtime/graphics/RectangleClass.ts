@@ -5,14 +5,20 @@ import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { ShapeClass } from './ShapeClass';
 import { FilledShapeClass } from './FilledShapeClass';
 import { CallbackFunction } from '../../../common/interpreter/StepFunction';
+import { JRC } from '../../JavaRuntimeLibraryComments';
 
 export class RectangleClass extends FilledShapeClass {
     static __javaDeclarations: LibraryDeclarations = [
-        { type: "declaration", signature: "class Rectangle extends FilledShape" },
+        { type: "declaration", signature: "class Rectangle extends FilledShape", comment: JRC.rectangleClassComment },
 
-        { type: "method", signature: "Rectangle()", java: RectangleClass.prototype._cj$_constructor_$Rectangle$ },
-        { type: "method", signature: "Rectangle(double left, double top, double width, double height)", java: RectangleClass.prototype._cj$_constructor_$Rectangle$double$double$double$double },
-        // { type: "method", signature: "final boolean isKeyUp(string key)", java: ActorClass.prototype._mj$isKeyUp$boolean$string },
+        { type: "method", signature: "Rectangle()", java: RectangleClass.prototype._cj$_constructor_$Rectangle$, comment: JRC.rectangleEmptyConstructorComment },
+        { type: "method", signature: "Rectangle(double left, double top, double width, double height)", java: RectangleClass.prototype._cj$_constructor_$Rectangle$double$double$double$double, comment: JRC.rectangleConstructorComment },
+        { type: "method", signature: "final void setWidth(double width)", native: RectangleClass.prototype._setWidth, comment: JRC.rectangleSetWidthComment },
+        { type: "method", signature: "final void setHeight(double height)", native: RectangleClass.prototype._setHeight, comment: JRC.rectangleSetHeightComment },
+        { type: "method", signature: "final double getWidth()", template: '(&1.width*§1.scaleFactor)', comment: JRC.rectangleGetWidthComment },
+        { type: "method", signature: "final double getHeight()", template: '(&1.height*&1.scaleFactor)', comment: JRC.rectangleGetHeightComment },
+        { type: "method", signature: "final Rectangle copy()", java: RectangleClass.prototype._mj$copy$Rectangle$, comment: JRC.rectangleCopyComment },
+        { type: "method", signature: "final void moveTo(double x, double y)", native: RectangleClass.prototype._moveTo, comment: JRC.rectangleMoveToComment },
 
     ]
 
@@ -43,12 +49,13 @@ export class RectangleClass extends FilledShapeClass {
 
     }
 
-    getCopy(t: Thread, callback: CallbackFunction): RectangleClass {
+    _mj$copy$Rectangle$(t: Thread, callback: CallbackFunction){
         let copy = new RectangleClass();
         copy._cj$_constructor_$Rectangle$double$double$double$double(t, callback, this.left, this.top, this.width, this.height);
         copy.copyFrom(this);
-        this.render();
-        return this;
+        copy.render();
+        t.s.push(copy);
+        if(callback) callback();
     }
 
     render(): void {
@@ -89,5 +96,26 @@ export class RectangleClass extends FilledShapeClass {
 
     };
 
+    _setWidth(width: number){
+        this.width = width / this.container.scale.x;
+        this.centerXInitial = this.left + this.width / 2;
+
+        this.render();
+    }
+
+    _setHeight(height: number){
+        this.height = height / this.container.scale.y;
+        this.centerYInitial = this.top + this.height / 2;
+
+        this.render();
+    }
+
+    _moveTo(x: number, y: number){
+        this.transformHitPolygon();
+
+        this._move(x - this.hitPolygonTransformed[0].x, y - this.hitPolygonTransformed[0].y);
+
+    }
+    
 
 }

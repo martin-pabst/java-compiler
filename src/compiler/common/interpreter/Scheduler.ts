@@ -103,7 +103,7 @@ export class Scheduler {
                     if (currentThread.maxStepsPerSecond < 20) {
                         this.interpreter.showProgramPointer(this.getNextStepPosition(currentThread));
                     } else {
-                        this.interpreter.hideProgrampointerPosition();
+                        if(this.state == SchedulerState.running) this.interpreter.hideProgrampointerPosition();
                     }
                 } else if (this.runningThreads.length == 1) {
                     return SchedulerExitState.nothingMoreToDo;

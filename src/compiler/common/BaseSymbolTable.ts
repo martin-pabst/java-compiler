@@ -7,7 +7,7 @@ import { IRange } from "./range/Range";
  */
 export abstract class BaseSymbol {
 
-    documentation?: string;
+    documentation?: string | (() => string);
 
     constructor(public identifier: string, public identifierRange: IRange, public module: Module) {
 

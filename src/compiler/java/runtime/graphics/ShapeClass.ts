@@ -3,29 +3,46 @@ import { Thread } from "../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { ActorClass } from "./ActorClass";
-import { Punkt } from '../../../../tools/MatheTools';
+import { Punkt, polygonEnthältPunkt } from '../../../../tools/MatheTools';
 import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { FilledShapeDefaults } from './FilledShapeDefaults';
 import { ColorHelper } from '../../lexer/ColorHelper';
 import { GroupClass } from './GroupClass';
 import { updateWorldTransformRecursively } from './PixiHelper';
+import { JRC } from '../../JavaRuntimeLibraryComments';
 
 export class ShapeClass extends ActorClass {
     static __javaDeclarations: LibraryDeclarations = [
-        { type: "declaration", signature: "abstract class Shape extends Actor" },
+        { type: "declaration", signature: "abstract class Shape extends Actor", comment: JRC.shapeClassComment },
+
+        { type: "field", signature: "final double angle" , comment: JRC.shapeAngleComment },
+        { type: "field", signature: "final double centerX" , comment: JRC.shapeCenterXComment },
+        { type: "field", signature: "final double centerY" , comment: JRC.shapeCenterYComment },
 
         { type: "method", signature: "Shape()", java: ShapeClass.prototype._cj$_constructor_$Shape$ },
-        // { type: "method", signature: "final boolean isKeyUp(string key)", java: ActorClass.prototype._mj$isKeyUp$boolean$string },
-        { type: "method", signature: "final void move(double dx, double dy)", native: ShapeClass.prototype._move },
-        { type: "method", signature: "final void rotate(double angleInDeg, double centerX, double centerY)", native: ShapeClass.prototype._rotate },
-        { type: "method", signature: "final void rotate(double angleInDeg)", native: ShapeClass.prototype._rotate },
-        { type: "method", signature: "final void scale(double factor, double centerX, double centerY)", native: ShapeClass.prototype._scale },
-        { type: "method", signature: "final void scale(double factor)", native: ShapeClass.prototype._scale },
-        { type: "method", signature: "final void mirrorX()", template: "§1._mirrorXY(-1, 1)" },
-        { type: "method", signature: "final void mirrorY()", template: "§1._mirrorXY(1, -1)" },
-        { type: "method", signature: "final void defineDirection(double angleInDeg)", native: ShapeClass.prototype._defineDirection },
-        { type: "method", signature: "final void forward(double distance)", native: ShapeClass.prototype._forward },
-        { type: "method", signature: "final boolean isOutsideView()", native: ShapeClass.prototype._isOutsideView },
+        { type: "method", signature: "final void move(double dx, double dy)", native: ShapeClass.prototype._move , comment: JRC.shapeMoveComment },
+        { type: "method", signature: "final void rotate(double angleInDeg, double centerX, double centerY)", native: ShapeClass.prototype._rotate , comment: JRC.shapeRotateComment1 },
+        { type: "method", signature: "final void rotate(double angleInDeg)", native: ShapeClass.prototype._rotate , comment: JRC.shapeRotateComment2},
+        { type: "method", signature: "final void scale(double factor, double centerX, double centerY)", native: ShapeClass.prototype._scale , comment: JRC.shapeScaleComment1},
+        { type: "method", signature: "final void scale(double factor)", native: ShapeClass.prototype._scale , comment: JRC.shapeScaleComment2},
+        { type: "method", signature: "final void mirrorX()", template: "§1._mirrorXY(-1, 1)" , comment: JRC.shapeMirrorXComment},
+        { type: "method", signature: "final void mirrorY()", template: "§1._mirrorXY(1, -1)" , comment: JRC.shapeMirrorYComment},
+        { type: "method", signature: "final void defineDirection(double angleInDeg)", native: ShapeClass.prototype._defineDirection , comment: JRC.shapeDefineDirectionComment},
+        { type: "method", signature: "final void forward(double distance)", native: ShapeClass.prototype._forward , comment: JRC.shapeForwardComment},
+        { type: "method", signature: "final boolean isOutsideView()", native: ShapeClass.prototype._isOutsideView , comment: JRC.shapeOutsideViewComment},
+        { type: "method", signature: "final double getCenterX()", template: '(§1.centerX)' , comment: JRC.shapeCenterXComment},
+        { type: "method", signature: "final double getCenterY()", template: '(§1.centerY)' , comment: JRC.shapeCenterYComment},
+        { type: "method", signature: "final double getAngle()", template: '(§1.angle)' , comment: JRC.shapeAngleComment},
+        { type: "method", signature: "final boolean containsPoint(double x, double y)", native: ShapeClass.prototype._containsPoint , comment: JRC.shapeContainsPointComment},
+        { type: "method", signature: "final void moveTo(double x, double y)", native: ShapeClass.prototype._moveTo , comment: JRC.shapeMoveToComment},
+        { type: "method", signature: "final void defineCenter(double x, double y)", native: ShapeClass.prototype._defineCenter , comment: JRC.shapeDefineCenterComment},
+        { type: "method", signature: "final void defineCenterRelative(double x, double y)", native: ShapeClass.prototype._defineCenterRelative , comment: JRC.shapeDefineCenterRelativeComment},
+        
+        { type: "method", signature: "static void setDefaultVisibility(boolean isVisible)", native: ShapeClass._setDefaultVisibility , comment: JRC.shapeSetDefaultVisibilityComment},
+        { type: "method", signature: "final void setVisible(boolean isVisible)", native: ShapeClass.prototype._setVisible , comment: JRC.shapeSetVisibleComment},
+        { type: "method", signature: "final boolean isVisible()", template: '§1.container.visible' , comment: JRC.shapeSetVisibleComment},
+        { type: "method", signature: "final void setStatic(boolean isStatic)", native: ShapeClass.prototype._setStatic , comment: JRC.shapeSetStaticComment},
+
 
     ]
 
@@ -109,7 +126,6 @@ export class ShapeClass extends ActorClass {
 
         this.container.setFromMatrix(this.container.localTransform.translate(dx, dy));
         this.container.updateLocalTransform();
-        updateWorldTransformRecursively(this.container, true);
         this.hitPolygonDirty = true;
     }
 
@@ -133,7 +149,6 @@ export class ShapeClass extends ActorClass {
 
         this.container.setFromMatrix(this.container.localTransform);
         this.container.updateLocalTransform();
-        updateWorldTransformRecursively(this.container, true);
 
         this.hitPolygonDirty = true;
 
@@ -162,7 +177,6 @@ export class ShapeClass extends ActorClass {
 
         this.container.setFromMatrix(this.container.localTransform);
         this.container.updateLocalTransform();
-        updateWorldTransformRecursively(this.container, true);
 
         this.hitPolygonDirty = true;
 
@@ -178,13 +192,14 @@ export class ShapeClass extends ActorClass {
         cX = p.x;
         cY = p.y;
 
+        this.container.toGlobal()
+
         this.container.localTransform.translate(-cX, -cY);
         this.container.localTransform.scale(scaleX, scaleY);
         this.container.localTransform.translate(cX, cY);
 
         this.container.setFromMatrix(this.container.localTransform);
         this.container.updateLocalTransform();
-        updateWorldTransformRecursively(this.container, true);
 
         this.hitPolygonDirty = true;
 
@@ -266,13 +281,13 @@ export class ShapeClass extends ActorClass {
 
     }
 
-    public getCenterX(): number {
+    public _getCenterX(): number {
         let p = new PIXI.Point(this.centerXInitial, this.centerYInitial);
         this.container.worldTransform.apply(p, p);
         return p.x;
     }
 
-    public getCenterY(): number {
+    public _getCenterY(): number {
         let p = new PIXI.Point(this.centerXInitial, this.centerYInitial);
         this.container.worldTransform.apply(p, p);
         return p.y;
@@ -293,5 +308,66 @@ export class ShapeClass extends ActorClass {
         this.container.destroy();
         super.destroy();
     }
+
+    transformHitPolygon() {
+
+        this.hitPolygonTransformed = [];
+        let m = this.container.worldTransform;
+        for (let p of this.hitPolygonInitial) {
+            this.hitPolygonTransformed.push({
+                x: (m.a * p.x) + (m.c * p.y) + m.tx,
+                y: (m.b * p.x) + (m.d * p.y) + m.ty
+            });
+        }
+
+        this.hitPolygonDirty = false;
+
+    }
+
+    _containsPoint(x: number, y: number) {
+        if (!this.container.getBounds().containsPoint(x, y)) return false;
+
+        if (this.hitPolygonInitial == null) return true;
+
+        if (this.hitPolygonDirty) this.transformHitPolygon();
+        return polygonEnthältPunkt(this.hitPolygonTransformed, { x: x, y: y });
+    }
+
+    _moveTo(x: number, y: number){
+        this._move(x - this._getCenterX(), y - this._getCenterY())
+    }
+
+    _defineCenter(x: number, y: number){
+        let p = new PIXI.Point(x, y);
+        this.container.worldTransform.applyInverse(p, p);
+        this.centerXInitial = p.x;
+        this.centerYInitial = p.y;
+    }
+
+    _defineCenterRelative(x: number, y: number) {
+        let bounds = this.container.getBounds(false);
+        this._defineCenter(bounds.left + bounds.width * x, bounds.top + bounds.height * y);
+    }
+
+    static _setDefaultVisibility(isVisible: boolean){
+        FilledShapeDefaults.setDefaultVisibility(isVisible);
+    }
+
+    _setVisible(isVisible: boolean) {
+        this.container.visible = isVisible;
+    }
+
+    _setStatic(isStatic: boolean) {
+        let list = this.world.shapesNotAffectedByWorldTransforms;
+        if (isStatic) {
+            list.push(this);
+        } else {
+            let index = list.indexOf(this);
+            if (index >= 0) {
+                list.splice(index, 1);
+            }
+        }
+    }
+
 
 }

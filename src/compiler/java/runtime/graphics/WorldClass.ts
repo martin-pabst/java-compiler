@@ -44,6 +44,8 @@ export class WorldClass extends ObjectClass implements IWorld {
 
     shapesWhichBelongToNoGroup: ShapeClass[] = [];
 
+    shapesNotAffectedByWorldTransforms: ShapeClass[] = [];
+
     tickerFunction?: (ticker: PIXI.Ticker) => void;
 
 

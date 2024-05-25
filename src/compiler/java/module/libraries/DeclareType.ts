@@ -3,6 +3,7 @@ export type LMADeclarationType = "declaration" | "field" | "method";
 export type LibraryClassDeclaration = {
     type: LMADeclarationType;
     signature: string;
+    comment?: string | (() => string);
 }
 
 export type LibraryMethodDeclaration = {
@@ -12,6 +13,7 @@ export type LibraryMethodDeclaration = {
     java?: Function;
     template?: string;
     constantFoldingFunction?: (...parms: any) => any;
+    comment?: string | (() => string);
 }
 
 export type LibraryAttributeDeclaration = {
@@ -19,6 +21,7 @@ export type LibraryAttributeDeclaration = {
     signature: string;
     nativeIdentifier: string;
     constantValue: any;
+    comment?: string | (() => string);
 } 
 
 export type LibraryMethodOrAttributeDeclaration = LibraryClassDeclaration | LibraryMethodDeclaration | LibraryAttributeDeclaration;

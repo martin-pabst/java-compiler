@@ -82,7 +82,7 @@ export abstract class IJavaInterface extends NonPrimitiveType {
                 range: rangeToReplace,
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                 documentation: method.documentation == null ? undefined : {
-                    value: method.documentation
+                    value: typeof method.documentation == "string" ? method.documentation : method.documentation()
                 }
             });
         }

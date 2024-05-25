@@ -44,7 +44,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
                 insertText: field.identifier,
                 range: rangeToReplace,
                 documentation: field.documentation == null ? undefined : {
-                    value: field.documentation
+                    value: typeof field.documentation == "string" ? field.documentation : field.documentation()
                 }
             });
         }
@@ -73,7 +73,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
                 range: rangeToReplace,
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                 documentation: method.documentation == null ? undefined : {
-                    value: method.documentation
+                    value: typeof method.documentation == "string" ? method.documentation : method.documentation()
                 }
             });
         }
@@ -98,7 +98,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
             range: rangeToReplace,
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             documentation: method.documentation == null ? undefined : {
-                value: method.documentation
+                value: typeof method.documentation == "string" ? method.documentation : method.documentation()
             }
         });
 

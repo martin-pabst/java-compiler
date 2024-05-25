@@ -1,14 +1,19 @@
 import * as PIXI from 'pixi.js';
 
-export function updateWorldTransformRecursively(container: PIXI.Container, recursively: boolean){
+export function updateWorldTransformRecursively(container: PIXI.Container, includeChildren: boolean){
 
     let parent = container.parent;
-    PIXI.updateWorldTransform(container.localTransform, parent.worldTransform, container.worldTransform);
 
-    if(recursively){
-        for(let child of container.children){
-            updateWorldTransformRecursively(child, true);
+    if(parent){
+        updateWorldTransformRecursively(parent, false);
+        PIXI.updateWorldTransform(container.localTransform, parent.worldTransform, container.worldTransform);
+    
+        if(includeChildren){
+            for(let child of container.children){
+                updateWorldTransformRecursively(child, true);
+            }
         }
     }
+
 
 }

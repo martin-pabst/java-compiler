@@ -128,7 +128,7 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
                 insertText: field.identifier,
                 range: rangeToReplace,
                 documentation: field.documentation == null ? undefined : {
-                    value: field.documentation
+                    value: typeof field.documentation == "string" ? field.documentation : field.documentation()
                 }
             });
         }
@@ -149,7 +149,7 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
                 detail: method.returnParameterType ? method.returnParameterType.getDeclaration() : "void",
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                 documentation: method.documentation == null ? undefined : {
-                    value: method.documentation
+                    value: typeof method.documentation == "string" ? method.documentation : method.documentation()
                 }
             });
         }

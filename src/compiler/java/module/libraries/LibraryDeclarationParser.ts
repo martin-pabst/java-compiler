@@ -108,6 +108,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         }
 
         klass.type = npt;
+        npt.documentation = javaClassDeclaration?.comment;
 
         if(parentPath){
             let parent = this.currentTypeStore.getType(parentPath);
@@ -512,6 +513,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 new GenericMethod(identifier, EmptyRange.instance, module, modifiers.visibility, genericParameters);
             m.returnParameterType = type;
             m.isConstructor = isConstructor;
+            m.documentation = decl.comment;
 
             if (!this.comesToken(TokenType.rightBracket, false)) {
                 do {
@@ -612,6 +614,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             a.isStatic = modifiers.static;
             a.isFinal = modifiers.final;
             a.classEnum = klassType;
+            a.documentation = adecl.comment;
 
             a.internalName = adecl.nativeIdentifier || identifier;
             if (typeof adecl.constantValue !== "undefined") {

@@ -13,6 +13,7 @@ export interface IWorld {
     currentTop: number;
     currentWidth: number;
     currentHeight: number;
+    shapesNotAffectedByWorldTransforms: ShapeClass[];
 
     registerActor(actor: IActor, type: ActorType): void;
     unregisterActor(actor: IActor): void;
