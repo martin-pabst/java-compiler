@@ -12,14 +12,14 @@ import { RunnableInterface } from "./RunnableInterface.ts";
 
 export class ThreadStateClass extends EnumClass {
 
-    static NEW: ThreadStateClass = new ThreadStateClass("NEW", 0);
-    static RUNNABLE: ThreadStateClass = new ThreadStateClass("RUNNABLE", 1);
-    static BLOCKED: ThreadStateClass = new ThreadStateClass("BLOCKED", 2);
-    static WAITING: ThreadStateClass = new ThreadStateClass("WAITING", 3);
-    static TIMED_WAITING: ThreadStateClass = new ThreadStateClass("TIMED_WAITING", 4);
-    static TERMINATED: ThreadStateClass = new ThreadStateClass("TERMINATED", 5);
-
-    static values: ThreadStateClass[] = [ThreadStateClass.NEW, ThreadStateClass.RUNNABLE, ThreadStateClass.BLOCKED, ThreadStateClass.WAITING, ThreadStateClass.TIMED_WAITING, ThreadStateClass.TERMINATED];
+    static values: ThreadStateClass[] = [
+    new ThreadStateClass("new", ThreadState.new),
+    new ThreadStateClass("runnable", ThreadState.runnable),
+    new ThreadStateClass("stopped_at_breakpoint", ThreadState.stoppedAtBreakpoint),
+    new ThreadStateClass("blocked", ThreadState.blocked),
+    new ThreadStateClass("waiting", ThreadState.waiting),
+    new ThreadStateClass("timed_waiting", ThreadState.timed_waiting),
+    new ThreadStateClass("terminated", ThreadState.terminated)];
 
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "enum Thread.State" }
@@ -27,14 +27,8 @@ export class ThreadStateClass extends EnumClass {
 
     static type: NonPrimitiveType;
 
-    static ThreadStateToEnumMap: Record<ThreadState, ThreadStateClass> = {
-        [ThreadState.new]: ThreadStateClass.NEW,
-        [ThreadState.runnable]: ThreadStateClass.RUNNABLE,
-        [ThreadState.blocked]: ThreadStateClass.BLOCKED,
-        [ThreadState.waiting]: ThreadStateClass.WAITING,
-        [ThreadState.timed_waiting]: ThreadStateClass.TIMED_WAITING,
-        [ThreadState.terminated]: ThreadStateClass.TERMINATED,
-        [ThreadState.terminatedWithException]: ThreadStateClass.TERMINATED,
+    static _values(): ThreadStateClass[] {
+        return ThreadStateClass.values;
     }
 
     /**
@@ -94,9 +88,9 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
 
     _mj$getState$Thread_State$(t: Thread, callback: CallbackFunction){
 
-        let state: ThreadStateClass = ThreadStateClass.NEW;
+        let state: ThreadStateClass = ThreadStateClass._values()[0];
         if(this.thread){
-            state = ThreadStateClass.ThreadStateToEnumMap[this.thread.state];
+            state = ThreadStateClass._values()[this.thread.state];
         }
 
         t.s.push(state);

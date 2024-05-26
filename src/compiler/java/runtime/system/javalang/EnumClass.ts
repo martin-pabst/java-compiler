@@ -38,4 +38,5 @@ export class EnumClass extends ObjectClass {
         t.s.push(new StringClass(this.name));
         if(callback) callback;
     }
+
 }

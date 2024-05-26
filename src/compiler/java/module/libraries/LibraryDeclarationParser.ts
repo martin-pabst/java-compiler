@@ -103,7 +103,9 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 let npt2 = <JavaEnum>npt;
                 npt2.runtimeClass = klass;
                 npt2.pathAndIdentifier = pathAndIdentifier;
-                this.initEnumValues(npt as JavaEnum, klass, module);
+                npt2.baseEnumClass = <any>this.findType("Enum");
+                this.initEnumValues(npt2, klass, module);
+                npt2.addValuesMethod(klass);
                 break;
         }
 
@@ -643,6 +645,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             a.internalName = value.name;
 
             enumType.fields.push(a);
+            klass[value.name] = value;
         }
     }
 }

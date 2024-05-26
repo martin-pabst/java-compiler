@@ -29,6 +29,7 @@ import { LabelCodeSnippet } from "./LabelManager.ts";
 import { CodeReacedAssertion, CodeReachedAssertions } from "../../common/interpreter/CodeReachedAssertions.ts";
 import { JCM } from "../JavaCompilerMessages.ts";
 import { JavaLibraryModule } from "../module/libraries/JavaLibraryModule.ts";
+import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
 
 export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
@@ -789,8 +790,10 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         this.registerUsagePosition(field, node.range);
+        let isEnum = objectType instanceof StaticNonPrimitiveType && objectType.nonPrimitiveType instanceof JavaEnum;
 
-        if (field.isFinal && field.initialValueIsConstant) {
+
+        if (field.isFinal && field.initialValueIsConstant && !isEnum) {
             let constantValue = field.initialValue!;
             let constantValueAsString = typeof constantValue == "string" ? `"${constantValue}"` : "" + constantValue;
             return new StringCodeSnippet(constantValueAsString, range, field.type, constantValue);

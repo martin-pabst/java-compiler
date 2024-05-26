@@ -54,6 +54,7 @@ import { RectangleClass } from "../graphics/RectangleClass.ts";
 import { GroupClass } from "../graphics/GroupClass.ts";
 import { ColorClass } from "../graphics/ColorClass.ts";
 import { NullType } from "./primitiveTypes/NullType.ts";
+import { ScaleModeEnum } from "../graphics/ScaleModeEnum.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -105,7 +106,8 @@ export class SystemModule extends JavaLibraryModule {
 
             // Graphics
             ColorClass,
-            WorldClass, ActorClass, ShapeClass, FilledShapeClass, RectangleClass, GroupClass
+            WorldClass, ActorClass, ShapeClass, FilledShapeClass, RectangleClass, GroupClass,
+            ScaleModeEnum
         )
 
     }

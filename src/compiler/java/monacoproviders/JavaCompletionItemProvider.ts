@@ -6,6 +6,7 @@ import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { ArrayType } from "../types/ArrayType";
 import { IJavaClass, JavaClass } from "../types/JavaClass";
+import { JavaEnum } from "../types/JavaEnum.ts";
 import { IJavaInterface, JavaInterface } from "../types/JavaInterface";
 import { Method } from "../types/Method";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
@@ -352,7 +353,9 @@ export class JavaCompletionItemProvider implements monaco.languages.CompletionIt
         // console.log("Complete element.praefix; praefix: " + textAfterDot + ", Type: " + (type == null ? null : type.identifier));
 
 
-        if (type instanceof IJavaClass || type instanceof StaticNonPrimitiveType) {
+        if (type instanceof IJavaClass || type instanceof StaticNonPrimitiveType
+            || type instanceof JavaEnum
+        ) {
 
             let visibilityUpTo = getVisibilityUpTo(type, classContext);
 

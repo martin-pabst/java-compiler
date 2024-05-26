@@ -30,7 +30,7 @@ export class ObjectClass {
     private reentranceCounter?: number;                 // == 1 when thread first entered synchronized block
 
     constructor() {
-
+        
     }
 
     /**
