@@ -1,16 +1,18 @@
 import { CallbackParameter } from "./CallbackParameter";
 import { Thread } from "./Thread";
 
+export type TextContainer = {text: string};
+
 export class ArrayToStringCaster {
 
-    public static arrayOfObjectsToString(t: Thread, array: any[], callback?: CallbackParameter) {
+    public static arrayOfObjectsToString(textContainer: TextContainer, t: Thread, array: any[], callback?: CallbackParameter) {
         if (array == null) {
             t.s.push("null");
             if (callback) callback();
             return;
         }
 
-        let text = "[";
+        textContainer.text += "[";
         let array1 = array.slice();
 
         t.s.push(array1);
@@ -20,27 +22,27 @@ export class ArrayToStringCaster {
             if (array.length > 0) {
                 let element = array.shift();
                 if (element == null) {
-                    text += "null";
+                    textContainer.text += "null";
                     if (array.length > 0) {
-                        text += ", ";
+                        textContainer.text += ", ";
                         t.s.push(array);
                         f(callback1);
                         return;
                     } else {
-                        text += "]";
+                        textContainer.text += "]";
                         if (callback1) callback1();
                         return;
                     }
                 } else if (Array.isArray(element)) {
                     t.s.push(element);
-                    this.arrayOfObjectsToString(t, element, () => {
+                    this.arrayOfObjectsToString(textContainer, t, element, () => {
                         if (array.length > 0) {
-                            text += ", ";
+                            textContainer.text += ", ";
                             t.s.push(array);
                             f(callback1);
                             return;
                         } else {
-                            text += "]";
+                            textContainer.text += "]";
                             if (callback1) callback1();
                             return;
                         }
@@ -48,15 +50,15 @@ export class ArrayToStringCaster {
                     return;
                 } else {
                     // element is object => call it's toString()-method! 
-                    element._mj$String$toString$(this, () => {
-                        text += t.s.pop();
+                    element._mj$toString$String$(t, () => {
+                        textContainer.text += t.s.pop().value;
                         if (array.length > 0) {
-                            text += ", ";
+                            textContainer.text += ", ";
                             t.s.push(array);
                             f(callback1);
                             return;
                         } else {
-                            text += "]";
+                            textContainer.text += "]";
                             if (callback1) callback1();
                             return;
                         }
@@ -67,8 +69,6 @@ export class ArrayToStringCaster {
         }
 
         f(() => {
-            text += "]";
-            t.s.push(text);
             if (callback) callback();
         });
 

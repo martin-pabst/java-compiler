@@ -14,7 +14,7 @@ import { NonPrimitiveType } from "../../java/types/NonPrimitiveType.ts";
 import { ClassCastExceptionClass } from "../../java/runtime/system/javalang/ClassCastExceptionClass.ts";
 import { IndexOutOfBoundsExceptionClass } from "../../java/runtime/system/javalang/IndexOutOfBoundsExceptionClass.ts";
 import { CallbackParameter } from "./CallbackParameter.ts";
-import { ArrayToStringCaster } from "./ArrayToStringCaster.ts";
+import { ArrayToStringCaster, TextContainer } from "./ArrayToStringCaster.ts";
 
 
 type ProgramState = {
@@ -516,7 +516,11 @@ export class Thread {
     }
 
     _arrayOfObjectsToString(array: any[], callback?: CallbackParameter) {
-        ArrayToStringCaster.arrayOfObjectsToString(this, array, callback);
+        let textContainer: TextContainer = {text: ""};
+        ArrayToStringCaster.arrayOfObjectsToString(textContainer, this, array, () => {
+            this.s.push(textContainer.text);
+            if(callback) callback;
+        });
     }
 
     _primitiveElementOrArrayToString(element: any): string {

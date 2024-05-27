@@ -253,7 +253,7 @@ export abstract class BinopCastCodeGenerator {
             newSnippet1 = SnippetFramer.frame(source, `${Helpers.primitiveArrayToString}(§1)`);
         } else {
             
-            let newSnippet2 = SnippetFramer.frame(source, `${Helpers.objectArrayToString}(§1)`);
+            let newSnippet2 = SnippetFramer.frame(source, `${Helpers.objectArrayToString}(§1);\n`);
             newSnippet2.finalValueIsOnStack = true;
             
             let newSnippet3 = new CodeSnippetContainer([newSnippet2]);

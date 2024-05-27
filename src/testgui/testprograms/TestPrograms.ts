@@ -6,7 +6,7 @@ Sprite s = new Sprite(300, 300, SpriteLibrary.Bird, 0);
 s.scale(10);
 s.setImageIndex(2);
 
-s.playAnimation({ 0, 1, 2 }, RepeatType.backAndForth,
+s.playAnimation(new int[]{ 0, 1, 2 }, RepeatType.backAndForth,
    2); 
 
 println();

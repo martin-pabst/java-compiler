@@ -292,8 +292,8 @@ export class SpriteClass extends ShapeClass {
     setTexture(spriteLibrary?: string, imageIndex?: number) {
 
         if (spriteLibrary == this.spriteLibrary && imageIndex == this.imageIndex) return;
-
         if (spriteLibrary == null) spriteLibrary = this.spriteLibrary;
+
         if (imageIndex == null) imageIndex = 0;
         this.imageIndex = imageIndex;
 
@@ -425,9 +425,11 @@ export class SpriteClass extends ShapeClass {
                 break;
         }
 
-        this.animationTime += ticker.deltaTime;
+        this.animationTime += ticker.deltaMS;
+        // console.log(this.animationTime);
+        // console.log(image);
 
-        this.setTexture(undefined, this.animationIndices[image]);
+        this.setTexture(this.spriteLibrary, this.animationIndices[image]);
     }
 
     getTileImage(): TileImageClass {
