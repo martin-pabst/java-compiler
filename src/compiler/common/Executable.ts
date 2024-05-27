@@ -83,7 +83,7 @@ export class Executable {
                 }
 
                 if (!dependsOnOthers) {
-                    if (cti.staticInitializer) {
+                    if (cti.staticInitializer && cti.staticInitializer.stepsSingle.length > 0) {
                         this.staticInitializationSequence.push({
                             klass: cti.runtimeClass!,
                             program: cti.staticInitializer

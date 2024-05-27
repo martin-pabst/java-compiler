@@ -2,6 +2,7 @@ import { Helpers, Klass, StepParams } from "../../../common/interpreter/StepFunc
 import { EmptyRange, IRange } from "../../../common/range/Range";
 import { TokenType } from "../../TokenType";
 import { EnumClass } from "../../runtime/system/javalang/EnumClass";
+import { PrimitiveType } from "../../runtime/system/primitiveTypes/PrimitiveType";
 import { ArrayType } from "../../types/ArrayType";
 import { Field } from "../../types/Field";
 import { GenericTypeParameters, GenericTypeParameter } from "../../types/GenericTypeParameter";
@@ -105,7 +106,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 npt2.pathAndIdentifier = pathAndIdentifier;
                 npt2.baseEnumClass = <any>this.findType("Enum");
                 this.initEnumValues(npt2, klass, module);
-                npt2.addValuesMethod(klass);
+                npt2.addValuesMethod(klass, this.currentTypeStore.getType("string") as PrimitiveType);
                 break;
         }
 

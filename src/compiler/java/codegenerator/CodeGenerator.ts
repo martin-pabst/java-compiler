@@ -175,6 +175,12 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     private compileStaticFieldsAndInitializerAndEnumValues(classContext: JavaClass | JavaEnum | JavaInterface, cdef: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode) {
         let staticFieldSnippets: CodeSnippet[] = [];
+
+        if (cdef.kind == TokenType.keywordEnum) {
+            this.compileEnumValueConstruction(<JavaEnum>classContext, cdef, staticFieldSnippets);
+        }
+
+
         for (let fieldOrInitializer of cdef.fieldsOrInstanceInitializers) {
 
             switch (fieldOrInitializer.kind) {
@@ -202,9 +208,6 @@ export class CodeGenerator extends StatementCodeGenerator {
 
         }
 
-        if (cdef.kind == TokenType.keywordEnum) {
-            this.compileEnumValueConstruction(<JavaEnum>classContext, cdef, staticFieldSnippets);
-        }
 
         classContext.staticInitializer = this.buildInitializer(staticFieldSnippets, "staticInitializer");
         cdef.staticInitializer = classContext.staticInitializer;
@@ -212,8 +215,10 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     compileEnumValueConstruction(javaEnum: JavaEnum, enumDeclNode: ASTEnumDefinitionNode, staticFieldSnippets: CodeSnippet[]) {
 
+        staticFieldSnippets.push(new StringCodeSnippet(`${Helpers.classes}["${javaEnum.identifier}"].values = [];\n`));
+        
         let parameterlessConstructor = javaEnum.methods.find(m => m.isConstructor && m.parameters.length == 0);
-
+        
         let enumValueIndex: number = 0;
         for (let valueNode of enumDeclNode.valueNodes) {
 
@@ -343,7 +348,9 @@ export class CodeGenerator extends StatementCodeGenerator {
 
     buildInitializer(snippets: CodeSnippet[], identifier: string): Program {
         let program = new Program(this.module, this.currentSymbolTable, identifier);
-        snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
+        if(snippets.length > 0){
+            snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
+        }
         this.linker.link(snippets, program);
         return program;
     }

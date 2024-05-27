@@ -10,6 +10,7 @@ import { JavaModuleManager } from "../module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "../module/libraries/JavaLibraryModuleManager";
 import { ASTArrayTypeNode, ASTBaseTypeNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTGenericTypeInstantiationNode, ASTInterfaceDefinitionNode, ASTMethodDeclarationNode, ASTTypeDefinitionWithGenerics, ASTTypeNode, ASTWildcardTypeNode, TypeScope } from "../parser/AST";
 import { InterfaceClass } from "../runtime/system/javalang/InterfaceClass";
+import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
 import { ArrayType } from "../types/ArrayType";
 import { Field } from "../types/Field";
 import { GenericTypeParameter } from "../types/GenericTypeParameter";
@@ -574,6 +575,7 @@ export class TypeResolver {
         for (let enumNode of this.enumDeclarationNodes) {
             let javaEnum = enumNode.resolvedType!;
             javaEnum.initRuntimeClass(enumRuntimeClass);
+            javaEnum.addValuesMethod(javaEnum.runtimeClass!, this.libraryModuleManager.typestore.getType("string") as PrimitiveType);
             for (let field of enumNode.fieldsOrInstanceInitializers) {
                 if (field.kind == TokenType.fieldDeclaration) {
                     let f: Field = new Field(field.identifier, field.range, javaEnum.module, field.type.resolvedType!, field.visibility);

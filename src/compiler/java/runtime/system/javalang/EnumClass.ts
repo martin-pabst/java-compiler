@@ -36,7 +36,7 @@ export class EnumClass extends ObjectClass {
 
     _mj$toString$String$(t: Thread, callback: CallbackFunction) {
         t.s.push(new StringClass(this.name));
-        if(callback) callback;
+        if(callback) callback();
     }
 
 }
