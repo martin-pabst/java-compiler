@@ -81,7 +81,7 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
         super();
     }
 
-    _jconstructor(t: Thread, runnable?: RunnableInterface) {
+    _jconstructor(t: Thread, callback?: CallbackFunction, runnable?: RunnableInterface) {
         t.s.push(this);        
         this.runnable = runnable;
     }

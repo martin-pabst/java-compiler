@@ -149,6 +149,12 @@ export class JCM {
         "en": `Parameter ${identifier} has wrong type. Expected type: ${type}.`,
     })
 
+    static arrayLiteralTypeUnknown = () => le({
+        "de": `Der erwartete Datentyp der Array-Elemente kann nicht ermittelt werden.\n Tipp: Versuchen Sie es mit der Syntax 'new int[]{1, 2, 3}'`,
+        "en": `Can't figure out exptected type of array elements.\nHint: Try syntax 'new int[]{1, 2, 3}'.`,
+    })
+
+    
     /**
      * Messages for class CodePrinter:
      */
@@ -337,6 +343,11 @@ export class JCM {
     static arrayLiteralElementsNotSameDimension = () => le({
         "de": `Die Elemente des Array-Literals haben unterschiedliche Dimension.`,
         "en": `Elements of array literal don't have same dimension.`,
+    })
+
+    static arrayLiteralElementDimensionWrong = () => le({
+        "de": `Dieses Element des Array-Literals sollte kein Array sein.`,
+        "en": `This particular element of the array literal must be no array itself.`,
     })
 
     static cantCastTermTo = (destType: string) => le({

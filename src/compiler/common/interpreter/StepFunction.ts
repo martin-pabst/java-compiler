@@ -29,8 +29,10 @@ export class Helpers {
     static checkCast = StepParams.thread + "." + Thread.prototype.CheckCast.name;
     static exit = StepParams.thread + "." + Thread.prototype.exit.name;
     static assertionObservers = StepParams.thread + ".assertionObservers"; 
-    static registerCodeReached = StepParams.thread + "." + Thread.prototype.registerCodeReached.name;; 
+    static registerCodeReached = StepParams.thread + "." + Thread.prototype.registerCodeReached.name;
     static nullstringIfNull = StepParams.thread + "." + Thread.prototype.NullstringIfNull.name;
+    static primitiveArrayToString = StepParams.thread + "." + Thread.prototype._primitiveElementOrArrayToString.name;
+    static objectArrayToString = StepParams.thread + "." + Thread.prototype._arrayOfObjectsToString.name;
 
     static callbackParameter = "callback";
 

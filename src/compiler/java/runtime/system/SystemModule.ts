@@ -55,6 +55,9 @@ import { GroupClass } from "../graphics/GroupClass.ts";
 import { ColorClass } from "../graphics/ColorClass.ts";
 import { NullType } from "./primitiveTypes/NullType.ts";
 import { ScaleModeEnum } from "../graphics/ScaleModeEnum.ts";
+import { RepeatTypeEnum } from "../graphics/RepeatTypeEnum.ts";
+import { SpriteLibraryEnum } from "../graphics/SpriteLibraryEnum.ts";
+import { SpriteClass, TileImageClass } from "../graphics/SpriteClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -107,7 +110,7 @@ export class SystemModule extends JavaLibraryModule {
             // Graphics
             ColorClass,
             WorldClass, ActorClass, ShapeClass, FilledShapeClass, RectangleClass, GroupClass,
-            ScaleModeEnum
+            ScaleModeEnum, RepeatTypeEnum, SpriteLibraryEnum, TileImageClass, SpriteClass // Sprite
         )
 
     }

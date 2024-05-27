@@ -1,5 +1,16 @@
 export var testProgramsList = [
 ['', ''],
+['SpriteTest', `
+
+Sprite s = new Sprite(300, 300, SpriteLibrary.Bird, 0);
+s.scale(10);
+s.setImageIndex(2);
+
+s.playAnimation({ 0, 1, 2 }, RepeatType.backAndForth,
+   2); 
+
+println();
+`],
    ['Particles', `
 println("Verändern Sie die Erzeugungsrate der Rechtecke mit dem Geschwindigkeitsregler!");
 World g = new World(800, 900);

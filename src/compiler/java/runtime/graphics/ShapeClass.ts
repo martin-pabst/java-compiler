@@ -10,6 +10,7 @@ import { ColorHelper } from '../../lexer/ColorHelper';
 import { GroupClass } from './GroupClass';
 import { updateWorldTransformRecursively } from './PixiHelper';
 import { JRC } from '../../JavaRuntimeLibraryComments';
+import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
 
 export class ShapeClass extends ActorClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -99,13 +100,13 @@ export class ShapeClass extends ActorClass {
 
     render(): void { };
 
-    _cj$_constructor_$Shape$(t: Thread, callback: CallbackFunction) {
-        this._cj$_constructor_$Actor$(t);   // call base class constructor
-
-        if (!this.world.defaultGroup) {
-            this.world.shapesWhichBelongToNoGroup.push(this);
-        }
-
+    _cj$_constructor_$Shape$(t: Thread, callback: CallbackParameter) {
+        this._cj$_constructor_$Actor$(t, () => {
+            if (!this.world.defaultGroup) {
+                this.world.shapesWhichBelongToNoGroup.push(this);
+            }
+            if(callback) callback();
+        });   // call base class constructor
     }
 
     _isOutsideView() {
@@ -125,7 +126,10 @@ export class ShapeClass extends ActorClass {
         }
 
         this.container.setFromMatrix(this.container.localTransform.translate(dx, dy));
-        this.container.updateLocalTransform();
+        
+        //@ts-ignore
+        this.container._didLocalTransformChangeId = this.container._didChangeId;
+        //this.container.updateLocalTransform();
         this.hitPolygonDirty = true;
     }
 
@@ -137,6 +141,7 @@ export class ShapeClass extends ActorClass {
             cY = p.y;
         } else {
             let p = new PIXI.Point(cX, cY);
+            updateWorldTransformRecursively(this.container, false);
             this.container.worldTransform.applyInverse(p, p);
             this.container.localTransform.apply(p, p);
             cX = p.x;
@@ -148,7 +153,10 @@ export class ShapeClass extends ActorClass {
         this.container.localTransform.translate(cX, cY);
 
         this.container.setFromMatrix(this.container.localTransform);
-        this.container.updateLocalTransform();
+        
+        //@ts-ignore
+        this.container._didLocalTransformChangeId = this.container._didChangeId;
+        //this.container.updateLocalTransform();
 
         this.hitPolygonDirty = true;
 
@@ -165,6 +173,8 @@ export class ShapeClass extends ActorClass {
             cY = p.y;
         } else {
             let p = new PIXI.Point(cX, cY);
+            updateWorldTransformRecursively(this.container, false);
+
             this.container.worldTransform.applyInverse(p, p);
             this.container.localTransform.apply(p, p);
             cX = p.x;
@@ -175,8 +185,11 @@ export class ShapeClass extends ActorClass {
         this.container.localTransform.scale(factor, factor);
         this.container.localTransform.translate(cX, cY);
 
+        
         this.container.setFromMatrix(this.container.localTransform);
-        this.container.updateLocalTransform();
+        //@ts-ignore
+        this.container._didLocalTransformChangeId = this.container._didChangeId;
+        //this.container.updateLocalTransform();
 
         this.hitPolygonDirty = true;
 
@@ -196,8 +209,10 @@ export class ShapeClass extends ActorClass {
         this.container.localTransform.scale(scaleX, scaleY);
         this.container.localTransform.translate(cX, cY);
 
-        this.container.setFromMatrix(this.container.localTransform);
-        this.container.updateLocalTransform();
+        
+        //@ts-ignore
+        this.container._didLocalTransformChangeId = this.container._didChangeId;this.container.setFromMatrix(this.container.localTransform);
+        //this.container.updateLocalTransform();
 
         this.hitPolygonDirty = true;
 
@@ -330,6 +345,9 @@ export class ShapeClass extends ActorClass {
         if (this.hitPolygonDirty) this.transformHitPolygon();
         return polygonEnthältPunkt(this.hitPolygonTransformed, { x: x, y: y });
     }
+
+    
+
 
     _moveTo(x: number, y: number){
         this._move(x - this._getCenterX(), y - this._getCenterY())

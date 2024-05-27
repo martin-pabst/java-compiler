@@ -45,13 +45,7 @@ export class ActorClass extends ObjectClass implements IActor {
         this.world = otherActor.world;
     }
 
-    _cj$_constructor_$Actor$(t: Thread){
-
-        this.world = t.scheduler.interpreter.objectStore["World"];
-        if(!this.world){
-            this.world = new t.classes["World"]()._cj$_constructor_$World$(t);
-        }
-
+    constructorHelper(t: Thread){
         if(this._mj$act$void$ != ActorClass.prototype._mj$act$void$){
             this.world.registerActor(this, "act");
         }
@@ -73,6 +67,23 @@ export class ActorClass extends ObjectClass implements IActor {
         }
 
         t.s.push(this);
+
+    }
+
+    _cj$_constructor_$Actor$(t: Thread, callback: CallbackParameter){
+
+        this.world = t.scheduler.interpreter.objectStore["World"];
+        if(!this.world){
+            new t.classes["World"]()._cj$_constructor_$World$(t, () => {
+                this.world = t.s.pop();
+                this.constructorHelper(t);
+                if(callback) callback();
+            });
+        } else {
+            this.constructorHelper(t);
+            if(callback) callback();
+        }
+
     }
 
     _mj$act$void$(t: Thread, callback: () => {}): void{

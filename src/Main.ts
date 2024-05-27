@@ -13,6 +13,8 @@ import { TabManager } from "./tools/TabManager.ts";
 import { Interpreter } from "./compiler/common/interpreter/Interpreter.ts";
 import { ProgramControlButtons } from "./testgui/ProgramControlButtons.ts";
 
+import * as PIXI from 'pixi.js';
+
 import jQuery from "jquery";
 import { ProgramPointerPositionInfo } from "./compiler/common/interpreter/Scheduler.ts";
 import { ActionManager } from "./testgui/ActionManager.ts";
@@ -42,6 +44,9 @@ import { KeyboardManager } from "./compiler/common/interpreter/KeyboardManager.t
 import { BreakpointManager } from "./compiler/common/BreakpointManager.ts";
 import { Formatter as JavaFormatter } from "./compiler/java/monacoproviders/JavaFormatter.ts";
 import { ColorProvider } from "./compiler/common/monacoproviders/ColorProvider.ts";
+
+import spritesheetjson from '/include/graphics/spritesheet.json.txt';
+import spritesheetpng from '/include/graphics/spritesheet.png';
 
 export class Main implements IMain {
 
@@ -75,6 +80,8 @@ export class Main implements IMain {
   decorations?: monaco.editor.IEditorDecorationsCollection;
 
   constructor() {
+    this.loadSpritesheet();
+
     this.language = new JavaLanguage();
     this.language.registerLanguageAtMonacoEditor();
 
@@ -415,6 +422,26 @@ export class Main implements IMain {
 
   getAllModules(): Module[] {
     return this.getCompiler().moduleManager.modules;
+  }
+
+  loadSpritesheet(){
+    fetch(`${spritesheetjson}`)
+    .then((response) => response.json())
+    .then((spritesheetData: any) => {
+        PIXI.Assets.load(`${spritesheetpng}`).then((texture: PIXI.Texture) => {
+            let source: PIXI.ImageSource = texture.source;
+            source.minFilter = "nearest";
+            source.magFilter = "nearest";
+
+            spritesheetData.meta.size.w = texture.width;
+            spritesheetData.meta.size.h = texture.height;
+            let spritesheet = new PIXI.Spritesheet(texture, spritesheetData);
+            spritesheet.parse().then(() => {
+                PIXI.Assets.cache.set('spritesheet', spritesheet);
+            });
+        })
+    });
+
   }
 
 }

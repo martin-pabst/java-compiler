@@ -1,1 +1,1 @@
-export type CallbackParameter = (() => {}) | undefined;
+export type CallbackParameter = (() => void) | undefined;

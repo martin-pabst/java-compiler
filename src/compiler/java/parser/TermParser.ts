@@ -3,6 +3,7 @@ import { JCM } from "../JavaCompilerMessages.ts";
 import { TokenType } from "../TokenType.ts";
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
+import { ArrayType } from "../types/ArrayType.ts";
 import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode, ASTMethodDeclarationNode, ASTWildcardTypeNode, ASTGenericTypeInstantiationNode, ASTArrayTypeNode, ASTArrayLiteralNode, ASTMethodCallNode, ASTBaseTypeNode } from "./AST.ts";
 import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator.ts";
@@ -210,12 +211,13 @@ export abstract class TermParser extends TokenIterator {
                 break;
             case TokenType.keywordNew:
                 // parse new ArrayList<String>(), new int[10][20], new ArrayList<Integer>[20], ...
-                let leftBracketOrLeftSquareBracket = this.lookForTokenTillOtherToken([TokenType.leftBracket, TokenType.leftSquareBracket], [TokenType.semicolon, TokenType.leftCurlyBracket])
+                let leftBracketOrLeftSquareBracket = this.lookForTokenTillOtherToken([TokenType.leftBracket, TokenType.leftSquareBracket, TokenType.leftRightSquareBracket], [TokenType.semicolon, TokenType.leftCurlyBracket])
                 switch (leftBracketOrLeftSquareBracket) {
                     case TokenType.leftBracket:
                         node = this.parseNewObjectInstantiation(undefined);
                         break;
                     case TokenType.leftSquareBracket:
+                    case TokenType.leftRightSquareBracket:
                         node = this.parseNewArray();
                         break;
                     default:
@@ -511,9 +513,14 @@ export abstract class TermParser extends TokenIterator {
             } while (this.comesToken(TokenType.leftSquareBracket, true));
 
 
-        } else if (this.comesToken(TokenType.leftRightSquareBracket, false)) {
-            newArrayNode.dimensionCount = 0;
-            while (this.comesToken(TokenType.leftRightSquareBracket, true)) newArrayNode.dimensionCount++;
+        } else if ('arrayDimensions' in type && 'arrayOf' in type) {
+            let dimension = type.arrayDimensions as number;
+            newArrayNode.dimensionCount = dimension;
+            if(dimension == 1){
+                newArrayNode.arrayType = type.arrayOf as ASTTypeNode;
+            } else {
+                newArrayNode.arrayType = this.nodeFactory.buildArrayTypeNode(type.arrayOf as ASTTypeNode, undefined, dimension - 1);
+            }
 
             if (this.expect(TokenType.leftCurlyBracket, false)) {
                 newArrayNode.initialization = this.parseArrayLiteral();

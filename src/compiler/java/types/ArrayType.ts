@@ -12,6 +12,12 @@ export class ArrayType extends JavaType {
     constructor(public elementType: JavaType, public dimension: number,
         module: JavaBaseModule, identifierRange: IRange) {
         super(elementType.identifier + "[]".repeat(dimension), identifierRange, module);
+        
+        while(this.elementType instanceof ArrayType){
+            this.dimension += this.elementType.dimension;
+            this.elementType = this.elementType.elementType;
+        }
+
         this.isPrimitive = false;
         this.genericTypeParameters = undefined;
     }
@@ -79,4 +85,8 @@ export class ArrayType extends JavaType {
         return new ArrayType(type, 1, type.module, type.identifierRange);
     }
 
+    getElementType(): JavaType {
+        if(this.dimension == 1) return this.elementType;
+        return new ArrayType(this.elementType, this.dimension - 1, this.module, this.identifierRange);
+    }
 }

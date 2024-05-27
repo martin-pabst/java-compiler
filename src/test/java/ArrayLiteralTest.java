@@ -35,4 +35,14 @@ int[][] testArray = {{1, 2}, {3, 4}};
 
 assertEquals(2, testArray.length, "Test length of array literal");
 
+String s = testArray;
+
+assertEquals("[[1, 2], [3, 4]]", s, "Cast from array to string doesn't work.");
+
+int[][][] threeDimensional = {testArray, testArray};
+
+String s1 = threeDimensional;
+assertEquals("[[[1, 2], [3, 4]], [[1, 2], [3, 4]]]", threeDimensional, "Cast from array to string doesn't work.");
+
+
 

@@ -11,6 +11,7 @@ import { IWorld } from './IWorld.ts';
 import { ActorManager } from './ActorManager.ts';
 import { GroupClass } from './GroupClass.ts';
 import { ShapeClass } from './ShapeClass.ts';
+import { CallbackParameter } from '../../../common/interpreter/CallbackParameter.ts';
 
 
 export class WorldClass extends ObjectClass implements IWorld {
@@ -23,6 +24,8 @@ export class WorldClass extends ObjectClass implements IWorld {
     ]
 
     static type: NonPrimitiveType;
+
+    interpreter!: Interpreter;
 
     width: number = 800;
     height: number = 600;
@@ -49,11 +52,12 @@ export class WorldClass extends ObjectClass implements IWorld {
     tickerFunction?: (ticker: PIXI.Ticker) => void;
 
 
-    _cj$_constructor_$World$(t: Thread, callback: any): WorldClass {
-        return this.cj$_constructor_$World$int$int(t, undefined, 800, 600);
+    _cj$_constructor_$World$(t: Thread, callback: CallbackParameter) {
+        this.interpreter = t.scheduler.interpreter;
+        this.cj$_constructor_$World$int$int(t, callback, 800, 600);
     }
 
-    cj$_constructor_$World$int$int(t: Thread, callback: any, width: number, height: number): WorldClass {
+    cj$_constructor_$World$int$int(t: Thread, callback: CallbackParameter, width: number, height: number) {
 
         let interpreter = t.scheduler.interpreter;
         let existingWorld = <WorldClass>interpreter.objectStore["World"];
@@ -98,9 +102,12 @@ export class WorldClass extends ObjectClass implements IWorld {
             interpreter.isExternalTimer = true;
             
             t.state = ThreadState.runnable;
+
+            t.s.push(this);
+
+            if(callback) callback();
         })
 
-        return this;
     }
 
     tick(elapsedMS: number, interpreter: Interpreter) {

@@ -246,6 +246,29 @@ export abstract class BinopCastCodeGenerator {
 
     }
 
+    wrapWithArrayToString(source: CodeSnippet, primitiveOrClassNeeded: "string" | "String"): CodeSnippet {
+        let newSnippet1: CodeSnippet;
+
+        if((<ArrayType>source.type!).elementType.isPrimitive){
+            newSnippet1 = SnippetFramer.frame(source, `${Helpers.primitiveArrayToString}(§1)`);
+        } else {
+            
+            let newSnippet2 = SnippetFramer.frame(source, `${Helpers.objectArrayToString}(§1)`);
+            newSnippet2.finalValueIsOnStack = true;
+            
+            let newSnippet3 = new CodeSnippetContainer([newSnippet2]);
+            newSnippet3.addNextStepMark();
+            newSnippet1 = newSnippet3;
+        }
+
+        if(primitiveOrClassNeeded == "String"){
+            newSnippet1 = SnippetFramer.frame(newSnippet1, `new ${Helpers.classes}["String"](§1)`);
+            newSnippet1.type = this.stringNonPrimitiveType;
+        }
+
+        return newSnippet1;
+    }
+
     wrapWithToStringCall(leftSnippet: CodeSnippet, primitiveOrClassNeeded: "string" | "String"): CodeSnippet {
         if (leftSnippet.type?.identifier == "String") {
             if (primitiveOrClassNeeded == "string") {
@@ -353,7 +376,11 @@ export abstract class BinopCastCodeGenerator {
         if (!type.isPrimitive) {
             if(type == this.nullType) return snippet;
             if (castTo.identifier == "string" || castTo.identifier == "String") {
-                snippet = this.wrapWithToStringCall(snippet, castTo.identifier);
+                if(type instanceof ArrayType){
+                    snippet = this.wrapWithArrayToString(snippet, castTo.identifier);
+                } else {
+                    snippet = this.wrapWithToStringCall(snippet, castTo.identifier);
+                }
                 return snippet;
             }
             if (castTo.isPrimitive) {

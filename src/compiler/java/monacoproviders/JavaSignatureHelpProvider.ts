@@ -234,7 +234,7 @@ export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelp
             let posFrom = label.length;
             let type = p.type;
             if (p.isEllipsis) {
-                type = (<ArrayType>type).elementType;
+                type = (<ArrayType>type).getElementTypee();
             }
 
             let pLabel = type.toString() + (p.isEllipsis ? "..." : "") + " " + p.identifier;

@@ -15,6 +15,8 @@ import { BreakpointManager } from "../BreakpointManager.ts";
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
 
+
+
 export type ShowProgramPointerCallback = (showHide: "show" | "hide", _textPositionWithModule?: ProgramPointerPositionInfo) => void;
 
 export class Interpreter {

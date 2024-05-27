@@ -2,10 +2,12 @@ import * as PIXI from 'pixi.js';
 import { ActorType, IActor } from "./IActor";
 import { GroupClass } from './GroupClass';
 import { ShapeClass } from './ShapeClass';
+import { Interpreter } from '../../../common/interpreter/Interpreter';
 
 
 export interface IWorld {
     app: PIXI.Application;
+    interpreter: Interpreter;
     defaultGroup?: GroupClass;
     shapesWhichBelongToNoGroup: ShapeClass[];
 

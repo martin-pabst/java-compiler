@@ -13,6 +13,8 @@ import { ObjectClass, StringClass } from "../../java/runtime/system/javalang/Obj
 import { NonPrimitiveType } from "../../java/types/NonPrimitiveType.ts";
 import { ClassCastExceptionClass } from "../../java/runtime/system/javalang/ClassCastExceptionClass.ts";
 import { IndexOutOfBoundsExceptionClass } from "../../java/runtime/system/javalang/IndexOutOfBoundsExceptionClass.ts";
+import { CallbackParameter } from "./CallbackParameter.ts";
+import { ArrayToStringCaster } from "./ArrayToStringCaster.ts";
 
 
 type ProgramState = {
@@ -245,10 +247,10 @@ export class Thread {
             while (ps?.exceptionInfoList.length > 0) {
                 let exInfo = ps.exceptionInfoList.pop()!;
 
-                if(exInfo.aquiredObjectLocks){
-                    while(exInfo.aquiredObjectLocks.length > 0) this.leaveSynchronizedBlock(exInfo.aquiredObjectLocks.pop()!);
+                if (exInfo.aquiredObjectLocks) {
+                    while (exInfo.aquiredObjectLocks.length > 0) this.leaveSynchronizedBlock(exInfo.aquiredObjectLocks.pop()!);
                 }
-    
+
                 for (let cn of classNames) {
                     for (let catchBlockInfo of exInfo.catchBlockInfos) {
                         if (catchBlockInfo.exceptionTypes[cn]) {
@@ -286,8 +288,8 @@ export class Thread {
                 }
             }
 
-            if(ps?.aquiredObjectLocks){
-                while(ps.aquiredObjectLocks.length > 0) this.leaveSynchronizedBlock(ps.aquiredObjectLocks.pop()!);
+            if (ps?.aquiredObjectLocks) {
+                while (ps.aquiredObjectLocks.length > 0) this.leaveSynchronizedBlock(ps.aquiredObjectLocks.pop()!);
             }
 
             stackTrace.push(ps);
@@ -338,7 +340,7 @@ export class Thread {
         if (returnValue != null) this.s.push(returnValue);
         if (callback != null) {
             callback();
-        } 
+        }
 
         if (this.programStack.length > 0) {
             this.currentProgramState = this.programStack[this.programStack.length - 1];
@@ -497,20 +499,34 @@ export class Thread {
         this.scheduler.interpreter.registerCodeReached(key);
     }
 
-    registerEnteringSynchronizedBlock(aquiredLock: ObjectClass){
+    registerEnteringSynchronizedBlock(aquiredLock: ObjectClass) {
         let ps = this.programStack[this.programStack.length - 1];
-        if(ps.exceptionInfoList.length > 0){
+        if (ps.exceptionInfoList.length > 0) {
             let ei = ps.exceptionInfoList[ps.exceptionInfoList.length - 1];
-            if(!ei.aquiredObjectLocks) ei.aquiredObjectLocks = [];
+            if (!ei.aquiredObjectLocks) ei.aquiredObjectLocks = [];
             ei.aquiredObjectLocks.push(aquiredLock);
         } else {
-            if(!ps.aquiredObjectLocks) ps.aquiredObjectLocks = [];
+            if (!ps.aquiredObjectLocks) ps.aquiredObjectLocks = [];
             ps.aquiredObjectLocks.push(aquiredLock);
         }
     }
 
-    leaveSynchronizedBlock(aquiredLock: ObjectClass){
+    leaveSynchronizedBlock(aquiredLock: ObjectClass) {
         aquiredLock.leaveSynchronizedBlock(this);
+    }
+
+    _arrayOfObjectsToString(array: any[], callback?: CallbackParameter) {
+        ArrayToStringCaster.arrayOfObjectsToString(this, array, callback);
+    }
+
+    _primitiveElementOrArrayToString(element: any): string {
+        if (Array.isArray(element)) {
+            return "[" + element.map(e => this._primitiveElementOrArrayToString(e)).join(", ") + "]";
+        }
+
+        if (typeof element == "string") return '"' + element + '"';
+
+        return "" + element;
     }
 
 }

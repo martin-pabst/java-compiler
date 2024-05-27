@@ -1,3 +1,4 @@
+import { CallbackParameter } from "../../common/interpreter/CallbackParameter.ts";
 import { Program } from "../../common/interpreter/Program";
 import { CallbackFunction, Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 import { Thread } from "../../common/interpreter/Thread.ts";
@@ -325,7 +326,7 @@ export class CodeGenerator extends StatementCodeGenerator {
                 //                  `${Helpers.pushProgram}(this.constructor.__programs[${methodIndex}]);`);
 
 
-                let functionStub = function (this: any, __t: Thread, ...parameters: any) {
+                let functionStub = function (this: any, __t: Thread, callback: CallbackParameter, ...parameters: any) {
                     __t.s.push(this, ...parameters);
                     __t.pushProgram(method!.program!);
                 }
@@ -545,7 +546,9 @@ export class CodeGenerator extends StatementCodeGenerator {
                 if(method.isSynchronized){
                     snippets.push(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${ObjectClass.prototype.leaveSynchronizedBlock.name}(${StepParams.thread});\n`));
                 }
-                snippets.push(new StringCodeSnippet(`${Helpers.return}();`));
+                let sn1 = new CodeSnippetContainer([new StringCodeSnippet(`${Helpers.return}();`)]);
+                sn1.enforceNewStepBeforeSnippet();
+                snippets.push(sn1);
             }
 
             this.missingStatementManager.endMethodBody(method, this.module.errors);

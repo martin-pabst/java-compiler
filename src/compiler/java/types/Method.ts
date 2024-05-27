@@ -190,7 +190,7 @@ export class Method extends BaseSymbol {
             let p = parameters[i];
             if (p.isEllipsis) {
                 let arrayType: ArrayType = <any>p.type;
-                label += arrayType.elementType.toString() + "... " + p.identifier;
+                label += arrayType.getElementType().toString() + "... " + p.identifier;
             } else {
                 label += p.type.toString() + " " + p.identifier;
             }

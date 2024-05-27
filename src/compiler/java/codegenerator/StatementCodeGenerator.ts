@@ -227,7 +227,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             assignCollectionSnippet.range = node.collection.range;
             forLoopSnippet.addParts(assignCollectionSnippet);
 
-            collectionElementType = collectionType.elementType;
+            collectionElementType = collectionType.getElementType();
             if (node.elementType.kind != TokenType.varType) {
                 if (!this.typesAreIdentical(elementType!, collectionElementType)) {
                     this.pushError(JCM.wrongArrayElementType(elementType!.toString(), node.elementIdentifier, collectionElementType.toString()), "error", node.elementIdentifierPosition);
@@ -910,7 +910,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
                 case TokenType.arrayLiteral:
                     let type1 = destinationType;
                     if (type1 && type1 instanceof ArrayType) {
-                        initValueSnippet = this.compileArrayLiteral(type1.elementType, <ASTArrayLiteralNode>initializationNode);
+                        initValueSnippet = this.compileArrayLiteral(type1.getElementType(), <ASTArrayLiteralNode>initializationNode);
                     } else {
                         this.pushError(JCM.cantAssignArrayLiteralToNonArrayVariable(), "error", initializationNode);
                     }
