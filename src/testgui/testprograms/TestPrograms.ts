@@ -1,5 +1,31 @@
 export var testProgramsList = [
 ['', ''],
+['ExceptionTest', `
+Test t = new Test();
+
+t.t1();
+
+class Test {
+   void t1() {
+      t2();
+   }
+
+   void t2() {
+      try {
+         t3();
+         println("This statement must not be reached.");
+      } catch(Exception ex){
+         println("Correct!");
+      }
+      println("After exception handling");
+   }
+
+   void t3() {
+      throw new Exception("Hello!");
+      println("This statement must not be reached.");
+   }
+
+}`],
 ['MouseTest', `
 new MyRectangle();
 
