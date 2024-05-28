@@ -1,5 +1,29 @@
 export var testProgramsList = [
 ['', ''],
+['MouseTest', `
+new MyRectangle();
+
+
+class MyRectangle extends Rectangle {
+   
+   public void onMouseDown(double x, double y, int button) {
+      println(x + ", " + y);
+   }
+
+   public void onMouseEnter(double x, double y) {
+      println("Enter!");
+   }
+
+   public void onMouseLeave(double x, double y) {
+      println("Leave!");
+   }
+
+   public void act() {
+      
+   }
+
+}
+`],
 ['SpriteTest', `
 
 Sprite s = new Sprite(300, 300, SpriteLibrary.Bird, 0);

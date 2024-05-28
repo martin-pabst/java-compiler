@@ -181,7 +181,6 @@ export class Thread {
         this._state = state;
     }
 
-
     isSingleStepCompleted() {
 
         // if step to execute is on same position in program text as next step: execute both!
@@ -226,7 +225,11 @@ export class Thread {
 
     }
 
-    start() {
+    startIfNotEmptyOrDestroy() {
+        if(this.programStack.length == 0){
+            this.scheduler.removeThread(this);
+            this.return;
+        }
         if ([ThreadState.new, ThreadState.blocked].indexOf(this.state) >= 0) {
             this.state = ThreadState.runnable;
         }

@@ -58,6 +58,8 @@ import { ScaleModeEnum } from "../graphics/ScaleModeEnum.ts";
 import { RepeatTypeEnum } from "../graphics/RepeatTypeEnum.ts";
 import { SpriteLibraryEnum } from "../graphics/SpriteLibraryEnum.ts";
 import { SpriteClass, TileImageClass } from "../graphics/SpriteClass.ts";
+import { MouseListenerInterface } from "../graphics/MouseListenerInterface.ts";
+import { CircleClass } from "../graphics/CircleClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -109,8 +111,10 @@ export class SystemModule extends JavaLibraryModule {
 
             // Graphics
             ColorClass,
+            MouseListenerInterface,
             WorldClass, ActorClass, ShapeClass, FilledShapeClass, RectangleClass, GroupClass,
-            ScaleModeEnum, RepeatTypeEnum, SpriteLibraryEnum, TileImageClass, SpriteClass // Sprite
+            ScaleModeEnum, RepeatTypeEnum, SpriteLibraryEnum, TileImageClass, SpriteClass, // Sprite
+            CircleClass
         )
 
     }

@@ -38,11 +38,12 @@ export class GroupClass extends ShapeClass {
     }
 
     _cj$_constructor_$Group$T(t: Thread, callback: CallbackFunction, shapes: ShapeClass[]){
-        this._cj$_constructor_$Group$(t, callback);
-        if(!shapes) return;
-        for(let shape of shapes){
-            this.add(shape);
-        }
+        this._cj$_constructor_$Group$(t, () => {
+            if(!shapes) return;
+            for(let shape of shapes){
+                this.add(shape);
+            }
+        });
     }
 
     render(){

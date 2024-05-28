@@ -12,6 +12,9 @@ import { ActorManager } from './ActorManager.ts';
 import { GroupClass } from './GroupClass.ts';
 import { ShapeClass } from './ShapeClass.ts';
 import { CallbackParameter } from '../../../common/interpreter/CallbackParameter.ts';
+import { ColorHelper } from '../../lexer/ColorHelper.ts';
+import { JRC } from '../../JavaRuntimeLibraryComments.ts';
+import { MouseManager } from './MouseManager.ts';
 
 
 export class WorldClass extends ObjectClass implements IWorld {
@@ -20,6 +23,28 @@ export class WorldClass extends ObjectClass implements IWorld {
 
         { type: "method", signature: "World()", java: WorldClass.prototype._cj$_constructor_$World$ },
         { type: "method", signature: "World(int width, int height)", java: WorldClass.prototype.cj$_constructor_$World$int$int },
+
+        { type: "method", signature: "void setBackgroundColor(int colorAsRGBInt)", native: WorldClass.prototype._setBackgroundColor, comment: JRC.worldSetBackgroundColorIntComment },
+        { type: "method", signature: "void setBackgroundColor(String colorAsString)", native: WorldClass.prototype._setBackgroundColor, comment: JRC.worldSetBackgroundColorStringComment },
+
+        { type: "method", signature: "void move(double dx, double dy)", native: WorldClass.prototype._move, comment: JRC.worldMoveComment },
+        { type: "method", signature: "void rotate(double angleInDeg, double centerX, double centerY)", native: WorldClass.prototype._rotate, comment: JRC.worldRotateComment },
+        { type: "method", signature: "void setCoordinateSystem(double left, double top, double width, double height)", native: WorldClass.prototype._setCoordinateSystem, comment: JRC.worldSetCoordinateSystemComment },
+        { type: "method", signature: "void setCursor(string cursor)", native: WorldClass.prototype._setCursor, comment: JRC.worldSetCursorComment },
+        { type: "method", signature: "void clear()", native: WorldClass.prototype._clear, comment: JRC.worldClearComment },
+        
+        { type: "method", signature: "double getWidth()", template: `Math.round(§1.currentWidth)`, comment: JRC.worldGetWidthComment },
+        { type: "method", signature: "double getHeight()", template: `Math.round(§1.currentHeight)`, comment: JRC.worldGetHeightComment },
+        { type: "method", signature: "double getTop()", template: `Math.round(§1.currentTop)`, comment: JRC.worldGetTopComment },
+        { type: "method", signature: "double getLeft()", template: `Math.round(§1.currentLeft)`, comment: JRC.worldGetLeftComment },
+        
+        { type: "method", signature: "Group getDefaultGroup()", template: `§1.defaultGroup`, comment: JRC.worldGetDefaultGroupComment },
+        { type: "method", signature: "void setDefaultGroup(Group defaultGroup)", template: `§1.defaultGroup = §2;`, comment: JRC.worldSetDefaultGroupComment },
+        
+        { type: "method", signature: "void addMouseListener(MouseListener mouseListener)", template: `§1.mouseListener.addMouseListener(§2);`, comment: JRC.worldAddMouseListenerComment },
+
+
+
 
     ]
 
@@ -35,7 +60,6 @@ export class WorldClass extends ObjectClass implements IWorld {
     currentWidth: number = 800;
     currentHeight: number = 600;
 
-
     app!: PIXI.Application;
 
     graphicsDiv?: HTMLDivElement;
@@ -48,6 +72,8 @@ export class WorldClass extends ObjectClass implements IWorld {
     shapesWhichBelongToNoGroup: ShapeClass[] = [];
 
     shapesNotAffectedByWorldTransforms: ShapeClass[] = [];
+
+    mouseManager!: MouseManager;
 
     tickerFunction?: (ticker: PIXI.Ticker) => void;
 
@@ -82,7 +108,7 @@ export class WorldClass extends ObjectClass implements IWorld {
             this.app!.canvas.style.height = "10px";
             this.graphicsDiv?.appendChild(this.app!.canvas);
 
-            this.resizeObserver = new ResizeObserver(() => {this.changeResolution(this.width, this.height);});
+            this.resizeObserver = new ResizeObserver(() => { this.changeResolution(this.width, this.height); });
             this.resizeObserver.observe(this.graphicsDiv!);
 
             this.app!.stage.setFromMatrix(new PIXI.Matrix(1, 0, 0, 1, 0, 0));
@@ -93,19 +119,21 @@ export class WorldClass extends ObjectClass implements IWorld {
 
             this.tickerFunction = (ticker: PIXI.Ticker) => {
                 this.tick(PIXI.Ticker.shared.elapsedMS, interpreter);
-            };    
+            };
 
             this.app!.ticker.add(this.tickerFunction);
             this.app!.ticker.maxFPS = 30;
             this.app!.ticker.minFPS = 30;
-    
+
             interpreter.isExternalTimer = true;
-            
+
+            this.mouseManager = new MouseManager(this);
+
             t.state = ThreadState.runnable;
 
             t.s.push(this);
 
-            if(callback) callback();
+            if (callback) callback();
         })
 
     }
@@ -122,18 +150,18 @@ export class WorldClass extends ObjectClass implements IWorld {
             interpreter.eventManager.off(onProgramStoppedCallback);
             this.destroyWorld(interpreter);
         }
-        
+
         let onProgramStoppedCallback = () => {
             this.onProgramStopped();
             interpreter.eventManager.off(onProgramStoppedCallback);
         }
-        
+
         interpreter.eventManager.on("resetRuntime", onResetRuntimeCallback)
         interpreter.eventManager.on("stop", onProgramStoppedCallback)
-        
+
     }
-    
-    destroyWorld(interpreter: Interpreter){
+
+    destroyWorld(interpreter: Interpreter) {
         this.actorManager.clear();
         this.app?.ticker.remove(this.tickerFunction!);
         interpreter.isExternalTimer = false;
@@ -141,7 +169,7 @@ export class WorldClass extends ObjectClass implements IWorld {
 
         //@ts-ignore
         this.app = undefined;
-        this.resizeObserver?.disconnect();    
+        this.resizeObserver?.disconnect();
     }
 
     changeResolution(width: number, height: number) {
@@ -195,7 +223,7 @@ export class WorldClass extends ObjectClass implements IWorld {
             clear: false,
         });
         setTimeout(() => {
-            if(!this.app) return;
+            if (!this.app) return;
             let children = this.app!.stage.children.slice();
             this.app!.stage.removeChildren(0, children.length);
             children.forEach(c => c.destroy());
@@ -220,6 +248,110 @@ export class WorldClass extends ObjectClass implements IWorld {
 
     hasActors(): boolean {
         return this.actorManager.hasActors();
+    }
+
+    _setBackgroundColor(color: string | number) {
+        let renderer = (<PIXI.Renderer>(this.app.renderer));
+        if (typeof color == "string") {
+            let c = ColorHelper.parseColorToOpenGL(color);
+            if (!c.color) return;
+            renderer.background.color.setValue(c.color);
+        } else {
+            renderer.background.color.setValue(color);
+        }
+
+    }
+
+    _move(dx: number, dy: number) {
+        let stage = this.app.stage;
+        stage.localTransform.translate(dx, dy);
+        stage.setFromMatrix(stage.localTransform);
+        //@ts-ignore
+        stage._didLocalTransformChangeId = stage._didChangeId;
+    }
+
+    _rotate(angleInDeg: number, centerX: number, centerY: number){
+        let angleRad = -angleInDeg / 180 * Math.PI;
+        let stage = this.app.stage;
+        stage.localTransform.translate(-centerX, -centerY);
+        stage.localTransform.rotate(angleRad);
+        stage.localTransform.translate(centerX, centerY);
+
+        stage.setFromMatrix(stage.localTransform);
+        //@ts-ignore
+        stage._didLocalTransformChangeId = stage._didChangeId;
+
+        this.computeCurrentWorldBounds();
+        this.shapesNotAffectedByWorldTransforms.forEach(
+            (shape) => {
+                shape._rotate(-angleInDeg, centerX, centerY);
+            });
+
+    }
+
+    _translate(factor: number, centerX: number, centerY: number){
+        let stage = this.app.stage;
+        stage.localTransform.translate(-centerX, -centerY);
+        stage.localTransform.scale(factor, factor);
+        stage.localTransform.translate(centerX, centerY);
+
+        stage.setFromMatrix(stage.localTransform);
+        //@ts-ignore
+        stage._didLocalTransformChangeId = stage._didChangeId;
+
+        this.computeCurrentWorldBounds();
+        let inverseFactor = 1/factor;
+        this.shapesNotAffectedByWorldTransforms.forEach(
+            (shape) => {
+                shape._scale(inverseFactor, centerX, centerY);
+            });
+
+    }
+
+    _setCoordinateSystem(left: number, top: number, width: number, height: number){
+        let stage = this.app.stage;
+
+        stage.localTransform.identity();
+        stage.localTransform.translate(-left, -top);
+        stage.localTransform.scale(this.width / width, this.height / height);
+
+        stage.setFromMatrix(stage.localTransform);
+        //@ts-ignore
+        stage._didLocalTransformChangeId = stage._didChangeId;
+
+        this.computeCurrentWorldBounds();
+        let inverseFactor = width/this.width;
+        this.shapesNotAffectedByWorldTransforms.forEach(
+            (shape) => {
+                shape._scale(inverseFactor, left, top);
+                shape._move(left, top);
+            });
+
+    }
+
+    computeCurrentWorldBounds() {
+
+        let p1: PIXI.Point = new PIXI.Point(0, 0);
+        this.app.stage.localTransform.applyInverse(p1, p1);
+
+        let p2: PIXI.Point = new PIXI.Point(this.width, this.height);
+        this.app.stage.localTransform.applyInverse(p2, p2);
+
+        this.currentLeft = p1.x;
+        this.currentTop = p1.y;
+        this.currentWidth = Math.abs(p2.x - p1.x);
+        this.currentHeight = Math.abs(p2.y - p1.y);
+
+    }
+
+    _setCursor(cursor: string) {
+        this.app.canvas.style.cursor = cursor;
+    }
+
+    _clear(){
+        while(this.shapesWhichBelongToNoGroup.length > 0){
+            this.shapesWhichBelongToNoGroup.pop()?.destroy();
+        }    
     }
 
 }

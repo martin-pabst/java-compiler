@@ -234,7 +234,7 @@ export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelp
             let posFrom = label.length;
             let type = p.type;
             if (p.isEllipsis) {
-                type = (<ArrayType>type).getElementTypee();
+                type = (<ArrayType>type).getElementType();
             }
 
             let pLabel = type.toString() + (p.isEllipsis ? "..." : "") + " " + p.identifier;
@@ -261,7 +261,7 @@ export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelp
         return {
             label: label,
             parameters: parameterInformationList,
-            documentation: method.documentation == null ? "" : method.documentation
+            documentation: method.documentation == null ? "" : (typeof method.documentation == "string") ? method.documentation : method.documentation()
         }
 
     }

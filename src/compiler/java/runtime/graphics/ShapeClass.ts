@@ -3,7 +3,7 @@ import { Thread } from "../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { ActorClass } from "./ActorClass";
-import { Punkt, polygonEnthältPunkt } from '../../../../tools/MatheTools';
+import { Punkt, polygonBerührtPolygonExakt, polygonEnthältPunkt } from '../../../../tools/MatheTools';
 import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { FilledShapeDefaults } from './FilledShapeDefaults';
 import { ColorHelper } from '../../lexer/ColorHelper';
@@ -11,14 +11,17 @@ import { GroupClass } from './GroupClass';
 import { updateWorldTransformRecursively } from './PixiHelper';
 import { JRC } from '../../JavaRuntimeLibraryComments';
 import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
+import { MouseEventKind } from './MouseManager';
+
+export type MouseEventMethod = (t: Thread, callback: CallbackParameter, x: number, y: number, button: number) => void;
 
 export class ShapeClass extends ActorClass {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "abstract class Shape extends Actor", comment: JRC.shapeClassComment },
 
-        { type: "field", signature: "final double angle" , comment: JRC.shapeAngleComment },
-        { type: "field", signature: "final double centerX" , comment: JRC.shapeCenterXComment },
-        { type: "field", signature: "final double centerY" , comment: JRC.shapeCenterYComment },
+        { type: "field", signature: "private double angle" , comment: JRC.shapeAngleComment },
+        { type: "field", signature: "private double centerX" , comment: JRC.shapeCenterXComment },
+        { type: "field", signature: "private double centerY" , comment: JRC.shapeCenterYComment },
 
         { type: "method", signature: "Shape()", java: ShapeClass.prototype._cj$_constructor_$Shape$ },
         { type: "method", signature: "final void move(double dx, double dy)", native: ShapeClass.prototype._move , comment: JRC.shapeMoveComment },
@@ -43,6 +46,12 @@ export class ShapeClass extends ActorClass {
         { type: "method", signature: "final void setVisible(boolean isVisible)", native: ShapeClass.prototype._setVisible , comment: JRC.shapeSetVisibleComment},
         { type: "method", signature: "final boolean isVisible()", template: '§1.container.visible' , comment: JRC.shapeSetVisibleComment},
         { type: "method", signature: "final void setStatic(boolean isStatic)", native: ShapeClass.prototype._setStatic , comment: JRC.shapeSetStaticComment},
+        
+        { type: "method", signature: "void onMouseUp(double x, double y, int button)", java: ShapeClass.prototype._mj$onMouseUp$void$double$double$int , comment: JRC.shapeOnMouseUpComment},
+        { type: "method", signature: "void onMouseDown(double x, double y, int button)", java: ShapeClass.prototype._mj$onMouseDown$void$double$double$int , comment: JRC.shapeOnMouseDownComment},
+        { type: "method", signature: "void onMouseEnter(double x, double y)", java: ShapeClass.prototype._mj$onMouseEnter$void$double$double , comment: JRC.shapeOnMouseEnterComment},
+        { type: "method", signature: "void onMouseLeave(double x, double y)", java: ShapeClass.prototype._mj$onMouseLeave$void$double$double , comment: JRC.shapeOnMouseLeaveComment},
+        { type: "method", signature: "void onMouseMove(double x, double y)", java: ShapeClass.prototype._mj$onMouseMove$void$double$double , comment: JRC.shapeOnMouseMoveComment},
 
 
     ]
@@ -77,6 +86,8 @@ export class ShapeClass extends ActorClass {
     lastMoveDx: number = 0;
     lastMoveDy: number = 0;
 
+    mouseEventsImplemented?: {[mouseEvent: string]: MouseEventMethod};
+
     copyFrom(otherShape: ShapeClass) {
         super.copyFrom(otherShape);
         this.centerXInitial = otherShape.centerXInitial;
@@ -105,8 +116,42 @@ export class ShapeClass extends ActorClass {
             if (!this.world.defaultGroup) {
                 this.world.shapesWhichBelongToNoGroup.push(this);
             }
+
+            let atLeastOneMouseListenerOverridden = false;
+            if(this._mj$onMouseDown$void$double$double$int != ShapeClass.prototype._mj$onMouseDown$void$double$double$int){
+                atLeastOneMouseListenerOverridden = true;
+                if(!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
+                this.mouseEventsImplemented["mousedown"] = this._mj$onMouseDown$void$double$double$int;
+            }
+            if(this._mj$onMouseUp$void$double$double$int != ShapeClass.prototype._mj$onMouseUp$void$double$double$int){
+                atLeastOneMouseListenerOverridden = true;
+                if(!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
+                this.mouseEventsImplemented["mouseup"] = this._mj$onMouseUp$void$double$double$int;
+            }
+            if(this._mj$onMouseMove$void$double$double != ShapeClass.prototype._mj$onMouseMove$void$double$double){
+                atLeastOneMouseListenerOverridden = true;
+                if(!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
+                this.mouseEventsImplemented["mousemove"] = this._mj$onMouseMove$void$double$double;
+            }
+            if(this._mj$onMouseEnter$void$double$double != ShapeClass.prototype._mj$onMouseEnter$void$double$double){
+                atLeastOneMouseListenerOverridden = true;
+                if(!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
+                this.mouseEventsImplemented["mouseenter"] = this._mj$onMouseEnter$void$double$double;
+            }
+            if(this._mj$onMouseLeave$void$double$double != ShapeClass.prototype._mj$onMouseLeave$void$double$double){
+                atLeastOneMouseListenerOverridden = true;
+                if(!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
+                this.mouseEventsImplemented["mouseleave"] = this._mj$onMouseLeave$void$double$double;
+            }
+            if(atLeastOneMouseListenerOverridden){
+                this.world.mouseManager.addShapeWithImplementedMouseMethods(this);
+            }
+
             if(callback) callback();
+
         });   // call base class constructor
+
+
     }
 
     _isOutsideView() {
@@ -319,6 +364,11 @@ export class ShapeClass extends ActorClass {
             this.belongsToGroup.container.removeChildAt(this.belongsToGroup.container.getChildIndex(this.container))
         }
         this.container.destroy();
+
+        if(this.mouseEventsImplemented){
+            this.world.mouseManager.removeShapeWithImplementedMouseMethods(this);
+        }
+
         super.destroy();
     }
 
@@ -385,5 +435,47 @@ export class ShapeClass extends ActorClass {
         }
     }
 
+    _mj$onMouseUp$void$double$double$int(t: Thread, callback: CallbackParameter, x: number, y: number, button: number){}
+    _mj$onMouseDown$void$double$double$int(t: Thread, callback: CallbackParameter, x: number, y: number, button: number){}
+    _mj$onMouseEnter$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number, button: number){}
+    _mj$onMouseLeave$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number, button: number){}
+    _mj$onMouseMove$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number, button: number){}
+
+    collidesWith(otherShape: ShapeClass): boolean {
+
+        // if(!(this instanceof TurtleHelper) && (shapeHelper instanceof TurtleHelper)){
+        // if (this["lineElements"] == null && (otherShape["lineElements"] != null)) {
+        //     return otherShape.collidesWith(this);
+        // }
+
+        //@ts-ignore  check if other shape is group:
+        if (otherShape["shapes"]) {
+            return otherShape.collidesWith(this);
+        }
+
+        if (this.isDestroyed == null || otherShape.isDestroyed == null) return false;
+
+        // uncomment this to remove lag of 1/30 s
+        // updateWorldTransformRecursively(this.container, false);
+        // updateWorldTransformRecursively(otherShape.container, false);
+
+
+        let bb = this.container.getBounds();
+        let bb1 = otherShape.container.getBounds();
+
+        if (bb.left > bb1.right || bb1.left > bb.right) return false;
+
+        if (bb.top > bb1.bottom || bb1.top > bb.bottom) return false;
+
+        if (this.hitPolygonInitial == null || otherShape.hitPolygonInitial == null) return true;
+
+        // boundig boxes collide, so check further:
+        if (this.hitPolygonDirty) this.transformHitPolygon();
+        if (otherShape.hitPolygonDirty) otherShape.transformHitPolygon();
+
+        // return polygonBerührtPolygon(this.hitPolygonTransformed, shapeHelper.hitPolygonTransformed);
+        return polygonBerührtPolygonExakt(this.hitPolygonTransformed, otherShape.hitPolygonTransformed, true, true);
+
+    }
 
 }

@@ -6,12 +6,117 @@ import { le, lm } from "../../tools/language/LanguageManager"
 export class JRC {
 
     /**
+     * Class World
+     */
+
+    static worldSetBackgroundColorIntComment = () => lm({
+    "de": "Setzt die Hintergrundfarbe. Die Farbe wird als integer-Zahl erwartet. Am besten schreibt man sie als Hexadezimalzahl, also z.B. setBackgroundColor(0xff8080).",
+    "en": "Sets world's background color. Color is coded as integer number, e.g. in hexadecimal writing (setBackgroundColor(0xff8080)).",
+    })
+
+    static worldSetBackgroundColorStringComment = () => lm({
+    "de": 'Setzt die Hintergrundfarbe. Die Farbe ist entweder eine vordefinierte Farbe ("schwarz", "rot", ...) oder eine css-Farbe der Art "#ffa7b3" (ohne alpha), "#ffa7b380" (mit alpha), "rgb(172, 22, 18)" oder "rgba(123, 22,18, 0.3)',
+    "en": 'Sets world\'s background color. Color is coded as predefined color ("black", "red", ...) or css color like "#ffa7b3" (ohne alpha), "#ffa7b380" (mit alpha), "rgb(172, 22, 18)" oder "rgba(123, 22,18, 0.3).',
+    })
+
+    static worldAddMouseListenerComment = () => lm({
+    "de": "Fügt einen neuen MouseListener hinzu, dessen Methoden bei Mausereignissen aufgerufen werden.",
+    "en": "Adds a MouseLister object. It's methods are called every time a mouse event occurs.",
+    })
+
+    static worldMoveComment = () => lm({
+    "de": "Verschiebt alle Objekte der Welt um dx nach rechts und dy nach unten.\nTipp: Falls Objekte NICHT mitverschoben werden sollen, rufe die Methode setStatic(true) auf.",
+    "en": "Moves all objects in this word by dx to the right and by dy down.\n Hint: If objects should NOT move with world, invoke method setStatic(true) for them.",
+    })
+
+    static worldRotateComment = () => lm({
+    "de": "Rotiert die Welt um den angegebenen Winkel (in Grad!) im Urzeigersinn. Drehpunkt ist der Punkt (centerX, centerY).\nTipp: Falls Objekte NICHT mitgedreht werden sollen, rufe die Methode setStatic(true) auf.",
+    "en": "Rotates world by angleInDeg clockwise.\n Hint: If objects should NOT rotate with world, invoke method setStatic(true) for them.",
+    })
+
+    static worldScaleComment = () => lm({
+    "de": "Streckt die Welt um den angegebenen Faktor. Zentrum der Streckung ist (CenterX, centerY). Drehpunkt ist der Punkt (centerX, centerY).\nTipp: Falls Objekte NICHT mitgedreht werden sollen, rufe die Methode setStatic(true) auf.",
+    "en": "Scales world by given factorr. Pivot of scaling is (centerX, centerY).\n Hint: If objects should NOT scale with world, invoke method setStatic(true) for them.",
+    })
+
+    static worldSetCoordinateSystemComment = () => lm({
+    "de": "Setzt das Koordinatensystem der Welt so, dass (left, top) die linke obere Ecke des sichtbaren Bereiches ist, width seine Breite und height seine Höhe.",
+    "en": "Sets coordinate system of world in a way so that (left, top) is top-left corner of visible view, width is it's width and height it's height.",
+    })
+
+    static worldSetCursorComment = () => lm({
+    "de": "Ändert die Form des Mauscursors im gesamten Grafikbereich. Mögliche Werte: siehe https://developer.mozilla.org/en-US/docs/Web/CSS/cursor.",
+    "en": "Sets mouse cursor image inside graphic window. For valid values see: https://developer.mozilla.org/en-US/docs/Web/CSS/cursor",
+    })
+
+    static worldClearComment = () => lm({
+    "de": "Löscht alle Grafikobjekte in der Welt, indem es ihre destroy()-Methode aufruft.",
+    "en": "Clears all graphic objects inside this world by calling it's destroy() method.",
+    })
+
+    static worldGetWidthComment = () => lm({
+    "de": "Gibt die Breite des sichtbaren Bereichs der Welt zurück.",
+    "en": "Returns width of visible part of world.",
+    })
+
+    static worldGetHeightComment = () => lm({
+    "de": "Gibt die Höhe des sichtbaren Bereichs der Welt zurück.",
+    "en": "Returns height of visible part of world.",
+    })
+
+    static worldGetLeftComment = () => lm({
+    "de": "Gibt die X-Koordinate der linken oberen Ecke des sichtbaren Bereichs der Welt zurück.",
+    "en": "Returns x-coordinate of top-left corner of visible part of world.",
+    })
+
+    static worldGetTopComment = () => lm({
+    "de": "Gibt die Y-Koordinate der linken oberen Ecke des sichtbaren Bereichs der Welt zurück.",
+    "en": "Returns y-coordinate of top-left corner of visible part of world.",
+    })
+
+    static worldGetDefaultGroupComment = () => lm({
+    "de": "Gibt die Gruppe zurück, zu der aktuell alle neuen Objekte automatisch hinzugefügt werden. Falls gerade keine defaultGroup festgelegt ist, wird null zurückgegeben.",
+    "en": "Returns group to which all new graphic objects are added by default. If no default group is set, this method returns null.",
+    })
+
+    static worldSetDefaultGroupComment = () => lm({
+    "de": "Legt die Gruppe fest, zu der aktuell alle neuen Objekte automatisch hinzugefügt werden. Falls keine defaultGroup gewünscht ist, rufen Sie setDefaultGroup(null) auf.",
+    "en": "Sets group to which all new graphic objects are added by default. For 'no default group' call setDefaultGroup(null).",
+    })
+
+
+    /**
      * Class Shape
      */
 
     static shapeClassComment = () => lm({
         "de": "Die Klasse Shape ist Oberklasse aller graphischen Objekte.",
         "en": "Class Shape is base class of all graphical objects.",
+    })
+
+    static shapeOnMouseUpComment = () => lm({
+    "de": "Wird aufgerufen, wenn sich der Mauspfeil über dem Objekt befindet und der Benutzer eine Maustaste loslässt.",
+    "en": "Is called if mouse cursor is on object and user releases a mouse button.",
+    })
+
+    static shapeOnMouseDownComment = () => lm({
+    "de": "Wird aufgerufen, wenn sich der Mauspfeil über dem Objekt befindet und der Benutzer eine Maustaste drückt.",
+    "en": "Is called if mouse cursor is on object and user presses a mouse button.",
+    })
+
+    static shapeOnMouseMoveComment = () => lm({
+    "de": "Wird aufgerufen, wenn sich der Mauspfeil über dem Objekt befindet und der Benutzer die Maus bewegt.",
+    "en": "Is called if mouse cursor is on object and user moves mouse.",
+    })
+
+    static shapeOnMouseEnterComment = () => lm({
+    "de": "Wird aufgerufen, wenn der Mauspfeil das Objekt betritt.",
+    "en": "Is called if mouse cursor enters object.",
+    })
+
+    static shapeOnMouseLeaveComment = () => lm({
+    "de": "Wird aufgerufen, wenn der Mauspfeil das Objekt verlässt.",
+    "en": "Is called if mouse cursor leaves object.",
     })
 
     static shapeMoveComment = () => lm({
@@ -114,6 +219,72 @@ export class JRC {
         "en": "setStatic(true) makes the object not follow subsequent transformations of world object.",
     })
 
+    /**
+     * Class Circle
+     */
+
+    static circleClassComment = () => lm({
+    "de": "Kreis",
+    "en": "Circle",
+    })
+
+    static circleEmptyConstructorComment = () => lm({
+    "de": "Instanziert einen neuen Kreis mit Mittelpunkt (50, 50) und Radius 50.",
+    "en": "Creates a new Circle object with center at (50, 50) and radius 50.",
+    })
+
+    static circleConstructorComment = () => lm({
+    "de": "Instanziert einen neuen Kreis. (mx, my) ist der Mittelpunt, r sein Radius.",
+    "en": "Creates a new Circle object with center at (mx, my) and given radius.",
+    })
+
+    static circleSetRadiusComment = () => lm({
+    "de": "Setzt den Radius des Kreises.",
+    "en": "Set radius.",
+    })
+
+    static circleGetRadiusComment = () => lm({
+    "de": "Gibt den Radius des Kreises zurück.",
+    "en": "Gets radius.",
+    })
+
+    static circleCopyComment = () => lm({
+    "de": "Erstellt eine Kopie des Circle-Objekts und git sie zurück.",
+    "en": "Creates a exact copy of this circle object and returns it.",
+    })
+
+    /**
+     * Interface MouseListener
+     */
+    static mouseListenerInterfaceComment = () => lm({
+    "de": "Interface mit Methoden, die aufgerufen werden, wenn Maus-Ereignisse eintreten. Ein Objekt, das dieses Interface implementiert muss zuvor aber mit world.addMouseListener() registriert werden, wobei world das aktuelle World-Objekt ist.",
+    "en": "A MouseListener's methods are called whenever a mouse event occurs. Objects implementing this interface need registering at world by world.addMouseListener().",
+    })
+
+    static mouseListenerOnMouseUpComment = () => lm({
+    "de": "Wird aufgerufen, wenn eine Maustaste über dem Grafikbereich losgelassen wird.",
+    "en": "This method gets called if user releases a mouse button.",
+    })
+
+    static mouseListenerOnMouseDownComment = () => lm({
+    "de": "Wird aufgerufen, wenn eine Maustaste über dem Grafikbereich gedrückt wird.",
+    "en": "This method gets called if user presses a mouse button.",
+    })
+
+    static mouseListenerOnMouseMoveComment = () => lm({
+    "de": "Wird aufgerufen, wenn der Mauszeiger über dem Grafikbereich bewegt wird.",
+    "en": "This method gets called if user moves mouse.",
+    })
+
+    static mouseListenerOnMouseEnterComment = () => lm({
+    "de": "Wird aufgerufen, wenn der Mauszeiger in den Grafikbereich hineinbewegt wird.",
+    "en": "This method gets called if mouse cursor enters graphic view.",
+    })
+
+    static mouseListenerOnMouseLeaveComment = () => lm({
+    "de": "Wird aufgerufen, wenn der Mauszeiger den Grafikbereich verlässt.",
+    "en": "This method gets called if mouse cursor leaves graphic view.",
+    })
 
     /**
      * Class Rectangle

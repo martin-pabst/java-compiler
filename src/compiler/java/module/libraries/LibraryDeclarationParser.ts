@@ -591,7 +591,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             if (mdecl.java) {
                 if (klassType instanceof JavaInterface || m.isAbstract) {
                     if (mdecl.java.name != m.getInternalName("java")) {
-                        console.log(`${LibraryDeclarationParser.name}: Method ${mdecl.java.name} should have identifier ${m.getInternalName("java")}.`);
+                        console.log(`${LibraryDeclarationParser.name}: Method ${mdecl.java.name} in class/enum/interface ${klassType.identifier} should have identifier ${m.getInternalName("java")}.`);
                     }
                 } else {
                     if (m.isStatic) {

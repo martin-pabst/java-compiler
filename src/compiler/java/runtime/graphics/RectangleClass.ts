@@ -19,7 +19,6 @@ export class RectangleClass extends FilledShapeClass {
         { type: "method", signature: "final double getHeight()", template: '(&1.height*&1.scaleFactor)', comment: JRC.rectangleGetHeightComment },
         { type: "method", signature: "final Rectangle copy()", java: RectangleClass.prototype._mj$copy$Rectangle$, comment: JRC.rectangleCopyComment },
         { type: "method", signature: "final void moveTo(double x, double y)", native: RectangleClass.prototype._moveTo, comment: JRC.rectangleMoveToComment },
-
     ]
 
     static type: NonPrimitiveType;
@@ -35,17 +34,18 @@ export class RectangleClass extends FilledShapeClass {
     _cj$_constructor_$Rectangle$double$double$double$double(t: Thread, callback: CallbackFunction,
         left: number, top: number, width: number, height: number
     ) {
-        this._cj$_constructor_$FilledShape$(t, callback);   // call base class constructor
+        this._cj$_constructor_$FilledShape$(t, () => {
+            this.centerXInitial = left + width / 2;
+            this.centerYInitial = top + height / 2;
+    
+            this.left = left;
+            this.top = top;
+            this.width = width;
+            this.height = height;
+    
+            this.render();
+        });   // call base class constructor
 
-        this.centerXInitial = left + width / 2;
-        this.centerYInitial = top + height / 2;
-
-        this.left = left;
-        this.top = top;
-        this.width = width;
-        this.height = height;
-
-        this.render();
 
     }
 

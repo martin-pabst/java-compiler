@@ -115,7 +115,7 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
                 that.callbackWhenThreadFinished();        
             })
 
-            this.thread.start();
+            this.thread.startIfNotEmptyOrDestroy();
         }
 
         if(callback) callback(); 
