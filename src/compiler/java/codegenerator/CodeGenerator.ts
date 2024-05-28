@@ -312,7 +312,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             }
             let thisFollowedByParameterIdentifiers = ["this"].concat(parameterIdentifiers);
 
-            method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
+            method.program = new Program(this.module, symbolTable, classContext.identifier + "." + method.identifier);
             method.program.numberOfThisObjects = 1;
             method.program.numberOfParameters = parameterIdentifiers.length;
 
@@ -537,7 +537,7 @@ export class CodeGenerator extends StatementCodeGenerator {
             }
 
             
-            method.program = new Program(this.module, symbolTable, classContext.identifier + method.identifier);
+            method.program = new Program(this.module, symbolTable, classContext.identifier + "." + method.identifier);
             
             if(method.isSynchronized){
                 snippets.unshift(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${ObjectClass.prototype.enterSynchronizedBlock.name}(${StepParams.thread});\n`));

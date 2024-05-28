@@ -1,3 +1,5 @@
+import { Exception } from "./ExceptionInfo";
+
 export interface PrintManager {
     print(text: string | undefined, withNewline: boolean, color: number | undefined): void;
     clear(): void;

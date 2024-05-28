@@ -100,7 +100,8 @@ export class Program {
     stepsSingle: Step[] = [];
     stepsMultiple: Step[] = [];
 
-    constructor(public module: Module, public symbolTable: BaseSymbolTable | undefined, public methodIdentifierWithClass: string) {
+    constructor(public module: Module, public symbolTable: BaseSymbolTable | undefined, 
+        public methodIdentifierWithClass: string) {
 
         module.programsToCompileToFunctions.push(this);
 

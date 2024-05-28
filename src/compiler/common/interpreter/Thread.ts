@@ -5,7 +5,7 @@ import { CallbackFunction, KlassObjectRegistry } from "./StepFunction.ts";
 import { ExceptionInfo, CatchBlockInfo, Exception } from "./ExceptionInfo.ts";
 import { ThrowableClass } from "../../java/runtime/system/javalang/ThrowableClass.ts";
 import { SystemException } from "./SystemException.ts";
-import { IThrowable } from "./ThrowableType.ts";
+import { IThrowable, Stacktrace } from "./ThrowableType.ts";
 import { ArithmeticExceptionClass } from "../../java/runtime/system/javalang/ArithmeticExceptionClass.ts";
 import { NullPointerExceptionClass } from "../../java/runtime/system/javalang/NullPointerExceptionClass.ts";
 import { AssertionObserver, DummyAssertionObserver } from "../../java/runtime/unittests/AssertionObserver.ts";
@@ -15,9 +15,10 @@ import { ClassCastExceptionClass } from "../../java/runtime/system/javalang/Clas
 import { IndexOutOfBoundsExceptionClass } from "../../java/runtime/system/javalang/IndexOutOfBoundsExceptionClass.ts";
 import { CallbackParameter } from "./CallbackParameter.ts";
 import { ArrayToStringCaster, TextContainer } from "./ArrayToStringCaster.ts";
+import { ExceptionPrinter } from "./ExceptionPrinter.ts";
 
 
-type ProgramState = {
+export type ProgramState = {
     program: Program;
     currentStepList: Step[];   // Link to program.stepSingle or program.stepMultiple
     stepIndex: number;
@@ -29,6 +30,8 @@ type ProgramState = {
     afterExceptionTrimStackToSize?: number;     // stack size when entering try {...} block
 
     aquiredObjectLocks?: ObjectClass[];
+
+    lastExecutedStep?: Step;
 }
 
 export type ThreadStateInfoAfterRun = {
@@ -62,7 +65,7 @@ export class Thread {
     public get state() { return this._state } // setter: see below
 
     exception?: Exception;
-    stackTrace?: ProgramState[];
+    stackTrace?: Stacktrace;
 
     stepEndsWhenProgramstackLengthLowerOrEqual: number = -1;
     stepEndsWhenStepIndexIsNotEqualTo: number = Number.MAX_SAFE_INTEGER;
@@ -146,6 +149,8 @@ export class Thread {
 
                         if (currentProgramState != this.currentProgramState) {
                             currentProgramState.stepIndex = stepIndex;
+
+                            currentProgramState.lastExecutedStep = step; // for Exception printing
 
                             currentProgramState = this.currentProgramState;
                             stepIndex = currentProgramState.stepIndex;
@@ -239,7 +244,7 @@ export class Thread {
         let classNames = exception.getExtendedImplementedIdentifiers().slice();
         classNames.push(exception.getIdentifier());
 
-        let stackTrace: ProgramState[] = [];
+        let rawStackTrace: ProgramState[] = [];
         let newProgramStates: ProgramState[] = [];
         let foundCatchBlockInfo: CatchBlockInfo | undefined;
 
@@ -264,8 +269,8 @@ export class Thread {
                 }
 
                 if (foundCatchBlockInfo) {
-                    stackTrace.push(Object.assign({}, ps));
-                    exception.stacktrace = stackTrace.map(state => {
+                    rawStackTrace.push(Object.assign({}, ps));
+                    exception.stacktrace = rawStackTrace.map(state => {
                         return {
                             methodIdentifierWithClass: state.program.methodIdentifierWithClass,
                             range: <IRange>state.currentStepList[state.stepIndex].range
@@ -295,16 +300,22 @@ export class Thread {
                 while (ps.aquiredObjectLocks.length > 0) this.leaveSynchronizedBlock(ps.aquiredObjectLocks.pop()!);
             }
 
-            stackTrace.push(ps);
+            rawStackTrace.push(ps);
             this.programStack.pop();
 
         } while (this.programStack.length > 0 && !foundCatchBlockInfo)
 
         if (this.programStack.length == 0) {
-            this.stackTrace = stackTrace;
+            this.stackTrace = rawStackTrace.map( ste => {
+                return {
+                    range: ste.lastExecutedStep? ste.lastExecutedStep.range : ste.currentStepList[ste.stepIndex].range,
+                    methodIdentifierWithClass: ste.program.methodIdentifierWithClass
+                }
+            });
             this.exception = exception;
             this.state = ThreadState.terminatedWithException;
             console.log(exception);
+            ExceptionPrinter.print(exception, this.stackTrace, this.scheduler.interpreter.printManager);
             //@ts-ignore
             this.currentProgramState = undefined;
         } else {

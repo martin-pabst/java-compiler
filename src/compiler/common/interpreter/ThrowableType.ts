@@ -1,7 +1,7 @@
 import { IRange } from "../range/Range.ts";
 
 export type StacktraceElement = {
-    range: IRange,
+    range: { startLineNumber?: number, startColumn?: number, endLineNumber?: number, endColumn?: number },
     methodIdentifierWithClass: string
 }
 
