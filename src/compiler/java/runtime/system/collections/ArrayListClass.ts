@@ -1,16 +1,18 @@
-import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts";
+import { CallbackFunction, Klass } from "../../../../common/interpreter/StepFunction.ts";
 import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { NullPointerExceptionClass } from "../javalang/NullPointerExceptionClass.ts";
-import { ObjectClass } from "../javalang/ObjectClassStringClass.ts";
+import { ObjectClass, StringClass } from "../javalang/ObjectClassStringClass.ts";
 import { CollectionInterface } from "./CollectionInterface.ts";
 import { SystemCollection } from "./SystemCollection.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { IndexOutOfBoundsExceptionClass } from "../javalang/IndexOutOfBoundsExceptionClass.ts";
 import { ConsumerInterface } from "../functional/ConsumerInterface.ts";
 import { ComparatorInterface } from "./ComparatorInterface.ts";
+import { BaseListType, BaseType } from "../../../../common/BaseType.ts";
+import { ArrayToStringCaster } from "../../../../common/interpreter/ArrayToStringCaster.ts";
 
-export class ArrayListClass extends SystemCollection {
+export class ArrayListClass extends SystemCollection implements BaseListType {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "class ArrayList<E> implements List<E>" },
 
@@ -42,6 +44,8 @@ export class ArrayListClass extends SystemCollection {
         { type: "method", signature: "E set (int index, E Element)", native: ArrayListClass.prototype._setWithIndex },
         { type: "method", signature: "void sort(Comparator<? super E> comparator)", java: ArrayListClass.prototype._mj$sort$void$Comparator },
 
+        // override toString-method
+        { type: "method", signature: "String toString()", java: ArrayListClass.prototype._mj$toString$String$ },
         // 
     ]
 
@@ -67,6 +71,26 @@ export class ArrayListClass extends SystemCollection {
 
         f();
 
+    }
+
+    _mj$toString$String$(t: Thread, callback: CallbackFunction) {
+        if(this.elements.length == 0){
+            t.s.push("[]");
+            if(callback) callback();
+            return;
+        }
+        let element = this.elements[0];
+        if(typeof element == "object" || Array.isArray(element) || element == null){
+            t._arrayOfObjectsToString(this.elements, () => {
+                t.s.push(new StringClass(t.s.pop()));
+                if(callback) callback();
+            })
+            return;
+        } else {
+            t.s.push(new StringClass(t._primitiveElementOrArrayToString(this.elements)));
+            if(callback) callback();
+            return;
+        }
     }
 
     _iterator() {
@@ -366,5 +390,14 @@ export class ArrayListClass extends SystemCollection {
 
 
     }
+
+    isBaseListType(): boolean {
+        return true;
+    }
+
+    getElements(): any[] {
+        return this.elements;
+    }
+
 
 }

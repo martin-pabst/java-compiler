@@ -24,3 +24,8 @@ export interface BaseObjectType {
 export interface BaseArrayType {
     getElementType(): BaseType;
 }
+
+export interface BaseListType {
+    isBaseListType(): boolean;
+    getElements(): any[];
+}

@@ -450,6 +450,18 @@ String[] list2 = new String[1];
 String[] list3 = list.toArray(list2);
 
 println(list3[2]);
+
+
+ArrayList<String> [] z = { list, list };
+println(z);
+
+int[][] zweiDimensional = {
+   { 1, 2, 3 },
+   { 4, 5, 6 },
+   { 7, 8, 9 }
+};
+
+println(zweiDimensional);
 `],
 ['genericParameterTest', `
 interface I1<T> {

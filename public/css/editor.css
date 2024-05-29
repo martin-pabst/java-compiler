@@ -121,3 +121,20 @@
     top: 3px;
     border-radius: var(--breakpoint-radius);
 }
+
+/* Debugger */
+.jo_debugger_type {
+    color:#6cbfe6;
+}
+
+.jo_debugger_identifier {
+    color:#c189cd;
+}
+
+.jo_debugger_value {
+    color:#ffffff;
+}
+
+.jo_debugger_index {
+    color:#b7b374;
+}

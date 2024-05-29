@@ -71,7 +71,7 @@ export abstract class BaseSymbolTable {
         let bestTable: BaseSymbolTable = this;
         for(let child of this.childTables){
             let t1 = child.findSymbolTableAtPosition(position);
-            if(t1) bestTable = child;
+            if(t1) bestTable = t1;
         }
 
         return bestTable;

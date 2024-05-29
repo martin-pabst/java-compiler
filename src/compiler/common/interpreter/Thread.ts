@@ -533,7 +533,7 @@ export class Thread {
         let textContainer: TextContainer = {text: ""};
         ArrayToStringCaster.arrayOfObjectsToString(textContainer, this, array, () => {
             this.s.push(textContainer.text);
-            if(callback) callback;
+            if(callback) callback();
         });
     }
 
