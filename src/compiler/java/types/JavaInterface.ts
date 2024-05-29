@@ -2,11 +2,11 @@ import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
-import { Field } from "./Field";
+import { JavaField } from "./JavaField";
 import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter";
 import { JavaClass } from "./JavaClass";
 import { JavaType } from "./JavaType";
-import { Method } from "./Method";
+import { JavaMethod } from "./JavaMethod";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility";
 
@@ -20,9 +20,9 @@ export abstract class IJavaInterface extends NonPrimitiveType {
         return this.module.file;
     }
 
-    getFields(): Field[] { return [] };
+    getFields(): JavaField[] { return [] };
 
-    abstract getOwnMethods(): Method[];
+    abstract getOwnMethods(): JavaMethod[];
 
     abstract getExtends(): IJavaInterface[];
 
@@ -37,7 +37,7 @@ export abstract class IJavaInterface extends NonPrimitiveType {
         return undefined;
     }
 
-    getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): Field | undefined {
+    getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): JavaField | undefined {
         let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
         if (field) return field;
         if (uptoVisibility == TokenType.keywordPrivate) uptoVisibility = TokenType.keywordProtected;
@@ -62,7 +62,7 @@ export abstract class IJavaInterface extends NonPrimitiveType {
     }
 
     getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, 
-        rangeToReplace: monaco.IRange, methodContext: Method | undefined, onlyStatic?: false): monaco.languages.CompletionItem[] {
+        rangeToReplace: monaco.IRange, methodContext: JavaMethod | undefined, onlyStatic?: false): monaco.languages.CompletionItem[] {
 
         let itemList: monaco.languages.CompletionItem[] = [];
 
@@ -98,8 +98,8 @@ export abstract class IJavaInterface extends NonPrimitiveType {
 
 export class JavaInterface extends IJavaInterface {
 
-    methods: Method[] = [];
-    fields: Field[] = [];               // A interface may have fields, but they must be static final
+    methods: JavaMethod[] = [];
+    fields: JavaField[] = [];               // A interface may have fields, but they must be static final
 
     private extends: IJavaInterface[] = [];
 
@@ -112,7 +112,7 @@ export class JavaInterface extends IJavaInterface {
         return this.methods.length == 1;
     }
 
-    getFields(): Field[] {
+    getFields(): JavaField[] {
         return this.fields;
     }
 
@@ -149,19 +149,19 @@ export class JavaInterface extends IJavaInterface {
         return this.extends;
     }
 
-    public getOwnMethods(): Method[] {
+    public getOwnMethods(): JavaMethod[] {
         return this.methods;
     }
 
-    public getAllMethods(): Method[] {
-        let methods: Method[] = this.methods;
+    public getAllMethods(): JavaMethod[] {
+        let methods: JavaMethod[] = this.methods;
         for (let impl of this.extends) {
             methods = methods.concat(impl.getAllMethods());
         }
         return methods;
     }
 
-    private getAllInheritedMethodsHelper(alreadyFoundSignatureMap: Map<string, Method>) {
+    private getAllInheritedMethodsHelper(alreadyFoundSignatureMap: Map<string, JavaMethod>) {
         for (let m of this.methods) {
             let signature = m.getInternalName("java");
             if (!alreadyFoundSignatureMap.get(signature)) {
@@ -173,10 +173,10 @@ export class JavaInterface extends IJavaInterface {
         }
     }
 
-    public getAllInheritedMethods(): Method[] {
-        let map: Map<string, Method> = new Map();
+    public getAllInheritedMethods(): JavaMethod[] {
+        let map: Map<string, JavaMethod> = new Map();
         this.getAllInheritedMethodsHelper(map);
-        let list: Method[] = [];
+        let list: JavaMethod[] = [];
         map.forEach((method, signatur) => list.push(method));
         return list;
     }
@@ -239,7 +239,7 @@ export class JavaInterface extends IJavaInterface {
 
 export class GenericVariantOfJavaInterface extends IJavaInterface {
 
-    private cachedMethods?: Method[];
+    private cachedMethods?: JavaMethod[];
 
     private cachedExtends?: IJavaInterface[];
 
@@ -317,7 +317,7 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
         return new GenericVariantOfJavaInterface(this.isGenericVariantOf, newTypeMap);
     }
 
-    public getOwnMethods(): Method[] {
+    public getOwnMethods(): JavaMethod[] {
         if (!this.cachedMethods) {
             this.cachedMethods = [];
 
@@ -329,8 +329,8 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
     }
 
 
-    public getAllMethods(): Method[] {
-        let methods: Method[] = this.getOwnMethods();
+    public getAllMethods(): JavaMethod[] {
+        let methods: JavaMethod[] = this.getOwnMethods();
         for (let impl of this.getExtends()) {
             methods = methods.concat(impl.getAllMethods());
         }

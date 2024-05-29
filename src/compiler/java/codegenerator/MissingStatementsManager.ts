@@ -2,8 +2,8 @@ import { BaseSymbol } from "../../common/BaseSymbolTable";
 import { Error } from "../../common/Error";
 import { IRange } from "../../common/range/Range";
 import { JCM } from "../JavaCompilerMessages";
-import { Method } from "../types/Method";
-import { Parameter } from "../types/Parameter";
+import { JavaMethod } from "../types/JavaMethod";
+import { JavaParameter } from "../types/JavaParameter";
 
 class MissingStatements {
 
@@ -85,7 +85,7 @@ export class MissingStatementManager {
     
     stack: MissingStatements[] = [];
     
-    beginMethodBody(parameters: Parameter[]){
+    beginMethodBody(parameters: JavaParameter[]){
         this.stack = [];
         let missingStatements = new MissingStatements();
         for(let parameter of parameters) {
@@ -114,7 +114,7 @@ export class MissingStatementManager {
         currentMissingStatements.childrenWithReturnStatement = 0;
     }
     
-    endMethodBody(method: Method | undefined, errors: Error[]){
+    endMethodBody(method: JavaMethod | undefined, errors: Error[]){
         let currentMissingStatements = this.stack[this.stack.length - 1];
         
         if(method && method.returnParameterType && method.returnParameterType.identifier != "void"){

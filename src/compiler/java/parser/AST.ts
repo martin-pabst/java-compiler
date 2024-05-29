@@ -8,7 +8,7 @@ import { JavaClass } from "../types/JavaClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { JavaInterface } from "../types/JavaInterface.ts";
 import { JavaType } from "../types/JavaType.ts";
-import { Method } from "../types/Method.ts";
+import { JavaMethod } from "../types/JavaMethod.ts";
 import { Visibility } from "../types/Visibility.ts";
 
 export type ASTNodes = ASTNode[];
@@ -171,7 +171,7 @@ export interface ASTMethodDeclarationNode extends ASTNode, ASTNodeWithModifiers,
     isContructor: boolean;
     isAbstract: boolean;
     statement: ASTStatementNode | undefined;  // undefined in case of abstract method and methoddeclaration in interface
-    method?: Method;
+    method?: JavaMethod;
     program?: Program,       // only for debugging purposes
     parentTypeScope: TypeScope,   // class or interface or enum containing this method
     innerTypes: (ASTClassDefinitionNode | ASTInterfaceDefinitionNode | ASTEnumDefinitionNode)[];

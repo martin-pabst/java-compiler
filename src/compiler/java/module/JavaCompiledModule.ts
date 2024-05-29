@@ -9,10 +9,10 @@ import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable.ts";
 import { LexerOutput } from "../lexer/Lexer.ts";
 import { TokenList } from "../lexer/Token";
 import { ASTBlockNode, ASTClassDefinitionNode, ASTGlobalNode } from "../parser/AST";
-import { ArrayType } from "../types/ArrayType.ts";
+import { JavaArrayType } from "../types/JavaArrayType.ts";
 import { JavaType } from "../types/JavaType";
 import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
-import { Method } from "../types/Method.ts";
+import { JavaMethod } from "../types/JavaMethod.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { JavaBaseModule } from "./JavaBaseModule";
@@ -21,10 +21,10 @@ import { TypePosition } from "./TypePosition.ts";
 
 export type JavaMethodCallPosition = {
     identifierRange: monaco.IRange,
-    possibleMethods: Method[] | string, // string for print, println, ...
+    possibleMethods: JavaMethod[] | string, // string for print, println, ...
     commaPositions: monaco.IPosition[],
     rightBracketPosition: monaco.IPosition,
-    bestMethod?: Method
+    bestMethod?: JavaMethod
 }
 
 /**
@@ -61,7 +61,7 @@ export class JavaCompiledModule extends JavaBaseModule {
     addTypePosition(position: Position, type: JavaType){
 
 
-        if(type instanceof NonPrimitiveType || type instanceof StaticNonPrimitiveType || type instanceof ArrayType){
+        if(type instanceof NonPrimitiveType || type instanceof StaticNonPrimitiveType || type instanceof JavaArrayType){
             let list = this.typePositions[position.lineNumber];
             if(list == null){
                 list = [];
@@ -74,7 +74,7 @@ export class JavaCompiledModule extends JavaBaseModule {
         }
     }
 
-    getTypeAtPosition(line: number, column: number): NonPrimitiveType | StaticNonPrimitiveType | ArrayType | undefined {
+    getTypeAtPosition(line: number, column: number): NonPrimitiveType | StaticNonPrimitiveType | JavaArrayType | undefined {
 
         return this.typePositions[line]?.find(tp => tp.position.column == column)?.type;
 
@@ -203,8 +203,8 @@ export class JavaCompiledModule extends JavaBaseModule {
     }
 
     pushMethodCallPosition(identifierRange: monaco.IRange, commaPositions: monaco.IPosition[],
-        possibleMethods: Method[] | string, rightBracketPosition: monaco.IPosition,
-    bestMethod?: Method) {
+        possibleMethods: JavaMethod[] | string, rightBracketPosition: monaco.IPosition,
+    bestMethod?: JavaMethod) {
 
         let lines: number[] = [];
         lines.push(identifierRange.startLineNumber);

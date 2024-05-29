@@ -4,8 +4,8 @@ import { Module } from "../../common/module/Module.ts";
 import { Range } from "../../common/range/Range.ts";
 import { JavaLocalVariable } from "../codegenerator/JavaLocalVariable.ts";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
-import { Field } from "../types/Field.ts";
-import { Method } from "../types/Method.ts";
+import { JavaField } from "../types/JavaField.ts";
+import { JavaMethod } from "../types/JavaMethod.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 
 export class JavaHoverProvider {
@@ -93,7 +93,7 @@ export class JavaHoverProvider {
         let declarationAsString = "";
 
         if (usagePosition && symbol && symbol.identifier != "var") {
-            if (symbol instanceof NonPrimitiveType || symbol instanceof Method) {
+            if (symbol instanceof NonPrimitiveType || symbol instanceof JavaMethod) {
                 declarationAsString = "```\n" + symbol.getDeclaration() + "\n```";
                 return {
                     range: usagePosition.range,
@@ -105,7 +105,7 @@ export class JavaHoverProvider {
                     range: usagePosition.range,
                     contents: [{ value: declarationAsString }],
                 }
-            } else if(symbol instanceof JavaLocalVariable || symbol instanceof Field) {
+            } else if(symbol instanceof JavaLocalVariable || symbol instanceof JavaField) {
                 // Variable
                 
                 declarationAsString =  symbol.getDeclaration() ;

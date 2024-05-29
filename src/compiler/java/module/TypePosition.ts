@@ -1,9 +1,9 @@
 import { Position } from "../../common/range/Position"
-import { ArrayType } from "../types/ArrayType";
+import { JavaArrayType } from "../types/JavaArrayType";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType";
 
 export type TypePosition = {
     position: Position;
-    type: NonPrimitiveType | StaticNonPrimitiveType | ArrayType;
+    type: NonPrimitiveType | StaticNonPrimitiveType | JavaArrayType;
 }

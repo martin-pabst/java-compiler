@@ -4,11 +4,11 @@ import { JavaCompiler } from "../JavaCompiler.ts";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
-import { ArrayType } from "../types/ArrayType";
+import { JavaArrayType } from "../types/JavaArrayType";
 import { IJavaClass, JavaClass } from "../types/JavaClass";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { IJavaInterface, JavaInterface } from "../types/JavaInterface";
-import { Method } from "../types/Method";
+import { JavaMethod } from "../types/JavaMethod";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType";
 import { getVisibilityUpTo } from "../types/VisibilityTools";
@@ -372,7 +372,7 @@ export class JavaCompletionItemProvider implements monaco.languages.CompletionIt
             });
         }
 
-        if (type instanceof ArrayType) {
+        if (type instanceof JavaArrayType) {
             return Promise.resolve({
                 suggestions: [
                     {
@@ -632,7 +632,7 @@ export class JavaCompletionItemProvider implements monaco.languages.CompletionIt
 
         let keywordCompletionItems: monaco.languages.CompletionItem[] = [];
 
-        let methods: Method[] = [];
+        let methods: JavaMethod[] = [];
         let c = classContext.getExtends();
         while (c != null) {
             methods = methods.concat(c.getOwnMethods().filter((m) => {

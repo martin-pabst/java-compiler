@@ -10,13 +10,11 @@ import { JavaTypeStore } from "../module/JavaTypeStore";
 import { ASTAnnotationNode, ASTAnonymousClassNode, ASTBlockNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTMethodCallNode, ASTMethodDeclarationNode, ASTStatementNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
 import { ObjectClass } from "../runtime/system/javalang/ObjectClassStringClass.ts";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
-import { Field } from "../types/Field.ts";
 import { GenericTypeParameter } from "../types/GenericTypeParameter.ts";
 import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
 import { JavaType } from "../types/JavaType.ts";
-import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { CodeSnippetContainer } from "./CodeSnippetKinds.ts";
 import { OneParameterTemplate } from "./CodeTemplate.ts";
@@ -98,6 +96,11 @@ export class CodeGenerator extends StatementCodeGenerator {
                 this.pushSymbolTable(cdef.symbolTable);
             } else {
                 cdef.symbolTable = this.pushAndGetNewSymbolTable(cdef.range, false, type);
+                //@ts-ignore
+                if(cdef.identifier == "" && cdef.parent["mainProgramNode"]){
+                    cdef.symbolTable.hiddenWhenDebugging = true;
+                }
+                
             }
 
             this.compileStaticFieldsAndInitializerAndEnumValues(type, cdef);

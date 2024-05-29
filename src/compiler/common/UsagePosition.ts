@@ -1,13 +1,4 @@
 import chalk from "chalk";
-import { JavaCompiledModule } from "../java/module/JavaCompiledModule";
-import { JavaLibraryModule } from "../java/module/libraries/JavaLibraryModule";
-import { SystemModule } from "../java/runtime/system/SystemModule";
-import { Field } from "../java/types/Field.ts";
-import { GenericVariantOfJavaClass } from "../java/types/JavaClass.ts";
-import { GenericVariantOfJavaInterface } from "../java/types/JavaInterface.ts";
-import { Method } from "../java/types/Method.ts";
-import { NonPrimitiveType } from "../java/types/NonPrimitiveType.ts";
-import { StaticNonPrimitiveType } from "../java/types/StaticNonPrimitiveType.ts";
 import { BaseSymbol } from "./BaseSymbolTable";
 import { File } from "./module/File";
 import { Module } from "./module/Module";

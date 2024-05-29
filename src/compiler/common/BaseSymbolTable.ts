@@ -1,6 +1,8 @@
+import { BaseType } from "./BaseType.ts";
 import { File } from "./module/File";
 import { Module } from "./module/Module.ts";
-import { IRange } from "./range/Range";
+import { IPosition, Position } from "./range/Position.ts";
+import { IRange, Range } from "./range/Range";
 
 /**
  * Fields, parameters and local variables
@@ -8,6 +10,7 @@ import { IRange } from "./range/Range";
 export abstract class BaseSymbol {
 
     documentation?: string | (() => string);
+    hiddenWhenDebugging?: boolean;
 
     constructor(public identifier: string, public identifierRange: IRange, public module: Module) {
 
@@ -18,6 +21,11 @@ export abstract class BaseSymbol {
     }
 
     abstract getDeclaration(): string;
+
+    /**
+     * For debugger;
+     */
+    abstract getType(): BaseType;
 
 }
 
@@ -30,13 +38,15 @@ export abstract class SymbolOnStackframe extends BaseSymbol {
     }
 
     // mouseover in debugger-mode => show value ...
-    abstract getValue(stack: any, stackframeStart: number): any;
+    getValue(stack: any[], stackframeStart: number): any {
+        return stack[stackframeStart + this.stackframePosition!];
+    }
 }
 
 /**
  * For a given program position the debugger has to know what to expect on the current stackframe
  */
-export class BaseSymbolTable {
+export abstract class BaseSymbolTable {
 
     childTables: BaseSymbolTable[] = [];
 
@@ -44,13 +54,29 @@ export class BaseSymbolTable {
 
     identifierToSymbolMap: Map<string, BaseSymbol> = new Map();
 
-    constructor(public parent?: BaseSymbolTable) {
+    hiddenWhenDebugging?: boolean;
+
+    constructor(public range: IRange, public parent?: BaseSymbolTable) {
         if (parent) parent.childTables.push(this);
     }
 
     addSymbol(symbol: BaseSymbol) {
         this.identifierToSymbolMap.set(symbol.identifier, symbol);
     }
+
+    abstract getSymbolsForDebugger(): SymbolOnStackframe[];
+
+    findSymbolTableAtPosition(position: IPosition): BaseSymbolTable | undefined {
+        if(!Range.containsPosition(this.range, position)) return undefined;
+        let bestTable: BaseSymbolTable = this;
+        for(let child of this.childTables){
+            let t1 = child.findSymbolTableAtPosition(position);
+            if(t1) bestTable = child;
+        }
+
+        return bestTable;
+    }
+
 
 }
 
@@ -96,4 +122,8 @@ export class BaseStackframe {
         return index;
     }
 
+}
+
+export abstract class BaseField extends BaseSymbol {
+    abstract getFieldIndentifier(): string;
 }

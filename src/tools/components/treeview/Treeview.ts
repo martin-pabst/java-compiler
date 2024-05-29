@@ -157,7 +157,9 @@ export class Treeview<E> {
 
     setFlexWeight(flex: string) {
         this._outerDiv.style.flexGrow = flex;
-        this._outerDiv.style.flexBasis = this.config.minHeight + "px";
+        if(this.config.minHeight! > 0){
+            this._outerDiv.style.flexBasis = this.config.minHeight + "px";
+        }
     }
 
     invokeMoveNodesCallback(movedElements: E[], destinationFolder: E | null, position: { order: number, elementBefore: E | null, elementAfter: E | null }): boolean {
@@ -235,6 +237,11 @@ export class Treeview<E> {
 
         return node;
     }
+
+    addNodeInternal(node: TreeviewNode<E>) {
+        if(this.nodes.indexOf(node) < 0) this.nodes.push(node);
+    }
+
 
     public initialRenderAll() {
         let renderedExternalReferences: Map<any, boolean> = new Map();

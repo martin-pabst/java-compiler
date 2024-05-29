@@ -12,13 +12,13 @@ import { JavaLocalVariable } from "./JavaLocalVariable";
 import { JumpToLabelCodeSnippet, LabelCodeSnippet } from "./LabelManager.ts";
 import { SnippetFramer } from "./CodeSnippetTools.ts";
 import { TermCodeGenerator } from "./TermCodeGenerator";
-import { Method } from "../types/Method.ts";
+import { JavaMethod } from "../types/JavaMethod.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { CatchBlockInfo } from "../../common/interpreter/ExceptionInfo.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { EmptyRange, IRange } from "../../common/range/Range.ts";
 import { ExceptionTree } from "./ExceptionTree.ts";
-import { ArrayType } from "../types/ArrayType.ts";
+import { JavaArrayType } from "../types/JavaArrayType.ts";
 import { GenericVariantOfJavaClass, IJavaClass } from "../types/JavaClass.ts";
 import { GenericVariantOfJavaInterface, IJavaInterface } from "../types/JavaInterface.ts";
 import { SystemCollection } from "../runtime/system/collections/SystemCollection.ts";
@@ -128,7 +128,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
         let snippet = new CodeSnippetContainer([], node.range);
 
-        let method: Method | undefined = this.currentSymbolTable.methodContext;
+        let method: JavaMethod | undefined = this.currentSymbolTable.methodContext;
         if (!method) {
             this.pushError(JCM.returnNotExpected(), "error", node.range);
             return undefined;
@@ -219,7 +219,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         let collectionType = collectionSnippet.type;
         let collectionElementType: JavaType;
 
-        if (collectionType instanceof ArrayType) {
+        if (collectionType instanceof JavaArrayType) {
             /*
             * Loop over array
             */
@@ -909,7 +909,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
                     break;
                 case TokenType.arrayLiteral:
                     let type1 = destinationType;
-                    if (type1 && type1 instanceof ArrayType) {
+                    if (type1 && type1 instanceof JavaArrayType) {
                         initValueSnippet = this.compileArrayLiteral(type1.getElementType(), <ASTArrayLiteralNode>initializationNode);
                     } else {
                         this.pushError(JCM.cantAssignArrayLiteralToNonArrayVariable(), "error", initializationNode);

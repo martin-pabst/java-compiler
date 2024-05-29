@@ -3,7 +3,7 @@ import { Klass } from '../../../common/interpreter/StepFunction';
 import { JRC } from '../../JavaRuntimeLibraryComments';
 import { EnumClass } from '../system/javalang/EnumClass';
 import { JavaEnum } from '../../types/JavaEnum';
-import { Field } from '../../types/Field';
+import { JavaField } from '../../types/JavaField';
 import { EmptyRange } from '../../../common/range/Range';
 import { TokenType } from '../../TokenType';
 
@@ -44,7 +44,7 @@ export class SpriteLibraryEnum extends EnumClass {
             let sle: Klass = SpriteLibraryEnum;
             sle[name] = value;
 
-            let field = new Field(name, EmptyRange.instance, 
+            let field = new JavaField(name, EmptyRange.instance, 
                 SpriteLibraryEnum.type.module, SpriteLibraryEnum.type, TokenType.keywordPublic
             );
             field.isStatic = true;

@@ -1,12 +1,12 @@
 import { IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
-import { Field } from "./Field";
+import { JavaField } from "./JavaField";
 import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter.ts";
 import { JavaTypeWithInstanceInitializer } from "./JavaTypeWithInstanceInitializer.ts";
 import { GenericVariantOfJavaInterface, IJavaInterface, JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
-import { Method } from "./Method";
+import { JavaMethod } from "./JavaMethod";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility";
 import { CallbackFunction, Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
@@ -22,15 +22,15 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
         this.isPrimitive = false;
     }
 
-    abstract getFields(): Field[];
-    abstract getOwnMethods(): Method[];
+    abstract getFields(): JavaField[];
+    abstract getOwnMethods(): JavaMethod[];
 
     abstract getExtends(): IJavaClass | undefined;
     abstract getImplements(): IJavaInterface[];
 
 
     getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, 
-        rangeToReplace: monaco.IRange, methodContext: Method | undefined, onlyStatic?: false): monaco.languages.CompletionItem[] {
+        rangeToReplace: monaco.IRange, methodContext: JavaMethod | undefined, onlyStatic?: false): monaco.languages.CompletionItem[] {
 
         let itemList: monaco.languages.CompletionItem[] = [];
 
@@ -83,7 +83,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 
     }
 
-    pushSuperCompletionItem(itemList: monaco.languages.CompletionItem[], method: Method, leftBracketAlreadyThere: boolean,
+    pushSuperCompletionItem(itemList: monaco.languages.CompletionItem[], method: JavaMethod, leftBracketAlreadyThere: boolean,
         rangeToReplace: monaco.IRange) {
         itemList.push({
             label: method.getCompletionLabel().replace(method.identifier, "super"),
@@ -118,7 +118,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     }
 
 
-    getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): Field | undefined {
+    getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): JavaField | undefined {
         let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
         if (field) return field;
         if (uptoVisibility == TokenType.keywordPrivate) uptoVisibility = TokenType.keywordProtected;
@@ -162,8 +162,8 @@ export class JavaClass extends IJavaClass {
     isStatic: boolean = false;
     _isAbstract: boolean = false;
 
-    fields: Field[] = [];
-    methods: Method[] = [];
+    fields: JavaField[] = [];
+    methods: JavaMethod[] = [];
 
     private extends?: IJavaClass;
     private implements: IJavaInterface[] = [];
@@ -173,10 +173,10 @@ export class JavaClass extends IJavaClass {
         this.genericTypeParameters = [];
     }
     
-    getAbstractMethodsNotYetImplemented(): Method[] {
+    getAbstractMethodsNotYetImplemented(): JavaMethod[] {
 
-        let abstractMethods: Method[] = [];
-        let concreteMethodSignatures: Map<string, Method> = new Map();
+        let abstractMethods: JavaMethod[] = [];
+        let concreteMethodSignatures: Map<string, JavaMethod> = new Map();
 
         let klass: IJavaClass | undefined = this;
 
@@ -197,7 +197,7 @@ export class JavaClass extends IJavaClass {
 
     }
 
-    findMethodWithSignature(otherMethod: Method): Method | undefined {
+    findMethodWithSignature(otherMethod: JavaMethod): JavaMethod | undefined {
         let otherMethodsIdentifier = otherMethod.identifier;
         let otherMethodsParameterCount = otherMethod.parameters.length;
         for (let method of this.methods) {
@@ -232,7 +232,7 @@ export class JavaClass extends IJavaClass {
 
     checkIfAbstractParentsAreImplemented() {
         if (!this._isAbstract) {
-            let abstractMethodsNotYetImplemented: Method[] = this.getAbstractMethodsNotYetImplemented();
+            let abstractMethodsNotYetImplemented: JavaMethod[] = this.getAbstractMethodsNotYetImplemented();
             if (abstractMethodsNotYetImplemented.length > 0) {
                 let jc = JCM.abstractMethodsNotImplemented(this.identifier, abstractMethodsNotYetImplemented.map(m => m.getSignature()).join(", "));
                 this.module.errors.push({
@@ -276,7 +276,7 @@ export class JavaClass extends IJavaClass {
     checkIfInterfacesAreImplementedAndSupplementDefaultMethods() {
         for (let ji of this.getImplements()) {
             let javaInterface = <JavaInterface>ji;
-            let notImplementedMethods: Method[] = [];
+            let notImplementedMethods: JavaMethod[] = [];
             for (let method of javaInterface.getOwnMethods()) {
 
                 let classesMethod = this.findMethodWithSignature(method);
@@ -353,17 +353,17 @@ export class JavaClass extends IJavaClass {
         return this._isAbstract;
     }
 
-    public getFields(): Field[] {
+    public getFields(): JavaField[] {
 
         return this.fields;
 
     }
 
-    public getOwnMethods(): Method[] {
+    public getOwnMethods(): JavaMethod[] {
         return this.methods;
     }
 
-    public getAllMethods(): Method[] {
+    public getAllMethods(): JavaMethod[] {
         if (this.extends) {
             return this.methods.concat(this.extends?.getAllMethods());
         } else {
@@ -465,8 +465,8 @@ export class JavaClass extends IJavaClass {
 
 export class GenericVariantOfJavaClass extends IJavaClass {
 
-    private cachedFields?: Field[];
-    private cachedMethods?: Method[];
+    private cachedFields?: JavaField[];
+    private cachedMethods?: JavaMethod[];
 
     private cachedExtends?: IJavaClass;
 
@@ -548,7 +548,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         return new GenericVariantOfJavaClass(this.isGenericVariantOf, newTypeMap);
     }
 
-    public getFields(): Field[] {
+    public getFields(): JavaField[] {
         if (!this.cachedFields) {
             this.cachedFields = [];
 
@@ -559,7 +559,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         return this.cachedFields;
     }
 
-    public getOwnMethods(): Method[] {
+    public getOwnMethods(): JavaMethod[] {
         if (!this.cachedMethods) {
             this.cachedMethods = [];
 
@@ -570,7 +570,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         return this.cachedMethods;
     }
 
-    public getAllMethods(): Method[] {
+    public getAllMethods(): JavaMethod[] {
         let extend = this.getExtends();
         if (extend) {
             return this.getOwnMethods().concat(extend.getAllMethods());

@@ -4,7 +4,7 @@ import { JavaModuleManager } from "../java/module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "../java/module/libraries/JavaLibraryModuleManager.ts";
 import { JavaClass } from "../java/types/JavaClass.ts";
 import { JavaTypeWithInstanceInitializer } from "../java/types/JavaTypeWithInstanceInitializer";
-import { Method } from "../java/types/Method.ts";
+import { JavaMethod } from "../java/types/JavaMethod.ts";
 import { NonPrimitiveType } from "../java/types/NonPrimitiveType";
 import { Error } from "./Error";
 import { Program } from "./interpreter/Program";
@@ -109,7 +109,7 @@ export class Executable {
     }
 
     getTestMethods() {
-        let testMethods: Method[] = [];
+        let testMethods: JavaMethod[] = [];
         for (let module of this.moduleManager.modules) {
             for (let type of module.types) {
                 if (type instanceof JavaClass) {

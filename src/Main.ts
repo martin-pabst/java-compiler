@@ -47,6 +47,7 @@ import { ColorProvider } from "./compiler/common/monacoproviders/ColorProvider.t
 
 import spritesheetjson from '/include/graphics/spritesheet.json.txt';
 import spritesheetpng from '/include/graphics/spritesheet.png';
+import { Debugger } from "./compiler/common/debugger/Debugger.ts";
 
 export class Main implements IMain {
 
@@ -62,6 +63,7 @@ export class Main implements IMain {
   errorDiv: HTMLDivElement;
   testDiv: HTMLDivElement;
   graphicsDiv: HTMLDivElement;
+  debuggerDiv: HTMLDivElement;
 
   programControlButtons!: ProgramControlButtons;
   actionManager: ActionManager;
@@ -91,7 +93,7 @@ export class Main implements IMain {
     //let testProgram: string = testPrograms.listeVorlage.trim();
 
     this.insightTabsManager = new TabManager(document.getElementById('insighttabs')!,
-      ['token', 'ast', 'code', 'errors', 'tests', 'graphics']);
+      ['token', 'ast', 'code', 'errors', 'tests', 'graphics', 'debugger']);
 
     this.insightTabsManager.setBodyElementClass('tabBodyElement');
     this.tokenDiv = this.insightTabsManager.getBodyElement(0);
@@ -103,6 +105,9 @@ export class Main implements IMain {
     this.errorDiv = this.insightTabsManager.getBodyElement(3);
     this.testDiv = this.insightTabsManager.getBodyElement(4);
     this.graphicsDiv = this.insightTabsManager.getBodyElement(5);
+    this.debuggerDiv = this.insightTabsManager.getBodyElement(6);
+
+    this.debuggerDiv.id = "debuggerdiv";
 
     this.testResultViewer = new TestResultViewer();
 
@@ -139,9 +144,11 @@ export class Main implements IMain {
     let keyboardManager = new KeyboardManager(jQuery('#insighttabs'), this);
 
     this.breakpointManager = new BreakpointManager(this);
+    let _debugger = new Debugger(this.debuggerDiv);
 
     this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager,
-      new GraphicsManager(this.graphicsDiv), keyboardManager, this.breakpointManager);
+      new GraphicsManager(this.graphicsDiv), keyboardManager, 
+      this.breakpointManager, _debugger);
 
     this.initButtons();
     this.initCompiler();

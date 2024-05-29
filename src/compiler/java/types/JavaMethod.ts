@@ -1,22 +1,22 @@
 import { BaseSymbol } from "../../common/BaseSymbolTable.ts";
+import { BaseType } from "../../common/BaseType.ts";
 import { Error } from "../../common/Error";
 import { Program } from "../../common/interpreter/Program";
 import { IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
-import { ArrayType } from "./ArrayType.ts";
 import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter";
+import { JavaArrayType } from "./JavaArrayType.ts";
 import { IJavaClass, JavaClass } from "./JavaClass";
 import { JavaEnum } from "./JavaEnum";
 import { IJavaInterface, JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { NonPrimitiveType } from "./NonPrimitiveType";
-import { Parameter } from "./Parameter";
+import { JavaParameter } from "./JavaParameter";
 import { Visibility } from "./Visibility";
 
-export class Method extends BaseSymbol {
-
+export class JavaMethod extends BaseSymbol {
 
     isStatic: boolean = false;
     isFinal: boolean = false;
@@ -32,7 +32,7 @@ export class Method extends BaseSymbol {
 
     program?: Program;
 
-    parameters: Parameter[] = [];
+    parameters: JavaParameter[] = [];
     hasOuterClassParameter: boolean = false;            // constructors of non-static inner classes have invisible first parameter with identifier outerClassAttributeIdentifier
 
     template?: string;      // only for library Methods, i.e. Math.sin
@@ -56,7 +56,7 @@ export class Method extends BaseSymbol {
 
     callbackAfterCodeGeneration: (() => void)[] = [];
 
-    isCopyOf?: Method;
+    isCopyOf?: JavaMethod;
 
     constructor(identifier: string, identifierRange: IRange, module: JavaBaseModule,
         public visibility: Visibility = TokenType.keywordPublic) {
@@ -73,10 +73,10 @@ export class Method extends BaseSymbol {
         }
     }
 
-    getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, NonPrimitiveType>, genericClassOrInterfaceOrEnum: IJavaClass | JavaEnum | IJavaInterface): Method {
+    getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, NonPrimitiveType>, genericClassOrInterfaceOrEnum: IJavaClass | JavaEnum | IJavaInterface): JavaMethod {
 
         let copyNeeded: boolean = false;
-        let newParameters: Parameter[] = [];
+        let newParameters: JavaParameter[] = [];
         for (let p of this.parameters) {
             let copy = p.getCopyWithConcreteType(typeMap);
             newParameters.push(copy);
@@ -92,7 +92,7 @@ export class Method extends BaseSymbol {
 
         if (!copyNeeded) return this;
 
-        let newMethod = new Method(this.identifier, this.identifierRange, this.module, this.visibility);
+        let newMethod = new JavaMethod(this.identifier, this.identifierRange, this.module, this.visibility);
         newMethod.isConstructor = this.isConstructor;
         newMethod.isFinal = this.isFinal;
         newMethod.isAbstract = this.isAbstract;
@@ -113,12 +113,12 @@ export class Method extends BaseSymbol {
 
     }
 
-    getCopy(): Method {
+    getCopy(): JavaMethod {
 
-        let newParameters: Parameter[] = [];
+        let newParameters: JavaParameter[] = [];
         for (let p of this.parameters) newParameters.push(p.getCopy());
 
-        let newMethod = new Method(this.identifier, this.identifierRange, this.module, this.visibility);
+        let newMethod = new JavaMethod(this.identifier, this.identifierRange, this.module, this.visibility);
         newMethod.isConstructor = this.isConstructor;
         newMethod.isFinal = this.isFinal;
         newMethod.isAbstract = this.isAbstract;
@@ -149,7 +149,7 @@ export class Method extends BaseSymbol {
         return this.signatureCacheWithGenericParameterIdentifiers[callingConvention];
     }
 
-    takeInternalJavaNameWithGenericParamterIdentifiersFrom(method: Method) {
+    takeInternalJavaNameWithGenericParamterIdentifiersFrom(method: JavaMethod) {
         this.signatureCacheWithGenericParameterIdentifiers["java"] = method.getInternalNameWithGenericParameterIdentifiers("java");
     }
 
@@ -189,7 +189,7 @@ export class Method extends BaseSymbol {
 
             let p = parameters[i];
             if (p.isEllipsis) {
-                let arrayType: ArrayType = <any>p.type;
+                let arrayType: JavaArrayType = <any>p.type;
                 label += arrayType.getElementType().toString() + "... " + p.identifier;
             } else {
                 label += p.type.toString() + " " + p.identifier;
@@ -247,10 +247,15 @@ export class Method extends BaseSymbol {
         this.annotations = annotations;
     }
 
+    getType(): BaseType {
+        return this.returnParameterType!;
+    }
+
+
 }
 
 
-export class GenericMethod extends Method {
+export class GenericMethod extends JavaMethod {
 
     constructor(identifier: string, identifierRange: IRange, module: JavaBaseModule,
         visibility: Visibility = TokenType.keywordPublic, public genericTypeParameters: GenericTypeParameters) {
@@ -272,7 +277,7 @@ export class GenericMethod extends Method {
         return errors;
     }
 
-    getCopyWithConcreteTypes(): Method {
+    getCopyWithConcreteTypes(): JavaMethod {
 
         let typeMap: Map<GenericTypeParameter, NonPrimitiveType> = new Map();
 

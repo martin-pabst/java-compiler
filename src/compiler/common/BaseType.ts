@@ -1,4 +1,4 @@
-import { BaseSymbol } from "./BaseSymbolTable";
+import { BaseField, BaseSymbol } from "./BaseSymbolTable";
 import { Module } from "./module/Module";
 import { IRange } from "./range/Range";
 
@@ -11,4 +11,16 @@ export abstract class BaseType extends BaseSymbol {
         super(identifier, identifierRange, module);
     }
 
+    getType(): BaseType {
+        return this;
+    }
+
+}
+
+export interface BaseObjectType {
+    getFields(): BaseField[];
+}
+
+export interface BaseArrayType {
+    getElementType(): BaseType;
 }

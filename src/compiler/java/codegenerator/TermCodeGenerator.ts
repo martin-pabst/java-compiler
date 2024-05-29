@@ -6,10 +6,10 @@ import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
 import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode, ASTAttributeDereferencingNode, ASTEnumValueNode, ASTAnonymousClassNode, ASTLambdaFunctionDeclarationNode, ASTCastNode, ASTArrayLiteralNode, ASTThisNode, ASTSuperNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
-import { ArrayType } from "../types/ArrayType";
-import { Field } from "../types/Field";
+import { JavaArrayType } from "../types/JavaArrayType";
+import { JavaField } from "../types/JavaField";
 import { JavaType } from "../types/JavaType";
-import { Parameter } from "../types/Parameter";
+import { JavaParameter } from "../types/JavaParameter";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { JavaLocalVariable } from "./JavaLocalVariable";
 import { JavaSymbolTable } from "./JavaSymbolTable";
@@ -19,7 +19,7 @@ import { CodeSnippetContainer } from "./CodeSnippetKinds";
 import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { BinopCastCodeGenerator } from "./BinopCastCodeGenerator.ts";
-import { GenericMethod, Method } from "../types/Method.ts";
+import { GenericMethod, JavaMethod } from "../types/JavaMethod.ts";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { MissingStatementManager } from "./MissingStatementsManager.ts";
@@ -254,7 +254,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
     }
 
-    castParameterValuesAndPackEllipsis(parameterValues: (CodeSnippet | undefined)[], method: Method): CodeSnippet[] {
+    castParameterValuesAndPackEllipsis(parameterValues: (CodeSnippet | undefined)[], method: JavaMethod): CodeSnippet[] {
 
         let ellipsisType: JavaType | undefined;
         let castParameters: CodeSnippet[] = [];
@@ -265,7 +265,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             if (!destinationType) {
                 let parameter = method.parameters[i];
                 if (parameter.isEllipsis) {
-                    destinationType = (<ArrayType>parameter.type).getElementType();
+                    destinationType = (<JavaArrayType>parameter.type).getElementType();
                     ellipsisType = destinationType;
                 } else {
                     destinationType = parameter.type;
@@ -289,7 +289,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         return parametersBeforeEllipsis;
     }
 
-    protected invokeConstructor(parameterValues: CodeSnippet[], method: Method, klassType: IJavaClass | JavaEnum,
+    protected invokeConstructor(parameterValues: CodeSnippet[], method: JavaMethod, klassType: IJavaClass | JavaEnum,
         node: ASTNewObjectNode | ASTEnumValueNode, newObjectSnippet: CodeSnippet | undefined,
         enumValueIdentifier?: string, enumValueIndex?: number) {
 
@@ -352,7 +352,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     }
 
     pushAndGetNewSymbolTable(range: IRange, withStackframe: boolean,
-        classContext?: JavaClass | JavaEnum | JavaInterface | StaticNonPrimitiveType | undefined, methodContext?: Method): JavaSymbolTable {
+        classContext?: JavaClass | JavaEnum | JavaInterface | StaticNonPrimitiveType | undefined, methodContext?: JavaMethod): JavaSymbolTable {
 
         let newSymbolTable = new JavaSymbolTable(this.module, range, withStackframe,
             this.currentSymbolTable,
@@ -373,7 +373,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     compileSelectArrayElement(node: ASTSelectArrayElementNode): CodeSnippet | undefined {
         let arraySnippet = this.compileTerm(node.array);
         let arrayType = arraySnippet?.type;
-        if (!arraySnippet || !arrayType || !(arrayType instanceof ArrayType)) {
+        if (!arraySnippet || !arrayType || !(arrayType instanceof JavaArrayType)) {
             this.pushError(JCM.noArrayBracketAfterType(arrayType?.identifier || "---"), "error", node.array)
             return undefined;
         }
@@ -384,7 +384,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         let remainingDimensions = arrayType.dimension - node.indices.length;
-        let remainingType = remainingDimensions > 0 ? (new ArrayType(arrayType.elementType, remainingDimensions, arrayType.module, EmptyRange.instance))
+        let remainingType = remainingDimensions > 0 ? (new JavaArrayType(arrayType.elementType, remainingDimensions, arrayType.module, EmptyRange.instance))
             : arrayType.elementType;
 
         let indexSnippets: CodeSnippet[] = [];
@@ -447,7 +447,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         if (node.initialization) {
             let arrayLiteralSnippet = this.compileArrayLiteral(elementType, node.initialization);
             let literalType = arrayLiteralSnippet?.type;
-            if (literalType && literalType instanceof ArrayType) {
+            if (literalType && literalType instanceof JavaArrayType) {
                 if (literalType.dimension == -1) {
                     literalType.dimension = node.dimensionCount || 1;
                 } else {
@@ -467,7 +467,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         if (node.elements.length == 0) {
             // Empty array gets dimension == -1
-            return new StringCodeSnippet("[]", node.range, new ArrayType(elementType, 1, this.module, node.range));
+            return new StringCodeSnippet("[]", node.range, new JavaArrayType(elementType, 1, this.module, node.range));
         }
 
         let elementSnippets: CodeSnippet[] = [];
@@ -475,7 +475,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         for (let elementNode of node.elements) {
             if (elementNode.kind == TokenType.arrayLiteral) {
-                if (!(elementType instanceof ArrayType)) {
+                if (!(elementType instanceof JavaArrayType)) {
                     this.pushError(JCM.arrayLiteralElementDimensionWrong(), "error", node.range);
                     return undefined;
                 }
@@ -495,7 +495,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             }
         }
 
-        let type = new ArrayType(elementType, 1, this.module, node.range);
+        let type = new JavaArrayType(elementType, 1, this.module, node.range);
 
         return ParametersJoinedTemplate.applyToSnippet(type, node.range, "[", ", ", "]", ...elementSnippets);
 
@@ -511,7 +511,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         //@ts-ignore
         let dimensionTerms: CodeSnippet[] = maybeUndefinedDimensionTerms;
 
-        let arrayType = new ArrayType(elementType, dimensionTerms.length, this.module, node.range);
+        let arrayType = new JavaArrayType(elementType, dimensionTerms.length, this.module, node.range);
 
 
         let prefix = `${Helpers.newArray}(${defaultValue}, `;
@@ -541,8 +541,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                     return this.compileOuterClassLocalVariableAccess(symbol, node.range);
                 }
             }
-            if (symbol instanceof Field) {
-                let field = <Field>symbol;
+            if (symbol instanceof JavaField) {
+                let field = <JavaField>symbol;
 
                 if (this.classOfCurrentlyCompiledStaticInitialization && !field.isStatic) {
                     this.pushError(JCM.cantUseNonstaticFieldsToInitializeStaticOne(), "error", node);
@@ -604,7 +604,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     compileOuterClassLocalVariableAccess(symbol: JavaLocalVariable, range: IRange) {
 
         // generate invisible field
-        let f: Field = new Field(symbol.identifier, symbol.identifierRange, this.module, symbol.type, TokenType.keywordPrivate);
+        let f: JavaField = new JavaField(symbol.identifier, symbol.identifierRange, this.module, symbol.type, TokenType.keywordPrivate);
         f.isInnerClassCopyOfOuterClassLocalVariable = symbol;
         let klass: JavaClass = <JavaClass>this.currentSymbolTable.classContext;
         klass.fields.push(f);
@@ -615,14 +615,14 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     }
 
     compileSymbolOnStackframeAccess(symbol: SymbolOnStackframe, range: IRange): CodeSnippet | undefined {
-        let type = (<JavaLocalVariable | Parameter>symbol).type;
+        let type = (<JavaLocalVariable | JavaParameter>symbol).type;
         let snippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(symbol.stackframePosition!)}`, range, type);
         snippet.isLefty = !symbol.isFinal;
         return snippet;
     }
 
     compileFieldAccess(symbol: BaseSymbol, range: IRange, outerClassLevel: number = 0): CodeSnippet | undefined {
-        let field = <Field>symbol;
+        let field = <JavaField>symbol;
 
         if (field.isStatic && this.classOfCurrentlyCompiledStaticInitialization) {
             this.classOfCurrentlyCompiledStaticInitialization.staticConstructorsDependOn.set(field.classEnum, true);
@@ -747,7 +747,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             return objectSnippet;
         }
 
-        if (objectSnippet.type instanceof ArrayType) {
+        if (objectSnippet.type instanceof JavaArrayType) {
             if (node.attributeIdentifier != 'length') {
                 this.pushError(JCM.arraysOnlyHaveLengthField(node.attributeIdentifier), "error", node);
                 return undefined;
@@ -947,7 +947,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
                 let resultAsString: string = "";
 
-                if (method.returnParameterType instanceof ArrayType && Array.isArray(result)) {
+                if (method.returnParameterType instanceof JavaArrayType && Array.isArray(result)) {
                     if (this.isStringOrChar(method.returnParameterType.elementType)) {
                         resultAsString = "[" + result.map(r => `"${r}"`).join(", ") + "]";
                     } else {
@@ -1044,11 +1044,11 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
     searchMethod(identifier: string, objectType: JavaType, parameterTypes: (JavaType | undefined)[],
         isConstructor: boolean, hasToBeStatic: boolean, takingVisibilityIntoAccount: boolean,
-        methodCallPosition: IRange): { best: Method | undefined, possible: Method[] } {
+        methodCallPosition: IRange): { best: JavaMethod | undefined, possible: JavaMethod[] } {
 
         if (objectType == this.stringType) objectType = this.primitiveStringClass.type;
 
-        let possibleMethods: Method[];
+        let possibleMethods: JavaMethod[];
 
         if (objectType instanceof StaticNonPrimitiveType) {
             possibleMethods = objectType.getPossibleMethods(identifier, isConstructor, hasToBeStatic);
@@ -1076,7 +1076,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             })
         }
 
-        let bestMethodSoFar: Method | undefined;
+        let bestMethodSoFar: JavaMethod | undefined;
         let castsNeededWithBestMethodSoFar: number = Number.MAX_SAFE_INTEGER;
 
         for (let method of possibleMethods) {
@@ -1097,7 +1097,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 if (!toType) {
                     let parameter = method.parameters[i];
                     if (parameter.isEllipsis) {
-                        toType = (<ArrayType>parameter.type).getElementType();
+                        toType = (<JavaArrayType>parameter.type).getElementType();
                         ellipsisType = toType;
                     } else {
                         toType = parameter.type;

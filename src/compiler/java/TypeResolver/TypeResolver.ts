@@ -11,16 +11,16 @@ import { JavaLibraryModuleManager } from "../module/libraries/JavaLibraryModuleM
 import { ASTArrayTypeNode, ASTBaseTypeNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTGenericTypeInstantiationNode, ASTInterfaceDefinitionNode, ASTMethodDeclarationNode, ASTTypeDefinitionWithGenerics, ASTTypeNode, ASTWildcardTypeNode, TypeScope } from "../parser/AST";
 import { InterfaceClass } from "../runtime/system/javalang/InterfaceClass";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
-import { ArrayType } from "../types/ArrayType";
-import { Field } from "../types/Field";
+import { JavaArrayType } from "../types/JavaArrayType";
+import { JavaField } from "../types/JavaField";
 import { GenericTypeParameter } from "../types/GenericTypeParameter";
 import { IJavaClass, JavaClass } from "../types/JavaClass";
 import { JavaEnum } from "../types/JavaEnum";
 import { IJavaInterface, JavaInterface } from "../types/JavaInterface";
 import { JavaType } from "../types/JavaType";
-import { GenericMethod, Method } from "../types/Method";
+import { GenericMethod, JavaMethod } from "../types/JavaMethod";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
-import { Parameter } from "../types/Parameter";
+import { JavaParameter } from "../types/JavaParameter";
 import { CycleFinder } from "./CycleFinder";
 
 
@@ -246,7 +246,7 @@ export class TypeResolver {
                 let arrayTypeNode = <ASTArrayTypeNode>typeNode;
                 let baseType1 = this.resolveTypeNode(arrayTypeNode.arrayOf, module);
                 if (!baseType1) return undefined;
-                return typeNode.resolvedType = new ArrayType(baseType1, arrayTypeNode.arrayDimensions, module, arrayTypeNode.range);
+                return typeNode.resolvedType = new JavaArrayType(baseType1, arrayTypeNode.arrayDimensions, module, arrayTypeNode.range);
             case TokenType.voidType:
                 return typeNode.resolvedType = this.libraryModuleManager.typestore.getType("void");
             case TokenType.varType:
@@ -512,14 +512,14 @@ export class TypeResolver {
 
         for (let methodNode of node.methods) {
 
-            let method: Method;
+            let method: JavaMethod;
 
             if (methodNode.genericParameterDeclarations.length > 0) {
                 let genericParameters = methodNode.genericParameterDeclarations.map(gp => gp.resolvedType!);
                 method = new GenericMethod(methodNode.identifier, methodNode.identifierRange,
                     module, methodNode.visibility, genericParameters);
             } else {
-                method = new Method(methodNode.identifier, methodNode.identifierRange,
+                method = new JavaMethod(methodNode.identifier, methodNode.identifierRange,
                     module, methodNode.visibility);
             }
 
@@ -536,10 +536,15 @@ export class TypeResolver {
             for (let p of methodNode.parameters) {
                 if (p.type?.resolvedType) {
 
-                    let type = p.isEllipsis ? new ArrayType(p.type.resolvedType, 1, module, p.type.range) : p.type.resolvedType;
+                    let type = p.isEllipsis ? new JavaArrayType(p.type.resolvedType, 1, module, p.type.range) : p.type.resolvedType;
 
-                    let parameter = new Parameter(p.identifier, p.identifierRange,
+                    let parameter = new JavaParameter(p.identifier, p.identifierRange,
                         module, type, p.isFinal, p.isEllipsis, p.trackMissingReadAccess);
+
+                    if(node.identifier == '' && methodNode.identifier == 'main' && parameter.identifier == 'args'){
+                        parameter.hiddenWhenDebugging = true;
+                    }
+
                     module.compiledSymbolsUsageTracker.registerUsagePosition(parameter, module.file, p.identifierRange);
                     method.parameters.push(parameter);
                 }
@@ -578,7 +583,7 @@ export class TypeResolver {
             javaEnum.addValuesMethod(javaEnum.runtimeClass!, this.libraryModuleManager.typestore.getType("string") as PrimitiveType);
             for (let field of enumNode.fieldsOrInstanceInitializers) {
                 if (field.kind == TokenType.fieldDeclaration) {
-                    let f: Field = new Field(field.identifier, field.range, javaEnum.module, field.type.resolvedType!, field.visibility);
+                    let f: JavaField = new JavaField(field.identifier, field.range, javaEnum.module, field.type.resolvedType!, field.visibility);
                     f.isStatic = field.isStatic;
                     f.isFinal = field.isFinal;
                     f.classEnum = javaEnum;
@@ -588,7 +593,7 @@ export class TypeResolver {
 
             // each enum value gets compiled to a public static final field
             for (let enumValue of enumNode.valueNodes) {
-                let f: Field = new Field(enumValue.identifier, enumValue.identifierRange, javaEnum.module, javaEnum, TokenType.keywordPublic);
+                let f: JavaField = new JavaField(enumValue.identifier, enumValue.identifierRange, javaEnum.module, javaEnum, TokenType.keywordPublic);
                 f.isStatic = true;
                 f.isFinal = true;
                 f.classEnum = javaEnum;
@@ -604,7 +609,7 @@ export class TypeResolver {
             // interfaces may have static fields...
             for (let field of interfaceNode.fieldsOrInstanceInitializers) {
                 if (field.kind == TokenType.fieldDeclaration) {
-                    let f: Field = new Field(field.identifier, field.range, javaInterface.module, field.type.resolvedType!, field.visibility);
+                    let f: JavaField = new JavaField(field.identifier, field.range, javaInterface.module, field.type.resolvedType!, field.visibility);
                     f.isStatic = field.isStatic;
                     f.isFinal = field.isFinal;
                     f.classEnum = javaInterface;
@@ -629,7 +634,7 @@ export class TypeResolver {
                         javaClass.initRuntimeClass(baseClass.runtimeClass);  // first recursively initialize field of base classes
                         for (let field of classNode.fieldsOrInstanceInitializers) {
                             if (field.kind == TokenType.fieldDeclaration) {
-                                let f: Field = new Field(field.identifier, field.range, javaClass.module, field.type.resolvedType!, field.visibility);
+                                let f: JavaField = new JavaField(field.identifier, field.range, javaClass.module, field.type.resolvedType!, field.visibility);
                                 f.isStatic = field.isStatic;
                                 f.isFinal = field.isFinal;
                                 f.classEnum = javaClass;

@@ -1,8 +1,8 @@
 import { Klass } from "../../common/interpreter/StepFunction.ts";
-import { Field } from "./Field.ts";
+import { JavaField } from "./JavaField.ts";
 import { GenericTypeParameter } from "./GenericTypeParameter";
 import { JavaType } from "./JavaType";
-import { Method } from "./Method";
+import { JavaMethod } from "./JavaMethod";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility.ts";
 
@@ -23,7 +23,7 @@ export class StaticNonPrimitiveType extends JavaType {
     }
 
     getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, 
-        rangeToReplace: monaco.IRange, methodContext: Method | undefined): monaco.languages.CompletionItem[]{
+        rangeToReplace: monaco.IRange, methodContext: JavaMethod | undefined): monaco.languages.CompletionItem[]{
 
             return this.nonPrimitiveType.getCompletionItems(visibilityUpTo, leftBracketAlreadyThere, identifierAndBracketAfterCursor,
                 rangeToReplace, methodContext, true);
@@ -44,11 +44,11 @@ export class StaticNonPrimitiveType extends JavaType {
         return null;
     }
 
-    getPossibleMethods(identifier: string, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
+    getPossibleMethods(identifier: string, isConstructor: boolean, hasToBeStatic: boolean): JavaMethod[] {
         return this.nonPrimitiveType.getPossibleMethods(identifier, isConstructor, hasToBeStatic);
     }
 
-    getField(identifier: string, uptoVisibility: Visibility): Field | undefined {
+    getField(identifier: string, uptoVisibility: Visibility): JavaField | undefined {
         return this.nonPrimitiveType.getField(identifier, uptoVisibility, true);
     }
 
@@ -66,6 +66,10 @@ export class StaticNonPrimitiveType extends JavaType {
 
     getDeclaration(): string {
         return this.nonPrimitiveType.getDeclaration();
+    }
+
+    getFields(): JavaField[] {
+        return this.nonPrimitiveType.getFields().filter(f => f.isStatic);
     }
 
 }

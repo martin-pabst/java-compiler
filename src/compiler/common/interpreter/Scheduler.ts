@@ -319,4 +319,9 @@ export class Scheduler {
         return mainThread;
     }
 
+    getCurrentThread(): Thread | undefined {
+        return this.runningThreads[this.currentThreadIndex];
+    }
+
+
 }

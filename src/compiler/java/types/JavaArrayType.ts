@@ -1,3 +1,4 @@
+import { BaseArrayType, BaseType } from "../../common/BaseType";
 import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
 import { CodeTemplate } from "../codegenerator/CodeTemplate";
@@ -7,13 +8,13 @@ import { BinaryOperator, UnaryPrefixOperator } from "../parser/AST";
 import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter";
 import { JavaType } from "./JavaType";
 
-export class ArrayType extends JavaType {
+export class JavaArrayType extends JavaType implements BaseArrayType {
 
     constructor(public elementType: JavaType, public dimension: number,
         module: JavaBaseModule, identifierRange: IRange) {
         super(elementType.identifier + "[]".repeat(dimension), identifierRange, module);
         
-        while(this.elementType instanceof ArrayType){
+        while(this.elementType instanceof JavaArrayType){
             this.dimension += this.elementType.dimension;
             this.elementType = this.elementType.elementType;
         }
@@ -35,7 +36,7 @@ export class ArrayType extends JavaType {
         let mappedElemenType = _typeMap.get(this.elementType);
         if(!mappedElemenType) return this;
 
-        return new ArrayType(mappedElemenType, this.dimension, this.module, this.identifierRange)
+        return new JavaArrayType(mappedElemenType, this.dimension, this.module, this.identifierRange)
     }
 
     getFile(): File {
@@ -77,16 +78,18 @@ export class ArrayType extends JavaType {
         return internalName;
     }
 
-    static increaseArrayDimension(type: JavaType): ArrayType {
-        if(type instanceof ArrayType){
+    static increaseArrayDimension(type: JavaType): JavaArrayType {
+        if(type instanceof JavaArrayType){
             type.dimension++;
             return type;
         }
-        return new ArrayType(type, 1, type.module, type.identifierRange);
+        return new JavaArrayType(type, 1, type.module, type.identifierRange);
     }
 
     getElementType(): JavaType {
         if(this.dimension == 1) return this.elementType;
-        return new ArrayType(this.elementType, this.dimension - 1, this.module, this.identifierRange);
+        return new JavaArrayType(this.elementType, this.dimension - 1, this.module, this.identifierRange);
     }
+
+
 }

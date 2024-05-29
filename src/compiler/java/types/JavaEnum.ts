@@ -2,25 +2,25 @@ import { File } from "../../common/module/File";
 import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType.ts";
 import { JavaBaseModule } from "../module/JavaBaseModule";
-import { Field } from "./Field";
+import { JavaField } from "./JavaField";
 import { GenericTypeParameter } from "./GenericTypeParameter";
 import { JavaClass } from "./JavaClass";
 import { JavaTypeWithInstanceInitializer } from "./JavaTypeWithInstanceInitializer.ts";
 import { JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
-import { Method } from "./Method";
+import { JavaMethod } from "./JavaMethod";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility.ts";
 import { Klass } from "../../common/interpreter/StepFunction.ts";
-import { ArrayType } from "./ArrayType.ts";
+import { JavaArrayType } from "./JavaArrayType.ts";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
-import { Parameter } from "./Parameter.ts";
+import { JavaParameter } from "./JavaParameter.ts";
 
 
 export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
-    fields: Field[] = [];
-    methods: Method[] = [];
+    fields: JavaField[] = [];
+    methods: JavaMethod[] = [];
 
     private implements: JavaInterface[] = [];
 
@@ -29,7 +29,7 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
         super(identifier, identifierRange, path, module);
     }
 
-    getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): Field | undefined {
+    getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): JavaField | undefined {
         let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
         if (field) return field;
         if (uptoVisibility == TokenType.keywordPrivate) uptoVisibility = TokenType.keywordProtected;
@@ -62,17 +62,17 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
         return this.implements;
     }
 
-    public getFields(): Field[] {
+    public getFields(): JavaField[] {
 
         return this.fields;
 
     }
 
-    public getOwnMethods(): Method[] {
+    public getOwnMethods(): JavaMethod[] {
         return this.methods;
     }
 
-    getAllMethods(): Method[] {
+    getAllMethods(): JavaMethod[] {
         return this.getOwnMethods().concat(this.baseEnumClass.getAllMethods());
     }
 
@@ -121,7 +121,7 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
     }
 
     getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string,
-        rangeToReplace: monaco.IRange, methodContext?: Method, onlyStatic?: false): monaco.languages.CompletionItem[] {
+        rangeToReplace: monaco.IRange, methodContext?: JavaMethod, onlyStatic?: false): monaco.languages.CompletionItem[] {
 
         let itemList: monaco.languages.CompletionItem[] = [];
 
@@ -168,8 +168,8 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
             return klass.values;
         })
 
-        let valuesMethod = new Method("values", EmptyRange.instance, this.module, TokenType.keywordPublic);
-        valuesMethod.returnParameterType = new ArrayType(this, 1, this.module, EmptyRange.instance);
+        let valuesMethod = new JavaMethod("values", EmptyRange.instance, this.module, TokenType.keywordPublic);
+        valuesMethod.returnParameterType = new JavaArrayType(this, 1, this.module, EmptyRange.instance);
         valuesMethod.isStatic = true;
         valuesMethod.hasImplementationWithNativeCallingConvention = true;
 
@@ -181,9 +181,9 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
             return value;
         })
 
-        let valueOfMethod = new Method("valueOf", EmptyRange.instance, this.module, TokenType.keywordPublic);
+        let valueOfMethod = new JavaMethod("valueOf", EmptyRange.instance, this.module, TokenType.keywordPublic);
         valueOfMethod.returnParameterType = this;
-        valueOfMethod.parameters.push(new Parameter("name", EmptyRange.instance, this.module, stringType, true, false, false));
+        valueOfMethod.parameters.push(new JavaParameter("name", EmptyRange.instance, this.module, stringType, true, false, false));
         valueOfMethod.isStatic = true;
         valueOfMethod.hasImplementationWithNativeCallingConvention = true;
 

@@ -1,7 +1,7 @@
 import { IMain } from "../../common/IMain.ts";
 import { JavaCompiledModule, JavaMethodCallPosition } from "../module/JavaCompiledModule.ts";
-import { ArrayType } from "../types/ArrayType.ts";
-import { Method } from "../types/Method.ts";
+import { JavaArrayType } from "../types/JavaArrayType.ts";
+import { JavaMethod } from "../types/JavaMethod.ts";
 
 export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelpProvider {
 
@@ -89,7 +89,7 @@ export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelp
         } else {
             let i = 0;
             for (let method of methodCallPosition.possibleMethods) {
-                let m = <Method>method;
+                let m = <JavaMethod>method;
                 if (m.parameters.length > parameterIndex) {
 
                     signatureInformationList.push(this.makeSignatureInformation(m));
@@ -214,7 +214,7 @@ export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelp
     }
 
 
-    makeSignatureInformation(method: Method): monaco.languages.SignatureInformation {
+    makeSignatureInformation(method: JavaMethod): monaco.languages.SignatureInformation {
 
         let label: string = "";
 
@@ -234,7 +234,7 @@ export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelp
             let posFrom = label.length;
             let type = p.type;
             if (p.isEllipsis) {
-                type = (<ArrayType>type).getElementType();
+                type = (<JavaArrayType>type).getElementType();
             }
 
             let pLabel = type.toString() + (p.isEllipsis ? "..." : "") + " " + p.identifier;

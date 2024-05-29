@@ -1,4 +1,5 @@
-import { BaseSymbol } from "../../common/BaseSymbolTable";
+import { BaseField, BaseSymbol } from "../../common/BaseSymbolTable";
+import { BaseType } from "../../common/BaseType";
 import { IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaLocalVariable } from "../codegenerator/JavaLocalVariable";
@@ -10,7 +11,7 @@ import { JavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
 import { Visibility } from "./Visibility";
 
-export class Field extends BaseSymbol {
+export class JavaField extends BaseField {
 
     isStatic: boolean = false;
     isFinal: boolean = false;
@@ -29,11 +30,15 @@ export class Field extends BaseSymbol {
             super(identifier, identifierRange, module);
     }
 
-    getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, JavaType>): Field {
+    getFieldIndentifier(): string {
+        return this.getInternalName();
+    }
+
+    getCopyWithConcreteType(typeMap: Map<GenericTypeParameter, JavaType>): JavaField {
         let newType: JavaType = this.type.getCopyWithConcreteType(typeMap);
         if(newType == this.type) return this;
         
-        let copy = new Field(this.identifier, this.identifierRange, this.module,
+        let copy = new JavaField(this.identifier, this.identifierRange, this.module,
              newType, this.visibility);
 
         return copy;
@@ -69,6 +74,10 @@ export class Field extends BaseSymbol {
 
     toString(): string {
         return this.type.toString() + " " + this.identifier;
+    }
+
+    getType(): BaseType {
+        return this.type;
     }
 
 }

@@ -3,11 +3,11 @@ import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
 import { JCM } from "../JavaCompilerMessages.ts";
 import { JavaBaseModule } from "../module/JavaBaseModule";
-import { Field } from "./Field";
+import { JavaField } from "./JavaField";
 import { IJavaClass } from "./JavaClass";
 import { IJavaInterface } from "./JavaInterface";
 import { JavaType } from "./JavaType";
-import { Method } from "./Method";
+import { JavaMethod } from "./JavaMethod";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility.ts";
 
@@ -15,8 +15,8 @@ export class GenericTypeParameter extends NonPrimitiveType {
 
     isWildcard: boolean;
 
-    private fieldCache?: Field[];
-    private methodCache?: Method[];
+    private fieldCache?: JavaField[];
+    private methodCache?: JavaMethod[];
 
     // only used for generic type parameters of generic methods:
     public catches?: NonPrimitiveType[];
@@ -33,7 +33,7 @@ export class GenericTypeParameter extends NonPrimitiveType {
         this.isWildcard = (this.identifier == '?');
     }
 
-    getField(identifier: string, uptoVisibility: Visibility, forceStatic?: boolean | undefined): Field | undefined {
+    getField(identifier: string, uptoVisibility: Visibility, forceStatic?: boolean | undefined): JavaField | undefined {
         return undefined;
     }
 
@@ -59,7 +59,7 @@ export class GenericTypeParameter extends NonPrimitiveType {
         return this.module.file;
     }
 
-    getFields(): Field[]{
+    getFields(): JavaField[]{
         if(!this.fieldCache){
             if(this.upperBounds.length == 0){
                 this.fieldCache = [];     // TODO: fields of Object class!
@@ -70,7 +70,7 @@ export class GenericTypeParameter extends NonPrimitiveType {
         return this.fieldCache;
     }
 
-    getOwnMethods(): Method[]{
+    getOwnMethods(): JavaMethod[]{
         if(!this.methodCache){
             this.methodCache = [];
             for(let ub of this.upperBounds){
@@ -80,11 +80,11 @@ export class GenericTypeParameter extends NonPrimitiveType {
         return this.methodCache;
     }
 
-    getAllMethods(): Method[]{
+    getAllMethods(): JavaMethod[]{
         return this.getOwnMethods();
     }
 
-    getPossibleMethods(identifier: string, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
+    getPossibleMethods(identifier: string, isConstructor: boolean, hasToBeStatic: boolean): JavaMethod[] {
         return this.getAllMethods().filter(m => m.identifier == identifier && m.isConstructor == isConstructor && (m.isStatic || !hasToBeStatic));
     }
 
@@ -200,7 +200,7 @@ export class GenericTypeParameter extends NonPrimitiveType {
         return this.identifier;
     }
 
-    getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, rangeToReplace: monaco.IRange, methodContext: Method | undefined, onlyStatic?: boolean | undefined): monaco.languages.CompletionItem[] {
+    getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, rangeToReplace: monaco.IRange, methodContext: JavaMethod | undefined, onlyStatic?: boolean | undefined): monaco.languages.CompletionItem[] {
         return [];
     }
 

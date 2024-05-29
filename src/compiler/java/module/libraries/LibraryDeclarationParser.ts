@@ -3,16 +3,16 @@ import { EmptyRange, IRange } from "../../../common/range/Range";
 import { TokenType } from "../../TokenType";
 import { EnumClass } from "../../runtime/system/javalang/EnumClass";
 import { PrimitiveType } from "../../runtime/system/primitiveTypes/PrimitiveType";
-import { ArrayType } from "../../types/ArrayType";
-import { Field } from "../../types/Field";
+import { JavaArrayType } from "../../types/JavaArrayType";
+import { JavaField } from "../../types/JavaField";
 import { GenericTypeParameters, GenericTypeParameter } from "../../types/GenericTypeParameter";
 import { JavaClass } from "../../types/JavaClass";
 import { JavaEnum } from "../../types/JavaEnum";
 import { JavaInterface } from "../../types/JavaInterface";
 import { JavaType } from "../../types/JavaType";
-import { GenericMethod, Method } from "../../types/Method";
+import { GenericMethod, JavaMethod } from "../../types/JavaMethod";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
-import { Parameter } from "../../types/Parameter";
+import { JavaParameter } from "../../types/JavaParameter";
 import { Visibility } from "../../types/Visibility";
 import { JavaBaseModule } from "../JavaBaseModule";
 import { JavaTypeStore } from "../JavaTypeStore";
@@ -323,10 +323,10 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         }
 
         while (this.comesToken(TokenType.leftSquareBracket, true)) {
-            if (type instanceof ArrayType) {
+            if (type instanceof JavaArrayType) {
                 type.dimension++;
             } else {
-                type = new ArrayType(type, 1, module, LibraryDeclarationParser.nullRange);
+                type = new JavaArrayType(type, 1, module, LibraryDeclarationParser.nullRange);
             }
             this.expect(TokenType.rightSquareBracket, true);
         }
@@ -512,7 +512,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             this.comesToken(TokenType.leftBracket, true);
             // method
             let m = genericParameters.length == 0 ?
-                new Method(identifier, EmptyRange.instance, module, modifiers.visibility) :
+                new JavaMethod(identifier, EmptyRange.instance, module, modifiers.visibility) :
                 new GenericMethod(identifier, EmptyRange.instance, module, modifiers.visibility, genericParameters);
             m.returnParameterType = type;
             m.isConstructor = isConstructor;
@@ -523,9 +523,9 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                     let isFinal = this.comesToken(TokenType.keywordFinal, true);
                     let type = this.parseType(module);
                     let isEllipsis = this.comesToken(TokenType.ellipsis, true);
-                    if (isEllipsis) type = new ArrayType(type, 1, module, EmptyRange.instance);
+                    if (isEllipsis) type = new JavaArrayType(type, 1, module, EmptyRange.instance);
                     let id = this.expectIdentifier();
-                    m.parameters.push(new Parameter(id, EmptyRange.instance, module, type, isFinal, isEllipsis, false));
+                    m.parameters.push(new JavaParameter(id, EmptyRange.instance, module, type, isFinal, isEllipsis, false));
                 } while (this.comesToken(TokenType.comma, true));
             }
 
@@ -613,7 +613,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         } else {
             let adecl = <LibraryAttributeDeclaration>decl;
             // attribute
-            let a = new Field(identifier, EmptyRange.instance, module, type, modifiers.visibility);
+            let a = new JavaField(identifier, EmptyRange.instance, module, type, modifiers.visibility);
             a.isStatic = modifiers.static;
             a.isFinal = modifiers.final;
             a.classEnum = klassType;
@@ -637,7 +637,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         let values: EnumClass[] = klass.values;
         for(let value of values){
             // attribute
-            let a = new Field(value.name, EmptyRange.instance, module, enumType, TokenType.keywordPublic);
+            let a = new JavaField(value.name, EmptyRange.instance, module, enumType, TokenType.keywordPublic);
             a.isStatic = true;
             a.isFinal = true;
             a.classEnum = enumType;

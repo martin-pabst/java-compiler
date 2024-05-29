@@ -16,7 +16,9 @@ export class TreeviewNode<E> {
     public setFocus(value: boolean) {
         if (value) this.treeview.unfocusAllNodes();
         this._hasFocus = value;
-        this.nodeLineDiv.classList.toggle('jo_treeview_focus', value);
+        if(this.nodeLineDiv){
+            this.nodeLineDiv.classList.toggle('jo_treeview_focus', value);
+        }
     }
 
     private _isSelected: boolean = false;
@@ -25,7 +27,9 @@ export class TreeviewNode<E> {
     }
     public setSelected(value: boolean) {
         this._isSelected = value;
-        this.nodeLineDiv.classList.toggle('jo_treeview_selected', value);
+        if(this.nodeLineDiv){
+            this.nodeLineDiv.classList.toggle('jo_treeview_selected', value);
+        }
     }
 
 
@@ -65,7 +69,10 @@ export class TreeviewNode<E> {
         private _iconClass: string | undefined,
         private _externalObject: E | null,
         private _externalReference: any,
-        private _parentExternalReference: any) {
+        private _parentExternalReference: any,
+        private _renderCaptionAsHtml: boolean = false) {
+
+            _treeview.addNodeInternal(this);
     }
 
     findAndCorrectParent() {
@@ -84,11 +91,15 @@ export class TreeviewNode<E> {
     render() {
         if (!this.nodeWithChildrenDiv) {
             this.buildHtmlScaffolding();
-        }
+        }  
 
         if (this.isRootNode()) return;
 
-        this.captionDiv.textContent = this.caption;
+        if(this._renderCaptionAsHtml){
+            this.captionDiv.innerHTML = this.caption;
+        } else {
+            this.captionDiv.textContent = this.caption;
+        }
 
         // adjust icon
         if (this.currentIconClass != this.iconClass) {
@@ -128,13 +139,23 @@ export class TreeviewNode<E> {
     }
     public set caption(value: string) {
         this._caption = value;
-        this.captionDiv.textContent = value;
+        if(this._renderCaptionAsHtml){
+            this.captionDiv.innerHTML = value;
+        } else {
+            this.captionDiv.textContent = value;
+        }
     }
     public get isFolder(): boolean {
         return this._isFolder;
     }
     public set isFolder(value: boolean) {
         this._isFolder = value;
+        if(value){
+            this.expandCollapseComponent.show();
+        } else {
+            this.expandCollapseComponent.hide();
+        }
+
     }
     public get treeview(): Treeview<E> {
         return this._treeview;
@@ -148,6 +169,10 @@ export class TreeviewNode<E> {
     }
 
     buildHtmlScaffolding() {
+
+        if(!this.parent && !this.isRootNode()){
+            this.findAndCorrectParent();
+        }
 
         this.nodeWithChildrenDiv = DOM.makeDiv(undefined, 'jo_treeviewNodeWithChildren');
 
@@ -201,16 +226,17 @@ export class TreeviewNode<E> {
         this.childrenDiv = DOM.makeDiv(this.nodeWithChildrenDiv, 'jo_treeviewChildren');
         this.childrenLineDiv = DOM.makeDiv(this.childrenDiv, 'jo_treeviewChildrenLineDiv');
 
-        if (this._isFolder) {
-            this.expandCollapseComponent =
-                new ExpandCollapseComponent(this.expandCollapseDiv, (state: ExpandCollapseState) => {
-                    this.toggleChildrenDiv(state);
-                }, "expanded")
-            if (!this.isRootNode()) {
-                this.captionDiv.onpointerup = () => {
-                    // this.expandCollapseComponent.toggleState();
-                }
+        this.expandCollapseComponent =
+        new ExpandCollapseComponent(this.expandCollapseDiv, (state: ExpandCollapseState) => {
+            this.toggleChildrenDiv(state);
+        }, "expanded")
+        if (!this.isRootNode()) {
+            this.captionDiv.onpointerup = () => {
+                // this.expandCollapseComponent.toggleState();
             }
+        }
+        if (!this._isFolder) {
+            this.expandCollapseComponent.hide();
         }
 
         if (this.treeview.config.withDeleteButtons && !this.isRootNode()) {

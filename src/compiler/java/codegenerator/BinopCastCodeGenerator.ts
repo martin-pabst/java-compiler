@@ -8,7 +8,7 @@ import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
 import { ASTAnonymousClassNode, ASTLambdaFunctionDeclarationNode, ASTNode, AssignmentOperator, BinaryOperator, ConstantType, LogicOperator } from "../parser/AST";
 import { PrimitiveStringClass } from "../runtime/system/javalang/PrimitiveStringClass";
-import { ArrayType } from "../types/ArrayType";
+import { JavaArrayType } from "../types/JavaArrayType";
 import { JavaClass } from "../types/JavaClass";
 import { JavaInterface } from "../types/JavaInterface";
 import { JavaType } from "../types/JavaType";
@@ -249,7 +249,7 @@ export abstract class BinopCastCodeGenerator {
     wrapWithArrayToString(source: CodeSnippet, primitiveOrClassNeeded: "string" | "String"): CodeSnippet {
         let newSnippet1: CodeSnippet;
 
-        if((<ArrayType>source.type!).elementType.isPrimitive){
+        if((<JavaArrayType>source.type!).elementType.isPrimitive){
             newSnippet1 = SnippetFramer.frame(source, `${Helpers.primitiveArrayToString}(§1)`);
         } else {
             
@@ -376,7 +376,7 @@ export abstract class BinopCastCodeGenerator {
         if (!type.isPrimitive) {
             if(type == this.nullType) return snippet;
             if (castTo.identifier == "string" || castTo.identifier == "String") {
-                if(type instanceof ArrayType){
+                if(type instanceof JavaArrayType){
                     snippet = this.wrapWithArrayToString(snippet, castTo.identifier);
                 } else {
                     snippet = this.wrapWithToStringCall(snippet, castTo.identifier);
@@ -521,8 +521,8 @@ export abstract class BinopCastCodeGenerator {
             if(typeFrom == this.nullType) return true;
             if (typeFrom == this.stringType) typeFrom = this.primitiveStringClass.type;
 
-            if (typeFrom instanceof ArrayType || typeTo instanceof ArrayType) {
-                if (typeFrom instanceof ArrayType && typeTo instanceof ArrayType) {
+            if (typeFrom instanceof JavaArrayType || typeTo instanceof JavaArrayType) {
+                if (typeFrom instanceof JavaArrayType && typeTo instanceof JavaArrayType) {
                     return typeFrom.dimension == typeTo.dimension && this.canCastTo(typeFrom.elementType, typeTo.elementType, castType);
                 }
                 return false;

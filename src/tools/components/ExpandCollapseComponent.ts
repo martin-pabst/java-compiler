@@ -77,4 +77,11 @@ export class ExpandCollapseComponent {
         this.render();
     }
 
+    hide(){
+        this.divElement.style.visibility = "hidden";
+    }
+
+    show(){
+        this.divElement.style.visibility = "visible";
+    }
 }

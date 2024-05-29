@@ -11,6 +11,7 @@ import { IWorld } from "../../java/runtime/graphics/IWorld.ts";
 import { KeyboardManager } from "./KeyboardManager.ts";
 import { Thread, ThreadState } from "./Thread.ts";
 import { BreakpointManager } from "../BreakpointManager.ts";
+import { Debugger } from "../debugger/Debugger.ts";
 
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
@@ -69,7 +70,7 @@ export class Interpreter {
 
     constructor(printManager?: PrintManager, private actionManager?: ActionManager,
         public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager,
-        public breakpointManager?: BreakpointManager
+        public breakpointManager?: BreakpointManager, public _debugger?: Debugger
     ) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {
 
@@ -206,6 +207,12 @@ export class Interpreter {
         this.scheduler.keepThread = true;
         this.scheduler.unmarkCurrentlyExecutedSingleStep();
         this.showProgramPointer(this.scheduler.getNextStepPosition());
+        this.updateDebugger();
+    }
+
+    private updateDebugger(){
+        if(!this._debugger) return;
+        this._debugger.showThreadState(this.scheduler.getCurrentThread());
     }
 
     stop(restart: boolean) {

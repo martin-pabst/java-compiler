@@ -3,11 +3,12 @@ import { Klass } from "../../common/interpreter/StepFunction.ts";
 import { IRange } from "../../common/range/Range";
 import { TokenType } from "../TokenType.ts";
 import { JavaBaseModule } from "../module/JavaBaseModule";
-import { Field } from "./Field";
+import { JavaField } from "./JavaField";
 import { JavaType } from "./JavaType";
-import { Method } from "./Method";
+import { JavaMethod } from "./JavaMethod";
 import { StaticNonPrimitiveType } from "./StaticNonPrimitiveType.ts";
 import { Visibility } from "./Visibility.ts";
+import { BaseObjectType } from "../../common/BaseType.ts";
 
 /**
  * A NonPrimitiveType 
@@ -15,7 +16,7 @@ import { Visibility } from "./Visibility.ts";
  *  - may have fields (de: "Attribute")
  *  - may have methods
  */
-export abstract class NonPrimitiveType extends JavaType {
+export abstract class NonPrimitiveType extends JavaType implements BaseObjectType {
 
     abstract isGenericVariant(): boolean;
     abstract isGenericTypeParameter(): boolean;
@@ -23,14 +24,14 @@ export abstract class NonPrimitiveType extends JavaType {
     abstract canExplicitlyCastTo(otherType: JavaType): boolean;  // you can cast long to int or Number to Integer EXPLICITLY, e.g. int c = (int)10L
     abstract canImplicitlyCastTo(otherType: JavaType): boolean; // int gets casted to long implicitly; Integer gets casted to Number implicitly e.g. in: Number n = new Integer(10);
 
-    abstract getFields(): Field[];
-    abstract getOwnMethods(): Method[];
-    abstract getAllMethods(): Method[];
+    abstract getFields(): JavaField[];
+    abstract getOwnMethods(): JavaMethod[];
+    abstract getAllMethods(): JavaMethod[];
 
-    abstract getField(identifier: string, uptoVisibility: Visibility, forceStatic?: boolean): Field | undefined;
+    abstract getField(identifier: string, uptoVisibility: Visibility, forceStatic?: boolean): JavaField | undefined;
 
     abstract getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, 
-        rangeToReplace: monaco.IRange, methodContext: Method | undefined, onlyStatic?: boolean): monaco.languages.CompletionItem[]; 
+        rangeToReplace: monaco.IRange, methodContext: JavaMethod | undefined, onlyStatic?: boolean): monaco.languages.CompletionItem[]; 
     
     visibility: Visibility = TokenType.keywordPublic;
     isStatic: boolean = false; // static inner classes behave differently from non-static inner classes
@@ -96,8 +97,8 @@ export abstract class NonPrimitiveType extends JavaType {
          };
     }
 
-    getPossibleMethods(identifier: string, isConstructor: boolean, hasToBeStatic: boolean): Method[] {
-        let methodsWithArbitraryParameterCount: Method[] = [];
+    getPossibleMethods(identifier: string, isConstructor: boolean, hasToBeStatic: boolean): JavaMethod[] {
+        let methodsWithArbitraryParameterCount: JavaMethod[] = [];
 
         if (isConstructor) {
             let type: NonPrimitiveType | undefined = this;

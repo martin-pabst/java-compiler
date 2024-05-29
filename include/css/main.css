@@ -106,3 +106,8 @@ body, html, #main {
     display: inline-block;
     height: 14px;
 }
+
+#debuggerdiv {
+    display: flex;
+    flex-direction: column;
+}
