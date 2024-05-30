@@ -614,8 +614,8 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             let adecl = <LibraryAttributeDeclaration>decl;
             // attribute
             let a = new JavaField(identifier, EmptyRange.instance, module, type, modifiers.visibility);
-            a.isStatic = modifiers.static;
-            a.isFinal = modifiers.final;
+            a._isStatic = modifiers.static;
+            a._isFinal = modifiers.final;
             a.classEnum = klassType;
             a.documentation = adecl.comment;
 
@@ -623,6 +623,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             if (typeof adecl.constantValue !== "undefined") {
                 a.initialValue = adecl.constantValue;
                 a.initialValueIsConstant = true;
+                klass[a.internalName] = adecl.constantValue; 
             }
 
             klassType.fields.push(a);
@@ -638,8 +639,8 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         for(let value of values){
             // attribute
             let a = new JavaField(value.name, EmptyRange.instance, module, enumType, TokenType.keywordPublic);
-            a.isStatic = true;
-            a.isFinal = true;
+            a._isStatic = true;
+            a._isFinal = true;
             a.classEnum = enumType;
             a.initialValueIsConstant = true;
             a.initialValue = value;

@@ -69,7 +69,7 @@ export class StaticNonPrimitiveType extends JavaType {
     }
 
     getFields(): JavaField[] {
-        return this.nonPrimitiveType.getFields().filter(f => f.isStatic);
+        return this.nonPrimitiveType.getFields().filter(f => f._isStatic);
     }
 
 }

@@ -17,7 +17,9 @@ export class SymbolTableSection {
             captionLine: {
                 enabled: false
             },
-            flexWeight: "0"
+            flexWeight: "0",
+            withDeleteButtons: false,
+            withDragAndDrop: false
         });
         // divToRenderInto.prepend(this.treeview.outerDiv);
 

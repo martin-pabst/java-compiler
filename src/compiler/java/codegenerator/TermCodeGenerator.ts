@@ -544,7 +544,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             if (symbol instanceof JavaField) {
                 let field = <JavaField>symbol;
 
-                if (this.classOfCurrentlyCompiledStaticInitialization && !field.isStatic) {
+                if (this.classOfCurrentlyCompiledStaticInitialization && !field._isStatic) {
                     this.pushError(JCM.cantUseNonstaticFieldsToInitializeStaticOne(), "error", node);
                 }
 
@@ -624,13 +624,13 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     compileFieldAccess(symbol: BaseSymbol, range: IRange, outerClassLevel: number = 0): CodeSnippet | undefined {
         let field = <JavaField>symbol;
 
-        if (field.isStatic && this.classOfCurrentlyCompiledStaticInitialization) {
+        if (field._isStatic && this.classOfCurrentlyCompiledStaticInitialization) {
             this.classOfCurrentlyCompiledStaticInitialization.staticConstructorsDependOn.set(field.classEnum, true);
         }
 
         let type = (field).type;
 
-        if (field.isFinal && field.initialValueIsConstant) {
+        if (field._isFinal && field.initialValueIsConstant) {
             let constantValue = field.initialValue!;
             let constantValueAsString = typeof constantValue == "string" ? `"${constantValue}"` : "" + constantValue;
             return new StringCodeSnippet(constantValueAsString, range, type, constantValue);
@@ -641,7 +641,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         let snippet: CodeSnippet;
 
-        if (field.isStatic) {
+        if (field._isStatic) {
             let classIdentifier = field.classEnum.identifier;
             snippet = new StringCodeSnippet(`${Helpers.classes}["${classIdentifier}"].${fieldName}`, range, type);
         } else {
@@ -653,7 +653,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
             snippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${outerClassPraefix}${fieldName}`, range, type);
         }
-        snippet.isLefty = !field.isFinal;
+        snippet.isLefty = !field._isFinal;
 
         if (field.isInnerClassCopyOfOuterClassLocalVariable) {
             this.registerUsagePosition(field.isInnerClassCopyOfOuterClassLocalVariable, range);
@@ -785,25 +785,25 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let isEnum = objectType instanceof StaticNonPrimitiveType && objectType.nonPrimitiveType instanceof JavaEnum;
 
 
-        if (field.isFinal && field.initialValueIsConstant && !isEnum) {
+        if (field._isFinal && field.initialValueIsConstant && !isEnum) {
             let constantValue = field.initialValue!;
             let constantValueAsString = typeof constantValue == "string" ? `"${constantValue}"` : "" + constantValue;
             return new StringCodeSnippet(constantValueAsString, range, field.type, constantValue);
         }
 
 
-        if (field.isStatic) {
+        if (field._isStatic) {
             let classIdentifier = field.classEnum.pathAndIdentifier;
             let snippet = new OneParameterTemplate(`${Helpers.classes}["${classIdentifier}"].${field.getInternalName()}`)
                 .applyToSnippet(field.type, range, objectSnippet);
-            snippet.isLefty = !field.isFinal;
+            snippet.isLefty = !field._isFinal;
             return snippet;
         } else {
             let template: string = objectSnippet.type instanceof JavaEnum ? `§1` : `(§1 || ${Helpers.throwNPE}(${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn}))`;
 
             let snippet = new OneParameterTemplate(`${template}.${field.getInternalName()}`)
                 .applyToSnippet(field.type, range, objectSnippet);
-            snippet.isLefty = !field.isFinal;
+            snippet.isLefty = !field._isFinal;
             return snippet;
         }
 

@@ -67,11 +67,11 @@ export abstract class BaseSymbolTable {
     abstract getSymbolsForDebugger(): SymbolOnStackframe[];
 
     findSymbolTableAtPosition(position: IPosition): BaseSymbolTable | undefined {
-        if(!Range.containsPosition(this.range, position)) return undefined;
+        if (!Range.containsPosition(this.range, position)) return undefined;
         let bestTable: BaseSymbolTable = this;
-        for(let child of this.childTables){
+        for (let child of this.childTables) {
             let t1 = child.findSymbolTableAtPosition(position);
-            if(t1) bestTable = t1;
+            if (t1) bestTable = t1;
         }
 
         return bestTable;
@@ -126,4 +126,7 @@ export class BaseStackframe {
 
 export abstract class BaseField extends BaseSymbol {
     abstract getFieldIndentifier(): string;
+    abstract isStatic(): boolean;
+    abstract isFinal(): boolean;
+
 }

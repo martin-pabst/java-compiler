@@ -32,7 +32,7 @@ export class LongClass extends NumberClass {
     static type: NonPrimitiveType;
 
     constructor(i: number){
-        super(i);
+        super(i || 0);
     }
 
     _compareTo(otherValue: LongClass){

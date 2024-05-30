@@ -94,6 +94,9 @@ export abstract class NonPrimitiveType extends JavaType implements BaseObjectTyp
         let that = this;
         this.runtimeClass = class extends baseClass {
             static type = that;
+            constructor(){
+                super();
+            }
          };
     }
 

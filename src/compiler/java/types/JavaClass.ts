@@ -34,8 +34,8 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 
         let itemList: monaco.languages.CompletionItem[] = [];
 
-        for (let field of this.getFields().filter(f => f.visibility <= visibilityUpTo && (f.isStatic || !onlyStatic))) {
-            let isColor = this.identifier == 'Color' && field.isStatic;
+        for (let field of this.getFields().filter(f => f.visibility <= visibilityUpTo && (f._isStatic || !onlyStatic))) {
+            let isColor = this.identifier == 'Color' && field._isStatic;
             
             itemList.push({
                 label: field.toString(),
@@ -119,7 +119,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 
 
     getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): JavaField | undefined {
-        let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
+        let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f._isStatic || !forceStatic));
         if (field) return field;
         if (uptoVisibility == TokenType.keywordPrivate) uptoVisibility = TokenType.keywordProtected;
 

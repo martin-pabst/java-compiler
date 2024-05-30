@@ -30,7 +30,7 @@ export class DoubleClass extends NumberClass {
     static type: NonPrimitiveType;
 
     constructor(i: number){
-        super(i);
+        super(i || 0);
     }
 
     _compareTo(otherValue: DoubleClass){

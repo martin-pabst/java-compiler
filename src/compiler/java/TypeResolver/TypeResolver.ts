@@ -584,8 +584,8 @@ export class TypeResolver {
             for (let field of enumNode.fieldsOrInstanceInitializers) {
                 if (field.kind == TokenType.fieldDeclaration) {
                     let f: JavaField = new JavaField(field.identifier, field.range, javaEnum.module, field.type.resolvedType!, field.visibility);
-                    f.isStatic = field.isStatic;
-                    f.isFinal = field.isFinal;
+                    f._isStatic = field.isStatic;
+                    f._isFinal = field.isFinal;
                     f.classEnum = javaEnum;
                     javaEnum.fields.push(f);
                 }
@@ -594,8 +594,8 @@ export class TypeResolver {
             // each enum value gets compiled to a public static final field
             for (let enumValue of enumNode.valueNodes) {
                 let f: JavaField = new JavaField(enumValue.identifier, enumValue.identifierRange, javaEnum.module, javaEnum, TokenType.keywordPublic);
-                f.isStatic = true;
-                f.isFinal = true;
+                f._isStatic = true;
+                f._isFinal = true;
                 f.classEnum = javaEnum;
                 javaEnum.fields.push(f);
             }
@@ -610,8 +610,8 @@ export class TypeResolver {
             for (let field of interfaceNode.fieldsOrInstanceInitializers) {
                 if (field.kind == TokenType.fieldDeclaration) {
                     let f: JavaField = new JavaField(field.identifier, field.range, javaInterface.module, field.type.resolvedType!, field.visibility);
-                    f.isStatic = field.isStatic;
-                    f.isFinal = field.isFinal;
+                    f._isStatic = field.isStatic;
+                    f._isFinal = field.isFinal;
                     f.classEnum = javaInterface;
                     javaInterface.fields.push(f);
                 }
@@ -635,8 +635,8 @@ export class TypeResolver {
                         for (let field of classNode.fieldsOrInstanceInitializers) {
                             if (field.kind == TokenType.fieldDeclaration) {
                                 let f: JavaField = new JavaField(field.identifier, field.range, javaClass.module, field.type.resolvedType!, field.visibility);
-                                f.isStatic = field.isStatic;
-                                f.isFinal = field.isFinal;
+                                f._isStatic = field.isStatic;
+                                f._isFinal = field.isFinal;
                                 f.classEnum = javaClass;
                                 javaClass.fields.push(f);
                             }

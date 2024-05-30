@@ -47,8 +47,8 @@ export class SpriteLibraryEnum extends EnumClass {
             let field = new JavaField(name, EmptyRange.instance, 
                 SpriteLibraryEnum.type.module, SpriteLibraryEnum.type, TokenType.keywordPublic
             );
-            field.isStatic = true;
-            field.isFinal = true;
+            field._isStatic = true;
+            field._isFinal = true;
             field.type = SpriteLibraryEnum.type;
 
             SpriteLibraryEnum.type.fields.push(field);

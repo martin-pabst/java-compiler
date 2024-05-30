@@ -13,8 +13,8 @@ import { Visibility } from "./Visibility";
 
 export class JavaField extends BaseField {
 
-    isStatic: boolean = false;
-    isFinal: boolean = false;
+    _isStatic: boolean = false;
+    _isFinal: boolean = false;
 
     classEnum!: JavaClass | JavaEnum | JavaInterface;
 
@@ -67,8 +67,8 @@ export class JavaField extends BaseField {
 
     getDeclaration(): string {
         let decl: string = TokenTypeReadable[this.visibility] + " ";
-        if(this.isStatic) decl += "static ";
-        if(this.isFinal) decl += "final ";
+        if(this._isStatic) decl += "static ";
+        if(this._isFinal) decl += "final ";
         return decl + this.type.toString() + " " + this.identifier;
     }
 
@@ -78,6 +78,14 @@ export class JavaField extends BaseField {
 
     getType(): BaseType {
         return this.type;
+    }
+
+    isStatic(): boolean {
+        return this._isStatic;
+    }
+
+    isFinal(): boolean {
+        return this._isFinal;
     }
 
 }

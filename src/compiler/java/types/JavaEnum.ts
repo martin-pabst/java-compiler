@@ -30,7 +30,7 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
     }
 
     getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): JavaField | undefined {
-        let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
+        let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f._isStatic || !forceStatic));
         if (field) return field;
         if (uptoVisibility == TokenType.keywordPrivate) uptoVisibility = TokenType.keywordProtected;
 
@@ -125,7 +125,7 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
         let itemList: monaco.languages.CompletionItem[] = [];
 
-        for (let field of this.getFields().filter(f => f.visibility <= visibilityUpTo && (f.isStatic || !onlyStatic))) {
+        for (let field of this.getFields().filter(f => f.visibility <= visibilityUpTo && (f._isStatic || !onlyStatic))) {
             itemList.push({
                 label: field.toString(),
                 kind: monaco.languages.CompletionItemKind.Field,

@@ -38,7 +38,7 @@ export abstract class IJavaInterface extends NonPrimitiveType {
     }
 
     getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): JavaField | undefined {
-        let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f.isStatic || !forceStatic));
+        let field = this.getFields().find(f => f.identifier == identifier && f.visibility <= uptoVisibility && (f._isStatic || !forceStatic));
         if (field) return field;
         if (uptoVisibility == TokenType.keywordPrivate) uptoVisibility = TokenType.keywordProtected;
         for (let interf of this.getExtends()) {

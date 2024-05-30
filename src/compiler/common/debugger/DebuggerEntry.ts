@@ -14,6 +14,7 @@ type RuntimeObject = {
 
 interface RuntimeObjectType {
     getFields(): BaseField[];
+    [index: string]: any;
 }
 
 export class DebuggerEntry {
@@ -182,7 +183,12 @@ export class ObjectFieldDebuggerEntry extends DebuggerEntry {
     }
 
     fetchValueFromObjectAndRender(object: RuntimeObject) {
-        let value = object[this.field.getFieldIndentifier()];
+        let value: any;
+        if(this.field.isStatic()){
+            value = object.getType().runtimeClass[this.field.getFieldIndentifier()];
+        } else {
+            value = object[this.field.getFieldIndentifier()];
+        }
         this.render(value);
     }
 
