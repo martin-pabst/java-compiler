@@ -108,11 +108,7 @@ export class ActorClass extends ObjectClass implements IActor {
     }
 
     _mj$destroy$void$(t: Thread){
-        let world: IWorld = t.scheduler.interpreter.objectStore["World"];
-        if(world){
-            world.unregisterActor(this);
-        }
-        this.isDestroyed = true;
+        this.destroy();
     }
     
     _mj$isKeyUp$boolean$string(t: Thread, callback: CallbackParameter, key: string){
@@ -155,5 +151,6 @@ export class ActorClass extends ObjectClass implements IActor {
 
     destroy(){
         this.world.unregisterActor(this);
+        this.isDestroyed = true;
     }
 }

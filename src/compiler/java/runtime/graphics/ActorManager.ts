@@ -5,7 +5,7 @@ import { StringClass } from "../system/javalang/ObjectClassStringClass";
 import { ActorType, ActorTypes, IActor } from "./IActor";
 
 export class ActorManager {
-    
+
     actors: Record<ActorType, IActor[]> = {
         "act": [],
         "actWithTime": [],
@@ -21,82 +21,87 @@ export class ActorManager {
     keyUpListener: KeyUpListener = (key: string) => {
         this.onKeyUp(key);
     }
-    
+
     keyTypedListener: KeyPressedListener = (key: string) => {
         this.onKeyPressed(key);
     }
-    
-    constructor(private interpreter: Interpreter){
+
+    constructor(private interpreter: Interpreter) {
         this.clear();
-        if(interpreter.keyboardManager){
+        if (interpreter.keyboardManager) {
             interpreter.keyboardManager.addKeyDownListener(this.keyDownListener);
             interpreter.keyboardManager.addKeyUpListener(this.keyUpListener);
             interpreter.keyboardManager.addKeyPressedListener(this.keyTypedListener);
         }
     }
 
-    destroy(){
-        if(this.interpreter.keyboardManager){
+    destroy() {
+        if (this.interpreter.keyboardManager) {
             this.interpreter.keyboardManager.removeKeyDownListener(this.keyDownListener);
             this.interpreter.keyboardManager.removeKeyUpListener(this.keyUpListener);
             this.interpreter.keyboardManager.removeKeyPressedListener(this.keyTypedListener);
         }
     }
-    
+
     registerActor(actor: IActor, type: ActorType): void {
         let list = this.actors[type];
         list.push(actor);
     }
-    
-    thread1?: Thread;
-    thread2?: Thread;
-    callActMethods(dt: number){
-        while(this.thread1 && this.thread1.state == ThreadState.terminated){
-            this.thread1 = this.thread2;
-            this.thread2 = undefined;
+
+    runningactThread?: Thread;
+    tickHappenedWhenThreadNotEmpty: boolean = false;
+    callActMethods(dt: number) {
+        if (this.runningactThread && this.runningactThread.state == ThreadState.runnable) {
+            this.tickHappenedWhenThreadNotEmpty = true;
+            return;
         }
 
-        if(this.thread2) return;
+        this.tickHappenedWhenThreadNotEmpty = false;
 
-        if(this.actors["act"].length == 0 && this.actors["actWithTime"].length == 0 ) return;
+        if (this.actors["act"].length == 0 && this.actors["actWithTime"].length == 0) return;
 
-        let t = this.interpreter.scheduler.createThread();
-        for(let actor of this.actors["act"]){
-            if(actor.isActing) actor._mj$act$void$(t, undefined);
+        this.runningactThread = this.interpreter.scheduler.createThread("act method-thread");
+        for (let actor of this.actors["act"]) {
+            if (actor.isActing) actor._mj$act$void$(this.runningactThread, undefined);
         }
-        for(let actor of this.actors["actWithTime"]){
-            if(actor.isActing) actor._mj$act$void$double(t, undefined, dt);
+        for (let actor of this.actors["actWithTime"]) {
+            if (actor.isActing) actor._mj$act$void$double(this.runningactThread, undefined, dt);
         }
 
-        if(t.programStack.length > 0){
-            t.state = ThreadState.runnable;
-            if(this.thread1){
-                this.thread2 = t;
-            } else {
-                this.thread1 = t;
+        if (this.runningactThread.programStack.length > 0) {
+            this.runningactThread.state = ThreadState.runnable;
+            this.runningactThread.callbackAfterTerminated = () => {
+                if(this.tickHappenedWhenThreadNotEmpty){
+                    this.callActMethods(dt);
+                }
             }
         } else {
-            this.interpreter.scheduler.removeThread(t);
+            this.interpreter.scheduler.removeThread(this.runningactThread);
+            this.runningactThread = undefined;
         }
 
     }
-    
+
+    startActMethods(){
+        
+    }
+
     clear() {
         ActorTypes.forEach(at => this.actors[at] = []);
     }
 
-    unregisterActor(actor: IActor){
+    unregisterActor(actor: IActor) {
         ActorTypes.forEach(at => {
             let actorList = this.actors[at];
             let index = actorList.indexOf(actor);
-            if(index >= 0) actorList.splice(index, 1);
+            if (index >= 0) actorList.splice(index, 1);
         });
 
     }
 
-    hasActors():boolean {
-        for(let at of ActorTypes){
-            if(this.actors[at].length > 0){
+    hasActors(): boolean {
+        for (let at of ActorTypes) {
+            if (this.actors[at].length > 0) {
                 return true;
             }
         }
@@ -104,30 +109,30 @@ export class ActorManager {
     }
 
     onKeyPressed(key: string): void {
-        if(this.actors["keyPressed"].length == 0) return;
-        let t = this.interpreter.scheduler.createThread();
+        if (this.actors["keyPressed"].length == 0) return;
+        let t = this.interpreter.scheduler.createThread("key pressed event thread");
 
-        for(let actor of this.actors["keyPressed"]){
+        for (let actor of this.actors["keyPressed"]) {
             actor._mj$onKeyTyped$void$String(t, undefined, new StringClass(key));
         }
         t.state = ThreadState.runnable;
     }
 
     onKeyUp(key: string): void {
-        if(this.actors["keyUp"].length == 0) return;
-        let t = this.interpreter.scheduler.createThread();
+        if (this.actors["keyUp"].length == 0) return;
+        let t = this.interpreter.scheduler.createThread("key up event thread");
 
-        for(let actor of this.actors["keyUp"]){
+        for (let actor of this.actors["keyUp"]) {
             actor._mj$onKeyUp$void$String(t, undefined, new StringClass(key));
         }
         t.state = ThreadState.runnable;
     }
 
     onKeyDown(key: string, isShift: boolean, isCtrl: boolean, isAlt: boolean): void {
-        if(this.actors["keyDown"].length == 0) return;
-        let t = this.interpreter.scheduler.createThread();
+        if (this.actors["keyDown"].length == 0) return;
+        let t = this.interpreter.scheduler.createThread("key down event thread");
 
-        for(let actor of this.actors["keyDown"]){
+        for (let actor of this.actors["keyDown"]) {
             actor._mj$onKeyDown$void$String$boolean$boolean$boolean(t, undefined, new StringClass(key), isShift, isCtrl, isAlt);
         }
         t.state = ThreadState.runnable;

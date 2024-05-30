@@ -1,64 +1,135 @@
-import { DOM } from "../../../tools/DOM";
-import { makeDiv } from "../../../tools/HtmlTools";
 import { Treeview } from "../../../tools/components/treeview/Treeview";
+import { TreeviewAccordion } from "../../../tools/components/treeview/TreeviewAccordion";
 import { BaseSymbolTable } from "../BaseSymbolTable";
-import { Thread } from "../interpreter/Thread";
-import { Range } from "../range/Range";
-import { DebuggerEntry } from "./DebuggerEntry";
+import { Scheduler } from "../interpreter/Scheduler";
+import { ProgramState, Thread } from "../interpreter/Thread";
+import { DebuggerCallstackEntry } from "./DebuggerCallstackEntry";
+import { DebuggerSymbolEntry } from "./DebuggerSymbolEntry";
 import { SymbolTableSection } from "./SymbolTableSection";
 
 export class Debugger {
 
-    currentlyVisibleSymbolTableSections: SymbolTableSection[] = [];
-    showVariablesDiv: HTMLDivElement;
-    showVariablesTreeview: Treeview<DebuggerEntry>;
+    treeviewAccordion: TreeviewAccordion;
 
+    currentlyVisibleSymbolTableSections: SymbolTableSection[] = [];
+    showVariablesTreeview!: Treeview<DebuggerSymbolEntry>;
+    
+    callstackTreeview!: Treeview<DebuggerCallstackEntry>;
+
+    threadsTreeview!: Treeview<Thread>;
+
+    maxCallstackEntries: number = 15;
 
     constructor(debuggerDiv: HTMLDivElement){
-        this.showVariablesDiv = DOM.makeDiv(debuggerDiv);
-        this.showVariablesDiv.style.display = "flex";
-        this.showVariablesDiv.style.flexDirection = "column";
-        
-        let remainingDiv = DOM.makeDiv(debuggerDiv);
-        remainingDiv.style.flex = "1";
 
-        this.showVariablesTreeview = new Treeview(this.showVariablesDiv, {
-            minHeight: 0,
+        this.treeviewAccordion = new TreeviewAccordion(debuggerDiv);
+        this.initShowVariablesTreeview();
+        this.initCallstackTreeview();
+        this.initThreadsTreeview();
+    }
+    
+    initThreadsTreeview(){
+        this.threadsTreeview = new Treeview(this.treeviewAccordion, {
             captionLine: {
-                enabled: false
+                enabled: true,
+                text: "threads"
             },
-            flexWeight: "0",
+            flexWeight: "1",
             withDeleteButtons: false,
             withDragAndDrop: false
         });
 
     }
 
+    initCallstackTreeview(){
+        this.callstackTreeview = new Treeview(this.treeviewAccordion, {
+            captionLine: {
+                enabled: true,
+                text: "call stack"
+            },
+            flexWeight: "1",
+            withDeleteButtons: false,
+            withDragAndDrop: false
+        });
+
+    }
+
+    initShowVariablesTreeview(){
+        this.showVariablesTreeview = new Treeview(this.treeviewAccordion, {
+            captionLine: {
+                enabled: true,
+                text: "variables"
+            },
+            flexWeight: "3",
+            withDeleteButtons: false,
+            withDragAndDrop: false
+        });
+
+    }
+
+    showThreads(scheduler: Scheduler){
+        let currentThread = scheduler.getCurrentThread();
+        this.threadsTreeview.clear();
+        for(let thread of scheduler.runningThreads){
+            let caption = thread.name;
+            let node = this.threadsTreeview.addNode(false, caption,
+                undefined, thread, thread, undefined, true
+            )
+            if(thread == currentThread) node.setSelected(true);
+            node.onClickHandler = (t) => {
+                this.showCallstack(t);
+                this.showVariables(t);
+            }
+        }
+    }
+
     showThreadState(thread: Thread | undefined){
+
         if(!thread || thread.programStack.length == 0){
             return;
         }
 
-        let programState = thread.programStack[thread.programStack.length - 1];
-        let program = programState.program;
+        this.showVariables(thread);
+        this.showCallstack(thread);
+        this.showThreads(thread.scheduler);
+    }
 
-        let symbolTable = program.symbolTable;
-        if(!symbolTable){
-            return;
+    showCallstack(thread: Thread){
+        this.callstackTreeview.clear();
+        let programStack = thread.programStack;
+        let count = Math.min(programStack.length, this.maxCallstackEntries);
+        for(let i = programStack.length - 1; i >= programStack.length - count; i--){
+            let programState = programStack[i];
+            let entry = new DebuggerCallstackEntry(programState);
+            let node = this.callstackTreeview.addNode(false, entry.getCaption(), undefined,
+                entry, entry, undefined, true);
+            node.onClickHandler = (entry) => {
+                this.showVariables(thread, entry.programState);
+            }
+            if(i == programStack.length - 1){
+                node.setSelected(true);
+            }
         }
 
-        let currentStep = programState.lastExecutedStep;
-        if(!currentStep) currentStep = programState.currentStepList[programState.stepIndex];
-
-        if(currentStep && currentStep.range.startLineNumber && currentStep.range.startColumn){
-            symbolTable = symbolTable.findSymbolTableAtPosition({
-                lineNumber: currentStep.range.startLineNumber!,
-                column: currentStep.range.startColumn!
-            })
+        if(count < programStack.length){
+            //@ts-ignore
+            this.callstackTreeview.addNode(false, `${programStack.length - count} weitere ...`, undefined, "x", undefined, undefined, true);
         }
+    }
+
+    showVariables(thread: Thread, programState?: ProgramState){
+        if(!programState){
+            programState = thread.programStack[thread.programStack.length - 1];
+        }
+
+        if(!programState) return;
         
+        let callstackEntry = new DebuggerCallstackEntry(programState);
+                
+        if(!callstackEntry.symbolTable) return;
+
         let symbolTablesToShow: BaseSymbolTable[] = [];
-        let st1 = symbolTable;
+        let st1: BaseSymbolTable | undefined = callstackEntry.symbolTable;
         while(st1){
             if(!st1.hiddenWhenDebugging){
                 symbolTablesToShow.unshift(st1);

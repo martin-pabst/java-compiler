@@ -2,13 +2,13 @@ import { Treeview } from "../../../tools/components/treeview/Treeview";
 import { JavaSymbolTable } from "../../java/codegenerator/JavaSymbolTable";
 import { BaseSymbol, BaseSymbolTable } from "../BaseSymbolTable";
 import { Debugger } from "./Debugger";
-import { DebuggerEntry, StackElementDebuggerEntry } from "./DebuggerEntry";
+import { DebuggerSymbolEntry, StackElementDebuggerEntry } from "./DebuggerSymbolEntry";
 
 export class SymbolTableSection {
 
     children: StackElementDebuggerEntry[] = [];
 
-    constructor(public treeview: Treeview<DebuggerEntry>, 
+    constructor(public treeview: Treeview<DebuggerSymbolEntry>, 
         public symbolTable: BaseSymbolTable) {
         
         // divToRenderInto.prepend(this.treeview.outerDiv);

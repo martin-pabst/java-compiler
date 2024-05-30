@@ -102,10 +102,10 @@ export class Treeview<E> {
     }
 
     private _onNodeClickedHandler?: TreeviewNodeOnClickHandler<E>;
-    set onNodeClickedHandler(och: TreeviewNodeOnClickHandler<E>) {
+    set onNodeClickedHandler(och: TreeviewNodeOnClickHandler<E>){
         this._onNodeClickedHandler = och;
     }
-    get onNodeClickedHandler(): TreeviewNodeOnClickHandler<E> | undefined {
+    get onNodeClickedHandler(): TreeviewNodeOnClickHandler<E> | undefined{
         return this._onNodeClickedHandler;
     }
 
@@ -157,7 +157,7 @@ export class Treeview<E> {
 
     setFlexWeight(flex: string) {
         this._outerDiv.style.flexGrow = flex;
-        if (this.config.minHeight! > 0) {
+        if(this.config.minHeight! > 0){
             this._outerDiv.style.flexBasis = this.config.minHeight + "px";
         }
     }
@@ -231,7 +231,7 @@ export class Treeview<E> {
 
         let node = new TreeviewNode(this, isFolder, caption, iconClass,
             externalElement, externalReference, parentExternalReference,);
-        if (this.nodes.indexOf(node) < 0) this.nodes.push(node);
+            if(this.nodes.indexOf(node) < 0) this.nodes.push(node);
 
         if (renderImmediately) node.render();
 
@@ -239,7 +239,7 @@ export class Treeview<E> {
     }
 
     addNodeInternal(node: TreeviewNode<E>) {
-        if (this.nodes.indexOf(node) < 0) this.nodes.push(node);
+        if(this.nodes.indexOf(node) < 0) this.nodes.push(node);
     }
 
 
@@ -325,7 +325,7 @@ export class Treeview<E> {
 
     removeNode(node: TreeviewNode<E>) {
         let index = this.nodes.indexOf(node);
-        if (index >= 0) this.nodes.splice(index, 1);
+        if(index >= 0) this.nodes.splice(index, 1);
         node.destroy(false);
     }
 
@@ -374,9 +374,9 @@ export class Treeview<E> {
         this.rootNode.removeChildren();
     }
 
-    detachAllNodes() {
-        for (let node of this.nodes.slice()) {
-            if (node !== this.rootNode) node.detach();
+    detachAllNodes(){
+        for(let node of this.nodes.slice()) {
+            if(node !== this.rootNode) node.detach();
         }
     }
 }

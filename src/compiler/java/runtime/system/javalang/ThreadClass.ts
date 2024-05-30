@@ -108,7 +108,7 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
             let runnable = this.runnable;
             if(!runnable) runnable = this;
 
-            this.thread = t.scheduler.createThread([]);
+            this.thread = t.scheduler.createThread("user generated thread", []);
             
             let that = this;
             runnable._mj$run$void$(this.thread, () => {

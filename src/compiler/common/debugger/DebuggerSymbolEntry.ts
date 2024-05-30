@@ -17,15 +17,15 @@ interface RuntimeObjectType {
     [index: string]: any;
 }
 
-export class DebuggerEntry {
+export class DebuggerSymbolEntry {
 
-    treeViewNode: TreeviewNode<DebuggerEntry>;
-    children: DebuggerEntry[] = [];
+    treeViewNode: TreeviewNode<DebuggerSymbolEntry>;
+    children: DebuggerSymbolEntry[] = [];
     oldValue?: any; // old value if value is primitive type
     oldLength?: number; // old length if value is array
 
     constructor(private symbolTableSection: SymbolTableSection,
-        parent: DebuggerEntry | undefined, private type: BaseType | undefined, public identifier: string
+        parent: DebuggerSymbolEntry | undefined, private type: BaseType | undefined, public identifier: string
     ) {
         this.treeViewNode = new TreeviewNode(symbolTableSection.treeview,
             false, "", undefined,
@@ -154,7 +154,7 @@ export class DebuggerEntry {
 }
 
 
-export class StackElementDebuggerEntry extends DebuggerEntry {
+export class StackElementDebuggerEntry extends DebuggerSymbolEntry {
 
     constructor(symbolTableSection: SymbolTableSection,
         private symbol: SymbolOnStackframe) {
@@ -174,10 +174,10 @@ export class StackElementDebuggerEntry extends DebuggerEntry {
 
 }
 
-export class ObjectFieldDebuggerEntry extends DebuggerEntry {
+export class ObjectFieldDebuggerEntry extends DebuggerSymbolEntry {
 
     constructor(symbolTableSection: SymbolTableSection,
-        parent: DebuggerEntry,
+        parent: DebuggerSymbolEntry,
         private field: BaseField) {
         super(symbolTableSection, parent, field.getType(), field.identifier);
     }
@@ -194,10 +194,10 @@ export class ObjectFieldDebuggerEntry extends DebuggerEntry {
 
 }
 
-export class ArrayElementDebuggerEntry extends DebuggerEntry {
+export class ArrayElementDebuggerEntry extends DebuggerSymbolEntry {
 
     constructor(symbolTableSection: SymbolTableSection,
-        parent: DebuggerEntry,
+        parent: DebuggerSymbolEntry,
         private index: number,
         elementType: BaseType) {
         super(symbolTableSection, parent, elementType, parent.identifier + '[<span class="jo_debugger_index">' + index + '</span>]');
@@ -210,10 +210,10 @@ export class ArrayElementDebuggerEntry extends DebuggerEntry {
 
 }
 
-export class ListElementDebuggerEntry extends DebuggerEntry {
+export class ListElementDebuggerEntry extends DebuggerSymbolEntry {
 
     constructor(symbolTableSection: SymbolTableSection,
-        parent: DebuggerEntry,
+        parent: DebuggerSymbolEntry,
         private index: number) {
         super(symbolTableSection, parent, undefined, parent.identifier + '.get(<span class="jo_debugger_index">' + index + '</span>)');
     }

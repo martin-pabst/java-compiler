@@ -52,7 +52,7 @@ export class MouseManager {
                 }
 
                 if (that.javaMouseListeners.length > 0) {
-                    let t: Thread = this.world.interpreter.scheduler.createThread();
+                    let t: Thread = this.world.interpreter.scheduler.createThread("mouse event thread");
 
                     for (let listener of that.javaMouseListeners) {
                         switch (mouseEventKind) {
@@ -101,7 +101,7 @@ export class MouseManager {
 
         if (this.shapesWithImplementedMouseMethods.length == 0) return;
 
-        let t: Thread = this.world.interpreter.scheduler.createThread();
+        let t: Thread = this.world.interpreter.scheduler.createThread("mouse event thread");
 
         switch (mouseEventKind) {
             case "mousedown":

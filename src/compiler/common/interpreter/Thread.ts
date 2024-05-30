@@ -79,11 +79,13 @@ export class Thread {
     maxStepsPerSecond?: number;
     timeLastStepExecuted: number = performance.now();
 
+    callbackAfterTerminated?: () => void;
+
     get assertionObservers() {
         return this.scheduler.interpreter.assertionObserverList;
     }
 
-    constructor(public scheduler: Scheduler, initialStack: any[]) {
+    constructor(public scheduler: Scheduler, public name: string, initialStack: any[]) {
         this.s = initialStack;
         this.classes = scheduler.classObjectRegistry;
     }
@@ -129,7 +131,12 @@ export class Thread {
                     }
                     if (this.isSingleStepCompleted()) {
                         this.stepCallback();
-                        return { state: this.state, stepsExecuted: numberOfSteps }
+                        if(this._state == ThreadState.terminated){
+                            if(this.name == 'main thread'){
+                                console.log("Hier!");
+                            }
+                        }
+                        return { state: this._state, stepsExecuted: numberOfSteps }
                     }
 
                 } else {
@@ -179,11 +186,15 @@ export class Thread {
 
         }
 
-        return { state: this.state, stepsExecuted: numberOfSteps }
+        return { state: this._state, stepsExecuted: numberOfSteps }
     }
 
     public set state(state: ThreadState) {
         this._state = state;
+        if(state == ThreadState.terminated && this.callbackAfterTerminated){
+            this.callbackAfterTerminated();
+            this.callbackAfterTerminated = undefined;
+        }
     }
 
     isSingleStepCompleted() {
@@ -506,6 +517,9 @@ export class Thread {
     }
 
     exit() {
+        if(this.name == "main thread"){
+            console.log("Hier!");
+        }
         this.state = ThreadState.terminated;
     }
 

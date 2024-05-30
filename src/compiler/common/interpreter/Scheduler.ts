@@ -34,6 +34,9 @@ export class Scheduler {
     stepCountSinceStartOfProgram: number = 0;
     libraryTypeStore?: JavaTypeStore;
 
+    lastTimeDebuggeroutputWritten: number = 0;
+    updateDebuggerEveryMs: number = 1000;
+
     // if pause button is pressed when there is no thread 
     // and Program has actors then interpreter sets this callback:
     onStartingNextThreadCallback?: () => void;
@@ -45,11 +48,13 @@ export class Scheduler {
 
     run(numberOfStepsMax: number): SchedulerExitState {
 
+        this.periodicallyUpdateDebugger();
+
         if (this.onStartingNextThreadCallback) {
             if (this.getNextStepPosition()) {
                 this.onStartingNextThreadCallback();
                 this.onStartingNextThreadCallback = undefined;
-                return SchedulerExitState.giveMeAdditionalTime;
+                return SchedulerExitState.nothingMoreToDo;
             }
         }
 
@@ -97,18 +102,26 @@ export class Scheduler {
                 let elapsedTime = t - currentThread.timeLastStepExecuted;
                 let numberOfSteps = Math.min(elapsedTime / msPerStep, stepsPerThread);
                 if (numberOfSteps > 0) {
+
+                    // run!
                     threadState = currentThread.run(numberOfSteps);
+                    
                     currentThread.timeLastStepExecuted =
                         currentThread.timeLastStepExecuted + threadState.stepsExecuted * msPerStep;
                     if (currentThread.maxStepsPerSecond < 20) {
                         this.interpreter.showProgramPointer(this.getNextStepPosition(currentThread));
+                        this.interpreter.updateDebugger();
                     } else {
-                        if(this.state == SchedulerState.running) this.interpreter.hideProgrampointerPosition();
+                        if (this.state == SchedulerState.running) this.interpreter.hideProgrampointerPosition();
                     }
-                } else if (this.runningThreads.length == 1) {
-                    return SchedulerExitState.nothingMoreToDo;
+                } else {
+                    threadState.state = currentThread.state;
+                    if (this.runningThreads.length == 1) {
+                        return SchedulerExitState.nothingMoreToDo;
+                    }
                 }
             } else {
+                // run!
                 threadState = currentThread.run(stepsPerThread);
             }
 
@@ -187,7 +200,7 @@ export class Scheduler {
         this.suspendedThreads.length = 0;
     }
 
-    private ifBreakpointPresentDisableOnce(){
+    private ifBreakpointPresentDisableOnce() {
         let currentThread = this.runningThreads[this.currentThreadIndex];
         let programState = currentThread.currentProgramState;
         if (currentThread) {
@@ -237,8 +250,8 @@ export class Scheduler {
         if (thread) thread.unmarkStep();
     }
 
-    createThread(initialStack: any[] = []): Thread {
-        let thread = new Thread(this, initialStack);
+    createThread(name: string, initialStack: any[] = []): Thread {
+        let thread = new Thread(this, name, initialStack);
         this.runningThreads.push(thread);
         return thread;
     }
@@ -301,7 +314,7 @@ export class Scheduler {
 
         this.keepThread = false;
 
-        let mainThread = this.createThread();
+        let mainThread = this.createThread("main thread");
 
         let mainModule = executable.mainModule;
 
@@ -323,5 +336,15 @@ export class Scheduler {
         return this.runningThreads[this.currentThreadIndex];
     }
 
+    resetLastTimeExecutedTimestamps() {
+        this.runningThreads.filter(t => t.maxStepsPerSecond).forEach(t => t.timeLastStepExecuted = performance.now());
+    }
 
+    periodicallyUpdateDebugger(){
+        if(this.state == SchedulerState.running && 
+            performance.now() - this.lastTimeDebuggeroutputWritten > this.updateDebuggerEveryMs){
+            this.lastTimeDebuggeroutputWritten = performance.now();
+            this.interpreter.updateDebugger();
+        }
+    }
 }

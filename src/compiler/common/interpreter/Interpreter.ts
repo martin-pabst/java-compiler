@@ -91,7 +91,7 @@ export class Interpreter {
 
         this.registerActions();
 
-        if(breakpointManager) breakpointManager.attachToInterpreter(this);
+        if (breakpointManager) breakpointManager.attachToInterpreter(this);
 
         this.scheduler = new Scheduler(this);
         this.loadController = new LoadController(this.scheduler, this);
@@ -167,6 +167,7 @@ export class Interpreter {
             this.init(this.executable!);
             this.resetRuntime();
             this.showProgramPointer(this.scheduler.getNextStepPosition());
+            this.updateDebugger();
             this.setState(SchedulerState.paused);
             return;
         }
@@ -210,14 +211,15 @@ export class Interpreter {
         this.updateDebugger();
     }
 
-    private updateDebugger(){
-        if(!this._debugger) return;
+    public updateDebugger() {
+        if (!this._debugger) return;
         this._debugger.showThreadState(this.scheduler.getCurrentThread());
     }
 
     stop(restart: boolean) {
 
         this.showProgramPointer(undefined);
+        this.updateDebugger();
 
         // this.inputManager.hide();
         this.setState(SchedulerState.stopped);
@@ -252,6 +254,7 @@ export class Interpreter {
         this.hideProgrampointerPosition();
 
         this.scheduler.keepThread = false;
+        this.scheduler.resetLastTimeExecutedTimestamps();
 
         this.setState(SchedulerState.running);
 
@@ -328,6 +331,7 @@ export class Interpreter {
 
         if (state == SchedulerState.stopped) {
             this.showProgramPointer(undefined);
+            this.updateDebugger();
             this.eventManager.fire("stop");
             // TODO
             // this.closeAllWebsockets();
@@ -394,7 +398,7 @@ export class Interpreter {
         //     this.main.getBottomDiv()?.console?.detachValues();  // detach values from console entries
         // }
 
-        
+
 
         this.setState(SchedulerState.stopped);
         this.mainThread = this.scheduler.init(executable);
