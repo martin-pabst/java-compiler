@@ -18,7 +18,7 @@ export class ThreadStateClass extends EnumClass {
     new ThreadStateClass("stopped_at_breakpoint", ThreadState.stoppedAtBreakpoint),
     new ThreadStateClass("blocked", ThreadState.blocked),
     new ThreadStateClass("waiting", ThreadState.waiting),
-    new ThreadStateClass("timed_waiting", ThreadState.timed_waiting),
+    new ThreadStateClass("timed_waiting", ThreadState.timedWaiting),
     new ThreadStateClass("terminated", ThreadState.terminated)];
 
     static __javaDeclarations: LibraryDeclarations = [
@@ -162,7 +162,7 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
                 t.scheduler.restoreThread(t);
             }, milliseconds);
 
-            t.state = ThreadState.timed_waiting;
+            t.state = ThreadState.timedWaiting;
         } else {
             t.state = ThreadState.waiting;
         }

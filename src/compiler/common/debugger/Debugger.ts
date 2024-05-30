@@ -2,7 +2,7 @@ import { Treeview } from "../../../tools/components/treeview/Treeview";
 import { TreeviewAccordion } from "../../../tools/components/treeview/TreeviewAccordion";
 import { BaseSymbolTable } from "../BaseSymbolTable";
 import { Scheduler } from "../interpreter/Scheduler";
-import { ProgramState, Thread } from "../interpreter/Thread";
+import { ProgramState, Thread, ThreadState } from "../interpreter/Thread";
 import { DebuggerCallstackEntry } from "./DebuggerCallstackEntry";
 import { DebuggerSymbolEntry } from "./DebuggerSymbolEntry";
 import { SymbolTableSection } from "./SymbolTableSection";
@@ -19,6 +19,8 @@ export class Debugger {
     threadsTreeview!: Treeview<Thread>;
 
     maxCallstackEntries: number = 15;
+
+    lastThread?: Thread;
 
     constructor(debuggerDiv: HTMLDivElement){
 
@@ -70,10 +72,17 @@ export class Debugger {
     showThreads(scheduler: Scheduler){
         let currentThread = scheduler.getCurrentThread();
         this.threadsTreeview.clear();
-        for(let thread of scheduler.runningThreads){
+
+        let threadList = scheduler.runningThreads;
+        if(threadList.length == 0 && this.lastThread){
+            threadList = [this.lastThread];
+        }
+
+        for(let thread of threadList){
             let caption = thread.name;
+            let icon = "img_thread-" + ThreadState[thread.state];
             let node = this.threadsTreeview.addNode(false, caption,
-                undefined, thread, thread, undefined, true
+                icon, thread, thread, undefined, true
             )
             if(thread == currentThread) node.setSelected(true);
             node.onClickHandler = (t) => {
@@ -85,9 +94,13 @@ export class Debugger {
 
     showThreadState(thread: Thread | undefined){
 
-        if(!thread || thread.programStack.length == 0){
-            return;
+        if(!thread){
+            if(this.lastThread) thread = this.lastThread;
         }
+
+        this.lastThread = thread;
+
+        if(!thread) return;
 
         this.showVariables(thread);
         this.showCallstack(thread);
@@ -97,6 +110,8 @@ export class Debugger {
     showCallstack(thread: Thread){
         this.callstackTreeview.clear();
         let programStack = thread.programStack;
+        if(programStack.length == 0) return;
+
         let count = Math.min(programStack.length, this.maxCallstackEntries);
         for(let i = programStack.length - 1; i >= programStack.length - count; i--){
             let programState = programStack[i];
@@ -119,10 +134,14 @@ export class Debugger {
 
     showVariables(thread: Thread, programState?: ProgramState){
         if(!programState){
-            programState = thread.programStack[thread.programStack.length - 1];
+            if(thread.programStack.length > 0) programState = thread.programStack[thread.programStack.length - 1];
         }
 
-        if(!programState) return;
+        if(!programState){
+            this.showVariablesTreeview.clear();
+            this.currentlyVisibleSymbolTableSections = [];
+            return;
+        } 
         
         let callstackEntry = new DebuggerCallstackEntry(programState);
                 

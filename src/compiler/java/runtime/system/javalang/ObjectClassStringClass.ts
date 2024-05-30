@@ -53,10 +53,10 @@ export class ObjectClass {
 
         if (milliseconds) {
             setTimeout(() => {
-                if (t.state == ThreadState.timed_waiting) t.state = ThreadState.blocked;
+                if (t.state == ThreadState.timedWaiting) t.state = ThreadState.blocked;
             }, milliseconds);
 
-            t.state = ThreadState.timed_waiting;
+            t.state = ThreadState.timedWaiting;
         } else {
             t.state = ThreadState.waiting;
         }
@@ -76,7 +76,7 @@ export class ObjectClass {
         }
         if (this.waitingThreads) {
             for (let i = 0; i < this.waitingThreads.length; i++) {
-                if ([ThreadState.waiting, ThreadState.timed_waiting].indexOf(this.waitingThreads[i].state) >= 0) {
+                if ([ThreadState.waiting, ThreadState.timedWaiting].indexOf(this.waitingThreads[i].state) >= 0) {
                     this.waitingThreads[i].state = ThreadState.blocked;
                     break;
                 }

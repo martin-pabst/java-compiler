@@ -48,7 +48,7 @@ export enum ThreadState {
     stoppedAtBreakpoint,
     blocked,      // A thread that is blocked waiting for a monitor lock (semaphor!) is in this state.
     waiting,
-    timed_waiting,
+    timedWaiting,
     terminated,   // A thread that has exited is in this state.
     terminatedWithException
 }
@@ -131,11 +131,6 @@ export class Thread {
                     }
                     if (this.isSingleStepCompleted()) {
                         this.stepCallback();
-                        if(this._state == ThreadState.terminated){
-                            if(this.name == 'main thread'){
-                                console.log("Hier!");
-                            }
-                        }
                         return { state: this._state, stepsExecuted: numberOfSteps }
                     }
 
