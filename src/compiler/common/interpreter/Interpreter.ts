@@ -439,6 +439,9 @@ export class Interpreter {
         if (this.mainThread) {
             this.mainThread.maxStepsPerSecond = isMaxSpeed ? undefined : value;
         }
+
+        this.scheduler.setMaxSpeed(value, isMaxSpeed);
+
         if (!isMaxSpeed && this.stepsPerSecondGoal > 20) {
             this.hideProgrampointerPosition();
         }

@@ -62,6 +62,8 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
     runnable?: RunnableInterface;
     name?: string;
 
+    maxStepsPerSecond?: number;
+
     threadsToJoinWhenFinished: Thread[] = [];
 
     static __javaDeclarations: LibraryDeclarations = [
@@ -77,6 +79,7 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
         { type: "method", signature: "public void join(int milliseconds)", java: ThreadClass.prototype._mj$join },
         { type: "method", signature: "public string getName()", template: `§1.name` },
         { type: "method", signature: "public void setName(string name)", java: ThreadClass.prototype._setName },
+        { type: "method", signature: "public void setSpeed(int maxStepsPerSecond)", java: ThreadClass.prototype._setSpeed },
     ]
 
 
@@ -178,5 +181,9 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
         this.name = name;
     }
 
+    _setSpeed(maxStepsPerSecond: number){
+        this.maxStepsPerSecond = maxStepsPerSecond? maxStepsPerSecond : undefined;
+        if(this.thread) this.thread.maxStepsPerSecond = this.maxStepsPerSecond;
+    }
 
 }

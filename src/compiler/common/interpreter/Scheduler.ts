@@ -347,4 +347,10 @@ export class Scheduler {
             this.interpreter.updateDebugger();
         }
     }
+
+
+    setMaxSpeed(value: number, isMaxSpeed: boolean) {
+        this.runningThreads.filter(t => t.name != 'act method-thread').forEach(t => t.maxStepsPerSecond = isMaxSpeed ? undefined : value);
+    }
+
 }
