@@ -253,6 +253,13 @@ export class Scheduler {
     createThread(name: string, initialStack: any[] = []): Thread {
         let thread = new Thread(this, name, initialStack);
         this.runningThreads.push(thread);
+
+        if(thread.name != "act method-thread"){
+            if(!this.interpreter.isMaxSpeed){
+                thread.maxStepsPerSecond = this.interpreter.stepsPerSecondGoal;
+            }
+        }
+        
         return thread;
     }
 

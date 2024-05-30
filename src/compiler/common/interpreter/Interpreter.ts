@@ -65,8 +65,8 @@ export class Interpreter {
     }
 
     mainThread?: Thread;
-    private stepsPerSecondGoal: number = 1e8;
-    private isMaxSpeed: boolean = true;
+    public stepsPerSecondGoal: number = 1e8;
+    public isMaxSpeed: boolean = true;
 
     constructor(printManager?: PrintManager, private actionManager?: ActionManager,
         public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager,
