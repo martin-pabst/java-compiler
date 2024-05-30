@@ -1,14 +1,18 @@
 import { DOM } from "../../../tools/DOM";
 import { makeDiv } from "../../../tools/HtmlTools";
+import { Treeview } from "../../../tools/components/treeview/Treeview";
 import { BaseSymbolTable } from "../BaseSymbolTable";
 import { Thread } from "../interpreter/Thread";
 import { Range } from "../range/Range";
+import { DebuggerEntry } from "./DebuggerEntry";
 import { SymbolTableSection } from "./SymbolTableSection";
 
 export class Debugger {
 
     currentlyVisibleSymbolTableSections: SymbolTableSection[] = [];
     showVariablesDiv: HTMLDivElement;
+    showVariablesTreeview: Treeview<DebuggerEntry>;
+
 
     constructor(debuggerDiv: HTMLDivElement){
         this.showVariablesDiv = DOM.makeDiv(debuggerDiv);
@@ -17,11 +21,21 @@ export class Debugger {
         
         let remainingDiv = DOM.makeDiv(debuggerDiv);
         remainingDiv.style.flex = "1";
+
+        this.showVariablesTreeview = new Treeview(this.showVariablesDiv, {
+            minHeight: 0,
+            captionLine: {
+                enabled: false
+            },
+            flexWeight: "0",
+            withDeleteButtons: false,
+            withDragAndDrop: false
+        });
+
     }
 
     showThreadState(thread: Thread | undefined){
         if(!thread || thread.programStack.length == 0){
-            this.hideAll();
             return;
         }
 
@@ -30,7 +44,6 @@ export class Debugger {
 
         let symbolTable = program.symbolTable;
         if(!symbolTable){
-            this.hideAll();
             return;
         }
 
@@ -55,36 +68,34 @@ export class Debugger {
 
         let remainingSymbolTableSections: SymbolTableSection[] = [];
 
+        this.showVariablesTreeview.detachAllNodes();
         let firstNonFittingFound = false;
         for(let i = 0; i < this.currentlyVisibleSymbolTableSections.length; i++){
             let sts = this.currentlyVisibleSymbolTableSections[i];
             if(i > symbolTablesToShow.length || sts.symbolTable != symbolTablesToShow[i] || firstNonFittingFound){
-                sts.hide();
                 firstNonFittingFound = true;
             } else {
                 remainingSymbolTableSections.push(sts);
+                sts.attachNodesToTreeview();
             }
         }
 
         while(remainingSymbolTableSections.length < symbolTablesToShow.length){
             let index = remainingSymbolTableSections.length;
-            remainingSymbolTableSections.push(new SymbolTableSection(this.showVariablesDiv, symbolTablesToShow[index]));
+            remainingSymbolTableSections.push(new SymbolTableSection(this.showVariablesTreeview, symbolTablesToShow[index]));
         }
         
         this.currentlyVisibleSymbolTableSections = remainingSymbolTableSections;
 
+
         for(let sts of this.currentlyVisibleSymbolTableSections){
+            sts.attachNodesToTreeview();
             sts.renewValues(thread.s, programState.stackBase);
         }
 
     }
 
 
-    hideAll(){
-        for(let ssm of this.currentlyVisibleSymbolTableSections){
-            ssm.hide();
-        }
-    }
 
 
 }

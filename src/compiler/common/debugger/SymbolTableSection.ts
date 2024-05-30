@@ -6,21 +6,11 @@ import { DebuggerEntry, StackElementDebuggerEntry } from "./DebuggerEntry";
 
 export class SymbolTableSection {
 
-    treeview: Treeview<DebuggerEntry>;
     children: StackElementDebuggerEntry[] = [];
 
-    constructor(divToRenderInto: HTMLDivElement, 
+    constructor(public treeview: Treeview<DebuggerEntry>, 
         public symbolTable: BaseSymbolTable) {
         
-        this.treeview = new Treeview(divToRenderInto, {
-            minHeight: 0,
-            captionLine: {
-                enabled: false
-            },
-            flexWeight: "0",
-            withDeleteButtons: false,
-            withDragAndDrop: false
-        });
         // divToRenderInto.prepend(this.treeview.outerDiv);
 
         let symbols = symbolTable.getSymbolsForDebugger();
@@ -38,12 +28,10 @@ export class SymbolTableSection {
 
     }
 
-    hide(){
-        this.treeview.outerDiv.style.display = "none";
-    }
-
-    show(){
-        this.treeview.outerDiv.style.display = "flex";
+    attachNodesToTreeview() {
+        for(let child of this.children){
+            child.treeViewNode.attach();
+        }
     }
 
 }

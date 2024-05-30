@@ -16,7 +16,7 @@ export class TreeviewNode<E> {
     public setFocus(value: boolean) {
         if (value) this.treeview.unfocusAllNodes();
         this._hasFocus = value;
-        if(this.nodeLineDiv){
+        if (this.nodeLineDiv) {
             this.nodeLineDiv.classList.toggle('jo_treeview_focus', value);
         }
     }
@@ -27,7 +27,7 @@ export class TreeviewNode<E> {
     }
     public setSelected(value: boolean) {
         this._isSelected = value;
-        if(this.nodeLineDiv){
+        if (this.nodeLineDiv) {
             this.nodeLineDiv.classList.toggle('jo_treeview_selected', value);
         }
     }
@@ -60,7 +60,7 @@ export class TreeviewNode<E> {
     private currentIconClass?: string;
 
     private _onClickHandler?: TreeviewNodeOnClickHandler<E>;
-    set onClickHandler(och: TreeviewNodeOnClickHandler<E>){
+    set onClickHandler(och: TreeviewNodeOnClickHandler<E>) {
         this._onClickHandler = och;
     }
 
@@ -72,7 +72,7 @@ export class TreeviewNode<E> {
         private _parentExternalReference: any,
         private _renderCaptionAsHtml: boolean = false) {
 
-            _treeview.addNodeInternal(this);
+        _treeview.addNodeInternal(this);
     }
 
     findAndCorrectParent() {
@@ -91,11 +91,11 @@ export class TreeviewNode<E> {
     render() {
         if (!this.nodeWithChildrenDiv) {
             this.buildHtmlScaffolding();
-        }  
+        }
 
         if (this.isRootNode()) return;
 
-        if(this._renderCaptionAsHtml){
+        if (this._renderCaptionAsHtml) {
             this.captionDiv.innerHTML = this.caption;
         } else {
             this.captionDiv.textContent = this.caption;
@@ -139,7 +139,7 @@ export class TreeviewNode<E> {
     }
     public set caption(value: string) {
         this._caption = value;
-        if(this._renderCaptionAsHtml){
+        if (this._renderCaptionAsHtml) {
             this.captionDiv.innerHTML = value;
         } else {
             this.captionDiv.textContent = value;
@@ -150,7 +150,7 @@ export class TreeviewNode<E> {
     }
     public set isFolder(value: boolean) {
         this._isFolder = value;
-        if(value){
+        if (value) {
             this.expandCollapseComponent.show();
         } else {
             this.expandCollapseComponent.hide();
@@ -170,7 +170,7 @@ export class TreeviewNode<E> {
 
     buildHtmlScaffolding() {
 
-        if(!this.parent && !this.isRootNode()){
+        if (!this.parent && !this.isRootNode()) {
             this.findAndCorrectParent();
         }
 
@@ -217,8 +217,8 @@ export class TreeviewNode<E> {
                 this.setSelected(true);
                 this.treeview.addToSelection(this);
                 this.setFocus(true);
-                if(this._onClickHandler) this._onClickHandler(this._externalObject!);
-                if(this.treeview.onNodeClickedHandler) this.treeview.onNodeClickedHandler(this._externalObject!);
+                if (this._onClickHandler) this._onClickHandler(this._externalObject!);
+                if (this.treeview.onNodeClickedHandler) this.treeview.onNodeClickedHandler(this._externalObject!);
             }
 
         }
@@ -227,9 +227,9 @@ export class TreeviewNode<E> {
         this.childrenLineDiv = DOM.makeDiv(this.childrenDiv, 'jo_treeviewChildrenLineDiv');
 
         this.expandCollapseComponent =
-        new ExpandCollapseComponent(this.expandCollapseDiv, (state: ExpandCollapseState) => {
-            this.toggleChildrenDiv(state);
-        }, "expanded")
+            new ExpandCollapseComponent(this.expandCollapseDiv, (state: ExpandCollapseState) => {
+                this.toggleChildrenDiv(state);
+            }, "expanded")
         if (!this.isRootNode()) {
             this.captionDiv.onpointerup = () => {
                 // this.expandCollapseComponent.toggleState();
@@ -324,13 +324,13 @@ export class TreeviewNode<E> {
 
                 if (this.treeview.renameCallback(this._externalObject!, newText, this)) {
                     this.caption = newText;
-                    if(this.treeview.config.comparator){
+                    if (this.treeview.config.comparator) {
                         this.parent?.sort(this.treeview.config.comparator);
                     }
                 }
 
             }
-        }, {start: 0, end: this._caption.length});
+        }, { start: 0, end: this._caption.length });
     }
 
     /**
@@ -361,22 +361,22 @@ export class TreeviewNode<E> {
         }
 
         let endPos = this.nodeWithChildrenDiv.getBoundingClientRect().bottom - top;
-        if(this.children.length > 0) endPos = this.children[this.children.length - 1].nodeWithChildrenDiv.getBoundingClientRect().bottom - top;
+        if (this.children.length > 0) endPos = this.children[this.children.length - 1].nodeWithChildrenDiv.getBoundingClientRect().bottom - top;
 
         return { index: this.children.length, insertPosY: endPos }
     }
 
     containsNode(node: TreeviewNode<E>): boolean {
-        if(this == node) return true;
-        for(let c of this.children){
-            if(c.containsNode(node)) return true;
+        if (this == node) return true;
+        for (let c of this.children) {
+            if (c.containsNode(node)) return true;
         }
         return false;
     }
 
     selectionContainsThisNode(): boolean {
-        for(let node of this.treeview.getCurrentlySelectedNodes()){
-            if(node.containsNode(this)){
+        for (let node of this.treeview.getCurrentlySelectedNodes()) {
+            if (node.containsNode(this)) {
                 return true;
             }
         }
@@ -414,8 +414,8 @@ export class TreeviewNode<E> {
 
         if (this.isFolder) {
             this.dropzoneDiv.ondragover = (event) => {
-                
-                if(event.dataTransfer){
+
+                if (event.dataTransfer) {
                     event.dataTransfer.dropEffect = "move";
                 }
 
@@ -440,7 +440,7 @@ export class TreeviewNode<E> {
 
                 this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', true);
 
-                if(!selectionContainsThisNode){
+                if (!selectionContainsThisNode) {
                     event.preventDefault();
                     event.stopPropagation();
                 }
@@ -459,15 +459,15 @@ export class TreeviewNode<E> {
 
             }
 
-            this.dropzoneDiv.onclick = () => {this.stopDragAndDrop();}
-            this.nodeWithChildrenDiv.onclick = () => {this.stopDragAndDrop();}
+            this.dropzoneDiv.onclick = () => { this.stopDragAndDrop(); }
+            this.nodeWithChildrenDiv.onclick = () => { this.stopDragAndDrop(); }
 
             this.dropzoneDiv.ondrop = (event) => {
                 this.dragAndDropDestinationDiv.style.display = "none";
 
                 this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', false);
 
-                if(this.selectionContainsThisNode()){
+                if (this.selectionContainsThisNode()) {
                     event.preventDefault();
                     event.stopPropagation();
                     return;
@@ -487,12 +487,12 @@ export class TreeviewNode<E> {
 
                 let movedElements: E[] = this.treeview.getCurrentlySelectedNodes().map(n => n.externalObject!);
                 let folder: E | null = this.externalObject;
-                
+
                 let nodeBefore: TreeviewNode<E> | null = null;
                 let index = ddi.index;
-                while(nodeBefore == null && index > 0){
+                while (nodeBefore == null && index > 0) {
                     nodeBefore = index > 0 ? this.children[ddi.index - 1] : null;
-                    if(nodeBefore?.selectionContainsThisNode()){
+                    if (nodeBefore?.selectionContainsThisNode()) {
                         nodeBefore = null;
                         index--;
                     }
@@ -513,7 +513,7 @@ export class TreeviewNode<E> {
                             nodesToInsert.push(node);
                         }
                     }
-                    
+
                     let insertIndex: number = nodeBefore == null ? 0 : this.children.indexOf(nodeBefore) + 1;
                     this.children.splice(insertIndex, 0, ...nodesToInsert);
 
@@ -533,7 +533,7 @@ export class TreeviewNode<E> {
 
     }
 
-    stopDragAndDrop(){
+    stopDragAndDrop() {
         this.dragAndDropDestinationDiv.style.display = "none";
 
         this.nodeWithChildrenDiv.classList.toggle('jo_treeviewNode_highlightDragDropDestination', false);
@@ -604,7 +604,7 @@ export class TreeviewNode<E> {
 
     public remove(child: TreeviewNode<E>) {
         let index = this.children.indexOf(child);
-        if(index >= 0) this.children.splice(index, 1);
+        if (index >= 0) this.children.splice(index, 1);
     }
 
     public sort(comparator: (e1: E, e2: E) => number) {
@@ -637,9 +637,23 @@ export class TreeviewNode<E> {
 
     }
 
-    removeChildren(){
+    removeChildren() {
         this.children = [];
         DOM.clear(this.childrenDiv);
+    }
+
+    detach() {
+        if(this.parent == this.treeview.rootNode){
+            this.treeview.rootNode.childrenDiv.removeChild(this.nodeWithChildrenDiv);
+        }
+        this.treeview.nodes.splice(this.treeview.nodes.indexOf(this), 1);
+    }
+
+    attach() {
+        if(this.treeview.nodes.indexOf(this) < 0) this.treeview.nodes.push(this);
+        if(this.parent == this.treeview.rootNode){
+            this.treeview.rootNode.childrenDiv.appendChild(this.nodeWithChildrenDiv);
+        }
     }
 
 }
