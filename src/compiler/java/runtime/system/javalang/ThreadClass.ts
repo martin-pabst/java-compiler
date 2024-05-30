@@ -60,6 +60,7 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
 
     thread?: Thread;
     runnable?: RunnableInterface;
+    name?: string;
 
     threadsToJoinWhenFinished: Thread[] = [];
 
@@ -67,11 +68,15 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
         { type: "declaration", signature: "class Thread extends Object implements Runnable" },
         { type: "method", signature: "public Thread()", java: ThreadClass.prototype._jconstructor },
         { type: "method", signature: "public Thread(Runnable runnable)", java: ThreadClass.prototype._jconstructor },
+        { type: "method", signature: "public Thread(Runnable runnable, string name)", java: ThreadClass.prototype._jconstructor },
+        { type: "method", signature: "public Thread(string name)", java: ThreadClass.prototype._jconstructor1 },
         { type: "method", signature: "public Thread.State getState()", java: ThreadClass.prototype._mj$getState$Thread_State$ },
         { type: "method", signature: "public void run()", java: ThreadClass.prototype._mj$run$void$ },
         { type: "method", signature: "public void start()", java: ThreadClass.prototype._mj$start$void$ },
         { type: "method", signature: "public void join()", java: ThreadClass.prototype._mj$join },
         { type: "method", signature: "public void join(int milliseconds)", java: ThreadClass.prototype._mj$join },
+        { type: "method", signature: "public string getName()", template: `§1.name` },
+        { type: "method", signature: "public void setName(string name)", java: ThreadClass.prototype._setName },
     ]
 
 
@@ -81,9 +86,17 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
         super();
     }
 
-    _jconstructor(t: Thread, callback?: CallbackFunction, runnable?: RunnableInterface) {
+    _jconstructor(t: Thread, callback?: CallbackFunction, runnable?: RunnableInterface, name?: string) {
         t.s.push(this);        
         this.runnable = runnable;
+        this.name = name || "user generated thread";
+        
+    }
+
+    _jconstructor1(t: Thread, callback?: CallbackFunction, name?: string) {
+        t.s.push(this);        
+        this.name = name || "user generated thread";
+        
     }
 
     _mj$getState$Thread_State$(t: Thread, callback: CallbackFunction){
@@ -108,7 +121,7 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
             let runnable = this.runnable;
             if(!runnable) runnable = this;
 
-            this.thread = t.scheduler.createThread("user generated thread", []);
+            this.thread = t.scheduler.createThread(this.name || "user generated thread", []);
             
             let that = this;
             runnable._mj$run$void$(this.thread, () => {
@@ -161,7 +174,9 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
         return new StringClass(this.getClassName() + ": ");
     }
 
-
+    _setName(name: string){
+        this.name = name;
+    }
 
 
 }
