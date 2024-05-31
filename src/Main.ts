@@ -16,7 +16,6 @@ import { ProgramControlButtons } from "./testgui/ProgramControlButtons.ts";
 import * as PIXI from 'pixi.js';
 
 import jQuery from "jquery";
-import { ProgramPointerPositionInfo } from "./compiler/common/interpreter/Scheduler.ts";
 import { ActionManager } from "./testgui/ActionManager.ts";
 import { ProgramViewerComponent } from "./testgui/ProgramViewerComponent.ts";
 import { testProgramsList } from "./testgui/testprograms/TestPrograms.ts";
@@ -48,6 +47,7 @@ import { ColorProvider } from "./compiler/common/monacoproviders/ColorProvider.t
 import spritesheetjson from '/include/graphics/spritesheet.json.txt';
 import spritesheetpng from '/include/graphics/spritesheet.png';
 import { Debugger } from "./compiler/common/debugger/Debugger.ts";
+import { ProgramPointerManager } from "./compiler/common/monacoproviders/ProgramPointerManager.ts";
 
 export class Main implements IMain {
 
@@ -148,47 +148,10 @@ export class Main implements IMain {
 
     this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager,
       new GraphicsManager(this.graphicsDiv), keyboardManager, 
-      this.breakpointManager, _debugger);
+      this.breakpointManager, _debugger, new ProgramPointerManager(this));
 
     this.initButtons();
     this.initCompiler();
-
-    this.interpreter.showProgramPointerCallback = (showHide: "show" | "hide", positionInfo?: ProgramPointerPositionInfo) => {
-      switch (showHide) {
-        case "show":
-          this.decorations?.clear();
-          let lineNumber: number | undefined = positionInfo?.range.startLineNumber! || positionInfo?.range.endLineNumber;
-          if (!lineNumber) return;
-
-          let range = new monaco.Range(lineNumber, positionInfo?.range.startColumn || 1, lineNumber, positionInfo?.range.endColumn || 100)
-
-          this.decorations = this.tabbedEditorManager.editor.editor.createDecorationsCollection([{
-            range: range,
-            options: {
-              isWholeLine: true,
-              className: "jo_revealProgramPointer",
-              overviewRuler: {
-                color: "#6fd61b",
-                position: monaco.editor.OverviewRulerLane.Center
-              },
-              minimap: {
-                color: "#6fd61b",
-                position: monaco.editor.MinimapPosition.Inline
-              }
-            },
-          },
-          {
-            range: range,
-            options: { beforeContentClassName: 'jo_revealProgramPointerBefore' }
-          }])
-          break;
-        case "hide":
-          this.decorations?.clear();
-          break;
-      }
-      // let nextStep = positionInfo?.program.stepsSingle[positionInfo.nextStepIndex];
-      // console.log(nextStep?.codeAsString);
-    }
 
     this.registerMonacoProviders();
 
@@ -290,29 +253,6 @@ export class Main implements IMain {
     let testResults = testRunner.getTestResults();
 
     this.testResultViewer.setAttribute('results', JSON.stringify(testResults));
-  }
-
-  compile() {
-
-    // let executable = this.compiler.compileIfDirty(this.files, this.tabbedEditorManager.getCurrentlyOpenedFile());
-
-    // let module = this.compiler.moduleManager.getModuleFromFile(this.tabbedEditorManager.getCurrentlyOpenedFile())!;
-
-
-    // if (module) {
-    //   TokenPrinter.print(module.tokens!, this.tokenDiv);
-    //   this.astComponent.buildTreeView(module.ast);
-
-    //   this.markErrors(module);
-    //   this.printErrors(module);
-
-    //   let codePrinter = new CodePrinter();
-
-    // }
-
-    // this.interpreter.setExecutable(executable);
-    // this.programViewerCompoment.buildTreeView(this.compiler.moduleManager);
-
   }
 
   initCompiler() {

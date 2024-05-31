@@ -5,6 +5,7 @@ import { BaseField, BaseSymbol, SymbolOnStackframe } from "../BaseSymbolTable";
 import { BaseArrayType, BaseListType, BaseType } from "../BaseType";
 import { Klass } from "../interpreter/StepFunction";
 import { ProgramState } from "../interpreter/Thread";
+import { DebM } from "./DebuggerMessages";
 import { SymbolTableSection } from "./SymbolTableSection";
 
 type RuntimeObject = {
@@ -84,6 +85,11 @@ export class DebuggerSymbolEntry {
             return;
         } 
         
+        if(["Double", "Boolean", "Integer", "Float", "Character"].indexOf(type.identifier) >= 0){
+            this.renderPrimitiveValue(o.value);
+            return;
+        }
+
         let typesDiffer: boolean = false;
         if(type != this.type){
             typesDiffer = true;
@@ -101,7 +107,8 @@ export class DebuggerSymbolEntry {
             return;
         }
 
-        this.setCaption(": ", this.type.toString() + "-Object", "jo_debugger_type");
+        this.treeViewNode.iconClass = "img_debugger-object";
+        this.setCaption(": ", this.type.toString() + "-" + DebM.object(), "jo_debugger_type");
 
         if (typesDiffer || this.children.length == 0) {
             this.removeChildren();
@@ -117,7 +124,7 @@ export class DebuggerSymbolEntry {
     }
 
     renderList(value: BaseListType){
-        this.setCaption(": ", this.type!.toString() + "-Object", "jo_debugger_type");
+        this.setCaption(": ", this.type!.toString() + "-" + DebM.object(), "jo_debugger_type");
         let elements = value.getElements();
         if(elements.length != this.oldLength){
             this.removeChildren();

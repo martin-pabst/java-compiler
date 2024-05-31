@@ -3,7 +3,9 @@ import { TreeviewAccordion } from "../../../tools/components/treeview/TreeviewAc
 import { BaseSymbolTable } from "../BaseSymbolTable";
 import { Scheduler } from "../interpreter/Scheduler";
 import { ProgramState, Thread, ThreadState } from "../interpreter/Thread";
+import { ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager";
 import { DebuggerCallstackEntry } from "./DebuggerCallstackEntry";
+import { DebM } from "./DebuggerMessages";
 import { DebuggerSymbolEntry } from "./DebuggerSymbolEntry";
 import { SymbolTableSection } from "./SymbolTableSection";
 
@@ -34,11 +36,12 @@ export class Debugger {
         this.threadsTreeview = new Treeview(this.treeviewAccordion, {
             captionLine: {
                 enabled: true,
-                text: "threads"
+                text: DebM.threads()
             },
             flexWeight: "1",
             withDeleteButtons: false,
-            withDragAndDrop: false
+            withDragAndDrop: false,
+            buttonAddFolders: false
         });
 
     }
@@ -47,11 +50,12 @@ export class Debugger {
         this.callstackTreeview = new Treeview(this.treeviewAccordion, {
             captionLine: {
                 enabled: true,
-                text: "call stack"
+                text: DebM.callStack()
             },
             flexWeight: "1",
             withDeleteButtons: false,
-            withDragAndDrop: false
+            withDragAndDrop: false,
+            buttonAddFolders: false
         });
 
     }
@@ -60,11 +64,12 @@ export class Debugger {
         this.showVariablesTreeview = new Treeview(this.treeviewAccordion, {
             captionLine: {
                 enabled: true,
-                text: "variables"
+                text: DebM.variables()
             },
             flexWeight: "3",
             withDeleteButtons: false,
-            withDragAndDrop: false
+            withDragAndDrop: false,
+            buttonAddFolders: false
         });
 
     }
@@ -120,6 +125,7 @@ export class Debugger {
                 entry, entry, undefined, true);
             node.onClickHandler = (entry) => {
                 this.showVariables(thread, entry.programState);
+                this.showProgramPosition(thread, entry);
             }
             if(i == programStack.length - 1){
                 node.setSelected(true);
@@ -128,8 +134,27 @@ export class Debugger {
 
         if(count < programStack.length){
             //@ts-ignore
-            this.callstackTreeview.addNode(false, `${programStack.length - count} weitere ...`, undefined, "x", undefined, undefined, true);
+            this.callstackTreeview.addNode(false, `${programStack.length - count} ${DebM.more()}`, undefined, "x", undefined, undefined, true);
         }
+    }
+
+    showProgramPosition(thread: Thread, entry: DebuggerCallstackEntry) {
+        if(!entry.range) return;
+
+        let position: ProgramPointerPositionInfo = {
+            module: entry.program.module,
+            program: entry.program,
+            range: entry.range            
+        }
+        
+        thread.scheduler.interpreter.programPointerManager?.show(position, {
+            key: "callstackEntry",
+            isWholeLine: true,
+            className: "jo_revealCallstackEntry",
+            minimapColor: "#3067ce",
+            rulerColor: "#3067ce",
+            beforeContentClassName: "jo_revealCallstackEntryBefore"
+        })
     }
 
     showVariables(thread: Thread, programState?: ProgramState){

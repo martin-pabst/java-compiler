@@ -4,6 +4,7 @@ import { BaseSymbolTable } from "../BaseSymbolTable";
 import { Program, Step } from "../interpreter/Program";
 import { ProgramState } from "../interpreter/Thread";
 import { IRange } from "../range/Range";
+import { DebM } from "./DebuggerMessages";
 
 export class DebuggerCallstackEntry {
 
@@ -35,7 +36,7 @@ export class DebuggerCallstackEntry {
 
     getCaption(){
         let caption: string = this.program.methodIdentifierWithClass;
-        if(caption == ".main") caption = "Hauptprogramm";
+        if(caption == ".main") caption = DebM.mainProgram();
         if(this.range && this.range.startLineNumber){
             caption += `:${this.range.startLineNumber}`
         }

@@ -2,6 +2,7 @@ import { SpeedControl } from "../../../testgui/SpeedControl.ts";
 import { JavaTypeStore } from "../../java/module/JavaTypeStore.ts";
 import { Executable } from "../Executable.ts";
 import { Module } from "../module/Module";
+import { ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager.ts";
 import { IRange } from "../range/Range";
 import { Interpreter } from "./Interpreter";
 import { Program, Step } from "./Program";
@@ -10,12 +11,7 @@ import { Thread, ThreadState, ThreadStateInfoAfterRun } from "./Thread";
 
 export enum SchedulerState { not_initialized, running, paused, stopped, error }
 
-export type ProgramPointerPositionInfo = {
-    module: Module,
-    range: IRange,
-    nextStepIndex: number,
-    program: Program
-}
+
 
 export enum SchedulerExitState { nothingMoreToDo, giveMeAdditionalTime }
 
@@ -306,7 +302,6 @@ export class Scheduler {
             module: programState.program.module,
             //@ts-ignore
             range: step.range,
-            nextStepIndex: programState.stepIndex,
             program: programState.program
         }
     }

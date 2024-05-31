@@ -5,13 +5,14 @@ import { CodeReachedAssertions } from "./CodeReachedAssertions.ts";
 import { EventManager } from "./EventManager";
 import { LoadController } from "./LoadController";
 import { DummyPrintManager, PrintManager } from "./PrintManager";
-import { ProgramPointerPositionInfo, Scheduler, SchedulerState } from "./Scheduler";
+import { Scheduler, SchedulerState } from "./Scheduler";
 import { GraphicsManager } from "./GraphicsManager.ts";
 import { IWorld } from "../../java/runtime/graphics/IWorld.ts";
 import { KeyboardManager } from "./KeyboardManager.ts";
 import { Thread, ThreadState } from "./Thread.ts";
 import { BreakpointManager } from "../BreakpointManager.ts";
 import { Debugger } from "../debugger/Debugger.ts";
+import { ProgramPointerManager, ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager.ts";
 
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
@@ -42,7 +43,6 @@ export class Interpreter {
     public printManager: PrintManager;
 
     eventManager: EventManager<InterpreterEvents> = new EventManager();
-    showProgramPointerCallback?: ShowProgramPointerCallback;
 
     objectStore: { [key: string]: any } = {};
 
@@ -70,7 +70,8 @@ export class Interpreter {
 
     constructor(printManager?: PrintManager, private actionManager?: ActionManager,
         public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager,
-        public breakpointManager?: BreakpointManager, public _debugger?: Debugger
+        public breakpointManager?: BreakpointManager, public _debugger?: Debugger,
+        public programPointerManager?: ProgramPointerManager
     ) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {
 
@@ -180,14 +181,24 @@ export class Interpreter {
     }
 
     showProgramPointer(_textPositionWithModule: ProgramPointerPositionInfo | undefined) {
-        if (this.showProgramPointerCallback) {
+        if (this.programPointerManager) {
             if (_textPositionWithModule?.range) {
                 if (_textPositionWithModule.range.startLineNumber >= 0) {
-                    this.showProgramPointerCallback("show", _textPositionWithModule);
+
+                    this.programPointerManager.show(_textPositionWithModule, {
+                        key: "programPointer",
+                        isWholeLine: true,
+                        className: "jo_revealProgramPointer",
+                        rulerColor: "#6fd61b",
+                        minimapColor: "#6fd61b",
+                        beforeContentClassName: "jo_revealProgramPointerBefore"
+                    })
+
                 }
             } else {
-                this.showProgramPointerCallback("hide");
+                this.programPointerManager.hide("programPointer");
             }
+
         }
     }
 
@@ -413,9 +424,7 @@ export class Interpreter {
     }
 
     hideProgrampointerPosition() {
-
-        if (this.showProgramPointerCallback) this.showProgramPointerCallback("hide");
-
+        this.programPointerManager?.hide("ProgramPointer");
     }
 
     registerCodeReached(key: string) {
