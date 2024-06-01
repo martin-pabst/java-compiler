@@ -103,24 +103,6 @@ export class Interpreter {
         this.setState(SchedulerState.not_initialized);
     }
 
-    setTestExecutable(executable: Executable | undefined) {
-        if (!executable) return;
-
-        executable.setTestExecutable();
-        this.executable = executable;
-        if (executable.testModule) {
-            executable.compileToJavascript();
-            if (executable.isCompiledToJavascript) {
-                this.init(executable);
-                this.setState(SchedulerState.stopped);
-            } else {
-                this.setState(SchedulerState.not_initialized);
-            }
-        } else {
-            this.setState(SchedulerState.not_initialized);
-        }
-    }
-
     setExecutable(executable: Executable | undefined) {
         if (!executable) return;
         this.executable = executable;
@@ -341,6 +323,10 @@ export class Interpreter {
 
     }
 
+    executableHasTests(): boolean {
+        return this.executable != null && this.executable.hasTests();
+    }
+
     setState(state: SchedulerState) {
 
         if (state == SchedulerState.stopped) {
@@ -377,6 +363,7 @@ export class Interpreter {
             this.actionManager.setActive("interpreter.restart", buttonRestartActive);
             this.actionManager.setActive("interpreter.stepOver", buttonStepOverActive);
             this.actionManager.setActive("interpreter.stepInto", buttonStepIntoActive);
+            this.actionManager.setActive("interpreter.startTests", this.executableHasTests() && state == SchedulerState.stopped);
 
 
         }

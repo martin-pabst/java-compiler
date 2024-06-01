@@ -18,7 +18,7 @@ import jQuery from 'jquery';
 
 import { SpeedControl } from "./SpeedControl.js";
 import { Interpreter } from '../compiler/common/interpreter/Interpreter.js';
-import { ActionManager } from './ActionManager.js';
+import { ActionManager } from '../compiler/common/interpreter/IActionManager.js';
 
 
 type ButtonData = {
@@ -39,7 +39,8 @@ export class ProgramControlButtons {
         "stepOver": [false, false, true, true, true, false],
         "stepInto": [false, false, true, true, true, false],
         "stepOut": [false, false, true, false, false, false],
-        "restart": [false, true, true, true, true, true]
+        "restart": [false, true, true, true, true, true],
+        "startTests": [false, true, true, true, true, true]
     }
 
     buttonData: ButtonData[] = [
@@ -50,6 +51,8 @@ export class ProgramControlButtons {
         { actionIdentifier: "interpreter.stepInto", title: "Step Into", iconClass: "img_step-into-dark jo_button"},
         { actionIdentifier: "interpreter.stepOut", title: "Step Out", iconClass: "img_step-out-dark jo_button"},
         { actionIdentifier: "interpreter.restart", title: "Restart", iconClass: "img_restart-dark jo_button"},
+        { actionIdentifier: "interpreter.restart", title: "Restart", iconClass: "img_restart-dark jo_button"},
+        { actionIdentifier: "interpreter.startTests", title: "Alle JUnit-Tests im Workspace ausführen", iconClass: "img_test-start jo_button"},
     ]
 
     constructor($buttonsContainer: JQuery<HTMLElement>, interpreter: Interpreter, actionManager: ActionManager){

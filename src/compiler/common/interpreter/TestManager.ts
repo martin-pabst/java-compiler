@@ -29,7 +29,7 @@ export class TestManager {
 
     constructor(private main: IMain, private actionManager: ActionManager, private testResultViewer: TestResultViewer) {
 
-        actionManager.registerAction("Run all Tests", [], (name) => {
+        actionManager.registerAction("interpreter.startTests", [], (name) => {
             this.executeAllTests();
         }, "Führt alle im aktuellen Workspace enthaltenen JUnit-Test aus.");
 
@@ -70,7 +70,7 @@ export class TestManager {
         interpreter.start();
     }
 
-    executeListOfTests(methods: JavaMethod[]) {
+    executeListOfTests(methods: JavaMethod[], testgroup: string) {
         let testRunner = new GUITestRunner();
         this.main.getInterpreter().attachAssertionObserver(new GUITestAssertions(testRunner));
 
@@ -98,7 +98,7 @@ export class TestManager {
         let testclassToTestMethodsMap = this.main.getInterpreter().executable?.getTestMethods();
         if (!testclassToTestMethodsMap) return;
         testclassToTestMethodsMap.forEach((methodList, klass) => {
-            this.executeListOfTests(methodList);
+            this.executeListOfTests(methodList, klass.identifier);
         })
     }
 
@@ -121,14 +121,14 @@ export class TestManager {
                 if (!model) return;
 
                 decorations.push(this.getDecoration(klass.module, klass.identifierRange.startLineNumber, "Alle JUnit-Tests dieser Klasse ausführen", () => {
-                    this.executeListOfTests(methods)
+                    this.executeListOfTests(methods, "")
                 }));
 
                 for (let method of methods) {
                     let annotation = method.getAnnotation("Test");
                     if(!annotation) continue;
                     decorations.push(this.getDecoration(klass.module, annotation?.range.startLineNumber, "Diesen JUnit-Test ausführen", () => {
-                        this.executeListOfTests([method]);
+                        this.executeListOfTests([method], "");
                     }));
 
                 }

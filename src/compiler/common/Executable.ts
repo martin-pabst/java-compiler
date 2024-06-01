@@ -25,6 +25,8 @@ export class Executable {
     mainModule?: Module;
     testModule?: Module;
 
+    testClassToTestMethodMap?: Map<JavaClass, JavaMethod[]>
+
     isCompiledToJavascript: boolean = false;
 
     constructor(public classObjectRegistry: KlassObjectRegistry,
@@ -108,8 +110,14 @@ export class Executable {
 
     }
 
+    hasTests(): boolean {
+        if(!this.testClassToTestMethodMap) this.getTestMethods();
+        return this.testClassToTestMethodMap!.size > 0;
+    }
+
     getTestMethods(): Map<JavaClass, JavaMethod[]> {
-        let testClassToTestMethodMap: Map<JavaClass, JavaMethod[]> = new Map();
+        if(this.testClassToTestMethodMap) return this.testClassToTestMethodMap;
+        this.testClassToTestMethodMap = new Map();
         for (let module of this.moduleManager.modules) {
             for (let type of module.types) {
                 if (type instanceof JavaClass) {
@@ -118,17 +126,17 @@ export class Executable {
 
                     if(testMethods2.length == 0) continue;
 
-                    let list = testClassToTestMethodMap.get(type);
+                    let list = this.testClassToTestMethodMap.get(type);
                     if(!list){
                         list = [];
-                        testClassToTestMethodMap.set(type, list);
+                        this.testClassToTestMethodMap.set(type, list);
                     }
                     list.push(...testMethods2);
                 }
             }
         }
 
-        return testClassToTestMethodMap;
+        return this.testClassToTestMethodMap;
     }
 
     findMainModule(test: boolean, lastOpenedFile?: File, currentlyOpenedFile?: File) {
@@ -155,12 +163,6 @@ export class Executable {
         }
 
     }
-
-    setTestExecutable() {
-        this.findMainModule(true);
-
-    }
-
 
     findModuleByFile(file?: File): Module | undefined {
         if (!file) return undefined;
