@@ -1,8 +1,6 @@
-import { Program } from "../../../../common/interpreter/Program";
-import { Scheduler } from "../../../../common/interpreter/Scheduler.ts";
-import { CallbackFunction, Helpers } from "../../../../common/interpreter/StepFunction.ts";
+import { JCM } from "../../../../../tools/language/JavaCompilerMessages.ts";
+import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts";
 import { Thread, ThreadState } from "../../../../common/interpreter/Thread";
-import { JCM } from "../../../JavaCompilerMessages.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
 

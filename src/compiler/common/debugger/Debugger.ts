@@ -1,11 +1,11 @@
 import { Treeview } from "../../../tools/components/treeview/Treeview";
 import { TreeviewAccordion } from "../../../tools/components/treeview/TreeviewAccordion";
+import { DebM } from "../../../tools/language/DebuggerMessages";
 import { BaseSymbolTable } from "../BaseSymbolTable";
 import { Scheduler } from "../interpreter/Scheduler";
 import { ProgramState, Thread, ThreadState } from "../interpreter/Thread";
 import { ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager";
 import { DebuggerCallstackEntry } from "./DebuggerCallstackEntry";
-import { DebM } from "./DebuggerMessages";
 import { DebuggerSymbolEntry } from "./DebuggerSymbolEntry";
 import { SymbolTableSection } from "./SymbolTableSection";
 

@@ -22,7 +22,7 @@ import { JavaArrayType } from "../types/JavaArrayType.ts";
 import { GenericVariantOfJavaClass, IJavaClass } from "../types/JavaClass.ts";
 import { GenericVariantOfJavaInterface, IJavaInterface } from "../types/JavaInterface.ts";
 import { SystemCollection } from "../runtime/system/collections/SystemCollection.ts";
-import { JCM } from "../JavaCompilerMessages.ts";
+import { JCM } from "../../../tools/language/JavaCompilerMessages";
 import { ObjectClass } from "../runtime/system/javalang/ObjectClassStringClass.ts";
 
 export abstract class StatementCodeGenerator extends TermCodeGenerator {

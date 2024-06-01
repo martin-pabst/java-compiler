@@ -1,4 +1,4 @@
-import { lm } from "../../../tools/language/LanguageManager";
+import { lm } from "./LanguageManager";
 
 /**
  * Debugger messages

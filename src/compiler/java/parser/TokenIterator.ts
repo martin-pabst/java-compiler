@@ -1,7 +1,7 @@
 import { ErrormessageWithId } from "../../../tools/language/LanguageManager";
 import { ErrorLevel, QuickFix } from "../../common/Error";
 import { EmptyRange, IRange } from "../../common/range/Range";
-import { JCM } from "../JavaCompilerMessages";
+import { JCM } from "../../../tools/language/JavaCompilerMessages.ts";
 import { Token, TokenList } from "../lexer/Token";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { TokenType, TokenTypeReadable } from "../TokenType";

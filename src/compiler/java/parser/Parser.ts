@@ -1,5 +1,5 @@
+import { JCM } from "../../../tools/language/JavaCompilerMessages.ts";
 import { EmptyRange, Range } from "../../common/range/Range.ts";
-import { JCM } from "../JavaCompilerMessages.ts";
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType";

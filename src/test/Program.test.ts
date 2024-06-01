@@ -1,7 +1,5 @@
 import { expect, test, vi } from 'vitest'
 import { File } from '../compiler/common/module/File';
-import { ActionManager } from '../testgui/ActionManager';
-import { JavaLibraryModuleManager } from '../compiler/java/module/libraries/JavaLibraryModuleManager';
 import { JavaCompiler } from '../compiler/java/JavaCompiler';
 import { Interpreter } from '../compiler/common/interpreter/Interpreter';
 import { TestPrintManager } from '../testgui/TestPrintManager';

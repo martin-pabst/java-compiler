@@ -1,4 +1,4 @@
-import { JCM } from "../JavaCompilerMessages";
+import { JCM } from "../../../tools/language/JavaCompilerMessages";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaModuleManager } from "../module/JavaModuleManager";
 import { JavaClass } from "../types/JavaClass";

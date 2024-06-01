@@ -1,14 +1,14 @@
-import { LibraryDeclarations } from "../../module/libraries/DeclareType";
+import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
 import { Klass } from '../../../common/interpreter/StepFunction';
-import { JRC } from '../../JavaRuntimeLibraryComments';
-import { EnumClass } from '../system/javalang/EnumClass';
-import { JavaEnum } from '../../types/JavaEnum';
-import { JavaField } from '../../types/JavaField';
 import { EmptyRange } from '../../../common/range/Range';
 import { TokenType } from '../../TokenType';
+import { LibraryDeclarations } from "../../module/libraries/DeclareType";
+import { JavaEnum } from '../../types/JavaEnum';
+import { JavaField } from '../../types/JavaField';
+import { EnumClass } from '../system/javalang/EnumClass';
 
 //@ts-ignore
-import {SpriteLibrary} from  "./SpriteLibrary.js";
+import { SpriteLibrary } from "./SpriteLibrary.js";
 
 declare var SpriteLibrary :{index: number, name: string}[];
 

@@ -1,4 +1,4 @@
-import { le, lm } from "../../tools/language/LanguageManager"
+import { le, lm } from "./LanguageManager"
 
 /**
  * Java compiler's messages

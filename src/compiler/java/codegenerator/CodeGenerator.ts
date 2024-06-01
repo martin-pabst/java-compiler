@@ -3,7 +3,7 @@ import { Program } from "../../common/interpreter/Program";
 import { CallbackFunction, Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 import { Thread } from "../../common/interpreter/Thread.ts";
 import { EmptyRange } from "../../common/range/Range.ts";
-import { JCM } from "../JavaCompilerMessages.ts";
+import { JCM } from "../../../tools/language/JavaCompilerMessages";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";

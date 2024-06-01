@@ -1,18 +1,16 @@
+import { JCM } from "../../../tools/language/JavaCompilerMessages.ts";
 import { IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
+import { ColorHelper } from "../lexer/ColorHelper.ts";
 import { JavaBaseModule } from "../module/JavaBaseModule";
+import { GenericTypeParameter } from "./GenericTypeParameter.ts";
 import { JavaField } from "./JavaField";
-import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter.ts";
-import { JavaTypeWithInstanceInitializer } from "./JavaTypeWithInstanceInitializer.ts";
 import { GenericVariantOfJavaInterface, IJavaInterface, JavaInterface } from "./JavaInterface";
-import { JavaType } from "./JavaType";
 import { JavaMethod } from "./JavaMethod";
+import { JavaType } from "./JavaType";
+import { JavaTypeWithInstanceInitializer } from "./JavaTypeWithInstanceInitializer.ts";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility";
-import { CallbackFunction, Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
-import { Thread } from "../../common/interpreter/Thread.ts";
-import { JCM } from "../JavaCompilerMessages.ts";
-import { ColorHelper } from "../lexer/ColorHelper.ts";
 
 export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     isPrimitive: false;

@@ -1,8 +1,8 @@
+import { JCM } from "../../../tools/language/JavaCompilerMessages";
 import { ErrormessageWithId } from "../../../tools/language/LanguageManager";
 import { ErrorLevel, QuickFix } from "../../common/Error";
 import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { EmptyRange, IRange } from "../../common/range/Range";
-import { JCM } from "../JavaCompilerMessages";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";

@@ -1,5 +1,5 @@
 import { Program, Step } from "../../common/interpreter/Program";
-import { JCM } from "../JavaCompilerMessages";
+import { JCM } from "../../../tools/language/JavaCompilerMessages";
 
 export class CodePrinter{
 

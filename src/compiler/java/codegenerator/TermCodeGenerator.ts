@@ -27,7 +27,7 @@ import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
 import { OuterClassFieldAccessTracker } from "./OuterClassFieldAccessTracker.ts";
 import { LabelCodeSnippet } from "./LabelManager.ts";
 import { CodeReacedAssertion, CodeReachedAssertions } from "../../common/interpreter/CodeReachedAssertions.ts";
-import { JCM } from "../JavaCompilerMessages.ts";
+import { JCM } from "../../../tools/language/JavaCompilerMessages";
 import { JavaLibraryModule } from "../module/libraries/JavaLibraryModule.ts";
 import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
 
@@ -536,9 +536,9 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             if (symbol.onStackframe()) {
                 if (symbolInformation.outerClassLevel == 0) {
                     this.missingStatementManager.onSymbolAccess(symbol, node.range, this.module.errors, isWriteAccess);
-                    return this.compileSymbolOnStackframeAccess(symbol, node.range);
+                    return this.compileSymbolOnStackframeAccess(symbol as SymbolOnStackframe, node.range);
                 } else {
-                    return this.compileOuterClassLocalVariableAccess(symbol, node.range);
+                    return this.compileOuterClassLocalVariableAccess(symbol as JavaLocalVariable, node.range);
                 }
             }
             if (symbol instanceof JavaField) {

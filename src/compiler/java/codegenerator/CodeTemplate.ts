@@ -1,6 +1,6 @@
 import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { IRange } from "../../common/range/Range";
-import { JCM } from "../JavaCompilerMessages";
+import { JCM } from "../../../tools/language/JavaCompilerMessages";
 import { JavaType } from "../types/JavaType";
 import { CodeSnippet, ConstantValue, StringCodeSnippet } from "./CodeSnippet";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";

@@ -2,7 +2,6 @@ import { ErrormessageWithId } from "../../../tools/language/LanguageManager.ts";
 import { ErrorLevel } from "../../common/Error";
 import { Helpers, Klass, StepParams } from "../../common/interpreter/StepFunction";
 import { IRange } from "../../common/range/Range";
-import { JCM } from "../JavaCompilerMessages.ts";
 import { TokenType } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
@@ -22,6 +21,7 @@ import { GenericMethod, JavaMethod } from "../types/JavaMethod";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { JavaParameter } from "../types/JavaParameter";
 import { CycleFinder } from "./CycleFinder";
+import { JCM } from "../../../tools/language/JavaCompilerMessages.ts";
 
 
 export class TypeResolver {

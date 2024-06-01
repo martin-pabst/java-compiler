@@ -1,10 +1,10 @@
 import { Treeview } from "../../../tools/components/treeview/Treeview";
 import { TreeviewNode } from "../../../tools/components/treeview/TreeviewNode";
+import { DebM } from "../../../tools/language/DebuggerMessages";
 import { BaseSymbolTable } from "../BaseSymbolTable";
 import { Program, Step } from "../interpreter/Program";
 import { ProgramState } from "../interpreter/Thread";
 import { IRange } from "../range/Range";
-import { DebM } from "./DebuggerMessages";
 
 export class DebuggerCallstackEntry {
 

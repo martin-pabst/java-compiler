@@ -1,5 +1,3 @@
-import { test } from "vitest";
-import { JCM } from "../java/JavaCompilerMessages.ts";
 import { JavaModuleManager } from "../java/module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "../java/module/libraries/JavaLibraryModuleManager.ts";
 import { JavaClass } from "../java/types/JavaClass.ts";
@@ -12,6 +10,7 @@ import { Klass, KlassObjectRegistry } from "./interpreter/StepFunction";
 import { File } from "./module/File";
 import { Module } from "./module/Module";
 import { EmptyRange } from "./range/Range";
+import { JCM } from "../../tools/language/JavaCompilerMessages.ts";
 
 type StaticInitializationStep = {
     klass: Klass,

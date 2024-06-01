@@ -1,16 +1,13 @@
-import { Klass, KlassObjectRegistry } from "../../common/interpreter/StepFunction";
-import { JCM } from "../JavaCompilerMessages";
-import { TokenType } from "../TokenType";
-import { PrimitiveStringClass } from "../runtime/system/javalang/PrimitiveStringClass";
+import { JCM } from "../../../tools/language/JavaCompilerMessages";
+import { KlassObjectRegistry } from "../../common/interpreter/StepFunction";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaClass } from "../types/JavaClass";
 import { JavaEnum } from "../types/JavaEnum";
-import { IJavaInterface, JavaInterface } from "../types/JavaInterface";
+import { IJavaInterface } from "../types/JavaInterface";
 import { JavaType } from "../types/JavaType";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType";
 import { JavaCompiledModule } from "./JavaCompiledModule";
-import { LibraryKlassType } from "./libraries/JavaLibraryModule";
 
 export class JavaTypeStore {
 

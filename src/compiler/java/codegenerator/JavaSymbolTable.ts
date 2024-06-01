@@ -5,6 +5,7 @@ import { TokenType } from "../TokenType.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaClass } from "../types/JavaClass";
 import { JavaEnum } from "../types/JavaEnum";
+import { JavaField } from "../types/JavaField.ts";
 import { JavaInterface } from "../types/JavaInterface.ts";
 import { JavaMethod } from "../types/JavaMethod.ts";
 import { JavaParameter } from "../types/JavaParameter.ts";
@@ -13,7 +14,7 @@ import { Visibility } from "../types/Visibility.ts";
 import { JavaLocalVariable } from "./JavaLocalVariable";
 
 export type LocalVariableInformation = {
-    symbol: JavaLocalVariable,
+    symbol: JavaLocalVariable | JavaField,
     outerClassLevel: number
 }
 

@@ -1,12 +1,6 @@
-import * as PIXI from 'pixi.js';
-import { Thread } from "../../../common/interpreter/Thread";
+import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
-import { ShapeClass } from './ShapeClass';
-import { FilledShapeClass } from './FilledShapeClass';
-import { CallbackFunction } from '../../../common/interpreter/StepFunction';
-import { JRC } from '../../JavaRuntimeLibraryComments';
-import { ObjectClass } from '../system/javalang/ObjectClassStringClass';
 import { EnumClass } from '../system/javalang/EnumClass';
 
 export enum RepeatType {once, loop, backAndForth}

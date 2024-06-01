@@ -1,7 +1,7 @@
 import { BaseSymbol } from "../../common/BaseSymbolTable";
 import { Error } from "../../common/Error";
 import { IRange } from "../../common/range/Range";
-import { JCM } from "../JavaCompilerMessages";
+import { JCM } from "../../../tools/language/JavaCompilerMessages";
 import { JavaMethod } from "../types/JavaMethod";
 import { JavaParameter } from "../types/JavaParameter";
 

@@ -1,20 +1,19 @@
 
 import * as PIXI from 'pixi.js';
-import { CallbackFunction } from "../../../common/interpreter/StepFunction.ts";
+import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
+import { CallbackParameter } from '../../../common/interpreter/CallbackParameter.ts';
+import { Interpreter } from '../../../common/interpreter/Interpreter.ts';
 import { Thread, ThreadState } from "../../../common/interpreter/Thread.ts";
+import { ColorHelper } from '../../lexer/ColorHelper.ts';
 import { LibraryDeclarations } from "../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType.ts";
 import { ObjectClass } from "../system/javalang/ObjectClassStringClass.ts";
-import { Interpreter } from '../../../common/interpreter/Interpreter.ts';
-import { ActorType, IActor } from './IActor.ts';
-import { IWorld } from './IWorld.ts';
 import { ActorManager } from './ActorManager.ts';
 import { GroupClass } from './GroupClass.ts';
-import { ShapeClass } from './ShapeClass.ts';
-import { CallbackParameter } from '../../../common/interpreter/CallbackParameter.ts';
-import { ColorHelper } from '../../lexer/ColorHelper.ts';
-import { JRC } from '../../JavaRuntimeLibraryComments.ts';
+import { ActorType, IActor } from './IActor.ts';
+import { IWorld } from './IWorld.ts';
 import { MouseManager } from './MouseManager.ts';
+import { ShapeClass } from './ShapeClass.ts';
 
 
 export class WorldClass extends ObjectClass implements IWorld {

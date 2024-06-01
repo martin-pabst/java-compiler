@@ -1,7 +1,6 @@
 import { Error } from "../../common/Error.ts";
 import { File } from "../../common/module/File";
 import { IRange } from "../../common/range/Range";
-import { JCM } from "../JavaCompilerMessages.ts";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaField } from "./JavaField";
 import { IJavaClass } from "./JavaClass";
@@ -10,6 +9,7 @@ import { JavaType } from "./JavaType";
 import { JavaMethod } from "./JavaMethod";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility.ts";
+import { JCM } from "../../../tools/language/JavaCompilerMessages.ts";
 
 export class GenericTypeParameter extends NonPrimitiveType {
 

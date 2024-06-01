@@ -1,11 +1,8 @@
 import { TreeviewNode } from "../../../tools/components/treeview/TreeviewNode";
-import { ObjectClass } from "../../java/runtime/system/javalang/ObjectClassStringClass";
+import { DebM } from "../../../tools/language/DebuggerMessages";
 import { GenericVariantOfJavaClass, JavaClass } from "../../java/types/JavaClass";
 import { BaseField, BaseSymbol, SymbolOnStackframe } from "../BaseSymbolTable";
 import { BaseArrayType, BaseListType, BaseType } from "../BaseType";
-import { Klass } from "../interpreter/StepFunction";
-import { ProgramState } from "../interpreter/Thread";
-import { DebM } from "./DebuggerMessages";
 import { SymbolTableSection } from "./SymbolTableSection";
 
 type RuntimeObject = {

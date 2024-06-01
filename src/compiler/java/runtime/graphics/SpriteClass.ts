@@ -1,19 +1,18 @@
 import * as PIXI from 'pixi.js';
+import { convexhull } from '../../../../tools/ConvexHull';
+import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
+import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { Thread } from "../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
-import { ShapeClass } from './ShapeClass';
-import { FilledShapeClass } from './FilledShapeClass';
-import { CallbackFunction } from '../../../common/interpreter/StepFunction';
-import { JRC } from '../../JavaRuntimeLibraryComments';
-import { RepeatType, RepeatTypeEnum } from './RepeatTypeEnum';
-import { SpriteLibraryEnum } from './SpriteLibraryEnum';
-import { ScaleMode, ScaleModeEnum } from './ScaleModeEnum';
-import { convexhull } from '../../../../tools/ConvexHull';
+import { ObjectClass } from '../system/javalang/ObjectClassStringClass';
+import { RuntimeExceptionClass } from '../system/javalang/RuntimeException';
 import { GroupClass } from './GroupClass';
 import { HitPolygonStore } from './HitPolygonStore';
-import { RuntimeExceptionClass } from '../system/javalang/RuntimeException';
-import { ObjectClass } from '../system/javalang/ObjectClassStringClass';
+import { RepeatType, RepeatTypeEnum } from './RepeatTypeEnum';
+import { ScaleMode, ScaleModeEnum } from './ScaleModeEnum';
+import { ShapeClass } from './ShapeClass';
+import { SpriteLibraryEnum } from './SpriteLibraryEnum';
 
 export class SpriteClass extends ShapeClass {
     static __javaDeclarations: LibraryDeclarations = [
