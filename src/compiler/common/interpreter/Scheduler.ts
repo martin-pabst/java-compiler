@@ -1,12 +1,14 @@
 import { SpeedControl } from "../../../testgui/SpeedControl.ts";
 import { JavaTypeStore } from "../../java/module/JavaTypeStore.ts";
+import { JavaClass } from "../../java/types/JavaClass.ts";
+import { JavaMethod } from "../../java/types/JavaMethod.ts";
 import { Executable } from "../Executable.ts";
 import { Module } from "../module/Module";
 import { ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager.ts";
 import { IRange } from "../range/Range";
 import { Interpreter } from "./Interpreter";
 import { Program, Step } from "./Program";
-import { KlassObjectRegistry, Klass } from "./StepFunction.ts";
+import { KlassObjectRegistry, Klass, StepParams, Helpers } from "./StepFunction.ts";
 import { Thread, ThreadState, ThreadStateInfoAfterRun } from "./Thread";
 
 export enum SchedulerState { not_initialized, running, paused, stopped, error }
@@ -36,6 +38,8 @@ export class Scheduler {
     // if pause button is pressed when there is no thread 
     // and Program has actors then interpreter sets this callback:
     onStartingNextThreadCallback?: () => void;
+
+    callbackAfterProgramFinished?: () => void;
 
     constructor(public interpreter: Interpreter) {
         this.setState(SchedulerState.not_initialized);
@@ -147,6 +151,11 @@ export class Scheduler {
                             if (threadState.state == ThreadState.terminatedWithException) {
                                 this.interpreter.setState(SchedulerState.error);
                             }
+                            if(this.callbackAfterProgramFinished){
+                                let cb = this.callbackAfterProgramFinished;
+                                this.callbackAfterProgramFinished = undefined;
+                                cb();
+                            }
                             return SchedulerExitState.nothingMoreToDo;
                         }
                         break;
@@ -184,6 +193,7 @@ export class Scheduler {
                     this.interpreter.printManager.print("Duration: " + Math.round(dt * 100) / 100 + " ms, " + this.stepCountSinceStartOfProgram + " steps, " + SpeedControl.printMillions(stepsPerSecond) + " steps/s", true, undefined);
                 }
                 this.terminateAllThreads();
+                break;
         }
         this.state = newState;
     }
@@ -306,15 +316,20 @@ export class Scheduler {
         }
     }
 
-    init(executable: Executable): Thread | undefined {
-
+    private initIntern(executable: Executable){
         this.classObjectRegistry = executable.classObjectRegistry;
         this.libraryTypeStore = executable.libraryModuleManager.typestore;
 
         this.runningThreads = [];
+        this.suspendedThreads = [];
         this.currentThreadIndex = 0;
 
         this.keepThread = false;
+    }
+
+    init(executable: Executable): Thread | undefined {
+
+        this.initIntern(executable);
 
         let mainThread = this.createThread("main thread");
 
@@ -332,6 +347,48 @@ export class Scheduler {
         }
 
         return mainThread;
+    }
+
+    initJUnitTestMethodAndReturnMainThread(executable: Executable | undefined, method: JavaMethod, callback: () => void): Thread | undefined {
+        if(!executable) return undefined;
+        this.initIntern(executable);
+        let mainThread = this.createThread("main thread");
+
+        let klass = method.classEnumInterface as JavaClass;
+
+        let parameterlessConstructors = klass.getAllMethods().filter(m => m.isConstructor && m.parameters.length == 0);
+        if(parameterlessConstructors.length == 0){
+            console.log("Couldn't find parameterless constrructor for class " + klass.identifier + ".");
+            return undefined;
+        }
+
+        let parameterlessConstructor = parameterlessConstructors[0]!;
+
+        let program = new Program(klass.module, undefined, klass.identifier + ".testStub_" + method.identifier);
+        let statement1 = `new ${Helpers.classes}["${klass.identifier}"]().${parameterlessConstructor.getInternalName("java")}(${StepParams.thread}, ${StepParams.stack}, undefined);
+                          return 1;\n`;
+        program.addStep(statement1);
+        let statement2 = `${Helpers.elementRelativeToStackbase(0)}.${method.getInternalName("java")}(${StepParams.thread}, undefined);
+                          return 2; `;
+        program.addStep(statement2);
+
+        let statement3 = `${Helpers.return}(); `;
+        program.addStep(statement3);
+
+        if (!program.compileToJavascriptFunctions()) {
+            console.log("TestManager.executeSingleTest: Error compiling test method stub.");
+            return undefined;
+        }
+
+        mainThread.pushProgram(program);
+        this.callbackAfterProgramFinished = callback;
+
+        for (let staticInitStep of executable.staticInitializationSequence) {
+            mainThread.pushProgram(staticInitStep.program);
+        }
+
+        return mainThread;
+
     }
 
     getCurrentThread(): Thread | undefined {
@@ -353,6 +410,11 @@ export class Scheduler {
 
     setMaxSpeed(value: number, isMaxSpeed: boolean) {
         this.runningThreads.filter(t => t.name != 'act method-thread').forEach(t => t.maxStepsPerSecond = isMaxSpeed ? undefined : value);
+    }
+
+    removeAllThreads(){
+        this.runningThreads = [];
+        this.suspendedThreads = [];
     }
 
 }

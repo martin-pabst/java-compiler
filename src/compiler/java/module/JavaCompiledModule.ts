@@ -170,7 +170,7 @@ export class JavaCompiledModule extends JavaBaseModule {
 
         let THIS = mainRuntimeClass;
         
-        methodStub.call(THIS, thread, []);
+        methodStub.call(THIS, thread, thread.s);
 
         return true;
 
@@ -185,7 +185,7 @@ export class JavaCompiledModule extends JavaBaseModule {
         let tableWithSmallestNumberOfLines: JavaSymbolTable | undefined;
         let smallestNumberOfLines: number = Number.MAX_SAFE_INTEGER;
         for(let table of this.symbolTables){
-            let t1: JavaSymbolTable | undefined = table.findSymbolTableAtPosition(position);
+            let t1: JavaSymbolTable | undefined = table.findSymbolTableAtPosition(position) as JavaSymbolTable;
             if(t1){
                 let lineCount = t1.range.endLineNumber - t1.range.startLineNumber + 1;
                 if(lineCount < smallestNumberOfLines){

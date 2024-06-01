@@ -108,19 +108,27 @@ export class Executable {
 
     }
 
-    getTestMethods() {
-        let testMethods: JavaMethod[] = [];
+    getTestMethods(): Map<JavaClass, JavaMethod[]> {
+        let testClassToTestMethodMap: Map<JavaClass, JavaMethod[]> = new Map();
         for (let module of this.moduleManager.modules) {
             for (let type of module.types) {
                 if (type instanceof JavaClass) {
                     let testMethods2 = type.getOwnMethods()
                         .filter(m => !m.isConstructor && m.hasAnnotation("Test") && m.returnParameterType?.identifier == "void" && m.parameters.length == 0);
-                    testMethods = [...testMethods, ...testMethods2];
+
+                    if(testMethods2.length == 0) continue;
+
+                    let list = testClassToTestMethodMap.get(type);
+                    if(!list){
+                        list = [];
+                        testClassToTestMethodMap.set(type, list);
+                    }
+                    list.push(...testMethods2);
                 }
             }
         }
 
-        return testMethods;
+        return testClassToTestMethodMap;
     }
 
     findMainModule(test: boolean, lastOpenedFile?: File, currentlyOpenedFile?: File) {

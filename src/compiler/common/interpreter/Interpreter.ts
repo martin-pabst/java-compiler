@@ -1,4 +1,3 @@
-import { ActionManager } from "../../../testgui/ActionManager.ts";
 import { AssertionObserver } from "../../java/runtime/unittests/AssertionObserver.ts";
 import { Executable } from "../Executable.ts";
 import { CodeReachedAssertions } from "./CodeReachedAssertions.ts";
@@ -13,6 +12,9 @@ import { Thread, ThreadState } from "./Thread.ts";
 import { BreakpointManager } from "../BreakpointManager.ts";
 import { Debugger } from "../debugger/Debugger.ts";
 import { ProgramPointerManager, ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager.ts";
+import { Program } from "./Program.ts";
+import { TestManager } from "./TestManager.ts";
+import { ActionManager } from "./IActionManager.ts";
 
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
@@ -71,7 +73,7 @@ export class Interpreter {
     constructor(printManager?: PrintManager, private actionManager?: ActionManager,
         public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager,
         public breakpointManager?: BreakpointManager, public _debugger?: Debugger,
-        public programPointerManager?: ProgramPointerManager
+        public programPointerManager?: ProgramPointerManager, public testManager?: TestManager
     ) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {
 
@@ -122,17 +124,18 @@ export class Interpreter {
     setExecutable(executable: Executable | undefined) {
         if (!executable) return;
         this.executable = executable;
-        if (executable.mainModule) {
+        // if (executable.mainModule || executable.hasTests()) {
             executable.compileToJavascript();
             if (executable.isCompiledToJavascript) {
                 this.init(executable);
                 this.setState(SchedulerState.stopped);
+                this.testManager?.markTestsInEditor();
             } else {
                 this.setState(SchedulerState.not_initialized);
             }
-        } else {
-            this.setState(SchedulerState.not_initialized);
-        }
+        // } else {
+        //     this.setState(SchedulerState.not_initialized);
+        // }
     }
 
     attachAssertionObserver(observer: AssertionObserver) {
@@ -353,10 +356,29 @@ export class Interpreter {
                 this.actionManager.setActive("interpreter." + actionId, this.buttonActiveMatrix[actionId][state]);
             }
 
+            let mainModuleExists = this.executable?.mainModule != null;
+            let mainModuleExistsOrTestIsRunning = mainModuleExists || (state == 2 && this.scheduler.state == 1);
+
             let buttonStartActive = this.buttonActiveMatrix['start'][state];
+            buttonStartActive = buttonStartActive && mainModuleExistsOrTestIsRunning;
+
+            let buttonRestartActive = this.buttonActiveMatrix['restart'][state];
+            buttonRestartActive = buttonRestartActive && mainModuleExists;
+
+            let buttonStepOverActive = this.buttonActiveMatrix['stepOver'][state];
+            buttonStepOverActive = buttonStepOverActive && mainModuleExistsOrTestIsRunning;
+
+            let buttonStepIntoActive = this.buttonActiveMatrix['stepInto'][state];
+            buttonStepIntoActive = buttonStepIntoActive && mainModuleExistsOrTestIsRunning;
 
             this.actionManager.showHideButtons("interpreter.start", buttonStartActive);
             this.actionManager.showHideButtons("interpreter.pause", !buttonStartActive);
+
+            this.actionManager.setActive("interpreter.restart", buttonRestartActive);
+            this.actionManager.setActive("interpreter.stepOver", buttonStepOverActive);
+            this.actionManager.setActive("interpreter.stepInto", buttonStepIntoActive);
+
+
         }
 
         if (state == SchedulerState.stopped) {

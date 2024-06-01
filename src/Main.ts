@@ -16,7 +16,6 @@ import { ProgramControlButtons } from "./testgui/ProgramControlButtons.ts";
 import * as PIXI from 'pixi.js';
 
 import jQuery from "jquery";
-import { ActionManager } from "./testgui/ActionManager.ts";
 import { ProgramViewerComponent } from "./testgui/ProgramViewerComponent.ts";
 import { testProgramsList } from "./testgui/testprograms/TestPrograms.ts";
 import { TabbedEditorManager } from "./tools/TabbedEditorManager.ts";
@@ -48,6 +47,9 @@ import spritesheetjson from '/include/graphics/spritesheet.json.txt';
 import spritesheetpng from '/include/graphics/spritesheet.png';
 import { Debugger } from "./compiler/common/debugger/Debugger.ts";
 import { ProgramPointerManager } from "./compiler/common/monacoproviders/ProgramPointerManager.ts";
+import { JavaMethod } from "./compiler/java/types/JavaMethod.ts";
+import { TestManager } from "./compiler/common/interpreter/TestManager.ts";
+import { ActionManager } from "./compiler/common/interpreter/IActionManager.ts";
 
 export class Main implements IMain {
 
@@ -148,7 +150,8 @@ export class Main implements IMain {
 
     this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager,
       new GraphicsManager(this.graphicsDiv), keyboardManager, 
-      this.breakpointManager, _debugger, new ProgramPointerManager(this));
+      this.breakpointManager, _debugger, new ProgramPointerManager(this),
+    new TestManager(this, this.actionManager, this.testResultViewer));
 
     this.initButtons();
     this.initCompiler();
@@ -223,7 +226,9 @@ export class Main implements IMain {
     if (!executable) {
       return;
     }
-    let testMethods = executable.getTestMethods();
+    let testMethodMap = executable.getTestMethods();
+    let testMethods: JavaMethod[] = [];
+    testMethodMap.forEach((methodList, klass) => {testMethods = testMethods.concat(methodList)});
 
     let testRunner = new GUITestRunner();
     this.interpreter.attachAssertionObserver(new GUITestAssertions(testRunner));

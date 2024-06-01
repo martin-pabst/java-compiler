@@ -11,6 +11,7 @@ import { ASTAnnotationNode, ASTAnonymousClassNode, ASTBlockNode, ASTClassDefinit
 import { ObjectClass } from "../runtime/system/javalang/ObjectClassStringClass.ts";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
 import { GenericTypeParameter } from "../types/GenericTypeParameter.ts";
+import { JavaAnnotation } from "../types/JavaAnnotation.ts";
 import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
 import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
@@ -595,8 +596,9 @@ export class CodeGenerator extends StatementCodeGenerator {
         this.popSymbolTable();
 
     }
-    compileAnnotation(node: ASTAnnotationNode): string {
-        return node.identifier;
+
+    compileAnnotation(node: ASTAnnotationNode): JavaAnnotation {
+        return new JavaAnnotation(node.identifier, node.range);
     }
 
     checkIfSuperconstructorCallPresent(statement: ASTStatementNode | undefined): [boolean, boolean] {

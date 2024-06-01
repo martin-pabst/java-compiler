@@ -15,6 +15,7 @@ import { JavaType } from "./JavaType";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { JavaParameter } from "./JavaParameter";
 import { Visibility } from "./Visibility";
+import { JavaAnnotation } from "./JavaAnnotation.ts";
 
 export class JavaMethod extends BaseSymbol {
 
@@ -28,7 +29,7 @@ export class JavaMethod extends BaseSymbol {
 
     isSynchronized: boolean = false;
 
-    annotations: String[] = [];
+    annotations: JavaAnnotation[] = [];
 
     program?: Program;
 
@@ -239,11 +240,15 @@ export class JavaMethod extends BaseSymbol {
     }
 
 
-    hasAnnotation(annotation: string) {
-        return this.annotations.includes(annotation);
+    hasAnnotation(identifier: string) {
+        return this.annotations.find(a => a.identifier == identifier) != null;
+    }
+    
+    getAnnotation(identifier: string){
+        return this.annotations.find(a => a.identifier == identifier);
     }
 
-    setAnnotations(annotations: string[]) {
+    setAnnotations(annotations: JavaAnnotation[]) {
         this.annotations = annotations;
     }
 
