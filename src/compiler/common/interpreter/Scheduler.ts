@@ -46,10 +46,26 @@ export class Scheduler {
     }
 
 
+    /**
+     * This method is called every tick by LoadController.tick and gets told how many steps it may execute. It distributes 
+     * this steps evenly among all running threads and calls their run-method.
+     * 
+     * This one of three nested main loops:
+     * 
+     * Outer loop: LoadController.tick
+     * Middle loop: this one
+     * Inner loop: Thread.run
+     * @param numberOfStepsMax 
+     * @returns 
+     */
     run(numberOfStepsMax: number): SchedulerExitState {
 
         this.periodicallyUpdateDebugger();
 
+        if (this.state != SchedulerState.running) return SchedulerExitState.nothingMoreToDo;
+
+        // If pause button is pressed while no thread is in state running then noStartinNextThreadCallback is set to wait 
+        // for next running thread. This is neccessary because we we want to show program pointer immediately after program is paused.
         if (this.onStartingNextThreadCallback) {
             if (this.getNextStepPosition()) {
                 this.onStartingNextThreadCallback();
@@ -58,11 +74,9 @@ export class Scheduler {
             }
         }
 
-        if (this.state != SchedulerState.running) return SchedulerExitState.nothingMoreToDo;
-
         let stepsPerThread = Math.ceil(numberOfStepsMax / this.runningThreads.length);
 
-        let numberOfStepsInThisRun = 0;
+        let numberOfStepsInThisRun = 0;     // for displaying number of steps after program halt
         if (this.runningThreads.length == 0) return SchedulerExitState.nothingMoreToDo;
 
         let lastStoredStepsInThisRun = -1;          // watchdog uses this to decide if there's any runnable thread left
@@ -74,7 +88,7 @@ export class Scheduler {
 
         while (numberOfStepsInThisRun < numberOfStepsMax && this.state == SchedulerState.running) {
 
-            // watchdog:
+            // watchdog: if all threads had beed run once and no one executed a step then exit the loop to avoid endless looping when there's nothing to do: 
             if (this.currentThreadIndex == 0) {
                 if (lastStoredStepsInThisRun == numberOfStepsInThisRun || this.runningThreads.length == 0) {
                     break;
@@ -82,6 +96,7 @@ export class Scheduler {
                 lastStoredStepsInThisRun = numberOfStepsInThisRun;
             }
 
+            // fetch next thread (round robin)
             let currentThread = this.runningThreads[this.currentThreadIndex];
             if (!currentThread) {
                 if (this.runningThreads.length > 0) {
@@ -93,21 +108,20 @@ export class Scheduler {
                 }
             }
 
-            /**
-             * Let thread run!
-             */
+            // has current thread a speed limit?
             if (currentThread.maxStepsPerSecond) {
                 let t = performance.now();
                 let msPerStep = 1000 / currentThread.maxStepsPerSecond;
-                let elapsedTime = t - currentThread.timeLastStepExecuted;
-                let numberOfSteps = Math.min(elapsedTime / msPerStep, stepsPerThread);
+                let elapsedTimeSinceLastThreadRun = t - currentThread.lastTimeThreadWasRun;
+                let numberOfSteps = Math.min(elapsedTimeSinceLastThreadRun / msPerStep, stepsPerThread);
                 if (numberOfSteps > 0) {
 
                     // run!
                     threadState = currentThread.run(numberOfSteps);
                     
-                    currentThread.timeLastStepExecuted =
-                        currentThread.timeLastStepExecuted + threadState.stepsExecuted * msPerStep;
+                    // compute lastTimeThreadWasRun in a way to achieve exact step frequency currentThread.maxStepsPerSecond
+                    currentThread.lastTimeThreadWasRun =
+                        currentThread.lastTimeThreadWasRun + threadState.stepsExecuted * msPerStep;
                     if (currentThread.maxStepsPerSecond < 20) {
                         this.interpreter.showProgramPointer(this.getNextStepPosition(currentThread));
                         this.interpreter.updateDebugger();
@@ -115,17 +129,18 @@ export class Scheduler {
                         if (this.state == SchedulerState.running) this.interpreter.hideProgrampointerPosition();
                     }
                 } else {
-                    threadState.state = currentThread.state;
+                    threadState.state = currentThread.state;  // this is crucial as threadState.state would otherwise have a stale value of last running thread
+                    threadState.stepsExecuted = 0;
                     if (this.runningThreads.length == 1) {
                         return SchedulerExitState.nothingMoreToDo;
                     }
                 }
             } else {
-                // run!
+                // run in full speed!
                 threadState = currentThread.run(stepsPerThread);
             }
 
-            numberOfStepsInThisRun += threadState.stepsExecuted;  // to avoid endless loop
+            numberOfStepsInThisRun += threadState.stepsExecuted;  // to avoid endless loop and to keep statistics
 
             if (threadState.state != ThreadState.runnable) {
                 switch (threadState.state) {
@@ -135,7 +150,7 @@ export class Scheduler {
 
                         this.runningThreads.splice(this.currentThreadIndex, 1);
                         if (this.currentThreadIndex > this.runningThreads.length - 1) {
-                            this.currentThreadIndex = -1;
+                            this.currentThreadIndex = -1;   // it gets incremented by 1 later on
                             this.keepThread = false;
                         }
 
@@ -147,6 +162,7 @@ export class Scheduler {
                             }
 
                             this.stepCountSinceStartOfProgram += numberOfStepsInThisRun;
+
                             this.interpreter.setState(SchedulerState.stopped);
                             if (threadState.state == ThreadState.terminatedWithException) {
                                 this.interpreter.setState(SchedulerState.error);
@@ -167,6 +183,8 @@ export class Scheduler {
 
             }
 
+            // If user pressed stepOver or stepInto button then she/he expects
+            // program pointer to stay inside current thread. Therefore keepThread == true is set in this case.
             if (!this.keepThread) {
                 this.currentThreadIndex++;
                 if (this.currentThreadIndex >= this.runningThreads.length) {
@@ -351,31 +369,39 @@ export class Scheduler {
 
     initJUnitTestMethodAndReturnMainThread(executable: Executable | undefined, method: JavaMethod, callback: () => void): Thread | undefined {
         if(!executable) return undefined;
+
         this.initIntern(executable);
+
         let mainThread = this.createThread("main thread");
 
         let klass = method.classEnumInterface as JavaClass;
+        let program = new Program(klass.module, undefined, klass.identifier + ".testStub_" + method.identifier);
 
+        // Step 1: instantiate object and call it's parameterless constructor
         let parameterlessConstructors = klass.getAllMethods().filter(m => m.isConstructor && m.parameters.length == 0);
         if(parameterlessConstructors.length == 0){
+            // this shouldn't happen:
             console.log("Couldn't find parameterless constrructor for class " + klass.identifier + ".");
             return undefined;
         }
 
         let parameterlessConstructor = parameterlessConstructors[0]!;
 
-        let program = new Program(klass.module, undefined, klass.identifier + ".testStub_" + method.identifier);
         let statement1 = `new ${Helpers.classes}["${klass.identifier}"]().${parameterlessConstructor.getInternalName("java")}(${StepParams.thread}, ${StepParams.stack}, undefined);
                           return 1;\n`;
         program.addStep(statement1);
+
+        // Step 2: call test method
         let statement2 = `${Helpers.elementRelativeToStackbase(0)}.${method.getInternalName("java")}(${StepParams.thread}, undefined);
                           return 2; `;
         program.addStep(statement2);
 
+        // Step 3: return
         let statement3 = `${Helpers.return}(); `;
         program.addStep(statement3);
 
         if (!program.compileToJavascriptFunctions()) {
+            // this error should be impossible:
             console.log("TestManager.executeSingleTest: Error compiling test method stub.");
             return undefined;
         }
@@ -396,7 +422,7 @@ export class Scheduler {
     }
 
     resetLastTimeExecutedTimestamps() {
-        this.runningThreads.filter(t => t.maxStepsPerSecond).forEach(t => t.timeLastStepExecuted = performance.now());
+        this.runningThreads.filter(t => t.maxStepsPerSecond).forEach(t => t.lastTimeThreadWasRun = performance.now());
     }
 
     periodicallyUpdateDebugger(){

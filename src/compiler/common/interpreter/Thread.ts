@@ -77,7 +77,7 @@ export class Thread {
     classes: KlassObjectRegistry;
 
     maxStepsPerSecond?: number;
-    timeLastStepExecuted: number = performance.now();
+    lastTimeThreadWasRun: number = performance.now();
 
     callbackAfterTerminated?: () => void;
 
