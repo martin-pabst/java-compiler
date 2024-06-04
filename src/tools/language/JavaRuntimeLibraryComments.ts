@@ -84,6 +84,59 @@ export class JRC {
     "en": "Sets group to which all new graphic objects are added by default. For 'no default group' call setDefaultGroup(null).",
     })
 
+    /**
+     * Class Actor
+     */
+    
+    static actorActMethodComment = () => lm({
+    "de": "Die Methode act wird 30-mal pro Sekunde aufgerufen. Wenn Sie sie in einer Unterklasse überschreiben, so wird Ihre Methode 30-mal pro Sekunde aufgerufen.",
+    "en": "Method act is called 30 times per second. Overwrite it to get your own method being called 30 times per second.",
+    })
+
+    static actorActMethodComment2 = () => lm({
+    "de": "Die Methode act wird 30-mal pro Sekunde aufgerufen. Wenn Sie sie in einer Unterklasse überschreiben, so wird Ihre Methode 30-mal pro Sekunde aufgerufen. DletaTime ist die seit dem letzten Aufruf verstrichene Zeit in ms.",
+    "en": "Method act gets called 30 times per second. Overwrite it to get your own method being called 30 times per second. DeltaTime is time since last call in ms.",
+    })
+
+    static actorOnKeyTypedComment = () => lm({
+    "de": "onKeyTyped wird jedes Mal dann aufgerufen, wenn eine Taste heruntergedrückt und anschließend losgelassen wird. Der Parameter key enthält die gedrückte Taste. Im Fall von Sondertasten (Enter, Pfeiltasten...) wird eine der Konstanten Key.Enter, Key.ArrowUp, ... übergeben.",
+    "en": "onKeyTyped gets called after a key had been pressed and subsequently released. The key is stored in parameter key. For special keys (like enter, arrow keys, ...) use constants Key.Enter, Key.ArrowUp, ...",
+    })
+
+    static actorOnKeyUpComment = () => lm({
+    "de": "onKeyUp wird jedes Mal dann aufgerufen, wenn eine Taste losgelassen wird. Der Parameter key enthält die gedrückte Taste. Im Fall von Sondertasten (Enter, Pfeiltasten...) wird eine der Konstanten Key.Enter, Key.ArrowUp, ... übergeben.",
+    "en": "onKeyUP gets called after a key had been released. The key is stored in parameter key. For special keys (like enter, arrow keys, ...) use constants Key.Enter, Key.ArrowUp, ...",
+    })
+
+    static actorOnKeyDownComment = () => lm({
+    "de": "onKeyDown wird jedes Mal dann aufgerufen, wenn eine Taste gedrückt wird. Der Parameter key enthält die gedrückte Taste. Im Fall von Sondertasten (Enter, Pfeiltasten...) wird eine der Konstanten Key.Enter, Key.ArrowUp, ... übergeben.",
+    "en": "onKeyDown gets called after a key had been pressed down. The key is stored in parameter key. For special keys (like enter, arrow keys, ...) use constants Key.Enter, Key.ArrowUp, ...",
+    })
+
+    static getWorldComment = () => lm({
+    "de": "Gibt das aktuelle World-Objekt zurück.",
+    "en": "Returns current world object.",
+    })
+
+    static actorIsActingComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn die act-Methode 30-mal pro Sekunden aufgerufen wird. Nutzen Sie die Methoden stopActing und restartActing um dies zu deaktivieren bzw. zu aktivieren.",
+    "en": "Returns true if act method is called regularly 30 time sper second. Use Methods stopActing and restartActing to disable/enable this behaviour.",
+    })
+
+    static actorIsDestroyedComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn das Objekt durch Aufruf der Methode destroy() zerstört worden ist.",
+    "en": "Returns true if object had been destroyed by calling method destroy().",
+    })
+
+    static actorStopActingComment = () => lm({
+    "de": "Sorgt dafür, dass die act-Methode dieses Objekts zukünftig nicht mehr 30-mal pro Sekunde aufgerufen wird.",
+    "en": "Stops the act method of this object being called 30 times per second.",
+    })
+
+    static actorRestartActingComment = () => lm({
+    "de": "Sorgt dafür, dass die act-Methode dieses Objekts zukünftig wieder 30-mal pro Sekunde aufgerufen wird.",
+    "en": "Restarts the act method of this object being called 30 times per second.",
+    })
 
     /**
      * Class Shape
@@ -217,6 +270,15 @@ export class JRC {
     static shapeSetStaticComment = () => lm({
         "de": "setStatic(true) hat zur Folge, dass die Ansicht des Objekts durch Transformationen des World-Objekts nicht verändert wird.",
         "en": "setStatic(true) makes the object not follow subsequent transformations of world object.",
+    })
+
+    /**
+     * Class FilledShape
+     */
+
+    static fsGetFillColorComment = () => lm({
+    "de": "Gibt die Füllfarbe dieses Objekts als Color-Objekt zurück.",
+    "en": "Returns fill color of this object as ",
     })
 
     /**
