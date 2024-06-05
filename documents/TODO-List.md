@@ -36,17 +36,20 @@
   * synchronized methods/blocks
   * class Semaphor
   * automatic tests for compiler errors
+  * generics (status: need more testing)
+  * anonymous inner classes (status: need more testing)
+  * Lambda Functions (status: need more testing)
+  * generic methods (status: need more testing)
+  * library method examples
 
 ## working status on current issue:
 
 ### fine-grained next todos on current issue:
 
 ## next todos
-  * generics (status: need more testing)
-  * anonymous inner classes (status: need more testing)
-  * Lambda Functions (status: need more testing)
-  * generic methods (status: need more testing)
-  * library method examples
+  * REPL
+  * debugger: show fields of base classes
+  * if method overrides or implements other method and has no comment, then take the overriden method's comment
   * detect cyclic calling of constructors
 
 
