@@ -1,3 +1,4 @@
+import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
 import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts";
 import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
@@ -9,18 +10,18 @@ import { ObjectClass, StringClass } from "../javalang/ObjectClassStringClass.ts"
 
 export class OptionalClass extends ObjectClass {
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "declaration", signature: "class Optional<T>"},
-        { type: "method", signature: "public Optional()", java: OptionalClass.prototype._jconstructor },
+        {type: "declaration", signature: "class Optional<T>" , comment: JRC.optionalClassComment},
+        { type: "method", signature: "private Optional()", java: OptionalClass.prototype._jconstructor},
 
-        {type: "method", signature: "public static Optional<T> empty()", java: OptionalClass._mj$empty$Optional$},
-        {type: "method", signature: "public boolean equals(Object o)", java: OptionalClass.prototype._mj$equals$boolean$Object},
-        {type: "method", signature: "public boolean isEmpty()", java: OptionalClass.prototype._mj$isEmpty$boolean$},
-        {type: "method", signature: "public <U> Optional<U> map(Function<T,U> f)", java: OptionalClass.prototype._mj$map$Optional$Function},
-        {type: "method", signature: "public <U> Optional<U> flatMap(Function<T,Optional<U>> f)", java: OptionalClass.prototype._mj$flatMap$Optional$Function},
-        {type: "method", signature: "public static Optional<T> of(T t)", java: OptionalClass._mj$of$Optional$T},
-        {type: "method", signature: "public T orElse(T t)", java: OptionalClass.prototype._mj$orElse$T$T},
-        {type: "method", signature: "public void ifPresent(Consumer<? super T> c)", java: OptionalClass.prototype._mj$ifPresent$void$Consumer},
-        {type: "method", signature: "public String toString()", java: OptionalClass.prototype._mj$toString$String$},
+        {type: "method", signature: "public static Optional<T> empty()", java: OptionalClass._mj$empty$Optional$ , comment: JRC.optionalEmptyComment},
+        {type: "method", signature: "public boolean equals(Object o)", java: OptionalClass.prototype._mj$equals$boolean$Object , comment: JRC.optionalEqualsComment},
+        {type: "method", signature: "public boolean isEmpty()", java: OptionalClass.prototype._mj$isEmpty$boolean$ , comment: JRC.optionalIsEmptyComment},
+        {type: "method", signature: "public <U> Optional<U> map(Function<T,U> f)", java: OptionalClass.prototype._mj$map$Optional$Function , comment: JRC.optionalMapComment},
+        {type: "method", signature: "public <U> Optional<U> flatMap(Function<T,Optional<U>> f)", java: OptionalClass.prototype._mj$flatMap$Optional$Function , comment: JRC.optionalFlatMapComment},
+        {type: "method", signature: "public static Optional<T> of(T t)", java: OptionalClass._mj$of$Optional$T , comment: JRC.optionalOfComment},
+        {type: "method", signature: "public T orElse(T t)", java: OptionalClass.prototype._mj$orElse$T$T , comment: JRC.optionalOrElseComment},
+        {type: "method", signature: "public void ifPresent(Consumer<? super T> c)", java: OptionalClass.prototype._mj$ifPresent$void$Consumer , comment: JRC.optionalIfPresentComment},
+        {type: "method", signature: "public String toString()", java: OptionalClass.prototype._mj$toString$String$ , comment: JRC.optionalToStringComment},
 
     ]
 

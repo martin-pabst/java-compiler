@@ -10,8 +10,8 @@ export class JRC {
      * Class Object
      */
     static objectToStringComment = () => lm({
-    "de": "Wandelt das Objekt in eine Zeichenkette um und liefert diese zurück.",
-    "en": "Returns a String representation of this object.",
+        "de": "Wandelt das Objekt in eine Zeichenkette um und liefert diese zurück.",
+        "en": "Returns a String representation of this object.",
     })
 
     /**
@@ -359,12 +359,12 @@ export class JRC {
         "de": "Setzt die Default-Werte für Randbreite und Randfarbe. Allen danach neu erzeugten Objekten werden anfangs diese Eigenschaften zugewiesen.",
         "en": "Sets default border width and border color. All subsequently created objects get these border width and border color.",
     })
-    
+
     static fsSetDefaultBorderComment2 = () => lm({
         "de": "Setzt die Default-Werte für Randbreite, Randfarbe und alpha-Wert (Durchsichtigkeit). Allen danach neu erzeugten Objekten werden anfangs diese Eigenschaften zugewiesen.",
         "en": "Sets default border width and border color and alpha value. All subsequently created objects get these border width and border color.",
     })
-    
+
     static fsSetDefaultFillColor = () => lm({
         "de": "Setzt den Defaultwert für die Füllfarbe. Allen danach neu erzeugten Objekten wird anfangs diese Eigenschaft zugewiesen.",
         "en": "Sets default fill color. All subsequently created objects get this fill color.",
@@ -646,117 +646,502 @@ export class JRC {
      * Collection
      */
     static collectionToArrayComment = () => lm({
-    "de": "Wandelt die Collection in ein Array um und gibt dieses zurück.",
-    "en": "Returns an array containing all of the elements in this list in proper sequence (from first to last element).",
+        "de": "Wandelt die Collection in ein Array um und gibt dieses zurück.",
+        "en": "Returns an array containing all of the elements in this list in proper sequence (from first to last element).",
     })
 
     static collectionToArrayComment2 = () => lm({
-    "de": "Wandelt die Collection in ein Array um und gibt dieses zurück. Als Parameter muss ein Muster-Array übergeben werden, das den Typ des zurückgegebenen Arrays bestimmt.",
-    "en": "Returns an array containing all of the elements in this list in proper sequence (from first to last element); the runtime type of the returned array is that of the specified array.",
+        "de": "Wandelt die Collection in ein Array um und gibt dieses zurück. Als Parameter muss ein Muster-Array übergeben werden, das den Typ des zurückgegebenen Arrays bestimmt.",
+        "en": "Returns an array containing all of the elements in this list in proper sequence (from first to last element); the runtime type of the returned array is that of the specified array.",
     })
 
     static collectionAddElementComment = () => lm({
-    "de": "Fügt das übergebene Element ans Ende der Liste an.",
-    "en": "Appends the specified element to the end of this list.",
+        "de": "Fügt das übergebene Element ans Ende der Liste an.",
+        "en": "Appends the specified element to the end of this list.",
     })
 
     static collectionAddAllComment = () => lm({
-    "de": "Fügt alle Elemente der übergebenen Collection ans Ende der Liste an.",
-    "en": "Appends all of the elements in the specified collection to the end of this list, in the order that they are returned by the specified collection's Iterator.",
+        "de": "Fügt alle Elemente der übergebenen Collection ans Ende der Liste an.",
+        "en": "Appends all of the elements in the specified collection to the end of this list, in the order that they are returned by the specified collection's Iterator.",
     })
 
     static collectionClearComment = () => lm({
-    "de": "Entleert die Liste. Die Liste ist nach Aufruf dieser Methode leer. Die Elemente der Liste werden dadurch nicht beeinträchtigt.",
-    "en": "Removes all of the elements from this list. The list will be empty after this call returns.",
+        "de": "Entleert die Liste. Die Liste ist nach Aufruf dieser Methode leer. Die Elemente der Liste werden dadurch nicht beeinträchtigt.",
+        "en": "Removes all of the elements from this list. The list will be empty after this call returns.",
     })
 
     static collectionContainsComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn die Liste das angegebene Element enthält.",
-    "en": "Returns true if this list contains the specified element.",
+        "de": "Gibt genau dann true zurück, wenn die Liste das angegebene Element enthält.",
+        "en": "Returns true if this list contains the specified element.",
     })
 
     static collectionContainsAllComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn die Liste alle Elemente der übergebenen Collection enthält.",
-    "en": "Returns true if this collection contains all of the elements in the specified collection.",
+        "de": "Gibt genau dann true zurück, wenn die Liste alle Elemente der übergebenen Collection enthält.",
+        "en": "Returns true if this collection contains all of the elements in the specified collection.",
     })
 
     static collectionIsEmptyComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn die Liste leer ist, d.h. keine Elemente enthält.",
-    "en": "Returns true if this list contains no elements.",
+        "de": "Gibt genau dann true zurück, wenn die Liste leer ist, d.h. keine Elemente enthält.",
+        "en": "Returns true if this list contains no elements.",
     })
 
     static collectionRemoveObjectComment = () => lm({
-    "de": "Falls die Liste das übergebene Element enthält, entnimmt diese Methode der Liste das erste solche Element. Die Methode gibt genau dann true zurück, wenn die Liste das Element enthalten hat.",
-    "en": "Removes the first occurrence of the specified element from this list, if it is present. Returns true if element is found.",
+        "de": "Falls die Liste das übergebene Element enthält, entnimmt diese Methode der Liste das erste solche Element. Die Methode gibt genau dann true zurück, wenn die Liste das Element enthalten hat.",
+        "en": "Removes the first occurrence of the specified element from this list, if it is present. Returns true if element is found.",
     })
 
     static collectionRemoveAllComment = () => lm({
-    "de": "Entnimnt der Liste alle Vorkommen aller Elemente der übergebenen Collection.",
-    "en": "Removes from this list all of its elements that are contained in the specified collection.",
+        "de": "Entnimnt der Liste alle Vorkommen aller Elemente der übergebenen Collection.",
+        "en": "Removes from this list all of its elements that are contained in the specified collection.",
     })
 
     static collectionSizeComment = () => lm({
-    "de": "Gibt die Anzahl der in der Liste enthaltenen Elemente zurück. Ist ein Element mehrfach enthalten, so wird es dabei mehrfach gezählt.",
-    "en": "Returns the number of elements in this list.",
+        "de": "Gibt die Anzahl der in der Liste enthaltenen Elemente zurück. Ist ein Element mehrfach enthalten, so wird es dabei mehrfach gezählt.",
+        "en": "Returns the number of elements in this list.",
     })
 
     /**
      * List
      */
     static listAddElementComment = () => lm({
-    "de": "Fügt das angegebene Element an der angegebenen Position in die Liste ein. Alle nachfolgendne Elemente werden um eine Position nach hinten verschoben.",
-    "en": "Inserts the specified element at the specified position in this list. Shifts the element currently at that position (if any) and any subsequent elements to the right (adds one to their indices).",
+        "de": "Fügt das angegebene Element an der angegebenen Position in die Liste ein. Alle nachfolgendne Elemente werden um eine Position nach hinten verschoben.",
+        "en": "Inserts the specified element at the specified position in this list. Shifts the element currently at that position (if any) and any subsequent elements to the right (adds one to their indices).",
     })
 
     static listAddAllElementsComment = () => lm({
-    "de": "Fügt alle Elemente der übergebenen Collection an der angegebenen Position in die Liste ein. Alle nachfolgendne Elemente werden entsprechend nach hinten verschoben.",
-    "en": "Inserts all of the elements in the specified collection into this list, starting at the specified position. Shifts the element currently at that position (if any) and any subsequent elements to the right (increases their indices). The new elements will appear in the list in the order that they are returned by the specified collection's iterator.",
+        "de": "Fügt alle Elemente der übergebenen Collection an der angegebenen Position in die Liste ein. Alle nachfolgendne Elemente werden entsprechend nach hinten verschoben.",
+        "en": "Inserts all of the elements in the specified collection into this list, starting at the specified position. Shifts the element currently at that position (if any) and any subsequent elements to the right (increases their indices). The new elements will appear in the list in the order that they are returned by the specified collection's iterator.",
     })
 
     static listGetComment = () => lm({
-    "de": "Gibt das Element an der angegebenen Position zurück.\n Das erste Element der Liste hat Position 0.",
-    "en": "Returns the element at the specified position in this list. First element in list has position 0.",
+        "de": "Gibt das Element an der angegebenen Position zurück.\n Das erste Element der Liste hat Position 0.",
+        "en": "Returns the element at the specified position in this list. First element in list has position 0.",
     })
 
     static listIndexOfComment = () => lm({
-    "de": "Gibt den Index des angegebenen Elements in der Liste zurück. Falls das Element nicht in der Liste enthalten ist, wird -1 zurückgegeben.\nTipp: Das erste Element der Liste hat Index 0.",
-    "en": "Returns the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the element.\nHint: First element in List has index 0.",
+        "de": "Gibt den Index des angegebenen Elements in der Liste zurück. Falls das Element nicht in der Liste enthalten ist, wird -1 zurückgegeben.\nTipp: Das erste Element der Liste hat Index 0.",
+        "en": "Returns the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the element.\nHint: First element in List has index 0.",
     })
 
     static listRemoveComment = () => lm({
-    "de": "Entfernt das Element mit dem angegebenen Index aus der Liste.\nTipp: Das erste Element der Liste hat Index 0.",
-    "en": "Removes the element at the specified position in this list.\nHint: First element in list has index 0.",
+        "de": "Entfernt das Element mit dem angegebenen Index aus der Liste.\nTipp: Das erste Element der Liste hat Index 0.",
+        "en": "Removes the element at the specified position in this list.\nHint: First element in list has index 0.",
     })
 
     static listSetComment = () => lm({
-    "de": "Setzt das übergebene Element an der angegebenen Position in die Liste anstatt des bisher dort vorhandenen.",
-    "en": "Replaces the element at the specified position in this list with the specified element.",
+        "de": "Setzt das übergebene Element an der angegebenen Position in die Liste anstatt des bisher dort vorhandenen.",
+        "en": "Replaces the element at the specified position in this list with the specified element.",
     })
 
     static listSortComment = () => lm({
-    "de": "Sortiert die Liste anhand des übergebenen Comparator-Objekts.",
-    "en": "Sorts this list according to the order induced by the specified Comparator.",
+        "de": "Sortiert die Liste anhand des übergebenen Comparator-Objekts.",
+        "en": "Sorts this list according to the order induced by the specified Comparator.",
     })
 
     /**
      * ArrayList
      */
     static arrayListConstructorComment = () => lm({
-    "de": "Instanziert (d.h. erzeugt) eine neue, leere Liste.",
-    "en": "Constructs an empty list.",
+        "de": "Instanziert (d.h. erzeugt) eine neue, leere Liste.",
+        "en": "Constructs an empty list.",
     })
 
     static arrayListIteratorComment = () => lm({
-    "de": "Gibt ein Iterator-Objekt zurück, mit dem über alle Elemente der Liste in der gespeicherten Reihenfolge iteriert werden kann.",
-    "en": "Returns an iterator over the elements in this list in proper sequence.",
+        "de": "Gibt ein Iterator-Objekt zurück, mit dem über alle Elemente der Liste in der gespeicherten Reihenfolge iteriert werden kann.",
+        "en": "Returns an iterator over the elements in this list in proper sequence.",
     })
 
     static arrayListForeachComment = () => lm({
-    "de": "Führt die angegebene Methode (Aktion) für jedes Element der ArrayList aus.\nTipp: Die Aktion kann in Lambda-Schreibweise angegeben werden, z.B. foreach((element) -> {...})",
-    "en": "Performs the given action for each element of the Iterable until all elements have been processed or the action throws an exception. Unless otherwise specified by the implementing class, actions are performed in the order of iteration (if an iteration order is specified).",
+        "de": "Führt die angegebene Methode (Aktion) für jedes Element der ArrayList aus.\nTipp: Die Aktion kann in Lambda-Schreibweise angegeben werden, z.B. foreach((element) -> {...})",
+        "en": "Performs the given action for each element of the Iterable until all elements have been processed or the action throws an exception. Unless otherwise specified by the implementing class, actions are performed in the order of iteration (if an iteration order is specified).",
+    })
+
+    /**
+     * Comparable
+     */
+    static comparableInterfaceComment = () => lm({
+        "en": "This interface imposes a total ordering on the objects of each class that implements it. This ordering is referred to as the class's natural ordering, and the class's compareTo method is referred to as its natural comparison method.\nLists (and arrays) of objects that implement this interface can be sorted automatically by Collections.sort (and Arrays.sort). Objects that implement this interface can be used as keys in a sorted map or as elements in a sorted set, without the need to specify a comparator.",
+        "de": "Klassen, die dieses Interface implementieren, haben eine Methode compareTo, mit der sich zwei Objekte der Klasse vergleichen lassen.",
+    })
+
+    static comparableCompareToComment = () => lm({
+        "de": "Vergleicht das Objekt mit dem übergebenen Objekt. Liefert eine negative Zahl zurück, wenn das Objekt 'kleiner' ist als das übergebene, eine positive, falls es größer ist und 0, wenn beide Objekte gleich sind.",
+        "en": "Compares this object with the specified object for order. Returns a negative value if this object is 'smaller' than the specified object, a positive value if it is 'larger' and 0 if they are equal.",
+    })
+
+    /**
+     * Comparator
+     */
+    static comparatorInterfaceComment = () => lm({
+        "de": "A Comparator<T> is a object that can compare objects of class T.",
+        "en": "A comparison function, which imposes a total ordering on some collection of objects.",
+    })
+
+    static compataratorCompareComment = () => lm({
+        "de": "Vergleicht die zwei angegebenen Objekte. Gibt eine negative Zahl zurück, falls das erste 'kleiner' ist als das zweite, eine positive Zahl, falls es 'größer' ist und 0 falls die beiden Objekte 'gleich' sind.",
+        "en": "Compares its two arguments for order. Returns a negative value if the first object is 'smaller' than the second, a positive value if it is 'larger' than the second one and 0 if they are 'equal'.",
+    })
+
+    /**
+     * Iterable
+     */
+    static iterableInterfaceComment = () => lm({
+        "de": "Objekte von Klassen, die dieses Interface implementieren, können in einer vereinfachten for-loop (for(object o: list){...}) verwendet werden.",
+        "en": "Implementing this interface allows an object to be the target of the 'for-each loop' statement. See For-each Loop",
+    })
+
+    static iterableIteratorComment = () => lm({
+        "de": "Gibt ein Iterator-Objekt für dieses Iterable-Objekt zurück.",
+        "en": "Returns an iterator over elements of type T.",
+    })
+
+    static iterableForEachComment = () => lm({
+        "de": "Führt die angegebene Aktion für jedes Element dieses Iterable-Objekts aus.",
+        "en": "Performs the given action for each element of the Iterable until all elements have been processed.",
+    })
+
+    /**
+     * Iterator
+     */
+
+    static iteratorInterfaceComment = () => lm({
+        "de": "Ein Iterator ist ein Objekt, das die Elemente einer Liste der Reihe nach einzeln liefern kann.",
+        "en": "An Iterator can return all objects of a list one at a time.",
+    })
+
+    static iteratorHasNextComment = () => lm({
+        "de": "Liefert true zurück falls es noch weitere Elemente gibt, die mit der Methoe next() abgerufen werden können.",
+        "en": "Returns true if the iteration has more elements.",
+    })
+
+    static iteratorNextComment = () => lm({
+        "de": "Liefert das nächste Element.",
+        "en": "Returns the next element of the iteration.",
+    })
+
+    /**
+     * Math
+     */
+    static mathPIComment = () => lm({
+        "de": "Die Zahl Pi (3.14159...) in double-Genauigkeit (ca. 15 Nachkommastellen)",
+        "en": "Number Pi (3.14159...) in double precision (around 15 digits)",
+    })
+
+    static mathEComment = () => lm({
+        "de": "Die Zahl e (2.718281828459045...) in double-Genauigkeit (ca. 15 Nachkommastellen)",
+        "en": "Number e (2.718281828459045...) in double precision (around 15 digits)",
+    })
+
+    static mathAbsComment = () => lm({
+        "de": "Betrag der übergebenen Zahl",
+        "en": "Absolute value of given number",
+    })
+
+    static mathSinComment = () => lm({
+        "de": "Sinus des übergebenen Winkels (im Bogenmaß)",
+        "en": "Sine of given angle (in radians)",
+    })
+
+    static mathCosinComment = () => lm({
+        "de": "Cosinus des übergebenen Winkels (im Bogenmaß)",
+        "en": "Cosine of given angle (in radians)",
+    })
+
+    static mathTanComment = () => lm({
+        "de": "Tangens des übergebenen Winkels (im Bogenmaß)",
+        "en": "Tangens of given angle (in radians)",
+    })
+
+    static mathArcsinComment = () => lm({
+        "de": "Arcussinus der übergebenen Zahl",
+        "en": "Arc sine of given number",
+    })
+
+    static mathArccosComment = () => lm({
+        "de": "Arcuscosinus der übergebenen Zahl",
+        "en": "Arc cosinus of given number",
+    })
+
+    static mathArctanComment = () => lm({
+        "de": "Arcustangens der übergebenen Zahl",
+        "en": "Arc tan of given number",
+    })
+
+    static mathAtan2Comment = () => lm({
+        "de": "Gibt den Winkel (im Bogenmaß) von der positiven x-Achse aus zum Vektor (x/y) zurück.",
+        "en": "Returns angle (in radians) from positive x-axis to vector (x/y).",
+    })
+
+    static mathRoundComment = () => lm({
+        "de": "Rundet die übergebene Zahl auf eine ganze Zahl. Ab '...,5' wird aufgerundet.",
+        "en": "Rounds given number.",
+    })
+
+    static mathFloorComment = () => lm({
+        "de": "Rundet die übergebene Zahl auf eine ganze Zahl ab, d.h. aus 45.9 wird beispielsweise 45.",
+        "en": "Rounds given number down.",
+    })
+
+    static mathCeilComment = () => lm({
+        "de": "Rundet die übergebene Zahl auf eine ganze Zahl auf, d.h. aus 45.1 wird beispielsweise 46.",
+        "en": "Rounds given number up.",
+    })
+
+    static mathSignComment = () => lm({
+        "de": "Vorzeichen einer Zahl, d.h. -1 falls die Zahl negativ ist, +1 falls die Zahl positiv ist und 0, falls die Zahl 0 ist.",
+        "en": "Sign of the given number: -1 if number is less then 0, +1 if number is > 0 and 0 if number is 0.",
+    })
+
+    static mathSqrtComment = () => lm({
+        "de": "Quadratwurzel der Zahl",
+        "en": "Square root of given number",
+    })
+
+    static mathRandomComment = () => lm({
+        "de": "Zufallszahl aus dem Bereich [0; 1[",
+        "en": "Random number out of [0; 1[",
+    })
+
+    static mathPowComment = () => lm({
+        "de": "Potenz 'Basis hoch Exponent'",
+        "en": "base to the power of exponent",
+    })
+
+    static mathToDegreesComment = () => lm({
+        "de": "Wandelt den übergebenen Winkel vom Bogenmaß ins Gradmaß um, d.h. berechnet angle/pi * 180.",
+        "en": "Transforms given angle from radians to degrees.",
+    })
+
+    static mathToRadiansComment = () => lm({
+        "de": "Wandelt den übergebenen Winkel vom Gradmaß ins Bogenmaß um, d.h. berechnet angle/180 * pi.",
+        "en": "Transforms given angle from degrees to radians.",
+    })
+
+    static mathExpComment = () => lm({
+        "de": "Berechnet 'e hoch zahl'",
+        "en": "Calculates 'e to the power of given number'",
+    })
+
+    static mathLogComment = () => lm({
+        "de": "Berechnet den natürlichen Logarithmus der Zahl",
+        "en": "Returns the natural logarithm (base e) of a double value.",
+    })
+
+    static mathLog10Comment = () => lm({
+        "de": "Berechnet den Logarithmus der Zahl zur Basis 10.",
+        "en": "Returns the base 10 logarithm of a double value.",
+    })
+
+    static mathMaxComment = () => lm({
+        "de": "Gibt die größere der beiden Zahlen zurück.",
+        "en": "Returns the greater of two values.",
+    })
+
+    static mathMinComment = () => lm({
+        "de": "Gibt die kleinere der beiden Zahlen zurück.",
+        "en": "Returns the smaller of two values.",
     })
 
 
+    /**
+     * Random
+     */
+    static RandomClassComment = () => lm({
+        "de": "Die Klasse Random stellt Methoden zur Erzeugung von Zufallszahlen zur Verfügung.",
+        "en": "Class Random provides methods to generate random numbers.",
+    })
+
+    static randomRandIntComment = () => lm({
+        "de": "Gibt eine ganze Zufallszahl aus dem Bereich {from, from + 1, ... , to} zurück.",
+        "en": "Returns a natural random value out of {from, from + 1, ... , to}.",
+    })
+
+    static randomRandDoubleComment = () => lm({
+        "de": "Gibt eine ganze Zufallszahl aus dem Bereich [from, to[ zurück.",
+        "en": "Returns a natural random value out of [from, to[.",
+    })
+
+    static randomNextIntComment = () => lm({
+        "de": "Gibt eine ganzzahlige Zufallszahl aus der Menge {0, 1, ..., bound - 1} zurück.",
+        "en": "Returns a natural number out of {0, 1, ..., bound - 1}.",
+    })
+
+    /**
+     * DecimalFormat
+     */
+    static DecimalFormatClassComment = () => lm({
+        "de": "Die Klasse DecimalFormat wird zum Formatieren von Zahlen genutzt.",
+        "en": "Class DecimalFormat provides methods to format numbers.",
+    })
+
+    static decimalFormatConstructorComment = () => lm({
+        "de": "Erzeugt ein neues DecimalFormat-Object. Zur Bedeutung von format siehe https://docs.oracle.com/javase/8/docs/api/java/text/DecimalFormat.html",
+        "en": "Creates a new DecimalFormat object. For possible values for format see https://docs.oracle.com/javase/8/docs/api/java/text/DecimalFormat.html",
+    })
+
+    static decimalFormatFormatComment = () => lm({
+        "de": "Die Methode Format gibt die Zahl formatiert als String zurück.",
+        "en": "Formats a number to produce a string.",
+    })
+
+    /**
+     * Optional
+     */
+    static optionalClassComment = () => lm({
+        "de": "Ein Container-Objekt das einen Nicht-null-Wert enthalten kann oder auch nicht. Falls es eine Wert enthält liefert isPresent() true und get() den Wert.",
+        "en": "A container object which may or may not contain a non-null value. If a value is present, isPresent() will return true and get() will return the value.",
+    })
+
+    static optionalEmptyComment = () => lm({
+        "de": "Gibt ein leeres Optional-Objekt zurück.",
+        "en": "Returns an empty Optional instance.",
+    })
+
+    static optionalEqualsComment = () => lm({
+    "de": `Gibt genau dann true zurück, wenn beide Optional-Objekte leer sind oder wenn die enthaltenen Objekte gleich sind, ausgehend von deren equals-Funktion.`,
+    "en": `Indicates whether some other object is "equal to" this Optional. The other object is considered equal if:
+    it is also an Optional and;
+    both instances have no value present or;
+    the present values are "equal to" each other via equals().`,
+    })
+
+    static optionalIsEmptyComment = () => lm({
+    "de": "Gibt genau dann zurück, wenn im Optional-Objekt kein Wert enthalten ist.",
+    "en": "If a value is not present, returns true, otherwise false.",
+    })
+
+    static optionalMapComment = () => lm({
+    "de": "Wenn das Optional-Objekt einen Wert enthält liefert diese Methode Optional.of(f(Wert)) zurück, ansonsten ein leeres Optional-Objekt.",
+    "en": "If a value is present, returns an Optional describing (as if by ofNullable(T)) the result of applying the given mapping function to the value, otherwise returns an empty Optional.",
+    })
+
+    static optionalFlatMapComment = () => lm({
+    "de": "Wenn das Optional-Objekt einen Wert enthält liefert diese Methode f(Wert) zurück, ansonsten ein leeres Optional-Objekt.",
+    "en": "If a value is present, returns the result of applying the given Optional-bearing mapping function to the value, otherwise returns an empty Optional.",
+    })
+
+    static optionalOfComment = () => lm({
+    "de": "Gibt ein Optional-Objekt zurück das den gegebenen (von null verschiedenen) Wert enthält.",
+    "en": "Returns an Optional describing the given non-null value.",
+    })
+
+    static optionalOrElseComment = () => lm({
+    "de": "Wenn das Optional-Objekt einen Wert enthält liefert die Methode diesen zurück, ansonsten den übergebenen Wert t.",
+    "en": "If a value is present, returns the value, otherwise returns other.",
+    })
+
+    static optionalIfPresentComment = () => lm({
+    "de": "Wenn das Optional-Objekt einen Wert enthält wird damit die übergebene Aktion ausgeführt, ansonsten wird nichts gemacht.",
+    "en": "If a value is present, performs the given action with the value, otherwise does nothing.",
+    })
+
+    static optionalToStringComment = () => lm({
+    "de": "Gibt eine nichtleere String-Darstellung des Optional-Objekts zurück, passend zum Debuggen.",
+    "en": "Returns a non-empty string representation of this Optional suitable for debugging.",
+    })
+
+
+    /**
+     * Runnable
+     */
+    static RunnableInterfaceComment = () => lm({
+    "de": "Das Runnable-Interface wird von Klassen implementiert, die eine Methode run() besitzen, die in einem neuen Thread ausgeführt werden soll.",
+    "en": "The Runnable interface should be implemented by any class whose instances are intended to be executed by a thread. The class must define a method of no arguments called run.",
+    })
+
+    static runnableRunComment = () => lm({
+    "de": "WEnn ein Objekt, das das Interface Runnable implementiert, benutzt wird, um einen Thread zu erstellen, bewirkt das Starten des Threads die Ausführung der run()-Methode in diesem Thread.",
+    "en": "When an object implementing interface Runnable is used to create a thread, starting the thread causes the object's run method to be called in that separately executing thread.",
+    })
+
+    /**
+     * Semaphore
+     */
+    static semaphoreClassComment = () => lm({
+    "de": "Ein zählender Semaphor",
+    "en": "A counting semaphore. Conceptually, a semaphore maintains a set of permits. Each acquire() blocks if necessary until a permit is available, and then takes it. Each release() adds a permit, potentially releasing a blocking acquirer. ",
+    })
+
+    static semaphoreConstructorComment = () => lm({
+    "de": "Erstellt einen Semaphor mit der angegebenen Zahl von Permits.",
+    "en": "Creates a Semaphore with the given number of permits.",
+    })
+
+    static semaphoreAvailablePermitsComment = () => lm({
+    "de": "Gibt die Anzahl an Permits zurück, die in diesem Semaphor aktuell vorhanden ist.",
+    "en": "Returns the current number of permits available in this semaphore.",
+    })
+
+    static semaphoreAquireComment = () => lm({
+    "de": "Beschafft ein Permit. Falls keines vorhanden sind wird der Thread blockiert. Der Thread bleibt blockiert bis wieder ein Permit vorhanden ist oder der Thread unterbrochen (interrupted) wird.",
+    "en": "Acquires a permit from this semaphore, blocking until one is available, or the thread is interrupted.",
+    })
+
+    static semaphoreReleaseComment = () => lm({
+    "de": "Gibt ein Permit frei und führt es dem Semaphor wieder zu.",
+    "en": "Releases a permit, returning it to the semaphore.",
+    })
+
+
+    /**
+     * Thread
+     */
+    static threadClassComment = () => lm({
+    "de": "Ein Thread ist ein 'Ausführungsstrang' in einem Programm. Die Online IDE ermöglicht die gleichzeitige Ausführung mehrerer Threads.",
+    "en": "A thread is a thread of execution in a program. The Online IDE allows an application to have multiple threads of execution running concurrently.",
+    })
+
+    static threadConstructorComment = () => lm({
+    "de": "Erstellt ein neues Thread-Objekt, startet den Thread aber noch nicht.",
+    "en": "Creates a new Thread object.",
+    })
+
+    static threadConstructorRunnableComment = () => lm({
+    "de": "Erstellt ein neues Thread-Objekt. Wird der Thread gestartet, so wird die run()-Methode des übergebenen Runnable-Objekts ausgeführt.",
+    "en": "Creates a new Thread object. When starting this thread method run() of given Runnable-object ist called concurrently to the existing threads.",
+    })
+
+    static threadGetStateComment = () => lm({
+    "de": "Gibt den state des threads zurück.",
+    "en": "Returns the state of this thread.",
+    })
+
+    static threadRunComment = () => lm({
+    "de": "Führt die run()-Methode des bei diesem Thread gespeicherten Runnable-Objekts im AKTUELLEN thread aus. Die Wirkung ist dieselbe, als würde man die run()-Methode des Runnable-Objekts einfach aufrufen.",
+    "en": "Calls run()-Method of this thread's Runnable object in CURRENT thread.",
+    })
+
+    static threadStartComment = () => lm({
+    "de": "Führt die run()-Methode des bei diesem Thread gespeicherten Runnable-Objekts nebenläufig (parallel) zum aktuellen Thread aus.",
+    "en": "Runs the run()-Method of this thread's runnable object CONCURRENTLY to the current thread.",
+    })
+
+    static threadJoinComment = () => lm({
+    "de": "Wartet bis der Thread beendet (terminated) ist.",
+    "en": "Waits for this thread to die (state: terminated).",
+    })
+
+    static threadJoinComment2 = () => lm({
+    "de": "Wartet bis der Thread beendet (terminated) ist, längstens aber die übergebene Zahl an Millisekunden.",
+    "en": "Waits for this thread to die (state: terminated), at most given milliseconds.",
+    })
+
+    static threadGetNameComment = () => lm({
+    "de": "Gibt den Namen des Threads zurück.",
+    "en": "Returns the name of this thread.",
+    })
+
+    static threadSetNameComment = () => lm({
+    "de": "Ändert den Namen dieses Threads.",
+    "en": "Sets the name of this thread.",
+    })
+
+    static threadSetSpeedComment = () => lm({
+    "de": "Setzt die gewünschte Ausführungsgeschwindigkeit des Threads in Schritten/Sekunde. Werte <= 0 bewirken die Ausführung mit maximaler Geschwidigkeit.",
+    "en": "Sets speed of thread in steps/second. Values <= 0 mean 'maximum speed'.",
+    })
+
+    
 
     // Kürzel: mlc
 

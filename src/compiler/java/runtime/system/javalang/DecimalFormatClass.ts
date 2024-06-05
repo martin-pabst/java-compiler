@@ -1,3 +1,4 @@
+import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType";
 import { ObjectClass } from "./ObjectClassStringClass";
 
@@ -21,10 +22,10 @@ class Pattern {
 
 export class DecimalFormatClass extends ObjectClass {
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "declaration", signature: "class DecimalFormat extends Object"},
-        {type: "method", signature: "DecimalFormat(string format)", native: DecimalFormatClass.prototype._constructor1},
+        {type: "declaration", signature: "class DecimalFormat extends Object" , comment: JRC.DecimalFormatClassComment},
+        {type: "method", signature: "DecimalFormat(string format)", native: DecimalFormatClass.prototype._constructor1  , comment: JRC.decimalFormatConstructorComment},
         
-        {type: "method", signature: "public final string format(double number)", template: '§1.format(§2)'},
+        {type: "method", signature: "public final string format(double number)", template: '§1.format(§2)' , comment: JRC.decimalFormatFormatComment},
     ]
     position: number=0;
 

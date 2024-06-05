@@ -1,3 +1,4 @@
+import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
 import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts";
 import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
@@ -7,8 +8,8 @@ import { ObjectClass } from "../javalang/ObjectClassStringClass.ts";
 
 export class ComparatorInterface extends InterfaceClass {
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "declaration", signature: "interface Comparator<T>"},
-        {type: "method", signature: "int compare(T object1, T object2)", java: ComparatorInterface.prototype._mj$compare$int$T$T},
+        {type: "declaration", signature: "interface Comparator<T>" , comment: JRC.comparatorInterfaceComment},
+        {type: "method", signature: "int compare(T object1, T object2)", java: ComparatorInterface.prototype._mj$compare$int$T$T , comment: JRC.compataratorCompareComment},
     ]
 
     static type: NonPrimitiveType;

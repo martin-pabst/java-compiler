@@ -1,3 +1,4 @@
+import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
 import { Exception } from "../../../../common/interpreter/ExceptionInfo.ts";
 import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts";
 import { Thread, ThreadState } from "../../../../common/interpreter/Thread.ts";
@@ -18,9 +19,11 @@ export class SemaphoreClass extends ObjectClass {
     private waitingThreads1: Thread[] = [];
 
     static __javaDeclarations: LibraryDeclarations = [
-        { type: "declaration", signature: "class Semaphore extends Object" },
-        { type: "method", signature: "public Semaphore(int permits)", java: SemaphoreClass.prototype._jconstructor },
-        { type: "method", signature: "public final int availablePermits()", native: SemaphoreClass.prototype._nAvailablePermits },
+        { type: "declaration", signature: "class Semaphore extends Object" , comment: JRC.semaphoreClassComment},
+        { type: "method", signature: "public Semaphore(int permits)", java: SemaphoreClass.prototype._jconstructor , comment: JRC.semaphoreConstructorComment},
+        { type: "method", signature: "public final int availablePermits()", native: SemaphoreClass.prototype._nAvailablePermits , comment: JRC.semaphoreAvailablePermitsComment},
+        { type: "method", signature: "public void aquire()", java: SemaphoreClass.prototype._mj$aquire$void , comment: JRC.semaphoreAquireComment},
+        { type: "method", signature: "public void release()", java: SemaphoreClass.prototype._mj$release$void , comment: JRC.semaphoreReleaseComment},
     ]
 
 

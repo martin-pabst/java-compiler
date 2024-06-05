@@ -1,3 +1,4 @@
+import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
 import { Exception } from "../../../../common/interpreter/ExceptionInfo.ts";
 import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts";
 import { Thread, ThreadState } from "../../../../common/interpreter/Thread.ts";
@@ -67,19 +68,19 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
     threadsToJoinWhenFinished: Thread[] = [];
 
     static __javaDeclarations: LibraryDeclarations = [
-        { type: "declaration", signature: "class Thread extends Object implements Runnable" },
-        { type: "method", signature: "public Thread()", java: ThreadClass.prototype._jconstructor },
-        { type: "method", signature: "public Thread(Runnable runnable)", java: ThreadClass.prototype._jconstructor },
-        { type: "method", signature: "public Thread(Runnable runnable, string name)", java: ThreadClass.prototype._jconstructor },
-        { type: "method", signature: "public Thread(string name)", java: ThreadClass.prototype._jconstructor1 },
-        { type: "method", signature: "public Thread.State getState()", java: ThreadClass.prototype._mj$getState$Thread_State$ },
-        { type: "method", signature: "public void run()", java: ThreadClass.prototype._mj$run$void$ },
-        { type: "method", signature: "public void start()", java: ThreadClass.prototype._mj$start$void$ },
-        { type: "method", signature: "public void join()", java: ThreadClass.prototype._mj$join },
-        { type: "method", signature: "public void join(int milliseconds)", java: ThreadClass.prototype._mj$join },
-        { type: "method", signature: "public string getName()", template: `§1.name` },
-        { type: "method", signature: "public void setName(string name)", java: ThreadClass.prototype._setName },
-        { type: "method", signature: "public void setSpeed(int maxStepsPerSecond)", java: ThreadClass.prototype._setSpeed },
+        { type: "declaration", signature: "class Thread extends Object implements Runnable" , comment: JRC.threadClassComment},
+        { type: "method", signature: "public Thread()", java: ThreadClass.prototype._jconstructor , comment: JRC.threadConstructorComment},
+        { type: "method", signature: "public Thread(Runnable runnable)", java: ThreadClass.prototype._jconstructor , comment: JRC.threadConstructorRunnableComment},
+        { type: "method", signature: "public Thread(Runnable runnable, string name)", java: ThreadClass.prototype._jconstructor , comment: JRC.threadConstructorRunnableComment},
+        { type: "method", signature: "public Thread(string name)", java: ThreadClass.prototype._jconstructor1 , comment: JRC.threadConstructorComment},
+        { type: "method", signature: "public Thread.State getState()", java: ThreadClass.prototype._mj$getState$Thread_State$ , comment: JRC.threadGetStateComment },
+        { type: "method", signature: "public void run()", java: ThreadClass.prototype._mj$run$void$ , comment: JRC.threadRunComment},
+        { type: "method", signature: "public void start()", java: ThreadClass.prototype._mj$start$void$ , comment: JRC.threadStartComment},
+        { type: "method", signature: "public void join()", java: ThreadClass.prototype._mj$join , comment: JRC.threadJoinComment},
+        { type: "method", signature: "public void join(int milliseconds)", java: ThreadClass.prototype._mj$join , comment: JRC.threadJoinComment2},
+        { type: "method", signature: "public string getName()", template: `§1.name` , comment: JRC.threadGetNameComment},
+        { type: "method", signature: "public void setName(string name)", java: ThreadClass.prototype._setName , comment: JRC.threadSetNameComment},
+        { type: "method", signature: "public void setSpeed(int maxStepsPerSecond)", java: ThreadClass.prototype._setSpeed , comment: JRC.threadSetSpeedComment},
     ]
 
 
@@ -182,7 +183,7 @@ export class ThreadClass extends ObjectClass implements RunnableInterface {
     }
 
     _setSpeed(maxStepsPerSecond: number){
-        this.maxStepsPerSecond = maxStepsPerSecond? maxStepsPerSecond : undefined;
+        this.maxStepsPerSecond = maxStepsPerSecond > 0 ? maxStepsPerSecond : undefined;
         if(this.thread) this.thread.maxStepsPerSecond = this.maxStepsPerSecond;
     }
 
