@@ -20,9 +20,9 @@ This compiler/interpreter combo (work in progress...) understands a fairly large
   * locking, wait, notify
   * synchronized methods/blocks
   * semaphors (not yet tested)
+  * rich semantic support for editing sourcecode in the [monaco editor](https://microsoft.github.io/monaco-editor/)
 
 ## Features (in progress)
   * [REPL](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop)-mode
-  * port whole Onlne-IDE API to new compiler (2 %)
-  * rich semantic support for editing sourcecode in the [monaco editor](https://microsoft.github.io/monaco-editor/)
+  * port whole Onlne-IDE API to new compiler (10 %)
 
