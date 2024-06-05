@@ -5,6 +5,15 @@ import { le, lm } from "./LanguageManager"
  */
 export class JRC {
 
+
+    /**
+     * Class Object
+     */
+    static objectToStringComment = () => lm({
+    "de": "Wandelt das Objekt in eine Zeichenkette um und liefert diese zurück.",
+    "en": "Returns a String representation of this object.",
+    })
+
     /**
      * Class World
      */
@@ -632,6 +641,122 @@ export class JRC {
         "de": "Aufzählung der Sprite-Grafikbibliotheken",
         "en": "enum of sprite libraries",
     })
+
+    /**
+     * Collection
+     */
+    static collectionToArrayComment = () => lm({
+    "de": "Wandelt die Collection in ein Array um und gibt dieses zurück.",
+    "en": "Returns an array containing all of the elements in this list in proper sequence (from first to last element).",
+    })
+
+    static collectionToArrayComment2 = () => lm({
+    "de": "Wandelt die Collection in ein Array um und gibt dieses zurück. Als Parameter muss ein Muster-Array übergeben werden, das den Typ des zurückgegebenen Arrays bestimmt.",
+    "en": "Returns an array containing all of the elements in this list in proper sequence (from first to last element); the runtime type of the returned array is that of the specified array.",
+    })
+
+    static collectionAddElementComment = () => lm({
+    "de": "Fügt das übergebene Element ans Ende der Liste an.",
+    "en": "Appends the specified element to the end of this list.",
+    })
+
+    static collectionAddAllComment = () => lm({
+    "de": "Fügt alle Elemente der übergebenen Collection ans Ende der Liste an.",
+    "en": "Appends all of the elements in the specified collection to the end of this list, in the order that they are returned by the specified collection's Iterator.",
+    })
+
+    static collectionClearComment = () => lm({
+    "de": "Entleert die Liste. Die Liste ist nach Aufruf dieser Methode leer. Die Elemente der Liste werden dadurch nicht beeinträchtigt.",
+    "en": "Removes all of the elements from this list. The list will be empty after this call returns.",
+    })
+
+    static collectionContainsComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn die Liste das angegebene Element enthält.",
+    "en": "Returns true if this list contains the specified element.",
+    })
+
+    static collectionContainsAllComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn die Liste alle Elemente der übergebenen Collection enthält.",
+    "en": "Returns true if this collection contains all of the elements in the specified collection.",
+    })
+
+    static collectionIsEmptyComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn die Liste leer ist, d.h. keine Elemente enthält.",
+    "en": "Returns true if this list contains no elements.",
+    })
+
+    static collectionRemoveObjectComment = () => lm({
+    "de": "Falls die Liste das übergebene Element enthält, entnimmt diese Methode der Liste das erste solche Element. Die Methode gibt genau dann true zurück, wenn die Liste das Element enthalten hat.",
+    "en": "Removes the first occurrence of the specified element from this list, if it is present. Returns true if element is found.",
+    })
+
+    static collectionRemoveAllComment = () => lm({
+    "de": "Entnimnt der Liste alle Vorkommen aller Elemente der übergebenen Collection.",
+    "en": "Removes from this list all of its elements that are contained in the specified collection.",
+    })
+
+    static collectionSizeComment = () => lm({
+    "de": "Gibt die Anzahl der in der Liste enthaltenen Elemente zurück. Ist ein Element mehrfach enthalten, so wird es dabei mehrfach gezählt.",
+    "en": "Returns the number of elements in this list.",
+    })
+
+    /**
+     * List
+     */
+    static listAddElementComment = () => lm({
+    "de": "Fügt das angegebene Element an der angegebenen Position in die Liste ein. Alle nachfolgendne Elemente werden um eine Position nach hinten verschoben.",
+    "en": "Inserts the specified element at the specified position in this list. Shifts the element currently at that position (if any) and any subsequent elements to the right (adds one to their indices).",
+    })
+
+    static listAddAllElementsComment = () => lm({
+    "de": "Fügt alle Elemente der übergebenen Collection an der angegebenen Position in die Liste ein. Alle nachfolgendne Elemente werden entsprechend nach hinten verschoben.",
+    "en": "Inserts all of the elements in the specified collection into this list, starting at the specified position. Shifts the element currently at that position (if any) and any subsequent elements to the right (increases their indices). The new elements will appear in the list in the order that they are returned by the specified collection's iterator.",
+    })
+
+    static listGetComment = () => lm({
+    "de": "Gibt das Element an der angegebenen Position zurück.\n Das erste Element der Liste hat Position 0.",
+    "en": "Returns the element at the specified position in this list. First element in list has position 0.",
+    })
+
+    static listIndexOfComment = () => lm({
+    "de": "Gibt den Index des angegebenen Elements in der Liste zurück. Falls das Element nicht in der Liste enthalten ist, wird -1 zurückgegeben.\nTipp: Das erste Element der Liste hat Index 0.",
+    "en": "Returns the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the element.\nHint: First element in List has index 0.",
+    })
+
+    static listRemoveComment = () => lm({
+    "de": "Entfernt das Element mit dem angegebenen Index aus der Liste.\nTipp: Das erste Element der Liste hat Index 0.",
+    "en": "Removes the element at the specified position in this list.\nHint: First element in list has index 0.",
+    })
+
+    static listSetComment = () => lm({
+    "de": "Setzt das übergebene Element an der angegebenen Position in die Liste anstatt des bisher dort vorhandenen.",
+    "en": "Replaces the element at the specified position in this list with the specified element.",
+    })
+
+    static listSortComment = () => lm({
+    "de": "Sortiert die Liste anhand des übergebenen Comparator-Objekts.",
+    "en": "Sorts this list according to the order induced by the specified Comparator.",
+    })
+
+    /**
+     * ArrayList
+     */
+    static arrayListConstructorComment = () => lm({
+    "de": "Instanziert (d.h. erzeugt) eine neue, leere Liste.",
+    "en": "Constructs an empty list.",
+    })
+
+    static arrayListIteratorComment = () => lm({
+    "de": "Gibt ein Iterator-Objekt zurück, mit dem über alle Elemente der Liste in der gespeicherten Reihenfolge iteriert werden kann.",
+    "en": "Returns an iterator over the elements in this list in proper sequence.",
+    })
+
+    static arrayListForeachComment = () => lm({
+    "de": "Führt die angegebene Methode (Aktion) für jedes Element der ArrayList aus.\nTipp: Die Aktion kann in Lambda-Schreibweise angegeben werden, z.B. foreach((element) -> {...})",
+    "en": "Performs the given action for each element of the Iterable until all elements have been processed or the action throws an exception. Unless otherwise specified by the implementing class, actions are performed in the order of iteration (if an iteration order is specified).",
+    })
+
+
 
     // Kürzel: mlc
 
