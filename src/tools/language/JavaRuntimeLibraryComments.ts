@@ -9,9 +9,202 @@ export class JRC {
     /**
      * Class Object
      */
+    static objectConstructorComment = () => lm({
+        "de": "Erstellt ein neues Objekt.",
+        "en": "Creates a new object instance.",
+    })
+
     static objectToStringComment = () => lm({
         "de": "Wandelt das Objekt in eine Zeichenkette um und liefert diese zurück.",
         "en": "Returns a String representation of this object.",
+    })
+
+    static objectEqualsComment = () => lm({
+        "de": "Gibt genau dann true zurück, wenn das Objekt und das übergebene Objekt 'gleich' sind.",
+        "en": 'Indicates whether some other object is "equal to" this one.',
+    })
+
+    static objectWaitComment = () => lm({
+        "de": "Bewirkt, dass der aktuelle Thread wartet bis in einem anderen Thread die Methode notify() oder notifyAll() dieses Objekts aufgerufen wird.",
+        "en": "Causes the current thread to wait until another thread invokes the notify() method or the notifyAll() method for this object.",
+    })
+
+    static objectWaitWithTimeoutComment = () => lm({
+        "de": "Bewirkt, dass der aktuelle Thread wartet bis in einem anderen Thread die Methode notify() oder notifyAll() dieses Objekts aufgerufen wird oder das übergebene Timeout (in ms) abläuft.",
+        "en": "Causes the current thread to wait until another thread invokes the notify() method or the notifyAll() method for this object or given timeout elapsed.",
+    })
+
+    static objectNotifyComment = () => lm({
+        "de": "Weckt einen der Threads auf, der auf den Monitor dieses Objektes wartet.",
+        "en": "Wakes up a single thread that is waiting on this object's monitor.",
+    })
+
+    static objectNotifyAllComment = () => lm({
+        "de": "Weckt alle Threads auf, die auf den Monitor dieses Objektes warten.",
+        "en": "Wakes up all threads that are waiting on this object's monitor."
+    })
+
+    /**
+     * Class String
+     */
+    static stringClassComment = () => lm({
+        "de": "Ein String ist eine Zeichenkette.",
+        "en": "A String is a character sequence.",
+    })
+
+    static stringConstructorComment = () => lm({
+        "de": "Erzeugt ein neues, leeres String-Objekt.",
+        "en": "Creates a new empty string object.",
+    })
+
+    static stringConstructorComment2 = () => lm({
+        "de": "Erzeugt ein String-Objekt auf Grundlage des übergebenen.",
+        "en": "Initializes a newly created String object so that it represents the same sequence of characters as the argument; in other words, the newly created string is a copy of the argument string.",
+    })
+
+    static stringLengthComment = () => lm({
+        "de": "Gibt die Länge des Strings (== Anzahl an Zeichen) zurück.",
+        "en": "Returns the length of this string (number of characters).",
+    })
+
+    static stringIndexOfComment1 = () => lm({
+        "de": "Gib den Index innerhalb dieses Strings zurück, ab dem der übergebene String zum ersten Mal auftritt. Gibt -1 zurück, falls dieser nicht im String enthalten ist.",
+        "en": "Returns the index within this string of the first occurrence of the specified substring. Returns -1 if String does not contain given String.",
+    })
+
+    static stringIndexOfComment2 = () => lm({
+        "de": "Gib den Index innerhalb dieses Strings zurück, ab dem der übergebene String NACH fromIndex zum ersten Mal auftritt. Gibt -1 zurück, falls dieser NACH fromIndex nicht im String enthalten ist.",
+        "en": "Returns the index within this string of the first occurrence of the specified substring, starting at the specified index. Returns -1 if String does not contain given String after given Index.",
+    })
+
+    static stringIndexOfComment3 = () => lm({
+        "de": "Gib den Index innerhalb dieses Strings zurück, ab dem das übergebene Zeichen zum ersten Mal auftritt. Gibt -1 zurück, falls dieses nicht im String enthalten ist.",
+        "en": "Returns the index within this string of the first occurrence of the specified character. Returns -1 if String does not contain given character.",
+    })
+
+    static stringIndexOfComment4 = () => lm({
+        "de": "Gib den Index innerhalb dieses Strings zurück, ab dem das übergebene Zeichen NACH fromIndex zum ersten Mal auftritt. Gibt -1 zurück, falls dieses NACH fromIndex nicht im String enthalten ist.",
+        "en": "Returns the index within this string of the first occurrence of the specified character, starting at the specified index. Returns -1 if String does not contain given character after given Index.",
+    })
+
+    static stringCharAtComment = () => lm({
+        "de": "Gibt das Zeichen an der angegebenen Position zurück. Das erste Zeichen im String hat Position 0.",
+        "en": "Returns the char value at the specified index. An index ranges from 0 to length() - 1. The first char value of the sequence is at index 0, the next at index 1, and so on, as for array indexing.",
+    })
+
+    static compareToIgnoreCaseComment = () => lm({
+        "de": "Vergleicht die beiden Zeichenketten lexikalisch ohne Berücksichtigung von Klein- und Großschreibung und gibt entsprechend -1, 0 oder 1 zurück.",
+        "en": "Compares two strings lexicographically, ignoring case differences. This method returns an integer whose sign is that of calling compareTo with normalized versions of the strings where case differences have been eliminated by calling Character.toLowerCase(Character.toUpperCase(character)) on each character.",
+    })
+
+    static stringConcatComment = () => lm({
+        "de": "Gibt einen String zurück, der entsteht, indem man den übergebenen String hinter diesen hängt. Verändert den String dabei aber nicht.",
+        "en": "Concatenates the specified string to the end of this string",
+    })
+
+    static stringContainsComment = () => lm({
+        "de": "Gibt genau dann true zurück, wenn der String den übergebenen String enthält.",
+        "en": "Returns true if this String contains given String.",
+    })
+
+    static stringEndsWithComment = () => lm({
+        "de": "Gibt genau dann true zurück, wenn der String mit dem übergebenen String endet.",
+        "en": "Tests if this string ends with the specified suffix.",
+    })
+
+    static stringStartsWithComment = () => lm({
+        "de": "Gibt genau dann true zurück, wenn der String mit dem übergebenen String beginnt.",
+        "en": "Tests if this string starts with the specified praefix.",
+    })
+
+    static stringEqualsIgnoreCaseComment = () => lm({
+        "de": "Gibt genau dann true zurück, wenn der übergebene String diesem String bis auf Klein- und Großschreibung gleicht.",
+        "en": "Compares this String to another String, ignoring case considerations. Two strings are considered equal ignoring case if they are of the same length and corresponding characters in the two strings are equal ignoring case.",
+    })
+
+    static stringIsEmptyComment = () => lm({
+        "de": "Gibt genau dann true zurück, wenn der String leer ist, sich also keine Zeichen darin befinden. Das ist wiederum genau dann der Fall, wenn die Länge des Strings 0 beträgt.",
+        "en": "Returns true if, and only if, length() is 0.",
+    })
+
+    static stringLastIndexOfComment1 = () => lm({
+        "de": "Gib den Index innerhalb dieses Strings zurück, ab dem der übergebene String zum letzten Mal auftritt. Gibt -1 zurück, falls dieser nicht im String enthalten ist.",
+        "en": "Returns the index within this string of the last occurrence of the specified substring. Returns -1 if String does not contain given String.",
+    })
+
+    static stringLastIndexOfComment2 = () => lm({
+        "de": "Gib den Index innerhalb dieses Strings zurück, ab dem der übergebene String VOR fromIndex zum letzten Mal auftritt. Gibt -1 zurück, falls dieser VOR fromIndex nicht im String enthalten ist.",
+        "en": "Returns the index within this string of the last occurrence of the specified substring, starting at the specified index backwards. Returns -1 if String does not contain given String before given Index.",
+    })
+
+    static stringLastIndexOfComment3 = () => lm({
+        "de": "Gib den Index innerhalb dieses Strings zurück, ab dem das übergebene Zeichen zum letzten Mal auftritt. Gibt -1 zurück, falls dieses nicht im String enthalten ist.",
+        "en": "Returns the index within this string of the last occurrence of the specified character. Returns -1 if String does not contain given character.",
+    })
+
+    static stringLastIndexOfComment4 = () => lm({
+        "de": "Gib den Index innerhalb dieses Strings zurück, ab dem das übergebene Zeichen VOR fromIndex zum letzten Mal auftritt. Gibt -1 zurück, falls dieses VOR fromIndex nicht im String enthalten ist.",
+        "en": "Returns the index within this string of the last occurrence of the specified character, starting at the specified index backwards. Returns -1 if String does not contain given character before given Index.",
+    })
+
+    static stringToLowerCaseComment = () => lm({
+    "de": "Gibt einen String zurück, der den String in Kleinschreibung enthält.",
+    "en": "Converts all of the characters in this String to lower case using the rules of the default locale.",
+    })
+
+    static stringToUpperCaseComment = () => lm({
+    "de": "Gibt einen String zurück, der den String in Großschreibung enthält.",
+    "en": "Converts all of the characters in this String to upper case using the rules of the default locale.",
+    })
+
+    static stringSubstringComment1 = () => lm({
+    "de": "Gibt den Teilstring ab der übergebenen Position zurück. Position 0 ist der Beginn des Strings.",
+    "en": "Returns a string that is a substring of this string from given position on. Position 0 is start of string.",
+    })
+
+    static stringSubstringComment2 = () => lm({
+    "de": "Gibt den Teilstring zwischen den beiden übergebenen Positionen zurück. Position 0 ist der Beginn des Strings.",
+    "en": "Returns a string that is a substring of this string between given positions. Position 0 is start of string.",
+    })
+
+    static stringTrimComment = () => lm({
+    "de": "Gibt den String zurück, der entsteht, wenn man an Beginn und Ende alle unsichtbaren Zeichen (d.h. Leerzeichen, tabs und Zeilenumbrüche) entfernt.",
+    "en": "Returns a string whose value is this string, with any leading and trailing whitespace removed.",
+    })
+
+    static stringReplaceComment = () => lm({
+    "de": "Ersetzt alle Vorkommen von **target** durch **replacement** und gibt die entstandene Zeichenkette zurück. Die Zeichenkette selbst wird nicht verändert.",
+    "en": "Replaces each substring of this string that matches the literal target sequence with the specified literal replacement sequence.",
+    })
+
+    static stringReplaceAllComment = () => lm({
+    "de": "Durchsucht den String mit dem regulären Ausdruck (regex) und ersetzt **alle** Fundstellen durch **replacement**.",
+    "en": "Replaces each substring of this string that matches the given regular expression with the given replacement.",
+    })
+
+    static stringMatchesComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn der Wert der Zeichenkette dem regulären Ausdruck (regex) entspricht.",
+    "en": "Tells whether or not this string matches the given regular expression.",
+    })
+
+    static stringReplaceFirstComment = () => lm({
+    "de": "Durchsucht den String mit dem regulären Ausdruck (regex) und ersetzt **die erste** Fundstelle durch **replacement**.",
+    "en": "Replaces the first substring of this string that matches the given regular expression with the given replacement.",
+    })
+
+    static stringSplitComment = () => lm({
+    "de": "Teilt die Zeichenkette an den Stellen, die durch den regulären Ausdruck (regex) definiert sind, in Teile auf. Die Fundstellen des regex werden dabei weggelassen. Gibt die Teile als String-Array zurück.",
+    "en": "Splits this string around matches of the given regular expression.",
+    })
+
+    static hashCodeComment = () => lm({
+    "de": "Gibt den Hashcode des String zurück. Er wird wie folgt berechnet: s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]. Dabei ist s[i] das i-te Zeichen des Strings.",
+    "en": "Returns a hash code for this string. The hash code for a String object is computed as s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]",
+    })
+
+    static stringToCharArrayComment = () => lm({
+    "de": "Wandelt den String in ein char[] um.",
+    "en": "Converts given String to char[].",
     })
 
     /**
@@ -998,46 +1191,46 @@ export class JRC {
     })
 
     static optionalEqualsComment = () => lm({
-    "de": `Gibt genau dann true zurück, wenn beide Optional-Objekte leer sind oder wenn die enthaltenen Objekte gleich sind, ausgehend von deren equals-Funktion.`,
-    "en": `Indicates whether some other object is "equal to" this Optional. The other object is considered equal if:
+        "de": `Gibt genau dann true zurück, wenn beide Optional-Objekte leer sind oder wenn die enthaltenen Objekte gleich sind, ausgehend von deren equals-Funktion.`,
+        "en": `Indicates whether some other object is "equal to" this Optional. The other object is considered equal if:
     it is also an Optional and;
     both instances have no value present or;
     the present values are "equal to" each other via equals().`,
     })
 
     static optionalIsEmptyComment = () => lm({
-    "de": "Gibt genau dann zurück, wenn im Optional-Objekt kein Wert enthalten ist.",
-    "en": "If a value is not present, returns true, otherwise false.",
+        "de": "Gibt genau dann zurück, wenn im Optional-Objekt kein Wert enthalten ist.",
+        "en": "If a value is not present, returns true, otherwise false.",
     })
 
     static optionalMapComment = () => lm({
-    "de": "Wenn das Optional-Objekt einen Wert enthält liefert diese Methode Optional.of(f(Wert)) zurück, ansonsten ein leeres Optional-Objekt.",
-    "en": "If a value is present, returns an Optional describing (as if by ofNullable(T)) the result of applying the given mapping function to the value, otherwise returns an empty Optional.",
+        "de": "Wenn das Optional-Objekt einen Wert enthält liefert diese Methode Optional.of(f(Wert)) zurück, ansonsten ein leeres Optional-Objekt.",
+        "en": "If a value is present, returns an Optional describing (as if by ofNullable(T)) the result of applying the given mapping function to the value, otherwise returns an empty Optional.",
     })
 
     static optionalFlatMapComment = () => lm({
-    "de": "Wenn das Optional-Objekt einen Wert enthält liefert diese Methode f(Wert) zurück, ansonsten ein leeres Optional-Objekt.",
-    "en": "If a value is present, returns the result of applying the given Optional-bearing mapping function to the value, otherwise returns an empty Optional.",
+        "de": "Wenn das Optional-Objekt einen Wert enthält liefert diese Methode f(Wert) zurück, ansonsten ein leeres Optional-Objekt.",
+        "en": "If a value is present, returns the result of applying the given Optional-bearing mapping function to the value, otherwise returns an empty Optional.",
     })
 
     static optionalOfComment = () => lm({
-    "de": "Gibt ein Optional-Objekt zurück das den gegebenen (von null verschiedenen) Wert enthält.",
-    "en": "Returns an Optional describing the given non-null value.",
+        "de": "Gibt ein Optional-Objekt zurück das den gegebenen (von null verschiedenen) Wert enthält.",
+        "en": "Returns an Optional describing the given non-null value.",
     })
 
     static optionalOrElseComment = () => lm({
-    "de": "Wenn das Optional-Objekt einen Wert enthält liefert die Methode diesen zurück, ansonsten den übergebenen Wert t.",
-    "en": "If a value is present, returns the value, otherwise returns other.",
+        "de": "Wenn das Optional-Objekt einen Wert enthält liefert die Methode diesen zurück, ansonsten den übergebenen Wert t.",
+        "en": "If a value is present, returns the value, otherwise returns other.",
     })
 
     static optionalIfPresentComment = () => lm({
-    "de": "Wenn das Optional-Objekt einen Wert enthält wird damit die übergebene Aktion ausgeführt, ansonsten wird nichts gemacht.",
-    "en": "If a value is present, performs the given action with the value, otherwise does nothing.",
+        "de": "Wenn das Optional-Objekt einen Wert enthält wird damit die übergebene Aktion ausgeführt, ansonsten wird nichts gemacht.",
+        "en": "If a value is present, performs the given action with the value, otherwise does nothing.",
     })
 
     static optionalToStringComment = () => lm({
-    "de": "Gibt eine nichtleere String-Darstellung des Optional-Objekts zurück, passend zum Debuggen.",
-    "en": "Returns a non-empty string representation of this Optional suitable for debugging.",
+        "de": "Gibt eine nichtleere String-Darstellung des Optional-Objekts zurück, passend zum Debuggen.",
+        "en": "Returns a non-empty string representation of this Optional suitable for debugging.",
     })
 
 
@@ -1045,41 +1238,41 @@ export class JRC {
      * Runnable
      */
     static RunnableInterfaceComment = () => lm({
-    "de": "Das Runnable-Interface wird von Klassen implementiert, die eine Methode run() besitzen, die in einem neuen Thread ausgeführt werden soll.",
-    "en": "The Runnable interface should be implemented by any class whose instances are intended to be executed by a thread. The class must define a method of no arguments called run.",
+        "de": "Das Runnable-Interface wird von Klassen implementiert, die eine Methode run() besitzen, die in einem neuen Thread ausgeführt werden soll.",
+        "en": "The Runnable interface should be implemented by any class whose instances are intended to be executed by a thread. The class must define a method of no arguments called run.",
     })
 
     static runnableRunComment = () => lm({
-    "de": "WEnn ein Objekt, das das Interface Runnable implementiert, benutzt wird, um einen Thread zu erstellen, bewirkt das Starten des Threads die Ausführung der run()-Methode in diesem Thread.",
-    "en": "When an object implementing interface Runnable is used to create a thread, starting the thread causes the object's run method to be called in that separately executing thread.",
+        "de": "WEnn ein Objekt, das das Interface Runnable implementiert, benutzt wird, um einen Thread zu erstellen, bewirkt das Starten des Threads die Ausführung der run()-Methode in diesem Thread.",
+        "en": "When an object implementing interface Runnable is used to create a thread, starting the thread causes the object's run method to be called in that separately executing thread.",
     })
 
     /**
      * Semaphore
      */
     static semaphoreClassComment = () => lm({
-    "de": "Ein zählender Semaphor",
-    "en": "A counting semaphore. Conceptually, a semaphore maintains a set of permits. Each acquire() blocks if necessary until a permit is available, and then takes it. Each release() adds a permit, potentially releasing a blocking acquirer. ",
+        "de": "Ein zählender Semaphor",
+        "en": "A counting semaphore. Conceptually, a semaphore maintains a set of permits. Each acquire() blocks if necessary until a permit is available, and then takes it. Each release() adds a permit, potentially releasing a blocking acquirer. ",
     })
 
     static semaphoreConstructorComment = () => lm({
-    "de": "Erstellt einen Semaphor mit der angegebenen Zahl von Permits.",
-    "en": "Creates a Semaphore with the given number of permits.",
+        "de": "Erstellt einen Semaphor mit der angegebenen Zahl von Permits.",
+        "en": "Creates a Semaphore with the given number of permits.",
     })
 
     static semaphoreAvailablePermitsComment = () => lm({
-    "de": "Gibt die Anzahl an Permits zurück, die in diesem Semaphor aktuell vorhanden ist.",
-    "en": "Returns the current number of permits available in this semaphore.",
+        "de": "Gibt die Anzahl an Permits zurück, die in diesem Semaphor aktuell vorhanden ist.",
+        "en": "Returns the current number of permits available in this semaphore.",
     })
 
     static semaphoreAquireComment = () => lm({
-    "de": "Beschafft ein Permit. Falls keines vorhanden sind wird der Thread blockiert. Der Thread bleibt blockiert bis wieder ein Permit vorhanden ist oder der Thread unterbrochen (interrupted) wird.",
-    "en": "Acquires a permit from this semaphore, blocking until one is available, or the thread is interrupted.",
+        "de": "Beschafft ein Permit. Falls keines vorhanden sind wird der Thread blockiert. Der Thread bleibt blockiert bis wieder ein Permit vorhanden ist oder der Thread unterbrochen (interrupted) wird.",
+        "en": "Acquires a permit from this semaphore, blocking until one is available, or the thread is interrupted.",
     })
 
     static semaphoreReleaseComment = () => lm({
-    "de": "Gibt ein Permit frei und führt es dem Semaphor wieder zu.",
-    "en": "Releases a permit, returning it to the semaphore.",
+        "de": "Gibt ein Permit frei und führt es dem Semaphor wieder zu.",
+        "en": "Releases a permit, returning it to the semaphore.",
     })
 
 
@@ -1087,61 +1280,61 @@ export class JRC {
      * Thread
      */
     static threadClassComment = () => lm({
-    "de": "Ein Thread ist ein 'Ausführungsstrang' in einem Programm. Die Online IDE ermöglicht die gleichzeitige Ausführung mehrerer Threads.",
-    "en": "A thread is a thread of execution in a program. The Online IDE allows an application to have multiple threads of execution running concurrently.",
+        "de": "Ein Thread ist ein 'Ausführungsstrang' in einem Programm. Die Online IDE ermöglicht die gleichzeitige Ausführung mehrerer Threads.",
+        "en": "A thread is a thread of execution in a program. The Online IDE allows an application to have multiple threads of execution running concurrently.",
     })
 
     static threadConstructorComment = () => lm({
-    "de": "Erstellt ein neues Thread-Objekt, startet den Thread aber noch nicht.",
-    "en": "Creates a new Thread object.",
+        "de": "Erstellt ein neues Thread-Objekt, startet den Thread aber noch nicht.",
+        "en": "Creates a new Thread object.",
     })
 
     static threadConstructorRunnableComment = () => lm({
-    "de": "Erstellt ein neues Thread-Objekt. Wird der Thread gestartet, so wird die run()-Methode des übergebenen Runnable-Objekts ausgeführt.",
-    "en": "Creates a new Thread object. When starting this thread method run() of given Runnable-object ist called concurrently to the existing threads.",
+        "de": "Erstellt ein neues Thread-Objekt. Wird der Thread gestartet, so wird die run()-Methode des übergebenen Runnable-Objekts ausgeführt.",
+        "en": "Creates a new Thread object. When starting this thread method run() of given Runnable-object ist called concurrently to the existing threads.",
     })
 
     static threadGetStateComment = () => lm({
-    "de": "Gibt den state des threads zurück.",
-    "en": "Returns the state of this thread.",
+        "de": "Gibt den state des threads zurück.",
+        "en": "Returns the state of this thread.",
     })
 
     static threadRunComment = () => lm({
-    "de": "Führt die run()-Methode des bei diesem Thread gespeicherten Runnable-Objekts im AKTUELLEN thread aus. Die Wirkung ist dieselbe, als würde man die run()-Methode des Runnable-Objekts einfach aufrufen.",
-    "en": "Calls run()-Method of this thread's Runnable object in CURRENT thread.",
+        "de": "Führt die run()-Methode des bei diesem Thread gespeicherten Runnable-Objekts im AKTUELLEN thread aus. Die Wirkung ist dieselbe, als würde man die run()-Methode des Runnable-Objekts einfach aufrufen.",
+        "en": "Calls run()-Method of this thread's Runnable object in CURRENT thread.",
     })
 
     static threadStartComment = () => lm({
-    "de": "Führt die run()-Methode des bei diesem Thread gespeicherten Runnable-Objekts nebenläufig (parallel) zum aktuellen Thread aus.",
-    "en": "Runs the run()-Method of this thread's runnable object CONCURRENTLY to the current thread.",
+        "de": "Führt die run()-Methode des bei diesem Thread gespeicherten Runnable-Objekts nebenläufig (parallel) zum aktuellen Thread aus.",
+        "en": "Runs the run()-Method of this thread's runnable object CONCURRENTLY to the current thread.",
     })
 
     static threadJoinComment = () => lm({
-    "de": "Wartet bis der Thread beendet (terminated) ist.",
-    "en": "Waits for this thread to die (state: terminated).",
+        "de": "Wartet bis der Thread beendet (terminated) ist.",
+        "en": "Waits for this thread to die (state: terminated).",
     })
 
     static threadJoinComment2 = () => lm({
-    "de": "Wartet bis der Thread beendet (terminated) ist, längstens aber die übergebene Zahl an Millisekunden.",
-    "en": "Waits for this thread to die (state: terminated), at most given milliseconds.",
+        "de": "Wartet bis der Thread beendet (terminated) ist, längstens aber die übergebene Zahl an Millisekunden.",
+        "en": "Waits for this thread to die (state: terminated), at most given milliseconds.",
     })
 
     static threadGetNameComment = () => lm({
-    "de": "Gibt den Namen des Threads zurück.",
-    "en": "Returns the name of this thread.",
+        "de": "Gibt den Namen des Threads zurück.",
+        "en": "Returns the name of this thread.",
     })
 
     static threadSetNameComment = () => lm({
-    "de": "Ändert den Namen dieses Threads.",
-    "en": "Sets the name of this thread.",
+        "de": "Ändert den Namen dieses Threads.",
+        "en": "Sets the name of this thread.",
     })
 
     static threadSetSpeedComment = () => lm({
-    "de": "Setzt die gewünschte Ausführungsgeschwindigkeit des Threads in Schritten/Sekunde. Werte <= 0 bewirken die Ausführung mit maximaler Geschwidigkeit.",
-    "en": "Sets speed of thread in steps/second. Values <= 0 mean 'maximum speed'.",
+        "de": "Setzt die gewünschte Ausführungsgeschwindigkeit des Threads in Schritten/Sekunde. Werte <= 0 bewirken die Ausführung mit maximaler Geschwidigkeit.",
+        "en": "Sets speed of thread in steps/second. Values <= 0 mean 'maximum speed'.",
     })
 
-    
+
 
     // Kürzel: mlc
 
