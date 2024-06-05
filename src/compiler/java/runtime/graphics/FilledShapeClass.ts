@@ -7,31 +7,32 @@ import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { FilledShapeDefaults } from './FilledShapeDefaults';
 import { ColorClass } from './ColorClass';
 import { ColorHelper } from '../../lexer/ColorHelper';
+import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
 
 export class FilledShapeClass extends ShapeClass {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "abstract class FilledShape extends Shape" },
 
         { type: "method", signature: "FilledShape()", java: FilledShapeClass.prototype._cj$_constructor_$FilledShape$ },
-        { type: "method", signature: "Color getFillColor()", native: FilledShapeClass.prototype._getFillColor },
-        { type: "method", signature: "void setFillColor(int color)", native: FilledShapeClass.prototype._setFillColorInt },
-        { type: "method", signature: "void setFillColor(int color, double alpha)", native: FilledShapeClass.prototype._setFillColorIntDouble },
-        { type: "method", signature: "void setFillColor(string color)", native: FilledShapeClass.prototype._setFillColorString },
-        { type: "method", signature: "void setFillColor(string color, double alpha)", native: FilledShapeClass.prototype._setFillColorStringDouble },
-        { type: "method", signature: "Color getBorderColor()", native: FilledShapeClass.prototype._getBorderColor },
-        { type: "method", signature: "void setBorderColor(int color)", native: FilledShapeClass.prototype._setBorderColorInt },
-        { type: "method", signature: "void setBorderColor(int color, double alpha)", native: FilledShapeClass.prototype._setBorderColorIntDouble },
-        { type: "method", signature: "void setBorderColor(string color)", native: FilledShapeClass.prototype._setBorderColorString },
-        { type: "method", signature: "void setBorderColor(string color, double alpha)", native: FilledShapeClass.prototype._setBorderColorStringDouble },
-        { type: "method", signature: "void setBorderWidth(double width)", native: FilledShapeClass.prototype._setBorderWidth },
-        { type: "method", signature: "double getBorderWidth()", native: FilledShapeClass.prototype._getBorderWidth },
-        { type: "method", signature: "void setAlpha(double alpha)", native: FilledShapeClass.prototype._setAlpha },
-        { type: "method", signature: "double getAlpha()", native: FilledShapeClass.prototype._getAlpha },
+        { type: "method", signature: "Color getFillColor()", native: FilledShapeClass.prototype._getFillColor , comment: JRC.fsGetFillColorComment},
+        { type: "method", signature: "void setFillColor(int color)", native: FilledShapeClass.prototype._setFillColorInt , comment: JRC.fsSetFillColorCommentInt},
+        { type: "method", signature: "void setFillColor(int color, double alpha)", native: FilledShapeClass.prototype._setFillColorIntDouble , comment: JRC.fsSetFillColorCommentIntDouble},
+        { type: "method", signature: "void setFillColor(string color)", native: FilledShapeClass.prototype._setFillColorString , comment: JRC.fsSetFillColorCommentString},
+        { type: "method", signature: "void setFillColor(string color, double alpha)", native: FilledShapeClass.prototype._setFillColorStringDouble , comment: JRC.fsSetFillColorCommentStringDouble},
+        { type: "method", signature: "Color getBorderColor()", native: FilledShapeClass.prototype._getBorderColor , comment: JRC.fsGetBorderColorComment},
+        { type: "method", signature: "void setBorderColor(int color)", native: FilledShapeClass.prototype._setBorderColorInt , comment: JRC.fsSetBorderColorCommentInt},
+        { type: "method", signature: "void setBorderColor(int color, double alpha)", native: FilledShapeClass.prototype._setBorderColorIntDouble , comment: JRC.fsSetBorderColorCommentIntDouble},
+        { type: "method", signature: "void setBorderColor(string color)", native: FilledShapeClass.prototype._setBorderColorString , comment: JRC.fsSetBorderColorCommentString},
+        { type: "method", signature: "void setBorderColor(string color, double alpha)", native: FilledShapeClass.prototype._setBorderColorStringDouble , comment: JRC.fsSetBorderColorCommentStringDouble},
+        { type: "method", signature: "void setBorderWidth(double width)", native: FilledShapeClass.prototype._setBorderWidth , comment: JRC.fsSetBorderWidthComment},
+        { type: "method", signature: "double getBorderWidth()", native: FilledShapeClass.prototype._getBorderWidth , comment: JRC.fsGetBorderWidthComment},
+        { type: "method", signature: "void setAlpha(double alpha)", native: FilledShapeClass.prototype._setAlpha , comment: JRC.fsSetAlphaComment},
+        { type: "method", signature: "double getAlpha()", native: FilledShapeClass.prototype._getAlpha , comment: JRC.fsGetAlphaComment},
 
-        { type: "method", signature: "static void setDefaultBorder(double width, string color)", native: FilledShapeClass._setDefaultBorder },
-        { type: "method", signature: "static void setDefaultBorder(double width, int color, double alpha)", native: FilledShapeClass._setDefaultBorder },
-        { type: "method", signature: "static void setDefaultBorder(string color)", native: FilledShapeClass._setDefaultFillColor },
-        { type: "method", signature: "static void setDefaultBorder(int color, double alpha)", native: FilledShapeClass._setDefaultFillColor },
+        { type: "method", signature: "static void setDefaultBorder(double width, string color)", native: FilledShapeClass._setDefaultBorder , comment: JRC.fsSetDefaultBorderComment1},
+        { type: "method", signature: "static void setDefaultBorder(double width, int color, double alpha)", native: FilledShapeClass._setDefaultBorder , comment: JRC.fsSetDefaultBorderComment2},
+        { type: "method", signature: "static void setDefaultBorder(string color)", native: FilledShapeClass._setDefaultFillColor , comment: JRC.fsSetDefaultFillColor},
+        { type: "method", signature: "static void setDefaultBorder(int color, double alpha)", native: FilledShapeClass._setDefaultFillColor , comment: JRC.fsSetDefaultFillColor},
 
 
 
