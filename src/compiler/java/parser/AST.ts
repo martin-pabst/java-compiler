@@ -52,7 +52,7 @@ export interface ASTGlobalNode extends ASTNode, TypeScope {
     kind: TokenType.global;
     mainProgramNode: ASTProgramNode;
 
-    collectedTypeNodes: ASTTypeNode[];
+    collectedTypeNodes: ASTTypeNode[];      // if compile target is "Program"
 
 }
 
@@ -258,6 +258,7 @@ export interface ASTSynchronizedBlockNode extends ASTStatementNode {
 export interface ASTBlockNode extends ASTStatementNode {
     kind: TokenType.block;
     statements: ASTStatementNode[];
+    collectedTypeNodes?: ASTTypeNode[];      // if compile target is "REPL"
 }
 
 export interface ASTProgramNode extends ASTNode {

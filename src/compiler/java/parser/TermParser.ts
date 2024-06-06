@@ -6,6 +6,7 @@ import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode, ASTMethodDeclarationNode, ASTWildcardTypeNode, ASTGenericTypeInstantiationNode, ASTArrayTypeNode, ASTArrayLiteralNode, ASTMethodCallNode, ASTBaseTypeNode } from "./AST.ts";
 import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator.ts";
+import { JavaCompileData } from "./JavaCompileData.ts";
 
 export abstract class TermParser extends TokenIterator {
     static assignmentOperators = [TokenType.assignment, TokenType.plusAssignment, TokenType.minusAssignment,
@@ -48,7 +49,7 @@ export abstract class TermParser extends TokenIterator {
     currentClassOrInterface?: ASTClassDefinitionNode | ASTInterfaceDefinitionNode;
     currentMethod?: ASTMethodDeclarationNode;
 
-    constructor(public module: JavaCompiledModule) {
+    constructor(public module: JavaCompileData) {
         super(module.tokens!, module);
         this.nodeFactory = new ASTNodeFactory(this);
 
@@ -446,7 +447,7 @@ export abstract class TermParser extends TokenIterator {
         }
 
         if (returnedType) {
-            this.module.ast?.collectedTypeNodes.push(returnedType);
+            this.module.ast?.collectedTypeNodes!.push(returnedType);
         }
 
         return returnedType;
@@ -462,7 +463,7 @@ export abstract class TermParser extends TokenIterator {
             type = this.nodeFactory.buildBaseTypeNode(identifier, EmptyRange.instance);
         }
 
-        this.module.ast?.collectedTypeNodes.push(type);
+        this.module.ast?.collectedTypeNodes!.push(type);
 
         return type;
     }

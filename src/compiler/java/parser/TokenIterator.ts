@@ -6,6 +6,7 @@ import { Token, TokenList } from "../lexer/Token";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { ASTNode } from "./AST";
+import { JavaCompileData } from "./JavaCompileData.ts";
 
 export class TokenIterator {
 
@@ -56,7 +57,7 @@ export class TokenIterator {
 
 
 
-    constructor(private tokenList: TokenList, protected module: JavaBaseModule) {
+    constructor(private tokenList: TokenList, protected module: JavaCompileData) {
         if(tokenList.length == 0){
             tokenList.push({
                 tt: TokenType.endofSourcecode,

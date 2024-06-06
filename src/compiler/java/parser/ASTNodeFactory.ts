@@ -1,6 +1,7 @@
 import { EmptyRange, IRange, Range } from "../../common/range/Range";
 import { TokenType } from "../TokenType";
 import { Token } from "../lexer/Token.ts";
+import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { ASTAnnotationNode, ASTFieldDeclarationNode, ASTAttributeDereferencingNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTCastNode, ASTCatchNode, ASTClassDefinitionNode, ASTLiteralNode, ASTContinueNode, ASTDoWhileNode, ASTEnumDefinitionNode, ASTEnumValueNode, ASTForLoopNode, ASTIfNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTMethodCallNode, ASTMethodDeclarationNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTParameterNode, ASTPlusPlusMinusMinusSuffixNode, ASTPrintStatementNode, ASTProgramNode, ASTReturnNode, ASTSelectArrayElementNode, ASTEnhancedForLoopNode, ASTStatementNode, ASTSuperNode, ASTSwitchCaseNode, ASTTermNode, ASTThisNode, ASTTryCatchNode, ASTTypeNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTWhileNode, TypeScope as ASTTypeScope, ASTNewArrayNode, ASTInstanceInitializerNode, ASTStaticInitializerNode, ASTAnonymousClassNode, ASTWildcardTypeNode, ASTVoidTypeNode, ASTArrayTypeNode, ASTGenericTypeInstantiationNode, ASTBaseTypeNode, ASTArrayLiteralNode, TypeScope, ASTVarTypeNode, ASTSynchronizedBlockNode } from "./AST";
 import { TermParser } from "./TermParser.ts";
 
@@ -120,7 +121,7 @@ export class ASTNodeFactory {
     // }
 
     buildClassNode(modifiers: ASTNodeWithModifiers, identifier: Token | undefined,
-        parent: ASTTypeScope, annotations: ASTAnnotationNode[]): ASTClassDefinitionNode {
+        parent: ASTTypeScope, annotations: ASTAnnotationNode[], module: JavaCompiledModule): ASTClassDefinitionNode {
 
         let identifierValue = identifier ? <string>identifier.value : "";
 
@@ -147,7 +148,7 @@ export class ASTNodeFactory {
             innerTypes: [],
             annotations: [],
             resolvedType: undefined,
-            module: this.parser.module, 
+            module: module, 
             isAnonymousInnerType: false
         }
 
@@ -162,7 +163,7 @@ export class ASTNodeFactory {
     }
 
     buildEnumNode(modifiers: ASTNodeWithModifiers, identifier: Token,
-        parent: ASTTypeScope, annotations: ASTAnnotationNode[]): ASTEnumDefinitionNode {
+        parent: ASTTypeScope, annotations: ASTAnnotationNode[], module: JavaCompiledModule): ASTEnumDefinitionNode {
 
         let path: string = (parent.path != "" ? parent.path + "." : "") + identifier.value;
 
@@ -185,7 +186,7 @@ export class ASTNodeFactory {
             isSynchronized: modifiers.isSynchronized,
             resolvedType: undefined,
             innerTypes: [],
-            module: this.parser.module, 
+            module: module, 
             isAnonymousInnerType: false
         }
 
@@ -212,7 +213,7 @@ export class ASTNodeFactory {
     }
 
     buildInterfaceNode(modifiers: ASTNodeWithModifiers, identifier: Token,
-        parent: ASTTypeScope, annotations: ASTAnnotationNode[]): ASTInterfaceDefinitionNode {
+        parent: ASTTypeScope, annotations: ASTAnnotationNode[], module: JavaCompiledModule): ASTInterfaceDefinitionNode {
 
         let path: string = (parent.path != "" ? parent.path + "." : "") + identifier.value;
 
@@ -236,7 +237,7 @@ export class ASTNodeFactory {
             fieldsOrInstanceInitializers: [], // only static fields and static initializers...,
             resolvedType: undefined,
             innerTypes: [],
-            module: this.parser.module, 
+            module: module, 
             isAnonymousInnerType: false
         }
 

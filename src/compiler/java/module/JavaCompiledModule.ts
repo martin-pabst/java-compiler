@@ -18,6 +18,7 @@ import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { JavaBaseModule } from "./JavaBaseModule";
 import { JavaModuleManager } from "./JavaModuleManager";
 import { TypePosition } from "./TypePosition.ts";
+import { JavaCompileData } from "../parser/JavaCompileData.ts";
 
 export type JavaMethodCallPosition = {
     identifierRange: monaco.IRange,
@@ -30,7 +31,7 @@ export type JavaMethodCallPosition = {
 /**
  * A JavaModule represents a compiled Java Sourcecode File.
  */
-export class JavaCompiledModule extends JavaBaseModule {
+export class JavaCompiledModule extends JavaBaseModule implements JavaCompileData {
 
     sourceCode: string = "";
 
