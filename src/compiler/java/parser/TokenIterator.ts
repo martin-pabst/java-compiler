@@ -57,7 +57,7 @@ export class TokenIterator {
 
 
 
-    constructor(private tokenList: TokenList, protected module: JavaCompileData) {
+    constructor(private tokenList: TokenList, protected compileData: JavaCompileData) {
         if(tokenList.length == 0){
             tokenList.push({
                 tt: TokenType.endofSourcecode,
@@ -166,7 +166,7 @@ export class TokenIterator {
 
     pushError(messageWithId: ErrormessageWithId, errorLevel: ErrorLevel = "error", range?: IRange, quickFix?: QuickFix) {
         if (range == null) range = Object.assign({}, this.cct.range);
-        this.module.errors.push({
+        this.compileData.errors.push({
             message: messageWithId.message,
             id: messageWithId.id,
             range: range,
@@ -244,7 +244,7 @@ export class TokenIterator {
                             }
                         }
 
-                        if (invokeSemicolonAngel && this.module.errors.length < 3) {
+                        if (invokeSemicolonAngel && this.compileData.errors.length < 3) {
                             //this.module.main.getSemicolonAngel().register(range, this.module);
                         }
                     }

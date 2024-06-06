@@ -2,14 +2,15 @@ import { JCM } from "../../../../tools/language/JavaCompilerMessages.ts";
 import { TokenType } from "../../TokenType.ts";
 import { JavaCompiledModule } from "../../module/JavaCompiledModule.ts";
 import { ASTAnonymousClassNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTProgramNode } from "../AST.ts";
+import { JavaCompileData } from "../JavaCompileData.ts";
 import { StatementParser } from "../StatementParser.ts";
 
 
 export class ReplParser extends StatementParser {
 
 
-    constructor(module: JavaCompiledModule) {
-        super(module);
+    constructor(compileData: JavaCompileData) {
+        super(compileData);
         this.initializeAST();
     }
 
@@ -19,11 +20,7 @@ export class ReplParser extends StatementParser {
             endLineNumber: this.endToken.range.endLineNumber, endColumn: this.endToken.range.endColumn
         };
 
-        let ast: ASTProgramNode = {
-            kind: TokenType.program,
-            range: globalRange,
-            statements: []
-        }
+        this.compileData.ast!.range = globalRange;
     }
 
     parse() {
@@ -31,6 +28,7 @@ export class ReplParser extends StatementParser {
         while (!this.isEnd()) {
             let pos = this.pos;
 
+            this.parseStatementOrExpression(false);
 
             if (pos == this.pos) {
                 this.pushError(JCM.unexpectedToken("" + this.cct.value), "warning");
