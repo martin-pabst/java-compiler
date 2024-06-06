@@ -38,6 +38,16 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
     }
 
+    initRuntimeClass(baseClass: Klass) {
+        let that = this;
+        this.runtimeClass = class extends baseClass {
+            static type = that;
+            constructor(name: string, ordinal: number){
+                super(name, ordinal);
+            }
+         };
+    }
+
     getExtends(): JavaClass {
         return this.baseEnumClass;
     }
