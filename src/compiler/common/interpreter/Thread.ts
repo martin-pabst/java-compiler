@@ -32,6 +32,8 @@ export type ProgramState = {
     aquiredObjectLocks?: ObjectClass[];
 
     lastExecutedStep?: Step;
+
+
 }
 
 export type ThreadStateInfoAfterRun = {
@@ -78,6 +80,9 @@ export class Thread {
 
     maxStepsPerSecond?: number;
     lastTimeThreadWasRun: number = performance.now();
+
+    stacksizeBeforeREPLProgram: number  = 0;
+    replReturnValue: any;
 
     callbackAfterTerminated?: () => void;
 
@@ -372,6 +377,35 @@ export class Thread {
             this.state = ThreadState.terminated;
         }
     }
+
+    startREPLProgram(){
+        this.stacksizeBeforeREPLProgram = this.s.length;
+    }
+
+    /**
+     * return from REPL-Program
+     */
+    returnFromREPLProgram(){
+        let replProgram = this.programStack.pop();
+        this.replReturnValue = undefined;
+        if(this.s.length > this.stacksizeBeforeREPLProgram){
+            this.replReturnValue = this.s.pop();
+        }
+        // shouldn't be necessary:
+        while(this.s.length > this.stacksizeBeforeREPLProgram){
+            this.s.pop();
+        }
+
+        if(replProgram?.callbackAfterFinished){
+            replProgram.callbackAfterFinished();
+        }
+
+        if(this.programStack.length == 0){
+            this.state == ThreadState.terminated;
+        }
+
+    }
+
 
     /**
      * call a java method which is executed by this thread
