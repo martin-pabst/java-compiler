@@ -443,4 +443,11 @@ export class Scheduler {
         this.suspendedThreads = [];
     }
 
+    setAsCurrentThread(standaloneThread: Thread) {
+        let index = this.runningThreads.indexOf(standaloneThread);
+        if(index >= 0){
+            this.currentThreadIndex = index;
+        }
+    }
+
 }

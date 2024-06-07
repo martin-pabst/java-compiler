@@ -50,6 +50,7 @@ import { ProgramPointerManager } from "./compiler/common/monacoproviders/Program
 import { JavaMethod } from "./compiler/java/types/JavaMethod.ts";
 import { TestManager } from "./compiler/common/interpreter/TestManager.ts";
 import { ActionManager } from "./compiler/common/interpreter/IActionManager.ts";
+import { ErrorMarker } from "./compiler/common/monacoproviders/ErrorMarker.ts";
 
 export class Main implements IMain {
 
@@ -228,7 +229,7 @@ export class Main implements IMain {
       this.interpreter.setExecutable(executable);
       if (executable) {
         for (let module of executable.moduleManager.modules) {
-          this.markErrors(module);
+          ErrorMarker.markErrorsOfModule(module);
           this.printErrors(module);
         }
 
@@ -253,30 +254,6 @@ export class Main implements IMain {
   }
 
 
-  markErrors(module: Module) {
-
-    let markers: monaco.editor.IMarkerData[] = module.errors.map((error) => {
-      return {
-        startLineNumber: error.range.startLineNumber,
-        startColumn: error.range.startColumn,
-        endLineNumber: error.range.endLineNumber,
-        endColumn: error.range.endColumn,
-        message: error.message,
-        severity: this.errorLevelToMarkerSeverity(error.level)
-      }
-    })
-
-    monaco.editor.setModelMarkers(module.file.getMonacoModel()!, "martin", markers);
-
-  }
-
-  errorLevelToMarkerSeverity(errorlevel: ErrorLevel): monaco.MarkerSeverity {
-    switch (errorlevel) {
-      case "info": return monaco.MarkerSeverity.Info;
-      case "warning": return monaco.MarkerSeverity.Warning;
-      case "error": return monaco.MarkerSeverity.Error;
-    }
-  }
 
   printErrors(module: Module) {
     DOM.clear(this.errorDiv);

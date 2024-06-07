@@ -6,6 +6,7 @@ import { Program } from "../../../common/interpreter/Program.ts";
 import { SchedulerState } from "../../../common/interpreter/Scheduler.ts";
 import { Thread } from "../../../common/interpreter/Thread.ts";
 import { File } from "../../../common/module/File.ts";
+import { ErrorMarker } from "../../../common/monacoproviders/ErrorMarker.ts";
 import { EmptyRange } from "../../../common/range/Range.ts";
 import { ExceptionTree } from "../../codegenerator/ExceptionTree.ts";
 import { JavaSymbolTable } from "../../codegenerator/JavaSymbolTable.ts";
@@ -80,7 +81,7 @@ export class Repl {
     startProgram(programAndModule: { module: ReplCompiledModule; program: Program | undefined; }): any {
         
         if(programAndModule.module.hasErrors()){
-            if(this.editor) this.showErrors(this.editor, programAndModule.module.errors);
+            if(this.editor) this.showErrors(programAndModule.module.errors);
             return undefined;
         }
 
@@ -104,8 +105,13 @@ export class Repl {
         return currentThread.replReturnValue;
     }
 
-    showErrors(editor: monaco.editor.IStandaloneCodeEditor, errors: Error[]) {
-        throw new Error("Method not implemented.");
+    showErrors(errors: Error[]) {
+        if(!this.editor) return;
+        let monacoModel = this.editor.getModel();
+        if(!monacoModel) return;
+
+        ErrorMarker.markErrors(errors, monacoModel);
+
     }
 
 }
