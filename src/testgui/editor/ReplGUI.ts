@@ -1,10 +1,40 @@
 import { Main } from "../../Main";
+import { IMain } from "../../compiler/common/IMain";
+import { DOM } from "../../tools/DOM";
+import { Editor } from "./Editor";
 
-export class Editor {
-    editor: monaco.editor.IStandaloneCodeEditor;
+export class ReplGUI {
+    editor!: monaco.editor.IStandaloneCodeEditor;
+    
 
-    constructor(element: HTMLElement) {
+    constructor(private main: IMain, parentElement: HTMLElement) {
+        let upperDiv = DOM.makeDiv(parentElement);
+        upperDiv.style.flex = "1";
+        upperDiv.style.width = "100%";
+        upperDiv.style.backgroundColor = "#808080";
 
+        let editorDiv = DOM.makeDiv(parentElement);
+        editorDiv.style.width = "100%";
+        editorDiv.style.height = "22px";
+
+        this.initEditor(editorDiv);
+
+         this.editor.onKeyDown((e) => {
+            if(e.code == 'Enter'){
+                let statement = this.editor.getModel()?.getValue();
+                if(statement){
+                    setTimeout(() => {
+                        let returnValue = main.getRepl().execute(statement);
+                        console.log(returnValue);                        
+                    }, 10);
+                }
+            }
+         })
+
+
+    }
+
+    initEditor(parentElement: HTMLElement){
         monaco.editor.defineTheme('myCustomThemeDark', {
             base: 'vs-dark', // can also be vs-dark or hc-black
             inherit: true, // can also be false to completely replace the builtin rules
@@ -31,7 +61,7 @@ export class Editor {
         });
 
 
-        this.editor = monaco.editor.create(element, {
+        this.editor = monaco.editor.create(parentElement, {
             // value: [
             //     'function x() {',
             //     '\tconsole.log("Hello world!");',
@@ -83,21 +113,21 @@ export class Editor {
             insertSpaces: true,
             detectIndentation: false,
             minimap: {
-                enabled: true
+                enabled: false
             },
             scrollbar: {
-                vertical: 'auto',
-                horizontal: 'auto'
+                vertical: 'hidden',
+                horizontal: 'hidden',
             },
             theme: "myCustomThemeDark",
-            wrappingIndent: "same"
+            wrappingIndent: "same",
+            folding: false,
+            overviewRulerBorder: false,
+            lineNumbers: "off"
             // automaticLayout: true
 
         }
         );
-
-    
     }
-
 
 }

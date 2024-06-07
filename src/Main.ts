@@ -22,6 +22,7 @@ import { TabbedEditorManager } from "./tools/TabbedEditorManager.ts";
 import { TestResultViewer } from "./testgui/TestResultViewer.ts";
 
 import '/include/css/main.css';
+import '/include/css/button.css';
 import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts";
 import { JavaHoverProvider } from "./compiler/java/monacoproviders/JavaHoverProvider.ts";
 import { GUITestAssertions } from "./test/lib/GUITestAssertions.ts";
@@ -51,6 +52,8 @@ import { JavaMethod } from "./compiler/java/types/JavaMethod.ts";
 import { TestManager } from "./compiler/common/interpreter/TestManager.ts";
 import { ActionManager } from "./compiler/common/interpreter/IActionManager.ts";
 import { ErrorMarker } from "./compiler/common/monacoproviders/ErrorMarker.ts";
+import { ReplGUI } from "./testgui/editor/ReplGUI.ts";
+import { Repl } from "./compiler/java/parser/repl/Repl.ts";
 
 export class Main implements IMain {
 
@@ -83,6 +86,8 @@ export class Main implements IMain {
   interpreter: Interpreter;
 
   decorations?: monaco.editor.IEditorDecorationsCollection;
+
+  repl!: Repl;
 
   constructor() {
     this.loadSpritesheet();
@@ -159,6 +164,8 @@ export class Main implements IMain {
     this.initButtons();
     this.initCompiler();
 
+    this.initRepl();
+
     this.registerMonacoProviders();
 
   }
@@ -202,24 +209,41 @@ export class Main implements IMain {
   }
 
   initButtons() {
-    let buttonDiv = document.getElementById('buttons')!;
+    let buttonDiv = document.getElementById('bottomleft')!;
+    buttonDiv.style.display = "flex"
+    buttonDiv.style.flexDirection = "column"
+
     let firstRow = DOM.makeDiv(buttonDiv);
-    new Button(firstRow, 'update tree', '#30c030', () => {
-      this.programViewerCompoment.buildTreeView(this.compiler.moduleManager);
-    }, 'myButton');
+    firstRow.style.margin = "10px 0px"
+    firstRow.style.display = "flex"
+    firstRow.style.flexDirection = "row"
+    firstRow.style.alignItems = "center"
+    // new Button(firstRow, 'update tree', '#30c030', () => {
+    //   this.programViewerCompoment.buildTreeView(this.compiler.moduleManager);
+    // }, 'myButton');
 
     let programNames = testProgramsList.map((value) => value[0])
 
     let optionView = new OptionView();
     optionView.setAttribute('programs', JSON.stringify(programNames));
+    optionView.style.margin = "0 10px"
 
     optionView.addEventListener('set-program',
       (e: any) => { if (e.type == "set-program") this.setProgram(e!.detail!.programName); });
     firstRow.appendChild(optionView);
 
-    let programControlButtonDiv = DOM.makeDiv(buttonDiv, "programControlbuttons");
+    let programControlButtonDiv = DOM.makeDiv(firstRow, "programControlbuttons");
 
     this.programControlButtons = new ProgramControlButtons(jQuery(programControlButtonDiv), this.interpreter, this.actionManager);
+
+  }
+
+  initRepl(){
+
+    let buttonDiv = document.getElementById('bottomleft')!;
+    let replDiv = new ReplGUI(this, buttonDiv);
+
+    this.repl = new Repl(this.interpreter, this.compiler.libraryModuleManager, replDiv.editor);
 
   }
 
@@ -334,6 +358,10 @@ export class Main implements IMain {
         })
     });
 
+  }
+
+  getRepl(): Repl {
+    return this.repl;
   }
 
 }

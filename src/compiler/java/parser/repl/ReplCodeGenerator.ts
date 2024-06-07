@@ -1,5 +1,6 @@
 import { Program } from "../../../common/interpreter/Program.ts";
 import { CodeSnippet } from "../../codegenerator/CodeSnippet.ts";
+import { CodeSnippetContainer } from "../../codegenerator/CodeSnippetKinds.ts";
 import { ExceptionTree } from "../../codegenerator/ExceptionTree.ts";
 import { JavaSymbolTable } from "../../codegenerator/JavaSymbolTable.ts";
 import { SnippetLinker } from "../../codegenerator/SnippetLinker.ts";
@@ -19,18 +20,29 @@ export class ReplCodeGenerator extends StatementCodeGenerator {
     }
 
     start(baseSymbolTable: JavaSymbolTable): Program {
-        let symbolTable = new JavaSymbolTable(this.module, this.module.ast!.range, true, baseSymbolTable);
-        this.symbolTableStack.push(symbolTable)
+        this.currentSymbolTable = new JavaSymbolTable(this.module, this.module.ast!.range, true, baseSymbolTable);
+        this.symbolTableStack.push(this.currentSymbolTable)
 
         this.module.programsToCompileToFunctions = [];
 
-        let program = new Program(this.module, symbolTable, "Repl.method")
+        let program = new Program(this.module, this.currentSymbolTable, "Repl.method")
         
         let snippets: CodeSnippet[] = [];
 
+        let snippet: CodeSnippet | undefined;
         for(let statement of this.module.ast!.mainProgramNode.statements){
-            let snippet = this.compileStatementOrTerm(statement);
+            snippet = this.compileStatementOrTerm(statement);
             if(snippet) snippets.push(snippet);
+        }
+
+        if(snippet && snippet.type){
+            if(snippet.type != this.voidType){
+
+                let snippetWithValueOnStack = new CodeSnippetContainer(snippet, snippet.range, snippet.type);
+                snippetWithValueOnStack.ensureFinalValueIsOnStack();
+                snippets.pop();
+                snippets.push(snippetWithValueOnStack);
+            }
         }
 
         new SnippetLinker().link(snippets, program);
