@@ -1,16 +1,16 @@
+import { standardProperty } from "lit/decorators.js";
 import { JCM } from "../../../../tools/language/JavaCompilerMessages.ts";
 import { TokenType } from "../../TokenType.ts";
 import { JavaCompiledModule } from "../../module/JavaCompiledModule.ts";
 import { ASTAnonymousClassNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTProgramNode } from "../AST.ts";
-import { JavaCompileData } from "../JavaCompileData.ts";
 import { StatementParser } from "../StatementParser.ts";
 
 
 export class ReplParser extends StatementParser {
 
 
-    constructor(compileData: JavaCompileData) {
-        super(compileData);
+    constructor(module: JavaCompiledModule) {
+        super(module);
         this.initializeAST();
     }
 
@@ -20,7 +20,14 @@ export class ReplParser extends StatementParser {
             endLineNumber: this.endToken.range.endLineNumber, endColumn: this.endToken.range.endColumn
         };
 
-        this.compileData.ast!.range = globalRange;
+        this.module.ast = {
+            kind: TokenType.global,
+            range: globalRange,
+            innerTypes: [],
+            mainProgramNode: this.nodeFactory.buildMainProgramNode(this.cct),
+            collectedTypeNodes: [],
+            path: ""
+        }
     }
 
     parse() {
@@ -28,7 +35,10 @@ export class ReplParser extends StatementParser {
         while (!this.isEnd()) {
             let pos = this.pos;
 
-            this.parseStatementOrExpression(false);
+            let statementNode = this.parseStatementOrExpression(false);
+            if(statementNode){
+                this.module.ast?.mainProgramNode.statements.push(statementNode);
+            }
 
             if (pos == this.pos) {
                 this.pushError(JCM.unexpectedToken("" + this.cct.value), "warning");

@@ -11,14 +11,12 @@ import { TokenList } from "../lexer/Token";
 import { ASTBlockNode, ASTClassDefinitionNode, ASTGlobalNode } from "../parser/AST";
 import { JavaArrayType } from "../types/JavaArrayType.ts";
 import { JavaType } from "../types/JavaType";
-import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
 import { JavaMethod } from "../types/JavaMethod.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { JavaBaseModule } from "./JavaBaseModule";
 import { JavaModuleManager } from "./JavaModuleManager";
 import { TypePosition } from "./TypePosition.ts";
-import { JavaCompileData } from "../parser/JavaCompileData.ts";
 
 export type JavaMethodCallPosition = {
     identifierRange: monaco.IRange,
@@ -31,7 +29,7 @@ export type JavaMethodCallPosition = {
 /**
  * A JavaModule represents a compiled Java Sourcecode File.
  */
-export class JavaCompiledModule extends JavaBaseModule implements JavaCompileData {
+export class JavaCompiledModule extends JavaBaseModule {
 
     sourceCode: string = "";
 
@@ -48,7 +46,7 @@ export class JavaCompiledModule extends JavaBaseModule implements JavaCompileDat
 
     methodCallPositions: {[line: number]: JavaMethodCallPosition[]} = {};
 
-    constructor(file: File, public moduleManager: JavaModuleManager){
+    constructor(file: File, public moduleManager?: JavaModuleManager){
         super(file, false);
     }
 

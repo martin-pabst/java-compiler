@@ -90,11 +90,12 @@ export class JavaCompiler implements Compiler {
 
         let typeResolver = new TypeResolver(this.moduleManager, this.libraryModuleManager);
 
+        let exceptionTree = new ExceptionTree(this.libraryModuleManager.typestore, this.moduleManager.typestore);
+
         // resolve returns false if cyclic references are found. In this case we don't continue compiling.
         if (typeResolver.resolve()) {
             this.moduleManager.typestore.initFastExtendsImplementsLookup();
 
-            let exceptionTree = new ExceptionTree(this.libraryModuleManager.typestore, this.moduleManager.typestore);
 
             for (let module of newOrDirtyModules) {
                 let codegenerator = new CodeGenerator(module, this.libraryModuleManager.typestore,
@@ -112,7 +113,8 @@ export class JavaCompiler implements Compiler {
 
         let executable = new Executable(klassObjectRegistry,
             this.moduleManager, this.libraryModuleManager,
-            this.errors, this.lastOpenedFile, this.currentlyOpenFile);
+            this.errors, exceptionTree, 
+            this.lastOpenedFile, this.currentlyOpenFile);
 
         if (executable.mainModule) {
             this.lastOpenedFile = executable.mainModule.file;

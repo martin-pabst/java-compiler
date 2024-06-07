@@ -11,6 +11,7 @@ import { File } from "./module/File";
 import { Module } from "./module/Module";
 import { EmptyRange } from "./range/Range";
 import { JCM } from "../../tools/language/JavaCompilerMessages.ts";
+import { ExceptionTree } from "../java/codegenerator/ExceptionTree.ts";
 
 type StaticInitializationStep = {
     klass: Klass,
@@ -32,6 +33,7 @@ export class Executable {
         public moduleManager: JavaModuleManager,
         public libraryModuleManager: JavaLibraryModuleManager,
         public globalErrors: Error[],
+        public exceptionTree: ExceptionTree,
         lastOpenedFile?: File, currentlyOpenedFile?: File) {
 
         this.findMainModule(false, lastOpenedFile, currentlyOpenedFile);

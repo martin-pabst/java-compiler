@@ -5,14 +5,13 @@ import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType.ts";
 import { ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLocalVariableDeclarations, ASTReturnNode, ASTEnhancedForLoopNode, ASTStatementNode, ASTSwitchCaseNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTTypeNode, ASTWhileNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTNodeWithModifiers, ASTSynchronizedBlockNode } from "./AST.ts";
 import { TermParser } from "./TermParser.ts";
-import { JavaCompileData } from "./JavaCompileData.ts";
 
 export abstract class StatementParser extends TermParser {
 
     protected isCodeOutsideClassdeclarations: boolean = false;
 
-    constructor(compileData: JavaCompileData) {
-        super(compileData);
+    constructor(module: JavaCompiledModule) {
+        super(module);
     }
 
     parseStatementOrExpression(expectSemicolonAfterStatement: boolean = true): ASTStatementNode | undefined {
@@ -82,7 +81,7 @@ export abstract class StatementParser extends TermParser {
             case "methoddeclaration":
                 let modifiers = this.nodeFactory.buildNodeWithModifiers(this.cct.range);
                 modifiers.isStatic = true;
-                this.parseFieldOrMethodDeclaration(this.compileData.mainClass!, modifiers);
+                this.parseFieldOrMethodDeclaration(this.module.mainClass!, modifiers);
                 return undefined;
         }
 
@@ -135,7 +134,7 @@ export abstract class StatementParser extends TermParser {
         }
         if (type && additionalDimension > 0) {
             type = this.nodeFactory.buildArrayTypeNode(type, type.range, additionalDimension);
-            this.compileData.ast?.collectedTypeNodes!.push(type);
+            this.module.ast?.collectedTypeNodes!.push(type);
         }
         return type;
     }
@@ -161,7 +160,7 @@ export abstract class StatementParser extends TermParser {
                 }
                 
             } else {
-            this.compileData.pushMethodCallPosition(whileTokenRange, [], "while", Range.getStartPosition(this.cct.range));
+            this.module.pushMethodCallPosition(whileTokenRange, [], "while", Range.getStartPosition(this.cct.range));
             this.skipTokensTillEndOfLineOr([TokenType.rightBracket]);
         }
 
@@ -205,7 +204,7 @@ export abstract class StatementParser extends TermParser {
         if (this.comesToken(TokenType.leftBracket, true)) {
             let condition = this.parseTerm();
 
-            this.compileData.pushMethodCallPosition(ifTokenRange, [], "if", Range.getStartPosition(this.cct.range));
+            this.module.pushMethodCallPosition(ifTokenRange, [], "if", Range.getStartPosition(this.cct.range));
 
             this.expect(TokenType.rightBracket);
 
@@ -273,7 +272,7 @@ export abstract class StatementParser extends TermParser {
         let rightBracketPosition = Range.getStartPosition(this.cct.range);
         this.expect(TokenType.rightBracket, true);
 
-        this.compileData.pushMethodCallPosition(forTokenRange, semicolonPositions, "for", rightBracketPosition);
+        this.module.pushMethodCallPosition(forTokenRange, semicolonPositions, "for", rightBracketPosition);
 
         let statementToRepeat = this.parseStatementOrExpression(false);
 
@@ -315,7 +314,7 @@ export abstract class StatementParser extends TermParser {
         if (!this.expect(TokenType.leftBracket, true)) return;
         let term = this.parseTerm();
 
-        this.compileData.pushMethodCallPosition(switchTokenRange, [], "switch", Range.getStartPosition(this.cct.range));
+        this.module.pushMethodCallPosition(switchTokenRange, [], "switch", Range.getStartPosition(this.cct.range));
 
         this.expect(TokenType.rightBracket, true);
         if (!this.expect(TokenType.leftCurlyBracket, true) || !term) return undefined;

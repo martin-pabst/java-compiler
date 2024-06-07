@@ -6,7 +6,6 @@ import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode, ASTMethodDeclarationNode, ASTWildcardTypeNode, ASTGenericTypeInstantiationNode, ASTArrayTypeNode, ASTArrayLiteralNode, ASTMethodCallNode, ASTBaseTypeNode } from "./AST.ts";
 import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { TokenIterator } from "./TokenIterator.ts";
-import { JavaCompileData } from "./JavaCompileData.ts";
 
 export abstract class TermParser extends TokenIterator {
     static assignmentOperators = [TokenType.assignment, TokenType.plusAssignment, TokenType.minusAssignment,
@@ -49,8 +48,8 @@ export abstract class TermParser extends TokenIterator {
     currentClassOrInterface?: ASTClassDefinitionNode | ASTInterfaceDefinitionNode;
     currentMethod?: ASTMethodDeclarationNode;
 
-    constructor(public compileData: JavaCompileData) {
-        super(compileData.tokens!, compileData);
+    constructor(public module: JavaCompiledModule) {
+        super(module.tokens!, module);
         this.nodeFactory = new ASTNodeFactory(this);
 
         this.initOperatorToPrecedenceMap();
@@ -447,7 +446,7 @@ export abstract class TermParser extends TokenIterator {
         }
 
         if (returnedType) {
-            this.compileData.ast?.collectedTypeNodes!.push(returnedType);
+            this.module.ast?.collectedTypeNodes!.push(returnedType);
         }
 
         return returnedType;
@@ -463,7 +462,7 @@ export abstract class TermParser extends TokenIterator {
             type = this.nodeFactory.buildBaseTypeNode(identifier, EmptyRange.instance);
         }
 
-        this.compileData.ast?.collectedTypeNodes!.push(type);
+        this.module.ast?.collectedTypeNodes!.push(type);
 
         return type;
     }
@@ -619,7 +618,7 @@ export abstract class TermParser extends TokenIterator {
             }
 
             printlnStatement.rightBracketPosition = Range.getStartPosition(this.cct.range);
-            this.compileData.pushMethodCallPosition(printTokenRange, printlnStatement.commaPositions, 
+            this.module.pushMethodCallPosition(printTokenRange, printlnStatement.commaPositions, 
                 printlnStatement.isPrintln ? "println" : "print", printlnStatement.rightBracketPosition!
             );
             

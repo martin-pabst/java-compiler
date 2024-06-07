@@ -3,10 +3,9 @@ import { ErrorLevel, QuickFix } from "../../common/Error";
 import { EmptyRange, IRange } from "../../common/range/Range";
 import { JCM } from "../../../tools/language/JavaCompilerMessages.ts";
 import { Token, TokenList } from "../lexer/Token";
-import { JavaBaseModule } from "../module/JavaBaseModule";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { ASTNode } from "./AST";
-import { JavaCompileData } from "./JavaCompileData.ts";
+import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 
 export class TokenIterator {
 
@@ -57,7 +56,7 @@ export class TokenIterator {
 
 
 
-    constructor(private tokenList: TokenList, protected compileData: JavaCompileData) {
+    constructor(private tokenList: TokenList, protected module: JavaCompiledModule) {
         if(tokenList.length == 0){
             tokenList.push({
                 tt: TokenType.endofSourcecode,
@@ -166,7 +165,7 @@ export class TokenIterator {
 
     pushError(messageWithId: ErrormessageWithId, errorLevel: ErrorLevel = "error", range?: IRange, quickFix?: QuickFix) {
         if (range == null) range = Object.assign({}, this.cct.range);
-        this.compileData.errors.push({
+        this.module.errors.push({
             message: messageWithId.message,
             id: messageWithId.id,
             range: range,
@@ -244,7 +243,7 @@ export class TokenIterator {
                             }
                         }
 
-                        if (invokeSemicolonAngel && this.compileData.errors.length < 3) {
+                        if (invokeSemicolonAngel && this.module.errors.length < 3) {
                             //this.module.main.getSemicolonAngel().register(range, this.module);
                         }
                     }

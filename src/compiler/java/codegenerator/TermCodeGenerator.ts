@@ -967,7 +967,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             if (!isFinalOrStatic) {
                 if (method.classEnumInterface instanceof IJavaInterface) {
                     callingConvention = "java";
-                } else if (this.module.moduleManager.overriddenOrImplementedMethodPaths[method.getPathWithMethodIdentifier()]) {
+                } else if (this.module.moduleManager && this.module.moduleManager.overriddenOrImplementedMethodPaths[method.getPathWithMethodIdentifier()]) {
                     callingConvention = "java";
                 }
             }
