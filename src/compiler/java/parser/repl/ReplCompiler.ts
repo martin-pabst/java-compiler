@@ -3,6 +3,7 @@ import { Executable } from "../../../common/Executable.ts";
 import { Program } from "../../../common/interpreter/Program.ts";
 import { TypeResolver } from "../../TypeResolver/TypeResolver.ts";
 import { ExceptionTree } from "../../codegenerator/ExceptionTree.ts";
+import { JavaSymbolTable } from "../../codegenerator/JavaSymbolTable.ts";
 import { ReplCodeGenerator } from "./ReplCodeGenerator.ts";
 import { ReplCompiledModule } from "./ReplCompiledModule.ts";
 import { ReplParser } from "./ReplParser.ts";
@@ -10,7 +11,7 @@ import { ReplParser } from "./ReplParser.ts";
 export class ReplCompiler {
 
 
-    compile(code: string, symbolTable: BaseSymbolTable, executable: Executable): Program {
+    compile(code: string, symbolTable: JavaSymbolTable, executable: Executable): Program | undefined {
         let replCompiledModule: ReplCompiledModule = new ReplCompiledModule(code);
 
         let replParser = new ReplParser(replCompiledModule);
@@ -25,9 +26,11 @@ export class ReplCompiler {
             let replCodeGenerator = new ReplCodeGenerator(replCompiledModule, libraryTypestore,
                 compiledTypesTypestore, executable.exceptionTree);
 
-            replCodeGenerator.start
+            return replCodeGenerator.start(symbolTable);
                 
         }
+
+        return undefined;
 
     }
 

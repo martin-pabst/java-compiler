@@ -2,6 +2,7 @@ import { Program } from "../../../common/interpreter/Program.ts";
 import { CodeSnippet } from "../../codegenerator/CodeSnippet.ts";
 import { ExceptionTree } from "../../codegenerator/ExceptionTree.ts";
 import { JavaSymbolTable } from "../../codegenerator/JavaSymbolTable.ts";
+import { SnippetLinker } from "../../codegenerator/SnippetLinker.ts";
 import { StatementCodeGenerator } from "../../codegenerator/StatementCodeGenerator.ts";
 import { JavaCompiledModule } from "../../module/JavaCompiledModule.ts";
 import { JavaTypeStore } from "../../module/JavaTypeStore.ts";
@@ -17,16 +18,24 @@ export class ReplCodeGenerator extends StatementCodeGenerator {
 
     }
 
-    start(baseSymbolTable: JavaSymbolTable){
+    start(baseSymbolTable: JavaSymbolTable): Program {
         let symbolTable = new JavaSymbolTable(this.module, this.module.ast!.range, true, baseSymbolTable);
         this.symbolTableStack.push(symbolTable)
 
         this.module.programsToCompileToFunctions = [];
 
+        let program = new Program(this.module, symbolTable, "Repl.method")
+        
+        let snippets: CodeSnippet[] = [];
+
         for(let statement of this.module.ast!.mainProgramNode.statements){
             let snippet = this.compileStatementOrTerm(statement);
+            if(snippet) snippets.push(snippet);
         }
 
+        new SnippetLinker().link(snippets, program);
+
+        return program;
     }
 
 
