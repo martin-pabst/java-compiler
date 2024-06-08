@@ -52,7 +52,8 @@ export enum ThreadState {
     waiting,
     timedWaiting,
     terminated,   // A thread that has exited is in this state.
-    terminatedWithException
+    terminatedWithException,
+    immediatelyAfterReplStatement
 }
 
 export class Thread {
@@ -400,9 +401,10 @@ export class Thread {
             replProgram.callbackAfterFinished();
         }
 
-        if(this.programStack.length == 0){
-            this.state == ThreadState.terminated;
-        }
+        
+        this.currentProgramState = this.programStack[this.programStack.length - 1];
+        this.state = ThreadState.immediatelyAfterReplStatement;
+
 
     }
 
@@ -426,6 +428,28 @@ export class Thread {
 
         for (let i = 0; i < program.numberOfLocalVariables; i++) {
             this.s.push(null);
+        }
+
+        this.programStack.push(state);
+        this.currentProgramState = state;
+    }
+
+    /**
+     * call a java method which is executed by this thread
+     * @param program 
+     */
+    pushReplProgram(program: Program, callback?: CallbackFunction) {
+
+        // Object creation is faster than Object.assign, see
+        // https://measurethat.net/Benchmarks/Show/18401/0/objectassign-vs-creating-new-objects3
+        let state: ProgramState = {
+            program: program,
+            currentStepList: program.stepsSingle,
+            // currentStepList: this.scheduler.executeMode == NExecuteMode.singleSteps ? program.stepsSingle : program.stepsMultiple,
+            stackBase: this.currentProgramState ? this.currentProgramState.stackBase : 0,
+            stepIndex: 0,
+            callbackAfterFinished: callback,
+            exceptionInfoList: []
         }
 
         this.programStack.push(state);

@@ -87,6 +87,7 @@ export class Main implements IMain {
 
   decorations?: monaco.editor.IEditorDecorationsCollection;
 
+  replGUI!: ReplGUI;
   repl!: Repl;
 
   constructor() {
@@ -140,7 +141,7 @@ export class Main implements IMain {
     this.tabbedEditorManager = new TabbedEditorManager(document.getElementById('editorOuter')!,
       this.files);
 
-    this.setProgram("listeVorlage");
+    this.setProgram("simpleWhileLoops");
 
     this.compiler = new JavaCompiler();
     this.compiler.files = this.files;
@@ -205,6 +206,10 @@ export class Main implements IMain {
       }
     }
 
+    if(model == this.replGUI.editor.getModel()){
+      return this.repl.getCurrentModule();
+    }
+
     return undefined;
   }
 
@@ -241,9 +246,9 @@ export class Main implements IMain {
   initRepl(){
 
     let buttonDiv = document.getElementById('bottomleft')!;
-    let replDiv = new ReplGUI(this, buttonDiv);
+    this.replGUI = new ReplGUI(this, buttonDiv);
 
-    this.repl = new Repl(this.interpreter, this.compiler.libraryModuleManager, replDiv.editor);
+    this.repl = new Repl(this.interpreter, this.compiler.libraryModuleManager, this.replGUI.editor);
 
   }
 

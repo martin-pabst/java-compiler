@@ -5,13 +5,13 @@ import { Editor } from "./Editor";
 
 export class ReplGUI {
     editor!: monaco.editor.IStandaloneCodeEditor;
-    
+    upperDiv: HTMLElement;
 
     constructor(private main: IMain, parentElement: HTMLElement) {
-        let upperDiv = DOM.makeDiv(parentElement);
-        upperDiv.style.flex = "1";
-        upperDiv.style.width = "100%";
-        upperDiv.style.backgroundColor = "#808080";
+        this.upperDiv = DOM.makeDiv(parentElement);
+        this.upperDiv.style.flex = "1";
+        this.upperDiv.style.width = "100%";
+        this.upperDiv.style.backgroundColor = "#808080";
 
         let editorDiv = DOM.makeDiv(parentElement);
         editorDiv.style.width = "100%";
@@ -19,22 +19,33 @@ export class ReplGUI {
 
         this.initEditor(editorDiv);
 
-         this.editor.onKeyDown((e) => {
-            if(e.code == 'Enter'){
-                let statement = this.editor.getModel()?.getValue();
-                if(statement){
-                    setTimeout(() => {
-                        let returnValue = main.getRepl().execute(statement);
-                        console.log(returnValue);                        
-                    }, 10);
+        let lastStatement: string = "";
+
+        this.editor.onKeyUp((e) => {
+            let statement = this.editor.getModel()?.getValue();
+            if (!statement) return;
+
+            if (e.code == 'Enter') {
+                setTimeout(() => {
+                    let returnValue = main.getRepl().execute(statement);
+                    console.log(returnValue);
+                    let outputDiv = DOM.makeDiv(this.upperDiv);
+                    outputDiv.textContent = '' + returnValue;
+                    this.editor.getModel()?.setValue('');
+                }, 10);
+            } else {
+                if(statement != lastStatement){
+                    main.getRepl().compileAndShowErrors(statement);
+                    lastStatement = statement;
                 }
             }
-         })
+        })
+
 
 
     }
 
-    initEditor(parentElement: HTMLElement){
+    initEditor(parentElement: HTMLElement) {
         monaco.editor.defineTheme('myCustomThemeDark', {
             base: 'vs-dark', // can also be vs-dark or hc-black
             inherit: true, // can also be false to completely replace the builtin rules
@@ -52,7 +63,7 @@ export class ReplGUI {
                 // { token: 'comment.js', foreground: '008800', fontStyle: 'bold italic underline' },
 
                 // semantic tokens:
-                {token: 'property', foreground: 'ffffff' ,fontStyle: 'bold'},
+                { token: 'property', foreground: 'ffffff', fontStyle: 'bold' },
             ],
             colors: {
                 "editor.background": "#1e1e1e",
@@ -97,6 +108,7 @@ export class ReplGUI {
             formatOnPaste: true,
             suggestFontSize: 16,
             suggestLineHeight: 22,
+            wordBasedSuggestions: false,
             suggest: {
                 localityBonus: true,
                 insertMode: "replace",

@@ -1,5 +1,5 @@
 import { Step } from "../../common/interpreter/Program";
-import { StepParams } from "../../common/interpreter/StepFunction";
+import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { IRange } from "../../common/range/Range";
 import { JavaType } from "../types/JavaType";
 
@@ -90,7 +90,7 @@ export class StringCodeSnippet extends CodeSnippet {
 
     ensureFinalValueIsOnStack(): void {
         if(this.text.endsWith(";\n")) this.text = this.text.substring(0, this.text.length - 2);
-        this.text = `push(${this.text});\n`
+        this.text = `${StepParams.stack}.push(${this.text});\n`
     }
 
     index(lastIndex: number): number {

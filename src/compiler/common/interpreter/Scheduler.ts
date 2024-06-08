@@ -179,6 +179,10 @@ export class Scheduler {
                         currentThread.state = ThreadState.runnable;
                         this.interpreter.pause();
                         break;
+                    case ThreadState.immediatelyAfterReplStatement:
+                        currentThread.state = ThreadState.runnable;
+                        this.interpreter.pause();
+                        break;
                 }
 
             }

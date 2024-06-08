@@ -1,6 +1,6 @@
 import { EmptyRange, IRange, Range } from "../../common/range/Range.ts";
 import { JCM } from "../../../tools/language/JavaCompilerMessages.ts";
-import { TokenType } from "../TokenType.ts";
+import { TokenType, TokenTypeReadable } from "../TokenType.ts";
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { ASTBinaryNode, ASTCastNode, ASTClassDefinitionNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTNewObjectNode, ASTSelectArrayElementNode, ASTStatementNode, ASTTermNode, ASTTypeNode, ASTSymbolNode, BinaryOperator, ASTAnonymousClassNode, ASTReturnNode, ASTMethodDeclarationNode, ASTWildcardTypeNode, ASTGenericTypeInstantiationNode, ASTArrayTypeNode, ASTArrayLiteralNode, ASTMethodCallNode, ASTBaseTypeNode } from "./AST.ts";
@@ -96,7 +96,10 @@ export abstract class TermParser extends TokenIterator {
             let operatorRange = this.cct.range;
             this.nextToken();
             let newRightNode: ASTTermNode | undefined = this.parsePraefixSuffix();
-            if (newRightNode == null) return node;
+            if (newRightNode == null) {
+                this.pushError(JCM.secondOperandExpected(TokenTypeReadable[operator]), "error")
+                return node;
+            }
 
             let h: number = 1;
             let newLeftNodesParent: ASTBinaryNode | null = null;

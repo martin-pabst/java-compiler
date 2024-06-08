@@ -58,7 +58,9 @@ export class TypeResolver {
 
     gatherTypeDefinitionNodes() {
         for (let module of this.dirtyModules) {
-            this.gatherTypeDefinitionNodesRecursively(module.ast!);
+            if(module.ast){
+                this.gatherTypeDefinitionNodesRecursively(module.ast);
+            }
         }
     }
 
@@ -169,8 +171,10 @@ export class TypeResolver {
 
     resolveTypeReferences() {
         for (let module of this.dirtyModules) {
-            for (let typeNode of module.ast!.collectedTypeNodes) {
-                this.resolveTypeNode(typeNode, module);
+            if(module.ast){
+                for (let typeNode of module.ast.collectedTypeNodes) {
+                    this.resolveTypeNode(typeNode, module);
+                }
             }
         }
     }

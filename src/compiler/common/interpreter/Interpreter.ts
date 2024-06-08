@@ -260,7 +260,7 @@ export class Interpreter {
 
     runMainProgramSynchronously() {
         this.start();
-        while (this.scheduler.state != SchedulerState.stopped && this.scheduler.state != SchedulerState.error) {
+        while (this.scheduler.state == SchedulerState.running) {
             this.scheduler.run(100);
         }
     }

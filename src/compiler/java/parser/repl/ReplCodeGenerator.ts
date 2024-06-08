@@ -1,5 +1,6 @@
 import { Program } from "../../../common/interpreter/Program.ts";
-import { CodeSnippet } from "../../codegenerator/CodeSnippet.ts";
+import { Helpers } from "../../../common/interpreter/StepFunction.ts";
+import { CodeSnippet, StringCodeSnippet } from "../../codegenerator/CodeSnippet.ts";
 import { CodeSnippetContainer } from "../../codegenerator/CodeSnippetKinds.ts";
 import { ExceptionTree } from "../../codegenerator/ExceptionTree.ts";
 import { JavaSymbolTable } from "../../codegenerator/JavaSymbolTable.ts";
@@ -20,7 +21,9 @@ export class ReplCodeGenerator extends StatementCodeGenerator {
     }
 
     start(baseSymbolTable: JavaSymbolTable): Program {
+
         this.currentSymbolTable = new JavaSymbolTable(this.module, this.module.ast!.range, true, baseSymbolTable);
+        this.module.symbolTables.push(this.currentSymbolTable);
         this.symbolTableStack.push(this.currentSymbolTable)
 
         this.module.programsToCompileToFunctions = [];
@@ -28,23 +31,25 @@ export class ReplCodeGenerator extends StatementCodeGenerator {
         let program = new Program(this.module, this.currentSymbolTable, "Repl.method")
         
         let snippets: CodeSnippet[] = [];
-
+        snippets.push(new StringCodeSnippet(`${Helpers.startReplProgram}();\n`))
+        
         let snippet: CodeSnippet | undefined;
         for(let statement of this.module.ast!.mainProgramNode.statements){
             snippet = this.compileStatementOrTerm(statement);
             if(snippet) snippets.push(snippet);
         }
-
+        
         if(snippet && snippet.type){
             if(snippet.type != this.voidType){
-
+                
                 let snippetWithValueOnStack = new CodeSnippetContainer(snippet, snippet.range, snippet.type);
                 snippetWithValueOnStack.ensureFinalValueIsOnStack();
                 snippets.pop();
                 snippets.push(snippetWithValueOnStack);
             }
         }
-
+        snippets.push(new StringCodeSnippet(`${Helpers.returnFromReplProgram}();\n`))
+        
         new SnippetLinker().link(snippets, program);
 
         return program;

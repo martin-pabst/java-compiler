@@ -33,6 +33,9 @@ export class Helpers {
     static nullstringIfNull = StepParams.thread + "." + Thread.prototype.NullstringIfNull.name;
     static primitiveArrayToString = StepParams.thread + "." + Thread.prototype._primitiveElementOrArrayToString.name;
     static objectArrayToString = StepParams.thread + "." + Thread.prototype._arrayOfObjectsToString.name;
+    static startReplProgram = StepParams.thread + "." + Thread.prototype.startREPLProgram.name;
+    static returnFromReplProgram = StepParams.thread + "." + Thread.prototype.returnFromREPLProgram.name;
+
 
     static callbackParameter = "callback";
 

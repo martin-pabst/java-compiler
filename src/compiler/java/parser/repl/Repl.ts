@@ -16,6 +16,7 @@ import { JavaLibraryModuleManager } from "../../module/libraries/JavaLibraryModu
 import { ReplCompiledModule } from "./ReplCompiledModule.ts";
 import { ReplCompiler } from "./ReplCompiler.ts";
 
+type ProgramAndModule = { module: ReplCompiledModule, program: Program | undefined };
 
 export class Repl {
 
@@ -31,36 +32,43 @@ export class Repl {
 
     replCompiler: ReplCompiler;
 
+    lastCompiledModule?: JavaCompiledModule;
+
     constructor(private interpreter: Interpreter, libraryModuleManager: JavaLibraryModuleManager,
         private editor?: monaco.editor.IStandaloneCodeEditor
-    ){
+    ) {
         this.standaloneModule = new JavaCompiledModule(new File());
         this.standaloneSymbolTable = new JavaSymbolTable(this.standaloneModule, EmptyRange.instance, true);
-        this.standaloneThread = interpreter.scheduler.createThread("REPL standalone thread");  
+        this.standaloneThread = interpreter.scheduler.createThread("REPL standalone thread");
         this.standaloneModuleManager = new JavaModuleManager();
         this.standaloneModuleManager.addModule(this.standaloneModule);
         this.standaloneExecutable = new Executable(this.interpreter.scheduler.classObjectRegistry, this.standaloneModuleManager,
-            libraryModuleManager, [], new ExceptionTree(libraryModuleManager.typestore, this.standaloneModuleManager.typestore)  
+            libraryModuleManager, [], new ExceptionTree(libraryModuleManager.typestore, this.standaloneModuleManager.typestore)
         )
-        
+
         this.replCompiler = new ReplCompiler();
     }
 
-    execute(statement: string):any {
-        let programAndModule: {module: ReplCompiledModule, program: Program | undefined} | undefined;
+    getCurrentModule(): JavaCompiledModule | undefined {
+        return this.lastCompiledModule;
+    }
 
-        if(this.interpreter.scheduler.state == SchedulerState.paused){
+
+    compileAndShowErrors(statement: string): ProgramAndModule | undefined {
+        let programAndModule: ProgramAndModule | undefined;
+
+        if (this.interpreter.scheduler.state == SchedulerState.paused) {
             // execute in current thread context
             let currentThread = this.interpreter.scheduler.getCurrentThread();
-            if(this.interpreter.executable && currentThread && currentThread.programStack.length > 0){
-                
+            if (this.interpreter.executable && currentThread && currentThread.programStack.length > 0) {
+
                 let programState = currentThread.programStack[currentThread.programStack.length - 1];
-                
+
                 let debuggerCallstackEntry = new DebuggerCallstackEntry(programState);
-                
+
                 let symbolTable = debuggerCallstackEntry.symbolTable as JavaSymbolTable;
-                
-                if(symbolTable){
+
+                if (symbolTable) {
                     programAndModule = this.replCompiler.compile(statement, symbolTable, this.interpreter.executable);
                 }
 
@@ -69,8 +77,20 @@ export class Repl {
             // execute in REPL standalone context
             programAndModule = this.replCompiler.compile(statement, this.standaloneSymbolTable, this.standaloneExecutable);
         }
-        
-        if(programAndModule){
+
+        if (programAndModule) {
+            if (this.editor) this.showErrors(programAndModule.module.errors);
+            this.lastCompiledModule = programAndModule.module;
+        }
+
+        return programAndModule;
+    }
+
+    execute(statement: string): any {
+
+        let programAndModule = this.compileAndShowErrors(statement);
+
+        if (programAndModule) {
             return this.startProgram(programAndModule);
         } else {
             return undefined;
@@ -79,26 +99,31 @@ export class Repl {
     }
 
     startProgram(programAndModule: { module: ReplCompiledModule; program: Program | undefined; }): any {
-        
-        if(programAndModule.module.hasErrors()){
-            if(this.editor) this.showErrors(programAndModule.module.errors);
+
+        if (programAndModule.module.hasErrors()) {
             return undefined;
         }
 
-        if(!programAndModule.program){
+        if (!programAndModule.program) {
             return undefined;
         }
+
+        programAndModule.program.compileToJavascriptFunctions();
 
         let currentThread = this.interpreter.scheduler.getCurrentThread();
-        if(!currentThread){
+        if (!currentThread) {
             this.interpreter.scheduler.setAsCurrentThread(this.standaloneThread);
             currentThread = this.standaloneThread;
         }
 
+        let saveMaxStepsPerSecond = currentThread.maxStepsPerSecond;
+        currentThread.maxStepsPerSecond = undefined;
+
         currentThread.callbackAfterTerminated = () => {
             this.interpreter.setState(SchedulerState.paused);
+            currentThread.maxStepsPerSecond = saveMaxStepsPerSecond;
         }
-
+        currentThread.pushReplProgram(programAndModule.program);
 
         this.interpreter.runMainProgramSynchronously();
 
@@ -106,9 +131,9 @@ export class Repl {
     }
 
     showErrors(errors: Error[]) {
-        if(!this.editor) return;
+        if (!this.editor) return;
         let monacoModel = this.editor.getModel();
-        if(!monacoModel) return;
+        if (!monacoModel) return;
 
         ErrorMarker.markErrors(errors, monacoModel);
 

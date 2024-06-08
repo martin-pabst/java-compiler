@@ -487,6 +487,11 @@ export class JCM {
         "en": `Keyword new has syntax new Class(parameters...) or new ArrayType[length].`,
     })
 
+    static secondOperandExpected = (operator: string) => le({
+        "de": "Rechts vom binären Operator " + operator + " wird ein zweiter Operand erwartet.",
+        "en": `Expecting second Operand on right side of binary operator ${operator}.`,
+    })
+
     static dotOperatorNotExpected = () => le({
         "de": "Der Punkt-Operator wird hier nicht erwartet.",
         "en": `Dot operator (.) not expected`,

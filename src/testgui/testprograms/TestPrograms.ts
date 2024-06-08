@@ -786,13 +786,13 @@ class Test {
 `],
 ['simpleWhileLoops', `
 int i = 0;
-while(i < 10000){
+while(i < 100){
     int j = 0;
-    while(j < 10000){
+    while(j < 100){
         j++;
     }
     i++;
-    if(i % 1000 == 0){
+    if(i % 10 == 0){
     print(i + "; ");
     }
 }
