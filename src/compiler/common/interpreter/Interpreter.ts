@@ -260,6 +260,11 @@ export class Interpreter {
 
     runMainProgramSynchronously() {
         this.start();
+        this.runREPLSynchronously();
+    }
+    
+    runREPLSynchronously(){
+        this.scheduler.setState(SchedulerState.running);
         while (this.scheduler.state == SchedulerState.running) {
             this.scheduler.run(100);
         }

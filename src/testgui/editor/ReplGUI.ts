@@ -28,7 +28,6 @@ export class ReplGUI {
             if (e.code == 'Enter') {
                 setTimeout(() => {
                     let returnValue = main.getRepl().execute(statement);
-                    console.log(returnValue);
                     let outputDiv = DOM.makeDiv(this.upperDiv);
                     outputDiv.textContent = '' + returnValue;
                     this.editor.getModel()?.setValue('');

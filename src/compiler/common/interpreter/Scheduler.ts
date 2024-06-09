@@ -20,6 +20,8 @@ export enum SchedulerExitState { nothingMoreToDo, giveMeAdditionalTime }
 export class Scheduler {
     runningThreads: Thread[] = [];
     suspendedThreads: Thread[] = [];
+    storedThreads?: Thread[] = undefined;
+    storedCurrentThreadIndex: number = 0;
 
     currentThreadIndex: number = 0;
     state!: SchedulerState;
@@ -40,6 +42,9 @@ export class Scheduler {
     onStartingNextThreadCallback?: () => void;
 
     callbackAfterProgramFinished?: () => void;
+
+    callbackAfterReplProgramFinished?: () => void;
+
 
     constructor(public interpreter: Interpreter) {
         this.setState(SchedulerState.not_initialized);
@@ -118,7 +123,7 @@ export class Scheduler {
 
                     // run!
                     threadState = currentThread.run(numberOfSteps);
-                    
+
                     // compute lastTimeThreadWasRun in a way to achieve exact step frequency currentThread.maxStepsPerSecond
                     currentThread.lastTimeThreadWasRun =
                         currentThread.lastTimeThreadWasRun + threadState.stepsExecuted * msPerStep;
@@ -167,7 +172,7 @@ export class Scheduler {
                             if (threadState.state == ThreadState.terminatedWithException) {
                                 this.interpreter.setState(SchedulerState.error);
                             }
-                            if(this.callbackAfterProgramFinished){
+                            if (this.callbackAfterProgramFinished) {
                                 let cb = this.callbackAfterProgramFinished;
                                 this.callbackAfterProgramFinished = undefined;
                                 cb();
@@ -180,8 +185,15 @@ export class Scheduler {
                         this.interpreter.pause();
                         break;
                     case ThreadState.immediatelyAfterReplStatement:
-                        currentThread.state = ThreadState.runnable;
-                        this.interpreter.pause();
+                        if (currentThread.programStack.length == 0) {
+                            this.runningThreads.splice(this.runningThreads.indexOf(currentThread), 1);
+                        }
+                        if (this.callbackAfterReplProgramFinished) {
+                            let cb = this.callbackAfterReplProgramFinished;
+                            this.callbackAfterReplProgramFinished = undefined;
+                            cb();
+                        }
+
                         break;
                 }
 
@@ -282,12 +294,12 @@ export class Scheduler {
         let thread = new Thread(this, name, initialStack);
         this.runningThreads.push(thread);
 
-        if(thread.name != "act method-thread"){
-            if(!this.interpreter.isMaxSpeed){
+        if (thread.name != "act method-thread") {
+            if (!this.interpreter.isMaxSpeed) {
                 thread.maxStepsPerSecond = this.interpreter.stepsPerSecondGoal;
             }
         }
-        
+
         return thread;
     }
 
@@ -338,7 +350,7 @@ export class Scheduler {
         }
     }
 
-    private initIntern(executable: Executable){
+    private initIntern(executable: Executable) {
         this.classObjectRegistry = executable.classObjectRegistry;
         this.libraryTypeStore = executable.libraryModuleManager.typestore;
 
@@ -372,7 +384,7 @@ export class Scheduler {
     }
 
     initJUnitTestMethodAndReturnMainThread(executable: Executable | undefined, method: JavaMethod, callback: () => void): Thread | undefined {
-        if(!executable) return undefined;
+        if (!executable) return undefined;
 
         this.initIntern(executable);
 
@@ -383,7 +395,7 @@ export class Scheduler {
 
         // Step 1: instantiate object and call it's parameterless constructor
         let parameterlessConstructors = klass.getAllMethods().filter(m => m.isConstructor && m.parameters.length == 0);
-        if(parameterlessConstructors.length == 0){
+        if (parameterlessConstructors.length == 0) {
             // this shouldn't happen:
             console.log("Couldn't find parameterless constrructor for class " + klass.identifier + ".");
             return undefined;
@@ -429,9 +441,9 @@ export class Scheduler {
         this.runningThreads.filter(t => t.maxStepsPerSecond).forEach(t => t.lastTimeThreadWasRun = performance.now());
     }
 
-    periodicallyUpdateDebugger(){
-        if(this.state == SchedulerState.running && 
-            performance.now() - this.lastTimeDebuggeroutputWritten > this.updateDebuggerEveryMs){
+    periodicallyUpdateDebugger() {
+        if (this.state == SchedulerState.running &&
+            performance.now() - this.lastTimeDebuggeroutputWritten > this.updateDebuggerEveryMs) {
             this.lastTimeDebuggeroutputWritten = performance.now();
             this.interpreter.updateDebugger();
         }
@@ -442,16 +454,35 @@ export class Scheduler {
         this.runningThreads.filter(t => t.name != 'act method-thread').forEach(t => t.maxStepsPerSecond = isMaxSpeed ? undefined : value);
     }
 
-    removeAllThreads(){
+    removeAllThreads() {
         this.runningThreads = [];
         this.suspendedThreads = [];
     }
 
     setAsCurrentThread(standaloneThread: Thread) {
         let index = this.runningThreads.indexOf(standaloneThread);
-        if(index >= 0){
+        if (index >= 0) {
             this.currentThreadIndex = index;
+        } else {
+            this.runningThreads.push(standaloneThread);
+            this.currentThreadIndex = this.runningThreads.length - 1;
+        }
+        standaloneThread.state = ThreadState.runnable;
+    }
+
+    saveAllThreadsBut(currentThread: Thread) {
+        this.storedCurrentThreadIndex = this.currentThreadIndex;
+        this.storedThreads = this.runningThreads.filter(t => t != currentThread);
+        this.runningThreads = [currentThread];
+        this.currentThreadIndex = 0;
+    }
+
+    retrieveThreads() {
+        if (this.storedThreads) {
+            this.runningThreads = this.runningThreads.concat(this.storedThreads);
+            this.currentThreadIndex = this.storedCurrentThreadIndex;
         }
     }
+
 
 }

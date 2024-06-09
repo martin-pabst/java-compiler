@@ -319,9 +319,16 @@ export class Thread {
 
         if (this.programStack.length == 0) {
             this.stackTrace = rawStackTrace.map( ste => {
-                return {
-                    range: ste.lastExecutedStep? ste.lastExecutedStep.range : ste.currentStepList[ste.stepIndex].range,
-                    methodIdentifierWithClass: ste.program.methodIdentifierWithClass
+                if(ste) {
+                    return {
+                        range: ste.lastExecutedStep? ste.lastExecutedStep.range : ste.currentStepList[ste.stepIndex].range,
+                        methodIdentifierWithClass: ste.program.methodIdentifierWithClass
+                    }
+                } else {
+                    return {
+                        range: EmptyRange.instance,
+                        methodIdentifierWithClass: "---"
+                    }
                 }
             });
             this.exception = exception;
@@ -405,6 +412,16 @@ export class Thread {
         this.currentProgramState = this.programStack[this.programStack.length - 1];
         this.state = ThreadState.immediatelyAfterReplStatement;
 
+        if(!this.currentProgramState){
+            this.currentProgramState = {
+                currentStepList: [],
+                stepIndex: 0,
+                exceptionInfoList: [],
+                //@ts-ignore
+                program: undefined,
+                stackBase: 0
+            }
+        }
 
     }
 

@@ -4,7 +4,7 @@ import { DebuggerCallstackEntry } from "../../../common/debugger/DebuggerCallsta
 import { Interpreter } from "../../../common/interpreter/Interpreter.ts";
 import { Program } from "../../../common/interpreter/Program.ts";
 import { SchedulerState } from "../../../common/interpreter/Scheduler.ts";
-import { Thread } from "../../../common/interpreter/Thread.ts";
+import { Thread, ThreadState } from "../../../common/interpreter/Thread.ts";
 import { File } from "../../../common/module/File.ts";
 import { ErrorMarker } from "../../../common/monacoproviders/ErrorMarker.ts";
 import { EmptyRange } from "../../../common/range/Range.ts";
@@ -110,22 +110,29 @@ export class Repl {
 
         programAndModule.program.compileToJavascriptFunctions();
 
-        let currentThread = this.interpreter.scheduler.getCurrentThread();
-        if (!currentThread) {
+        let noProgramIsRunning = [SchedulerState.running, SchedulerState.paused].indexOf(this.interpreter.scheduler.state) < 0;
+        let currentThread = this.interpreter.scheduler.getCurrentThread()!;
+        if (noProgramIsRunning) {
             this.interpreter.scheduler.setAsCurrentThread(this.standaloneThread);
             currentThread = this.standaloneThread;
         }
 
+        this.interpreter.scheduler.saveAllThreadsBut(currentThread);
+
         let saveMaxStepsPerSecond = currentThread.maxStepsPerSecond;
         currentThread.maxStepsPerSecond = undefined;
 
-        currentThread.callbackAfterTerminated = () => {
-            this.interpreter.setState(SchedulerState.paused);
+        let oldState = this.interpreter.scheduler.state;
+
+        this.interpreter.scheduler.callbackAfterReplProgramFinished = () => {
             currentThread.maxStepsPerSecond = saveMaxStepsPerSecond;
+            currentThread.state = ThreadState.runnable;
+            this.interpreter.setState(oldState);
+            this.interpreter.scheduler.retrieveThreads();
         }
         currentThread.pushReplProgram(programAndModule.program);
 
-        this.interpreter.runMainProgramSynchronously();
+        this.interpreter.runREPLSynchronously();
 
         return currentThread.replReturnValue;
     }
