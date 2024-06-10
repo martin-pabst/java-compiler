@@ -86,19 +86,58 @@ export class Repl {
         return programAndModule;
     }
 
-    execute(statement: string): any {
+    executeSynchronously(statement: string): any {
 
         let programAndModule = this.compileAndShowErrors(statement);
 
-        if (programAndModule) {
-            return this.startProgram(programAndModule);
-        } else {
+        if (!programAndModule) {
             return undefined;
         }
 
+        let thread = this.prepareThread(programAndModule);
+        if (!thread) {
+            return undefined;
+        }
+
+        this.interpreter.runREPLSynchronously();
+
+        return thread.replReturnValue;
+
     }
 
-    startProgram(programAndModule: { module: ReplCompiledModule; program: Program | undefined; }): any {
+    async executeAsync(statement: string): Promise<any> {
+
+        let programAndModule = this.compileAndShowErrors(statement);
+
+        if (!programAndModule) {
+            return undefined;
+        }
+
+
+        let p = new Promise<any>((resolve, reject) => {
+            let callback = (returnValue: any) => {
+                resolve(returnValue);
+            }
+
+            let thread = this.prepareThread(programAndModule, callback);
+            if (!thread) {
+                resolve(undefined);
+                return;
+            }
+            
+    
+            this.interpreter.setState(SchedulerState.running);
+
+        })
+
+
+        return p;
+
+    }
+
+
+
+    prepareThread(programAndModule: { module: ReplCompiledModule; program: Program | undefined; }, callback?: (returnValue: any) => void): Thread | undefined {
 
         if (programAndModule.module.hasErrors()) {
             return undefined;
@@ -129,12 +168,11 @@ export class Repl {
             currentThread.state = ThreadState.runnable;
             this.interpreter.setState(oldState);
             this.interpreter.scheduler.retrieveThreads();
+            if(callback) callback(currentThread.replReturnValue);
         }
         currentThread.pushReplProgram(programAndModule.program);
 
-        this.interpreter.runREPLSynchronously();
-
-        return currentThread.replReturnValue;
+        return currentThread;
     }
 
     showErrors(errors: Error[]) {
