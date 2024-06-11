@@ -110,7 +110,16 @@ export class DebuggerSymbolEntry {
         if (typesDiffer || this.children.length == 0) {
             this.removeChildren();
             let fields = type.getFields();
-            for (let field of type.getFields()) {
+
+            if(type instanceof JavaClass){
+                let baseType = type.getExtends()
+                while(baseType){
+                    fields = fields.concat(baseType.getFields());
+                    baseType = baseType.getExtends();
+                }
+            }
+
+            for (let field of fields) {
                 let fde = new ObjectFieldDebuggerEntry(this.symbolTableSection, this, field);
                 this.children.push(fde);
             }

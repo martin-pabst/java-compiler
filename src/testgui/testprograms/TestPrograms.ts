@@ -1,5 +1,20 @@
 export var testProgramsList = [
 ['', ''],
+['DebuggerTest', `
+A a = new A();
+a.doIt();
+
+class A extends B {
+   String fieldA = "field A";
+   void doIt(){
+      println(fieldA);
+   }
+}
+
+class B {
+   String fieldB = "field B";
+}
+`],
 ['ExceptionTest', `
 Test t = new Test();
 
