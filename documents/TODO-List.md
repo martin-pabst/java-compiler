@@ -41,14 +41,14 @@
   * Lambda Functions (status: need more testing)
   * generic methods (status: need more testing)
   * library method examples
+  * REPL
+  * debugger: show fields of base classes
 
 ## working status on current issue:
 
 ### fine-grained next todos on current issue:
 
 ## next todos
-  * REPL
-  * debugger: show fields of base classes
   * if method overrides or implements other method and has no comment, then take the overriden method's comment
   * detect cyclic calling of constructors
 

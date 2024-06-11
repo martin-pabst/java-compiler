@@ -164,6 +164,22 @@ export class DebuggerSymbolEntry {
         this.children.forEach(c => (<ArrayElementDebuggerEntry>c).fetchValueFromArrayAndRender(a));
     }
 
+    quickArrayOutput(a: any[]): string {
+
+        let dimension: number = 0;
+        let a1 = a;
+        while(Array.isArray(a1)){
+            dimension++;
+            if(a1.length > 0){
+                a1 = a1[0];
+            }
+        }
+        
+        let elementTypeIsString: boolean = (typeof a1 == 'string');
+        let elementTypeIsObject: boolean = (typeof a1 == 'object');
+
+    }
+
 }
 
 
