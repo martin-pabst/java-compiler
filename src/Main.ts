@@ -54,6 +54,7 @@ import { ActionManager } from "./compiler/common/interpreter/IActionManager.ts";
 import { ErrorMarker } from "./compiler/common/monacoproviders/ErrorMarker.ts";
 import { ReplGUI } from "./testgui/editor/ReplGUI.ts";
 import { Repl } from "./compiler/java/parser/repl/Repl.ts";
+import { ReplCompiledModule } from "./compiler/java/parser/repl/ReplCompiledModule.ts";
 
 export class Main implements IMain {
 
@@ -194,7 +195,11 @@ export class Main implements IMain {
   }
 
   ensureModuleIsCompiled(module: JavaCompiledModule): void {
-    this.compiler.updateSingleModuleForCodeCompletion(module);
+    if(module instanceof ReplCompiledModule){
+      this.repl.compileAndShowErrors(module.file.getText());
+    } else {
+      this.compiler.updateSingleModuleForCodeCompletion(module);
+    }
   }
 
   getModuleForMonacoModel(model: monaco.editor.ITextModel | null): JavaCompiledModule | undefined {
