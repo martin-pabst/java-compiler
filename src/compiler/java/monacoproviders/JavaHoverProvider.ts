@@ -1,5 +1,6 @@
 import { Editor } from "../../../testgui/editor/Editor.ts";
 import { IMain } from "../../common/IMain.ts";
+import { SchedulerState } from "../../common/interpreter/Scheduler.ts";
 import { Module } from "../../common/module/Module.ts";
 import { Range } from "../../common/range/Range.ts";
 import { JavaLocalVariable } from "../codegenerator/JavaLocalVariable.ts";
@@ -62,15 +63,22 @@ export class JavaHoverProvider {
 
         let selection: monaco.Selection | null = this.editor.getSelection();
 
-        // if cursor is inside current selection then don't show hover, because editor.onDidChangeCursorPosition evaluates selected Text 
-        // (see class Editor).
         if (selection != null) {
             if (selection.startLineNumber != selection.endLineNumber || selection.startColumn != selection.endColumn) {
                 if (
                     (selection.startLineNumber < position.lineNumber || selection.startLineNumber == position.lineNumber && selection.startColumn <= position.column) &&
                     (selection.endLineNumber > position.lineNumber || selection.endLineNumber == position.lineNumber && selection.endColumn >= position.column)
                 ) {
-                    return;
+                    if(this.main.getInterpreter().scheduler.state != SchedulerState.paused) return;
+                    let text = model.getValueInRange(selection);
+                    let value = this.main.getRepl().executeSynchronously(text);
+                    if(value != null){
+                        if(typeof value == 'string') value = '"' + value + '"';
+                        return {
+                            range: selection,
+                            contents: [{ value: '```\n' + text + " = " + value + '\n```'  }],
+                        };
+                    }
                 }
             }
         }
@@ -121,29 +129,28 @@ export class JavaHoverProvider {
             }
         }
 
-        // let state = this.editor.main.getInterpreter().state;
+        let state = this.main.getInterpreter().scheduler.state;
 
-        // let value: string = null;
+        let value: string | undefined;
 
-        // if (state == InterpreterState.paused) {
-        //     let evaluator = this.editor.main.getCurrentWorkspace().evaluator;
+        if (state == SchedulerState.paused) {
 
-        //     let identifier: string = this.widenDeclaration(model, position, symbol?.identifier);
+            let repl = this.main.getRepl();
 
-        //     if (identifier == null) {
-        //         return null;
-        //     }
+            let identifier: string | undefined = this.widenDeclaration(model, position, symbol?.identifier);
 
-        //     let result = evaluator.evaluate(identifier);
-        //     if (result.error == null && result.value != null) {
-        //         value = result.value.type.debugOutput(result.value);
-        //         declarationAsString = identifier;
-        //     }
+            if (!identifier) {
+                return null;
+            }
 
-        // }
+            let result: string | undefined = repl.executeSynchronously('"" + ' + identifier);
+            if (result != null) {
+                declarationAsString = identifier + " = " + result;
+            }
+
+        }
 
         let contents = [];
-        let value: string | null = null;
 
         if (value == null && declarationAsString.length == 0) {
             return null;
@@ -214,7 +221,7 @@ export class JavaHoverProvider {
     }
 
     widenDeclaration(model: monaco.editor.ITextModel, position: monaco.Position,
-        identifier: string): string {
+        identifier: string | undefined): string | undefined {
 
         let pos = model.getValueLengthInRange({
             startColumn: 0,
@@ -234,8 +241,6 @@ export class JavaHoverProvider {
         while (begin > 0 && this.isInsideIdentifierChain(text.charAt(begin - 1))) {
             begin--;
         }
-
-        let lenght: number = identifier?.length == null ? 1 : identifier.length;
 
         if (end - begin > length) {
             return text.substring(begin, end);
