@@ -1,9 +1,17 @@
 import jQuery from 'jquery';
 import { escapeHtml } from "./StringTools.js";
 
-export function makeEditable(elementWithText: JQuery<HTMLElement>,
-    elementToReplace: JQuery<HTMLElement> | undefined,
+export function makeEditable(elementWithText: JQuery<HTMLElement> | HTMLElement,
+    elementToReplace: JQuery<HTMLElement> | HTMLElement | undefined,
     renameDoneCallback: (newContent: string) => void, selectionRange?: { start: number, end: number }) {
+
+    if(elementWithText instanceof HTMLElement){
+        elementWithText = jQuery(elementWithText);
+    }
+
+    if(elementToReplace && elementToReplace instanceof HTMLElement){
+        elementToReplace = jQuery(elementToReplace);
+    }
 
     let mousePointer = window.PointerEvent ? "pointer" : "mouse";
 

@@ -72,11 +72,12 @@ export class Lexer {
         this.colorIndices = []; // indices of identifier 'Color' inside tokenList
     }
 
-    lex(input: string): LexerOutput {
-        this.input = input;
-        if (input.length == 0) {
+    lex(input?: string): LexerOutput {
+        if (!input || input.length == 0) {
             return { tokens: this.tokens, errors: this.errorList, bracketError: undefined, colorInformation: [] };
         }
+        
+        this.input = input;
 
         this.currentChar = this.input.charAt(0);
 

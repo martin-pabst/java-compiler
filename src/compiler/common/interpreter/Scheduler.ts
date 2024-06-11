@@ -45,6 +45,8 @@ export class Scheduler {
 
     callbackAfterReplProgramFinished?: () => void;
 
+    runsSynchronously: boolean = false;
+
 
     constructor(public interpreter: Interpreter) {
         this.setState(SchedulerState.not_initialized);
@@ -442,6 +444,7 @@ export class Scheduler {
     }
 
     periodicallyUpdateDebugger() {
+        if(this.runsSynchronously) return;
         if (this.state == SchedulerState.running &&
             performance.now() - this.lastTimeDebuggeroutputWritten > this.updateDebuggerEveryMs) {
             this.lastTimeDebuggeroutputWritten = performance.now();

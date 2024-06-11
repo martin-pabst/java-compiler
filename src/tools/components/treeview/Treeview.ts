@@ -5,6 +5,7 @@ import '/include/css/icons.css';
 import { ExpandCollapseComponent, ExpandCollapseState } from '../ExpandCollapseComponent.ts';
 import { IconButtonComponent, IconButtonListener } from '../IconButtonComponent.ts';
 import { TreeviewNode, TreeviewNodeOnClickHandler } from './TreeviewNode.ts';
+import { makeEditable } from '../../HtmlTools.ts';
 
 
 export type TreeviewConfig<E> = {
@@ -22,8 +23,10 @@ export type TreeviewConfig<E> = {
     comparator?: (externalElement1: E, externalElement2: E) => number,
     minHeight?: number,
     buttonAddFolders?: boolean,
+    
     buttonAddElements?: boolean,
-    buttonAddElementsCaption?: string
+    buttonAddElementsCaption?: string,
+    defaultIconClass?: string,
 
     initialExpandCollapseState?: ExpandCollapseState
 }
@@ -40,6 +43,8 @@ export type TreeviewContextMenuItem<E> = {
 
 export type TreeviewMoveNodesCallback<E> = (movedElements: E[], destinationFolder: E | null, position: { order: number, elementBefore: E | null, elementAfter: E | null }) => boolean;
 export type TreeviewRenameCallback<E> = (element: E, newName: string, node: TreeviewNode<E>) => boolean;
+export type TreeviewDeleteCallback<E> = (element: E | null) => void;
+export type TreeviewNewNodeCallback<E> = (name: string, node: TreeviewNode<E>) => E;
 export type TreeviewContextMenuProvider<E> = (element: E, node: TreeviewNode<E>) => TreeviewContextMenuItem<E>[];
 
 
@@ -94,6 +99,22 @@ export class Treeview<E> {
     }
     public set renameCallback(value: TreeviewRenameCallback<E> | undefined) {
         this._renameCallback = value;
+    }
+
+    private _newNodeCallback?: TreeviewNewNodeCallback<E> | undefined;
+    public get newNodeCallback(): TreeviewNewNodeCallback<E> | undefined {
+        return this._newNodeCallback;
+    }
+    public set newNodeCallback(value: TreeviewNewNodeCallback<E> | undefined) {
+        this._newNodeCallback = value;
+    }
+
+    private _deleteCallback?: TreeviewDeleteCallback<E> | undefined;
+    public get deleteCallback(): TreeviewDeleteCallback<E> | undefined {
+        return this._deleteCallback;
+    }
+    public set deleteCallback(value: TreeviewDeleteCallback<E> | undefined) {
+        this._deleteCallback = value;
     }
 
     private _contextMenuProvider?: TreeviewContextMenuProvider<E> | undefined;
@@ -218,11 +239,28 @@ export class Treeview<E> {
 
         if (this.config.buttonAddElements) {
             this.captionLineAddIconButton("img_add-dark", () => {
-
+                    this.addNewNode();
             }, this.config.buttonAddElementsCaption);
         }
 
     }
+
+    addNewNode(){
+        let selectedNodes = this.getCurrentlySelectedNodes();
+
+        let folder: TreeviewNode<E> | undefined;
+        if(selectedNodes.length == 1 && selectedNodes[0].isFolder) folder = selectedNodes[0];
+
+        let node = this.addNode(false, "", this.config.defaultIconClass, {} as E, null, folder?.externalObject, true);
+        makeEditable(node.captionDiv, node.captionDiv, (newContent: string) => {
+            node.caption = newContent;
+            if(this.newNodeCallback){
+                node.externalObject = this.newNodeCallback(newContent, node);
+            }
+        })
+
+    }
+
 
     captionLineAddIconButton(iconClass: string, callback: IconButtonListener, tooltip?: string): IconButtonComponent {
         return new IconButtonComponent(this.captionLineButtonsDiv, iconClass, callback, tooltip);

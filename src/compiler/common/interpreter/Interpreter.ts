@@ -15,6 +15,7 @@ import { ProgramPointerManager, ProgramPointerPositionInfo } from "../monacoprov
 import { Program } from "./Program.ts";
 import { TestManager } from "./TestManager.ts";
 import { ActionManager } from "./IActionManager.ts";
+import { Repl } from "../../java/parser/repl/Repl.ts";
 
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
@@ -73,7 +74,8 @@ export class Interpreter {
     constructor(printManager?: PrintManager, private actionManager?: ActionManager,
         public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager,
         public breakpointManager?: BreakpointManager, public _debugger?: Debugger,
-        public programPointerManager?: ProgramPointerManager, public testManager?: TestManager
+        public programPointerManager?: ProgramPointerManager, public testManager?: TestManager,
+        public repl?: Repl
     ) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {
 
@@ -264,9 +266,14 @@ export class Interpreter {
     }
     
     runREPLSynchronously(){
+        this.scheduler.runsSynchronously = true;
         this.scheduler.setState(SchedulerState.running);
-        while (this.scheduler.state == SchedulerState.running) {
-            this.scheduler.run(100);
+        try {
+            while (this.scheduler.state == SchedulerState.running) {
+                this.scheduler.run(100);
+            }
+        } finally {
+            this.scheduler.runsSynchronously = false;
         }
     }
 

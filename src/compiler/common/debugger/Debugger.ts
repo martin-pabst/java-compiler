@@ -137,6 +137,7 @@ export class Debugger {
         this.showVariables(thread);
         this.showCallstack(thread);
         this.showThreads(thread.scheduler);
+        this.watchSection.update(thread.scheduler.interpreter)
     }
 
     showCallstack(thread: Thread){

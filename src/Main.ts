@@ -167,6 +167,7 @@ export class Main implements IMain {
     this.initCompiler();
 
     this.initRepl();
+    this.interpreter.repl = this.repl;
 
     this.registerMonacoProviders();
 

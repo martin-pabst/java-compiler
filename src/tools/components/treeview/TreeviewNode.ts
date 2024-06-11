@@ -50,7 +50,7 @@ export class TreeviewNode<E> {
     private marginLeftDiv!: HTMLDivElement;
     private expandCollapseDiv!: HTMLDivElement;
     private iconDiv!: HTMLDivElement;
-    private captionDiv!: HTMLDivElement;
+    public captionDiv!: HTMLDivElement;
     private errorsDiv!: HTMLDivElement;
     private buttonsDiv!: HTMLDivElement;
     //@ts-ignore
@@ -128,6 +128,11 @@ export class TreeviewNode<E> {
     public get externalObject(): E | null {
         return this._externalObject;
     }
+
+    public set externalObject(o: E) {
+        this._externalObject = o;
+    }
+
     public get iconClass(): string | undefined {
         return this._iconClass;
     }
@@ -241,7 +246,10 @@ export class TreeviewNode<E> {
 
         if (this.treeview.config.withDeleteButtons && !this.isRootNode()) {
             this.addIconButton("img_delete", () => {
-                // TODO!
+                this.treeview.removeNode(this);
+                if(this.treeview.deleteCallback){
+                    this.treeview.deleteCallback(this.externalObject);
+                }
             }, "Löschen");
         }
 
