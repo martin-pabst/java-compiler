@@ -99,7 +99,12 @@ export class Repl {
             return undefined;
         }
 
-        this.interpreter.runREPLSynchronously();
+        try {
+            this.interpreter.runREPLSynchronously();
+        } catch(ex){
+            console.log(ex);
+            return "---";
+        }
 
         return thread.replReturnValue;
 

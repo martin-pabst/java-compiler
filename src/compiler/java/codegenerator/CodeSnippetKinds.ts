@@ -251,9 +251,9 @@ export class CodeSnippetContainer extends CodeSnippet {
     }
 
     getLastPartWithType(): CodeSnippet | undefined {
-        for(let i = this.parts.length - 1; i >= 0; i++){
+        for(let i = this.parts.length - 1; i >= 0; i--){
             let part = this.parts[i];
-            if(part.type) return part;
+            if(part && part.type) return part;
         }
         return undefined;
     }

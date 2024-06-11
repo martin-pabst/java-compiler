@@ -76,7 +76,7 @@ export class JavaHoverProvider {
                         if(typeof value == 'string') value = '"' + value + '"';
                         return {
                             range: selection,
-                            contents: [{ value: '```\n' + text + " = " + value + '\n```'  }],
+                            contents: [{ value: '```\n' + text + " : " + value + '\n```'  }],
                         };
                     }
                 }
@@ -145,7 +145,7 @@ export class JavaHoverProvider {
 
             let result: string | undefined = repl.executeSynchronously('"" + ' + identifier);
             if (result != null) {
-                declarationAsString = identifier + " = " + result;
+                declarationAsString = identifier + " : " + result;
             }
 
         }
