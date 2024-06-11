@@ -7,6 +7,8 @@ import { ProgramState, Thread, ThreadState } from "../interpreter/Thread";
 import { ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager";
 import { DebuggerCallstackEntry } from "./DebuggerCallstackEntry";
 import { DebuggerSymbolEntry } from "./DebuggerSymbolEntry";
+import { DebuggerWatchEntry } from "./DebuggerWatchEntry.ts";
+import { DebuggerWatchSection } from "./DebuggerWatchSection.ts";
 import { SymbolTableSection } from "./SymbolTableSection";
 
 export class Debugger {
@@ -20,18 +22,40 @@ export class Debugger {
 
     threadsTreeview!: Treeview<Thread>;
 
+    watchTreeview!: Treeview<DebuggerWatchEntry>;
+
     maxCallstackEntries: number = 15;
 
     lastThread?: Thread;
+
+    watchSection: DebuggerWatchSection;
 
     constructor(debuggerDiv: HTMLDivElement){
 
         this.treeviewAccordion = new TreeviewAccordion(debuggerDiv);
         this.initShowVariablesTreeview();
+        this.initWatchTreeview();
         this.initCallstackTreeview();
         this.initThreadsTreeview();
+
+        this.watchSection = new DebuggerWatchSection(this.watchTreeview);
     }
     
+    initWatchTreeview(){
+        this.watchTreeview = new Treeview(this.treeviewAccordion, {
+            captionLine: {
+                enabled: true,
+                text: DebM.watch()
+            },
+            flexWeight: "1",
+            withDeleteButtons: true,
+            withDragAndDrop: false,
+            buttonAddFolders: false
+        });
+
+
+    }
+
     initThreadsTreeview(){
         this.threadsTreeview = new Treeview(this.treeviewAccordion, {
             captionLine: {
@@ -41,7 +65,8 @@ export class Debugger {
             flexWeight: "1",
             withDeleteButtons: false,
             withDragAndDrop: false,
-            buttonAddFolders: false
+            buttonAddFolders: false,
+            buttonAddElements: false
         });
 
     }
@@ -55,7 +80,8 @@ export class Debugger {
             flexWeight: "1",
             withDeleteButtons: false,
             withDragAndDrop: false,
-            buttonAddFolders: false
+            buttonAddFolders: false,
+            buttonAddElements: false
         });
 
     }
@@ -69,7 +95,8 @@ export class Debugger {
             flexWeight: "3",
             withDeleteButtons: false,
             withDragAndDrop: false,
-            buttonAddFolders: false
+            buttonAddFolders: false,
+            buttonAddElements: false
         });
 
     }

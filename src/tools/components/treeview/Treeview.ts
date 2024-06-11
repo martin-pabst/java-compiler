@@ -22,6 +22,8 @@ export type TreeviewConfig<E> = {
     comparator?: (externalElement1: E, externalElement2: E) => number,
     minHeight?: number,
     buttonAddFolders?: boolean,
+    buttonAddElements?: boolean,
+    buttonAddElementsCaption?: string
 
     initialExpandCollapseState?: ExpandCollapseState
 }
@@ -135,7 +137,9 @@ export class Treeview<E> {
             },
             minHeight: 200,
             initialExpandCollapseState: "expanded",
-            buttonAddFolders: true
+            buttonAddFolders: true,
+            buttonAddElements: true,
+            buttonAddElementsCaption: "Elemente hinzufügen"
         }
 
         this._lastExpandedHeight = config?.minHeight!;
@@ -210,6 +214,12 @@ export class Treeview<E> {
             this.captionLineAddIconButton("img_add-folder-dark", () => {
 
             }, "Ordner hinzufügen");
+        }
+
+        if (this.config.buttonAddElements) {
+            this.captionLineAddIconButton("img_add-dark", () => {
+
+            }, this.config.buttonAddElementsCaption);
         }
 
     }

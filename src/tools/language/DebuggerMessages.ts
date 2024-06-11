@@ -9,6 +9,11 @@ export class DebM {
      * Messages for class BinopCastCodeGenerator  
      */
 
+    static watch = () => lm({
+        "de": "BEOBACHTEN",
+        "en": "WATCH"
+    });
+
     static threads = () => lm({
         "de": "THREADS",
         "en": "THREADS"
