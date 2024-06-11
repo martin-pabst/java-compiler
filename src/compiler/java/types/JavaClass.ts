@@ -26,6 +26,17 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     abstract getExtends(): IJavaClass | undefined;
     abstract getImplements(): IJavaInterface[];
 
+    getOwnAndInheritedFields(): JavaField[]{
+        let fields: JavaField[] = this.getFields();
+
+        let baseClass = this.getExtends();
+        if(baseClass){
+            fields = fields.concat(baseClass.getOwnAndInheritedFields())
+        }
+
+        return fields;
+    }
+
 
     getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, 
         rangeToReplace: monaco.IRange, methodContext: JavaMethod | undefined, onlyStatic?: false): monaco.languages.CompletionItem[] {

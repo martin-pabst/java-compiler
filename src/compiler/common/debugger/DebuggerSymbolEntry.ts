@@ -1,23 +1,21 @@
 import { TreeviewNode } from "../../../tools/components/treeview/TreeviewNode";
 import { DebM } from "../../../tools/language/DebuggerMessages";
-import { GenericVariantOfJavaClass, JavaClass } from "../../java/types/JavaClass";
+import { GenericVariantOfJavaClass, IJavaClass, JavaClass } from "../../java/types/JavaClass";
 import { BaseField, BaseSymbol, SymbolOnStackframe } from "../BaseSymbolTable";
 import { BaseArrayType, BaseListType, BaseType } from "../BaseType";
 import { SymbolTableSection } from "./SymbolTableSection";
+import { ValueRenderer } from "./ValueRenderer.ts";
 
-type RuntimeObject = {
+export type RuntimeObject = {
     getType(): RuntimeObjectType & BaseType;
     [index: string]: any;
 }
 
 interface RuntimeObjectType {
-    getFields(): BaseField[];
+    getOwnAndInheritedFields(): BaseField[];
     [index: string]: any;
 }
 
-type ArrayOutputData = {
-    text: string
-}
 
 export class DebuggerSymbolEntry {
 
@@ -25,6 +23,7 @@ export class DebuggerSymbolEntry {
     children: DebuggerSymbolEntry[] = [];
     oldValue?: any; // old value if value is primitive type
     oldLength?: number; // old length if value is array
+    isLocalVariable: boolean = true;
 
     static quickArrayOutputMaxLength = 20;
 
@@ -45,7 +44,7 @@ export class DebuggerSymbolEntry {
             this.setCaption(" = ", "null", "jo_debugger_value");
             this.removeChildren();
         } else if (Array.isArray(value)) {
-            this.renderArray(value);
+            this.renderArray(value, DebuggerSymbolEntry.quickArrayOutputMaxLength);
         } else if (typeof value == "object") {
             this.renderObject(<RuntimeObject>value);
         } else {
@@ -64,7 +63,7 @@ export class DebuggerSymbolEntry {
         value = value.replaceAll("<", "&lt;")
         value = value.replaceAll(">", "&gt;")
 
-        let caption = `<span class="jo_debugger_identifier">${this.identifier}</span>${delimiter}<span class="${valuecss}">${value}</span>`;
+        let caption = `<span class="${this.isLocalVariable ? "jo_debugger_localVariableIdentifier" : "jo_debugger_fieldIdentifier"}">${this.identifier}</span>${delimiter}<span class="${valuecss}">${value}</span>`;
         this.treeViewNode.caption = caption;
     }
 
@@ -111,25 +110,19 @@ export class DebuggerSymbolEntry {
         }
 
         this.treeViewNode.iconClass = "img_debugger-object";
-        this.setCaption(": ", this.type.toString() + "-" + DebM.object(), "jo_debugger_type");
+        this.setCaption(": " +  this.type.toString() + "-" + DebM.object(), " " + ValueRenderer.renderValue(o, DebuggerSymbolEntry.quickArrayOutputMaxLength), "jo_debugger_value");
 
         if (typesDiffer || this.children.length == 0) {
             this.removeChildren();
-            let fields = type.getFields();
 
-            if(type instanceof JavaClass){
-                let baseType = type.getExtends()
-                while(baseType){
-                    fields = fields.concat(baseType.getFields());
-                    baseType = baseType.getExtends();
-                }
-            }
+            let fields: BaseField[] = type.getOwnAndInheritedFields();
 
             for (let field of fields) {
                 let fde = new ObjectFieldDebuggerEntry(this.symbolTableSection, this, field);
                 this.children.push(fde);
             }
             this.treeViewNode.isFolder = fields.length > 0;
+            this.treeViewNode.expandCollapseComponent.setState("collapsed");
         }
 
         this.children.forEach(c => (<ObjectFieldDebuggerEntry>c).fetchValueFromObjectAndRender(o));
@@ -151,12 +144,12 @@ export class DebuggerSymbolEntry {
         this.children.forEach(c => (<ListElementDebuggerEntry>c).fetchValueFromArrayAndRender(elements));
     }
     
-    renderArray(a: any[]) {
+    renderArray(a: any[], maxLength: number) {
         this.treeViewNode.isFolder = true;
         this.treeViewNode.expandCollapseComponent.setState("collapsed");
 
         let elementtype = (<BaseArrayType><any>this.type).getElementType()
-        this.setCaption(": " + elementtype.toString() + "[" + a.length + "] == ", this.quickArrayOutput(a) , "jo_debugger_value");
+        this.setCaption(": " + elementtype.toString() + "[" + a.length + "] ", ValueRenderer.quickArrayOutput(a, DebuggerSymbolEntry.quickArrayOutputMaxLength) , "jo_debugger_value");
 
         if (a.length != this.oldLength || this.children.length == 0) {
             this.oldLength = a.length;
@@ -172,65 +165,7 @@ export class DebuggerSymbolEntry {
         this.children.forEach(c => (<ArrayElementDebuggerEntry>c).fetchValueFromArrayAndRender(a));
     }
 
-    quickArrayOutput(a: any[]): string {
 
-        let dimension: number = 0;
-        let a1 = a;
-        while(Array.isArray(a1)){
-            dimension++;
-            if(a1.length > 0){
-                a1 = a1[0];
-            }
-        }
-        
-        let elementTypeIsString: boolean = (typeof a1 == 'string');
-        let elementTypeIsObject: boolean = (typeof a1 == 'object');
-
-        if(elementTypeIsObject) return "";
-
-        let data: ArrayOutputData = {
-            text: ""
-        }
-
-        this.quickArrayOutputHelper(a, data);
-
-        return data.text;
-    }
-
-    quickArrayOutputHelper(a: any[], data: ArrayOutputData){
-        let index: number = 0;
-        data.text += "[";
-        while(index < a.length && data.text.length < DebuggerSymbolEntry.quickArrayOutputMaxLength){
-            let element = a[index];
-            if(Array.isArray(element)){
-                this.quickArrayOutputHelper(element, data);
-            } else {
-                switch(typeof element){
-                    case "object":
-                        if(element == null){
-                            data.text += "null";
-                        } else {
-                            data.text += "{}";
-                        }
-                        break;
-                    case "string":
-                        data.text += '"' + element.substring(0, DebuggerSymbolEntry.quickArrayOutputMaxLength - data.text.length - 3) + '"';
-                        break;
-                    case "undefined":
-                        break;
-                    default:
-                        data.text += ("" + element).substring(0, DebuggerSymbolEntry.quickArrayOutputMaxLength - data.text.length - 2);
-                        break;
-                }
-            }
-            if(index < a.length - 1) data.text += ", ";
-            index++;
-        }
-
-        if(index < a.length) data.text += "...";
-
-        data.text += "]";
-    }
     
 
 
@@ -263,6 +198,7 @@ export class ObjectFieldDebuggerEntry extends DebuggerSymbolEntry {
         parent: DebuggerSymbolEntry,
         private field: BaseField) {
         super(symbolTableSection, parent, field.getType(), field.identifier);
+        this.isLocalVariable = false;
     }
 
     fetchValueFromObjectAndRender(object: RuntimeObject) {

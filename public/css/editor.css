@@ -127,8 +127,12 @@
     color:#6cbfe6;
 }
 
-.jo_debugger_identifier {
-    color:#c189cd;
+.jo_debugger_localVariableIdentifier {
+    color:#4ffa2c;
+}
+
+.jo_debugger_fieldIdentifier {
+    color:#e6e92c;
 }
 
 .jo_debugger_value {

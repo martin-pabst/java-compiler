@@ -28,6 +28,10 @@ export abstract class NonPrimitiveType extends JavaType implements BaseObjectTyp
     abstract getOwnMethods(): JavaMethod[];
     abstract getAllMethods(): JavaMethod[];
 
+    getOwnAndInheritedFields(): JavaField[] {
+        return this.getFields();
+    }
+
     abstract getField(identifier: string, uptoVisibility: Visibility, forceStatic?: boolean): JavaField | undefined;
 
     abstract getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, 
