@@ -1,28 +1,18 @@
-import { CallbackParameter } from "../../common/interpreter/CallbackParameter.ts";
 import { Program } from "../../common/interpreter/Program";
-import { CallbackFunction, Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
-import { Thread } from "../../common/interpreter/Thread.ts";
-import { EmptyRange } from "../../common/range/Range.ts";
+import { Helpers } from "../../common/interpreter/StepFunction.ts";
 import { JCM } from "../../../tools/language/JavaCompilerMessages";
 import { TokenType } from "../TokenType";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTAnnotationNode, ASTAnonymousClassNode, ASTBlockNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTFieldDeclarationNode, ASTInstanceInitializerNode, ASTInterfaceDefinitionNode, ASTLambdaFunctionDeclarationNode, ASTMethodCallNode, ASTMethodDeclarationNode, ASTStatementNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
-import { ObjectClass } from "../runtime/system/javalang/ObjectClassStringClass.ts";
-import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
-import { GenericTypeParameter } from "../types/GenericTypeParameter.ts";
-import { JavaAnnotation } from "../types/JavaAnnotation.ts";
-import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
+import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
+import { JavaClass } from "../types/JavaClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
-import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
-import { JavaType } from "../types/JavaType.ts";
+import { JavaInterface } from "../types/JavaInterface.ts";
 import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { CodeSnippetContainer } from "./CodeSnippetKinds.ts";
 import { OneParameterTemplate } from "./CodeTemplate.ts";
 import { ExceptionTree } from "./ExceptionTree.ts";
-import { MissingStatementManager } from "./MissingStatementsManager.ts";
 import { SnippetLinker } from "./SnippetLinker";
-import { StatementCodeGenerator } from "./StatementCodeGenerator";
 import { InnerClassCodeGenerator } from "./InnerClassCodeGenerator.ts";
 
 export class CodeGenerator extends InnerClassCodeGenerator {
