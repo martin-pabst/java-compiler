@@ -15,12 +15,18 @@ interface RuntimeObjectType {
     [index: string]: any;
 }
 
+type ArrayOutputData = {
+    text: string
+}
+
 export class DebuggerSymbolEntry {
 
     treeViewNode: TreeviewNode<DebuggerSymbolEntry>;
     children: DebuggerSymbolEntry[] = [];
     oldValue?: any; // old value if value is primitive type
     oldLength?: number; // old length if value is array
+
+    static quickArrayOutputMaxLength = 20;
 
     constructor(private symbolTableSection: SymbolTableSection,
         parent: DebuggerSymbolEntry | undefined, private type: BaseType | undefined, public identifier: string
@@ -147,8 +153,10 @@ export class DebuggerSymbolEntry {
     
     renderArray(a: any[]) {
         this.treeViewNode.isFolder = true;
+        this.treeViewNode.expandCollapseComponent.setState("collapsed");
+
         let elementtype = (<BaseArrayType><any>this.type).getElementType()
-        this.setCaption(": ", elementtype.toString() + "[" + a.length + "]" , "jo_debugger_type");
+        this.setCaption(": " + elementtype.toString() + "[" + a.length + "] == ", this.quickArrayOutput(a) , "jo_debugger_value");
 
         if (a.length != this.oldLength || this.children.length == 0) {
             this.oldLength = a.length;
@@ -178,7 +186,53 @@ export class DebuggerSymbolEntry {
         let elementTypeIsString: boolean = (typeof a1 == 'string');
         let elementTypeIsObject: boolean = (typeof a1 == 'object');
 
+        if(elementTypeIsObject) return "";
+
+        let data: ArrayOutputData = {
+            text: ""
+        }
+
+        this.quickArrayOutputHelper(a, data);
+
+        return data.text;
     }
+
+    quickArrayOutputHelper(a: any[], data: ArrayOutputData){
+        let index: number = 0;
+        data.text += "[";
+        while(index < a.length && data.text.length < DebuggerSymbolEntry.quickArrayOutputMaxLength){
+            let element = a[index];
+            if(Array.isArray(element)){
+                this.quickArrayOutputHelper(element, data);
+            } else {
+                switch(typeof element){
+                    case "object":
+                        if(element == null){
+                            data.text += "null";
+                        } else {
+                            data.text += "{}";
+                        }
+                        break;
+                    case "string":
+                        data.text += '"' + element.substring(0, DebuggerSymbolEntry.quickArrayOutputMaxLength - data.text.length - 3) + '"';
+                        break;
+                    case "undefined":
+                        break;
+                    default:
+                        data.text += ("" + element).substring(0, DebuggerSymbolEntry.quickArrayOutputMaxLength - data.text.length - 2);
+                        break;
+                }
+            }
+            if(index < a.length - 1) data.text += ", ";
+            index++;
+        }
+
+        if(index < a.length) data.text += "...";
+
+        data.text += "]";
+    }
+    
+
 
 }
 

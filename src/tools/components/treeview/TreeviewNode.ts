@@ -54,7 +54,7 @@ export class TreeviewNode<E> {
     private errorsDiv!: HTMLDivElement;
     private buttonsDiv!: HTMLDivElement;
     //@ts-ignore
-    private expandCollapseComponent!: ExpandCollapseComponent;
+    public expandCollapseComponent!: ExpandCollapseComponent;
     private childrenLineDiv!: HTMLDivElement;
 
     private currentIconClass?: string;
