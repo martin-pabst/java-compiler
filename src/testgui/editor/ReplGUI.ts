@@ -28,7 +28,7 @@ export class ReplGUI {
             if (e.code == 'Enter') {
                 setTimeout(async () => {
                     // let returnValue = main.getRepl().executeSynchronously(statement);
-                    let returnValue = await main.getRepl().executeAsync(statement);
+                    let returnValue = await main.getRepl().executeAsync(statement, false);
                     let outputDiv = DOM.makeDiv(this.upperDiv);
                     outputDiv.textContent = '' + returnValue;
                     this.editor.getModel()?.setValue('');

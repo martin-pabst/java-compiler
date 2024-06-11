@@ -105,7 +105,7 @@ export class Repl {
 
     }
 
-    async executeAsync(statement: string): Promise<any> {
+    async executeAsync(statement: string, withMaxSpeed: boolean): Promise<any> {
 
         let programAndModule = this.compileAndShowErrors(statement);
 
@@ -119,7 +119,7 @@ export class Repl {
                 resolve(returnValue);
             }
 
-            let thread = this.prepareThread(programAndModule, callback);
+            let thread = this.prepareThread(programAndModule, callback, withMaxSpeed);
             if (!thread) {
                 resolve(undefined);
                 return;
@@ -137,7 +137,8 @@ export class Repl {
 
 
 
-    prepareThread(programAndModule: { module: ReplCompiledModule; program: Program | undefined; }, callback?: (returnValue: any) => void): Thread | undefined {
+    prepareThread(programAndModule: { module: ReplCompiledModule; program: Program | undefined; }, callback?: (returnValue: any) => void,
+                   withMaxSpeed: boolean = true): Thread | undefined {
 
         if (programAndModule.module.hasErrors()) {
             return undefined;
@@ -159,13 +160,20 @@ export class Repl {
         this.interpreter.scheduler.saveAllThreadsBut(currentThread);
 
         let saveMaxStepsPerSecond = currentThread.maxStepsPerSecond;
-        currentThread.maxStepsPerSecond = undefined;
+        if(withMaxSpeed){
+            currentThread.maxStepsPerSecond = undefined;
+        } else {
+            currentThread.maxStepsPerSecond = this.interpreter.isMaxSpeed ? undefined : this.interpreter.stepsPerSecondGoal;
+        }
 
+        currentThread.lastTimeThreadWasRun = performance.now();
+        
         let oldState = this.interpreter.scheduler.state;
-
+        
         this.interpreter.scheduler.callbackAfterReplProgramFinished = () => {
             currentThread.maxStepsPerSecond = saveMaxStepsPerSecond;
             currentThread.state = ThreadState.runnable;
+            currentThread.lastTimeThreadWasRun = performance.now();
             this.interpreter.setState(oldState);
             this.interpreter.scheduler.retrieveThreads();
             if(callback) callback(currentThread.replReturnValue);

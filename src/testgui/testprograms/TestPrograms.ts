@@ -794,6 +794,9 @@ class Test {
    int i = 12;
    int j = i + 7;
    public int doIt(String s){
+      for(int k = 0; k < 10; k++){
+         print(k + ", ");
+      }
       println(s);
       return j;
    }
