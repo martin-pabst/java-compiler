@@ -1,5 +1,6 @@
 import { JCM } from "../../../../../tools/language/JavaCompilerMessages.ts";
 import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
+import { ValueRenderer } from "../../../../common/debugger/ValueRenderer.ts";
 import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts";
 import { Thread, ThreadState } from "../../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
@@ -128,7 +129,7 @@ export class ObjectClass {
 
 
     _nToString() {
-        return new StringClass("Object");
+        return new StringClass(ValueRenderer.renderValue(this, 200));
         // `t.stack.push(new ${Helpers.classes}["String"]("Object"));`
     }
 

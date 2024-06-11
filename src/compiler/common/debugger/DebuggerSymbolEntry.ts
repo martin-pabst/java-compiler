@@ -110,7 +110,7 @@ export class DebuggerSymbolEntry {
         }
 
         this.treeViewNode.iconClass = "img_debugger-object";
-        this.setCaption(": " +  this.type.toString() + "-" + DebM.object(), " " + ValueRenderer.renderValue(o, DebuggerSymbolEntry.quickArrayOutputMaxLength), "jo_debugger_value");
+        this.setCaption(": " +  this.type.toString(), " " + ValueRenderer.renderValue(o, DebuggerSymbolEntry.quickArrayOutputMaxLength), "jo_debugger_value");
 
         if (typesDiffer || this.children.length == 0) {
             this.removeChildren();

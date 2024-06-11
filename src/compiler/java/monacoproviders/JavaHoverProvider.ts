@@ -1,5 +1,6 @@
 import { Editor } from "../../../testgui/editor/Editor.ts";
 import { IMain } from "../../common/IMain.ts";
+import { RuntimeObject } from "../../common/debugger/DebuggerSymbolEntry.ts";
 import { SchedulerState } from "../../common/interpreter/Scheduler.ts";
 import { Module } from "../../common/module/Module.ts";
 import { Range } from "../../common/range/Range.ts";
@@ -143,9 +144,17 @@ export class JavaHoverProvider {
                 return null;
             }
 
-            let result: string | undefined = repl.executeSynchronously('"" + ' + identifier);
-            if (result != null) {
-                declarationAsString = identifier + " : " + result;
+            let resultAsString: string | undefined = repl.executeSynchronously('"" + ' + identifier);
+            let resultObject: any = repl.executeSynchronously(identifier);
+
+            let typeIdentifier = "";
+            if(resultObject.getType){
+                let type = (<RuntimeObject>resultObject).getType();
+                typeIdentifier = type.identifier + " ";
+            }
+
+            if (resultAsString != null) {
+                declarationAsString = identifier + ": " + typeIdentifier + resultAsString;
             }
 
         }
