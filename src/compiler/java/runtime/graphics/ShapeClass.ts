@@ -32,8 +32,8 @@ export class ShapeClass extends ActorClass {
         { type: "method", signature: "final void defineDirection(double angleInDeg)", native: ShapeClass.prototype._defineDirection , comment: JRC.shapeDefineDirectionComment},
         { type: "method", signature: "final void forward(double distance)", native: ShapeClass.prototype._forward , comment: JRC.shapeForwardComment},
         { type: "method", signature: "final boolean isOutsideView()", native: ShapeClass.prototype._isOutsideView , comment: JRC.shapeOutsideViewComment},
-        { type: "method", signature: "final double getCenterX()", template: '(§1.centerX)' , comment: JRC.shapeCenterXComment},
-        { type: "method", signature: "final double getCenterY()", template: '(§1.centerY)' , comment: JRC.shapeCenterYComment},
+        { type: "method", signature: "final double getCenterX()", native: ShapeClass.prototype._getCenterX , comment: JRC.shapeCenterXComment},
+        { type: "method", signature: "final double getCenterY()", native: ShapeClass.prototype._getCenterY , comment: JRC.shapeCenterYComment},
         { type: "method", signature: "final double getAngle()", template: '(§1.angle)' , comment: JRC.shapeAngleComment},
         { type: "method", signature: "final boolean containsPoint(double x, double y)", native: ShapeClass.prototype._containsPoint , comment: JRC.shapeContainsPointComment},
         { type: "method", signature: "final void moveTo(double x, double y)", native: ShapeClass.prototype._moveTo , comment: JRC.shapeMoveToComment},
@@ -83,6 +83,14 @@ export class ShapeClass extends ActorClass {
 
     lastMoveDx: number = 0;
     lastMoveDy: number = 0;
+
+    get centerX(): number {
+        return this._getCenterX();
+    }
+
+    get centerY(): number {
+        return this._getCenterY();
+    }
 
     mouseEventsImplemented?: {[mouseEvent: string]: MouseEventMethod};
 
@@ -185,7 +193,8 @@ export class ShapeClass extends ActorClass {
         } else {
             let p = new PIXI.Point(cX, cY);
             updateWorldTransformRecursively(this.container, false);
-            this.container.worldTransform.applyInverse(p, p);
+            //@ts-ignore
+            this.container._worldTransform.applyInverse(p, p);
             this.container.localTransform.apply(p, p);
             cX = p.x;
             cY = p.y;
@@ -217,8 +226,8 @@ export class ShapeClass extends ActorClass {
         } else {
             let p = new PIXI.Point(cX, cY);
             updateWorldTransformRecursively(this.container, false);
-
-            this.container.worldTransform.applyInverse(p, p);
+            //@ts-ignore
+            this.container._worldTransform.applyInverse(p, p);
             this.container.localTransform.apply(p, p);
             cX = p.x;
             cY = p.y;
@@ -339,13 +348,17 @@ export class ShapeClass extends ActorClass {
 
     public _getCenterX(): number {
         let p = new PIXI.Point(this.centerXInitial, this.centerYInitial);
-        this.container.worldTransform.apply(p, p);
+        updateWorldTransformRecursively(this.container, false);
+        //@ts-ignore
+        this.container._worldTransform.apply(p, p);
         return p.x;
     }
 
     public _getCenterY(): number {
         let p = new PIXI.Point(this.centerXInitial, this.centerYInitial);
-        this.container.worldTransform.apply(p, p);
+        updateWorldTransformRecursively(this.container, false);
+        //@ts-ignore
+        this.container._worldTransform.apply(p, p);
         return p.y;
     }
 
