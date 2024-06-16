@@ -151,7 +151,7 @@ export class Main implements IMain {
     let keyboardManager = new KeyboardManager(jQuery('#insighttabs'), this);
 
     this.breakpointManager = new BreakpointManager(this);
-    let _debugger = new Debugger(this.debuggerDiv);
+    let _debugger = new Debugger(this.debuggerDiv, this);
 
     let testManager = new TestManager(this, this.actionManager, this.testResultViewer);
 

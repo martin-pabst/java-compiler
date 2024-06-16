@@ -6,6 +6,8 @@ import { ShapeClass } from './ShapeClass';
 import { FilledShapeClass } from './FilledShapeClass';
 import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
+import { StringClass } from '../system/javalang/ObjectClassStringClass';
+import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
 
 export class CircleClass extends FilledShapeClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -19,6 +21,9 @@ export class CircleClass extends FilledShapeClass {
         { type: "method", signature: "final Circle copy()", java: CircleClass.prototype._mj$copy$Circle$, comment: JRC.circleCopyComment },
 
         { type: "method", signature: "final boolean containsPoint(double x, double y)", native: CircleClass.prototype._containsPoint , comment: JRC.shapeContainsPointComment},
+
+        { type: "method", signature: "String toString()", java: CircleClass.prototype._mj$toString$String$ , comment: JRC.objectToStringComment},
+
 
     ]
 
@@ -145,6 +150,20 @@ export class CircleClass extends FilledShapeClass {
         } else {
             return super.collidesWith(otherShape);
         }
+    }
+
+    _mj$toString$String$(t: Thread, callback: CallbackParameter) {
+
+        t.s.push(this._debugOutput);
+
+        if(callback) callback();
+        
+        return;
+    }
+
+    _debugOutput(){
+        let s = `{r: ${this.radius * this.scaleFactor}, mx: ${this._getCenterX()}, my: ${this._getCenterY()} }`;
+        return s;
     }
 
 

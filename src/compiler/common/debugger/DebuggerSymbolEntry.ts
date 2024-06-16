@@ -109,8 +109,15 @@ export class DebuggerSymbolEntry {
             return;
         }
 
+        let caption: string;
+        if(o["_debugOutput"]){
+            caption = o["_debugOutput"]();
+        } else {
+            caption = ValueRenderer.renderValue(o, DebuggerSymbolEntry.quickArrayOutputMaxLength);
+        }
+
         this.treeViewNode.iconClass = "img_debugger-object";
-        this.setCaption(": " +  this.type.toString(), " " + ValueRenderer.renderValue(o, DebuggerSymbolEntry.quickArrayOutputMaxLength), "jo_debugger_value");
+        this.setCaption(": " +  this.type.toString(), " " + caption, "jo_debugger_value");
 
         if (typesDiffer || this.children.length == 0) {
             this.removeChildren();

@@ -9,7 +9,7 @@ export class SymbolTableSection {
     children: StackElementDebuggerEntry[] = [];
 
     constructor(public treeview: Treeview<DebuggerSymbolEntry>, 
-        public symbolTable: BaseSymbolTable) {
+        public symbolTable: BaseSymbolTable, public debugger1: Debugger) {
         
         // divToRenderInto.prepend(this.treeview.outerDiv);
 

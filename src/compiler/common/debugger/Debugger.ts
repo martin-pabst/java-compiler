@@ -2,6 +2,7 @@ import { Treeview } from "../../../tools/components/treeview/Treeview";
 import { TreeviewAccordion } from "../../../tools/components/treeview/TreeviewAccordion";
 import { DebM } from "../../../tools/language/DebuggerMessages";
 import { BaseSymbolTable } from "../BaseSymbolTable";
+import { IMain } from "../IMain.ts";
 import { Scheduler } from "../interpreter/Scheduler";
 import { ProgramState, Thread, ThreadState } from "../interpreter/Thread";
 import { ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager";
@@ -30,7 +31,7 @@ export class Debugger {
 
     watchSection: DebuggerWatchSection;
 
-    constructor(debuggerDiv: HTMLDivElement){
+    constructor(debuggerDiv: HTMLDivElement, public main: IMain){
 
         this.treeviewAccordion = new TreeviewAccordion(debuggerDiv);
         this.initShowVariablesTreeview();
@@ -225,7 +226,7 @@ export class Debugger {
 
         while(remainingSymbolTableSections.length < symbolTablesToShow.length){
             let index = remainingSymbolTableSections.length;
-            remainingSymbolTableSections.push(new SymbolTableSection(this.showVariablesTreeview, symbolTablesToShow[index]));
+            remainingSymbolTableSections.push(new SymbolTableSection(this.showVariablesTreeview, symbolTablesToShow[index], this));
         }
         
         this.currentlyVisibleSymbolTableSections = remainingSymbolTableSections;
