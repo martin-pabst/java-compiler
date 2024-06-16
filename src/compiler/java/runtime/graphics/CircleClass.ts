@@ -154,7 +154,7 @@ export class CircleClass extends FilledShapeClass {
 
     _mj$toString$String$(t: Thread, callback: CallbackParameter) {
 
-        t.s.push(this._debugOutput);
+        t.s.push(new StringClass(this._debugOutput()));
 
         if(callback) callback();
         

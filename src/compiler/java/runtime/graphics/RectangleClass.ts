@@ -6,6 +6,8 @@ import { ShapeClass } from './ShapeClass';
 import { FilledShapeClass } from './FilledShapeClass';
 import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
+import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
+import { StringClass } from '../system/javalang/ObjectClassStringClass';
 
 export class RectangleClass extends FilledShapeClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -19,6 +21,9 @@ export class RectangleClass extends FilledShapeClass {
         { type: "method", signature: "final double getHeight()", template: '(&1.height*&1.scaleFactor)', comment: JRC.rectangleGetHeightComment },
         { type: "method", signature: "final Rectangle copy()", java: RectangleClass.prototype._mj$copy$Rectangle$, comment: JRC.rectangleCopyComment },
         { type: "method", signature: "final void moveTo(double x, double y)", native: RectangleClass.prototype._moveTo, comment: JRC.rectangleMoveToComment },
+
+        { type: "method", signature: "String toString()", java: RectangleClass.prototype._mj$toString$String$ , comment: JRC.objectToStringComment},
+
     ]
 
     static type: NonPrimitiveType;
@@ -116,6 +121,21 @@ export class RectangleClass extends FilledShapeClass {
         this._move(x - this.hitPolygonTransformed[0].x, y - this.hitPolygonTransformed[0].y);
 
     }
+
+    _mj$toString$String$(t: Thread, callback: CallbackParameter) {
+
+        t.s.push(new StringClass(this._debugOutput()));
+
+        if(callback) callback();
+        
+        return;
+    }
+
+    _debugOutput(){
+        let s = `{width: ${this.width * this.scaleFactor}, height: ${this.height * this.scaleFactor}, centerX: ${this._getCenterX()}, centerY: ${this._getCenterY()} }`;
+        return s;
+    }
+
     
 
 }
