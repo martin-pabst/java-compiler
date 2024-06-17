@@ -348,17 +348,17 @@ export class ShapeClass extends ActorClass {
 
     public _getCenterX(): number {
         let p = new PIXI.Point(this.centerXInitial, this.centerYInitial);
-        updateWorldTransformRecursively(this.container, false);
+        // updateWorldTransformRecursively(this.container, false);
         //@ts-ignore
-        this.container._worldTransform.apply(p, p);
+        this.container.worldTransform.apply(p, p);
         return p.x;
     }
 
     public _getCenterY(): number {
         let p = new PIXI.Point(this.centerXInitial, this.centerYInitial);
-        updateWorldTransformRecursively(this.container, false);
+        // updateWorldTransformRecursively(this.container, false);
         //@ts-ignore
-        this.container._worldTransform.apply(p, p);
+        this.container.worldTransform.apply(p, p);
         return p.y;
     }
 

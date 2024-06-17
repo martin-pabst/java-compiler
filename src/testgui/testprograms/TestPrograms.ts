@@ -1,5 +1,12 @@
 export var testProgramsList = [
 ['', ''],
+['TransformationTest', `
+Circle c = new Circle();
+
+c.move(100, 200);
+
+println(c.getCenterX());
+`],
 ['DebuggerTest', `
 A a = new A();
 a.doIt();
