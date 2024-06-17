@@ -6,7 +6,6 @@ import { ShapeClass } from './ShapeClass';
 import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { ExceptionClass } from '../system/javalang/ExceptionClass';
 import { RuntimeExceptionClass } from '../system/javalang/RuntimeException';
-import { updateWorldTransformRecursively } from './PixiHelper';
 
 export class GroupClass extends ShapeClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -88,6 +87,7 @@ export class GroupClass extends ShapeClass {
             throw new RuntimeExceptionClass("Es wurde versucht, eine Gruppe A zu einer Gruppe B hinzuzufügen, wobei B die Gruppe A bereits enthielt. Dies führt zu einem unzulässigen Zirkelbezug.")
         }
         
+        shape.getWorldTransform();
         if (shape.belongsToGroup != null) {
             shape.belongsToGroup.remove(shape);
         } else {
@@ -101,29 +101,27 @@ export class GroupClass extends ShapeClass {
 
 
         // console.log(shape.container.worldTransform);
-        updateWorldTransformRecursively(this.container, false)
-        updateWorldTransformRecursively(shape.container, false);
-        let inverse = new PIXI.Matrix().copyFrom(this.container.worldTransform).invert();
-        inverse.append(shape.container.worldTransform);   // A.append(B)   is B * A
+        let inverse = new PIXI.Matrix().copyFrom(this.getWorldTransform()).invert();
+        inverse.append(shape.getWorldTransform());   // A.append(B)   is B * A
         // shape.container.localTransform.copyFrom(inverse);
         // console.log("before:" + shape.container.localTransform);
         // console.log("inverse:" + shape.container.localTransform);
         shape.container.setFromMatrix(inverse);
         shape.container.updateLocalTransform();
+        shape.worldTransformDirty = true;
         // console.log("after:" + shape.container.localTransform);
         this.container.addChild(shape.container);
-        updateWorldTransformRecursively(shape.container, true);
 
         let count = this.shapes.length;
         // old center of group in world coordinates:
-        let p0: PIXI.Point = this.container.worldTransform.apply(new PIXI.Point(this.centerXInitial, this.centerYInitial));
+        let p0: PIXI.Point = this.getWorldTransform().apply(new PIXI.Point(this.centerXInitial, this.centerYInitial));
 
         let centerOfAddedShape = shape.getCenter();
 
         let x: number = (p0.x * (count - 1) + centerOfAddedShape.x) / count;
         let y: number = (p0.y * (count - 1) + centerOfAddedShape.y) / count;
 
-        let p1: PIXI.Point =  this.container.worldTransform.applyInverse(new PIXI.Point(x, y));
+        let p1: PIXI.Point =  this.getWorldTransform().applyInverse(new PIXI.Point(x, y));
 
         this.centerXInitial = p1.x;
         this.centerYInitial = p1.y;
@@ -162,32 +160,31 @@ export class GroupClass extends ShapeClass {
 
     private deregister(shape: ShapeClass, index: number) {
 
-        updateWorldTransformRecursively(shape.container, false)
-        updateWorldTransformRecursively(this.container, false)
 
+        shape.getWorldTransform();
         this.container.removeChild(shape.container);
         this.world.app.stage.addChild(shape.container);
         
         let inverseStageTransform = new PIXI.Matrix().copyFrom(this.world.app.stage.localTransform).invert();
-        inverseStageTransform.append(shape.container.worldTransform);
+        inverseStageTransform.append(shape.getWorldTransform());
         // shape.container.localTransform.copyFrom(inverseStageTransform);
         shape.container.setFromMatrix(inverseStageTransform);
         shape.container.updateLocalTransform();
+        shape.worldTransformDirty = true;
 
-        updateWorldTransformRecursively(shape.container, false);
 
         shape.belongsToGroup = undefined;
 
         let count = this.shapes.length;
         // old center of group in world coordinates:
-        let p0: PIXI.Point = this.container.worldTransform.apply(new PIXI.Point(this.centerXInitial, this.centerYInitial));
+        let p0: PIXI.Point = this.getWorldTransform().apply(new PIXI.Point(this.centerXInitial, this.centerYInitial));
 
         let centerOfRemovedShape = shape.getCenter();
 
         let x: number = (p0.x * (count + 1) - centerOfRemovedShape.x) / (count);
         let y: number = (p0.y * (count + 1) - centerOfRemovedShape.y) / (count);
 
-        let p1: PIXI.Point =  this.container.worldTransform.applyInverse(new PIXI.Point(x, y));
+        let p1: PIXI.Point =  this.getWorldTransform().applyInverse(new PIXI.Point(x, y));
 
         this.centerXInitial = p1.x;
         this.centerYInitial = p1.y;
@@ -208,5 +205,11 @@ export class GroupClass extends ShapeClass {
         }
         super.destroy();
     }
+
+    setWorldTransformDirty(): void {
+        this.worldTransformDirty = true;
+        for(let shape of this.shapes) shape.setWorldTransformDirty();
+    }
+
 
 }

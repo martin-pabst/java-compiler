@@ -17,39 +17,39 @@ export class ShapeClass extends ActorClass {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "abstract class Shape extends Actor", comment: JRC.shapeClassComment },
 
-        { type: "field", signature: "private double angle" , comment: JRC.shapeAngleComment },
-        { type: "field", signature: "private double centerX" , comment: JRC.shapeCenterXComment },
-        { type: "field", signature: "private double centerY" , comment: JRC.shapeCenterYComment },
+        { type: "field", signature: "private double angle", comment: JRC.shapeAngleComment },
+        { type: "field", signature: "private double centerX", comment: JRC.shapeCenterXComment },
+        { type: "field", signature: "private double centerY", comment: JRC.shapeCenterYComment },
 
         { type: "method", signature: "Shape()", java: ShapeClass.prototype._cj$_constructor_$Shape$ },
-        { type: "method", signature: "final void move(double dx, double dy)", native: ShapeClass.prototype._move , comment: JRC.shapeMoveComment },
-        { type: "method", signature: "final void rotate(double angleInDeg, double centerX, double centerY)", native: ShapeClass.prototype._rotate , comment: JRC.shapeRotateComment1 },
-        { type: "method", signature: "final void rotate(double angleInDeg)", native: ShapeClass.prototype._rotate , comment: JRC.shapeRotateComment2},
-        { type: "method", signature: "final void scale(double factor, double centerX, double centerY)", native: ShapeClass.prototype._scale , comment: JRC.shapeScaleComment1},
-        { type: "method", signature: "final void scale(double factor)", native: ShapeClass.prototype._scale , comment: JRC.shapeScaleComment2},
-        { type: "method", signature: "final void mirrorX()", template: "§1._mirrorXY(-1, 1)" , comment: JRC.shapeMirrorXComment},
-        { type: "method", signature: "final void mirrorY()", template: "§1._mirrorXY(1, -1)" , comment: JRC.shapeMirrorYComment},
-        { type: "method", signature: "final void defineDirection(double angleInDeg)", native: ShapeClass.prototype._defineDirection , comment: JRC.shapeDefineDirectionComment},
-        { type: "method", signature: "final void forward(double distance)", native: ShapeClass.prototype._forward , comment: JRC.shapeForwardComment},
-        { type: "method", signature: "final boolean isOutsideView()", native: ShapeClass.prototype._isOutsideView , comment: JRC.shapeOutsideViewComment},
-        { type: "method", signature: "final double getCenterX()", native: ShapeClass.prototype._getCenterX , comment: JRC.shapeCenterXComment},
-        { type: "method", signature: "final double getCenterY()", native: ShapeClass.prototype._getCenterY , comment: JRC.shapeCenterYComment},
-        { type: "method", signature: "final double getAngle()", template: '(§1.angle)' , comment: JRC.shapeAngleComment},
-        { type: "method", signature: "final boolean containsPoint(double x, double y)", native: ShapeClass.prototype._containsPoint , comment: JRC.shapeContainsPointComment},
-        { type: "method", signature: "final void moveTo(double x, double y)", native: ShapeClass.prototype._moveTo , comment: JRC.shapeMoveToComment},
-        { type: "method", signature: "final void defineCenter(double x, double y)", native: ShapeClass.prototype._defineCenter , comment: JRC.shapeDefineCenterComment},
-        { type: "method", signature: "final void defineCenterRelative(double x, double y)", native: ShapeClass.prototype._defineCenterRelative , comment: JRC.shapeDefineCenterRelativeComment},
-        
-        { type: "method", signature: "static void setDefaultVisibility(boolean isVisible)", native: ShapeClass._setDefaultVisibility , comment: JRC.shapeSetDefaultVisibilityComment},
-        { type: "method", signature: "final void setVisible(boolean isVisible)", native: ShapeClass.prototype._setVisible , comment: JRC.shapeSetVisibleComment},
-        { type: "method", signature: "final boolean isVisible()", template: '§1.container.visible' , comment: JRC.shapeSetVisibleComment},
-        { type: "method", signature: "final void setStatic(boolean isStatic)", native: ShapeClass.prototype._setStatic , comment: JRC.shapeSetStaticComment},
-        
-        { type: "method", signature: "void onMouseUp(double x, double y, int button)", java: ShapeClass.prototype._mj$onMouseUp$void$double$double$int , comment: JRC.shapeOnMouseUpComment},
-        { type: "method", signature: "void onMouseDown(double x, double y, int button)", java: ShapeClass.prototype._mj$onMouseDown$void$double$double$int , comment: JRC.shapeOnMouseDownComment},
-        { type: "method", signature: "void onMouseEnter(double x, double y)", java: ShapeClass.prototype._mj$onMouseEnter$void$double$double , comment: JRC.shapeOnMouseEnterComment},
-        { type: "method", signature: "void onMouseLeave(double x, double y)", java: ShapeClass.prototype._mj$onMouseLeave$void$double$double , comment: JRC.shapeOnMouseLeaveComment},
-        { type: "method", signature: "void onMouseMove(double x, double y)", java: ShapeClass.prototype._mj$onMouseMove$void$double$double , comment: JRC.shapeOnMouseMoveComment},
+        { type: "method", signature: "final void move(double dx, double dy)", native: ShapeClass.prototype._move, comment: JRC.shapeMoveComment },
+        { type: "method", signature: "final void rotate(double angleInDeg, double centerX, double centerY)", native: ShapeClass.prototype._rotate, comment: JRC.shapeRotateComment1 },
+        { type: "method", signature: "final void rotate(double angleInDeg)", native: ShapeClass.prototype._rotate, comment: JRC.shapeRotateComment2 },
+        { type: "method", signature: "final void scale(double factor, double centerX, double centerY)", native: ShapeClass.prototype._scale, comment: JRC.shapeScaleComment1 },
+        { type: "method", signature: "final void scale(double factor)", native: ShapeClass.prototype._scale, comment: JRC.shapeScaleComment2 },
+        { type: "method", signature: "final void mirrorX()", template: "§1._mirrorXY(-1, 1)", comment: JRC.shapeMirrorXComment },
+        { type: "method", signature: "final void mirrorY()", template: "§1._mirrorXY(1, -1)", comment: JRC.shapeMirrorYComment },
+        { type: "method", signature: "final void defineDirection(double angleInDeg)", native: ShapeClass.prototype._defineDirection, comment: JRC.shapeDefineDirectionComment },
+        { type: "method", signature: "final void forward(double distance)", native: ShapeClass.prototype._forward, comment: JRC.shapeForwardComment },
+        { type: "method", signature: "final boolean isOutsideView()", native: ShapeClass.prototype._isOutsideView, comment: JRC.shapeOutsideViewComment },
+        { type: "method", signature: "final double getCenterX()", native: ShapeClass.prototype._getCenterX, comment: JRC.shapeCenterXComment },
+        { type: "method", signature: "final double getCenterY()", native: ShapeClass.prototype._getCenterY, comment: JRC.shapeCenterYComment },
+        { type: "method", signature: "final double getAngle()", template: '(§1.angle)', comment: JRC.shapeAngleComment },
+        { type: "method", signature: "final boolean containsPoint(double x, double y)", native: ShapeClass.prototype._containsPoint, comment: JRC.shapeContainsPointComment },
+        { type: "method", signature: "final void moveTo(double x, double y)", native: ShapeClass.prototype._moveTo, comment: JRC.shapeMoveToComment },
+        { type: "method", signature: "final void defineCenter(double x, double y)", native: ShapeClass.prototype._defineCenter, comment: JRC.shapeDefineCenterComment },
+        { type: "method", signature: "final void defineCenterRelative(double x, double y)", native: ShapeClass.prototype._defineCenterRelative, comment: JRC.shapeDefineCenterRelativeComment },
+
+        { type: "method", signature: "static void setDefaultVisibility(boolean isVisible)", native: ShapeClass._setDefaultVisibility, comment: JRC.shapeSetDefaultVisibilityComment },
+        { type: "method", signature: "final void setVisible(boolean isVisible)", native: ShapeClass.prototype._setVisible, comment: JRC.shapeSetVisibleComment },
+        { type: "method", signature: "final boolean isVisible()", template: '§1.container.visible', comment: JRC.shapeSetVisibleComment },
+        { type: "method", signature: "final void setStatic(boolean isStatic)", native: ShapeClass.prototype._setStatic, comment: JRC.shapeSetStaticComment },
+
+        { type: "method", signature: "void onMouseUp(double x, double y, int button)", java: ShapeClass.prototype._mj$onMouseUp$void$double$double$int, comment: JRC.shapeOnMouseUpComment },
+        { type: "method", signature: "void onMouseDown(double x, double y, int button)", java: ShapeClass.prototype._mj$onMouseDown$void$double$double$int, comment: JRC.shapeOnMouseDownComment },
+        { type: "method", signature: "void onMouseEnter(double x, double y)", java: ShapeClass.prototype._mj$onMouseEnter$void$double$double, comment: JRC.shapeOnMouseEnterComment },
+        { type: "method", signature: "void onMouseLeave(double x, double y)", java: ShapeClass.prototype._mj$onMouseLeave$void$double$double, comment: JRC.shapeOnMouseLeaveComment },
+        { type: "method", signature: "void onMouseMove(double x, double y)", java: ShapeClass.prototype._mj$onMouseMove$void$double$double, comment: JRC.shapeOnMouseMoveComment },
 
 
     ]
@@ -92,7 +92,7 @@ export class ShapeClass extends ActorClass {
         return this._getCenterY();
     }
 
-    mouseEventsImplemented?: {[mouseEvent: string]: MouseEventMethod};
+    mouseEventsImplemented?: { [mouseEvent: string]: MouseEventMethod };
 
     copyFrom(otherShape: ShapeClass) {
         super.copyFrom(otherShape);
@@ -124,36 +124,36 @@ export class ShapeClass extends ActorClass {
             }
 
             let atLeastOneMouseListenerOverridden = false;
-            if(this._mj$onMouseDown$void$double$double$int != ShapeClass.prototype._mj$onMouseDown$void$double$double$int){
+            if (this._mj$onMouseDown$void$double$double$int != ShapeClass.prototype._mj$onMouseDown$void$double$double$int) {
                 atLeastOneMouseListenerOverridden = true;
-                if(!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
+                if (!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
                 this.mouseEventsImplemented["mousedown"] = this._mj$onMouseDown$void$double$double$int;
             }
-            if(this._mj$onMouseUp$void$double$double$int != ShapeClass.prototype._mj$onMouseUp$void$double$double$int){
+            if (this._mj$onMouseUp$void$double$double$int != ShapeClass.prototype._mj$onMouseUp$void$double$double$int) {
                 atLeastOneMouseListenerOverridden = true;
-                if(!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
+                if (!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
                 this.mouseEventsImplemented["mouseup"] = this._mj$onMouseUp$void$double$double$int;
             }
-            if(this._mj$onMouseMove$void$double$double != ShapeClass.prototype._mj$onMouseMove$void$double$double){
+            if (this._mj$onMouseMove$void$double$double != ShapeClass.prototype._mj$onMouseMove$void$double$double) {
                 atLeastOneMouseListenerOverridden = true;
-                if(!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
+                if (!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
                 this.mouseEventsImplemented["mousemove"] = this._mj$onMouseMove$void$double$double;
             }
-            if(this._mj$onMouseEnter$void$double$double != ShapeClass.prototype._mj$onMouseEnter$void$double$double){
+            if (this._mj$onMouseEnter$void$double$double != ShapeClass.prototype._mj$onMouseEnter$void$double$double) {
                 atLeastOneMouseListenerOverridden = true;
-                if(!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
+                if (!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
                 this.mouseEventsImplemented["mouseenter"] = this._mj$onMouseEnter$void$double$double;
             }
-            if(this._mj$onMouseLeave$void$double$double != ShapeClass.prototype._mj$onMouseLeave$void$double$double){
+            if (this._mj$onMouseLeave$void$double$double != ShapeClass.prototype._mj$onMouseLeave$void$double$double) {
                 atLeastOneMouseListenerOverridden = true;
-                if(!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
+                if (!this.mouseEventsImplemented) this.mouseEventsImplemented = {};
                 this.mouseEventsImplemented["mouseleave"] = this._mj$onMouseLeave$void$double$double;
             }
-            if(atLeastOneMouseListenerOverridden){
+            if (atLeastOneMouseListenerOverridden) {
                 this.world.mouseManager.addShapeWithImplementedMouseMethods(this);
             }
 
-            if(callback) callback();
+            if (callback) callback();
 
         });   // call base class constructor
 
@@ -177,11 +177,13 @@ export class ShapeClass extends ActorClass {
         }
 
         this.container.setFromMatrix(this.container.localTransform.translate(dx, dy));
-        
+
+        this.container.updateLocalTransform();
         //@ts-ignore
         this.container._didLocalTransformChangeId = this.container._didChangeId;
-        //this.container.updateLocalTransform();
+
         this.hitPolygonDirty = true;
+        this.setWorldTransformDirty();
     }
 
     _rotate(angleInDeg: number, cX?: number, cY?: number) {
@@ -192,9 +194,7 @@ export class ShapeClass extends ActorClass {
             cY = p.y;
         } else {
             let p = new PIXI.Point(cX, cY);
-            updateWorldTransformRecursively(this.container, false);
-            //@ts-ignore
-            this.container._worldTransform.applyInverse(p, p);
+            this.getWorldTransform().applyInverse(p, p);
             this.container.localTransform.apply(p, p);
             cX = p.x;
             cY = p.y;
@@ -206,11 +206,12 @@ export class ShapeClass extends ActorClass {
 
         this.container.setFromMatrix(this.container.localTransform);
         
+        this.container.updateLocalTransform();
         //@ts-ignore
         this.container._didLocalTransformChangeId = this.container._didChangeId;
-        //this.container.updateLocalTransform();
 
         this.hitPolygonDirty = true;
+        this.setWorldTransformDirty();
 
         this.angle += angleInDeg;
         this.directionRad += angleInDeg / 180 * Math.PI;
@@ -225,9 +226,8 @@ export class ShapeClass extends ActorClass {
             cY = p.y;
         } else {
             let p = new PIXI.Point(cX, cY);
-            updateWorldTransformRecursively(this.container, false);
             //@ts-ignore
-            this.container._worldTransform.applyInverse(p, p);
+            this.getWorldTransform().applyInverse(p, p);
             this.container.localTransform.apply(p, p);
             cX = p.x;
             cY = p.y;
@@ -237,13 +237,14 @@ export class ShapeClass extends ActorClass {
         this.container.localTransform.scale(factor, factor);
         this.container.localTransform.translate(cX, cY);
 
-        
+
         this.container.setFromMatrix(this.container.localTransform);
+        this.container.updateLocalTransform();
         //@ts-ignore
         this.container._didLocalTransformChangeId = this.container._didChangeId;
-        //this.container.updateLocalTransform();
 
         this.hitPolygonDirty = true;
+        this.setWorldTransformDirty();
 
         this.scaleFactor *= factor;
 
@@ -261,12 +262,14 @@ export class ShapeClass extends ActorClass {
         this.container.localTransform.scale(scaleX, scaleY);
         this.container.localTransform.translate(cX, cY);
 
-        
+        this.container.setFromMatrix(this.container.localTransform);
+
+        this.container.updateLocalTransform();
         //@ts-ignore
-        this.container._didLocalTransformChangeId = this.container._didChangeId;this.container.setFromMatrix(this.container.localTransform);
-        //this.container.updateLocalTransform();
+        this.container._didLocalTransformChangeId = this.container._didChangeId;
 
         this.hitPolygonDirty = true;
+        this.setWorldTransformDirty();
 
     }
 
@@ -348,17 +351,13 @@ export class ShapeClass extends ActorClass {
 
     public _getCenterX(): number {
         let p = new PIXI.Point(this.centerXInitial, this.centerYInitial);
-        // updateWorldTransformRecursively(this.container, false);
-        //@ts-ignore
-        this.container.worldTransform.apply(p, p);
+        this.getWorldTransform().apply(p, p);
         return p.x;
     }
 
     public _getCenterY(): number {
         let p = new PIXI.Point(this.centerXInitial, this.centerYInitial);
-        // updateWorldTransformRecursively(this.container, false);
-        //@ts-ignore
-        this.container.worldTransform.apply(p, p);
+        this.getWorldTransform().apply(p, p);
         return p.y;
     }
 
@@ -376,7 +375,7 @@ export class ShapeClass extends ActorClass {
         }
         this.container.destroy();
 
-        if(this.mouseEventsImplemented){
+        if (this.mouseEventsImplemented) {
             this.world.mouseManager.removeShapeWithImplementedMouseMethods(this);
         }
 
@@ -407,14 +406,14 @@ export class ShapeClass extends ActorClass {
         return polygonEnthältPunkt(this.hitPolygonTransformed, { x: x, y: y });
     }
 
-    
 
 
-    _moveTo(x: number, y: number){
+
+    _moveTo(x: number, y: number) {
         this._move(x - this._getCenterX(), y - this._getCenterY())
     }
 
-    _defineCenter(x: number, y: number){
+    _defineCenter(x: number, y: number) {
         let p = new PIXI.Point(x, y);
         this.container.worldTransform.applyInverse(p, p);
         this.centerXInitial = p.x;
@@ -426,7 +425,7 @@ export class ShapeClass extends ActorClass {
         this._defineCenter(bounds.left + bounds.width * x, bounds.top + bounds.height * y);
     }
 
-    static _setDefaultVisibility(isVisible: boolean){
+    static _setDefaultVisibility(isVisible: boolean) {
         FilledShapeDefaults.setDefaultVisibility(isVisible);
     }
 
@@ -446,11 +445,11 @@ export class ShapeClass extends ActorClass {
         }
     }
 
-    _mj$onMouseUp$void$double$double$int(t: Thread, callback: CallbackParameter, x: number, y: number, button: number){}
-    _mj$onMouseDown$void$double$double$int(t: Thread, callback: CallbackParameter, x: number, y: number, button: number){}
-    _mj$onMouseEnter$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number, button: number){}
-    _mj$onMouseLeave$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number, button: number){}
-    _mj$onMouseMove$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number, button: number){}
+    _mj$onMouseUp$void$double$double$int(t: Thread, callback: CallbackParameter, x: number, y: number, button: number) { }
+    _mj$onMouseDown$void$double$double$int(t: Thread, callback: CallbackParameter, x: number, y: number, button: number) { }
+    _mj$onMouseEnter$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number, button: number) { }
+    _mj$onMouseLeave$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number, button: number) { }
+    _mj$onMouseMove$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number, button: number) { }
 
     collidesWith(otherShape: ShapeClass): boolean {
 
@@ -487,6 +486,35 @@ export class ShapeClass extends ActorClass {
         // return polygonBerührtPolygon(this.hitPolygonTransformed, shapeHelper.hitPolygonTransformed);
         return polygonBerührtPolygonExakt(this.hitPolygonTransformed, otherShape.hitPolygonTransformed, true, true);
 
+    }
+
+    worldTransformDirty: boolean = true;
+
+    setWorldTransformDirty(){
+        this.worldTransformDirty = true;
+    }
+
+    public getWorldTransform(): PIXI.Matrix {
+        //@ts-ignore
+        if (!this.worldTransformDirty) return this.container._worldTransform;
+        if (this.belongsToGroup != null) this.belongsToGroup.getWorldTransform();
+        let parent = this.container.parent;
+
+        //@ts-ignore
+        this.container._worldTransform ||= new PIXI.Matrix();
+        //@ts-ignore
+        if (parent && parent._worldTransform) {
+            //@ts-ignore
+            PIXI.updateWorldTransform(this.container.localTransform, parent._worldTransform, this.container._worldTransform);
+        } else {
+            //@ts-ignore
+            this.container._worldTransform.copyFrom(this.container.localTransform);
+        }
+
+        this.worldTransformDirty = false;
+
+        //@ts-ignore
+        return this.container._worldTransform;
     }
 
 }
