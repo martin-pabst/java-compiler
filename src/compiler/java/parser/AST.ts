@@ -339,6 +339,7 @@ export interface ASTAttributeDereferencingNode extends ASTTermNode {
 
 export interface ASTNewObjectNode extends ASTTermNode {
     kind: TokenType.newObject;
+    klassIdentifierRange: monaco.IRange;
     type: ASTTypeNode;
     parameterValues: ASTTermNode[];
     object?: ASTTermNode;

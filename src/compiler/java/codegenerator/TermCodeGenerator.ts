@@ -224,7 +224,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let methods = this.searchMethod(klassType.identifier, klassType, parameterValues.map(p => p?.type), true, false, true, node.range);
         let method = methods.best;
 
-        this.module.pushMethodCallPosition(node.range, node.commaPositions, methods.possible,
+        this.module.pushMethodCallPosition(node.klassIdentifierRange, node.commaPositions, methods.possible,
             node.rightBracketPosition!, method
         )
 

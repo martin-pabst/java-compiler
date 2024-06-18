@@ -414,6 +414,7 @@ export class ASTNodeFactory {
         return {
             kind: TokenType.newObject,
             range: startToken.range,
+            klassIdentifierRange: type.range,
             parameterValues: [],
             type: type,
             object: object,

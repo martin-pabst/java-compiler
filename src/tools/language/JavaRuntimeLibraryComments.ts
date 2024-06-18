@@ -600,7 +600,7 @@ export class JRC {
     })
 
     /**
-     * Class Ard
+     * Class Arc
      */
 
     static ArcClassComment = () => lm({
@@ -656,6 +656,71 @@ export class JRC {
     static ArcCopyComment = () => lm({
         "de": "Erstellt eine Kopie des arc-Objekts und git sie zurück.",
         "en": "Creates a exact copy of this arc object and returns it.",
+    })
+
+
+    /**
+     * Class Sector
+     */
+
+    static SectorClassComment = () => lm({
+    "de": "Kreisbogen/Kreissektor",
+    "en": "Sector",
+    })
+
+    static SectorConstructorComment = () => lm({
+    "de": "Instanziert einen neuen Kreisbogen. (mx, my) ist der Mittelpunt, ri sein Innenradius, ra sein Außenradius. Der Kreisbogen wird von startAngle bis endAngle (beides in Grad) gegen den Uhrzeigersinn gezogen.",
+    "en": "Creates a new Sector. (mx, my) is it's center, ri it's inner radius, ra it's outer radius. The sector will be drawn from startAngle up to endAngle (both in degrees) counterclockwise.",
+    })
+
+    static SectorSetRadiusComment = () => lm({
+    "de": "Setzt den Innenradius des Kreisbogens.",
+    "en": "Sets inner radius of sector.",
+    })
+
+    static SectorSetOuterRadiusComment = () => lm({
+    "de": "Setzt den Außenradius des Kreisbogens.",
+    "en": "Sets outer radius of sector.",
+    })
+
+    static SectorSetStartAngleComment = () => lm({
+    "de": "Setzt den Startwinkel des Kreisbogens (in Grad).",
+    "en": "Sets start angle of sector (in degrees).",
+    })
+
+    static SectorSetEndAngleComment = () => lm({
+    "de": "Setzt den Endwinkel des Kreisbogens (in Grad).",
+    "en": "Sets end angle of sector (in degrees).",
+    })
+
+    static SectorGetRadiusComment = () => lm({
+    "de": "Liefert den Innenradius des Kreisbogens.",
+    "en": "Gets inner radius of sector.",
+    })
+
+    static SectorGetOuterRadiusComment = () => lm({
+    "de": "Liefert den Außenradius des Kreisbogens.",
+    "en": "Gets outer radius of sector.",
+    })
+
+    static SectorGetStartAngleComment = () => lm({
+    "de": "Liefert den Startwinkel des Kreisbogens (in Grad).",
+    "en": "Gets start angle of sector (in degrees).",
+    })
+
+    static SectorGetEndAngleComment = () => lm({
+    "de": "Liefert den Endwinkel des Kreisbogens (in Grad).",
+    "en": "Gets end angle of sector (in degrees).",
+    })
+
+    static SectorDrawRadiiComment = () => lm({
+    "de": "Legt fest, ob beim Zeichnen des Umrisses auch die beiden Radii ( = Strecken vom Mittelpunkt zur Kreislinie) mitgezeichnet werden sollen.",
+    "en": "Set to true if drawn border should also contain the radii ( = lines from center to the arc perimeter )",
+    })
+
+    static SectorCopyComment = () => lm({
+        "de": "Erstellt eine Kopie des sector-Objekts und git sie zurück.",
+        "en": "Creates a exact copy of this sector object and returns it.",
     })
 
 
