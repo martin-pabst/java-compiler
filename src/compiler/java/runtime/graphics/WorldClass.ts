@@ -101,7 +101,7 @@ export class WorldClass extends ObjectClass implements IWorld {
 
         t.state = ThreadState.waiting;
         this.app = new PIXI.Application();
-        this.app.init({ background: '#000000', width: width, height: height, resizeTo: undefined }).then(() => {
+        this.app.init({ background: '#000000', width: width, height: height, resizeTo: undefined, antialias: true }).then(() => {
 
             this.app!.canvas.style.width = "10px";
             this.app!.canvas.style.height = "10px";
@@ -209,9 +209,10 @@ export class WorldClass extends ObjectClass implements IWorld {
 
     onProgramStopped() {
 
-        const stageSize = {
+        const stageSize: PIXI.TextureSourceOptions = {
             width: this.app!.screen.width,
             height: this.app!.screen.height,
+            antialias: true
         };
 
         // Create two render textures... these dynamic textures will be used to draw the scene into itself
@@ -219,7 +220,7 @@ export class WorldClass extends ObjectClass implements IWorld {
         this.app!.renderer.render({
             container: this.app!.stage,
             target: renderTexture,
-            clear: false,
+            clear: false
         });
         setTimeout(() => {
             if (!this.app) return;
