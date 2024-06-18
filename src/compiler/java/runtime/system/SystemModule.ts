@@ -61,6 +61,7 @@ import { SpriteClass, TileImageClass } from "../graphics/SpriteClass.ts";
 import { MouseListenerInterface } from "../graphics/MouseListenerInterface.ts";
 import { CircleClass } from "../graphics/CircleClass.ts";
 import { EllipseClass } from "../graphics/EllipseClass.ts";
+import { ArcClass } from "../graphics/ArcClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -115,7 +116,7 @@ export class SystemModule extends JavaLibraryModule {
             MouseListenerInterface,
             WorldClass, ActorClass, ShapeClass, FilledShapeClass, RectangleClass, GroupClass,
             ScaleModeEnum, RepeatTypeEnum, SpriteLibraryEnum, TileImageClass, SpriteClass, // Sprite
-            CircleClass, EllipseClass
+            CircleClass, EllipseClass, ArcClass
         )
 
     }

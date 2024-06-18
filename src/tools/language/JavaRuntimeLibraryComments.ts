@@ -600,6 +600,67 @@ export class JRC {
     })
 
     /**
+     * Class Ard
+     */
+
+    static ArcClassComment = () => lm({
+    "de": "Kreisbogenumriss (wahlweise gefüllt)",
+    "en": "Arc (filled/not filled)",
+    })
+
+    static ArcConstructorComment = () => lm({
+    "de": "Instanziert einen neuen Kreisbogen. (mx, my) ist der Mittelpunt, ri sein Innenradius, ra sein Außenradius. Der Kreisbogen wird von startAngle bis endAngle (beides in Grad) gegen den Uhrzeigersinn gezogen.",
+    "en": "Creates a new Arc. (mx, my) is it's center, ri it's inner radius, ra it's outer radius. The arc will be drawn from startAngle up to endAngle (both in degrees) counterclockwise.",
+    })
+
+    static ArcSetInnerRadiusComment = () => lm({
+    "de": "Setzt den Innenradius des Kreisbogens.",
+    "en": "Sets inner radius of arc.",
+    })
+
+    static ArcSetOuterRadiusComment = () => lm({
+    "de": "Setzt den Außenradius des Kreisbogens.",
+    "en": "Sets outer radius of arc.",
+    })
+
+    static ArcSetStartAngleComment = () => lm({
+    "de": "Setzt den Startwinkel des Kreisbogens (in Grad).",
+    "en": "Sets start angle of arc (in degrees).",
+    })
+
+    static ArcSetEndAngleComment = () => lm({
+    "de": "Setzt den Endwinkel des Kreisbogens (in Grad).",
+    "en": "Sets end angle of arc (in degrees).",
+    })
+
+    static ArcGetInnerRadiusComment = () => lm({
+    "de": "Liefert den Innenradius des Kreisbogens.",
+    "en": "Gets inner radius of arc.",
+    })
+
+    static ArcGetOuterRadiusComment = () => lm({
+    "de": "Liefert den Außenradius des Kreisbogens.",
+    "en": "Gets outer radius of arc.",
+    })
+
+    static ArcGetStartAngleComment = () => lm({
+    "de": "Liefert den Startwinkel des Kreisbogens (in Grad).",
+    "en": "Gets start angle of arc (in degrees).",
+    })
+
+    static ArcGetEndAngleComment = () => lm({
+    "de": "Liefert den Endwinkel des Kreisbogens (in Grad).",
+    "en": "Gets end angle of arc (in degrees).",
+    })
+
+    static ArcCopyComment = () => lm({
+        "de": "Erstellt eine Kopie des arc-Objekts und git sie zurück.",
+        "en": "Creates a exact copy of this arc object and returns it.",
+    })
+
+
+
+    /**
      * Class ellipse
      */
 
