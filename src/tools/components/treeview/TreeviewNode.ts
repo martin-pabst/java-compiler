@@ -75,6 +75,10 @@ export class TreeviewNode<E> {
         _treeview.addNodeInternal(this);
     }
 
+    set renderCaptionAsHtml(value: boolean){
+        this._renderCaptionAsHtml = value;
+    }
+
     findAndCorrectParent() {
         let parent = this.treeview.findParent(this);
         if (this.parent != parent) {

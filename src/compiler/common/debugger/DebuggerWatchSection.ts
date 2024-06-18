@@ -13,6 +13,7 @@ export class DebuggerWatchSection {
     constructor(private treeview: Treeview<DebuggerWatchEntry>){
         treeview.newNodeCallback = (text: string, node: TreeviewNode<DebuggerWatchEntry>): DebuggerWatchEntry => {
             let dwe = new DebuggerWatchEntry(text);
+            node.renderCaptionAsHtml = true;
             if(this.lastRepl) this.updateNode(node, dwe, this.lastRepl);
             return dwe;
         }
@@ -46,7 +47,10 @@ export class DebuggerWatchSection {
             valueAsString = ValueRenderer.renderValue(value, 20);
         }
 
-        node.caption = debuggerWatchEntry.term + " = " + valueAsString;
+        monaco.editor.colorize(debuggerWatchEntry.term + " = " + valueAsString, 'myJava', { tabSize: 3 }).then((formattedValue) => {
+            node.caption = formattedValue;
+        })
+
 
     }
     
