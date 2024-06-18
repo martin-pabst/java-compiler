@@ -148,63 +148,63 @@ export class JRC {
     })
 
     static stringToLowerCaseComment = () => lm({
-    "de": "Gibt einen String zurück, der den String in Kleinschreibung enthält.",
-    "en": "Converts all of the characters in this String to lower case using the rules of the default locale.",
+        "de": "Gibt einen String zurück, der den String in Kleinschreibung enthält.",
+        "en": "Converts all of the characters in this String to lower case using the rules of the default locale.",
     })
 
     static stringToUpperCaseComment = () => lm({
-    "de": "Gibt einen String zurück, der den String in Großschreibung enthält.",
-    "en": "Converts all of the characters in this String to upper case using the rules of the default locale.",
+        "de": "Gibt einen String zurück, der den String in Großschreibung enthält.",
+        "en": "Converts all of the characters in this String to upper case using the rules of the default locale.",
     })
 
     static stringSubstringComment1 = () => lm({
-    "de": "Gibt den Teilstring ab der übergebenen Position zurück. Position 0 ist der Beginn des Strings.",
-    "en": "Returns a string that is a substring of this string from given position on. Position 0 is start of string.",
+        "de": "Gibt den Teilstring ab der übergebenen Position zurück. Position 0 ist der Beginn des Strings.",
+        "en": "Returns a string that is a substring of this string from given position on. Position 0 is start of string.",
     })
 
     static stringSubstringComment2 = () => lm({
-    "de": "Gibt den Teilstring zwischen den beiden übergebenen Positionen zurück. Position 0 ist der Beginn des Strings.",
-    "en": "Returns a string that is a substring of this string between given positions. Position 0 is start of string.",
+        "de": "Gibt den Teilstring zwischen den beiden übergebenen Positionen zurück. Position 0 ist der Beginn des Strings.",
+        "en": "Returns a string that is a substring of this string between given positions. Position 0 is start of string.",
     })
 
     static stringTrimComment = () => lm({
-    "de": "Gibt den String zurück, der entsteht, wenn man an Beginn und Ende alle unsichtbaren Zeichen (d.h. Leerzeichen, tabs und Zeilenumbrüche) entfernt.",
-    "en": "Returns a string whose value is this string, with any leading and trailing whitespace removed.",
+        "de": "Gibt den String zurück, der entsteht, wenn man an Beginn und Ende alle unsichtbaren Zeichen (d.h. Leerzeichen, tabs und Zeilenumbrüche) entfernt.",
+        "en": "Returns a string whose value is this string, with any leading and trailing whitespace removed.",
     })
 
     static stringReplaceComment = () => lm({
-    "de": "Ersetzt alle Vorkommen von **target** durch **replacement** und gibt die entstandene Zeichenkette zurück. Die Zeichenkette selbst wird nicht verändert.",
-    "en": "Replaces each substring of this string that matches the literal target sequence with the specified literal replacement sequence.",
+        "de": "Ersetzt alle Vorkommen von **target** durch **replacement** und gibt die entstandene Zeichenkette zurück. Die Zeichenkette selbst wird nicht verändert.",
+        "en": "Replaces each substring of this string that matches the literal target sequence with the specified literal replacement sequence.",
     })
 
     static stringReplaceAllComment = () => lm({
-    "de": "Durchsucht den String mit dem regulären Ausdruck (regex) und ersetzt **alle** Fundstellen durch **replacement**.",
-    "en": "Replaces each substring of this string that matches the given regular expression with the given replacement.",
+        "de": "Durchsucht den String mit dem regulären Ausdruck (regex) und ersetzt **alle** Fundstellen durch **replacement**.",
+        "en": "Replaces each substring of this string that matches the given regular expression with the given replacement.",
     })
 
     static stringMatchesComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn der Wert der Zeichenkette dem regulären Ausdruck (regex) entspricht.",
-    "en": "Tells whether or not this string matches the given regular expression.",
+        "de": "Gibt genau dann true zurück, wenn der Wert der Zeichenkette dem regulären Ausdruck (regex) entspricht.",
+        "en": "Tells whether or not this string matches the given regular expression.",
     })
 
     static stringReplaceFirstComment = () => lm({
-    "de": "Durchsucht den String mit dem regulären Ausdruck (regex) und ersetzt **die erste** Fundstelle durch **replacement**.",
-    "en": "Replaces the first substring of this string that matches the given regular expression with the given replacement.",
+        "de": "Durchsucht den String mit dem regulären Ausdruck (regex) und ersetzt **die erste** Fundstelle durch **replacement**.",
+        "en": "Replaces the first substring of this string that matches the given regular expression with the given replacement.",
     })
 
     static stringSplitComment = () => lm({
-    "de": "Teilt die Zeichenkette an den Stellen, die durch den regulären Ausdruck (regex) definiert sind, in Teile auf. Die Fundstellen des regex werden dabei weggelassen. Gibt die Teile als String-Array zurück.",
-    "en": "Splits this string around matches of the given regular expression.",
+        "de": "Teilt die Zeichenkette an den Stellen, die durch den regulären Ausdruck (regex) definiert sind, in Teile auf. Die Fundstellen des regex werden dabei weggelassen. Gibt die Teile als String-Array zurück.",
+        "en": "Splits this string around matches of the given regular expression.",
     })
 
     static hashCodeComment = () => lm({
-    "de": "Gibt den Hashcode des String zurück. Er wird wie folgt berechnet: s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]. Dabei ist s[i] das i-te Zeichen des Strings.",
-    "en": "Returns a hash code for this string. The hash code for a String object is computed as s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]",
+        "de": "Gibt den Hashcode des String zurück. Er wird wie folgt berechnet: s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]. Dabei ist s[i] das i-te Zeichen des Strings.",
+        "en": "Returns a hash code for this string. The hash code for a String object is computed as s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]",
     })
 
     static stringToCharArrayComment = () => lm({
-    "de": "Wandelt den String in ein char[] um.",
-    "en": "Converts given String to char[].",
+        "de": "Wandelt den String in ein char[] um.",
+        "en": "Converts given String to char[].",
     })
 
     /**
@@ -604,53 +604,53 @@ export class JRC {
      */
 
     static ArcClassComment = () => lm({
-    "de": "Kreisbogenumriss (wahlweise gefüllt)",
-    "en": "Arc (filled/not filled)",
+        "de": "Kreisbogenumriss (wahlweise gefüllt)",
+        "en": "Arc (filled/not filled)",
     })
 
     static ArcConstructorComment = () => lm({
-    "de": "Instanziert einen neuen Kreisbogen. (mx, my) ist der Mittelpunt, ri sein Innenradius, ra sein Außenradius. Der Kreisbogen wird von startAngle bis endAngle (beides in Grad) gegen den Uhrzeigersinn gezogen.",
-    "en": "Creates a new Arc. (mx, my) is it's center, ri it's inner radius, ra it's outer radius. The arc will be drawn from startAngle up to endAngle (both in degrees) counterclockwise.",
+        "de": "Instanziert einen neuen Kreisbogen. (mx, my) ist der Mittelpunt, ri sein Innenradius, ra sein Außenradius. Der Kreisbogen wird von startAngle bis endAngle (beides in Grad) gegen den Uhrzeigersinn gezogen.",
+        "en": "Creates a new Arc. (mx, my) is it's center, ri it's inner radius, ra it's outer radius. The arc will be drawn from startAngle up to endAngle (both in degrees) counterclockwise.",
     })
 
     static ArcSetInnerRadiusComment = () => lm({
-    "de": "Setzt den Innenradius des Kreisbogens.",
-    "en": "Sets inner radius of arc.",
+        "de": "Setzt den Innenradius des Kreisbogens.",
+        "en": "Sets inner radius of arc.",
     })
 
     static ArcSetOuterRadiusComment = () => lm({
-    "de": "Setzt den Außenradius des Kreisbogens.",
-    "en": "Sets outer radius of arc.",
+        "de": "Setzt den Außenradius des Kreisbogens.",
+        "en": "Sets outer radius of arc.",
     })
 
     static ArcSetStartAngleComment = () => lm({
-    "de": "Setzt den Startwinkel des Kreisbogens (in Grad).",
-    "en": "Sets start angle of arc (in degrees).",
+        "de": "Setzt den Startwinkel des Kreisbogens (in Grad).",
+        "en": "Sets start angle of arc (in degrees).",
     })
 
     static ArcSetEndAngleComment = () => lm({
-    "de": "Setzt den Endwinkel des Kreisbogens (in Grad).",
-    "en": "Sets end angle of arc (in degrees).",
+        "de": "Setzt den Endwinkel des Kreisbogens (in Grad).",
+        "en": "Sets end angle of arc (in degrees).",
     })
 
     static ArcGetInnerRadiusComment = () => lm({
-    "de": "Liefert den Innenradius des Kreisbogens.",
-    "en": "Gets inner radius of arc.",
+        "de": "Liefert den Innenradius des Kreisbogens.",
+        "en": "Gets inner radius of arc.",
     })
 
     static ArcGetOuterRadiusComment = () => lm({
-    "de": "Liefert den Außenradius des Kreisbogens.",
-    "en": "Gets outer radius of arc.",
+        "de": "Liefert den Außenradius des Kreisbogens.",
+        "en": "Gets outer radius of arc.",
     })
 
     static ArcGetStartAngleComment = () => lm({
-    "de": "Liefert den Startwinkel des Kreisbogens (in Grad).",
-    "en": "Gets start angle of arc (in degrees).",
+        "de": "Liefert den Startwinkel des Kreisbogens (in Grad).",
+        "en": "Gets start angle of arc (in degrees).",
     })
 
     static ArcGetEndAngleComment = () => lm({
-    "de": "Liefert den Endwinkel des Kreisbogens (in Grad).",
-    "en": "Gets end angle of arc (in degrees).",
+        "de": "Liefert den Endwinkel des Kreisbogens (in Grad).",
+        "en": "Gets end angle of arc (in degrees).",
     })
 
     static ArcCopyComment = () => lm({
@@ -664,58 +664,58 @@ export class JRC {
      */
 
     static SectorClassComment = () => lm({
-    "de": "Kreisbogen/Kreissektor",
-    "en": "Sector",
+        "de": "Kreisbogen/Kreissektor",
+        "en": "Sector",
     })
 
     static SectorConstructorComment = () => lm({
-    "de": "Instanziert einen neuen Kreisbogen. (mx, my) ist der Mittelpunt, ri sein Innenradius, ra sein Außenradius. Der Kreisbogen wird von startAngle bis endAngle (beides in Grad) gegen den Uhrzeigersinn gezogen.",
-    "en": "Creates a new Sector. (mx, my) is it's center, ri it's inner radius, ra it's outer radius. The sector will be drawn from startAngle up to endAngle (both in degrees) counterclockwise.",
+        "de": "Instanziert einen neuen Kreisbogen. (mx, my) ist der Mittelpunt, ri sein Innenradius, ra sein Außenradius. Der Kreisbogen wird von startAngle bis endAngle (beides in Grad) gegen den Uhrzeigersinn gezogen.",
+        "en": "Creates a new Sector. (mx, my) is it's center, ri it's inner radius, ra it's outer radius. The sector will be drawn from startAngle up to endAngle (both in degrees) counterclockwise.",
     })
 
     static SectorSetRadiusComment = () => lm({
-    "de": "Setzt den Innenradius des Kreisbogens.",
-    "en": "Sets inner radius of sector.",
+        "de": "Setzt den Innenradius des Kreisbogens.",
+        "en": "Sets inner radius of sector.",
     })
 
     static SectorSetOuterRadiusComment = () => lm({
-    "de": "Setzt den Außenradius des Kreisbogens.",
-    "en": "Sets outer radius of sector.",
+        "de": "Setzt den Außenradius des Kreisbogens.",
+        "en": "Sets outer radius of sector.",
     })
 
     static SectorSetStartAngleComment = () => lm({
-    "de": "Setzt den Startwinkel des Kreisbogens (in Grad).",
-    "en": "Sets start angle of sector (in degrees).",
+        "de": "Setzt den Startwinkel des Kreisbogens (in Grad).",
+        "en": "Sets start angle of sector (in degrees).",
     })
 
     static SectorSetEndAngleComment = () => lm({
-    "de": "Setzt den Endwinkel des Kreisbogens (in Grad).",
-    "en": "Sets end angle of sector (in degrees).",
+        "de": "Setzt den Endwinkel des Kreisbogens (in Grad).",
+        "en": "Sets end angle of sector (in degrees).",
     })
 
     static SectorGetRadiusComment = () => lm({
-    "de": "Liefert den Innenradius des Kreisbogens.",
-    "en": "Gets inner radius of sector.",
+        "de": "Liefert den Innenradius des Kreisbogens.",
+        "en": "Gets inner radius of sector.",
     })
 
     static SectorGetOuterRadiusComment = () => lm({
-    "de": "Liefert den Außenradius des Kreisbogens.",
-    "en": "Gets outer radius of sector.",
+        "de": "Liefert den Außenradius des Kreisbogens.",
+        "en": "Gets outer radius of sector.",
     })
 
     static SectorGetStartAngleComment = () => lm({
-    "de": "Liefert den Startwinkel des Kreisbogens (in Grad).",
-    "en": "Gets start angle of sector (in degrees).",
+        "de": "Liefert den Startwinkel des Kreisbogens (in Grad).",
+        "en": "Gets start angle of sector (in degrees).",
     })
 
     static SectorGetEndAngleComment = () => lm({
-    "de": "Liefert den Endwinkel des Kreisbogens (in Grad).",
-    "en": "Gets end angle of sector (in degrees).",
+        "de": "Liefert den Endwinkel des Kreisbogens (in Grad).",
+        "en": "Gets end angle of sector (in degrees).",
     })
 
     static SectorDrawRadiiComment = () => lm({
-    "de": "Legt fest, ob beim Zeichnen des Umrisses auch die beiden Radii ( = Strecken vom Mittelpunkt zur Kreislinie) mitgezeichnet werden sollen.",
-    "en": "Set to true if drawn border should also contain the radii ( = lines from center to the arc perimeter )",
+        "de": "Legt fest, ob beim Zeichnen des Umrisses auch die beiden Radii ( = Strecken vom Mittelpunkt zur Kreislinie) mitgezeichnet werden sollen.",
+        "en": "Set to true if drawn border should also contain the radii ( = lines from center to the arc perimeter )",
     })
 
     static SectorCopyComment = () => lm({
@@ -723,7 +723,65 @@ export class JRC {
         "en": "Creates a exact copy of this sector object and returns it.",
     })
 
+    /**
+     * Class Polygon
+     */
 
+    static PolygonClassComment = () => lm({
+        "de": "Polygon",
+        "en": "polygon",
+    })
+
+    static PolygonEmptyConstructorComment = () => lm({
+        "de": "Instanziert ein neues Polygon. Der Standardkonstruktor ohne Parameter instanziert ein regelmäßiges Sechseck. \nTipp: Es gibt auch Konstruktoren, denen man ein Array von Koordinaten bzw. einzelne Koordinaten übergeben kann!",
+        "en": "Creates a polygon. The parameterless constructor creates a regular hexagon. \nHint: There are constructors that take (an array of) coordinates.",
+    })
+
+    static PolygonConstructor1Comment = () => lm({
+        "de": "Instanziert ein neues Polygon. Die Punkte werden als Array von double-Werten der Form {x1, y1, x2, y2, ...} übergeben.",
+        "en": "Creates a polygon. Points are given as array of double-values in this order: {x1, y1, x2, y2, ...}",
+    })
+
+    static PolygonConstructor2Comment = () => lm({
+    "de": "Instanziert ein neues Polygon. Die Punkte werden als double-Werte der Form x1, y1, x2, y2, ... übergeben.",
+    "en": "Creates a polygon. Points are given as double-values in this order: x1, y1, x2, y2, ...",
+    })
+
+    static PolygonConstructorShapeComment = () => lm({
+    "de": "Instanziert ein neues Polygon. Seine Punkte sind die Punkte des Hitpolygons der übergebenen Figur.",
+    "en": "Creates a polygon based on given shape's hitpolygon.",
+    })
+
+    static PolygonCopyComment = () => lm({
+        "de": "Erstellt eine Kopie des polygon-Objekts und git sie zurück.",
+        "en": "Creates a exact copy of this polygon object and returns it.",
+    })
+
+    static PolygonAddPointComment = () => lm({
+    "de": "Fügt dem Polygon einen Punkt hinzu.",
+    "en": "Adds a point to the polygon.",
+    })
+
+    static PolygonSetPointsComment = () => lm({
+    "de": "Löscht alle Punkte des Polygons und setzt komplett neue. Diese werden in einem double[] übergeben, das abwechselnd die x- und y-Koordinaten enthält.",
+    "en": "Remove all points from polygon and replace them by given ones. Given double-array contains alternating x- and y-coordinates.",
+    })
+
+
+    static PolygonAddPointsComment = () => lm({
+    "de": "Fügt dem Polygon mehrere Punkte hinzu. Diese werden in einem double[] übergeben, das abwechselnd die x- und y-Koordinaten enthält.",
+    "en": "Add given points to polygon. Given double-array contains alternating x- and y-coordinates.",
+    })
+
+    static PolygonInsertPointComment = () => lm({
+    "de": "Fügt dem Polygon einen Punkt als 'index-ter' Punkt hinzu. index == 0 => ganz am Anfang; index == Anzahl der bisherigen Punkte => ganz am Ende;",
+    "en": "Insert point on given index into polygon. index == 0 means 'at the beginning', index == number of points means 'at the end'.",
+    })
+
+    static PolygonMovePointToComment = () => lm({
+    "de": 'Schiebt den index-ten Punkt nach (x, y). index == 0 => erster Punkt, index == 1 => zweiter Punkt usw.',
+    "en": "",
+    })
 
     /**
      * Class ellipse

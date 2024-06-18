@@ -63,6 +63,7 @@ import { CircleClass } from "../graphics/CircleClass.ts";
 import { EllipseClass } from "../graphics/EllipseClass.ts";
 import { ArcClass } from "../graphics/ArcClass.ts";
 import { SectorClass } from "../graphics/SectorClass.ts";
+import { PolygonClass } from "../graphics/PolygonClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -117,7 +118,8 @@ export class SystemModule extends JavaLibraryModule {
             MouseListenerInterface,
             WorldClass, ActorClass, ShapeClass, FilledShapeClass, RectangleClass, GroupClass,
             ScaleModeEnum, RepeatTypeEnum, SpriteLibraryEnum, TileImageClass, SpriteClass, // Sprite
-            CircleClass, EllipseClass, ArcClass, SectorClass
+            CircleClass, EllipseClass, ArcClass, SectorClass,
+            PolygonClass
         )
 
     }
