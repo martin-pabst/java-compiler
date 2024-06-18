@@ -600,6 +600,50 @@ export class JRC {
     })
 
     /**
+     * Class ellipse
+     */
+
+    static EllipseClassComment = () => lm({
+        "de": "Ellipse",
+        "en": "ellipse",
+    })
+
+    static EllipseEmptyConstructorComment = () => lm({
+        "de": "Instanziert einen neuen Ellipse mit Mittelpunkt (200, 100) und den Radien 100 und 50.",
+        "en": "Creates a new ellipse object with center at (200, 100) and radii 100, 50.",
+    })
+
+    static EllipseConstructorComment = () => lm({
+        "de": "Instanziert eine neuen Ellipse. (mx, my) ist der Mittelpunt, rx ihr Radius in x-Richtung, ry ihr Radius in y-Richtung.",
+        "en": "Creates a new ellipse object with center at (mx, my) and given radii in rx, ry.",
+    })
+
+    static EllipseSetRadiusXComment = () => lm({
+        "de": "Setzt den Radius der Ellipse in X-Richtung.",
+        "en": "Set radius of ellipse in x-direction.",
+    })
+
+    static EllipseSetRadiusYComment = () => lm({
+        "de": "Setzt den Radius der Ellipse in Y-Richtung.",
+        "en": "Set radius of ellipse in y-direction.",
+    })
+
+    static EllipseGetRadiusXComment = () => lm({
+        "de": "Gibt den x-Radius der Ellipse zurück.",
+        "en": "Gets x-radius.",
+    })
+
+    static EllipseGetRadiusYComment = () => lm({
+        "de": "Gibt den y-Radius der Ellipse zurück.",
+        "en": "Gets y-radius.",
+    })
+
+    static EllipseCopyComment = () => lm({
+        "de": "Erstellt eine Kopie des ellipse-Objekts und git sie zurück.",
+        "en": "Creates a exact copy of this ellipse object and returns it.",
+    })
+
+    /**
      * Interface MouseListener
      */
     static mouseListenerInterfaceComment = () => lm({
