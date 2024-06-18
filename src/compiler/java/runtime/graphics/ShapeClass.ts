@@ -182,8 +182,7 @@ export class ShapeClass extends ActorClass {
         //@ts-ignore
         this.container._didLocalTransformChangeId = this.container._didChangeId;
 
-        this.hitPolygonDirty = true;
-        this.setWorldTransformDirty();
+        this.setWorldTransformAndHitPolygonDirty();
     }
 
     _rotate(angleInDeg: number, cX?: number, cY?: number) {
@@ -210,8 +209,7 @@ export class ShapeClass extends ActorClass {
         //@ts-ignore
         this.container._didLocalTransformChangeId = this.container._didChangeId;
 
-        this.hitPolygonDirty = true;
-        this.setWorldTransformDirty();
+        this.setWorldTransformAndHitPolygonDirty();
 
         this.angle += angleInDeg;
         this.directionRad += angleInDeg / 180 * Math.PI;
@@ -243,8 +241,7 @@ export class ShapeClass extends ActorClass {
         //@ts-ignore
         this.container._didLocalTransformChangeId = this.container._didChangeId;
 
-        this.hitPolygonDirty = true;
-        this.setWorldTransformDirty();
+        this.setWorldTransformAndHitPolygonDirty();
 
         this.scaleFactor *= factor;
 
@@ -268,8 +265,7 @@ export class ShapeClass extends ActorClass {
         //@ts-ignore
         this.container._didLocalTransformChangeId = this.container._didChangeId;
 
-        this.hitPolygonDirty = true;
-        this.setWorldTransformDirty();
+        this.setWorldTransformAndHitPolygonDirty();
 
     }
 
@@ -490,8 +486,9 @@ export class ShapeClass extends ActorClass {
 
     worldTransformDirty: boolean = true;
 
-    setWorldTransformDirty(){
+    setWorldTransformAndHitPolygonDirty(){
         this.worldTransformDirty = true;
+        this.hitPolygonDirty = true;
     }
 
     public getWorldTransform(): PIXI.Matrix {

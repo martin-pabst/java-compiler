@@ -206,9 +206,9 @@ export class GroupClass extends ShapeClass {
         super.destroy();
     }
 
-    setWorldTransformDirty(): void {
+    setWorldTransformAndHitPolygonDirty(): void {
         this.worldTransformDirty = true;
-        for(let shape of this.shapes) shape.setWorldTransformDirty();
+        for(let shape of this.shapes) shape.setWorldTransformAndHitPolygonDirty();
     }
 
 
