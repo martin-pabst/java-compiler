@@ -984,6 +984,36 @@ export class JRC {
         
     })
 
+    static BitmapSetColorComment = () => lm({
+    "de": "Setzt die Farbe des angegebenen Bildpunkts auf der Bitmap.",
+    "en": "Sets color of given point on Bitmap.",
+    })
+
+
+    static BitmapGetColorComment = () => lm({
+    "de": "Gibt die Farbe des angegebenen Punktes als Color-Objekt zurück.",
+    "en": "Returns color of given point as Color-object.",
+    })
+
+    static BitmapIsColorComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn die Farbe am angegebenen Punkt (x,y) mit der übergebenen Farbe übereinstimmt.",
+    "en": "Returns true if and only if color at point (x, y) matches given color.",
+    })
+
+    static BitmapFillAllComment = () => lm({
+    "de": "Füllt die ganze Bitmap mit der angegebenen Farbe.",
+    "en": "Fills whole Bitmap with given color.",
+    })
+
+    /**
+     * enum Direction
+     */
+
+    static DirectionEnumComment = () => lm({
+    "de": "Richtung (top, right, bottom, left)",
+    "en": "Direction (top, right, bottom, left)",
+    })
+
     /**
      * class Sprite
      */

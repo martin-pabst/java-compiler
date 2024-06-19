@@ -20,9 +20,17 @@ export class BitmapClass extends ShapeClass {
             type: "method", signature: "Bitmap(int pointsX, int pointsY, double left, double top, double displayWidth, double displayHeight)",
             java: BitmapClass.prototype._cj$_constructor_$Bitmap$int$int$double$double$double$double, comment: JRC.BitmapConstructorComment
         },
-        { type: "method", signature: "void setColor(int x, int y, int color, double alpha)", native: BitmapClass.prototype.setzeFarbe, comment: JRC.BitmapCopyComment },
-
-
+        { type: "method", signature: "void setColor(int x, int y, int color, double alpha)", native: BitmapClass.prototype._setColor, comment: JRC.BitmapSetColorComment },
+        { type: "method", signature: "void setColor(int x, int y, string color, double alpha)", native: BitmapClass.prototype._setColor, comment: JRC.BitmapSetColorComment },
+        { type: "method", signature: "void setColor(int x, int y, int color)", native: BitmapClass.prototype._setColor, comment: JRC.BitmapSetColorComment },
+        { type: "method", signature: "void setColor(int x, int y, string color)", native: BitmapClass.prototype._setColor, comment: JRC.BitmapSetColorComment },
+        { type: "method", signature: "Color getColor(int x, int y)", native: BitmapClass.prototype._getColor, comment: JRC.BitmapGetColorComment },
+        
+        { type: "method", signature: "boolean isColor(int x, int y, string colorAsRGBString)", native: BitmapClass.prototype._isColor, comment: JRC.BitmapIsColorComment },
+        { type: "method", signature: "boolean isColor(int x, int y, int color)", native: BitmapClass.prototype._isColor, comment: JRC.BitmapIsColorComment },
+        
+        { type: "method", signature: "void fillAll(int color, double alpha)", native: BitmapClass.prototype._fillAll, comment: JRC.BitmapFillAllComment },
+        { type: "method", signature: "void fillAll(string colorAsRGBString, double alpha)", native: BitmapClass.prototype._fillAll, comment: JRC.BitmapFillAllComment },
 
         { type: "method", signature: "final Bitmap copy()", java: BitmapClass.prototype._mj$copy$Bitmap$, comment: JRC.BitmapCopyComment },
 
@@ -164,7 +172,7 @@ export class BitmapClass extends ShapeClass {
 
     }
 
-    public getFarbeAsObject(x: number, y: number): ColorClass {
+    public _getColor(x: number, y: number): ColorClass {
 
         let i = (x + y * (this.anzahlX));
 
@@ -182,7 +190,7 @@ export class BitmapClass extends ShapeClass {
     }
 
 
-    public istFarbe(x: number, y: number, color: string | number, alpha?: number) {
+    public _isColor(x: number, y: number, color: string | number, alpha?: number) {
 
         let i = (x + y * (this.anzahlX));
 
@@ -206,7 +214,7 @@ export class BitmapClass extends ShapeClass {
 
     }
 
-    public setzeFarbe(x: number, y: number, color: string | number, alpha?: number) {
+    public _setColor(x: number, y: number, color: string | number, alpha?: number) {
 
         if(x < 0 || x > this.anzahlX || y < 0 || y > this.anzahlY){
             throw new RuntimeExceptionClass(JRC.BitmapCoordinatesOutOfBoundsException(x, y, this.anzahlX, this.anzahlY));
@@ -231,7 +239,7 @@ export class BitmapClass extends ShapeClass {
         }
     }
 
-    public fillAll(color: string | number, alpha?: number) {
+    public _fillAll(color: string | number, alpha?: number) {
         let c: number | undefined;
 
         if (typeof color == "string") {

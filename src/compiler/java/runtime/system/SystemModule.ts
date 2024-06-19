@@ -67,6 +67,7 @@ import { PolygonClass } from "../graphics/PolygonClass.ts";
 import { TriangleClass } from "../graphics/TriangleClass.ts";
 import { LineClass } from "../graphics/LineClass.ts";
 import { BitmapClass } from "../graphics/BitmapClass.ts";
+import { DirectionEnum } from "../graphics/DirectionEnum.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -117,7 +118,7 @@ export class SystemModule extends JavaLibraryModule {
             AssertionsClass,
 
             // Graphics
-            ColorClass,
+            ColorClass, DirectionEnum,
             MouseListenerInterface,
             WorldClass, ActorClass, ShapeClass, FilledShapeClass, RectangleClass, GroupClass,
             ScaleModeEnum, RepeatTypeEnum, SpriteLibraryEnum, TileImageClass, SpriteClass, // Sprite
