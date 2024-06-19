@@ -66,6 +66,7 @@ import { SectorClass } from "../graphics/SectorClass.ts";
 import { PolygonClass } from "../graphics/PolygonClass.ts";
 import { TriangleClass } from "../graphics/TriangleClass.ts";
 import { LineClass } from "../graphics/LineClass.ts";
+import { BitmapClass } from "../graphics/BitmapClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -121,7 +122,7 @@ export class SystemModule extends JavaLibraryModule {
             WorldClass, ActorClass, ShapeClass, FilledShapeClass, RectangleClass, GroupClass,
             ScaleModeEnum, RepeatTypeEnum, SpriteLibraryEnum, TileImageClass, SpriteClass, // Sprite
             CircleClass, EllipseClass, ArcClass, SectorClass,
-            PolygonClass, TriangleClass, LineClass
+            PolygonClass, TriangleClass, LineClass, BitmapClass,
         )
 
     }

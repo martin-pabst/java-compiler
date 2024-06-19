@@ -1,5 +1,46 @@
 export var testProgramsList = [
-['', ''],
+   ['', ``],
+['Mandelbrot', `// Beispiel: Mandelbrotmenge
+// Am besten mit voller Geschwindigkeit starten!
+new World(1000, 1000);
+int auflösung = 150;
+Bitmap bm = new Bitmap(auflösung, auflösung, 0, 0, 1000, 1000);
+
+double left = -2.2;
+double right = 1;
+double top = 1.6;
+double bottom = -1.6;
+
+for (int x = 0; x < auflösung; x++) {
+   double r = left + ((right - left) / auflösung) * x;
+   for (int y = 0; y < auflösung; y++) {
+      double i = bottom + ((top - bottom) / auflösung) * y;
+      int n = 0;
+      double r1 = r; double i1 = i;
+      double c;
+      double d;
+      double l = 0; 
+      while (l <= 4.0 && n <= 254) { 
+         c = r1;
+         d = i1;
+         r1 = c * c - d * d + r;
+         i1 = 2 * c * d + i;
+         l = r1 * r1 + i1 * i1;
+         n++;
+      }
+      int color = n / 16 * 0x80 + n % 16 * 0x10;
+      if(n == 255) {
+         color = 0;
+      }
+      bm.setColor(x, y, color, 1.0);
+   } 
+}
+
+bm.setColor(1, 1, 0xffffff, 1.0);
+`],
+['BitmapTest', `Bitmap bm = new Bitmap(100, 100, 50, 50, 300, 300);
+
+bm.setColor(50, 50, 0x0000ff, 0.5);`],
 ['TransformationTest', `
 Circle c = new Circle();
 

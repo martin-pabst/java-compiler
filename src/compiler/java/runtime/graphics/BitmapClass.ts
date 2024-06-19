@@ -1,0 +1,285 @@
+import * as PIXI from 'pixi.js';
+import { Thread } from "../../../common/interpreter/Thread";
+import { LibraryDeclarations } from "../../module/libraries/DeclareType";
+import { NonPrimitiveType } from "../../types/NonPrimitiveType";
+import { ShapeClass } from './ShapeClass';
+import { FilledShapeClass } from './FilledShapeClass';
+import { CallbackFunction } from '../../../common/interpreter/StepFunction';
+import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
+import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
+import { StringClass } from '../system/javalang/ObjectClassStringClass';
+import { ColorClass } from './ColorClass.ts';
+import { ColorHelper } from '../../lexer/ColorHelper.ts';
+import { RuntimeExceptionClass } from '../system/javalang/RuntimeException.ts';
+
+export class BitmapClass extends ShapeClass {
+    static __javaDeclarations: LibraryDeclarations = [
+        { type: "declaration", signature: "class Bitmap extends Shape", comment: JRC.BitmapClassComment },
+
+        {
+            type: "method", signature: "Bitmap(int pointsX, int pointsY, double left, double top, double displayWidth, double displayHeight)",
+            java: BitmapClass.prototype._cj$_constructor_$Bitmap$int$int$double$double$double$double, comment: JRC.BitmapConstructorComment
+        },
+        { type: "method", signature: "void setColor(int x, int y, int color, double alpha)", native: BitmapClass.prototype.setzeFarbe, comment: JRC.BitmapCopyComment },
+
+
+
+        { type: "method", signature: "final Bitmap copy()", java: BitmapClass.prototype._mj$copy$Bitmap$, comment: JRC.BitmapCopyComment },
+
+        { type: "method", signature: "String toString()", java: BitmapClass.prototype._mj$toString$String$, comment: JRC.objectToStringComment },
+
+    ]
+
+    static type: NonPrimitiveType;
+    left!: number;
+    top!: number;
+    width!: number;
+    height!: number;
+    anzahlX!: number;
+    anzahlY!: number;
+
+    texture!: PIXI.Texture;
+    ts!: PIXI.TextureSource;
+    data!: Uint32Array;
+
+    isBigEndian: boolean = true;
+
+    _cj$_constructor_$Bitmap$int$int$double$double$double$double(t: Thread, callback: CallbackFunction,
+        anzahlX: number, anzahlY: number, left: number, top: number, width: number, height: number,
+        bitmapToCopy?: BitmapClass, clone: boolean = false
+    ) {
+        this._cj$_constructor_$Shape$(t, () => {
+            this.centerXInitial = left + width / 2;
+            this.centerYInitial = top + height / 2;
+
+            this.left = left;
+            this.top = top;
+            this.width = width;
+            this.height = height;
+            this.anzahlX = anzahlX;
+            this.anzahlY = anzahlY;
+
+            this.initBitmap(bitmapToCopy, clone);
+        });   // call base class constructor
+
+
+    }
+
+    private initBitmap(bitmapToCopy?: BitmapClass, clone: boolean = false) {
+        let uInt32 = new Uint32Array([0x11223344]);
+        let uInt8 = new Uint8Array(uInt32.buffer);
+
+        if (uInt8[0] === 0x44) {
+            this.isBigEndian = false;
+        } else if (uInt8[0] === 0x11) {
+            this.isBigEndian = true;
+        }
+
+        // TODO: Little Endian...
+
+        this.centerXInitial = this.left + this.width / 2;
+        this.centerYInitial = this.top + this.height / 2;
+
+        this.hitPolygonInitial = [
+            { x: this.left, y: this.top }, { x: this.left, y: this.top + this.height }, { x: this.left + this.width, y: this.top + this.height }, { x: this.left + this.width, y: this.top }
+        ];
+
+        this.initGraphics(bitmapToCopy, clone);
+
+        let sprite = <PIXI.Sprite>this.container;
+
+        sprite.localTransform.scale(this.width / this.anzahlX, this.height / this.anzahlY);
+        sprite.localTransform.translate(this.left, this.top);
+        sprite.setFromMatrix(sprite.localTransform);
+        sprite.updateLocalTransform();
+        //@ts-ignore
+        sprite._didLocalTransformChangeId = sprite._didChangeId;
+
+        this.setWorldTransformAndHitPolygonDirty();
+
+        let p = new PIXI.Point(this.centerXInitial, this.centerYInitial);
+        sprite.localTransform.applyInverse(p, p);
+        this.centerXInitial = p.x;
+        this.centerYInitial = p.y;
+
+    }
+
+    protected initGraphics(bitmapToCopy?: BitmapClass, clone: boolean = false) {
+
+        if (bitmapToCopy == null) {
+            this.data = new Uint32Array(this.anzahlX * this.anzahlY);
+        } else {
+            if (clone) {
+                this.data = bitmapToCopy.data;
+            } else {
+                this.data = new Uint32Array(bitmapToCopy.data);
+            }
+        }
+
+        let u8Array = new Uint8Array(this.data.buffer);
+
+        if (!clone) {
+
+            this.texture = PIXI.Texture.from(new PIXI.BufferImageSource({resource: u8Array, 
+                width: this.anzahlX,
+                height: this.anzahlY,
+                scaleMode: "nearest",
+                format: "rgba8unorm",        // unfortunately the only one that works..           
+                alphaMode: "premultiplied-alpha", // 'no-premultiply-alpha' | 'premultiply-alpha-on-upload' | 'premultiplied-alpha'
+                
+            }))
+
+        } else {
+            this.texture = bitmapToCopy!.texture;
+        }
+
+        this.container = new PIXI.Sprite(this.texture);
+
+        this.world.app.stage.addChild(this.container);
+    }
+
+    _mj$copy$Bitmap$(t: Thread, callback: CallbackFunction) {
+        let copy = new BitmapClass();
+        copy._cj$_constructor_$Bitmap$int$int$double$double$double$double(t, callback, this.anzahlX, this.anzahlY, this.left, this.top, this.width, this.height,
+            this, true
+        );
+        copy.copyFrom(this);
+        copy.render();
+        t.s.push(copy);
+        if (callback) callback();
+    }
+
+    render(): void {
+
+    };
+
+    timerID: any = undefined;
+    uploadData() {
+        if(this.timerID) return;
+
+        this.timerID = setTimeout(() => {
+            this.texture.source.update();
+            this.timerID = undefined;
+        }, 100)
+
+    }
+
+    public getFarbeAsObject(x: number, y: number): ColorClass {
+
+        let i = (x + y * (this.anzahlX));
+
+        let c = this.data[i];
+
+        let color = new ColorClass();
+        color.red = c & 0xff;
+        color.green = (c & 0xff00) >> 8;
+        color.blue = (c & 0xff0000) >> 16;
+
+        color.alpha = 1.0;
+
+        return color;
+
+    }
+
+
+    public istFarbe(x: number, y: number, color: string | number, alpha?: number) {
+
+        let i = (x + y * (this.anzahlX));
+
+        let c: number | undefined;
+
+        if (typeof color == "string") {
+            let ch = ColorHelper.parseColorToOpenGL(color);
+            c = ch.color;
+            alpha = ch.alpha;
+        } else {
+            c = color;
+        }
+
+        let c1 = this.data[i];
+        let red = c1 & 0xff;
+        let green = (c1 & 0xff00) >> 8;
+        let blue = (c1 & 0xff0000) >> 16;
+
+
+        return c == red * 0x10000 + green * 0x100 + blue;
+
+    }
+
+    public setzeFarbe(x: number, y: number, color: string | number, alpha?: number) {
+
+        if(x < 0 || x > this.anzahlX || y < 0 || y > this.anzahlY){
+            throw new RuntimeExceptionClass(JRC.BitmapCoordinatesOutOfBoundsException(x, y, this.anzahlX, this.anzahlY));
+        }
+
+        let i = (x + y * (this.anzahlX));
+        let c: number | undefined;
+
+        if (typeof color == "string") {
+            let ch = ColorHelper.parseColorToOpenGL(color);
+            c = ch.color;
+            if (alpha == null) alpha = ch.alpha;
+        } else {
+            c = color;
+            if (alpha == null) alpha = 1.0;
+        }
+
+        if (c) {
+            this.data[i] = Math.round(alpha * 255) * 0x1000000 + ((c & 0xff) << 16) + (c & 0xff00) + ((c & 0xff0000) >> 16);
+
+            this.uploadData();
+        }
+    }
+
+    public fillAll(color: string | number, alpha?: number) {
+        let c: number | undefined;
+
+        if (typeof color == "string") {
+            let ch = ColorHelper.parseColorToOpenGL(color);
+            c = ch.color;
+            alpha = ch.alpha;
+        } else {
+            c = color;
+        }
+
+        if (c && alpha) {
+            this.data.fill(Math.round(alpha * 255) * 0x1000000 + ((c & 0xff) << 16) + (c & 0xff00) + ((c & 0xff0000) >> 16));
+
+            this.uploadData();
+        }
+    }
+
+    public setzeFarbeRGBA(x: number, y: number, r: number, g: number, b: number, alpha: number) {
+        let c = alpha * 0xff000000 + b * 0x10000 + g * 0x100 + r;
+        let i = (x + y * (this.anzahlX));
+        this.data[i] = c;
+        this.uploadData();
+    }
+
+    public getFarbe(x: number, y: number): number {
+        let c = this.data[x + y * this.anzahlX] & 0xffffff;
+        return (c & 0xff) << 16 + (c & 0xff00) + (c & 0xff0000) >> 16;
+    }
+
+    public getAlpha(x: number, y: number): number {
+        return (this.data[x + y * this.anzahlX] & 0xff000000) >> 24 / 255;
+    }
+
+
+    _mj$toString$String$(t: Thread, callback: CallbackParameter) {
+
+        t.s.push(new StringClass(this._debugOutput()));
+
+        if (callback) callback();
+
+        return;
+    }
+
+    _debugOutput() {
+        let s = `{width: ${this.width * this.scaleFactor}, height: ${this.height * this.scaleFactor}, centerX: ${this._getCenterX()}, centerY: ${this._getCenterY()} }`;
+        return s;
+    }
+
+
+
+}

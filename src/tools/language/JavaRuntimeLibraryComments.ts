@@ -743,13 +743,13 @@ export class JRC {
     })
 
     static PolygonConstructor2Comment = () => lm({
-    "de": "Instanziert ein neues Polygon. Die Punkte werden als double-Werte der Form x1, y1, x2, y2, ... übergeben.",
-    "en": "Creates a polygon. Points are given as double-values in this order: x1, y1, x2, y2, ...",
+        "de": "Instanziert ein neues Polygon. Die Punkte werden als double-Werte der Form x1, y1, x2, y2, ... übergeben.",
+        "en": "Creates a polygon. Points are given as double-values in this order: x1, y1, x2, y2, ...",
     })
 
     static PolygonConstructorShapeComment = () => lm({
-    "de": "Instanziert ein neues Polygon. Seine Punkte sind die Punkte des Hitpolygons der übergebenen Figur.",
-    "en": "Creates a polygon based on given shape's hitpolygon.",
+        "de": "Instanziert ein neues Polygon. Seine Punkte sind die Punkte des Hitpolygons der übergebenen Figur.",
+        "en": "Creates a polygon based on given shape's hitpolygon.",
     })
 
     static PolygonCopyComment = () => lm({
@@ -758,39 +758,39 @@ export class JRC {
     })
 
     static PolygonAddPointComment = () => lm({
-    "de": "Fügt dem Polygon einen Punkt hinzu.",
-    "en": "Adds a point to the polygon.",
+        "de": "Fügt dem Polygon einen Punkt hinzu.",
+        "en": "Adds a point to the polygon.",
     })
 
     static PolygonSetPointsComment = () => lm({
-    "de": "Löscht alle Punkte des Polygons und setzt komplett neue. Diese werden in einem double[] übergeben, das abwechselnd die x- und y-Koordinaten enthält.",
-    "en": "Remove all points from polygon and replace them by given ones. Given double-array contains alternating x- and y-coordinates.",
+        "de": "Löscht alle Punkte des Polygons und setzt komplett neue. Diese werden in einem double[] übergeben, das abwechselnd die x- und y-Koordinaten enthält.",
+        "en": "Remove all points from polygon and replace them by given ones. Given double-array contains alternating x- and y-coordinates.",
     })
 
 
     static PolygonAddPointsComment = () => lm({
-    "de": "Fügt dem Polygon mehrere Punkte hinzu. Diese werden in einem double[] übergeben, das abwechselnd die x- und y-Koordinaten enthält.",
-    "en": "Add given points to polygon. Given double-array contains alternating x- and y-coordinates.",
+        "de": "Fügt dem Polygon mehrere Punkte hinzu. Diese werden in einem double[] übergeben, das abwechselnd die x- und y-Koordinaten enthält.",
+        "en": "Add given points to polygon. Given double-array contains alternating x- and y-coordinates.",
     })
 
     static PolygonInsertPointComment = () => lm({
-    "de": "Fügt dem Polygon einen Punkt als 'index-ter' Punkt hinzu. index == 0 => ganz am Anfang; index == Anzahl der bisherigen Punkte => ganz am Ende;",
-    "en": "Insert point on given index into polygon. Index == 0 means 'at the beginning', index == number of points means 'at the end'.",
+        "de": "Fügt dem Polygon einen Punkt als 'index-ter' Punkt hinzu. index == 0 => ganz am Anfang; index == Anzahl der bisherigen Punkte => ganz am Ende;",
+        "en": "Insert point on given index into polygon. Index == 0 means 'at the beginning', index == number of points means 'at the end'.",
     })
 
     static PolygonMovePointToComment = () => lm({
-    "de": 'Verschiebt Punkt mit dem angegebenen Index nach (x, y). Index == 0 => erster Punkt, index == 1 => zweiter Punkt usw.',
-    "en": "Moves point with given index to position (x, y). Index == 0 means 'at the beginning', index == number of points means 'at the end'.",
+        "de": 'Verschiebt Punkt mit dem angegebenen Index nach (x, y). Index == 0 => erster Punkt, index == 1 => zweiter Punkt usw.',
+        "en": "Moves point with given index to position (x, y). Index == 0 means 'at the beginning', index == number of points means 'at the end'.",
     })
 
-    static 	PolygonCloseComment = () => lm({
-    "de": "Schließt das Polygon, indem es den ersten und letzten Punkt mit einer Strecke verbindet. Diese Methode hat bei gefüllten Polygonen keinen Effekt.",
-    "en": "Closes polygon by joining first and last point with a straight line. This method does nothing when polygon is filled.",
+    static PolygonCloseComment = () => lm({
+        "de": "Schließt das Polygon, indem es den ersten und letzten Punkt mit einer Strecke verbindet. Diese Methode hat bei gefüllten Polygonen keinen Effekt.",
+        "en": "Closes polygon by joining first and last point with a straight line. This method does nothing when polygon is filled.",
     })
 
-    static 	PolygonOpenComment = () => lm({
-    "de": "Öffnet das Polygon, indem des die Strecke zwischen erstem und letzem Punkt entfernt. Diese Methode hat bei gefüllten Polygonen keinen Effekt.",
-    "en": "Opens polygon by removing the line between first and last point. This method does nothing when polygon is filled.",
+    static PolygonOpenComment = () => lm({
+        "de": "Öffnet das Polygon, indem des die Strecke zwischen erstem und letzem Punkt entfernt. Diese Methode hat bei gefüllten Polygonen keinen Effekt.",
+        "en": "Opens polygon by removing the line between first and last point. This method does nothing when polygon is filled.",
     })
 
     /**
@@ -922,18 +922,18 @@ export class JRC {
      * class Triangle
      */
     static TriangleClassComment = () => lm({
-    "de": "Dreieck",
-    "en": "triangle",
+        "de": "Dreieck",
+        "en": "triangle",
     })
 
     static TriangleConstructorComment = () => lm({
-    "de": "Erstellt ein Dreieck mit den gegebenen drei Eckpunkten.",
-    "en": "Creates a triangle from given points.",
+        "de": "Erstellt ein Dreieck mit den gegebenen drei Eckpunkten.",
+        "en": "Creates a triangle from given points.",
     })
 
     static TriangleCopyComment = () => lm({
-    "de": "Erstellt eine Kopie des Dreiecks.",
-    "en": "Creates a copy of this triangle.",
+        "de": "Erstellt eine Kopie des Dreiecks.",
+        "en": "Creates a copy of this triangle.",
     })
 
     /**
@@ -941,25 +941,48 @@ export class JRC {
      */
 
     static LineClassComment = () => lm({
-    "de": "Die Klasse Line repräsentiert eine Strecke",
-    "en": "Line",
+        "de": "Die Klasse Line repräsentiert eine Strecke",
+        "en": "Line",
     })
 
     static LineEmptyConstructorComment = () => lm({
-    "de": "Erstellt eine gerade Strecke vom Punkt (0, 0) zum Punkt (100, 100).",
-    "en": "Creates a straight line from (0, 0) to (100, 100).",
+        "de": "Erstellt eine gerade Strecke vom Punkt (0, 0) zum Punkt (100, 100).",
+        "en": "Creates a straight line from (0, 0) to (100, 100).",
     })
 
     static LineConstructorComment1 = () => lm({
-    "de": "Erstellt eine gerade Strecke von (x1, y1) nach (x2, y2).",
-    "en": "Creates a straight line from (x1, y1) to (x2, y2).",
+        "de": "Erstellt eine gerade Strecke von (x1, y1) nach (x2, y2).",
+        "en": "Creates a straight line from (x1, y1) to (x2, y2).",
     })
 
     static LineCopyComment = () => lm({
-    "de": "Erstellt eine Kopie der Linie.",
-    "en": "Creates a copy of this line.",
+        "de": "Erstellt eine Kopie der Linie.",
+        "en": "Creates a copy of this line.",
     })
 
+    /**
+     * class Bitmap
+     */
+    static BitmapClassComment = () => lm({
+    "de": "Rechteckige Bitmap in der Grafikausgabe",
+    "en": "Rectangular Bitmap",
+    })
+
+    static BitmapConstructorComment = () => lm({
+    "de": "Instanziert eine neue Bitmap. pointsX bzw. pointsY bezeichnet Anzahl der Bildpunkte in x bzw. y-Richtung, (left, top) sind die Koordinaten der linken oberen Ecke.",
+    "en": "Creates a new Bitmap. pointsX and pointsY are it's resolution, (left, top) is it's top-left corner.",
+    })
+
+    static BitmapCopyComment = () => lm({
+    "de": "Erzeugt eine Kopie dieser Bitmap.",
+    "en": "Creates a copy of this bitmap.",
+    })
+
+    static BitmapCoordinatesOutOfBoundsException = (x: number, y: number, maxX: number, maxY: number) => lm({
+        "de": `Die Koordinaten x: ${x}, y: ${y} liegen außerhalb der Bitmap mit der Auflösung ${maxX}, ${maxY}.`,
+        "en": `Coordinates x: ${x}, y: ${y} are out of bounds ${maxX}, ${maxY}.`,
+        
+    })
 
     /**
      * class Sprite
