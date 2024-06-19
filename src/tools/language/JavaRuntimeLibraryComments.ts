@@ -937,6 +937,31 @@ export class JRC {
     })
 
     /**
+     * class Line
+     */
+
+    static LineClassComment = () => lm({
+    "de": "Die Klasse Line repräsentiert eine Strecke",
+    "en": "Line",
+    })
+
+    static LineEmptyConstructorComment = () => lm({
+    "de": "Erstellt eine gerade Strecke vom Punkt (0, 0) zum Punkt (100, 100).",
+    "en": "Creates a straight line from (0, 0) to (100, 100).",
+    })
+
+    static LineConstructorComment1 = () => lm({
+    "de": "Erstellt eine gerade Strecke von (x1, y1) nach (x2, y2).",
+    "en": "Creates a straight line from (x1, y1) to (x2, y2).",
+    })
+
+    static LineCopyComment = () => lm({
+    "de": "Erstellt eine Kopie der Linie.",
+    "en": "Creates a copy of this line.",
+    })
+
+
+    /**
      * class Sprite
      */
 

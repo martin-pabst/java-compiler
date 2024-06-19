@@ -379,9 +379,10 @@ export class ShapeClass extends ActorClass {
     }
 
     transformHitPolygon() {
+        if(!this.hitPolygonDirty) return;
 
         this.hitPolygonTransformed = [];
-        let m = this.container.worldTransform;
+        let m = this.getWorldTransform();
         for (let p of this.hitPolygonInitial) {
             this.hitPolygonTransformed.push({
                 x: (m.a * p.x) + (m.c * p.y) + m.tx,
