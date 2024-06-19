@@ -918,6 +918,23 @@ export class JRC {
         "en": "Moves the graphic object so that its diagonal intersection is at the specified coordinates",
     })
 
+    /**
+     * class Triangle
+     */
+    static TriangleClassComment = () => lm({
+    "de": "Dreieck",
+    "en": "triangle",
+    })
+
+    static TriangleConstructorComment = () => lm({
+    "de": "Erstellt ein Dreieck mit den gegebenen drei Eckpunkten.",
+    "en": "Creates a triangle from given points.",
+    })
+
+    static TriangleCopyComment = () => lm({
+    "de": "Erstellt eine Kopie des Dreiecks.",
+    "en": "Creates a copy of this triangle.",
+    })
 
     /**
      * class Sprite
