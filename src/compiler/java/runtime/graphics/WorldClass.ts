@@ -217,24 +217,26 @@ export class WorldClass extends ObjectClass implements IWorld {
 
         // Create two render textures... these dynamic textures will be used to draw the scene into itself
         let renderTexture = PIXI.RenderTexture.create(stageSize);
-        this.app!.renderer.render({
-            container: this.app!.stage,
-            target: renderTexture,
-            clear: false
-        });
-        setTimeout(() => {
-            if (!this.app) return;
-            let children = this.app!.stage.children.slice();
-            this.app!.stage.removeChildren(0, children.length);
-            children.forEach(c => c.destroy());
-
-            let sprite = new PIXI.Sprite(renderTexture);
-            sprite.x = 0;
-            sprite.y = 0;
-            sprite.anchor = 0;
-            this.app!.stage.setFromMatrix(new PIXI.Matrix());
-            this.app?.stage.addChild(sprite);
-        }, 500)
+        setTimeout(() => {      // outer timeout is needed for Bitmap-objects to get fully uploaded to gpu (see mandelbrot test...)
+            this.app!.renderer.render({
+                container: this.app!.stage,
+                target: renderTexture,
+                clear: false
+            });
+            setTimeout(() => { // inner timeout is needed to await rendering to texture
+                if (!this.app) return;
+                let children = this.app!.stage.children.slice();
+                this.app!.stage.removeChildren(0, children.length);
+                children.forEach(c => c.destroy());
+    
+                let sprite = new PIXI.Sprite(renderTexture);
+                sprite.x = 0;
+                sprite.y = 0;
+                sprite.anchor = 0;
+                this.app!.stage.setFromMatrix(new PIXI.Matrix());
+                this.app?.stage.addChild(sprite);
+            }, 200)
+        }, 200)
 
     }
 
