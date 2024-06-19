@@ -10,6 +10,7 @@ import { CallbackParameter } from '../../../common/interpreter/CallbackParameter
 import { StringClass } from '../system/javalang/ObjectClassStringClass';
 import { convexhull } from '../../../../tools/ConvexHull.ts';
 import { GroupClass } from './GroupClass.ts';
+import { polygonEnthältPunkt, streckenzugEnthältPunkt } from '../../../../tools/MatheTools.ts';
 
 export class PolygonClass extends FilledShapeClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -21,9 +22,16 @@ export class PolygonClass extends FilledShapeClass {
         { type: "method", signature: "Polygon(boolean closeAndFill, double[] coordinates)", java: PolygonClass.prototype._cj$_constructor_$Polygon$boolean$double_I, comment: JRC.PolygonConstructor1Comment },
         { type: "method", signature: "Polygon(Shape shape)", java: PolygonClass.prototype._cj$_constructor_$Polygon$Shape, comment: JRC.PolygonConstructorShapeComment },
         
-        { type: "method", signature: "addPoint(double x, double y)", native: PolygonClass.prototype._addPoint, comment: JRC.PolygonAddPointComment },
+        { type: "method", signature: "void addPoint(double x, double y)", native: PolygonClass.prototype._addPoint, comment: JRC.PolygonAddPointComment },
+        { type: "method", signature: "void setPoints(double[] points)", native: PolygonClass.prototype._setPoints, comment: JRC.PolygonSetPointsComment },
+        { type: "method", signature: "void addPoints(double[] points)", native: PolygonClass.prototype._addPoints, comment: JRC.PolygonAddPointsComment },
+        { type: "method", signature: "void insertPoint(double x, double y, int index)", native: PolygonClass.prototype._insertPoint, comment: JRC.PolygonInsertPointComment },
+        { type: "method", signature: "void movePointTo(double x, double y, int index)", native: PolygonClass.prototype._movePointTo, comment: JRC.PolygonMovePointToComment },
+        { type: "method", signature: "void open()", native: PolygonClass.prototype._open, comment: JRC.PolygonOpenComment },
+        { type: "method", signature: "void close()", native: PolygonClass.prototype._close, comment: JRC.PolygonCloseComment },
 
 
+        { type: "method", signature: "final boolean containsPoint(double x, double y)", native: PolygonClass.prototype._containsPoint , comment: JRC.shapeContainsPointComment},
 
         { type: "method", signature: "final Polygon copy()", java: PolygonClass.prototype._mj$copy$Polygon$, comment: JRC.PolygonCopyComment },
 
@@ -188,6 +196,93 @@ export class PolygonClass extends FilledShapeClass {
         return s;
     }
 
+    _addPoint(x: number, y: number, render: boolean = true){
+        let p = new PIXI.Point(x, y);
+        this.getWorldTransform().applyInverse(p, p);
+        this.hitPolygonInitial.push({ x: p.x, y: p.y });
+        this.hitPolygonDirty = true;
+        if (render) this.render();
+    }
 
+    _insertPoint(x: number, y: number, index: number) {
+        if (index < 0) index = 0;
+        if (index > this.hitPolygonInitial.length) index = this.hitPolygonInitial.length;
+        let p = new PIXI.Point(x, y);
+        this.getWorldTransform().applyInverse(p, p);
+        this.hitPolygonInitial.splice(index, 0, { x: p.x, y: p.y });
+        this.hitPolygonDirty = true;
+        this.render();
+    }
+
+    _movePointTo(x: number, y: number, index: number) {
+        if (index < 0) index = 0;
+        if (index > this.hitPolygonInitial.length) index = this.hitPolygonInitial.length;
+        if(this.hitPolygonInitial.length == 0) return;
+        let p = new PIXI.Point(x, y);
+        this.getWorldTransform().applyInverse(p, p);
+        this.hitPolygonInitial[index].x = p.x;
+        this.hitPolygonInitial[index].y = p.y;
+        this.hitPolygonDirty = true;
+        this.render();
+    }
+
+    _setPoint(x: number, y: number, index: number) {
+        if (index == 0 || index == 1) {
+            this.hitPolygonInitial[index] = { x: x, y: y };
+            this.hitPolygonDirty = true;
+            this.render();
+        }
+    }
+
+    _setPoints(coordinates: number[]) {
+
+        this.hitPolygonInitial = [];
+        for(let i = 0; i < coordinates.length - 1; i += 2){
+            this.hitPolygonInitial.push({x: coordinates[i], y: coordinates[i+1]});
+        }
+
+        this.hitPolygonDirty = true;
+        this.render();
+    }
+
+    _addPoints(points: number[]){
+        for (let i = 0; i < points.length - 1; i += 2) {
+            this._addPoint(points[i], points[i + 1], i >= points.length - 2);
+        }
+    }
+
+    _setAllPointsUntransformed(points: number[]) {
+        this.hitPolygonInitial = [];
+        for (let i = 0; i < points.length; i += 2) {
+            this.hitPolygonInitial.push({ x: points[i], y: points[i + 1] })
+        }
+        this.hitPolygonDirty = true;
+        this.render();
+    }
+
+    _containsPoint(x: number, y: number) {
+
+        if (!this.container.getBounds().containsPoint(x, y)) return false;
+
+        if (this.hitPolygonInitial == null) return true;
+
+        if (this.hitPolygonDirty) this.transformHitPolygon();
+
+        if(this.closeAndFill){
+            return polygonEnthältPunkt(this.hitPolygonTransformed, { x: x, y: y });
+        } else {
+            return streckenzugEnthältPunkt(this.hitPolygonTransformed, { x: x, y: y });
+        }
+    }
+
+    _open(){
+        this.isClosed = false;
+        this.render();
+    }
+
+    _close(){
+        this.isClosed = true;
+        this.render();
+    }
 
 }

@@ -775,12 +775,22 @@ export class JRC {
 
     static PolygonInsertPointComment = () => lm({
     "de": "Fügt dem Polygon einen Punkt als 'index-ter' Punkt hinzu. index == 0 => ganz am Anfang; index == Anzahl der bisherigen Punkte => ganz am Ende;",
-    "en": "Insert point on given index into polygon. index == 0 means 'at the beginning', index == number of points means 'at the end'.",
+    "en": "Insert point on given index into polygon. Index == 0 means 'at the beginning', index == number of points means 'at the end'.",
     })
 
     static PolygonMovePointToComment = () => lm({
-    "de": 'Schiebt den index-ten Punkt nach (x, y). index == 0 => erster Punkt, index == 1 => zweiter Punkt usw.',
-    "en": "",
+    "de": 'Verschiebt Punkt mit dem angegebenen Index nach (x, y). Index == 0 => erster Punkt, index == 1 => zweiter Punkt usw.',
+    "en": "Moves point with given index to position (x, y). Index == 0 means 'at the beginning', index == number of points means 'at the end'.",
+    })
+
+    static 	PolygonCloseComment = () => lm({
+    "de": "Schließt das Polygon, indem es den ersten und letzten Punkt mit einer Strecke verbindet. Diese Methode hat bei gefüllten Polygonen keinen Effekt.",
+    "en": "Closes polygon by joining first and last point with a straight line. This method does nothing when polygon is filled.",
+    })
+
+    static 	PolygonOpenComment = () => lm({
+    "de": "Öffnet das Polygon, indem des die Strecke zwischen erstem und letzem Punkt entfernt. Diese Methode hat bei gefüllten Polygonen keinen Effekt.",
+    "en": "Opens polygon by removing the line between first and last point. This method does nothing when polygon is filled.",
     })
 
     /**
