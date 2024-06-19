@@ -68,6 +68,7 @@ import { TriangleClass } from "../graphics/TriangleClass.ts";
 import { LineClass } from "../graphics/LineClass.ts";
 import { BitmapClass } from "../graphics/BitmapClass.ts";
 import { DirectionEnum } from "../graphics/DirectionEnum.ts";
+import { KeyClass } from "./additional/KeyClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -96,6 +97,8 @@ export class SystemModule extends JavaLibraryModule {
             
             ObjectClass, StringClass, EnumClass,                  // These two MUST come first!
             
+            //additional system classes
+            KeyClass,
 
             // Functional
             ConsumerInterface, FunctionInterface,
