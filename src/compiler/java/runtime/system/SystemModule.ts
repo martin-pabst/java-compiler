@@ -69,6 +69,8 @@ import { LineClass } from "../graphics/LineClass.ts";
 import { BitmapClass } from "../graphics/BitmapClass.ts";
 import { DirectionEnum } from "../graphics/DirectionEnum.ts";
 import { KeyClass } from "./additional/KeyClass.ts";
+import { TextClass } from "../graphics/TextClass.ts";
+import { AlignmentEnum } from "../graphics/AlignmentEnum.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -121,12 +123,12 @@ export class SystemModule extends JavaLibraryModule {
             AssertionsClass,
 
             // Graphics
-            ColorClass, DirectionEnum,
+            ColorClass, DirectionEnum, AlignmentEnum,
             MouseListenerInterface,
             WorldClass, ActorClass, ShapeClass, FilledShapeClass, RectangleClass, GroupClass,
             ScaleModeEnum, RepeatTypeEnum, SpriteLibraryEnum, TileImageClass, SpriteClass, // Sprite
             CircleClass, EllipseClass, ArcClass, SectorClass,
-            PolygonClass, TriangleClass, LineClass, BitmapClass,
+            PolygonClass, TriangleClass, LineClass, BitmapClass, TextClass
         )
 
     }

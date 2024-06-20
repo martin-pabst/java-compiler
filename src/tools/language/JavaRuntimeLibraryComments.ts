@@ -657,7 +657,83 @@ export class JRC {
         "de": "Erstellt eine Kopie des arc-Objekts und git sie zurück.",
         "en": "Creates a exact copy of this arc object and returns it.",
     })
+    
+    /**
+     * class Text
+     */
+    static TextClassComment = () => lm({
+        "de": "Text, der innerhalb der Grafikausgabe dargestellt werden kann",
+        "en": "Text inside graphic panel",
+    })
 
+    static TextEmptyConstructorComment = () => lm({
+        "de": "Instanziert ein neues Textobjekt. Der Textanker (default: links oben) liegt bei (0, 0).",
+        "en": "Creates a new Text object. It's anchor (default: top left) is positioned at (0, 0).",
+    })
+
+    static TextConstructorComment1 = () => lm({
+        "de": "Instanziert ein neues Textobjekt. (x, y) sind die Koordinaten des Textankers (default: links oben), fontsize die Höhe des Textes in Pixeln.",
+        "en": "Creates a new Text object. (x, y) is it's anchor's position, fontSize it's height in pixels.",
+    })
+
+    static TextCopyComment = () => lm({
+        "de": "Erstellt eine Kopie dieses Text-Objekts",
+        "en": "Creates a copy of this text object",
+    })
+
+    static TextSetFontsizeComment = () => lm({
+    "de": "Setzt die Schriftgröße des Textes (Einheit: Pixel).",
+    "en": "Sets fontsize of text (unit: pixels).",
+    })
+
+    static TextSetAlignmentComment = () => lm({
+    "de": "Setzt die Ausrichtung des Textes, z.B. Alignment.center, Alignment.right.",
+    "en": "Sets Alignment of text, e.g. Alignment.center, Alignment.right.",
+    })
+
+    static TextSetTextComment = () => lm({
+    "de": "Setzt den Text dieses graphischen Text-Objektes.",
+    "en": "Sets text of this graphical Text object.",
+    })
+
+    static TextGetWidthComment = () => lm({
+    "de": "Gibt die Breite des Textes zurück.",
+    "en": "Returns width of this text.",
+    })
+
+    static TextGetHeightComment = () => lm({
+    "de": "Gibt die Höhe des Textes zurück.",
+    "en": "Returns height of this text.",
+    })
+
+    static TextGetFontsizeComment = () => lm({
+    "de": "Gibt die Schriftgröße zurück.",
+    "en": "Returns fontsize.",
+    })
+
+    static TextGetTextComment = () => lm({
+    "de": "Gibt den Textinhalt zurück.",
+    "en": "Returns text content (as string).",
+    })
+
+    static TextSetStyleComment = () => lm({
+    "de": "Setzt den Stil des Textes: isBold (Fettschrift) und isItalic (Schrägschrift).",
+    "en": "Sets style of this text (bold, italic).",
+    })
+
+    static TextMoveToComment = () => lm({
+    "de": "Verschiebt das Grafikobjekt so, dass sich sein 'Mittelpunkt' an den angegebenen Koordinaten befindet.",
+    "en": "Moves this text object. After moving it's 'center' lies at given coordinates.",
+    })
+
+    /**
+     * Enum Alignment
+     */
+
+    static AlignmentEnumComment = () => lm({
+    "de": "Ausrichtung",
+    "en": "Alignment",
+    })
 
     /**
      * Class Sector
@@ -964,45 +1040,45 @@ export class JRC {
      * class Bitmap
      */
     static BitmapClassComment = () => lm({
-    "de": "Rechteckige Bitmap in der Grafikausgabe",
-    "en": "Rectangular Bitmap",
+        "de": "Rechteckige Bitmap in der Grafikausgabe",
+        "en": "Rectangular Bitmap",
     })
 
     static BitmapConstructorComment = () => lm({
-    "de": "Instanziert eine neue Bitmap. pointsX bzw. pointsY bezeichnet Anzahl der Bildpunkte in x bzw. y-Richtung, (left, top) sind die Koordinaten der linken oberen Ecke.",
-    "en": "Creates a new Bitmap. pointsX and pointsY are it's resolution, (left, top) is it's top-left corner.",
+        "de": "Instanziert eine neue Bitmap. pointsX bzw. pointsY bezeichnet Anzahl der Bildpunkte in x bzw. y-Richtung, (left, top) sind die Koordinaten der linken oberen Ecke.",
+        "en": "Creates a new Bitmap. pointsX and pointsY are it's resolution, (left, top) is it's top-left corner.",
     })
 
     static BitmapCopyComment = () => lm({
-    "de": "Erzeugt eine Kopie dieser Bitmap.",
-    "en": "Creates a copy of this bitmap.",
+        "de": "Erzeugt eine Kopie dieser Bitmap.",
+        "en": "Creates a copy of this bitmap.",
     })
 
     static BitmapCoordinatesOutOfBoundsException = (x: number, y: number, maxX: number, maxY: number) => lm({
         "de": `Die Koordinaten x: ${x}, y: ${y} liegen außerhalb der Bitmap mit der Auflösung ${maxX}, ${maxY}.`,
         "en": `Coordinates x: ${x}, y: ${y} are out of bounds ${maxX}, ${maxY}.`,
-        
+
     })
 
     static BitmapSetColorComment = () => lm({
-    "de": "Setzt die Farbe des angegebenen Bildpunkts auf der Bitmap.",
-    "en": "Sets color of given point on Bitmap.",
+        "de": "Setzt die Farbe des angegebenen Bildpunkts auf der Bitmap.",
+        "en": "Sets color of given point on Bitmap.",
     })
 
 
     static BitmapGetColorComment = () => lm({
-    "de": "Gibt die Farbe des angegebenen Punktes als Color-Objekt zurück.",
-    "en": "Returns color of given point as Color-object.",
+        "de": "Gibt die Farbe des angegebenen Punktes als Color-Objekt zurück.",
+        "en": "Returns color of given point as Color-object.",
     })
 
     static BitmapIsColorComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn die Farbe am angegebenen Punkt (x,y) mit der übergebenen Farbe übereinstimmt.",
-    "en": "Returns true if and only if color at point (x, y) matches given color.",
+        "de": "Gibt genau dann true zurück, wenn die Farbe am angegebenen Punkt (x,y) mit der übergebenen Farbe übereinstimmt.",
+        "en": "Returns true if and only if color at point (x, y) matches given color.",
     })
 
     static BitmapFillAllComment = () => lm({
-    "de": "Füllt die ganze Bitmap mit der angegebenen Farbe.",
-    "en": "Fills whole Bitmap with given color.",
+        "de": "Füllt die ganze Bitmap mit der angegebenen Farbe.",
+        "en": "Fills whole Bitmap with given color.",
     })
 
     /**
@@ -1010,8 +1086,8 @@ export class JRC {
      */
 
     static DirectionEnumComment = () => lm({
-    "de": "Richtung (top, right, bottom, left)",
-    "en": "Direction (top, right, bottom, left)",
+        "de": "Richtung (top, right, bottom, left)",
+        "en": "Direction (top, right, bottom, left)",
     })
 
     /**

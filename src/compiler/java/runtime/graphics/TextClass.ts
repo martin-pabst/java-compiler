@@ -8,6 +8,7 @@ import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
 import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
 import { StringClass } from '../system/javalang/ObjectClassStringClass';
+import { AlignmentEnum } from './AlignmentEnum';
 
 export class TextClass extends FilledShapeClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -15,17 +16,29 @@ export class TextClass extends FilledShapeClass {
 
         { type: "method", signature: "Text()", java: TextClass.prototype._cj$_constructor_$Text$, comment: JRC.TextEmptyConstructorComment },
         { type: "method", signature: "Text(double x, double y, double fontSize, string text)", java: TextClass.prototype._cj$_constructor_$Text$double$double$double$string, comment: JRC.TextConstructorComment1 },
+        { type: "method", signature: "Text(double x, double y, double fontSize, string text, string fontFamily)", java: TextClass.prototype._cj$_constructor_$Text$double$double$double$string, comment: JRC.TextConstructorComment1 },
         
+        { type: "method", signature: "void setFontsize(double fontsize)", native: TextClass.prototype._setFontsize, comment: JRC.TextSetFontsizeComment },
+        { type: "method", signature: "void setText(double text)", native: TextClass.prototype._setText, comment: JRC.TextSetTextComment },
+        { type: "method", signature: "void setAlignment(Alignment alignment)", native: TextClass.prototype._setAlignment, comment: JRC.TextSetAlignmentComment },
+        { type: "method", signature: "void setStyle(boolean bold, boolean italic)", native: TextClass.prototype._setStyle, comment: JRC.TextSetStyleComment },
         
+        { type: "method", signature: "double getFontsize()", template: `§1.fontsize` , comment: JRC.TextGetFontsizeComment },
+        { type: "method", signature: "string getText()", template: `§1.text`, comment: JRC.TextGetTextComment },
+        { type: "method", signature: "void getWidth()", native: TextClass.prototype._getWidth, comment: JRC.TextGetWidthComment },
+        { type: "method", signature: "void getHeight()", native: TextClass.prototype._getHeight, comment: JRC.TextGetHeightComment },
         
+        { type: "method", signature: "final void moveTo(double x, double y)", native: TextClass.prototype._moveTo, comment: JRC.TextMoveToComment },
+
+
         { type: "method", signature: "final Text copy()", java: TextClass.prototype._mj$copy$Text$, comment: JRC.TextCopyComment },
 
-        { type: "method", signature: "String toString()", java: TextClass.prototype._mj$toString$String$ , comment: JRC.objectToStringComment},
+        { type: "method", signature: "String toString()", java: TextClass.prototype._mj$toString$String$, comment: JRC.objectToStringComment },
 
     ]
 
     static type: NonPrimitiveType;
-   
+
     alignment: string = "left";
 
     textStyle: PIXI.TextStyle =
@@ -35,14 +48,16 @@ export class TextClass extends FilledShapeClass {
             fontStyle: 'normal',
             fontWeight: 'normal',
             fill: this.fillColor == null ? 0x000000 : this.fillColor, // gradient possible...
-            stroke: this.borderColor == null ? 0x000000 : this.borderColor,
-            //strokeThickness: this.borderColor == null ? 0 : this.borderWidth,
+            stroke: {
+                color: this.borderColor == null ? 0x000000 : this.borderColor,
+                width: this.borderColor == null ? 0 : this.borderWidth,
+                join: 'round'
+            },
             dropShadow: false,
             wordWrap: false,
             align: "left",
-            //lineJoin: 'round'
         });
-    
+
     x!: number;
     y!: number;
     fontsize!: number;
@@ -58,23 +73,23 @@ export class TextClass extends FilledShapeClass {
     ) {
         this._cj$_constructor_$FilledShape$(t, () => {
             this.x = x;
-            this.y = y; 
-            this.fontsize = fontSize; 
+            this.y = y;
+            this.fontsize = fontSize;
             this.text = text;
 
             this.centerXInitial = x;
             this.centerYInitial = y;
-    
+
             if (this.fontsize == 0) this.fontsize = 10;
-    
+
             this.borderColor = undefined;
             this.textStyle.stroke = 0x000000;
             if (fontFamily != undefined) {
                 this.textStyle.fontFamily = fontFamily;
             }
-    
+
             this.hitPolygonInitial = [];
-    
+
 
             this.render();
         });   // call base class constructor
@@ -82,21 +97,24 @@ export class TextClass extends FilledShapeClass {
 
     }
 
-    _mj$copy$Text$(t: Thread, callback: CallbackFunction){
+    _mj$copy$Text$(t: Thread, callback: CallbackFunction) {
         let copy = new TextClass();
         copy._cj$_constructor_$Text$double$double$double$string(t, callback, this.x, this.y, this.fontsize, this.text, this.fontFamily);
         copy.copyFrom(this);
         copy.render();
         t.s.push(copy);
-        if(callback) callback();
+        if (callback) callback();
     }
 
     render(): void {
 
         let g: PIXI.Text = <any>this.container;
         this.textStyle.fill = this.fillColor == null ? 0x000000 : this.fillColor;
-        this.textStyle.stroke = this.borderColor == null ? 0x000000 : this.borderColor;
-        //this.textStyle.strokeThickness = this.borderColor == null ? 0 : this.borderWidth;
+        this.textStyle.stroke = {
+            color: this.borderColor == null ? 0x000000 : this.borderColor,
+            width: this.borderColor == null ? 0 : this.borderWidth,
+            join: 'round'
+        }
         this.textStyle.fontSize = this.fontsize;
 
         if (!this.container) {
@@ -107,8 +125,12 @@ export class TextClass extends FilledShapeClass {
             this.container = g;
 
             this.container.localTransform.translate(this.x, this.y);
+            this.container.setFromMatrix(this.container.localTransform);
+            this.container.updateLocalTransform();
             //@ts-ignore
-            this.container.transform.onChange();
+            this.container._didLocalTransformChangeId = this.container._didChangeId;
+
+            this.setWorldTransformAndHitPolygonDirty();
 
             this.world.app!.stage.addChild(g);
         } else {
@@ -131,7 +153,7 @@ export class TextClass extends FilledShapeClass {
         let height = 0;
 
         if (this.text != null) {
-            let tm = PIXI.TextMetrics.measureText( "" + this.text, this.textStyle);
+            let tm = PIXI.CanvasTextMetrics.measureText("" + this.text, this.textStyle);
 
             width = tm.width;
             height = tm.height;
@@ -145,48 +167,65 @@ export class TextClass extends FilledShapeClass {
         let top = 0 - g.anchor.y * height;
 
         this.hitPolygonInitial = [
-            { x: left , y: top }, { x: left, y: top + height },
+            { x: left, y: top }, { x: left, y: top + height },
             { x: left + width, y: top + height }, { x: left + width, y: top }
         ];
 
 
     };
 
-    _setWidth(width: number){
-        this.width = width / this.container.scale.x;
-        this.centerXInitial = this.left + this.width / 2;
-
-        this.render();
-    }
-
-    _setHeight(height: number){
-        this.height = height / this.container.scale.y;
-        this.centerYInitial = this.top + this.height / 2;
-
-        this.render();
-    }
-
-    _moveTo(x: number, y: number){
-        this.transformHitPolygon();
-
-        this._move(x - this.hitPolygonTransformed[0].x, y - this.hitPolygonTransformed[0].y);
-
-    }
 
     _mj$toString$String$(t: Thread, callback: CallbackParameter) {
 
         t.s.push(new StringClass(this._debugOutput()));
 
-        if(callback) callback();
-        
+        if (callback) callback();
+
         return;
     }
 
-    _debugOutput(){
-        let s = `{width: ${this.width * this.scaleFactor}, height: ${this.height * this.scaleFactor}, centerX: ${this._getCenterX()}, centerY: ${this._getCenterY()} }`;
+    _debugOutput() {
+        let s = `{text: ${this.text}, centerX: ${this._getCenterX()}, centerY: ${this._getCenterY()} }`;
         return s;
     }
 
-    
+    _moveTo(newX: number, newY: number){
+        let p = new PIXI.Point(0, 0);
+        this.getWorldTransform();
+        this.container.localTransform.apply(p, p);
+        this._move(newX - p.x, newY - p.y);
+    }
+
+    _setFontsize(fontsize: number) {
+        this.fontsize = fontsize;
+        if (this.fontsize == 0) this.fontsize = 10;
+        this.render();
+    }
+
+    _setText(text: string) {
+        this.text = text;
+        this.render();
+    }
+
+    _setAlignment(alignment: AlignmentEnum) {
+        this.alignment = alignment.name;
+        this.render();
+    }
+
+    _getWidth(): number {
+        let g: PIXI.Text = <any>this.container;
+        return g.width;
+    }
+
+    _getHeight(): number {
+        let g: PIXI.Text = <any>this.container;
+        return g.height;
+    }
+
+    _setStyle(isBold: boolean, isItalic: boolean) {
+        this.textStyle.fontWeight = isBold ? "bold" : "normal";
+        this.textStyle.fontStyle = isItalic ? "italic" : "normal";
+        this.render();
+    }
 
 }
