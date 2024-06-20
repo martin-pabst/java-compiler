@@ -727,6 +727,45 @@ export class JRC {
     })
 
     /**
+     * class LocalDateTime
+     */
+    static LocalDateTimeClassComment = () => lm({
+    "de": "Ein LocalDate-Objekt speichert einen Zeitpunkt (Datum und Uhrzeit) und kann auch die Systemzeit auslesen.",
+    "en": "LocalDateTime is an immutable date-time object that represents a date-time, often viewed as year-month-day-hour-minute-second.",
+    })
+
+    static LocalDateTimeEmptyConstructorComment = () => lm({
+    "de": "Holt den aktuellen Zeitpunkt von der Systemuhr des Rechners und gibt ihn als LocalDateTime-Objekt zurück.",
+    "en": "Fetches current timestamp from system clock and returns it as LocalDateTime-Object",
+    })
+
+    static LocalDateTimeNowComment = () => lm({
+    "de": "Holt den aktuellen Zeitpunkt von der Systemuhr des Rechners und gibt ihn als LocalDateTime-Objekt zurück.",
+    "en": "Fetches current timestamp from system clock and returns it as LocalDateTime-Object",
+    })
+
+    static LocalDateTimeOfComment = () => lm({
+    "de": "Gibt ein LocalDateTime-Objekt zurück, das den durch year, month (1 - 12), dayOfMonth, hour, minute, second beschriebenen Zeitpunkt repräsentiert.",
+    "en": "Returns a new LocalDateTime-object given by year, month (1 - 12), dayOfMonth, hour, minute and second.",
+    })
+
+    static LocalDateTimePlusDaysComment = () => lm({
+    "de": "Gibt ein neues LocalDateTime-Objekt zurück, das einen Zeitpunkt repräsentiert, der um die übergebene Anzahl von Tagen später liegt.",
+    "en": "Returns a NEW LocalDateTime-object which timestamp is given days later than this one's.",
+    })
+
+    static LocalDateTimeMinusDaysComment = () => lm({
+    "de": "Gibt ein neues LocalDateTime-Objekt zurück, das einen Zeitpunkt repräsentiert, der um die übergebene Anzahl von Tagen früher liegt.",
+    "en": "Returns a NEW LocalDateTime-object which timestamp is given days prior to this one's.",
+    })
+
+    static LocalDateTimeUntilComment = () => lm({
+    "de": "Gibt zurück, wie viele Tage (gerundet) zwischen den beiden Zeitpunkten liegen.",
+    "en": "",
+    })
+
+
+    /**
      * Enum Alignment
      */
 
