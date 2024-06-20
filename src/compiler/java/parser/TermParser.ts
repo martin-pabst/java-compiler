@@ -104,7 +104,7 @@ export abstract class TermParser extends TokenIterator {
             let h: number = 1;
             let newLeftNodesParent: ASTBinaryNode | null = null;
             let newLeftNode: ASTTermNode = node;
-            while (h < rightRidgeHeight && (<ASTBinaryNode>node).precedence! < precedence) {
+            while (h < rightRidgeHeight && (<ASTBinaryNode>newLeftNode).precedence! < precedence) {
                 newLeftNodesParent = <ASTBinaryNode>newLeftNode;
                 newLeftNode = (<ASTBinaryNode>newLeftNode).rightSide;
                 h++;

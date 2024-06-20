@@ -1,5 +1,15 @@
 export var testProgramsList = [
    ['', ``],
+   ['OperatorTest', `int auflösung = 150;
+
+   double left = -2.2;
+   double right = 1;
+   
+   int x = 0;
+   
+   double r = left + right / auflösung * x;
+   
+   println(r);`],
 ['Mandelbrot', `// Beispiel: Mandelbrotmenge
 // Am besten mit voller Geschwindigkeit starten!
 new World(1000, 1000);
@@ -12,9 +22,9 @@ double top = 1.6;
 double bottom = -1.6;
 
 for (int x = 0; x < auflösung; x++) {
-   double r = left + ((right - left) / auflösung) * x;
+   double r = left + (right - left) / auflösung * x;
    for (int y = 0; y < auflösung; y++) {
-      double i = bottom + ((top - bottom) / auflösung) * y;
+      double i = bottom + (top - bottom) / auflösung * y;
       int n = 0;
       double r1 = r; double i1 = i;
       double c;
