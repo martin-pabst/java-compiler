@@ -657,7 +657,7 @@ export class JRC {
         "de": "Erstellt eine Kopie des arc-Objekts und git sie zurück.",
         "en": "Creates a exact copy of this arc object and returns it.",
     })
-    
+
     /**
      * class Text
      */
@@ -682,86 +682,159 @@ export class JRC {
     })
 
     static TextSetFontsizeComment = () => lm({
-    "de": "Setzt die Schriftgröße des Textes (Einheit: Pixel).",
-    "en": "Sets fontsize of text (unit: pixels).",
+        "de": "Setzt die Schriftgröße des Textes (Einheit: Pixel).",
+        "en": "Sets fontsize of text (unit: pixels).",
     })
 
     static TextSetAlignmentComment = () => lm({
-    "de": "Setzt die Ausrichtung des Textes, z.B. Alignment.center, Alignment.right.",
-    "en": "Sets Alignment of text, e.g. Alignment.center, Alignment.right.",
+        "de": "Setzt die Ausrichtung des Textes, z.B. Alignment.center, Alignment.right.",
+        "en": "Sets Alignment of text, e.g. Alignment.center, Alignment.right.",
     })
 
     static TextSetTextComment = () => lm({
-    "de": "Setzt den Text dieses graphischen Text-Objektes.",
-    "en": "Sets text of this graphical Text object.",
+        "de": "Setzt den Text dieses graphischen Text-Objektes.",
+        "en": "Sets text of this graphical Text object.",
     })
 
     static TextGetWidthComment = () => lm({
-    "de": "Gibt die Breite des Textes zurück.",
-    "en": "Returns width of this text.",
+        "de": "Gibt die Breite des Textes zurück.",
+        "en": "Returns width of this text.",
     })
 
     static TextGetHeightComment = () => lm({
-    "de": "Gibt die Höhe des Textes zurück.",
-    "en": "Returns height of this text.",
+        "de": "Gibt die Höhe des Textes zurück.",
+        "en": "Returns height of this text.",
     })
 
     static TextGetFontsizeComment = () => lm({
-    "de": "Gibt die Schriftgröße zurück.",
-    "en": "Returns fontsize.",
+        "de": "Gibt die Schriftgröße zurück.",
+        "en": "Returns fontsize.",
     })
 
     static TextGetTextComment = () => lm({
-    "de": "Gibt den Textinhalt zurück.",
-    "en": "Returns text content (as string).",
+        "de": "Gibt den Textinhalt zurück.",
+        "en": "Returns text content (as string).",
     })
 
     static TextSetStyleComment = () => lm({
-    "de": "Setzt den Stil des Textes: isBold (Fettschrift) und isItalic (Schrägschrift).",
-    "en": "Sets style of this text (bold, italic).",
+        "de": "Setzt den Stil des Textes: isBold (Fettschrift) und isItalic (Schrägschrift).",
+        "en": "Sets style of this text (bold, italic).",
     })
 
     static TextMoveToComment = () => lm({
-    "de": "Verschiebt das Grafikobjekt so, dass sich sein 'Mittelpunkt' an den angegebenen Koordinaten befindet.",
-    "en": "Moves this text object. After moving it's 'center' lies at given coordinates.",
+        "de": "Verschiebt das Grafikobjekt so, dass sich sein 'Mittelpunkt' an den angegebenen Koordinaten befindet.",
+        "en": "Moves this text object. After moving it's 'center' lies at given coordinates.",
+    })
+
+    /**
+     * enum DayOfWeek
+     */
+    static DayOfWeekEnumComment = () => lm({
+        "de": "Wochentag",
+        "en": "day of week",
+    })
+
+    static DayOfWeekMondayConst = () => lm({
+        "de": "Montag",
+        "en": "Monday",
+    })
+
+    static DayOfWeekTuesdayConst = () => lm({
+        "de": "Dienstag",
+        "en": "Tuesday",
+    })
+
+    static DayOfWeekWednesdayConst = () => lm({
+        "de": "Mittwoch",
+        "en": "Wednesday",
+    })
+
+    static DayOfWeekThursdayConst = () => lm({
+        "de": "Donnerstag",
+        "en": "Thursday",
+    })
+
+    static DayOfWeekFridayConst = () => lm({
+        "de": "Freitag",
+        "en": "Friday",
+    })
+
+    static DayOfWeekSaturdayConst = () => lm({
+        "de": "Samstag",
+        "en": "Saturday",
+    })
+
+    static DayOfWeekSundayConst = () => lm({
+        "de": "Sonntag",
+        "en": "Sunday",
     })
 
     /**
      * class LocalDateTime
      */
     static LocalDateTimeClassComment = () => lm({
-    "de": "Ein LocalDate-Objekt speichert einen Zeitpunkt (Datum und Uhrzeit) und kann auch die Systemzeit auslesen.",
-    "en": "LocalDateTime is an immutable date-time object that represents a date-time, often viewed as year-month-day-hour-minute-second.",
+        "de": "Ein LocalDate-Objekt speichert einen Zeitpunkt (Datum und Uhrzeit) und kann auch die Systemzeit auslesen.",
+        "en": "LocalDateTime is an immutable date-time object that represents a date-time, often viewed as year-month-day-hour-minute-second.",
     })
 
     static LocalDateTimeEmptyConstructorComment = () => lm({
-    "de": "Holt den aktuellen Zeitpunkt von der Systemuhr des Rechners und gibt ihn als LocalDateTime-Objekt zurück.",
-    "en": "Fetches current timestamp from system clock and returns it as LocalDateTime-Object",
+        "de": "Holt den aktuellen Zeitpunkt von der Systemuhr des Rechners und gibt ihn als LocalDateTime-Objekt zurück.",
+        "en": "Fetches current timestamp from system clock and returns it as LocalDateTime-Object",
     })
 
     static LocalDateTimeNowComment = () => lm({
-    "de": "Holt den aktuellen Zeitpunkt von der Systemuhr des Rechners und gibt ihn als LocalDateTime-Objekt zurück.",
-    "en": "Fetches current timestamp from system clock and returns it as LocalDateTime-Object",
+        "de": "Holt den aktuellen Zeitpunkt von der Systemuhr des Rechners und gibt ihn als LocalDateTime-Objekt zurück.",
+        "en": "Fetches current timestamp from system clock and returns it as LocalDateTime-Object",
     })
 
     static LocalDateTimeOfComment = () => lm({
-    "de": "Gibt ein LocalDateTime-Objekt zurück, das den durch year, month (1 - 12), dayOfMonth, hour, minute, second beschriebenen Zeitpunkt repräsentiert.",
-    "en": "Returns a new LocalDateTime-object given by year, month (1 - 12), dayOfMonth, hour, minute and second.",
+        "de": "Gibt ein LocalDateTime-Objekt zurück, das den durch year, month (1 - 12), dayOfMonth, hour, minute, second beschriebenen Zeitpunkt repräsentiert.",
+        "en": "Returns a new LocalDateTime-object given by year, month (1 - 12), dayOfMonth, hour, minute and second.",
     })
 
     static LocalDateTimePlusDaysComment = () => lm({
-    "de": "Gibt ein neues LocalDateTime-Objekt zurück, das einen Zeitpunkt repräsentiert, der um die übergebene Anzahl von Tagen später liegt.",
-    "en": "Returns a NEW LocalDateTime-object which timestamp is given days later than this one's.",
+        "de": "Gibt ein neues LocalDateTime-Objekt zurück, das einen Zeitpunkt repräsentiert, der um die übergebene Anzahl von Tagen später liegt.",
+        "en": "Returns a NEW LocalDateTime-object which timestamp is given days later than this one's.",
     })
 
     static LocalDateTimeMinusDaysComment = () => lm({
-    "de": "Gibt ein neues LocalDateTime-Objekt zurück, das einen Zeitpunkt repräsentiert, der um die übergebene Anzahl von Tagen früher liegt.",
-    "en": "Returns a NEW LocalDateTime-object which timestamp is given days prior to this one's.",
+        "de": "Gibt ein neues LocalDateTime-Objekt zurück, das einen Zeitpunkt repräsentiert, der um die übergebene Anzahl von Tagen früher liegt.",
+        "en": "Returns a NEW LocalDateTime-object which timestamp is given days prior to this one's.",
     })
 
     static LocalDateTimeUntilComment = () => lm({
-    "de": "Gibt zurück, wie viele Tage (gerundet) zwischen den beiden Zeitpunkten liegen.",
-    "en": "",
+        "de": "Gibt zurück, wie viele Tage (gerundet) zwischen den beiden Zeitpunkten liegen.",
+        "en": "",
+    })
+
+    static LocalDateTimeGetYearComment = () => lm({
+        "de": "Jahr",
+        "en": "Year",
+    })
+
+    static LocalDateTimeGetMonthComment = () => lm({
+        "de": "Gibt den Monat als Zahl zurück (Januar == 1, Februar == 2, ..., Dezember == 12).",
+        "en": "Month (January == 1, February == 2, ...)",
+    })
+
+    static LocalDateTimeGetDayOfMonthComment = () => lm({
+        "de": "Gibt den Tag innerhalb des Monats zurück (Zahl von 1 bis 31).",
+        "en": "Day of month (1, ..., 31)",
+    })
+
+    static LocalDateTimeGetHourComment = () => lm({
+        "de": "Stunde",
+        "en": "Hour",
+    })
+
+    static LocalDateTimeGetMinuteComment = () => lm({
+        "de": "Minute",
+        "en": "Minute",
+    })
+
+    static LocalDateTimeGetSecondComment = () => lm({
+        "de": "Sekunde",
+        "en": "Second",
     })
 
 
@@ -770,8 +843,8 @@ export class JRC {
      */
 
     static AlignmentEnumComment = () => lm({
-    "de": "Ausrichtung",
-    "en": "Alignment",
+        "de": "Ausrichtung",
+        "en": "Alignment",
     })
 
     /**
@@ -1029,6 +1102,54 @@ export class JRC {
     })
 
     static rectangleMoveToComment = () => lm({
+        "de": "Verschiebt das Grafikobjekt so, dass sich sein Diagonalenschnittpunkt an den angegebenen Koordinaten befindet.",
+        "en": "Moves the graphic object so that its diagonal intersection is at the specified coordinates",
+    })
+
+    /**
+     * Class RoundedRectangle
+     */
+    static RoundedRectangleClassComment = () => lm({
+        "de": "Ein Objekt der Klasse RoundedRectangle zeichnet ein Rechteck in den Grafikbereich.",
+        "en": "Objects of class RoundedRectangle draw RoundedRectangles."
+    })
+
+    static RoundedRectangleEmptyConstructorComment = () => lm({
+        "de": "Instanziert ein Retangle-Objekt mit Standardmaßen. Seine linke obere Ecke liegt bei (0/0). Breite und Höhe betragen jeweils 100. Die Rechteckseiten sind zunächst parallel zu den Koordinatenachsen.",
+        "en": "Instantiates a RoundedRectangle object with default geometry. It's left top edge is located at (0/0). Width and height are 100 each. Initial orientation is parallel to x- and y-axis."
+    })
+
+    static RoundedRectangleConstructorComment = () => lm({
+        "de": "Instanziert ein Retangle-Objekt. Seine linke obere Ecke liegt bei (top/left). Width ist seine Breite, height seine Höhe. Das Rechteck ist zunächst achsenparallel.",
+        "en": "Instantiates a RoundedRectangle object with given width and height. It's left top edge is located at (top/left). Initial orientation is parallel to x- and y-axis."
+    })
+
+    static RoundedRectangleSetWidthComment = () => lm({
+        "de": "setzt die Breite des Rechtecks.",
+        "en": "sets width of RoundedRectangle",
+    })
+
+    static RoundedRectangleSetHeightComment = () => lm({
+        "de": "setzt die Höhe des Rechtecks.",
+        "en": "sets height of RoundedRectangle",
+    })
+
+    static RoundedRectangleGetWidthComment = () => lm({
+        "de": "gibt die Breite des Rechtecks zurück",
+        "en": "gets RoundedRectangle width",
+    })
+
+    static RoundedRectangleGetHeightComment = () => lm({
+        "de": "gibt die Höhe des Rechtecks zurück",
+        "en": "gets RoundedRectangle height",
+    })
+
+    static RoundedRectangleCopyComment = () => lm({
+        "de": "Erstellt eine Kopie des RoundedRectangle-Objekts und git sie zurück.",
+        "en": "returns a copy of this RoundedRectangle object",
+    })
+
+    static RoundedRectangleMoveToComment = () => lm({
         "de": "Verschiebt das Grafikobjekt so, dass sich sein Diagonalenschnittpunkt an den angegebenen Koordinaten befindet.",
         "en": "Moves the graphic object so that its diagonal intersection is at the specified coordinates",
     })

@@ -47,6 +47,11 @@ export class RectangleClass extends FilledShapeClass {
             this.top = top;
             this.width = width;
             this.height = height;
+
+            this.hitPolygonInitial = [
+                { x: this.left, y: this.top }, { x: this.left, y: this.top + this.height },
+                { x: this.left + this.width, y: this.top + this.height }, { x: this.left + this.width, y: this.top }
+            ];    
     
             this.render();
         });   // call base class constructor
@@ -64,11 +69,6 @@ export class RectangleClass extends FilledShapeClass {
     }
 
     render(): void {
-
-        this.hitPolygonInitial = [
-            { x: this.left, y: this.top }, { x: this.left, y: this.top + this.height },
-            { x: this.left + this.width, y: this.top + this.height }, { x: this.left + this.width, y: this.top }
-        ];
 
         let g: PIXI.Graphics = <any>this.container;
 
