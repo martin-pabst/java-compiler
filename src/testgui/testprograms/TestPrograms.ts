@@ -1,5 +1,8 @@
 export var testProgramsList = [
    ['', ``],
+   ['TextTest', `Text t = new Text(100, 100, 20, "Hello World!");
+   t.setBorderColor(Color.wheat);
+   t.setBorderWidth(3);`],
    ['OperatorTest', `int auflösung = 150;
 
    double left = -2.2;
