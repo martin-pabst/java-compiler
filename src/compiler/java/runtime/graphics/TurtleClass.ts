@@ -1,0 +1,583 @@
+import * as PIXI from 'pixi.js';
+import { Thread } from "../../../common/interpreter/Thread";
+import { LibraryDeclarations } from "../../module/libraries/DeclareType";
+import { NonPrimitiveType } from "../../types/NonPrimitiveType";
+import { ShapeClass } from './ShapeClass';
+import { FilledShapeClass } from './FilledShapeClass';
+import { CallbackFunction } from '../../../common/interpreter/StepFunction';
+import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
+import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
+import { StringClass } from '../system/javalang/ObjectClassStringClass';
+import { Punkt, abstandPunktZuStrecke, polygonBerührtPolygon, polygonEnthältPunkt, steckenzugSchneidetStreckenzug, streckenzugEnthältPunkt } from '../../../../tools/MatheTools.ts';
+
+type LineElement = {
+    x: number,
+    y: number,
+    color: number | undefined,
+    alpha: number,
+    lineWidth: number
+}
+
+export class TurtleClass extends FilledShapeClass {
+    static __javaDeclarations: LibraryDeclarations = [
+        { type: "declaration", signature: "class Turtle extends FilledShape", comment: JRC.TurtleClassComment },
+
+        { type: "method", signature: "Turtle()", java: TurtleClass.prototype._cj$_constructor_$Turtle$, comment: JRC.TurtleEmptyConstructorComment },
+
+        { type: "method", signature: "final Turtle copy()", java: TurtleClass.prototype._mj$copy$Turtle$, comment: JRC.TurtleCopyComment },
+
+        { type: "method", signature: "String toString()", java: TurtleClass.prototype._mj$toString$String$, comment: JRC.objectToStringComment },
+
+    ]
+
+    static type: NonPrimitiveType;
+
+    lineElements: LineElement[] = [];
+    turtleAngleDeg: number = 0; // in Rad
+
+    isFilled: boolean = false;
+
+    turtle!: PIXI.Graphics;
+    lineGraphic!: PIXI.Graphics;
+
+    xSum: number = 0;
+    ySum: number = 0;
+
+    initialHitPolygonDirty: boolean = true;
+
+    turtleSize: number = 40;
+
+    penIsDown: boolean = true;
+
+    lastLineWidth: number = 0;
+    lastColor: number = 0;
+    lastAlpha: number = 0;
+
+    lastTurtleAngleDeg: number = 0; // angle in Rad
+
+    renderJobPresent: boolean = false;
+
+    angleHasChanged: boolean = true;
+    lastLengthSign: number = -2;
+
+    showTurtle: boolean = true;
+
+
+    _cj$_constructor_$Turtle$(t: Thread, callback: CallbackFunction) {
+        this._cj$_constructor_$Turtle$double$double$double$double(t, callback, 100, 200);
+    }
+
+    _cj$_constructor_$Turtle$double$double$double$double(t: Thread, callback: CallbackFunction, xStart: number, yStart: number, showTurtle: boolean = true) {
+        this._cj$_constructor_$FilledShape$(t, () => {
+            this.lineElements.push({
+                x: xStart,
+                y: yStart,
+                color: 0,
+                alpha: 1,
+                lineWidth: 1
+            });
+            this.calculateCenter();
+
+            this.borderColor = 0xffffff;
+
+            this.hitPolygonInitial = [];
+
+            this.container = new PIXI.Container();
+
+            this.lineGraphic = new PIXI.Graphics();
+            this.container.addChild(this.lineGraphic);
+            this.lineGraphic.moveTo(xStart, yStart);
+
+            this.turtle = new PIXI.Graphics();
+            this.container.addChild(this.turtle);
+            this.turtle.visible = this.showTurtle;
+            this.initTurtle(0, 0, this.turtleAngleDeg);
+            this.moveTurtleTo(xStart, yStart, this.turtleAngleDeg);
+
+
+            this.render();
+        });   // call base class constructor
+
+
+    }
+
+    calculateCenter() {
+        let length = this.lineElements.length;
+        let lastLineElement = this.lineElements[length - 1];
+        this.xSum += lastLineElement.x;
+        this.ySum += lastLineElement.y;
+        this.centerXInitial = this.xSum / length;
+        this.centerYInitial = this.ySum / length;
+    }
+
+    closeAndFill(closeAndFill: boolean) {
+        if (closeAndFill != this.isFilled) {
+            this.isFilled = closeAndFill;
+            this.render();
+            this.initialHitPolygonDirty = true;
+        }
+    }
+
+    setShowTurtle(show: boolean) {
+        this.turtle.visible = show;
+    }
+
+    turn(angleDeg: number) {
+        this.angleHasChanged = true;
+        this.turtleAngleDeg -= angleDeg;
+        if (Math.abs(this.turtleAngleDeg) > 360) {
+            this.turtleAngleDeg -= Math.floor(this.turtleAngleDeg / 360) * 360;
+        }
+        let lastLineElement: LineElement = this.lineElements[this.lineElements.length - 1];
+        this.moveTurtleTo(lastLineElement.x, lastLineElement.y, this.turtleAngleDeg);
+    }
+
+    rotate(angleInDegrees: number, cx?: number, cy?: number) {
+        // this.turn(angleInDegrees);
+        super._rotate(angleInDegrees, cx, cy);
+    }
+
+
+    newTurtleX!: number;
+    newTurtleY!: number;
+    newAngleDeg!: number;
+
+    forward(length: number) {
+
+        if (Math.sign(length) != this.lastLengthSign) {
+            this.angleHasChanged = true;
+        }
+
+        this.lastLengthSign = Math.sign(length);
+
+        let lastLineElement: LineElement = this.lineElements[this.lineElements.length - 1];
+
+        let newBorderColor = this.penIsDown ? this.borderColor : undefined;
+        let turtleAngleRad = this.turtleAngleDeg / 180.0 * Math.PI;
+
+        let newLineElement: LineElement;
+
+        if (!this.angleHasChanged && lastLineElement.color == newBorderColor &&
+            lastLineElement.alpha == this.borderAlpha && lastLineElement.lineWidth == this.borderWidth) {
+            lastLineElement.x += length * Math.cos(turtleAngleRad);
+            lastLineElement.y += length * Math.sin(turtleAngleRad);
+            newLineElement = lastLineElement;
+        } else {
+            newLineElement = {
+                x: lastLineElement.x + length * Math.cos(turtleAngleRad),
+                y: lastLineElement.y + length * Math.sin(turtleAngleRad),
+                color: newBorderColor,
+                alpha: this.borderAlpha,
+                lineWidth: this.borderWidth
+            }
+
+            this.lineElements.push(newLineElement);
+        }
+
+        this.angleHasChanged = false;
+
+        this.hitPolygonDirty = true;
+        this.initialHitPolygonDirty = true;
+        this.calculateCenter();
+
+        this.newTurtleX = newLineElement.x;
+        this.newTurtleY = newLineElement.y;
+        this.newAngleDeg = this.turtleAngleDeg;
+
+        // don't render more frequent than every 1/100 s
+        if (!this.renderJobPresent) {
+            this.renderJobPresent = true;
+            setTimeout(() => {
+                this.renderJobPresent = false;
+                this.render();
+                this.moveTurtleTo(this.newTurtleX, this.newTurtleY, this.turtleAngleDeg);
+            }, 100);
+        }
+
+    }
+
+    moveTo(x: number, y: number) {
+        let newLineElement: LineElement = {
+            x: x,
+            y: y,
+            color: undefined,
+            alpha: this.borderAlpha,
+            lineWidth: this.borderWidth
+        }
+
+        this.lineElements.push(newLineElement);
+
+        this.hitPolygonDirty = true;
+        this.initialHitPolygonDirty = true;
+        this.calculateCenter();
+        this.moveTurtleTo(newLineElement.x, newLineElement.y, this.turtleAngleDeg);
+    }
+
+
+    initTurtle(x: number, y: number, angleDeg: number): void {
+        this.turtle.clear();
+        this.turtle.moveTo(x, y);
+
+        let angleRad = angleDeg / 180.0 * Math.PI;
+
+        let vx = Math.cos(angleRad);
+        let vy = Math.sin(angleRad);
+
+        let vxp = -Math.sin(angleRad);
+        let vyp = Math.cos(angleRad);
+
+        let lengthForward = this.turtleSize / 2;
+        let lengthBackward = this.turtleSize / 4;
+        let lengthBackwardP = this.turtleSize / 4;
+
+        this.turtle.moveTo(x + vx * lengthForward, y + vy * lengthForward);
+        this.turtle.lineTo(x - vx * lengthBackward + vxp * lengthBackwardP, y - vy * lengthBackward + vyp * lengthBackwardP);
+        this.turtle.lineTo(x - vx * lengthBackward - vxp * lengthBackwardP, y - vy * lengthBackward - vyp * lengthBackwardP);
+        this.turtle.lineTo(x + vx * lengthForward, y + vy * lengthForward);
+
+        this.turtle.stroke({
+            width: 3,
+            color: 0xff0000,
+            alpha: 1,
+            alignment: 0.5
+        })
+
+    }
+
+    moveTurtleTo(x: number, y: number, angleDeg: number) {
+        this.turtle.localTransform.identity();
+        this.turtle.localTransform.rotate(angleDeg / 180.0 * Math.PI);
+        this.turtle.localTransform.translate(x, y);
+
+        this.turtle.setFromMatrix(this.turtle.localTransform);
+
+        this.turtle.updateLocalTransform();
+        //@ts-ignore
+        this.turtle._didLocalTransformChangeId = this.turtle._didChangeId;
+
+        this.lastTurtleAngleDeg = this.turtleAngleDeg;
+    }
+
+
+
+    collidesWith(shape: ShapeClass) {
+
+        if (shape instanceof TurtleClass && shape.initialHitPolygonDirty) {
+            shape.setupInitialHitPolygon();
+        }
+
+        if (this.initialHitPolygonDirty) {
+            this.setupInitialHitPolygon();
+            this.transformHitPolygon();
+            this.render();
+        }
+
+        let bb = this.container.getBounds();
+        let bb1 = shape.container.getBounds();
+
+        if (bb.left > bb1.right || bb1.left > bb.right) return false;
+
+        if (bb.top > bb1.bottom || bb1.top > bb.bottom) return false;
+
+        //@ts-ignore
+        if (shape["shapes"]) {
+            return shape.collidesWith(this);
+        }
+
+        if (this.hitPolygonInitial == null || shape.hitPolygonInitial == null) return true;
+
+        // boundig boxes collide, so check further:
+        if (this.hitPolygonDirty) this.transformHitPolygon();
+        if (shape.hitPolygonDirty) shape.transformHitPolygon();
+
+        if (shape.hitPolygonTransformed.length == 2 && !this.isFilled) {
+            return steckenzugSchneidetStreckenzug(this.hitPolygonTransformed, shape.hitPolygonTransformed);
+        }
+
+        return polygonBerührtPolygon(this.hitPolygonTransformed, shape.hitPolygonTransformed);
+
+    }
+
+    setupInitialHitPolygon() {
+        this.hitPolygonInitial = this.lineElements.map((le) => { return { x: le.x, y: le.y } });
+    }
+
+    clear(x: number | undefined = undefined, y: number | undefined = undefined, angle: number | undefined = undefined) {
+        let lastLineElement = this.lineElements.pop()!;
+        if (x == null) x = lastLineElement.x;
+        if (y == null) y = lastLineElement.y;
+
+        this.lineElements = [];
+
+        this.lineElements.push({
+            x: x,
+            y: y,
+            color: 0,
+            alpha: 1,
+            lineWidth: 1
+        });
+        this.calculateCenter();
+
+        this.hitPolygonInitial = [];
+        if (angle != null) {
+            this.turtleAngleDeg = angle;
+            this.angleHasChanged = true;
+            this.lastTurtleAngleDeg = 0;
+            this.borderColor = 0;
+            this.turtleSize = 40;
+        }
+        this.render();
+        if (angle != null) {
+            this.moveTurtleTo(x, y, angle);
+        }
+    }
+
+
+    touchesAtLeastOneFigure(): boolean {
+        let lastLineElement: LineElement = this.lineElements[this.lineElements.length - 1];
+        let x = lastLineElement.x;
+        let y = lastLineElement.y;
+
+        for (let sh of this.world.shapesWhichBelongToNoGroup) {
+            if (sh != this && sh._containsPoint(x, y)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    touchesColor(farbe: number): boolean {
+        let lastLineElement: LineElement = this.lineElements[this.lineElements.length - 1];
+        let x = lastLineElement.x;
+        let y = lastLineElement.y;
+
+        for (let sh of this.world.shapesWhichBelongToNoGroup) {
+            if (sh != this && sh._containsPoint(x, y)) {
+                if (sh instanceof FilledShapeClass && sh.fillColor == farbe) return true;
+                // if(sh instanceof TurtleHelper) TODO
+            }
+        }
+        return false;
+    }
+
+    touchesShape(shape: ShapeClass) {
+        let lastLineElement: LineElement = this.lineElements[this.lineElements.length - 1];
+        let x = lastLineElement.x;
+        let y = lastLineElement.y;
+        return shape._containsPoint(x, y);
+    }
+
+    _containsPoint(x: number, y: number) {
+
+        if (this.initialHitPolygonDirty) {
+            this.setupInitialHitPolygon();
+            this.transformHitPolygon();
+            this.render();
+        }
+
+        if (!this.container.getBounds().containsPoint(x, y)) return false;
+
+        if (this.hitPolygonInitial == null) return true;
+
+        if (this.hitPolygonDirty) this.transformHitPolygon();
+
+        if (this.isFilled) {
+            return polygonEnthältPunkt(this.hitPolygonTransformed, { x: x, y: y });
+        } else {
+            return streckenzugEnthältPunkt(this.hitPolygonTransformed, { x: x, y: y });
+        }
+    }
+
+    public borderContainsPointExcludingLastLineElement(x: number, y: number, color: number = -1): boolean {
+
+        let lastLineElement = this.lineElements.pop()!;
+        let ret = this.borderContainsPoint(x, y, color);
+        this.lineElements.push(lastLineElement);
+        return ret;
+    }
+
+
+    public borderContainsPoint(x: number, y: number, color: number = -1): boolean {
+
+        let m = this.getWorldTransform();
+
+        let transformIsIdentity = m.a == 1 && m.b == 0 && m.c == 0 && m.d == 1 && m.tx == 0 && m.ty == 0;
+
+        let p: Punkt = { x: x, y: y };
+
+        if (this.lineElements.length < 2) return false;
+
+        let rightLe: LineElement = this.lineElements[0];
+
+        let left: Punkt;
+        let right: Punkt = rightLe;
+
+        if (!transformIsIdentity) {
+            right = {
+                x: (m.a * right.x) + (m.c * right.y) + m.tx,
+                y: (m.b * right.x) + (m.d * right.y) + m.ty
+            }
+        }
+
+        for (let i = 0; i < this.lineElements.length - 1; i++) {
+
+            left = right;
+            rightLe = this.lineElements[i + 1];
+            right = rightLe;
+
+            if (!transformIsIdentity) {
+                right = {
+                    x: (m.a * right.x) + (m.c * right.y) + m.tx,
+                    y: (m.b * right.x) + (m.d * right.y) + m.ty
+                }
+            }
+
+            if (color != -1 && rightLe.color != color) continue;
+
+            if (abstandPunktZuStrecke(left, right, p) <= rightLe.lineWidth / 2) return true;
+
+        }
+
+        return false;
+    }
+
+
+    collidesWithBorderColor(borderColor: number): boolean {
+        let lastLineElement = this.lineElements[this.lineElements.length - 1];
+        let x = lastLineElement.x;
+        let y = lastLineElement.y;
+
+        for (let sh of this.world.shapesWhichBelongToNoGroup) {
+            if (sh == this) {
+                if ((<TurtleClass>sh).borderContainsPointExcludingLastLineElement(x, y, borderColor)) return true;
+            } else {
+                if (sh.borderContainsPoint(x, y, borderColor)) return true;
+            }
+        }
+
+        return false;
+    }
+
+    getLastSegmentLength(): any {
+        if (this.lineElements.length < 2) return 0;
+        let l1 = this.lineElements[this.lineElements.length - 2];
+        let l2 = this.lineElements[this.lineElements.length - 1];
+        let dx = l2.x - l1.x;
+        let dy = l2.y - l1.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    getPosition(): LineElement {
+        return this.lineElements[this.lineElements.length - 1];
+    }
+
+    getCopy(): RuntimeObject {
+
+        let ro: RuntimeObject = new RuntimeObject(klass);
+        let rh: TurtleHelper = new TurtleHelper(this.lineElements[0].x, this.lineElements[0].y,
+            this.showTurtle, this.worldHelper.interpreter, ro);
+        ro.intrinsicData["Actor"] = rh;
+
+        rh.turtleAngleDeg = this.turtleAngleDeg;
+
+        rh.copyFrom(this);
+        rh.render();
+
+        return ro;
+    }
+
+
+    _mj$copy$Turtle$(t: Thread, callback: CallbackFunction) {
+        let copy = new TurtleClass();
+        copy._cj$_constructor_$Turtle$double$double$double$double(t, callback, this.left, this.top, this.width, this.height);
+        copy.copyFrom(this);
+        copy.render();
+        t.s.push(copy);
+        if (callback) callback();
+    }
+
+    render(): void {
+
+        let g: PIXI.Graphics = this.lineGraphic;
+
+        this.lastLineWidth = 0;
+        this.lastColor = 0;
+        this.lastAlpha = 0;
+
+        if (!this.container) {
+            g = new PIXI.Graphics();
+            this.container = g;
+            this.world.app.stage.addChild(g);
+
+        } else {
+            g.clear();
+        }
+
+
+        let firstPoint = this.lineElements[0];
+        g.moveTo(firstPoint.x, firstPoint.y);
+
+        for (let i = 1; i < this.lineElements.length; i++) {
+            let le: LineElement = this.lineElements[i];
+            if (le.color != null) {
+                g.lineTo(le.x, le.y);
+                if (!this.isFilled) {
+                    if (le.lineWidth != this.lastLineWidth || le.color != this.lastColor || le.alpha != this.lastAlpha) {
+                        this.lastLineWidth = le.lineWidth;
+                        this.lastColor = le.color;
+                        this.lastAlpha = le.alpha;
+                        g.stroke({
+                            width: le.lineWidth,
+                            color: le.color,
+                            alpha: le.alpha,
+                            alignment: 0.5
+                        })
+                    }
+                }
+                // console.log("LineTo: " + le.x + ", " + le.y);
+            } else {
+                g.moveTo(le.x, le.y);
+                // console.log("MoveTo: " + le.x + ", " + le.y);
+            }
+        }
+
+        if (this.isFilled) {
+            g.closePath();
+        }
+        if (this.isFilled) {
+            g.stroke({
+                width: this.borderWidth,
+                color: this.borderColor,
+                alpha: this.borderAlpha,
+                alignment: 0.5
+            })
+        }
+
+        if (this.fillColor != null && this.isFilled) {
+            g.fill(this.fillColor);
+            g.alpha = this.fillAlpha;
+        }
+
+
+        g.closePath();
+
+    };
+
+
+    _mj$toString$String$(t: Thread, callback: CallbackParameter) {
+
+        t.s.push(new StringClass(this._debugOutput()));
+
+        if (callback) callback();
+
+        return;
+    }
+
+    _debugOutput() {
+        let s = `{width: ${this.width * this.scaleFactor}, height: ${this.height * this.scaleFactor}, centerX: ${this._getCenterX()}, centerY: ${this._getCenterY()} }`;
+        return s;
+    }
+
+
+
+}

@@ -515,4 +515,8 @@ export class ShapeClass extends ActorClass {
         return this.container._worldTransform;
     }
 
+    public borderContainsPoint(x: number, y: number, color: number = -1): boolean {
+        return false;
+    }
+
 }
