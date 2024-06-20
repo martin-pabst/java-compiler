@@ -71,6 +71,8 @@ import { DirectionEnum } from "../graphics/DirectionEnum.ts";
 import { KeyClass } from "./additional/KeyClass.ts";
 import { TextClass } from "../graphics/TextClass.ts";
 import { AlignmentEnum } from "../graphics/AlignmentEnum.ts";
+import { LocalDateTimeClass } from "./javalang/LocalDateTimeClass.ts";
+import { DayOfWeekEnum } from "./DayOfWeekEnum.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -100,7 +102,7 @@ export class SystemModule extends JavaLibraryModule {
             ObjectClass, StringClass, EnumClass,                  // These two MUST come first!
             
             //additional system classes
-            KeyClass,
+            KeyClass, LocalDateTimeClass, DayOfWeekEnum,
 
             // Functional
             ConsumerInterface, FunctionInterface,
