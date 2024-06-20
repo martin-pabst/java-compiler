@@ -23,6 +23,17 @@ export class TurtleClass extends FilledShapeClass {
         { type: "declaration", signature: "class Turtle extends FilledShape", comment: JRC.TurtleClassComment },
 
         { type: "method", signature: "Turtle()", java: TurtleClass.prototype._cj$_constructor_$Turtle$, comment: JRC.TurtleEmptyConstructorComment },
+        { type: "method", signature: "Turtle(double x, double y)", java: TurtleClass.prototype._cj$_constructor_$Turtle$double$double, comment: JRC.TurtleConstructorComment1 },
+        { type: "method", signature: "Turtle(double x, double y, boolean showTurtle)", java: TurtleClass.prototype._cj$_constructor_$Turtle$double$double, comment: JRC.TurtleConstructorComment2 },
+        { type: "method", signature: "final void forward(double length)", native: TurtleClass.prototype._forward, comment: JRC.TurtleForwardComment },
+        { type: "method", signature: "final void turn(double angleInDeg)", native: TurtleClass.prototype._turn, comment: JRC.TurtleTurnComment },
+        { type: "method", signature: "final void penUp()", template: `§1.penIsDown = false;`, comment: JRC.TurtlePenUpComment },
+        { type: "method", signature: "final void penDown()", template: `§1.penIsDown = true;`, comment: JRC.TurtlePenDownComment },
+        { type: "method", signature: "final void closeAndFill(boolean closeAndFill)", native: TurtleClass.prototype._closeAndFill, comment: JRC.TurtleCloseAndFillComment },
+        { type: "method", signature: "final void showTurtle(boolean showTurtle)", native: TurtleClass.prototype._setShowTurtle, comment: JRC.TurtleShowTurtleComment },
+        { type: "method", signature: "final void clear()", native: TurtleClass.prototype._clear, comment: JRC.TurtleClearComment },
+        { type: "method", signature: "final boolean collidesWithBorderColor(int borderColor)", native: TurtleClass.prototype._collidesWithBorderColor, comment: JRC.TurtleCollidesWithBorderColorComment },
+        { type: "method", signature: "final boolean collidesWithBorderColor(String borderColor)", native: TurtleClass.prototype._collidesWithBorderColor, comment: JRC.TurtleCollidesWithBorderColorComment },
 
         { type: "method", signature: "final Turtle copy()", java: TurtleClass.prototype._mj$copy$Turtle$, comment: JRC.TurtleCopyComment },
 
@@ -64,10 +75,10 @@ export class TurtleClass extends FilledShapeClass {
 
 
     _cj$_constructor_$Turtle$(t: Thread, callback: CallbackFunction) {
-        this._cj$_constructor_$Turtle$double$double$double$double(t, callback, 100, 200);
+        this._cj$_constructor_$Turtle$double$double(t, callback, 100, 200);
     }
 
-    _cj$_constructor_$Turtle$double$double$double$double(t: Thread, callback: CallbackFunction, xStart: number, yStart: number, showTurtle: boolean = true) {
+    _cj$_constructor_$Turtle$double$double(t: Thread, callback: CallbackFunction, xStart: number, yStart: number, showTurtle: boolean = true) {
         this._cj$_constructor_$FilledShape$(t, () => {
             this.lineElements.push({
                 x: xStart,
@@ -110,7 +121,7 @@ export class TurtleClass extends FilledShapeClass {
         this.centerYInitial = this.ySum / length;
     }
 
-    closeAndFill(closeAndFill: boolean) {
+    _closeAndFill(closeAndFill: boolean) {
         if (closeAndFill != this.isFilled) {
             this.isFilled = closeAndFill;
             this.render();
@@ -118,11 +129,11 @@ export class TurtleClass extends FilledShapeClass {
         }
     }
 
-    setShowTurtle(show: boolean) {
+    _setShowTurtle(show: boolean) {
         this.turtle.visible = show;
     }
 
-    turn(angleDeg: number) {
+    _turn(angleDeg: number) {
         this.angleHasChanged = true;
         this.turtleAngleDeg -= angleDeg;
         if (Math.abs(this.turtleAngleDeg) > 360) {
@@ -132,17 +143,11 @@ export class TurtleClass extends FilledShapeClass {
         this.moveTurtleTo(lastLineElement.x, lastLineElement.y, this.turtleAngleDeg);
     }
 
-    rotate(angleInDegrees: number, cx?: number, cy?: number) {
-        // this.turn(angleInDegrees);
-        super._rotate(angleInDegrees, cx, cy);
-    }
-
-
     newTurtleX!: number;
     newTurtleY!: number;
     newAngleDeg!: number;
 
-    forward(length: number) {
+    _forward(length: number) {
 
         if (Math.sign(length) != this.lastLengthSign) {
             this.angleHasChanged = true;
@@ -260,7 +265,7 @@ export class TurtleClass extends FilledShapeClass {
 
 
 
-    collidesWith(shape: ShapeClass) {
+    _collidesWith(shape: ShapeClass): boolean {
 
         if (shape instanceof TurtleClass && shape.initialHitPolygonDirty) {
             shape.setupInitialHitPolygon();
@@ -302,7 +307,7 @@ export class TurtleClass extends FilledShapeClass {
         this.hitPolygonInitial = this.lineElements.map((le) => { return { x: le.x, y: le.y } });
     }
 
-    clear(x: number | undefined = undefined, y: number | undefined = undefined, angle: number | undefined = undefined) {
+    _clear(x: number | undefined = undefined, y: number | undefined = undefined, angle: number | undefined = undefined) {
         let lastLineElement = this.lineElements.pop()!;
         if (x == null) x = lastLineElement.x;
         if (y == null) y = lastLineElement.y;
@@ -442,7 +447,7 @@ export class TurtleClass extends FilledShapeClass {
     }
 
 
-    collidesWithBorderColor(borderColor: number): boolean {
+    _collidesWithBorderColor(borderColor: number): boolean {
         let lastLineElement = this.lineElements[this.lineElements.length - 1];
         let x = lastLineElement.x;
         let y = lastLineElement.y;
@@ -471,25 +476,12 @@ export class TurtleClass extends FilledShapeClass {
         return this.lineElements[this.lineElements.length - 1];
     }
 
-    getCopy(): RuntimeObject {
-
-        let ro: RuntimeObject = new RuntimeObject(klass);
-        let rh: TurtleHelper = new TurtleHelper(this.lineElements[0].x, this.lineElements[0].y,
-            this.showTurtle, this.worldHelper.interpreter, ro);
-        ro.intrinsicData["Actor"] = rh;
-
-        rh.turtleAngleDeg = this.turtleAngleDeg;
-
-        rh.copyFrom(this);
-        rh.render();
-
-        return ro;
-    }
-
 
     _mj$copy$Turtle$(t: Thread, callback: CallbackFunction) {
         let copy = new TurtleClass();
-        copy._cj$_constructor_$Turtle$double$double$double$double(t, callback, this.left, this.top, this.width, this.height);
+        copy._cj$_constructor_$Turtle$double$double(t, callback, this.lineElements[0].x, this.lineElements[0].y, this.showTurtle);
+        copy.turtleAngleDeg = this.turtleAngleDeg;
+        copy.lineElements = this.lineElements.slice();
         copy.copyFrom(this);
         copy.render();
         t.s.push(copy);
@@ -574,7 +566,7 @@ export class TurtleClass extends FilledShapeClass {
     }
 
     _debugOutput() {
-        let s = `{width: ${this.width * this.scaleFactor}, height: ${this.height * this.scaleFactor}, centerX: ${this._getCenterX()}, centerY: ${this._getCenterY()} }`;
+        let s = `{centerX: ${this._getCenterX()}, centerY: ${this._getCenterY()} }`;
         return s;
     }
 

@@ -1026,6 +1026,75 @@ export class JRC {
     })
 
     /**
+     * class Turtle
+     */
+    static TurtleClassComment = () => lm({
+    "de": "Turtle-Klasse zum Zeichnen von Streckenzügen oder gefüllten Figuren. Wichtig sind vor allem die Methoden forward(double length) und turn(double angleDeg), die die Turtle nach vorne bewegen bzw. ihre Blickrichtung ändern.",
+    "en": "Turtle class to draw straight lines or filled shapes. Most important methods are forward(double length) and turn(angleInDegrees).",
+    })
+
+    static TurtleEmptyConstructorComment = () => lm({
+    "de": "Instanziert ein neues Turtle-Objekt ohne Punkte. Die Turtle blickt anfangs nach rechts. Am Ende des Streckenzugs wird eine 'Schildkröte' (kleines Dreieck) gezeichnet.",
+    "en": "Creates a new Turtle object without points/lines. Initially the turtle's viewing direction is to the right. A small red triangle shows the turtle's current position. ",
+    })
+
+    static TurtleConstructorComment1 = () => lm({
+    "de": "Instanziert ein neues Turtle-Objekt ohne Punkte. (x, y) is die Startposition der Turtle. Die Turtle blickt anfangs nach rechts. Am Ende des Streckenzugs wird eine 'Schildkröte' (kleines Dreieck) gezeichnet.",
+    "en": "Creates a new Turtle object without points/lines at position (x, y). Initially the turtle's viewing direction is to the right. A small red triangle shows the turtle's current position. ",
+    })
+
+    static TurtleConstructorComment2 = () => lm({
+    "de": "Instanziert ein neues Turtle-Objekt ohne Punkte. (x, y) is die Startposition der Turtle. Die Turtle blickt anfangs nach rechts. Falls showTurtle == true wird am Ende des Streckenzugs eine 'Schildkröte' (kleines Dreieck) gezeichnet.",
+    "en": "Creates a new Turtle object without points/lines at position (x, y). Initially the turtle's viewing direction is to the right. If showTurtle == true a small red triangle shows the turtle's current position. ",
+    })
+
+    static TurtleCopyComment = () => lm({
+    "de": "Erstellt eine Kopie der Turtle.",
+    "en": "Creates a copy of this turtle object.",
+    })
+
+    static TurtleForwardComment = () => lm({
+    "de": "Weist die Turtle an, die angegebene Länge vorwärts zu gehen. Ihr zurückgelegter Weg wird als gerade Strecke mit der aktuellen BorderColor gezeichnet. Mit setBorderColor(null) bewirkst Du, dass ein Stück ihres Weges nicht gezeichnet wird.",
+    "en": "Makes the turtle walk forward given length. While walking it draws a line with current BorderColor. Use setBorderColor(null) to get invisible lines.",
+    })
+
+    static TurtleTurnComment = () => lm({
+    "de": "Bewirkt, dass sich die Turtle um den angegebenen Winkel (in Grad!) dreht, d.h. ihre Blickrichtung ändert. Ein positiver Winkel bewirkt eine Drehung gegen den Uhrzeigersinn. Diese Methode wirkt sich NICHT auf die bisher gezeichneten Strecken aus. Willst Du alles bisher Gezeichnete inklusive Turtle drehen, so nutze die Methode rotate.",
+    "en": "Makes the turtle (NOT the lines drawn by it) turn counterclockwise by given angle in Degrees. If you want to rotate all lines drawn by the turtle, then use method rotate instead.",
+    })
+
+    static TurtlePenUpComment = () => lm({
+    "de": "Bewirkt, dass die Turtle beim Gehen ab jetzt nicht mehr zeichnet.",
+    "en": "After this method call the turtle will stop drawing when it walks.",
+    })
+
+    static TurtlePenDownComment = () => lm({
+    "de": "Bewirkt, dass die Turtle beim Gehen ab jetzt wieder zeichnet.",
+    "en": "After this method call the turtle will restart drawing when it walks.",
+    })
+
+    static TurtleCloseAndFillComment = () => lm({
+    "de": "closeAndFill == true bewirkt, dass das von der Turtlezeichnung umschlossene Gebiet gefüllt wird.",
+    "en": "If closeAndFill == true then the area surronded by the turtle's drawing is filled.",
+    })
+
+    static TurtleShowTurtleComment = () => lm({
+    "de": "showTurtle == true bewirkt, dass am Ort der Turtle ein rotes Dreieck gezeichnet wird.",
+    "en": "If showTurtle == true then a small triangle indicates the turtle's position.",
+    })
+
+    static TurtleClearComment = () => lm({
+    "de": "Löscht alle bis jetzt mit der Turtle gezeichneten Strecken.",
+    "en": "Erases all lines drawn previously.",
+    })
+
+    static TurtleCollidesWithBorderColorComment = () => lm({
+    "de": 'Gibt genau dann true zurück, wenn sich der "Mittelpunkt" des Turtle-Dreiecks auf dem Rand eines anderen graphischen Objekts mit der angegebenen Farbe befindet.',
+    "en": "Returns true if and only if current position of turtle is on the border of another shape with given borderColor.",
+    })
+
+
+    /**
      * Interface MouseListener
      */
     static mouseListenerInterfaceComment = () => lm({
