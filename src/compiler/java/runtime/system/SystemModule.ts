@@ -75,6 +75,7 @@ import { LocalDateTimeClass } from "./javalang/LocalDateTimeClass.ts";
 import { DayOfWeekEnum } from "./DayOfWeekEnum.ts";
 import { RoundedRectangleClass } from "../graphics/RoundedRectangleClass.ts";
 import { TurtleClass } from "../graphics/TurtleClass.ts";
+import { PAppletClass } from "../graphics/PAppletClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -133,7 +134,10 @@ export class SystemModule extends JavaLibraryModule {
             ScaleModeEnum, RepeatTypeEnum, SpriteLibraryEnum, TileImageClass, SpriteClass, // Sprite
             CircleClass, EllipseClass, ArcClass, SectorClass,
             PolygonClass, TriangleClass, LineClass, BitmapClass, TextClass, RoundedRectangleClass,
-            TurtleClass
+            TurtleClass,
+
+            // Processing
+            PAppletClass
         )
 
     }

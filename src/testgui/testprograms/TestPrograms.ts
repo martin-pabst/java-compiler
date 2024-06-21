@@ -1,5 +1,14 @@
 export var testProgramsList = [
    ['', ``],
+   ['Processing', `
+   new Test();
+
+
+   class Test extends PApplet {
+         public void draw() {
+            println("Hello!");
+         }
+   }`],
    ['TurtleTest', `Turtle t = new Turtle();
    t.forward(200);
    t.turn(45);
@@ -21,7 +30,7 @@ export var testProgramsList = [
    double r = left + right / auflösung * x;
    
    println(r);`],
-['Mandelbrot', `// Beispiel: Mandelbrotmenge
+   ['Mandelbrot', `// Beispiel: Mandelbrotmenge
 // Am besten mit voller Geschwindigkeit starten!
 new World(1000, 1000);
 int auflösung = 150;
@@ -59,17 +68,17 @@ for (int x = 0; x < auflösung; x++) {
 
 bm.setColor(1, 1, 0xffffff, 1.0);
 `],
-['BitmapTest', `Bitmap bm = new Bitmap(100, 100, 50, 50, 300, 300);
+   ['BitmapTest', `Bitmap bm = new Bitmap(100, 100, 50, 50, 300, 300);
 
 bm.setColor(50, 50, 0x0000ff, 0.5);`],
-['TransformationTest', `
+   ['TransformationTest', `
 Circle c = new Circle();
 
 c.move(100, 200);
 
 println(c.getCenterX());
 `],
-['DebuggerTest', `
+   ['DebuggerTest', `
 A a = new A();
 a.doIt();
 
@@ -84,7 +93,7 @@ class B {
    String fieldB = "field B";
 }
 `],
-['ExceptionTest', `
+   ['ExceptionTest', `
 Test t = new Test();
 
 t.t1();
@@ -110,7 +119,7 @@ class Test {
    }
 
 }`],
-['MouseTest', `
+   ['MouseTest', `
 new MyRectangle();
 
 
@@ -134,7 +143,7 @@ class MyRectangle extends Rectangle {
 
 }
 `],
-['SpriteTest', `
+   ['SpriteTest', `
 
 Sprite s = new Sprite(300, 300, SpriteLibrary.Bird, 0);
 s.scale(10);
@@ -187,7 +196,7 @@ class Particle extends Rectangle {
 
 }
 `],
-['GroupTest', `
+   ['GroupTest', `
 
 Rectangle r = new Rectangle(200, 100, 100, 200);
 r.move(100, 200);
@@ -212,7 +221,7 @@ g.remove(r);
 
 r.move(10, 10);
 `],
-['synchronizedTest', `
+   ['synchronizedTest', `
 new A().test();
 
 
@@ -228,7 +237,7 @@ class A {
       println("Hallo!");
    }
 }`],
-['switchCaseWithConstant',`
+   ['switchCaseWithConstant', `
 public class A {
    public static final String a = "ABC";
    public static final int x = 5;
@@ -251,7 +260,7 @@ public class A {
  print("Here!");
 
 `],
-['threadTest',`
+   ['threadTest', `
 for(int n = 0; n < 10; n++){
    Thread t = new Thread(new Runnable(){
       void run(){
@@ -273,7 +282,7 @@ for(int i = 0; i < 1000000; i++){
    }
 }
 `],
-['sortTest',`
+   ['sortTest', `
 ArrayList<String> list = new ArrayList<>();
 
 list.add("c");
@@ -291,7 +300,7 @@ class StringComparator implements Comparator<String> {
 list.sort(new StringComparator());
 
 list.forEach((s) -> {println(s);})`],
-['ellipsisTest',`
+   ['ellipsisTest', `
 new A().test(12, "Nick", "Emma");
 
 
@@ -304,7 +313,7 @@ class A {
       }
    }
 }`],
-['consumerTestWithLambda',`
+   ['consumerTestWithLambda', `
 var list = new ArrayList<String>();
 
 list.add("first");
@@ -316,7 +325,7 @@ list.forEach((e) -> {println(e);});
 
 println("Fertig!");
 `],
-['consumerTest',`
+   ['consumerTest', `
 var list = new ArrayList<String>();
 
 list.add("first");
@@ -332,7 +341,7 @@ var consumer = new Consumer<String>(){
 
 list.forEach(consumer);
 `],
-['iteratorTest',`
+   ['iteratorTest', `
 class A implements Iterable<String> {
    Iterator<String> iterator(){
       return new Iterator<String>() {
@@ -352,7 +361,7 @@ for(var n: new A()){
    println(n);
 }
 `],
-   ['forLoopWithIterator',`
+   ['forLoopWithIterator', `
 var list = new ArrayList<Integer>();
 
 list.add(12);
@@ -362,7 +371,7 @@ list.add(14);
 for (Iterator<Integer> i = list.iterator(); i.hasNext(); ) {
     println(i.next());
 }`],
-['enhancedForLoopTest',`
+   ['enhancedForLoopTest', `
 int[] array = {1, 2, 3, 4};
 
 for(var n: array){
@@ -378,7 +387,7 @@ list.add(14);
 for(var n: list){
    println(n);
 }`],
-   ['dynamicCallingConvention',`
+   ['dynamicCallingConvention', `
 ArrayList<String> arrayList = new ArrayList<String>();
 arrayList.add("First");
 
@@ -395,13 +404,13 @@ class A<E> extends ArrayList<E> {
 
 
 }`],
-['charAtError', `
+   ['charAtError', `
 String s3 = "Das ist ein Test und noch ein Test";
 println(s3.charAt(2));
 
 //assertEquals(s3.charAt(2), 's', "String object charAt not working.");
 `],
-['callingConventions',`
+   ['callingConventions', `
 ArrayList<String> arrayList = new ArrayList<String>();
 arrayList.add("First");
 
@@ -519,8 +528,8 @@ switch(t) {
    case A.x: break;
    default: println("C");
 }
-`], 
-['arrayListTest', `
+`],
+   ['arrayListTest', `
 ArrayList<String> list = new ArrayList<String>();
 
 list.add("one");
@@ -547,7 +556,7 @@ int[][] zweiDimensional = {
 
 println(zweiDimensional);
 `],
-['genericParameterTest', `
+   ['genericParameterTest', `
 interface I1<T> {
    void doIt(T t);
 }
@@ -700,7 +709,7 @@ class A {
    }
 }
 `],
-['interfaceTest', `
+   ['interfaceTest', `
 T t = new T();
 t.def();
 
@@ -749,7 +758,7 @@ println("G");
 println("H");
 println("I");
 `],
-['fieldTest', `
+   ['fieldTest', `
 
 A a = new A();
 a.privateA = 12;
@@ -778,7 +787,7 @@ class B {
    }
 }
 `],
-['tryCatchTest', `
+   ['tryCatchTest', `
 A a = new A();
 a.testA();
 println("Main program continues...");
@@ -817,7 +826,7 @@ class MyException extends Exception {
 }
 
 `],
-['stringTest', `
+   ['stringTest', `
 String s = "A";
 
 new StringTest().test(s);
@@ -834,7 +843,7 @@ class StringTest {
    }
 } 
 `],
-['hanoi', `
+   ['hanoi', `
 Hanoi h = new Hanoi();
 h.erkläreLösung(1, 3, 4);    // Erkläre, wie man 4 Scheiben von Turm 1 zu Turm 3 bringt.
 
@@ -853,7 +862,7 @@ class Hanoi {
    }
 
 }`],
-['simpleClass', `
+   ['simpleClass', `
 Test m = new Test();
 int i = m.doIt("Hier!");
 
@@ -871,7 +880,7 @@ class Test {
    }
 }
 `],
-['simpleWhileLoops', `
+   ['simpleWhileLoops', `
 int i = 0;
 while(i < 100){
     int j = 0;
@@ -884,17 +893,17 @@ while(i < 100){
     }
 }
 `],
-['arrayIndices', `
+   ['arrayIndices', `
 int[] test = new int[10];
 test[5] = 2;
 println(test[5]);
 `],
-['forLoop', `
+   ['forLoop', `
 for(int i = 0; i < 10; i++){
     print(i + ", ");
 }
 `],
-['primzahlzwillinge', `int max = 100000;
+   ['primzahlzwillinge', `int max = 100000;
 boolean[] isPrime = new boolean[max];
 for(int i = 0; i < max; i++) {
    isPrime[i] = true;
@@ -968,8 +977,8 @@ println(k + " Primzahlzwillinge gefunden!");`],
       }
    
    }`],
-['listeVorlage', 
-`// Ergänze die folgende Vorlage, so dass die Klasse eine Liste nach dem FIFO - Prinzip implmentiert.
+   ['listeVorlage',
+      `// Ergänze die folgende Vorlage, so dass die Klasse eine Liste nach dem FIFO - Prinzip implmentiert.
 class MyList {
    int size;
    // Ergänze weitere Attribute

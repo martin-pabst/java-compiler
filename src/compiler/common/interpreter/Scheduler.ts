@@ -161,7 +161,7 @@ export class Scheduler {
                             this.keepThread = false;
                         }
 
-                        if (this.runningThreads.length == 0 && !this.interpreter.hasActors()
+                        if (this.runningThreads.length == 0 && !this.interpreter.hasActorsOrPApplet()
                             || threadState.state == ThreadState.terminatedWithException) {
 
                             if (currentThread.maxStepsPerSecond) {

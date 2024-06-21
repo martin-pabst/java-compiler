@@ -1029,88 +1029,88 @@ export class JRC {
      * class Turtle
      */
     static TurtleClassComment = () => lm({
-    "de": "Turtle-Klasse zum Zeichnen von Streckenzügen oder gefüllten Figuren. Wichtig sind vor allem die Methoden forward(double length) und turn(double angleDeg), die die Turtle nach vorne bewegen bzw. ihre Blickrichtung ändern.",
-    "en": "Turtle class to draw straight lines or filled shapes. Most important methods are forward(double length) and turn(angleInDegrees).",
+        "de": "Turtle-Klasse zum Zeichnen von Streckenzügen oder gefüllten Figuren. Wichtig sind vor allem die Methoden forward(double length) und turn(double angleDeg), die die Turtle nach vorne bewegen bzw. ihre Blickrichtung ändern.",
+        "en": "Turtle class to draw straight lines or filled shapes. Most important methods are forward(double length) and turn(angleInDegrees).",
     })
 
     static TurtleEmptyConstructorComment = () => lm({
-    "de": "Instanziert ein neues Turtle-Objekt ohne Punkte. Die Turtle blickt anfangs nach rechts. Am Ende des Streckenzugs wird eine 'Schildkröte' (kleines Dreieck) gezeichnet.",
-    "en": "Creates a new Turtle object without points/lines. Initially the turtle's viewing direction is to the right. A small red triangle shows the turtle's current position. ",
+        "de": "Instanziert ein neues Turtle-Objekt ohne Punkte. Die Turtle blickt anfangs nach rechts. Am Ende des Streckenzugs wird eine 'Schildkröte' (kleines Dreieck) gezeichnet.",
+        "en": "Creates a new Turtle object without points/lines. Initially the turtle's viewing direction is to the right. A small red triangle shows the turtle's current position. ",
     })
 
     static TurtleConstructorComment1 = () => lm({
-    "de": "Instanziert ein neues Turtle-Objekt ohne Punkte. (x, y) is die Startposition der Turtle. Die Turtle blickt anfangs nach rechts. Am Ende des Streckenzugs wird eine 'Schildkröte' (kleines Dreieck) gezeichnet.",
-    "en": "Creates a new Turtle object without points/lines at position (x, y). Initially the turtle's viewing direction is to the right. A small red triangle shows the turtle's current position. ",
+        "de": "Instanziert ein neues Turtle-Objekt ohne Punkte. (x, y) is die Startposition der Turtle. Die Turtle blickt anfangs nach rechts. Am Ende des Streckenzugs wird eine 'Schildkröte' (kleines Dreieck) gezeichnet.",
+        "en": "Creates a new Turtle object without points/lines at position (x, y). Initially the turtle's viewing direction is to the right. A small red triangle shows the turtle's current position. ",
     })
 
     static TurtleConstructorComment2 = () => lm({
-    "de": "Instanziert ein neues Turtle-Objekt ohne Punkte. (x, y) is die Startposition der Turtle. Die Turtle blickt anfangs nach rechts. Falls showTurtle == true wird am Ende des Streckenzugs eine 'Schildkröte' (kleines Dreieck) gezeichnet.",
-    "en": "Creates a new Turtle object without points/lines at position (x, y). Initially the turtle's viewing direction is to the right. If showTurtle == true a small red triangle shows the turtle's current position. ",
+        "de": "Instanziert ein neues Turtle-Objekt ohne Punkte. (x, y) is die Startposition der Turtle. Die Turtle blickt anfangs nach rechts. Falls showTurtle == true wird am Ende des Streckenzugs eine 'Schildkröte' (kleines Dreieck) gezeichnet.",
+        "en": "Creates a new Turtle object without points/lines at position (x, y). Initially the turtle's viewing direction is to the right. If showTurtle == true a small red triangle shows the turtle's current position. ",
     })
 
     static TurtleCopyComment = () => lm({
-    "de": "Erstellt eine Kopie der Turtle.",
-    "en": "Creates a copy of this turtle object.",
+        "de": "Erstellt eine Kopie der Turtle.",
+        "en": "Creates a copy of this turtle object.",
     })
 
     static TurtleForwardComment = () => lm({
-    "de": "Weist die Turtle an, die angegebene Länge vorwärts zu gehen. Ihr zurückgelegter Weg wird als gerade Strecke mit der aktuellen BorderColor gezeichnet. Mit setBorderColor(null) bewirkst Du, dass ein Stück ihres Weges nicht gezeichnet wird.",
-    "en": "Makes the turtle walk forward given length. While walking it draws a line with current BorderColor. Use setBorderColor(null) to get invisible lines.",
+        "de": "Weist die Turtle an, die angegebene Länge vorwärts zu gehen. Ihr zurückgelegter Weg wird als gerade Strecke mit der aktuellen BorderColor gezeichnet. Mit setBorderColor(null) bewirkst Du, dass ein Stück ihres Weges nicht gezeichnet wird.",
+        "en": "Makes the turtle walk forward given length. While walking it draws a line with current BorderColor. Use setBorderColor(null) to get invisible lines.",
     })
 
     static TurtleTurnComment = () => lm({
-    "de": "Bewirkt, dass sich die Turtle um den angegebenen Winkel (in Grad!) dreht, d.h. ihre Blickrichtung ändert. Ein positiver Winkel bewirkt eine Drehung gegen den Uhrzeigersinn. Diese Methode wirkt sich NICHT auf die bisher gezeichneten Strecken aus. Willst Du alles bisher Gezeichnete inklusive Turtle drehen, so nutze die Methode rotate.",
-    "en": "Makes the turtle (NOT the lines drawn by it) turn counterclockwise by given angle in Degrees. If you want to rotate all lines drawn by the turtle, then use method rotate instead.",
+        "de": "Bewirkt, dass sich die Turtle um den angegebenen Winkel (in Grad!) dreht, d.h. ihre Blickrichtung ändert. Ein positiver Winkel bewirkt eine Drehung gegen den Uhrzeigersinn. Diese Methode wirkt sich NICHT auf die bisher gezeichneten Strecken aus. Willst Du alles bisher Gezeichnete inklusive Turtle drehen, so nutze die Methode rotate.",
+        "en": "Makes the turtle (NOT the lines drawn by it) turn counterclockwise by given angle in Degrees. If you want to rotate all lines drawn by the turtle, then use method rotate instead.",
     })
 
     static TurtlePenUpComment = () => lm({
-    "de": "Bewirkt, dass die Turtle beim Gehen ab jetzt nicht mehr zeichnet.",
-    "en": "After this method call the turtle will stop drawing when it walks.",
+        "de": "Bewirkt, dass die Turtle beim Gehen ab jetzt nicht mehr zeichnet.",
+        "en": "After this method call the turtle will stop drawing when it walks.",
     })
 
     static TurtlePenDownComment = () => lm({
-    "de": "Bewirkt, dass die Turtle beim Gehen ab jetzt wieder zeichnet.",
-    "en": "After this method call the turtle will restart drawing when it walks.",
+        "de": "Bewirkt, dass die Turtle beim Gehen ab jetzt wieder zeichnet.",
+        "en": "After this method call the turtle will restart drawing when it walks.",
     })
 
     static TurtleCloseAndFillComment = () => lm({
-    "de": "closeAndFill == true bewirkt, dass das von der Turtlezeichnung umschlossene Gebiet gefüllt wird.",
-    "en": "If closeAndFill == true then the area surronded by the turtle's drawing is filled.",
+        "de": "closeAndFill == true bewirkt, dass das von der Turtlezeichnung umschlossene Gebiet gefüllt wird.",
+        "en": "If closeAndFill == true then the area surronded by the turtle's drawing is filled.",
     })
 
     static TurtleShowTurtleComment = () => lm({
-    "de": "showTurtle == true bewirkt, dass am Ort der Turtle ein rotes Dreieck gezeichnet wird.",
-    "en": "If showTurtle == true then a small triangle indicates the turtle's position.",
+        "de": "showTurtle == true bewirkt, dass am Ort der Turtle ein rotes Dreieck gezeichnet wird.",
+        "en": "If showTurtle == true then a small triangle indicates the turtle's position.",
     })
 
     static TurtleClearComment = () => lm({
-    "de": "Löscht alle bis jetzt mit der Turtle gezeichneten Strecken.",
-    "en": "Erases all lines drawn previously.",
+        "de": "Löscht alle bis jetzt mit der Turtle gezeichneten Strecken.",
+        "en": "Erases all lines drawn previously.",
     })
 
     static TurtleCollidesWithBorderColorComment = () => lm({
-    "de": 'Gibt genau dann true zurück, wenn sich der "Mittelpunkt" des Turtle-Dreiecks auf dem Rand eines anderen graphischen Objekts mit der angegebenen Farbe befindet.',
-    "en": "Returns true if and only if current position of turtle is on the border of another shape with given borderColor.",
+        "de": 'Gibt genau dann true zurück, wenn sich der "Mittelpunkt" des Turtle-Dreiecks auf dem Rand eines anderen graphischen Objekts mit der angegebenen Farbe befindet.',
+        "en": "Returns true if and only if current position of turtle is on the border of another shape with given borderColor.",
     })
 
     static TurtleGetLastSegmentLengthComment = () => lm({
-    "de": "Gibt die Länge des letzten gezeichneten Streckenzugs zurück.",
-    "en": "Returns length of last drawn line segment.",
+        "de": "Gibt die Länge des letzten gezeichneten Streckenzugs zurück.",
+        "en": "Returns length of last drawn line segment.",
     })
 
     static TurtleGetXComment = () => lm({
-    "de": "Gibt die x-Koordinate der aktuellen Turtleposition zurück.",
-    "en": "Returns x-coordinate of current turtle position.",
+        "de": "Gibt die x-Koordinate der aktuellen Turtleposition zurück.",
+        "en": "Returns x-coordinate of current turtle position.",
     })
 
     static TurtleGetYComment = () => lm({
-    "de": "Gibt die y-Koordinate der aktuellen Turtleposition zurück.",
-    "en": "Returns y-coordinate of current turtle position.",
+        "de": "Gibt die y-Koordinate der aktuellen Turtleposition zurück.",
+        "en": "Returns y-coordinate of current turtle position.",
     })
 
     static TurtleMoveToComment = () => lm({
-    "de": "Bewirkt, dass die Turtle zum Punkt (x, y) geht.",
-    "en": "Makes Turtle walk to position (x, y).",
+        "de": "Bewirkt, dass die Turtle zum Punkt (x, y) geht.",
+        "en": "Makes Turtle walk to position (x, y).",
     })
 
 
@@ -1999,14 +1999,89 @@ export class JRC {
      */
 
     static PAppletClassComment = () => lm({
-    "de": "Wenn Du Deine Klasse von PApplet ableitest (class Test extends PApplet{...}), kannst Du auf diese Weise ein Processing-Applet erstellen (siehe https://processing.org), indem Du ihre Methoden draw(), mousePressed(), usw. überschreibst und mit Inhalt füllst. Du startest das Applet, indem Du ein Objekt Deiner Klasse instanzierst und davon die main-Methode aufrufst: new Test().main();",
-    "en": "You can create a processing-Applet by extending class PApplet (class Test extends PApplet{...}), see https://processing.org. Overwrite it's methods draw(), mousePressed(), ... to get graphic output and interaction.",
+        "de": "Wenn Du Deine Klasse von PApplet ableitest (class Test extends PApplet{...}), kannst Du auf diese Weise ein Processing-Applet erstellen (siehe https://processing.org), indem Du ihre Methoden draw(), mousePressed(), usw. überschreibst und mit Inhalt füllst. Du startest das Applet, indem Du ein Objekt Deiner Klasse instanzierst und davon die main-Methode aufrufst: new Test().main();",
+        "en": "You can create a processing-Applet by extending class PApplet (class Test extends PApplet{...}), see https://processing.org. Overwrite it's methods draw(), mousePressed(), ... to get graphic output and interaction.",
     })
 
     static PAppletConstructorComment = () => lm({
-    "de": "Legt eine neues Processing-Applet an.",
-    "en": "Creates a new processing Applet.",
+        "de": "Legt eine neues Processing-Applet an.",
+        "en": "Creates a new processing Applet.",
     })
+
+    static PAppletSetupComment = () => lm({
+        "de": "Diese Methode wird nach Aufruf von main() genau ein Mal aufgerufen.",
+        "en": "This method is called once after main() had been called.",
+    })
+
+    static PAppletSettingsComment = () => lm({
+        "de": "Diese Methode wird nach Aufruf von main() genau ein Mal aufgerufen.",
+        "en": "This method is called once after main() had been called.",
+    })
+
+    static PAppletPreloadComment = () => lm({
+        "de": "Diese Methode wird nach Aufruf von main() genau ein Mal aufgerufen.",
+        "en": "This method is called once after main() had been called.",
+    })
+
+    static PAppletDrawComment = () => lm({
+        "de": "Diese Methode wird 30-mal pro Sekunde aufgerufen. Ihr Zweck ist es, die Grafikausgabe zu zeichnen.",
+        "en": "This method is called 30 times per second. It's purpose is to draw.",
+    })
+
+    static PAppletMousePressedComment = () => lm({
+        "de": "Die mousePressed-Methode wird immer dann aufgerufen, wenn gerade eine Maustaste heruntergedrückt wurde. Die aktuellen Koordinaten des Mauszeigers liegen in den Attributen mouseX und mouseY vor, die gerade heruntergedrückte Maustaste kann dem Attribut mouseButton entnommen werden.",
+        "en": "",
+    })
+
+    static PAppletMouseReleasedComment = () => lm({
+        "de": "Die mouseReleased-Methode wird immer dann aufgerufen, wenn gerade eine Maustaste losgelassen wurde. Die aktuellen Koordinaten des Mauszeigers liegen in den Attributen mouseX und mouseY vor, die gerade heruntergedrückte Maustaste kann dem Attribut mouseButton entnommen werden.",
+        "en": "",
+    })
+
+    static PAppletMouseClickedComment = () => lm({
+        "de": "Die mouseClicked-Methode wird immer dann aufgerufen, wenn gerade eine Maustaste auf dem Zeichenbereich gedrückt und anschließend losgelassen wurde. Die aktuellen Koordinaten des Mauszeigers liegen in den Attributen mouseX und mouseY vor, die gerade heruntergedrückte Maustaste kann dem Attribut mouseButton entnommen werden.",
+        "en": "",
+    })
+
+    static PAppletMouseDraggedComment = () => lm({
+        "de": "Die mouseDragged-Methode wird immer dann aufgerufen, wenn eine Maustaste gerade heruntergedrückt ist und die Position des Mauszeigers sich verändert hat. Die aktuellen Koordinaten des Mauszeigers liegen in den Attributen mouseX und mouseY vor, die zuletzt gedrückte Maustaste kann dem Attribut mouseButton entnommen werden.",
+        "en": "",
+    })
+
+    static PAppletMouseMovedComment = () => lm({
+        "de": "Die mouseMoved-Methode wird immer dann aufgerufen, wenn die Position des Mauszeigers sich verändert hat. Die aktuellen Koordinaten des Mauszeigers liegen in den Attributen mouseX und mouseY vor, die zuletzt gedrückte Maustaste kann dem Attribut mouseButton entnommen werden.",
+        "en": "",
+    })
+
+    static PAppletMouseEnteredComment = () => lm({
+        "de": "Die mouseEntered-Methode wird immer dann aufgerufen, wenn der Mauszeiger von außen neu in den Zeichenbereich hineinfährt.",
+        "en": "",
+    })
+
+    static PAppletMouseExitedComment = () => lm({
+        "de": "Die mouseExited-Methode wird immer dann aufgerufen, wenn der Mauszeiger den Zeichenbereich gerade verlassen hat.",
+        "en": "",
+    })
+
+    static PAppletKeyPressedComment = () => lm({
+        "de": "Die keyPressed-Methode wird immer dann aufgerufen, wenn eine Taste gerade heruntergedrückt wurde. Informationen zur Taste können den Attributen key (String) und keyCode (int) entnommen werden.",
+        "en": "",
+    })
+
+    static PAppletKeyReleasedComment = () => lm({
+        "de": "Die keyReleased-Methode wird immer dann aufgerufen, wenn eine Taste gerade losgelassen wurde. Informationen zur Taste können den Attributen key (String) und keyCode (int) entnommen werden.",
+        "en": "",
+    })
+
+    static PAppletMainComment = () => lm({
+        "de": "Rufen Sie die Methode main() auf, um das Processing-Applet zu starten.",
+        "en": "Call method main() to start this processing Applet.",
+    })
+
+
+
+
+
 
     // Kürzel: mlc
 

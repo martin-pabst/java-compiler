@@ -7,6 +7,7 @@ import { NonPrimitiveType } from "../../types/NonPrimitiveType.ts";
 import { ObjectClass } from "../system/javalang/ObjectClassStringClass.ts";
 import { DOM } from "../../../../tools/DOM.ts";
 import { Interpreter } from "../../../common/interpreter/Interpreter.ts";
+import { SchedulerState } from "../../../common/interpreter/Scheduler.ts";
 
 export class PAppletClass extends ObjectClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -14,6 +15,21 @@ export class PAppletClass extends ObjectClass {
 
         { type: "method", signature: "PApplet()", java: PAppletClass.prototype._cj$_constructor_$PApplet$, comment: JRC.PAppletConstructorComment },
 
+        { type: "method", signature: "void main()", java: PAppletClass.prototype._mj$main$void$, comment: JRC.PAppletMainComment },
+        
+        { type: "method", signature: "void setup()", java: PAppletClass.prototype._mj$setup$void$, comment: JRC.PAppletSetupComment },
+        { type: "method", signature: "void settings()", java: PAppletClass.prototype._mj$settings$void$, comment: JRC.PAppletSettingsComment },
+        { type: "method", signature: "void preload()", java: PAppletClass.prototype._mj$preload$void$, comment: JRC.PAppletPreloadComment },
+        { type: "method", signature: "void draw()", java: PAppletClass.prototype._mj$draw$void$, comment: JRC.PAppletDrawComment },
+        { type: "method", signature: "void mousePressed()", java: PAppletClass.prototype._mj$mousePressed$void$, comment: JRC.PAppletMousePressedComment },
+        { type: "method", signature: "void mouseReleased()", java: PAppletClass.prototype._mj$mouseReleased$void$, comment: JRC.PAppletMouseReleasedComment },
+        { type: "method", signature: "void mouseClicked()", java: PAppletClass.prototype._mj$mouseClicked$void$, comment: JRC.PAppletMouseClickedComment },
+        { type: "method", signature: "void mouseDragged()", java: PAppletClass.prototype._mj$mouseDragged$void$, comment: JRC.PAppletMouseDraggedComment },
+        { type: "method", signature: "void mouseEntered()", java: PAppletClass.prototype._mj$mouseEntered$void$, comment: JRC.PAppletMouseEnteredComment },
+        { type: "method", signature: "void mouseExited()", java: PAppletClass.prototype._mj$mouseExited$void$, comment: JRC.PAppletMouseExitedComment },
+        { type: "method", signature: "void mouseMoved()", java: PAppletClass.prototype._mj$mouseMoved$void$, comment: JRC.PAppletMouseMovedComment },
+        { type: "method", signature: "void keyPressed()", java: PAppletClass.prototype._mj$keyPressed$void$, comment: JRC.PAppletKeyPressedComment },
+        { type: "method", signature: "void keyReleased()", java: PAppletClass.prototype._mj$keyReleased$void$, comment: JRC.PAppletKeyReleasedComment },
 
     ]
 
@@ -36,7 +52,23 @@ export class PAppletClass extends ObjectClass {
     onSizeChanged: () => void = () => {};
     canvasCreated: boolean = false;
 
+    _mj$setup$void$(t: Thread, callback: CallbackFunction){}
+    _mj$settings$void$(t: Thread, callback: CallbackFunction){}
+    _mj$preload$void$(t: Thread, callback: CallbackFunction){}
+    _mj$draw$void$(t: Thread, callback: CallbackFunction){}
+    _mj$mousePressed$void$(t: Thread, callback: CallbackFunction){}
+    _mj$mouseReleased$void$(t: Thread, callback: CallbackFunction){}
+    _mj$mouseClicked$void$(t: Thread, callback: CallbackFunction){}
+    _mj$mouseDragged$void$(t: Thread, callback: CallbackFunction){}
+    _mj$mouseEntered$void$(t: Thread, callback: CallbackFunction){}
+    _mj$mouseExited$void$(t: Thread, callback: CallbackFunction){}
+    _mj$mouseMoved$void$(t: Thread, callback: CallbackFunction){}
+    _mj$keyPressed$void$(t: Thread, callback: CallbackFunction){}
+    _mj$keyReleased$void$(t: Thread, callback: CallbackFunction){}
 
+    _mj$main$void$(t: Thread, callback: CallbackFunction){
+
+    }
 
     _cj$_constructor_$PApplet$(t: Thread, callback: CallbackFunction){
         this._constructor();
@@ -48,6 +80,13 @@ export class PAppletClass extends ObjectClass {
 
         this.setupGraphicsDiv(this.graphicsDiv);
         this.setupProcessing(this.containerInner, interpreter);
+
+        interpreter.eventManager.once("stop", () => {
+            this.p5o.remove();
+            interpreter.objectStore["PApplet"] = undefined;
+        })
+
+        interpreter.objectStore["PApplet"] = this;
 
     }
 
@@ -91,11 +130,12 @@ export class PAppletClass extends ObjectClass {
         this.onSizeChanged();
         this.p5o.createCanvas(this.width, this.height, this.renderer);
         
-        jQuery(this.containerInner).find('canvas').css({
-            'width': '',
-            'height': ''
-
-        });
+        let canvas = this.containerInner.getElementsByTagName('canvas');
+        if(canvas.length > 0){
+            canvas[0].style.width = "";
+            canvas[0].style.height = "";
+        }
+        
         this.canvasCreated = true;
     }
 
@@ -104,7 +144,7 @@ export class PAppletClass extends ObjectClass {
 
         let that = this;
         this.canvasCreated = false;
-        let drawMethodPending: boolean = true;
+        let drawMethodPending: boolean = false;
 
         let sketch = (p5: p5) => {
 
@@ -124,70 +164,70 @@ export class PAppletClass extends ObjectClass {
 
                 let i = 2;
 
-                that.runMethod('setup', () => {
+                that.runMethod(that._mj$setup$void$, () => {
                     if (--i == 0) afterFinishingBoth();
-                });
+                }, interpreter);
 
-                that.runMethod('settings', () => {
+                that.runMethod(that._mj$settings$void$, () => {
                     if (--i == 0) afterFinishingBoth();
-                });
+                }, interpreter);
 
 
             };
 
             p5.preload = function () {
-                that.runMethod('preload');
+                that.runMethod(that._mj$preload$void$, undefined, interpreter);
             };
 
             p5.draw = function () {
-                if (that.interpreter.state == InterpreterState.running && !that.loopStopped) {
+                if (interpreter.scheduler.state == SchedulerState.running && !that.loopStopped) {
                     if (!drawMethodPending) {
                         drawMethodPending = true;
-                        that.runMethod("draw", () => {
+                        that.runMethod(that._mj$draw$void$, () => {
                             drawMethodPending = false;
-                        });
+                        }, interpreter);
                     }
                 }
-                that.tick();
-                // p5.background(50);
-                // p5.rect(p5.width / 2, p5.height / 2, 50, 50);
+                interpreter.timerFunction(1000/30.0);
+                p5.background(50);
+                p5.rect(p5.width / 2, p5.height / 2, 50, 50);
 
             };
 
             p5.mousePressed = function () {
-                that.runMethod('mousePressed');
+                that.runMethod(that._mj$mousePressed$void$, undefined, interpreter);
             };
 
             p5.mouseReleased = function () {
-                that.runMethod('mouseReleased');
+                that.runMethod(that._mj$mouseReleased$void$, undefined, interpreter);
             };
 
             p5.mouseClicked = function () {
-                that.runMethod('mouseClicked');
+                that.runMethod(that._mj$mouseClicked$void$, undefined, interpreter);
             };
 
             p5.mouseDragged = function () {
-                that.runMethod('mouseDragged');
+                that.runMethod(that._mj$mouseDragged$void$, undefined, interpreter);
             };
 
-            p5.mouseEntered = function () {
-                that.runMethod('mouseEntered');
-            };
+            // p5.mouseEntered = function () {
+            //     that.runMethod(that._mj$mouseEntered$void$, undefined, interpreter);
+            // };
 
-            p5.mouseExited = function () {
-                that.runMethod('mouseExited');
-            };
+            // p5.mouseExited = function () {
+            //     that.runMethod(that._mj$mouseExited$void$, undefined, interpreter);
+            // };
 
             p5.mouseMoved = function () {
-                that.runMethod('mouseMoved');
+                that.runMethod(that._mj$mouseMoved$void$, undefined, interpreter);
             };
 
             p5.keyPressed = function () {
-                that.runMethod('keyPressed');
+                that.runMethod(that._mj$keyPressed$void$, undefined, interpreter);
             };
 
             p5.keyReleased = function () {
-                that.runMethod('keyReleased');
+                that.runMethod(that._mj$keyReleased$void$, undefined, interpreter);
             };
 
 
@@ -195,14 +235,26 @@ export class PAppletClass extends ObjectClass {
 
         //@ts-ignore
         new p5(sketch, containerInner);
-        jQuery(containerInner).find('canvas').css({
-            'width': '',
-            'height': ''
-        })
+        let canvas = this.containerInner.getElementsByTagName('canvas');
+        if(canvas.length > 0){
+            canvas[0].style.width = "";
+            canvas[0].style.height = "";
+        }
 
     }
 
-    runMethod(method: (t: Thread, callback: CallbackFunction) => void, interpreter: Interpreter){
-        let t: Thread = new Thread
+    runMethod(method: (t: Thread, callback: CallbackFunction) => void, callback: CallbackFunction, interpreter: Interpreter){
+
+        // Test if method is overridden:
+        //@ts-ignore
+        if(method == PAppletClass.prototype[method.name]){
+            if(callback) callback();
+            return;
+        }
+
+        let t: Thread = interpreter.scheduler.createThread("processing: " + method.name);
+        method.call(this, t, callback);
+        t.startIfNotEmptyOrDestroy();
+
     }
 }

@@ -193,7 +193,7 @@ export class Interpreter {
         if (this.scheduler.getNextStepPosition()) {
             this.pauseIntern();
         } else {
-            if (this.hasActors()) {
+            if (this.hasActorsOrPApplet()) {
                 this.scheduler.onStartingNextThreadCallback = () => {
                     this.pauseIntern();
                 }
@@ -457,7 +457,10 @@ export class Interpreter {
             this.scheduler.state == SchedulerState.paused;
     }
 
-    hasActors(): boolean {
+    hasActorsOrPApplet(): boolean {
+
+        if(this.objectStore["PApplet"]) return true;
+
         let world: IWorld = this.objectStore["World"];
         if (!world) return false;
         return world.hasActors();
