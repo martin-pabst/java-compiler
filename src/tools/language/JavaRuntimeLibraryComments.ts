@@ -1093,6 +1093,27 @@ export class JRC {
     "en": "Returns true if and only if current position of turtle is on the border of another shape with given borderColor.",
     })
 
+    static TurtleGetLastSegmentLengthComment = () => lm({
+    "de": "Gibt die Länge des letzten gezeichneten Streckenzugs zurück.",
+    "en": "Returns length of last drawn line segment.",
+    })
+
+    static TurtleGetXComment = () => lm({
+    "de": "Gibt die x-Koordinate der aktuellen Turtleposition zurück.",
+    "en": "Returns x-coordinate of current turtle position.",
+    })
+
+    static TurtleGetYComment = () => lm({
+    "de": "Gibt die y-Koordinate der aktuellen Turtleposition zurück.",
+    "en": "Returns y-coordinate of current turtle position.",
+    })
+
+    static TurtleMoveToComment = () => lm({
+    "de": "Bewirkt, dass die Turtle zum Punkt (x, y) geht.",
+    "en": "Makes Turtle walk to position (x, y).",
+    })
+
+
 
     /**
      * Interface MouseListener

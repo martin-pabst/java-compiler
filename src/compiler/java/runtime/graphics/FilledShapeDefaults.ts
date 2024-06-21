@@ -6,7 +6,7 @@ export class FilledShapeDefaults {
 
     static defaultBorderColor?: number;
     static defaultBorderAlpha: number = 1.0;
-    static defaultBorderWidth: number = 10;
+    static defaultBorderWidth: number = 5;
 
     static defaultVisibility: boolean = true;
 

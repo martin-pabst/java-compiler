@@ -34,6 +34,11 @@ export class TurtleClass extends FilledShapeClass {
         { type: "method", signature: "final void clear()", native: TurtleClass.prototype._clear, comment: JRC.TurtleClearComment },
         { type: "method", signature: "final boolean collidesWithBorderColor(int borderColor)", native: TurtleClass.prototype._collidesWithBorderColor, comment: JRC.TurtleCollidesWithBorderColorComment },
         { type: "method", signature: "final boolean collidesWithBorderColor(String borderColor)", native: TurtleClass.prototype._collidesWithBorderColor, comment: JRC.TurtleCollidesWithBorderColorComment },
+        { type: "method", signature: "final double getLastSegmentLength()", native: TurtleClass.prototype._getLastSegmentLength, comment: JRC.TurtleGetLastSegmentLengthComment },
+        { type: "method", signature: "final double getX()", template: `&1.getPosition().x`, comment: JRC.TurtleGetXComment },
+        { type: "method", signature: "final double getY()", template: `&1.getPosition().y`, comment: JRC.TurtleGetYComment },
+        { type: "method", signature: "final void moveTo(double x, double y)", native: TurtleClass.prototype._moveTo, comment: JRC.TurtleMoveToComment },
+
 
         { type: "method", signature: "final Turtle copy()", java: TurtleClass.prototype._mj$copy$Turtle$, comment: JRC.TurtleCopyComment },
 
@@ -61,7 +66,7 @@ export class TurtleClass extends FilledShapeClass {
     penIsDown: boolean = true;
 
     lastLineWidth: number = 0;
-    lastColor: number = 0;
+    lastColor: number | undefined = 0;
     lastAlpha: number = 0;
 
     lastTurtleAngleDeg: number = 0; // angle in Rad
@@ -94,6 +99,8 @@ export class TurtleClass extends FilledShapeClass {
             this.hitPolygonInitial = [];
 
             this.container = new PIXI.Container();
+
+            this.world.app!.stage.addChild(this.container);
 
             this.lineGraphic = new PIXI.Graphics();
             this.container.addChild(this.lineGraphic);
@@ -201,7 +208,7 @@ export class TurtleClass extends FilledShapeClass {
 
     }
 
-    moveTo(x: number, y: number) {
+    _moveTo(x: number, y: number) {
         let newLineElement: LineElement = {
             x: x,
             y: y,
@@ -463,7 +470,7 @@ export class TurtleClass extends FilledShapeClass {
         return false;
     }
 
-    getLastSegmentLength(): any {
+    _getLastSegmentLength(): any {
         if (this.lineElements.length < 2) return 0;
         let l1 = this.lineElements[this.lineElements.length - 2];
         let l2 = this.lineElements[this.lineElements.length - 1];
@@ -492,18 +499,14 @@ export class TurtleClass extends FilledShapeClass {
 
         let g: PIXI.Graphics = this.lineGraphic;
 
-        this.lastLineWidth = 0;
-        this.lastColor = 0;
-        this.lastAlpha = 0;
-
-        if (!this.container) {
-            g = new PIXI.Graphics();
-            this.container = g;
-            this.world.app.stage.addChild(g);
-
-        } else {
-            g.clear();
+        if(this.lineElements.length > 1){
+            let le = this.lineElements[1];
+            this.lastLineWidth = le.lineWidth;
+            this.lastColor = le.color;
+            this.lastAlpha = le.alpha;
         }
+
+        g.clear();
 
 
         let firstPoint = this.lineElements[0];
@@ -512,20 +515,20 @@ export class TurtleClass extends FilledShapeClass {
         for (let i = 1; i < this.lineElements.length; i++) {
             let le: LineElement = this.lineElements[i];
             if (le.color != null) {
-                g.lineTo(le.x, le.y);
-                if (!this.isFilled) {
+                if (!this.isFilled && i > 1) {
                     if (le.lineWidth != this.lastLineWidth || le.color != this.lastColor || le.alpha != this.lastAlpha) {
+                        g.stroke({
+                            width: this.lastLineWidth,
+                            color: this.lastColor,
+                            alpha: this.lastAlpha,
+                            alignment: 0.5
+                        })
                         this.lastLineWidth = le.lineWidth;
                         this.lastColor = le.color;
                         this.lastAlpha = le.alpha;
-                        g.stroke({
-                            width: le.lineWidth,
-                            color: le.color,
-                            alpha: le.alpha,
-                            alignment: 0.5
-                        })
                     }
                 }
+                g.lineTo(le.x, le.y);
                 // console.log("LineTo: " + le.x + ", " + le.y);
             } else {
                 g.moveTo(le.x, le.y);
@@ -535,14 +538,22 @@ export class TurtleClass extends FilledShapeClass {
 
         if (this.isFilled) {
             g.closePath();
-        }
-        if (this.isFilled) {
             g.stroke({
                 width: this.borderWidth,
                 color: this.borderColor,
                 alpha: this.borderAlpha,
                 alignment: 0.5
             })
+        } else {
+            if(this.lineElements.length > 1){
+                let lastLineElement = this.lineElements[this.lineElements.length - 1];
+                g.stroke({
+                    width: lastLineElement.lineWidth,
+                    color: lastLineElement.color,
+                    alpha: lastLineElement.alpha,
+                    alignment: 0.5
+                })
+            }
         }
 
         if (this.fillColor != null && this.isFilled) {

@@ -1,5 +1,13 @@
 export var testProgramsList = [
    ['', ``],
+   ['TurtleTest', `Turtle t = new Turtle();
+   t.forward(200);
+   t.turn(45);
+   t.forward(200);
+   t.setBorderColor(0xff0000);
+   t.turn(-45);
+   t.forward(50);
+   `],
    ['TextTest', `Text t = new Text(100, 100, 20, "Hello World!");
    t.setBorderColor(Color.wheat);
    t.setBorderWidth(3);`],
