@@ -647,11 +647,17 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         } else {
             let outerClassPraefix: string = "";
             while (outerClassLevel > 0) {
-                outerClassPraefix += Helpers.outerClassAttributeIdentifier + ".";
+                outerClassPraefix += "." + Helpers.outerClassAttributeIdentifier;
                 outerClassLevel--;
             }
 
-            snippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${outerClassPraefix}${fieldName}`, range, type);
+            if(field.template){
+                let objectSnippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}${outerClassPraefix}`, range, type);
+                snippet = new OneParameterTemplate(field.template).applyToSnippet(type, range, objectSnippet);
+            } else {
+                snippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}${outerClassPraefix}.${fieldName}`, range, type);
+            }
+
         }
         snippet.isLefty = !field._isFinal;
 
@@ -801,10 +807,20 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         } else {
             let template: string = objectSnippet.type instanceof JavaEnum ? `§1` : `(§1 || ${Helpers.throwNPE}(${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn}))`;
 
-            let snippet = new OneParameterTemplate(`${template}.${field.getInternalName()}`)
-                .applyToSnippet(field.type, range, objectSnippet);
-            snippet.isLefty = !field._isFinal;
-            return snippet;
+            if(field.template){
+                let objSnippet1 = new OneParameterTemplate(template).applyToSnippet(objectSnippet.type, objectSnippet.range!, objectSnippet);
+                let snippet = new OneParameterTemplate(field.template).applyToSnippet(field.type, range, objSnippet1);
+                snippet.isLefty = !field._isFinal;
+    
+                return snippet;
+            } else {
+                let snippet = new OneParameterTemplate(`${template}.${field.getInternalName()}`)
+                    .applyToSnippet(field.type, range, objectSnippet);
+                snippet.isLefty = !field._isFinal;
+    
+                return snippet;
+            }
+            
         }
 
 

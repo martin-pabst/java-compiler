@@ -26,11 +26,11 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     abstract getExtends(): IJavaClass | undefined;
     abstract getImplements(): IJavaInterface[];
 
-    getOwnAndInheritedFields(): JavaField[]{
+    getOwnAndInheritedFields(): JavaField[] {
         let fields: JavaField[] = this.getFields();
 
         let baseClass = this.getExtends();
-        if(baseClass){
+        if (baseClass) {
             fields = fields.concat(baseClass.getOwnAndInheritedFields())
         }
 
@@ -38,14 +38,14 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     }
 
 
-    getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, 
+    getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string,
         rangeToReplace: monaco.IRange, methodContext: JavaMethod | undefined, onlyStatic?: false): monaco.languages.CompletionItem[] {
 
         let itemList: monaco.languages.CompletionItem[] = [];
 
         for (let field of this.getFields().filter(f => f.visibility <= visibilityUpTo && (f._isStatic || !onlyStatic))) {
             let isColor = this.identifier == 'Color' && field._isStatic;
-            
+
             itemList.push({
                 label: field.toString(),
                 kind: isColor ? monaco.languages.CompletionItemKind.Color : monaco.languages.CompletionItemKind.Field,
@@ -58,7 +58,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
             });
         }
 
-        for (let method of this.getAllMethods().filter( m => (m.classEnumInterface == this || m.visibility != TokenType.keywordPrivate) && (m.isStatic || !onlyStatic))) {
+        for (let method of this.getAllMethods().filter(m => (m.classEnumInterface == this || m.visibility != TokenType.keywordPrivate) && (m.isStatic || !onlyStatic))) {
             if (method.isConstructor) {
                 if (methodContext?.isConstructor && methodContext != method && method.classEnumInterface == this.getExtends()) {
                     this.pushSuperCompletionItem(itemList, method, leftBracketAlreadyThere, rangeToReplace);
@@ -85,6 +85,12 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
                     value: typeof method.documentation == "string" ? method.documentation : method.documentation()
                 }
             });
+        }
+
+        if (this.getExtends()) {
+            if (visibilityUpTo == TokenType.keywordPrivate) visibilityUpTo = TokenType.keywordProtected;
+            itemList = itemList.concat(this.getExtends()!.getCompletionItems(visibilityUpTo, leftBracketAlreadyThere, identifierAndBracketAfterCursor,
+                rangeToReplace, methodContext, onlyStatic));
         }
 
         return itemList;
@@ -156,10 +162,10 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     abstract isAbstract(): boolean;
 
     hasAncestorOrIs(objectType: NonPrimitiveType): boolean {
-        if(this == objectType) return true;
+        if (this == objectType) return true;
         let ext = this.getExtends();
-        if(ext == null) return false;
-        if(ext == objectType) return true;
+        if (ext == null) return false;
+        if (ext == objectType) return true;
         return ext.hasAncestorOrIs(objectType);
     }
 
@@ -167,7 +173,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
 
 
 export class JavaClass extends IJavaClass {
-    
+
     isStatic: boolean = false;
     _isAbstract: boolean = false;
 
@@ -176,12 +182,12 @@ export class JavaClass extends IJavaClass {
 
     private extends?: IJavaClass;
     private implements: IJavaInterface[] = [];
-    
+
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
         super(identifier, identifierRange, path, module);
         this.genericTypeParameters = [];
     }
-    
+
     getAbstractMethodsNotYetImplemented(): JavaMethod[] {
 
         let abstractMethods: JavaMethod[] = [];
@@ -463,8 +469,8 @@ export class JavaClass extends IJavaClass {
         if (this.genericTypeParameters && this.genericTypeParameters.length > 0) {
             decl += "<" + this.genericTypeParameters.map(gp => gp.getDeclaration()) + ">";
         }
-        if(this.extends) decl += " extends " + this.extends.toString();
-        if(this.implements.length > 0){
+        if (this.extends) decl += " extends " + this.extends.toString();
+        if (this.implements.length > 0) {
             decl += " implements " + this.implements.map(impl => impl.toString()).join(", ");
         }
         return decl;
@@ -514,8 +520,8 @@ export class GenericVariantOfJavaClass extends IJavaClass {
                 return type?.toString();
             }).join(", ") + ">";
         }
-        if(this.getExtends()) decl += " extends " + this.getExtends()!.toString();
-        if(this.getImplements().length > 0){
+        if (this.getExtends()) decl += " extends " + this.getExtends()!.toString();
+        if (this.getImplements().length > 0) {
             decl += " implements " + this.getImplements().map(impl => impl.toString()).join(", ");
         }
 

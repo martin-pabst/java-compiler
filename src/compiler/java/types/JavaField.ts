@@ -19,6 +19,7 @@ export class JavaField extends BaseField {
     classEnum!: JavaClass | JavaEnum | JavaInterface;
 
     internalName?: string;
+    template?: string;
 
     initialValue?: any;
     initialValueIsConstant: boolean = false;    // enables us to resolve values of final variables as constants

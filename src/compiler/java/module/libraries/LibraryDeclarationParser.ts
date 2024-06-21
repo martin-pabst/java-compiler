@@ -620,6 +620,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             a.documentation = adecl.comment;
 
             a.internalName = adecl.nativeIdentifier || identifier;
+            a.template = adecl.template;
             if (typeof adecl.constantValue !== "undefined") {
                 a.initialValue = adecl.constantValue;
                 a.initialValueIsConstant = true;

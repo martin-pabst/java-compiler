@@ -2008,6 +2008,28 @@ export class JRC {
         "en": "Creates a new processing Applet.",
     })
 
+    static PAppletLoopComment = () => lm({
+    "de": "Startet nach noLoop() die Renderer-Loop wieder neu, so dass draw() wieder periodisch aufgerufen wird.",
+    "en": "",
+    })
+
+    static PAppletNoLoopComment = () => lm({
+    "de": "Stoppt die Render-Loop, so dass draw() nicht mehr aufgerufen wird. Kann mit loop() wieder gestartet werden.",
+    "en": "",
+    })
+
+    static PAppletSizeComment = () => lm({
+    "de": "Definiert die Abmessungen des Processing-Ausgabebereichs in Pixeln.",
+    "en": "",
+    })
+
+    static PAppletCreateCanvasComment = () => lm({
+    "de": "Definiert die Abmessungen des Processing-Ausgabebereichs in Pixeln.",
+    "en": "",
+    })
+
+
+
     static PAppletSetupComment = () => lm({
         "de": "Diese Methode wird nach Aufruf von main() genau ein Mal aufgerufen.",
         "en": "This method is called once after main() had been called.",
@@ -2024,8 +2046,8 @@ export class JRC {
     })
 
     static PAppletDrawComment = () => lm({
-        "de": "Diese Methode wird 30-mal pro Sekunde aufgerufen. Ihr Zweck ist es, die Grafikausgabe zu zeichnen.",
-        "en": "This method is called 30 times per second. It's purpose is to draw.",
+        "de": "Diese Methode wird 60-mal pro Sekunde aufgerufen. Ihr Zweck ist es, die Grafikausgabe zu zeichnen.",
+        "en": "This method is called 60 times per second. It's purpose is to draw.",
     })
 
     static PAppletMousePressedComment = () => lm({
@@ -2079,7 +2101,176 @@ export class JRC {
     })
 
 
+    // Fields
+    static PAppletMouseXComment = () => lm({
+    "de": "aktuelle x-Koordinate des Mauszeigers",
+    "en": "current x-coordinate of mouse pointer",
+    })
 
+    static PAppletMouseYComment = () => lm({
+        "de": "aktuelle y-Koordinate des Mauszeigers",
+        "en": "current y-coordinate of mouse pointer",
+    })
+    
+    static PAppletPMouseXComment = () => lm({
+    "de": "x-Koordinate des Mauszeigers im vorherigen Frame",
+    "en": "x-coordinate of mouse pointer in previous frame",
+    })
+
+    static PAppletPMouseYComment = () => lm({
+    "de": "y-Koordinate des Mauszeigers im vorherigen Frame",
+    "en": "y-coordinate of mouse pointer in previous frame",
+    })
+
+    static PAppletLEFTComment = () => lm({
+    "de": "links",
+    "en": "left",
+    })
+
+    static PAppletCENTERComment = () => lm({
+    "de": "Mitte",
+    "en": "center",
+    })
+
+    static PAppletRIGHTComment = () => lm({
+    "de": "rechts",
+    "en": "right",
+    })
+
+    static PAppletTOPComment = () => lm({
+    "de": "obenbündig",
+    "en": "top",
+    })
+
+    static PAppletBASELINEComment = () => lm({
+    "de": "bündig auf der Grundlinie",
+    "en": "baseline",
+    })
+
+    static PAppletBOTTOMComment = () => lm({
+    "de": "untenbündig",
+    "en": "bottom",
+    })
+
+    static PAppletWidthComment = () => lm({
+    "de": "Breite des Zeichenbereichs",
+    "en": "width of canvas",
+    })
+
+    static PAppletHeightComment = () => lm({
+    "de": "Höhe des Zeichenbereichs",
+    "en": "height of canvas",
+    })
+
+    static PAppletKeyCodeComment = () => lm({
+    "de": "Zahlencode der zuletzt gedrückten Taste",
+    "en": "keycode of previously pressed key",
+    })
+
+    static PAppletMouseButtonComment = () => lm({
+    "de": "Zuletzt gedrückte Maustaste, kann die Werte LEFT, RIGHT und CENTER annehmen.",
+    "en": "Previously pressed mouse button. Possible values are LEFT, RIGHT or CENTER.",
+    })
+
+    static PAppletCORNERComment = () => lm({
+    "de": "Modus zum Zeichnen von Rechtecken.",
+    "en": "Mode to draw rectangles.",
+    })
+
+    static PAppletCORNERSComment = () => lm({
+    "de": "Modus zum Zeichnen von Rechtecken.",
+    "en": "Mode to draw rectangles.",
+    })
+
+    static PAppletRADIUSComment = () => lm({
+    "de": "Modus zum Zeichnen von Rechtecken.",
+    "en": "Mode to draw rectangles.",
+    })
+
+    static PAppletPOINTSComment = () => lm({
+    "de": "zeichne nachfolgend Einzelpunkte",
+    "en": "draw points only",
+    })
+
+    static PAppletLINESComment = () => lm({
+    "de": "zeichne nachfolgend einzelne Linien",
+    "en": "draw lines subsequently",
+    })
+
+    static PAppletTRIANGLESComment = () => lm({
+    "de": "zeichne nachfolgend einzelne Dreiecke",
+    "en": "draw triangles subsequently",
+    })
+
+    static PAppletTRIANGLE_STRIPComment = () => lm({
+    "de": "zeichne nachfolgend einen Triangle-Strip",
+    "en": "draw triangle-strip subesequently",
+    })
+
+    static PAppletTRIANGLE_FANComment = () => lm({
+    "de": "zeichne nachfolgend einen Triangle-Fan",
+    "en": "draw triangle-fan subesequently",
+    })
+
+    static PAppletQUADSComment = () => lm({
+    "de": "zeichne nachfolgend Vierecke",
+    "en": "draw quads subsequently",
+    })
+
+    static PAppletQUAD_STRIPComment = () => lm({
+    "de": "zeichne nachfolgend einen Quad-Strip",
+    "en": "draw quad-strip subsequently",
+    })
+
+    static PAppletTESSComment = () => lm({
+    "de": "zeichne nachfolgend ein TESS - geht nur bei createCanvas(width, height, WEBGL)",
+    "en": "draw TESS subsequently - only possible with createCanvas(width, height, WEBGL)",
+    })
+
+    static PAppletCLOSEComment = () => lm({
+    "de": "endShape(CLOSE) schließt den Linienzug",
+    "en": "endShape(CLOSE) closes line-strip",
+    })
+
+    static PAppletDEGREESComment = () => lm({
+    "de": "angleMode(DEGREES) sorgt dafür, dass nachfolgende Winkelangaben in Grad interpretiert werden.",
+    "en": "angleMode(DEGREES) makes processing interpret subsequent angle values as degrees",
+    })
+
+    static PAppletRADIANSComment = () => lm({
+    "de": "angleMode(RADIANS) sorgt dafür, dass nachfolgende Winkelangaben im Bogenmaß interpretiert werden.",
+    "en": "angleMode(RADIANS) makes processing interpret subsequent angle values as radians",
+    })
+
+    static PAppletWEBGLComment = () => lm({
+    "de": "WebGL-Renderer zur 3D-Ausgabe",
+    "en": "WebGL-Renderer for 3D-output",
+    })
+
+    static PAppletP2DComment = () => lm({
+    "de": "Renderer zur zweidimensionalen Ausgabe",
+    "en": "Renderer for 2D-Output",
+    })
+
+    static PAppletRGBComment = () => lm({
+    "de": "Color-Mode RGB (rot, grün, blau)",
+    "en": "color mode RGB (red, green, blue)",
+    })
+
+    static PAppletHSLComment = () => lm({
+    "de": "Color-Mode HSL",
+    "en": "color mode HSL",
+    })
+
+    static PAppletHSBComment = () => lm({
+    "de": "Color-Mode HSB",
+    "en": "color mode HSB",
+    })
+
+    static PAppletKeyComment = () => lm({
+    "de": "Letzte gedrückte Taste",
+    "en": "previously pressed key",
+    })
 
 
 

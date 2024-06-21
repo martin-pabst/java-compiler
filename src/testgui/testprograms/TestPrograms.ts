@@ -3,12 +3,14 @@ export var testProgramsList = [
    ['Processing', `
    new Test();
 
-
-   class Test extends PApplet {
-         public void draw() {
-            println("Hello!");
-         }
-   }`],
+class Test extends PApplet {
+   int i = 0;
+   public void draw() {
+      clear();
+      background(30);
+      rect(50 + i++, 50, 100, 100); 
+   }
+}`],
    ['TurtleTest', `Turtle t = new Turtle();
    t.forward(200);
    t.turn(45);

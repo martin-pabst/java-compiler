@@ -20,6 +20,7 @@ export type LibraryAttributeDeclaration = {
     type: LMADeclarationType;
     signature: string;
     nativeIdentifier: string;
+    template?: string;
     constantValue: any;
     comment?: string | (() => string);
 } 
