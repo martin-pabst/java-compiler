@@ -222,7 +222,8 @@ export class Scheduler {
                 this.timeStampProgramStarted = performance.now();
                 this.stepCountSinceStartOfProgram = 0;
                 break;
-            case SchedulerState.stopped, SchedulerState.error:
+            case SchedulerState.stopped:
+            case SchedulerState.error:
                 if (this.state == SchedulerState.running) {
                     let dt = performance.now() - this.timeStampProgramStarted;
                     let stepsPerSecond = Math.round(this.stepCountSinceStartOfProgram / dt * 1000);
