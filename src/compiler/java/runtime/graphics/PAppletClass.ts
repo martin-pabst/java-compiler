@@ -6,6 +6,7 @@ import { LibraryDeclarations } from "../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType.ts";
 import { ObjectClass } from "../system/javalang/ObjectClassStringClass.ts";
 import { DOM } from "../../../../tools/DOM.ts";
+import { Interpreter } from "../../../common/interpreter/Interpreter.ts";
 
 export class PAppletClass extends ObjectClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -29,7 +30,7 @@ export class PAppletClass extends ObjectClass {
 
     p5o!: p5;
 
-    renderer!: p5.RENDERER = "webgl";
+    renderer: p5.RENDERER = "webgl";
     loopStopped: boolean = false;
 
     onSizeChanged: () => void = () => {};
@@ -46,7 +47,7 @@ export class PAppletClass extends ObjectClass {
         this.graphicsDiv.style.overflow = "hidden";
 
         this.setupGraphicsDiv(this.graphicsDiv);
-        this.setupProcessing(this.containerInner);
+        this.setupProcessing(this.containerInner, interpreter);
 
     }
 
@@ -99,7 +100,7 @@ export class PAppletClass extends ObjectClass {
     }
 
 
-    setupProcessing(containerInner: HTMLDivElement) {
+    setupProcessing(containerInner: HTMLDivElement, interpreter: Interpreter) {
 
         let that = this;
         this.canvasCreated = false;
@@ -199,5 +200,9 @@ export class PAppletClass extends ObjectClass {
             'height': ''
         })
 
+    }
+
+    runMethod(method: (t: Thread, callback: CallbackFunction) => void, interpreter: Interpreter){
+        let t: Thread = new Thread
     }
 }
