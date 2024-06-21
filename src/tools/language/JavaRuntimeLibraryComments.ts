@@ -1994,6 +1994,19 @@ export class JRC {
     })
 
 
+    /**
+     * Klass PApplet
+     */
+
+    static PAppletClassComment = () => lm({
+    "de": "Wenn Du Deine Klasse von PApplet ableitest (class Test extends PApplet{...}), kannst Du auf diese Weise ein Processing-Applet erstellen (siehe https://processing.org), indem Du ihre Methoden draw(), mousePressed(), usw. überschreibst und mit Inhalt füllst. Du startest das Applet, indem Du ein Objekt Deiner Klasse instanzierst und davon die main-Methode aufrufst: new Test().main();",
+    "en": "You can create a processing-Applet by extending class PApplet (class Test extends PApplet{...}), see https://processing.org. Overwrite it's methods draw(), mousePressed(), ... to get graphic output and interaction.",
+    })
+
+    static PAppletConstructorComment = () => lm({
+    "de": "Legt eine neues Processing-Applet an.",
+    "en": "Creates a new processing Applet.",
+    })
 
     // Kürzel: mlc
 
