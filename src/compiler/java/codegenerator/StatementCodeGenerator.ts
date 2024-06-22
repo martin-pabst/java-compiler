@@ -16,7 +16,7 @@ import { JavaMethod } from "../types/JavaMethod.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 import { CatchBlockInfo } from "../../common/interpreter/ExceptionInfo.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
-import { EmptyRange, IRange } from "../../common/range/Range.ts";
+import { EmptyRange, IRange, Range } from "../../common/range/Range.ts";
 import { ExceptionTree } from "./ExceptionTree.ts";
 import { JavaArrayType } from "../types/JavaArrayType.ts";
 import { GenericVariantOfJavaClass, IJavaClass } from "../types/JavaClass.ts";
@@ -568,7 +568,9 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         whileSnippet.addStringPart("}", undefined);
         whileSnippet.addNextStepMark();
         whileSnippet.addParts(statementToRepeat);
-        whileSnippet.addParts(new JumpToLabelCodeSnippet(labelAtBeginOfWhileBlock));
+        let jtls = new JumpToLabelCodeSnippet(labelAtBeginOfWhileBlock);
+        jtls.range = Range.fromPositions(Range.getEndPosition(statementToRepeat.range!))
+        whileSnippet.addParts(jtls);
         whileSnippet.addNextStepMark();
         whileSnippet.addParts(labelAfterWhileBlock);
 

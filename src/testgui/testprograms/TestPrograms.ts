@@ -1,5 +1,26 @@
 export var testProgramsList = [
    ['', ``],
+   ['JavaKara', `JavaKaraWorld jkw = new JavaKaraWorld(10, 5);
+println(jkw.WEST);
+jkw.init("""
+tttttttttt
+t l  l  lt
+tttttttttt
+ m m m m 
+""");
+Kara kara = new Kara(jkw, 1, 1, jkw.EAST);
+
+if(kara.onLeaf()) { kara.removeLeaf(); }
+else { kara.putLeaf(); }
+
+while (!kara.treeFront()) {
+   kara.move();
+   if(kara.onLeaf()) {
+      kara.removeLeaf();
+   } else {
+      kara.putLeaf();
+   }
+}`],
    ['Processing', `
    new Test();
 

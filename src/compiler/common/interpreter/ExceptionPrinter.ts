@@ -19,8 +19,10 @@ export class ExceptionPrinter {
             if(methodIdentifierWithClass == ".main") methodIdentifierWithClass = "Main method";
 
             printManager.print(indent + methodIdentifierWithClass, false, 0xffffff);
-            printManager.print("(" + ste.range.startLineNumber + ":" + ste.range.startColumn + ")",
-             true, 0x80ff80);
+            if(ste.range){
+                printManager.print("(" + ste.range.startLineNumber + ":" + ste.range.startColumn + ")",
+                 true, 0x80ff80);
+            }
         }
     }
 

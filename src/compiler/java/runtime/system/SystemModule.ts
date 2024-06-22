@@ -76,6 +76,8 @@ import { DayOfWeekEnum } from "./DayOfWeekEnum.ts";
 import { RoundedRectangleClass } from "../graphics/RoundedRectangleClass.ts";
 import { TurtleClass } from "../graphics/TurtleClass.ts";
 import { PAppletClass } from "../graphics/PAppletClass.ts";
+import { PositionClass } from "../graphics/PositionClass.ts";
+import { JavaKaraClass, JavaKaraWorldClass } from "../graphics/JavaKaraClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -105,7 +107,7 @@ export class SystemModule extends JavaLibraryModule {
             ObjectClass, StringClass, EnumClass,                  // These two MUST come first!
             
             //additional system classes
-            KeyClass, LocalDateTimeClass, DayOfWeekEnum,
+            KeyClass, LocalDateTimeClass, DayOfWeekEnum, PositionClass,
 
             // Functional
             ConsumerInterface, FunctionInterface,
@@ -137,7 +139,10 @@ export class SystemModule extends JavaLibraryModule {
             TurtleClass,
 
             // Processing
-            PAppletClass
+            PAppletClass,
+
+            // Java Kara
+            JavaKaraWorldClass, JavaKaraClass,
         )
 
     }

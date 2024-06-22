@@ -2441,47 +2441,47 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
  
     static PAppletRect1Comment = () => lm({
         "de": `Zeichnet ein Rechteck. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks.`,
-        "en": ``,
+        "en": `Draws a rectangle.`,
     })
  
     static PAppletRect1aComment = () => lm({
         "de": `Zeichnet ein Rechteck mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks.`,
-        "en": ``,
+        "en": `Draws a rectangle with rounded edges.`,
     })
  
     static PAppletRect1bComment = () => lm({
         "de": `Zeichnet ein Rechteck mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks.`,
-        "en": ``,
+        "en": `Draws a rectangle with rounded edges.`,
     })
  
     static PAppletSquare1Comment = () => lm({
         "de": `Zeichnet ein Quadrat. (left, top) ist die linke obere Ecke, width Seitenlänge des Quadrats.`,
-        "en": ``,
+        "en": `Draws a square.`,
     })
  
     static PAppletSquare1aComment = () => lm({
         "de": `Zeichnet ein Quadrat mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width Seitenlänge des Quadrats. Radius ist der Eckenradius.`,
-        "en": ``,
+        "en": `Draws a sqare with rounded eges.`,
     })
  
     static PAppletSquare1bComment = () => lm({
         "de": `Zeichnet ein Quadrat mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width Seitenlänge des Quadrats. Radius ist der Eckenradius.`,
-        "en": ``,
+        "en": `Draws a sqare with rounded eges.`,
     })
  
     static PAppletRect1cComment = () => lm({
         "de": `Zeichnet ein Rechteck. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks. Radius ist der Eckenradius`,
-        "en": ``,
+        "en": `Draws a rectangle with rounded edges.`,
     })
  
     static PAppletEllipse1Comment = () => lm({
         "de": `Zeichnet eine Ellipse. (left, top) ist die linke obere Ecke der Boundingbox der Ellipse, width ihre Breite und height ihre Höhe. Das lässt sich aber mit ellipseMode(...) ändern!`,
-        "en": ``,
+        "en": `Draws an ellipse.`,
     })
  
     static PAppletCircle1Comment = () => lm({
         "de": `Zeichnet einen Kreis. (x, y) ist der Mittelpunkt des Kreises, extent der doppelte Radius.`,
-        "en": ``,
+        "en": `Draws a circle with center at (x, y). Extent is it's double radius.`,
     })
  
     static PAppletEllipseMode1Comment = () => lm({
@@ -2909,5 +2909,163 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
         "en": ``,
     })
 
+    /**
+     * JavaKara
+     */
+    static JavaKaraWorldClassComment = () => lm({
+    "de": "JavaKara-Welt",
+    "en": "JavaKara-World",
+    })
 
+    static JavaKaraWorldConstructorComment = () => lm({
+    "de": "",
+    "en": "",
+    })
+
+    static JavaKaraWorldGetSizeXComment = () => lm({
+    "de": "Gibt zurück, wie viele Felder breit die Welt ist.",
+    "en": "Returns number of tiles in x-direction.",
+    })
+    
+    static JavaKaraWorldGetSizeYComment = () => lm({
+    "de": "Gibt zurück, wie viele Felder hoch die Welt ist.",
+    "en": "Returns number of tiles in y-direction.",
+    })
+
+    static JavaKaraWorldClearAllComment = () => lm({
+    "de": "Löscht alles aus der Welt bis auf Kara.",
+    "en": "Removes everything except Kara the beatle.",
+    })
+
+    static JavaKaraWorldSetLeafComment = () => lm({
+    "de": "Setzt oder entfernt an der Position (x, y) ein Kleeblatt.",
+    "en": "Adds or removes a leaf at position (x, y).",
+    })
+
+    static JavaKaraWorldSetTreeComment = () => lm({
+    "de": "Setzt oder entfernt an der Position (x, y) einen Baumstumpf.",
+    "en": "Adds or removes a tree stump at position (x, y).",
+    })
+
+    static JavaKaraWorldSetMushroomComment = () => lm({
+    "de": "Setzt oder entfernt an der Position (x, y) einen Pilz.",
+    "en": "Adds or removes a mushroom at position (x, y).",
+    })
+
+    static JavaKaraWorldIsEmptyComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn sich auf dem angegebenen Feld nichts befindet (auch nicht Kara).",
+    "en": "Returns true if and only if there's nothing at position (x, y).",
+    })
+
+    static JavaKaraWorldInitComment = () => lm({
+    "de": "Baut die Welt mithilfe eines mehrzeiligen Strings. Dabei bedeutet \\n einen Zeilenumbruch, l ein Kleeblatt, t einen Baumstumpf und m einen Pilz.",
+    "en": "Creates world based on a multiline string. \\n is a line break, l a leaf, t a tree stump and m a Mushroom.",
+    })
+
+
+
+
+
+
+
+
+    static KaraClassComment = () => lm({
+    "de": "JavaKara-Marienkäfer",
+    "en": "Kara, the beatle",
+    })
+
+    static KaraConstructorComment = () => lm({
+    "de": "Instanziert ein neues Kara-Objekt.",
+    "en": "Creates a new Kara beatle.",
+    })
+
+    static KaraGetPositionComment = () => lm({
+    "de": "Gibt Karas Position zurück. Dabei ist (0/0) die Position der linken oberen Ecke.",
+    "en": "Returns Kara's position. (0/0) is position at top left corner.",
+    })
+
+    static KaraMoveComment = () => lm({
+    "de": "Bewegt Kara um ein Feld nach vorne.",
+    "en": "Moves Kara one tile forward.",
+    })
+
+    static KaraGetWorldComment = () => lm({
+    "de": "Gibt das JavaKaraWorld-Objekt zurück, in dem sich Kara befindet.",
+    "en": "Returns world-object.",
+    })
+
+    static KaraGetDirectionComment = () => lm({
+    "de": "Gibt die Blickrichtung von Kara zurück: 0 == Norden, 1 == Westen, 2 == Süden, 3 == Osten",
+    "en": "Returns direction of beatle Kara. 0 == north, 1 == west, 2 == south, 3 == east.",
+    })
+
+    static KaraOnLeafComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn sich Kara auf einem Kleeblatt befindet.",
+    "en": "Returns true if and only if Kara is located on a leaf.",
+    })
+
+    static KaraTreeFrontComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn sich vor Kara ein Baumstumpf befindet.",
+    "en": "Returns true if and only if on the tile IN FRONT OF Kara there is a tree stump.",
+    })
+
+    static KaraTreeLeftComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn sich auf dem Feld unmmittelbar links von Kara ein Baumstumpf befindet.",
+    "en": "Returns true if and only if directly left of Kara there is a tree stump.",
+    })
+
+    static KaraTreeRightComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn sich auf dem Feld unmmittelbar rechts von Kara ein Baumstumpf befindet.",
+    "en": "Returns true if and only if directly right of Kara there is a tree stump.",
+    })
+
+    static KaraMushroomFrontComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn sich vor Kara ein Pilz befindet.",
+    "en": "Returns true if and only if on the tile IN FRONT OF Kara there is a mushroom.",
+    })
+
+    static KaraTurnLeftComment = () => lm({
+    "de": "Dreht Kara um 90° nach links (d.h. gegen den Uhrzeigersinn).",
+    "en": "Turns Kara 90° leftwards (that is: counterclockwise).",
+    })
+
+    static KaraTurnRightComment = () => lm({
+    "de": "Dreht Kara um 90° nach rechts (d.h. im Uhrzeigersinn).",
+    "en": "Turns Kara 90° rightwards (that is: clockwise).",
+    })
+
+    static KaraPutLeafComment = () => lm({
+    "de": "Legt ein Kleeblatt auf die Position, an der Kara gerade steht.",
+    "en": "Deposits a leaf beneath Kara.",
+    })
+
+    static KaraRemoveLeafComment = () => lm({
+    "de": "Kara nimmt das Kleeblatt, das sich auf seiner aktuellen Position befindet.",
+    "en": "Removes a leaf beneath Kara.",
+    })
+
+
+
+    /**
+     * class Position
+     */
+    static PositionClassComment = () => lm({
+    "de": "Repräsentiert einen Position auf einem Gitternetz (nur ganzzahlige Koordinaten)",
+    "en": "Position inside a grid (only integer coordinates)",
+    })
+
+    static PositionXComment = () => lm({
+    "de": "x-Komponente der Position",
+    "en": "x-component of Position",
+    })
+
+    static PositionYComment = () => lm({
+    "de": "y-Komponente der Position",
+    "en": "y-component of Position",
+    })
+
+    static PositionConstructorComment = () => lm({
+    "de": "Instanziert eine neue Position den Komponenten x und y.",
+    "en": "Creates a new Position object with components x and y",
+    })
 }  

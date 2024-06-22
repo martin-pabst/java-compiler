@@ -26,7 +26,7 @@ export class DebuggerCallstackEntry {
             this.range = this.currentStep.range;
         }
 
-        if(this.symbolTable && this.currentStep && this.currentStep.range.startLineNumber && this.currentStep.range.startColumn){
+        if(this.symbolTable && this.currentStep && this.currentStep.range?.startLineNumber && this.currentStep.range?.startColumn){
             this.symbolTable = this.symbolTable.findSymbolTableAtPosition({
                 lineNumber: this.currentStep.range.startLineNumber!,
                 column: this.currentStep.range.startColumn!
