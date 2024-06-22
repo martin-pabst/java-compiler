@@ -2275,92 +2275,92 @@ export class JRC {
     // methods:
     static PAppletClear0Comment = () => lm({
         "de": `Löscht die Zeichenfläche.`,
-        "en": ``,
+        "en": `Clears the pixels on the canvas. clear() makes every pixel 100% transparent.`,
     })
  
     static PAppletBackground1Comment = () => lm({
         "de": `Übermalt die komplette Zeichenfläche mit der übergebenen Farbe.`,
-        "en": ``,
+        "en": `Sets the color used for the background of the canvas.`,
     })
  
     static PAppletBackground2Comment = () => lm({
         "de": `Übermalt die komplette Zeichenfläche mit der übergebenen Farbe. Übergeben wird eine Zeichenkette der Form 'rgb(0,0,255)' oder 'rgb(0%, 0%, 100%)' oder 'rgba(0, 0, 255, 1)' oder 'rgba(0%, 0%, 100%, 1)' und all diese Kombinationen statt rgb auch mit hsl und hsb.`,
-        "en": ``,
+        "en": `Sets the color used for the background of the canvas. Write color as 'rgb(0,0,255)' or 'rgb(0%, 0%, 100%)' or 'rgba(0, 0, 255, 1)' or 'rgba(0%, 0%, 100%, 1)' or use hsl or hsb instead of rgb.`,
     })
  
     static PAppletBackground3Comment = () => lm({
         "de": `Übermalt die komplette Zeichenfläche mit der übergebenen Farbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
-        "en": ``,
+        "en": `Sets the color used for the background of the canvas. v1, v2 and v3 are red, green and blue or - dependent on current color mode - color, saturation and luminescence.`,
     })
  
     static PAppletFill1Comment = () => lm({
         "de": `Setzt die Füllfarbe.`,
-        "en": ``,
+        "en": `Sets the color used to fill shapes.`,
     })
  
     static PAppletFill1aComment = () => lm({
         "de": `Setzt die Füllfarbe.`,
-        "en": ``,
+        "en": `Sets the color used to fill shapes.`,
     })
  
     static PAppletFill2Comment = () => lm({
         "de": `Setzt die Füllfarbe.`,
-        "en": ``,
+        "en": `Sets the color used to fill shapes.`,
     })
  
     static PAppletFill3Comment = () => lm({
         "de": `Setzt die Füllfarbe.`,
-        "en": ``,
+        "en": `Sets the color used to fill shapes.`,
     })
  
     static PAppletFill4Comment = () => lm({
         "de": `Setzt die Füllfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
-        "en": ``,
+        "en": `Sets the color used to fill shapes. v1, v2 and v3 are red, green and blue or - dependent on current color mode - color, saturation and luminescence.`,
     })
  
     static PAppletFill5Comment = () => lm({
         "de": `Setzt die Füllfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
-        "en": ``,
+        "en": `Sets the color used to fill shapes. v1, v2 and v3 are red, green and blue or - dependent on current color mode - color, saturation and luminescence.`,
     })
  
     static PAppletNoFill0Comment = () => lm({
         "de": `Die nachfolgend gezeichneten Figuren werden nicht gefüllt.`,
-        "en": ``,
+        "en": `Subsequently drawn shapes will not get filled.`,
     })
  
     static PAppletStroke1Comment = () => lm({
         "de": `Setzt die Linienfarbe.`,
-        "en": ``,
+        "en": `Sets the color used to draw points, lines, and the outlines of shapes.`,
     })
  
     static PAppletStroke1aComment = () => lm({
         "de": `Setzt die Linienfarbe.`,
-        "en": ``,
+        "en": `Sets the color used to draw points, lines, and the outlines of shapes.`,
     })
  
     static PAppletStroke2Comment = () => lm({
         "de": `Setzt die Linienfarbe.`,
-        "en": ``,
+        "en": `Sets the color used to draw points, lines, and the outlines of shapes.`,
     })
  
     static PAppletStroke3Comment = () => lm({
         "de": `Setzt die Linienfarbe.`,
-        "en": ``,
+        "en": `Sets the color used to draw points, lines, and the outlines of shapes.`,
     })
  
     static PAppletStroke4Comment = () => lm({
         "de": `Setzt die Linienfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
-        "en": ``,
+        "en": `Sets the color used to draw points, lines, and the outlines of shapes. v1, v2 and v3 are red, green and blue or - dependent on current color mode - color, saturation and luminescence.`,
     })
  
     static PAppletStroke5Comment = () => lm({
         "de": `Setzt die Linienfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
-        "en": ``,
+        "en": `Sets the color used to draw points, lines, and the outlines of shapes. v1, v2 and v3 are red, green and blue or - dependent on current color mode - color, saturation and luminescence.`,
     })
  
     static PAppletStrokeWeight1Comment = () => lm({
         "de": `Setzt die Linienbreite.`,
-        "en": ``,
+        "en": `Sets the width of the stroke used for points, lines, and the outlines of shapes.`,
     })
  
     static PAppletNoStroke0Comment = () => lm({
@@ -2370,57 +2370,73 @@ export class JRC {
  
     static PAppletColor1Comment = () => lm({
         "de": `Gibt den Grauton als String-kodierte Farbe zurück.`,
-        "en": ``,
+        "en": `Disables drawing points, lines, and the outlines of shapes.`,
     })
  
     static PAppletColor2Comment = () => lm({
         "de": `Gibt die Farbe zurück. Übergeben kann eine Zeichenkette der Form 'rgb(0,0,255)' oder 'rgb(0%, 0%, 100%)' oder 'rgba(0, 0, 255, 1)' oder 'rgba(0%, 0%, 100%, 1)' und all diese Kombinationen statt rgb auch mit hsl und hsb.`,
-        "en": ``,
+        "en": `Converts string like 'rgb(0,0,255)' or 'rgb(0%, 0%, 100%)' or 'rgba(0, 0, 255, 1)' or 'rgba(0%, 0%, 100%, 1)' to a color.`,
     })
  
     static PAppletColor3Comment = () => lm({
         "de": `Gibt den Grauton als String-kodierte Farbe zurück.`,
-        "en": ``,
+        "en": `Returns gray value of given color`,
     })
  
     static PAppletColor4Comment = () => lm({
         "de": `Gibt die aus v1, v2, v3 gebildete Farbe String-kodiert zurück.`,
-        "en": ``,
+        "en": `Returns color given by v1, v2 and v3. v1, v2 and v3 are red, green and blue or - dependent on current color mode - color, saturation and luminescence.`,
     })
  
     static PAppletColor5Comment = () => lm({
         "de": `Gibt die aus v1, v2, v3 und alpha gebildete Farbe String-kodiert zurück.`,
-        "en": ``,
+        "en": `Returns color given by v1, v2 and v3. v1, v2 and v3 are red, green and blue or - dependent on current color mode - color, saturation and luminescence.`,
     })
  
     static PAppletLerpColor3Comment = () => lm({
         "de": `Gibt eine Zwischenfarbe zwischen colorA und colorB zurück. t == 0 bedeutet: colorA, t == 1 bedeutet: colorB, t == 0.5 bedeutet: genau zwischen beiden, usw.`,
-        "en": ``,
+        "en": `Blends two colors to find a third color between them. The amt parameter specifies the amount to interpolate between the two values. 0 is equal to the first color, 0.1 is very near the first color, 0.5 is halfway between the two colors, and so on.`,
     })
  
     static PAppletColorMode1Comment = () => lm({
         "de": `Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB.`,
-        "en": ``,
+        "en": `Changes the way color values are interpreted. 
+By default, the Number parameters for fill(), stroke(), background(), and color() are defined by values between 0 and 255 using the RGB color model. This is equivalent to calling colorMode(RGB, 255). Pure red is color(255, 0, 0) in this model.
+Calling colorMode(RGB, 100) sets colors to use RGB color values between 0 and 100. Pure red is color(100, 0, 0) in this model.
+Calling colorMode(HSB) or colorMode(HSL) changes to HSB or HSL system instead of RGB. Pure red is color(0, 100, 100) in HSB and color(0, 100, 50) in HSL.`,
     })
  
     static PAppletColorMode2Comment = () => lm({
         "de": `Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB für Mode. Max ist der Maximalwert jeder Farbkomponente.`,
-        "en": ``,
+        "en": `Changes the way color values are interpreted. 
+By default, the Number parameters for fill(), stroke(), background(), and color() are defined by values between 0 and 255 using the RGB color model. This is equivalent to calling colorMode(RGB, 255). Pure red is color(255, 0, 0) in this model.
+Calling colorMode(RGB, 100) sets colors to use RGB color values between 0 and 100. Pure red is color(100, 0, 0) in this model.
+Calling colorMode(HSB) or colorMode(HSL) changes to HSB or HSL system instead of RGB. Pure red is color(0, 100, 100) in HSB and color(0, 100, 50) in HSL.`,
     })
  
     static PAppletColorMode4Comment = () => lm({
         "de": `Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB für Mode. Max ist der Maximalwert jeder Farbkomponente.`,
-        "en": ``,
+        "en": `Changes the way color values are interpreted. 
+By default, the Number parameters for fill(), stroke(), background(), and color() are defined by values between 0 and 255 using the RGB color model. This is equivalent to calling colorMode(RGB, 255). Pure red is color(255, 0, 0) in this model.
+Calling colorMode(RGB, 100) sets colors to use RGB color values between 0 and 100. Pure red is color(100, 0, 0) in this model.
+Calling colorMode(HSB) or colorMode(HSL) changes to HSB or HSL system instead of RGB. Pure red is color(0, 100, 100) in HSB and color(0, 100, 50) in HSL.`,
     })
  
     static PAppletColorMode5Comment = () => lm({
         "de": `Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB für Mode. Max ist der Maximalwert jeder Farbkomponente.`,
-        "en": ``,
+        "en": `Changes the way color values are interpreted. 
+By default, the Number parameters for fill(), stroke(), background(), and color() are defined by values between 0 and 255 using the RGB color model. This is equivalent to calling colorMode(RGB, 255). Pure red is color(255, 0, 0) in this model.
+Calling colorMode(RGB, 100) sets colors to use RGB color values between 0 and 100. Pure red is color(100, 0, 0) in this model.
+Calling colorMode(HSB) or colorMode(HSL) changes to HSB or HSL system instead of RGB. Pure red is color(0, 100, 100) in HSB and color(0, 100, 50) in HSL.`,
     })
  
     static PAppletRectMode1Comment = () => lm({
         "de": `Setzt den Modus, in dem nachfolgende Aufrufe von rect(...) interpretiert werden. Möglich sind die Werte CORNER, CORNERS, RADIUS und CENTER.`,
-        "en": ``,
+        "en": `Changes where rectangles and squares are drawn.
+By default, the first two parameters of rect() and square(), are the x- and y-coordinates of the shape's upper left corner. The next parameters set the shape's width and height. This is the same as calling rectMode(CORNER).
+rectMode(CORNERS) also uses the first two parameters as the location of one of the corners. The next parameters are the location of the opposite corner. This mode only works for rect().
+rectMode(CENTER) uses the first two parameters as the x- and y-coordinates of the shape's center. The next parameters are its width and height.
+rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates of the shape's center. The next parameters are half of the shape's width and height.`,
     })
  
     static PAppletRect1Comment = () => lm({
