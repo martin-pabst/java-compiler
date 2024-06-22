@@ -3044,7 +3044,128 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Removes a leaf beneath Kara.",
     })
 
+    /**
+     * Java Hamster
+     */
 
+    static HamsterWorldClassComment = () => lm({
+    "de": "JavaHamster-Welt"
+    })
+
+    static HamsterWorldConstructorComment = () => lm({
+    "de": "Instanziert eine neue JavaHamster-Welt"
+    })
+
+    static HamsterWorldGetBreiteComment = () => lm({
+    "de": "Gibt zurück, wie viele Felder breit die Welt ist.",
+    "en": "",
+    })
+
+    static HamsterWorldGetHoeheComment = () => lm({
+    "de": "Gibt zurück, wie viele Felder hoch die Welt ist.",
+    "en": "",
+    })
+
+    static HamsterWorldLoescheAllesComment = () => lm({
+    "de": "Löscht alles aus der Welt bis auf den Hamster.",
+    "en": "",
+    })
+
+    static HamsterWorldSetzeMauerComment = () => lm({
+    "de": "Setzt oder entfernt an der Position (x, y) eine Mauer.",
+    "en": "",
+    })
+
+    static HamsterWorldSetzeGetreideComment = () => lm({
+    "de": "Setzt an der Position (x, y) die Anzahl der Getreidekörner.",
+    "en": "",
+    })
+
+    static HamsterWorldInitComment = () => lm({
+    "de": "Baut die Welt mithilfe eines mehrzeiligen Strings. Dabei bedeutet \\n einen Zeilenumbruch, m eine Mauer und 1 ... 9, a ... f die entsprechende Anzahl an Getreidekörnern.",
+    "en": "",
+    })
+
+
+
+    static HamsterClassComment = () => lm({
+    "de": "JavaHamster-Hamster"
+    })
+
+    static HamsterConstructorComment = () => lm({
+    "de": "Instanziert ein neues Hamster-Objekt",
+    "en": "",
+    })
+
+    static HamsterVorComment = () => lm({
+    "de": "Bewegt den Hamster um ein Feld nach vorne.",
+    "en": "",
+    })
+
+    static HamsterGetWorldComment = () => lm({
+    "de": "Gibt das JavaHamsterWorld-Objekt zurück, in dem sich Hamster befindet.",
+    "en": "",
+    })
+
+    static HamsterGetBlickrichtungComment = () => lm({
+    "de": "Gibt die Blickrichtung von Hamster zurück: 0 == Norden, 1 == Osten, 2 == Süden, 3 == Westen",
+    "en": "",
+    })
+
+    static HamsterGetReiheComment = () => lm({
+    "de": "Gibt die Reihe zurück, in der sich der Hamster gerade befindet. Reihe 0 ist ganz oben.",
+    "en": "",
+    })
+
+    static HamsterGetSpalteComment = () => lm({
+    "de": "Gibt die Spalte zurück, in der sich der Hamster gerade befindet. Reihe 0 ist ganz links.",
+    "en": "",
+    })
+
+    static HamsterGetKoernerComment = () => lm({
+    "de": "Gibt die Anzahl der Körner zurück, die der Hamster gerade im Mund hat.",
+    "en": "",
+    })
+
+    static HamsterLinksUmComment = () => lm({
+    "de": "Dreht Hamster um 90° nach links",
+    "en": "",
+    })
+
+    static HamsterRechtsUmComment = () => lm({
+    "de": "Dreht Hamster um 90° nach rechts",
+    "en": "",
+    })
+
+    static HamsterGibComment = () => lm({
+    "de": "Der Hamster legt ein Korn in der Zelle ab, in der er sich gerade befindet.",
+    "en": "",
+    })
+
+    static HamsterNimmComment = () => lm({
+    "de": "Der Hamster nimmt ein Korn aus der Zelle, in der er sich gerade befindet.",
+    "en": "",
+    })
+
+    static HamsterVornFreiComment = () => lm({
+    "de": "Liefert genau dann true, wenn sich in Blickrichtung vor dem aufgerufenen Hamster keine Mauer befindet (wenn sich der Hamster in Blickrichtung am Rand des Territoriums befindet, wird false geliefert)",
+    "en": "",
+    })
+
+    static HamsterMaulLeerComment = () => lm({
+    "de": "Liefert genau dann true, wenn der Hamster keine Körner im Mund hat.",
+    "en": "",
+    })
+
+    static HamsterKornDaComment = () => lm({
+    "de": "Liefert genau dann true, wenn sich in der Zelle, auf der der Hamster sich befindet, mindestens ein Korn befindet.",
+    "en": "",
+    })
+
+    static HamsterSchreibComment = () => lm({
+    "de": "Gibt den Text auf dem Bildschirm aus.",
+    "en": "",
+    })
 
     /**
      * class Position

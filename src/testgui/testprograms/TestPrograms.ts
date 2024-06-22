@@ -1,5 +1,30 @@
 export var testProgramsList = [
    ['', ``],
+   ['JavaHamster', `new World(1000, 1000);
+JavaHamsterWorld jhw = new JavaHamsterWorld(10, 4);
+jhw.scale(2);
+jhw.init("""
+mmmmmmmmmm
+m 1 2 3 4m
+m        m
+mmmmmmmmmm
+""");
+
+Hamster h = new Hamster(jhw, 1, 1, Hamster.OST, 0);
+while (h.vornFrei()) {
+   h.vor();
+   while (h.kornDa()) {
+      h.nimm();
+   }
+}
+h.linksUm(); h.linksUm(); h.linksUm();
+h.vor();
+while (!h.maulLeer()) {
+   h.gib();
+}
+
+h.linksUm(); h.linksUm(); h.linksUm();
+h.vor();`],
    ['JavaKara', `JavaKaraWorld jkw = new JavaKaraWorld(10, 5);
 println(jkw.WEST);
 jkw.init("""

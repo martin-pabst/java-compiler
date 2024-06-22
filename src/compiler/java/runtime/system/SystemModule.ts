@@ -78,6 +78,7 @@ import { TurtleClass } from "../graphics/TurtleClass.ts";
 import { PAppletClass } from "../graphics/PAppletClass.ts";
 import { PositionClass } from "../graphics/PositionClass.ts";
 import { JavaKaraClass, JavaKaraWorldClass } from "../graphics/JavaKaraClass.ts";
+import { JavaHamsterClass, JavaHamsterWorldClass } from "../graphics/JavaHamsterClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -143,6 +144,9 @@ export class SystemModule extends JavaLibraryModule {
 
             // Java Kara
             JavaKaraWorldClass, JavaKaraClass,
+
+            // Java Hamster
+            JavaHamsterWorldClass, JavaHamsterClass,
         )
 
     }

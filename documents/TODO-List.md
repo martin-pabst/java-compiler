@@ -43,6 +43,8 @@
   * library method examples
   * REPL
   * debugger: show fields of base classes
+  * JavaKara
+  * JavaHamster
 
 ## working status on current issue:
 
@@ -52,8 +54,6 @@
   * Classes BigInteger, Console, Gamepad, Input, Math, MathToolsClass, System, SystemTools, Timer, Vector2 
   * Missing Collections 
   * GNG classes
-  * JavaKara
-  * JavaHamster
   * Robot
   * classes for graphical GUI-Elements
   * if method overrides or implements other method and has no comment, then take the overriden method's comment
