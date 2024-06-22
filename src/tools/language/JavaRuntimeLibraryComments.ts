@@ -2272,8 +2272,626 @@ export class JRC {
     "en": "previously pressed key",
     })
 
+    // methods:
+    static PAppletClear0Comment = () => lm({
+        "de": `Löscht die Zeichenfläche.`,
+        "en": ``,
+    })
+ 
+    static PAppletBackground1Comment = () => lm({
+        "de": `Übermalt die komplette Zeichenfläche mit der übergebenen Farbe.`,
+        "en": ``,
+    })
+ 
+    static PAppletBackground2Comment = () => lm({
+        "de": `Übermalt die komplette Zeichenfläche mit der übergebenen Farbe. Übergeben wird eine Zeichenkette der Form 'rgb(0,0,255)' oder 'rgb(0%, 0%, 100%)' oder 'rgba(0, 0, 255, 1)' oder 'rgba(0%, 0%, 100%, 1)' und all diese Kombinationen statt rgb auch mit hsl und hsb.`,
+        "en": ``,
+    })
+ 
+    static PAppletBackground3Comment = () => lm({
+        "de": `Übermalt die komplette Zeichenfläche mit der übergebenen Farbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
+        "en": ``,
+    })
+ 
+    static PAppletFill1Comment = () => lm({
+        "de": `Setzt die Füllfarbe.`,
+        "en": ``,
+    })
+ 
+    static PAppletFill1aComment = () => lm({
+        "de": `Setzt die Füllfarbe.`,
+        "en": ``,
+    })
+ 
+    static PAppletFill2Comment = () => lm({
+        "de": `Setzt die Füllfarbe.`,
+        "en": ``,
+    })
+ 
+    static PAppletFill3Comment = () => lm({
+        "de": `Setzt die Füllfarbe.`,
+        "en": ``,
+    })
+ 
+    static PAppletFill4Comment = () => lm({
+        "de": `Setzt die Füllfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
+        "en": ``,
+    })
+ 
+    static PAppletFill5Comment = () => lm({
+        "de": `Setzt die Füllfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
+        "en": ``,
+    })
+ 
+    static PAppletNoFill0Comment = () => lm({
+        "de": `Die nachfolgend gezeichneten Figuren werden nicht gefüllt.`,
+        "en": ``,
+    })
+ 
+    static PAppletStroke1Comment = () => lm({
+        "de": `Setzt die Linienfarbe.`,
+        "en": ``,
+    })
+ 
+    static PAppletStroke1aComment = () => lm({
+        "de": `Setzt die Linienfarbe.`,
+        "en": ``,
+    })
+ 
+    static PAppletStroke2Comment = () => lm({
+        "de": `Setzt die Linienfarbe.`,
+        "en": ``,
+    })
+ 
+    static PAppletStroke3Comment = () => lm({
+        "de": `Setzt die Linienfarbe.`,
+        "en": ``,
+    })
+ 
+    static PAppletStroke4Comment = () => lm({
+        "de": `Setzt die Linienfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
+        "en": ``,
+    })
+ 
+    static PAppletStroke5Comment = () => lm({
+        "de": `Setzt die Linienfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
+        "en": ``,
+    })
+ 
+    static PAppletStrokeWeight1Comment = () => lm({
+        "de": `Setzt die Linienbreite.`,
+        "en": ``,
+    })
+ 
+    static PAppletNoStroke0Comment = () => lm({
+        "de": `Die nachfolgend gezeichneten Figuren werden ohne Rand gezeichnet.`,
+        "en": ``,
+    })
+ 
+    static PAppletColor1Comment = () => lm({
+        "de": `Gibt den Grauton als String-kodierte Farbe zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletColor2Comment = () => lm({
+        "de": `Gibt die Farbe zurück. Übergeben kann eine Zeichenkette der Form 'rgb(0,0,255)' oder 'rgb(0%, 0%, 100%)' oder 'rgba(0, 0, 255, 1)' oder 'rgba(0%, 0%, 100%, 1)' und all diese Kombinationen statt rgb auch mit hsl und hsb.`,
+        "en": ``,
+    })
+ 
+    static PAppletColor3Comment = () => lm({
+        "de": `Gibt den Grauton als String-kodierte Farbe zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletColor4Comment = () => lm({
+        "de": `Gibt die aus v1, v2, v3 gebildete Farbe String-kodiert zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletColor5Comment = () => lm({
+        "de": `Gibt die aus v1, v2, v3 und alpha gebildete Farbe String-kodiert zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletLerpColor3Comment = () => lm({
+        "de": `Gibt eine Zwischenfarbe zwischen colorA und colorB zurück. t == 0 bedeutet: colorA, t == 1 bedeutet: colorB, t == 0.5 bedeutet: genau zwischen beiden, usw.`,
+        "en": ``,
+    })
+ 
+    static PAppletColorMode1Comment = () => lm({
+        "de": `Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB.`,
+        "en": ``,
+    })
+ 
+    static PAppletColorMode2Comment = () => lm({
+        "de": `Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB für Mode. Max ist der Maximalwert jeder Farbkomponente.`,
+        "en": ``,
+    })
+ 
+    static PAppletColorMode4Comment = () => lm({
+        "de": `Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB für Mode. Max ist der Maximalwert jeder Farbkomponente.`,
+        "en": ``,
+    })
+ 
+    static PAppletColorMode5Comment = () => lm({
+        "de": `Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB für Mode. Max ist der Maximalwert jeder Farbkomponente.`,
+        "en": ``,
+    })
+ 
+    static PAppletRectMode1Comment = () => lm({
+        "de": `Setzt den Modus, in dem nachfolgende Aufrufe von rect(...) interpretiert werden. Möglich sind die Werte CORNER, CORNERS, RADIUS und CENTER.`,
+        "en": ``,
+    })
+ 
+    static PAppletRect1Comment = () => lm({
+        "de": `Zeichnet ein Rechteck. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks.`,
+        "en": ``,
+    })
+ 
+    static PAppletRect1aComment = () => lm({
+        "de": `Zeichnet ein Rechteck mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks.`,
+        "en": ``,
+    })
+ 
+    static PAppletRect1bComment = () => lm({
+        "de": `Zeichnet ein Rechteck mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks.`,
+        "en": ``,
+    })
+ 
+    static PAppletSquare1Comment = () => lm({
+        "de": `Zeichnet ein Quadrat. (left, top) ist die linke obere Ecke, width Seitenlänge des Quadrats.`,
+        "en": ``,
+    })
+ 
+    static PAppletSquare1aComment = () => lm({
+        "de": `Zeichnet ein Quadrat mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width Seitenlänge des Quadrats. Radius ist der Eckenradius.`,
+        "en": ``,
+    })
+ 
+    static PAppletSquare1bComment = () => lm({
+        "de": `Zeichnet ein Quadrat mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width Seitenlänge des Quadrats. Radius ist der Eckenradius.`,
+        "en": ``,
+    })
+ 
+    static PAppletRect1cComment = () => lm({
+        "de": `Zeichnet ein Rechteck. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks. Radius ist der Eckenradius`,
+        "en": ``,
+    })
+ 
+    static PAppletEllipse1Comment = () => lm({
+        "de": `Zeichnet eine Ellipse. (left, top) ist die linke obere Ecke der Boundingbox der Ellipse, width ihre Breite und height ihre Höhe. Das lässt sich aber mit ellipseMode(...) ändern!`,
+        "en": ``,
+    })
+ 
+    static PAppletCircle1Comment = () => lm({
+        "de": `Zeichnet einen Kreis. (x, y) ist der Mittelpunkt des Kreises, extent der doppelte Radius.`,
+        "en": ``,
+    })
+ 
+    static PAppletEllipseMode1Comment = () => lm({
+        "de": `Setzt den Modus, in dem nachfolgende Aufrufe von ellipse(...) interpretiert werden. Möglich sind die Werte CORNER, CORNERS, RADIUS und CENTER.`,
+        "en": ``,
+    })
+ 
+    static PAppletLine1Comment = () => lm({
+        "de": `Zeichnet eine Strecke von (x1, y1) nach (x2, y2).`,
+        "en": ``,
+    })
+ 
+    static PAppletLine1aComment = () => lm({
+        "de": `Zeichnet eine Strecke von (x1, y1, z1) nach (x2, y2, z2).`,
+        "en": ``,
+    })
+ 
+    static PAppletTriangle1Comment = () => lm({
+        "de": `Zeichnet eine Dreieck mit den Eckpunkten (x1, y1), (x2, y2) und (x3, y3).`,
+        "en": ``,
+    })
+ 
+    static PAppletQuad1Comment = () => lm({
+        "de": `Zeichnet eine Viereck mit den Eckpunkten (x1, y1), (x2, y2), (x3, y3) und (x4, y4).`,
+        "en": ``,
+    })
+ 
+    static PAppletBezier1Comment = () => lm({
+        "de": `Zeichnet eine kubische Bezierkurve mit den Ankerpunkten (x1, y1), (x4, y4) und den Kontrollpunkten (x2, y2), (x3, y3).`,
+        "en": ``,
+    })
+ 
+    static PAppletCurve1Comment = () => lm({
+        "de": `Zeichnet eine Catmull-Rom-Kurve vom Punkt (x2, y2) nach (x3, y3) so, als würde sie von (x1, x2) kommen und es am Ende zu (x4, y4) weitergehen.`,
+        "en": ``,
+    })
+ 
+    static PAppletCurvePoint1Comment = () => lm({
+        "de": `Will man die Zwischenpunkte einer Curve erhalten (Beginn b, Ende c, als würde sie von a kommen und nach d gehen), so verwendet man sowohl für die x- als auch für die y-Koordinate diese Funktion. t gibt an, welchen Punkt der Kurve man haben möchte. t hat Werte zwischen 0 (Startpunkt) und 1 (Endpunkt).`,
+        "en": ``,
+    })
+ 
+    static PAppletCurveTangent1Comment = () => lm({
+        "de": `Will man die Zwischentangenten einer Curve erhalten (Beginn b, Ende c, als würde sie von a kommen und nach d gehen), so verwendet man sowohl für die x- als auch für die y-Koordinate diese Funktion. t gibt an, welchen Punkt der Kurve man haben möchte. t hat Werte zwischen 0 (Startpunkt) und 1 (Endpunkt).`,
+        "en": ``,
+    })
+ 
+    static PAppletBezierPoint1Comment = () => lm({
+        "de": `Will man die Zwischenpunkte einer Bezierkurve erhalten (Ankerkoordinaten x1, x4 und Stützkoordinaten x2, x3), so nutzt man - einzeln sowohl für die x- also auch für die y-Koordinate - diese Funktion. t gibt an, welchen Punkt der Kurve man haben möchte. t hat Werte zwischen 0 (Startpunkt) und 1 (Endpunkt).`,
+        "en": ``,
+    })
+ 
+    static PAppletBezierTangent1Comment = () => lm({
+        "de": `Will man die Zwischentangenten einer Bezierkurve erhalten (Ankerkoordinaten x1, x4 und Stützkoordinaten x2, x3), so nutzt man - einzeln sowohl für die x- also auch für die y-Koordinate - diese Funktion. t gibt an, welchen Punkt der Kurve man haben möchte. t hat Werte zwischen 0 (Startpunkt) und 1 (Endpunkt).`,
+        "en": ``,
+    })
+ 
+    static PAppletBeginShape0Comment = () => lm({
+        "de": `Beginnt mit dem Zeichnen eines Polygons. Die einzelnen Punkte werden mit der Methode vertex(x, y) gesetzt.`,
+        "en": ``,
+    })
+ 
+    static PAppletEndShape0Comment = () => lm({
+        "de": `Endet das Zeichnen eines Polygons.`,
+        "en": ``,
+    })
+ 
+    static PAppletBeginShape1Comment = () => lm({
+        "de": `Beginnt mit dem Zeichnen eines Polygons. Die einzelnen Punkte werden mit der Methode vertex(x, y) gesetzt. Mögliche Werte für kind sind: POINTS, LINES, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP`,
+        "en": ``,
+    })
+ 
+    static PAppletEndShape1Comment = () => lm({
+        "de": `endShape(CLOSE) schließt den Linienzug.`,
+        "en": ``,
+    })
+ 
+    static PAppletVertex1Comment = () => lm({
+        "de": `Setzt zwischen beginShape() und endShape() einen Punkt.`,
+        "en": ``,
+    })
+ 
+    static PAppletPoint1Comment = () => lm({
+        "de": `Zeichnet einen Punkt.`,
+        "en": ``,
+    })
+ 
+    static PAppletSet3Comment = () => lm({
+        "de": `Setzt die Farbe des Pixels bei (x, y).`,
+        "en": ``,
+    })
+ 
+    static PAppletVertex1aComment = () => lm({
+        "de": `Setzt zwischen beginShape() und endShape() einen Punkt.`,
+        "en": ``,
+    })
+ 
+    static PAppletPoint1aComment = () => lm({
+        "de": `Zeichnet einen Punkt.`,
+        "en": ``,
+    })
+ 
+    static PAppletCurveVertex1Comment = () => lm({
+        "de": `Setzt zwischen beginShape() und endShape() einen Punkt. Processing zeichnet damit eine Kurve nach dem Catmull-Rom-Algorithmus.`,
+        "en": ``,
+    })
+ 
+    static PAppletCurvevertex1Comment = () => lm({
+        "de": `Setzt zwischen beginShape() und endShape() einen Punkt. Processing zeichnet damit eine Kurve nach dem Catmull-Rom-Algorithmus.`,
+        "en": ``,
+    })
+ 
+    static PAppletBox1Comment = () => lm({
+        "de": `Zeichnet einen 3D-Würfel mit der Seitenlänge size.`,
+        "en": ``,
+    })
+ 
+    static PAppletBox1aComment = () => lm({
+        "de": `Zeichnet einen 3D-Würfel mit den angegebenen Seitenlängen.`,
+        "en": ``,
+    })
+ 
+    static PAppletResetMatrix0Comment = () => lm({
+        "de": `Setzt alle erfolgten Transformationen zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletPush0Comment = () => lm({
+        "de": `Sichert den aktuellen Zeichenzustand, d.h. die Farben und Transformationen, auf einen Stack.`,
+        "en": ``,
+    })
+ 
+    static PAppletPop0Comment = () => lm({
+        "de": `Holt den obersten Zeichenzustand, d.h. die Farben und Transformationen, vom Stack.`,
+        "en": ``,
+    })
+ 
+    static PAppletScale1Comment = () => lm({
+        "de": `Streckt die nachfolgend gezeichneten Figuren.`,
+        "en": ``,
+    })
+ 
+    static PAppletScale1aComment = () => lm({
+        "de": `Streckt die nachfolgend gezeichneten Figuren.`,
+        "en": ``,
+    })
+ 
+    static PAppletScale1bComment = () => lm({
+        "de": `Streckt die nachfolgend gezeichneten Figuren.`,
+        "en": ``,
+    })
+ 
+    static PAppletTranslate1Comment = () => lm({
+        "de": `Verschiebt die nachfolgend gezeichneten Figuren.`,
+        "en": ``,
+    })
+ 
+    static PAppletTranslate1aComment = () => lm({
+        "de": `Verschiebt die nachfolgend gezeichneten Figuren.`,
+        "en": ``,
+    })
+ 
+    static PAppletRotate1Comment = () => lm({
+        "de": `Rotiert die nachfolgend gezeichneten Figuren. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.`,
+        "en": ``,
+    })
+ 
+    static PAppletRotateX1Comment = () => lm({
+        "de": `Rotiert die nachfolgend gezeichneten Figuren um die X-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.`,
+        "en": ``,
+    })
+ 
+    static PAppletRotateY1Comment = () => lm({
+        "de": `Rotiert die nachfolgend gezeichneten Figuren um die Y-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.`,
+        "en": ``,
+    })
+ 
+    static PAppletShearX1Comment = () => lm({
+        "de": `Schert die nachfolgend gezeichneten Figuren in Richtung derX-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.`,
+        "en": ``,
+    })
+ 
+    static PAppletShearY1Comment = () => lm({
+        "de": `Schert die nachfolgend gezeichneten Figuren in Richtung der Y-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.`,
+        "en": ``,
+    })
+ 
+    static PAppletRotateZ1Comment = () => lm({
+        "de": `Rotiert die nachfolgend gezeichneten Figuren um die Z-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.`,
+        "en": ``,
+    })
+ 
+    static PAppletAngleMode1Comment = () => lm({
+        "de": `Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie winkel bei Rotationen interpretiert werden. Default ist RADIANS.`,
+        "en": ``,
+    })
+ 
+    static PAppletTextSize1Comment = () => lm({
+        "de": `Setzt die Schriftgröße in Pixel.`,
+        "en": ``,
+    })
+ 
+    static PAppletTextAlign1Comment = () => lm({
+        "de": `Setzt die Ausrichtung des nächsten ausgegebenen Textes in x-Richtung. Mögliche Werte sind CENTER, LEFT, RIGHT`,
+        "en": ``,
+    })
+ 
+    static PAppletTextAlign1aComment = () => lm({
+        "de": `Setzt die Ausrichtung des nächsten ausgegebenen Textes. Mögliche Werte für alignX sind CENTER, LEFT, RIGHT, mögliche Werte für alignY sind TOP, CENTER, BASELINE, BOTTOM`,
+        "en": ``,
+    })
+ 
+    static PAppletText3Comment = () => lm({
+        "de": `Gibt Text aus.`,
+        "en": ``,
+    })
+ 
+    static PAppletText5Comment = () => lm({
+        "de": `Gibt Text aus. x2 und y2 sind die Breite und Höhe des Textausgabebereichs. Hat der Text horizontal nicht Platz, so wird er entsprechend umgebrochen.`,
+        "en": ``,
+    })
+ 
+    static PAppletRandom1Comment = () => lm({
+        "de": `Gibt eine Zufallszahl zwischen low und high zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletRandom1aComment = () => lm({
+        "de": `Gibt eine Zufallszahl zwischen 0 und high zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletSqrt1Comment = () => lm({
+        "de": `Gibt die Quadratwurzel von n zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletPow1Comment = () => lm({
+        "de": `Gibt die den Wert der Potenz ("basis hoch exponent") zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletMax1Comment = () => lm({
+        "de": `Gibt den größeren der beiden Werte zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletMin1Comment = () => lm({
+        "de": `Gibt den kleineren der beiden Werte zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletAbs1Comment = () => lm({
+        "de": `Gibt den Betrag des Wertes zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletSin1Comment = () => lm({
+        "de": `Gibt den Sinus des Wertes zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletCos1Comment = () => lm({
+        "de": `Gibt den Cosinus des Wertes zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletTan1Comment = () => lm({
+        "de": `Gibt den Tangens des Wertes zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletAsin1Comment = () => lm({
+        "de": `Gibt den Arcussinus des Wertes zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletAcos1Comment = () => lm({
+        "de": `Gibt den Arcussosinus des Wertes zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletRadians1Comment = () => lm({
+        "de": `Wandelt einen Winkel vom Gradmaß ins Bogenmaß um.`,
+        "en": ``,
+    })
+ 
+    static PAppletDegrees1Comment = () => lm({
+        "de": `Wandelt einen Winkel vom Bogenmaß ins Gradmaß um.`,
+        "en": ``,
+    })
+ 
+    static PAppletAtan1Comment = () => lm({
+        "de": `Gibt den Arcussangens des Wertes zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletAtan21Comment = () => lm({
+        "de": `Gibt den Arcussangens des Wertes zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletSqrt1aComment = () => lm({
+        "de": `Gibt die Quadratwurzel des Wertes zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletSq1Comment = () => lm({
+        "de": `Gibt das Quadrat des Wertes zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletAbs1aComment = () => lm({
+        "de": `Gibt den Betrag des Wertes zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletRound1Comment = () => lm({
+        "de": `Rundet den Wert auf eine ganze Zahl.`,
+        "en": ``,
+    })
+ 
+    static PAppletCeil1Comment = () => lm({
+        "de": `Rundet den Wert auf eine ganze Zahl (Aufrunden!).`,
+        "en": ``,
+    })
+ 
+    static PAppletFloor1Comment = () => lm({
+        "de": `Rundet den Wert auf eine ganze Zahl (Abfrunden!).`,
+        "en": ``,
+    })
+ 
+    static PAppletDist1Comment = () => lm({
+        "de": `Berechnet den Abstand der Punkte (x1, y1) und (x2, y2).`,
+        "en": ``,
+    })
+ 
+    static PAppletLerp1Comment = () => lm({
+        "de": `Berechnet den a + (b - a)*t. Wählt man t zwischen 0 und 1, so kann man damit die Zwischenwerte zwischen a und b errechnen.`,
+        "en": ``,
+    })
+ 
+    static PAppletConstrain1Comment = () => lm({
+        "de": `Beschränkt value auf den Bereich [min, max], genauer: Ist value < min, so wird min zurückgegeben. Ist value > max, so wird max zurückgegeben. Ansonsten wird value zurückgegeben.`,
+        "en": ``,
+    })
+ 
+    static PAppletYear0Comment = () => lm({
+        "de": `Aktuelle Jahreszahl`,
+        "en": ``,
+    })
+ 
+    static PAppletMonth0Comment = () => lm({
+        "de": `Monat: 1 == Januar, 12 == Dezember`,
+        "en": ``,
+    })
+ 
+    static PAppletDay0Comment = () => lm({
+        "de": `Tag (innerhalb des Monats) des aktuellen Datums`,
+        "en": ``,
+    })
+ 
+    static PAppletHour0Comment = () => lm({
+        "de": `Stundenzahl der aktuellen Uhrzeit`,
+        "en": ``,
+    })
+  
+    static PAppletMinute0Comment = () => lm({
+        "de": `Minutenzahl der aktuellen Uhrzeit`,
+        "en": ``,
+    })
+ 
+    static PAppletSecond0Comment = () => lm({
+        "de": `Sekundenzahl der aktuellen Uhrzeit`,
+        "en": ``,
+    })
+ 
+    static PAppletFrameRate1Comment = () => lm({
+        "de": `Setzt die Framerate (Anzahl der Aufrufe von draw() pro Sekunde)`,
+        "en": ``,
+    })
+ 
+    static PAppletTextWidth1Comment = () => lm({
+        "de": `Gibt die Breite des Texts zurück.`,
+        "en": ``,
+    })
+ 
+    static PAppletTextAscent1Comment = () => lm({
+        "de": `Gibt den Ascent Textes zurück ( = Höhe des größten Zeichens über der Grundlinie).`,
+        "en": ``,
+    })
+ 
+    static PAppletTextDescent1Comment = () => lm({
+        "de": `Gibt den Descent Textes zurück ( = Tiefe des tiefsten Zeichens unter der Grundlinie).`,
+        "en": ``,
+    })
+ 
+    static PAppletTextLeading1Comment = () => lm({
+        "de": `Setzt den Abstand zweier aufeinanderfolgender Textzeilen.`,
+        "en": ``,
+    })
+ 
+    static PAppletCursor1Comment = () => lm({
+        "de": `Ändert das Aussehen des Mauscursors. Type ist einer der Werte "arrow", "cross", "text", "move", "hand", "wait", "progress".`,
+        "en": ``,
+    })
+ 
+    static PAppletNoCursor1Comment = () => lm({
+        "de": `Hat zur Folge, dass der Mauscursor über dem Zeichenbereich unsichtbar ist.`,
+        "en": ``,
+    })
+ 
+    static PAppletCopy1Comment = () => lm({
+        "de": `Kopiert den rechteckigen Bereich mit der linken oberen Ecke (sx, sy) sowie der Breite sw und der Höhe sh in den Bereich mit der linken oberen Ecke (dx, dy), der Breite dw und der Höhe dh.`,
+        "en": ``,
+    })
+ 
+    static PAppletMillis0Comment = () => lm({
+        "de": `Gibt die Millisekunden zurück, die vergangen sind, seit setup() aufgerufen wurde.`,
+        "en": ``,
+    })
+ 
+    static PAppletRedraw0Comment = () => lm({
+        "de": `Führt draw() genau ein Mal aus. Macht ggf. Sinn, wenn die Render-Loop zuvor mit noLoop() gestoppt wurde.`,
+        "en": ``,
+    })
 
 
-    // Kürzel: mlc
-
-}            
+}  

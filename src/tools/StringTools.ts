@@ -135,3 +135,4 @@ export function generateSecret(length: number): string {
   }
   return secret;
 }
+

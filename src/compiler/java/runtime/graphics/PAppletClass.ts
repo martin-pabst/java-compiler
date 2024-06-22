@@ -18,47 +18,47 @@ export class PAppletClass extends ObjectClass {
         { type: "field", signature: "int pMouseX", template: "§1.p5o.pMouseX", comment: JRC.PAppletPMouseXComment },
         { type: "field", signature: "int pMouseY", template: "§1.p5o.pMouseY", comment: JRC.PAppletPMouseYComment },
         { type: "field", signature: "int mouseButton", template: "§1.p5o.mouseButton", comment: JRC.PAppletMouseButtonComment },
-        
+
         { type: "field", signature: "int key", template: "§1.p5o.key", comment: JRC.PAppletKeyComment },
-        
+
         { type: "field", signature: "int LEFT", template: "§1.p5o.LEFT", comment: JRC.PAppletLEFTComment },
         { type: "field", signature: "int CENTER", template: "§1.p5o.CENTER", comment: JRC.PAppletCENTERComment },
         { type: "field", signature: "int RIGHT", template: "§1.p5o.RIGHT", comment: JRC.PAppletRIGHTComment },
         { type: "field", signature: "int TOP", template: "§1.p5o.TOP", comment: JRC.PAppletTOPComment },
         { type: "field", signature: "int BASELINE", template: "§1.p5o.BASELINE", comment: JRC.PAppletBASELINEComment },
         { type: "field", signature: "int BOTTOM", template: "§1.p5o.BOTTOM", comment: JRC.PAppletBOTTOMComment },
-        
+
         { type: "field", signature: "int CORNER", template: "§1.p5o.CORNER", comment: JRC.PAppletCORNERComment },
         { type: "field", signature: "int CORNERS", template: "§1.p5o.CORNERS", comment: JRC.PAppletCORNERSComment },
         { type: "field", signature: "int RADIUS", template: "§1.p5o.RADIUS", comment: JRC.PAppletRADIUSComment },
-        
+
         { type: "field", signature: "int POINTS", template: "§1.p5o.POINTS", comment: JRC.PAppletPOINTSComment },
         { type: "field", signature: "int LINES", template: "§1.p5o.LINES", comment: JRC.PAppletLINESComment },
         { type: "field", signature: "int TRIANGLES", template: "§1.p5o.TRIANGLES", comment: JRC.PAppletTRIANGLESComment },
         { type: "field", signature: "int TRIANGLE_STRIP", template: "§1.p5o.TRIANGLE_STRIP", comment: JRC.PAppletTRIANGLE_STRIPComment },
         { type: "field", signature: "int TRIANGLE_FAN", template: "§1.p5o.TRIANGLE_FAN", comment: JRC.PAppletTRIANGLE_FANComment },
-        
+
         { type: "field", signature: "string QUADS", template: "§1.p5o.QUADS", comment: JRC.PAppletQUADSComment },
         { type: "field", signature: "string QUAD_STRIP", template: "§1.p5o.QUAD_STRIP", comment: JRC.PAppletQUAD_STRIPComment },
         { type: "field", signature: "string TESS", template: "§1.p5o.TESS", comment: JRC.PAppletTESSComment },
-        
+
         { type: "field", signature: "string CLOSE", template: "§1.p5o.CLOSE", comment: JRC.PAppletCLOSEComment },
-        
+
         { type: "field", signature: "string DEGREES", template: "§1.p5o.DEGREES", comment: JRC.PAppletDEGREESComment },
         { type: "field", signature: "string RADIANS", template: "§1.p5o.RADIANS", comment: JRC.PAppletRADIANSComment },
-        
+
         { type: "field", signature: "string WEBGL", template: "§1.p5o.WEBGL", comment: JRC.PAppletWEBGLComment },
         { type: "field", signature: "string P2D", template: "§1.p5o.P2D", comment: JRC.PAppletP2DComment },
 
         { type: "field", signature: "string RGB", template: "§1.p5o.RGB", comment: JRC.PAppletRGBComment },
         { type: "field", signature: "string HSL", template: "§1.p5o.HSL", comment: JRC.PAppletHSLComment },
         { type: "field", signature: "string HSB", template: "§1.p5o.HSB", comment: JRC.PAppletHSBComment },
-        
+
         { type: "field", signature: "string PI", template: "§1.p5o.PI", comment: "PI = 3.1415..." },
         { type: "field", signature: "string QUARTER_PI", template: "§1.p5o.QUARTER_PI", comment: "PI/4" },
         { type: "field", signature: "string TWO_PI", template: "§1.p5o.TWO_PI", comment: "2*PI" },
         { type: "field", signature: "string TAU", template: "§1.p5o.TAU", comment: "2*PI" },
-        
+
         { type: "method", signature: "PApplet()", java: PAppletClass.prototype._cj$_constructor_$PApplet$, comment: JRC.PAppletConstructorComment },
 
         { type: "method", signature: "void main()", java: PAppletClass.prototype._mj$main$void$, comment: JRC.PAppletMainComment },
@@ -83,9 +83,133 @@ export class PAppletClass extends ObjectClass {
         { type: "method", signature: "void keyPressed()", java: PAppletClass.prototype._mj$keyPressed$void$, comment: JRC.PAppletKeyPressedComment },
         { type: "method", signature: "void keyReleased()", java: PAppletClass.prototype._mj$keyReleased$void$, comment: JRC.PAppletKeyReleasedComment },
 
+        // methods
+        { type: "method", signature: "final void clear()", template: "§1.p5o.clear()", comment: JRC.PAppletClear0Comment },
+        { type: "method", signature: "final void background(double rgb)", template: "§1.p5o.background(§2)", comment: JRC.PAppletBackground1Comment },
+        { type: "method", signature: "final string background(string colorAsString)", template: "§1.p5o.background(§2)", comment: JRC.PAppletBackground2Comment },
+        { type: "method", signature: "final void background(double v1, double v2, double v3)", template: "§1.p5o.background(§2, §3, §4)", comment: JRC.PAppletBackground3Comment },
+        { type: "method", signature: "final void fill(int rgb)", template: "§1.p5o.fill(§2)", comment: JRC.PAppletFill1Comment },
+        { type: "method", signature: "final void fill(string rgb)", template: "§1.p5o.fill(§2)", comment: JRC.PAppletFill1aComment },
+        { type: "method", signature: "final void fill(int rgb, double alpha)", template: "§1.p5o.fill(§2, §3)", comment: JRC.PAppletFill2Comment },
+        { type: "method", signature: "final void fill(double gray)", template: "§1.p5o.fill(§2)", comment: JRC.PAppletFill3Comment },
+        { type: "method", signature: "final void fill(double v1, double v2, double v3)", template: "§1.p5o.fill(§2, §3, §4)", comment: JRC.PAppletFill4Comment },
+        { type: "method", signature: "final void fill(double v1, double v2, double v3, double alpha)", template: "§1.p5o.fill(§2, §3, §4, §5)", comment: JRC.PAppletFill5Comment },
+        { type: "method", signature: "final void noFill()", template: "§1.p5o.noFill()", comment: JRC.PAppletNoFill0Comment },
+        { type: "method", signature: "final void stroke(int rgb)", template: "§1.p5o.stroke(§2)", comment: JRC.PAppletStroke1Comment },
+        { type: "method", signature: "final void stroke(string rgb)", template: "§1.p5o.stroke(§2)", comment: JRC.PAppletStroke1aComment },
+        { type: "method", signature: "final void stroke(int rgb, double alpha)", template: "§1.p5o.stroke(§2, §3)", comment: JRC.PAppletStroke2Comment },
+        { type: "method", signature: "final void stroke(double gray)", template: "§1.p5o.stroke(§2)", comment: JRC.PAppletStroke3Comment },
+        { type: "method", signature: "final void stroke(double v1, double v2, double v3)", template: "§1.p5o.stroke(§2, §3, §4)", comment: JRC.PAppletStroke4Comment },
+        { type: "method", signature: "final void stroke(double v1, double v2, double v3, double alpha)", template: "§1.p5o.stroke(§2, §3, §4, §5)", comment: JRC.PAppletStroke5Comment },
+        { type: "method", signature: "final void strokeWeight(double weight)", template: "§1.p5o.strokeWeight(§2)", comment: JRC.PAppletStrokeWeight1Comment },
+        { type: "method", signature: "final void noStroke()", template: "§1.p5o.noStroke()", comment: JRC.PAppletNoStroke0Comment },
+        { type: "method", signature: "final string color(double gray)", template: "§1.p5o.color(§2)", comment: JRC.PAppletColor1Comment },
+        { type: "method", signature: "final string color(string colorAsString)", template: "§1.p5o.color(§2)", comment: JRC.PAppletColor2Comment },
+        { type: "method", signature: "final string color(double gray, double alpha)", template: "§1.p5o.color(§2, §3)", comment: JRC.PAppletColor3Comment },
+        { type: "method", signature: "final string color(double v1, double v2, double v3)", template: "§1.p5o.color(§2, §3, §4)", comment: JRC.PAppletColor4Comment },
+        { type: "method", signature: "final string color(double v1, double v2, double v3, double alpha)", template: "§1.p5o.color(§2, §3, §4, §5)", comment: JRC.PAppletColor5Comment },
+        { type: "method", signature: "final string lerpColor(string colorA, string colorB, double t)", template: "§1.p5o.lerpColor(§2, §3, §4)", comment: JRC.PAppletLerpColor3Comment },
+        { type: "method", signature: "final void colorMode(string mode)", template: "§1.p5o.colorMode(§2)", comment: JRC.PAppletColorMode1Comment },
+        { type: "method", signature: "final void colorMode(string mode, double max)", template: "§1.p5o.colorMode(§2, §3)", comment: JRC.PAppletColorMode2Comment },
+        { type: "method", signature: "final void colorMode(string mode, double max1, double max2, double max3)", template: "§1.p5o.colorMode(§2, §3, §4, §5)", comment: JRC.PAppletColorMode4Comment },
+        { type: "method", signature: "final void colorMode(string mode, double max1, double max2, double max3, double maxAlpha)", template: "§1.p5o.colorMode(§2, §3, §4, §5, §6)", comment: JRC.PAppletColorMode5Comment },
+        { type: "method", signature: "final void rectMode(string mode)", template: "§1.p5o.rectMode(§2)", comment: JRC.PAppletRectMode1Comment },
+        { type: "method", signature: "final void rect(double left, double top, double width, double height)", template: "§1.p5o.rect(§2, §3, §4, §5)", comment: JRC.PAppletRect1Comment },
+        { type: "method", signature: "final void rect(double left, double top, double width, double height, double radius)", template: "§1.p5o.rect(§2, §3, §4, §5, §6)", comment: JRC.PAppletRect1aComment },
+        { type: "method", signature: "final void rect(double left, double top, double width, double height, double radius1, double radius2, double radius3, double radius4)", template: "§1.p5o.rect(§2, §3, §4, §5, §6, §7, §8, §9)", comment: JRC.PAppletRect1bComment },
+        { type: "method", signature: "final void square(double left, double top, double width)", template: "§1.p5o.square(§2, §3, §4)", comment: JRC.PAppletSquare1Comment },
+        { type: "method", signature: "final void square(double left, double top, double width, double radius)", template: "§1.p5o.square(§2, §3, §4, §5)", comment: JRC.PAppletSquare1aComment },
+        { type: "method", signature: "final void square(double left, double top, double width, double radius1, double radius2, double radius3, double radius4)", template: "§1.p5o.square(§2, §3, §4, §5, §6, §7, §8)", comment: JRC.PAppletSquare1bComment },
+        { type: "method", signature: "final void rect(double left, double top, double width, double height, double radius)", template: "§1.p5o.rect(§2, §3, §4, §5, §6)", comment: JRC.PAppletRect1cComment },
+        { type: "method", signature: "final void ellipse(double left, double top, double width, double height)", template: "§1.p5o.ellipse(§2, §3, §4, §5)", comment: JRC.PAppletEllipse1Comment },
+        { type: "method", signature: "final void circle(double x, double y, double extent)", template: "§1.p5o.circle(§2, §3, §4)", comment: JRC.PAppletCircle1Comment },
+        { type: "method", signature: "final void ellipseMode(string mode)", template: "§1.p5o.ellipseMode(§2)", comment: JRC.PAppletEllipseMode1Comment },
+        { type: "method", signature: "final void line(double x1, double y1, double x2, double y2)", template: "§1.p5o.line(§2, §3, §4, §5)", comment: JRC.PAppletLine1Comment },
+        { type: "method", signature: "final void line(double x1, double y1, double z1, double x2, double y2, double z2)", template: "§1.p5o.line(§2, §3, §4, §5, §6, §7)", comment: JRC.PAppletLine1aComment },
+        { type: "method", signature: "final void triangle(double x1, double y1, double x2, double y2, double x3, double y3)", template: "§1.p5o.triangle(§2, §3, §4, §5, §6, §7)", comment: JRC.PAppletTriangle1Comment },
+        { type: "method", signature: "final void quad(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4)", template: "§1.p5o.quad(§2, §3, §4, §5, §6, §7, §8, §9)", comment: JRC.PAppletQuad1Comment },
+        { type: "method", signature: "final void bezier(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4)", template: "§1.p5o.bezier(§2, §3, §4, §5, §6, §7, §8, §9)", comment: JRC.PAppletBezier1Comment },
+        { type: "method", signature: "final void curve(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4)", template: "§1.p5o.curve(§2, §3, §4, §5, §6, §7, §8, §9)", comment: JRC.PAppletCurve1Comment },
+        { type: "method", signature: "final double curvePoint(double a, double b, double c, double d, double t)", template: "§1.p5o.curvePoint(§2, §3, §4, §5, §6)", comment: JRC.PAppletCurvePoint1Comment },
+        { type: "method", signature: "final double curveTangent(double a, double b, double c, double d, double t)", template: "§1.p5o.curveTangent(§2, §3, §4, §5, §6)", comment: JRC.PAppletCurveTangent1Comment },
+        { type: "method", signature: "final double bezierPoint(double x1, double x2, double x3, double x4, double t)", template: "§1.p5o.bezierPoint(§2, §3, §4, §5, §6)", comment: JRC.PAppletBezierPoint1Comment },
+        { type: "method", signature: "final double bezierTangent(double x1, double x2, double x3, double x4, double t)", template: "§1.p5o.bezierTangent(§2, §3, §4, §5, §6)", comment: JRC.PAppletBezierTangent1Comment },
+        { type: "method", signature: "final void beginShape()", template: "§1.p5o.beginShape()", comment: JRC.PAppletBeginShape0Comment },
+        { type: "method", signature: "final void endShape()", template: "§1.p5o.endShape()", comment: JRC.PAppletEndShape0Comment },
+        { type: "method", signature: "final void beginShape(string kind)", template: "§1.p5o.beginShape(§2)", comment: JRC.PAppletBeginShape1Comment },
+        { type: "method", signature: "final void endShape(string kind)", template: "§1.p5o.endShape(§2)", comment: JRC.PAppletEndShape1Comment },
+        { type: "method", signature: "final void vertex(double x, double y)", template: "§1.p5o.vertex(§2, §3)", comment: JRC.PAppletVertex1Comment },
+        { type: "method", signature: "final void point(double x, double y)", template: "§1.p5o.point(§2, §3)", comment: JRC.PAppletPoint1Comment },
+        { type: "method", signature: "final void set(double x, double y, string color)", template: "§1.p5o.set(§2, §3, §4)", comment: JRC.PAppletSet3Comment },
+        { type: "method", signature: "final void vertex(double x, double y, double z)", template: "§1.p5o.vertex(§2, §3, §4)", comment: JRC.PAppletVertex1aComment },
+        { type: "method", signature: "final void point(double x, double y, double z)", template: "§1.p5o.point(§2, §3, §4)", comment: JRC.PAppletPoint1aComment },
+        { type: "method", signature: "final void curveVertex(double x, double y)", template: "§1.p5o.curveVertex(§2, §3)", comment: JRC.PAppletCurveVertex1Comment },
+        { type: "method", signature: "final void curvevertex(double x, double y, double z)", template: "§1.p5o.curvevertex(§2, §3, §4)", comment: JRC.PAppletCurvevertex1Comment },
+        { type: "method", signature: "final void box(double size)", template: "§1.p5o.box(§2)", comment: JRC.PAppletBox1Comment },
+        { type: "method", signature: "final void box(double sizeX, double sizeY, double sizeZ)", template: "§1.p5o.box(§2, §3, §4)", comment: JRC.PAppletBox1aComment },
+        { type: "method", signature: "final void resetMatrix()", template: "§1.p5o.resetMatrix()", comment: JRC.PAppletResetMatrix0Comment },
+        { type: "method", signature: "final void push()", template: "§1.p5o.push()", comment: JRC.PAppletPush0Comment },
+        { type: "method", signature: "final void pop()", template: "§1.p5o.pop()", comment: JRC.PAppletPop0Comment },
+        { type: "method", signature: "final void scale(double factor)", template: "§1.p5o.scale(§2)", comment: JRC.PAppletScale1Comment },
+        { type: "method", signature: "final void scale(double factorX, double factorY)", template: "§1.p5o.scale(§2, §3)", comment: JRC.PAppletScale1aComment },
+        { type: "method", signature: "final void scale(double factorX, double factorY, double factorZ)", template: "§1.p5o.scale(§2, §3, §4)", comment: JRC.PAppletScale1bComment },
+        { type: "method", signature: "final void translate(double x, double y)", template: "§1.p5o.translate(§2, §3)", comment: JRC.PAppletTranslate1Comment },
+        { type: "method", signature: "final void translate(double x, double y, double z)", template: "§1.p5o.translate(§2, §3, §4)", comment: JRC.PAppletTranslate1aComment },
+        { type: "method", signature: "final void rotate(double angle)", template: "§1.p5o.rotate(§2)", comment: JRC.PAppletRotate1Comment },
+        { type: "method", signature: "final void rotateX(double angle)", template: "§1.p5o.rotateX(§2)", comment: JRC.PAppletRotateX1Comment },
+        { type: "method", signature: "final void rotateY(double angle)", template: "§1.p5o.rotateY(§2)", comment: JRC.PAppletRotateY1Comment },
+        { type: "method", signature: "final void shearX(double angle)", template: "§1.p5o.shearX(§2)", comment: JRC.PAppletShearX1Comment },
+        { type: "method", signature: "final void shearY(double angle)", template: "§1.p5o.shearY(§2)", comment: JRC.PAppletShearY1Comment },
+        { type: "method", signature: "final void rotateZ(double angle)", template: "§1.p5o.rotateZ(§2)", comment: JRC.PAppletRotateZ1Comment },
+        { type: "method", signature: "final void angleMode(string mode)", template: "§1.p5o.angleMode(§2)", comment: JRC.PAppletAngleMode1Comment },
+        { type: "method", signature: "final void textSize(double size)", template: "§1.p5o.textSize(§2)", comment: JRC.PAppletTextSize1Comment },
+        { type: "method", signature: "final void textAlign(int alignX)", template: "§1.p5o.textAlign(§2)", comment: JRC.PAppletTextAlign1Comment },
+        { type: "method", signature: "final void textAlign(int alignX, int alignY)", template: "§1.p5o.textAlign(§2, §3)", comment: JRC.PAppletTextAlign1aComment },
+        { type: "method", signature: "final void text(string text, double x, double y)", template: "§1.p5o.text(§2, §3, §4)", comment: JRC.PAppletText3Comment },
+        { type: "method", signature: "final void text(string text, double x, double y, double x2, double y2)", template: "§1.p5o.text(§2, §3, §4, §5, §6)", comment: JRC.PAppletText5Comment },
+        { type: "method", signature: "final double random(double low, double high)", template: "§1.p5o.random(§2, §3)", comment: JRC.PAppletRandom1Comment },
+        { type: "method", signature: "final double random(double high)", template: "§1.p5o.random(§2)", comment: JRC.PAppletRandom1aComment },
+        { type: "method", signature: "final double sqrt(double n)", template: "§1.p5o.sqrt(§2)", comment: JRC.PAppletSqrt1Comment },
+        { type: "method", signature: "final double pow(double basis, double exponent)", template: "§1.p5o.pow(§2, §3)", comment: JRC.PAppletPow1Comment },
+        { type: "method", signature: "final double max(double a, double b)", template: "§1.p5o.max(§2, §3)", comment: JRC.PAppletMax1Comment },
+        { type: "method", signature: "final double min(double a, double b)", template: "§1.p5o.min(§2, §3)", comment: JRC.PAppletMin1Comment },
+        { type: "method", signature: "final double abs(double n)", template: "§1.p5o.abs(§2)", comment: JRC.PAppletAbs1Comment },
+        { type: "method", signature: "final double sin(double n)", template: "§1.p5o.sin(§2)", comment: JRC.PAppletSin1Comment },
+        { type: "method", signature: "final double cos(double n)", template: "§1.p5o.cos(§2)", comment: JRC.PAppletCos1Comment },
+        { type: "method", signature: "final double tan(double n)", template: "§1.p5o.tan(§2)", comment: JRC.PAppletTan1Comment },
+        { type: "method", signature: "final double asin(double n)", template: "§1.p5o.asin(§2)", comment: JRC.PAppletAsin1Comment },
+        { type: "method", signature: "final double acos(double n)", template: "§1.p5o.acos(§2)", comment: JRC.PAppletAcos1Comment },
+        { type: "method", signature: "final double radians(double angle)", template: "§1.p5o.radians(§2)", comment: JRC.PAppletRadians1Comment },
+        { type: "method", signature: "final double degrees(double angle)", template: "§1.p5o.degrees(§2)", comment: JRC.PAppletDegrees1Comment },
+        { type: "method", signature: "final double atan(double n)", template: "§1.p5o.atan(§2)", comment: JRC.PAppletAtan1Comment },
+        { type: "method", signature: "final double atan2(double x, double y)", template: "§1.p5o.atan2(§2, §3)", comment: JRC.PAppletAtan21Comment },
+        { type: "method", signature: "final double sqrt(double x, double y)", template: "§1.p5o.sqrt(§2, §3)", comment: JRC.PAppletSqrt1aComment },
+        { type: "method", signature: "final double sq(double x, double y)", template: "§1.p5o.sq(§2, §3)", comment: JRC.PAppletSq1Comment },
+        { type: "method", signature: "final int abs(int n)", template: "§1.p5o.abs(§2)", comment: JRC.PAppletAbs1aComment },
+        { type: "method", signature: "final int round(double n)", template: "§1.p5o.round(§2)", comment: JRC.PAppletRound1Comment },
+        { type: "method", signature: "final int ceil(double n)", template: "§1.p5o.ceil(§2)", comment: JRC.PAppletCeil1Comment },
+        { type: "method", signature: "final int floor(double n)", template: "§1.p5o.floor(§2)", comment: JRC.PAppletFloor1Comment },
+        { type: "method", signature: "final double dist(double x1, double y1, double x2, double y2)", template: "§1.p5o.dist(§2, §3, §4, §5)", comment: JRC.PAppletDist1Comment },
+        { type: "method", signature: "final double lerp(double a, double b, double t)", template: "§1.p5o.lerp(§2, §3, §4)", comment: JRC.PAppletLerp1Comment },
+        { type: "method", signature: "final double constrain(double value, double min, double max)", template: "§1.p5o.constrain(§2, §3, §4)", comment: JRC.PAppletConstrain1Comment },
+        { type: "method", signature: "final int year()", template: "§1.p5o.year()", comment: JRC.PAppletYear0Comment },
+        { type: "method", signature: "final int month()", template: "§1.p5o.month()", comment: JRC.PAppletMonth0Comment },
+        { type: "method", signature: "final int day()", template: "§1.p5o.day()", comment: JRC.PAppletDay0Comment },
+        { type: "method", signature: "final int hour()", template: "§1.p5o.hour()", comment: JRC.PAppletHour0Comment }, 
+        { type: "method", signature: "final int minute()", template: "§1.p5o.minute()", comment: JRC.PAppletMinute0Comment },
+        { type: "method", signature: "final int second()", template: "§1.p5o.second()", comment: JRC.PAppletSecond0Comment },
+        { type: "method", signature: "final void frameRate(int n)", template: "§1.p5o.frameRate(§2)", comment: JRC.PAppletFrameRate1Comment },
+        { type: "method", signature: "final double textWidth(string text)", template: "§1.p5o.textWidth(§2)", comment: JRC.PAppletTextWidth1Comment },
+        { type: "method", signature: "final double textAscent(string text)", template: "§1.p5o.textAscent(§2)", comment: JRC.PAppletTextAscent1Comment },
+        { type: "method", signature: "final double textDescent(string text)", template: "§1.p5o.textDescent(§2)", comment: JRC.PAppletTextDescent1Comment },
+        { type: "method", signature: "final void textLeading(double leading)", template: "§1.p5o.textLeading(§2)", comment: JRC.PAppletTextLeading1Comment },
+        { type: "method", signature: "final void cursor(string type)", template: "§1.p5o.cursor(§2)", comment: JRC.PAppletCursor1Comment },
+        { type: "method", signature: "final void noCursor(string type)", template: "§1.p5o.noCursor(§2)", comment: JRC.PAppletNoCursor1Comment },
+        { type: "method", signature: "final void copy(double sx, double sy, double sw, double sh, double dx, double dy, double dw, double dh)", template: "§1.p5o.copy(§2, §3, §4, §5, §6, §7, §8, §9)", comment: JRC.PAppletCopy1Comment },
+        { type: "method", signature: "final void millis()", template: "§1.p5o.millis()", comment: JRC.PAppletMillis0Comment },
+        { type: "method", signature: "final void redraw()", template: "§1.p5o.redraw()", comment: JRC.PAppletRedraw0Comment },
 
-
-    ]).concat(PAppletClass.addProcessingMethods());
+    ]);
 
     static type: NonPrimitiveType;
 
@@ -230,7 +354,7 @@ export class PAppletClass extends ObjectClass {
                     //     'width': '',
                     //     'height': ''
                     // })            
-                    if(!that.canvasCreated){
+                    if (!that.canvasCreated) {
                         that._createCanvas(that.width, that.height);
                     }
                 }
@@ -330,434 +454,6 @@ export class PAppletClass extends ObjectClass {
         method.call(this, t, callback);
         t.startIfNotEmptyOrDestroy();
 
-    }
-
-    static addProcessingMethods(): LibraryDeclarations {
-        return [
-/**
- * Setzen von Farben
- */
-            PAppletClass.getProcessingMethod('clear', [], [],
-                'Löscht die Zeichenfläche.'),
-
-            PAppletClass.getProcessingMethod('background', ['rgb'], "double",
-                'Übermalt die komplette Zeichenfläche mit der übergebenen Farbe.'),
-
-            PAppletClass.getProcessingMethod('background', ['colorAsString'], "string",
-                "Übermalt die komplette Zeichenfläche mit der übergebenen Farbe. Übergeben wird eine Zeichenkette der Form 'rgb(0,0,255)' oder 'rgb(0%, 0%, 100%)' oder 'rgba(0, 0, 255, 1)' oder 'rgba(0%, 0%, 100%, 1)' und all diese Kombinationen statt rgb auch mit hsl und hsb.", "string"),
-
-            PAppletClass.getProcessingMethod('background', ['v1', 'v2', 'v3'], "double",
-                'Übermalt die komplette Zeichenfläche mit der übergebenen Farbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit'),
-
-            PAppletClass.getProcessingMethod('fill', ['rgb'], "int",
-                'Setzt die Füllfarbe.'),
-
-            PAppletClass.getProcessingMethod('fill', ['rgb'], "string",
-                'Setzt die Füllfarbe.'),
-
-            PAppletClass.getProcessingMethod('fill', ['rgb', 'alpha'], ["int", "double"],
-                'Setzt die Füllfarbe.'),
-
-            PAppletClass.getProcessingMethod('fill', ['gray'], "double",
-                'Setzt die Füllfarbe.'),
-
-            PAppletClass.getProcessingMethod('fill', ['v1', 'v2', 'v3'], "double",
-                'Setzt die Füllfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit'),
-
-            PAppletClass.getProcessingMethod('fill', ['v1', 'v2', 'v3', 'alpha'], "double",
-                'Setzt die Füllfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit'),
-
-            PAppletClass.getProcessingMethod('noFill', [], [],
-                'Die nachfolgend gezeichneten Figuren werden nicht gefüllt.'),
-
-            PAppletClass.getProcessingMethod('stroke', ['rgb'], "int",
-                'Setzt die Linienfarbe.'),
-
-            PAppletClass.getProcessingMethod('stroke', ['rgb'], "string",
-                'Setzt die Linienfarbe.'),
-
-            PAppletClass.getProcessingMethod('stroke', ['rgb', 'alpha'], ["int", "double"],
-                'Setzt die Linienfarbe.'),
-
-            PAppletClass.getProcessingMethod('stroke', ['gray'], "double",
-                'Setzt die Linienfarbe.'),
-
-            PAppletClass.getProcessingMethod('stroke', ['v1', 'v2', 'v3'], "double",
-                'Setzt die Linienfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit'),
-
-            PAppletClass.getProcessingMethod('stroke', ['v1', 'v2', 'v3', 'alpha'], "double",
-                'Setzt die Linienfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit'),
-
-            PAppletClass.getProcessingMethod('strokeWeight', ['weight'], "double",
-                'Setzt die Linienbreite.'),
-
-            PAppletClass.getProcessingMethod('noStroke', [], [],
-                'Die nachfolgend gezeichneten Figuren werden ohne Rand gezeichnet.'),
-
-            PAppletClass.getProcessingMethod('color', ['gray'], "double",
-                'Gibt den Grauton als String-kodierte Farbe zurück.', "string"),
-
-            PAppletClass.getProcessingMethod('color', ['colorAsString'], "string",
-                "Gibt die Farbe zurück. Übergeben kann eine Zeichenkette der Form 'rgb(0,0,255)' oder 'rgb(0%, 0%, 100%)' oder 'rgba(0, 0, 255, 1)' oder 'rgba(0%, 0%, 100%, 1)' und all diese Kombinationen statt rgb auch mit hsl und hsb.", "string"),
-
-            PAppletClass.getProcessingMethod('color', ['gray', 'alpha'], "double",
-                'Gibt den Grauton als String-kodierte Farbe zurück.', "string"),
-
-            PAppletClass.getProcessingMethod('color', ['v1', 'v2', 'v3'], "double",
-                'Gibt die aus v1, v2, v3 gebildete Farbe String-kodiert zurück.', "string"),
-
-            PAppletClass.getProcessingMethod('color', ['v1', 'v2', 'v3', 'alpha'], "double",
-                'Gibt die aus v1, v2, v3 und alpha gebildete Farbe String-kodiert zurück.', "string"),
-
-            PAppletClass.getProcessingMethod('lerpColor', ['colorA', 'colorB', 't'], ["string", "string", "double"],
-                'Gibt eine Zwischenfarbe zwischen colorA und colorB zurück. t == 0 bedeutet: colorA, t == 1 bedeutet: colorB, t == 0.5 bedeutet: genau zwischen beiden, usw.', "string"),
-
-            PAppletClass.getProcessingMethod('colorMode', ['mode'], "string",
-                'Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB.'),
-
-            PAppletClass.getProcessingMethod('colorMode', ['mode', 'max'], ["string", "double"],
-                'Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB für Mode. Max ist der Maximalwert jeder Farbkomponente.'),
-
-            PAppletClass.getProcessingMethod('colorMode', ['mode', 'max1', 'max2', 'max3'], ["string", "double", "double", "double"],
-                'Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB für Mode. Max ist der Maximalwert jeder Farbkomponente.'),
-
-            PAppletClass.getProcessingMethod('colorMode', ['mode', 'max1', 'max2', 'max3', 'maxAlpha'], ["string", "double", "double", "double", "double"],
-                'Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB für Mode. Max ist der Maximalwert jeder Farbkomponente.'),
-
-
-
-            /**
-             * Zeichnen geometrischer Figuren
-             */
-            PAppletClass.getProcessingMethod('rectMode', ['mode'], "string",
-                'Setzt den Modus, in dem nachfolgende Aufrufe von rect(...) interpretiert werden. Möglich sind die Werte CORNER, CORNERS, RADIUS und CENTER.'),
-
-            PAppletClass.getProcessingMethod('rect', ['left', 'top', 'width', 'height'], "double",
-                'Zeichnet ein Rechteck. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks.'),
-
-            PAppletClass.getProcessingMethod('rect', ['left', 'top', 'width', 'height', 'radius'], "double",
-                'Zeichnet ein Rechteck mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks.'),
-
-            PAppletClass.getProcessingMethod('rect', ['left', 'top', 'width', 'height', 'radius1', 'radius2', 'radius3', 'radius4'], "double",
-                'Zeichnet ein Rechteck mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks.'),
-
-            PAppletClass.getProcessingMethod('square', ['left', 'top', 'width'], "double",
-                'Zeichnet ein Quadrat. (left, top) ist die linke obere Ecke, width Seitenlänge des Quadrats.'),
-
-            PAppletClass.getProcessingMethod('square', ['left', 'top', 'width', 'radius'], "double",
-                'Zeichnet ein Quadrat mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width Seitenlänge des Quadrats. Radius ist der Eckenradius.'),
-
-            PAppletClass.getProcessingMethod('square', ['left', 'top', 'width', 'radius1', 'radius2', 'radius3', 'radius4'], "double",
-                'Zeichnet ein Quadrat mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width Seitenlänge des Quadrats. Radius ist der Eckenradius.'),
-
-            PAppletClass.getProcessingMethod('rect', ['left', 'top', 'width', 'height', 'radius'], "double",
-                'Zeichnet ein Rechteck. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks. Radius ist der Eckenradius'),
-
-            PAppletClass.getProcessingMethod('ellipse', ['left', 'top', 'width', 'height'], "double",
-                'Zeichnet eine Ellipse. (left, top) ist die linke obere Ecke der Boundingbox der Ellipse, width ihre Breite und height ihre Höhe. Das lässt sich aber mit ellipseMode(...) ändern!'),
-
-            PAppletClass.getProcessingMethod('circle', ['x', 'y', 'extent'], "double",
-                'Zeichnet einen Kreis. (x, y) ist der Mittelpunkt des Kreises, extent der doppelte Radius.'),
-
-            PAppletClass.getProcessingMethod('ellipseMode', ['mode'], "string",
-                'Setzt den Modus, in dem nachfolgende Aufrufe von ellipse(...) interpretiert werden. Möglich sind die Werte CORNER, CORNERS, RADIUS und CENTER.'),
-
-
-            PAppletClass.getProcessingMethod('line', ['x1', 'y1', 'x2', 'y2'], "double",
-                'Zeichnet eine Strecke von (x1, y1) nach (x2, y2).'),
-
-            PAppletClass.getProcessingMethod('line', ['x1', 'y1', 'z1', 'x2', 'y2', 'z2'], "double",
-                'Zeichnet eine Strecke von (x1, y1, z1) nach (x2, y2, z2).'),
-
-            PAppletClass.getProcessingMethod('triangle', ['x1', 'y1', 'x2', 'y2', 'x3', 'y3'], "double",
-                'Zeichnet eine Dreieck mit den Eckpunkten (x1, y1), (x2, y2) und (x3, y3).'),
-
-            PAppletClass.getProcessingMethod('quad', ['x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4'], "double",
-                'Zeichnet eine Viereck mit den Eckpunkten (x1, y1), (x2, y2), (x3, y3) und (x4, y4).'),
-
-            PAppletClass.getProcessingMethod('bezier', ['x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4'], "double",
-                'Zeichnet eine kubische Bezierkurve mit den Ankerpunkten (x1, y1), (x4, y4) und den Kontrollpunkten (x2, y2), (x3, y3).'),
-
-            PAppletClass.getProcessingMethod('curve', ['x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4'], "double",
-                'Zeichnet eine Catmull-Rom-Kurve vom Punkt (x2, y2) nach (x3, y3) so, als würde sie von (x1, x2) kommen und es am Ende zu (x4, y4) weitergehen.'),
-
-            PAppletClass.getProcessingMethod('curvePoint', ['a', 'b', 'c', 'd', 't'], "double",
-                'Will man die Zwischenpunkte einer Curve erhalten (Beginn b, Ende c, als würde sie von a kommen und nach d gehen), so verwendet man sowohl für die x- als auch für die y-Koordinate diese Funktion. t gibt an, welchen Punkt der Kurve man haben möchte. t hat Werte zwischen 0 (Startpunkt) und 1 (Endpunkt).', "double"),
-
-            PAppletClass.getProcessingMethod('curveTangent', ['a', 'b', 'c', 'd', 't'], "double",
-                'Will man die Zwischentangenten einer Curve erhalten (Beginn b, Ende c, als würde sie von a kommen und nach d gehen), so verwendet man sowohl für die x- als auch für die y-Koordinate diese Funktion. t gibt an, welchen Punkt der Kurve man haben möchte. t hat Werte zwischen 0 (Startpunkt) und 1 (Endpunkt).', "double"),
-
-            PAppletClass.getProcessingMethod('bezierPoint', ['x1', 'x2', 'x3', 'x4', 't'], "double",
-                'Will man die Zwischenpunkte einer Bezierkurve erhalten (Ankerkoordinaten x1, x4 und Stützkoordinaten x2, x3), so nutzt man - einzeln sowohl für die x- also auch für die y-Koordinate - diese Funktion. t gibt an, welchen Punkt der Kurve man haben möchte. t hat Werte zwischen 0 (Startpunkt) und 1 (Endpunkt).', "double"),
-
-            PAppletClass.getProcessingMethod('bezierTangent', ['x1', 'x2', 'x3', 'x4', 't'], "double",
-                'Will man die Zwischentangenten einer Bezierkurve erhalten (Ankerkoordinaten x1, x4 und Stützkoordinaten x2, x3), so nutzt man - einzeln sowohl für die x- also auch für die y-Koordinate - diese Funktion. t gibt an, welchen Punkt der Kurve man haben möchte. t hat Werte zwischen 0 (Startpunkt) und 1 (Endpunkt).', "double"),
-
-
-            PAppletClass.getProcessingMethod('beginShape', [], [],
-                'Beginnt mit dem Zeichnen eines Polygons. Die einzelnen Punkte werden mit der Methode vertex(x, y) gesetzt.'),
-
-            PAppletClass.getProcessingMethod('endShape', [], [],
-                'Endet das Zeichnen eines Polygons.'),
-
-            PAppletClass.getProcessingMethod('beginShape', ['kind'], "string",
-                'Beginnt mit dem Zeichnen eines Polygons. Die einzelnen Punkte werden mit der Methode vertex(x, y) gesetzt. Mögliche Werte für kind sind: POINTS, LINES, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP'),
-
-            PAppletClass.getProcessingMethod('endShape', ['kind'], "string",
-                'endShape(CLOSE) schließt den Linienzug.'),
-
-            PAppletClass.getProcessingMethod('vertex', ['x', 'y'], "double",
-                'Setzt zwischen beginShape() und endShape() einen Punkt.'),
-
-            PAppletClass.getProcessingMethod('point', ['x', 'y'], "double",
-                'Zeichnet einen Punkt.'),
-
-            PAppletClass.getProcessingMethod('set', ['x', 'y', 'color'], ["double", "double", "string"],
-                'Setzt die Farbe des Pixels bei (x, y).'),
-
-            PAppletClass.getProcessingMethod('vertex', ['x', 'y', 'z'], "double",
-                'Setzt zwischen beginShape() und endShape() einen Punkt.'),
-
-            PAppletClass.getProcessingMethod('point', ['x', 'y', 'z'], "double",
-                'Zeichnet einen Punkt.'),
-
-            PAppletClass.getProcessingMethod('curveVertex', ['x', 'y'], "double",
-                'Setzt zwischen beginShape() und endShape() einen Punkt. Processing zeichnet damit eine Kurve nach dem Catmull-Rom-Algorithmus.'),
-
-            PAppletClass.getProcessingMethod('curvevertex', ['x', 'y', 'z'], "double",
-                'Setzt zwischen beginShape() und endShape() einen Punkt. Processing zeichnet damit eine Kurve nach dem Catmull-Rom-Algorithmus.'),
-
-            PAppletClass.getProcessingMethod('box', ['size'], "double",
-                'Zeichnet einen 3D-Würfel mit der Seitenlänge size.'),
-
-            PAppletClass.getProcessingMethod('box', ['sizeX', 'sizeY', 'sizeZ'], "double",
-                'Zeichnet einen 3D-Würfel mit den angegebenen Seitenlängen.'),
-
-            /**
-             * Transformationen
-             */
-            PAppletClass.getProcessingMethod('resetMatrix', [], [],
-                'Setzt alle erfolgten Transformationen zurück.'),
-
-            PAppletClass.getProcessingMethod('push', [], [],
-                'Sichert den aktuellen Zeichenzustand, d.h. die Farben und Transformationen, auf einen Stack.'),
-
-            PAppletClass.getProcessingMethod('pop', [], [],
-                'Holt den obersten Zeichenzustand, d.h. die Farben und Transformationen, vom Stack.'),
-
-            PAppletClass.getProcessingMethod('scale', ['factor'], "double",
-                'Streckt die nachfolgend gezeichneten Figuren.'),
-
-            PAppletClass.getProcessingMethod('scale', ['factorX', 'factorY'], "double",
-                'Streckt die nachfolgend gezeichneten Figuren.'),
-
-            PAppletClass.getProcessingMethod('scale', ['factorX', 'factorY', 'factorZ'], "double",
-                'Streckt die nachfolgend gezeichneten Figuren.'),
-
-            PAppletClass.getProcessingMethod('translate', ['x', 'y'], "double",
-                'Verschiebt die nachfolgend gezeichneten Figuren.'),
-
-            PAppletClass.getProcessingMethod('translate', ['x', 'y', 'z'], "double",
-                'Verschiebt die nachfolgend gezeichneten Figuren.'),
-
-            PAppletClass.getProcessingMethod('rotate', ['angle'], "double",
-                'Rotiert die nachfolgend gezeichneten Figuren. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.'),
-
-            PAppletClass.getProcessingMethod('rotateX', ['angle'], "double",
-                'Rotiert die nachfolgend gezeichneten Figuren um die X-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.'),
-
-            PAppletClass.getProcessingMethod('rotateY', ['angle'], "double",
-                'Rotiert die nachfolgend gezeichneten Figuren um die Y-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.'),
-
-            PAppletClass.getProcessingMethod('shearX', ['angle'], "double",
-                'Schert die nachfolgend gezeichneten Figuren in Richtung derX-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.'),
-
-            PAppletClass.getProcessingMethod('shearY', ['angle'], "double",
-                'Schert die nachfolgend gezeichneten Figuren in Richtung der Y-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.'),
-
-            PAppletClass.getProcessingMethod('rotateZ', ['angle'], "double",
-                'Rotiert die nachfolgend gezeichneten Figuren um die Z-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.'),
-
-            PAppletClass.getProcessingMethod('angleMode', ['mode'], "string",
-                'Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie winkel bei Rotationen interpretiert werden. Default ist RADIANS.'),
-
-            /**
-             * Text
-             */
-            PAppletClass.getProcessingMethod('textSize', ['size'], "double",
-                'Setzt die Schriftgröße in Pixel.'),
-
-            // PAppletClass.getProcessingMethod('loadFont', ['fontname'], "string",
-            //     'Lädt eine Schriftart. Diese Methode muss in der Methode preload aufgerufen werden.'),
-
-            PAppletClass.getProcessingMethod('textAlign', ['alignX'], "int",
-                'Setzt die Ausrichtung des nächsten ausgegebenen Textes in x-Richtung. Mögliche Werte sind CENTER, LEFT, RIGHT'),
-
-            PAppletClass.getProcessingMethod('textAlign', ['alignX', 'alignY'], "int",
-                'Setzt die Ausrichtung des nächsten ausgegebenen Textes. Mögliche Werte für alignX sind CENTER, LEFT, RIGHT, mögliche Werte für alignY sind TOP, CENTER, BASELINE, BOTTOM'),
-
-            PAppletClass.getProcessingMethod('text', ['text', 'x', 'y'], ["string", "double", "double"],
-                'Gibt Text aus.'),
-
-            PAppletClass.getProcessingMethod('text', ['text', 'x', 'y', 'x2', 'y2'], ["string", "double", "double", "double", "double"],
-                'Gibt Text aus. x2 und y2 sind die Breite und Höhe des Textausgabebereichs. Hat der Text horizontal nicht Platz, so wird er entsprechend umgebrochen.'),
-
-            /**
-             * Mathematische Funktionen
-             */
-            PAppletClass.getProcessingMethod('random', ['low', 'high'], "double",
-                'Gibt eine Zufallszahl zwischen low und high zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('random', ['high'], "double",
-                'Gibt eine Zufallszahl zwischen 0 und high zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('sqrt', ['n'], "double",
-                'Gibt die Quadratwurzel von n zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('pow', ['basis', 'exponent'], "double",
-                'Gibt die den Wert der Potenz ("basis hoch exponent") zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('max', ['a', 'b'], "double",
-                'Gibt den größeren der beiden Werte zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('min', ['a', 'b'], "double",
-                'Gibt den kleineren der beiden Werte zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('abs', ['n'], "double",
-                'Gibt den Betrag des Wertes zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('sin', ['n'], "double",
-                'Gibt den Sinus des Wertes zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('cos', ['n'], "double",
-                'Gibt den Cosinus des Wertes zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('tan', ['n'], "double",
-                'Gibt den Tangens des Wertes zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('asin', ['n'], "double",
-                'Gibt den Arcussinus des Wertes zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('acos', ['n'], "double",
-                'Gibt den Arcussosinus des Wertes zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('radians', ['angle'], "double",
-                'Wandelt einen Winkel vom Gradmaß ins Bogenmaß um.', "double"),
-
-            PAppletClass.getProcessingMethod('degrees', ['angle'], "double",
-                'Wandelt einen Winkel vom Bogenmaß ins Gradmaß um.', "double"),
-
-            PAppletClass.getProcessingMethod('atan', ['n'], "double",
-                'Gibt den Arcussangens des Wertes zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('atan2', ['x', 'y'], "double",
-                'Gibt den Arcussangens des Wertes zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('sqrt', ['x', 'y'], "double",
-                'Gibt die Quadratwurzel des Wertes zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('sq', ['x', 'y'], "double",
-                'Gibt das Quadrat des Wertes zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('abs', ['n'], "int",
-                'Gibt den Betrag des Wertes zurück.', "int"),
-
-            PAppletClass.getProcessingMethod('round', ['n'], "double",
-                'Rundet den Wert auf eine ganze Zahl.', "int"),
-
-            PAppletClass.getProcessingMethod('ceil', ['n'], "double",
-                'Rundet den Wert auf eine ganze Zahl (Aufrunden!).', "int"),
-
-            PAppletClass.getProcessingMethod('floor', ['n'], "double",
-                'Rundet den Wert auf eine ganze Zahl (Abfrunden!).', "int"),
-
-            PAppletClass.getProcessingMethod('dist', ['x1', 'y1', 'x2', 'y2'], "double",
-                'Berechnet den Abstand der Punkte (x1, y1) und (x2, y2).', "double"),
-
-            PAppletClass.getProcessingMethod('lerp', ['a', 'b', 't'], "double",
-                'Berechnet den a + (b - a)*t. Wählt man t zwischen 0 und 1, so kann man damit die Zwischenwerte zwischen a und b errechnen.', "double"),
-
-            PAppletClass.getProcessingMethod('constrain', ['value', 'min', 'max'], "double",
-                'Beschränkt value auf den Bereich [min, max], genauer: Ist value < min, so wird min zurückgegeben. Ist value > max, so wird max zurückgegeben. Ansonsten wird value zurückgegeben.', "double"),
-
-            /**
-             * Sonstiges
-             */
-
-            PAppletClass.getProcessingMethod('year', [], [],
-                'Aktuelle Jahreszahl', "int"),
-
-            PAppletClass.getProcessingMethod('month', [], [],
-                'Monat: 1 == Januar, 12 == Dezember', "int"),
-
-            PAppletClass.getProcessingMethod('day', [], [],
-                'Tag (innerhalb des Monats) des aktuellen Datums', "int"),
-
-            PAppletClass.getProcessingMethod('hour', [], [],
-                'Stundenzahl der aktuellen Uhrzeit', "int"),
-
-            PAppletClass.getProcessingMethod('hour', [], [],
-                'Stundenzahl der aktuellen Uhrzeit', "int"),
-
-            PAppletClass.getProcessingMethod('minute', [], [],
-                'Minutenzahl der aktuellen Uhrzeit', "int"),
-
-            PAppletClass.getProcessingMethod('second', [], [],
-                'Sekundenzahl der aktuellen Uhrzeit', "int"),
-
-            PAppletClass.getProcessingMethod('frameRate', ['n'], "int",
-                'Setzt die Framerate (Anzahl der Aufrufe von draw() pro Sekunde)'),
-
-            PAppletClass.getProcessingMethod('textWidth', ['text'], "string",
-                'Gibt die Breite des Texts zurück.', "double"),
-
-            PAppletClass.getProcessingMethod('textAscent', ['text'], "string",
-                'Gibt den Ascent Textes zurück ( = Höhe des größten Zeichens über der Grundlinie).', "double"),
-
-            PAppletClass.getProcessingMethod('textDescent', ['text'], "string",
-                'Gibt den Descent Textes zurück ( = Tiefe des tiefsten Zeichens unter der Grundlinie).', "double"),
-
-            PAppletClass.getProcessingMethod('textLeading', ['leading'], "double",
-                'Setzt den Abstand zweier aufeinanderfolgender Textzeilen.'),
-
-            PAppletClass.getProcessingMethod('cursor', ['type'], "string",
-                'Ändert das Aussehen des Mauscursors. Type ist einer der Werte "arrow", "cross", "text", "move", "hand", "wait", "progress".'),
-
-            PAppletClass.getProcessingMethod('noCursor', ['type'], "string",
-                'Hat zur Folge, dass der Mauscursor über dem Zeichenbereich unsichtbar ist.'),
-
-            PAppletClass.getProcessingMethod('copy', ['sx', 'sy', 'sw', 'sh', 'dx', 'dy', 'dw', 'dh'], "double",
-                'Kopiert den rechteckigen Bereich mit der linken oberen Ecke (sx, sy) sowie der Breite sw und der Höhe sh in den Bereich mit der linken oberen Ecke (dx, dy), der Breite dw und der Höhe dh.'),
-
-            PAppletClass.getProcessingMethod('millis', [], [],
-                'Gibt die Millisekunden zurück, die vergangen sind, seit setup() aufgerufen wurde.'),
-
-            PAppletClass.getProcessingMethod('redraw', [], [],
-                'Führt draw() genau ein Mal aus. Macht ggf. Sinn, wenn die Render-Loop zuvor mit noLoop() gestoppt wurde.'),
-
-        ];
-    }
-
-    static getProcessingMethod(identifier: string, parameterNames: string[], parameterTypes: string[] | string, comment: string, returnType?: string): LibraryMethodOrAttributeDeclaration {
-        if(!Array.isArray(parameterTypes)) parameterTypes = [parameterTypes];
-        
-        let parametersCommaSeparated = parameterNames.map((name, index) => {
-            let type: string = index < parameterTypes.length ? parameterTypes[index] : parameterTypes[0];
-            return type + " " + name;
-        }).join(", ");
-
-        let templateParametersCommaSeparated = parameterNames.map((name, index) => "§" + (index + 2)).join(", ");
-
-        let rt: string = returnType || "void";
-
-        let decl: LibraryMethodOrAttributeDeclaration = {
-            type: "method",
-            signature: `${rt} ${identifier}(${parametersCommaSeparated})`,
-            template: `§1.p5o.${identifier}(${templateParametersCommaSeparated})`,
-            comment: comment
-        }
-
-        return decl;
     }
 
 }
