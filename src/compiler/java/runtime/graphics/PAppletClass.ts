@@ -8,6 +8,7 @@ import { ObjectClass } from "../system/javalang/ObjectClassStringClass.ts";
 import { DOM } from "../../../../tools/DOM.ts";
 import { Interpreter } from "../../../common/interpreter/Interpreter.ts";
 import { SchedulerState } from "../../../common/interpreter/Scheduler.ts";
+import { render } from "lit";
 
 export class PAppletClass extends ObjectClass {
     static __javaDeclarations: LibraryDeclarations = (<LibraryDeclarations>[
@@ -287,7 +288,7 @@ export class PAppletClass extends ObjectClass {
     }
 
     setupGraphicsDiv(graphicsDiv: HTMLDivElement) {
-        this.containerOuter = DOM.makeDiv(undefined);
+        this.containerOuter = DOM.makeDiv(undefined, 'jo_pAppletOuter');
 
         this.onSizeChanged = () => {
             // let $jo_tabs = $graphicsDiv.parents(".jo_tabs");
@@ -308,7 +309,7 @@ export class PAppletClass extends ObjectClass {
 
         this.onSizeChanged();
 
-        this.containerInner = DOM.makeDiv(this.containerOuter);
+        this.containerInner = DOM.makeDiv(this.containerOuter, 'jo_pAppletInner');
         graphicsDiv.innerHTML = '';
         graphicsDiv.append(this.containerOuter);
 
@@ -320,11 +321,14 @@ export class PAppletClass extends ObjectClass {
 
     }
 
-    _createCanvas(width: number, height: number) {
+    _createCanvas(width: number, height: number, renderer?: p5.RENDERER) {
+        renderer ||= this.renderer;
+        this.renderer = renderer;
+        
         this.width = width;
         this.height = height;
         this.onSizeChanged();
-        this.p5o.createCanvas(this.width, this.height, this.renderer);
+        this.p5o.createCanvas(this.width, this.height, renderer);
 
         let canvas = this.containerInner.getElementsByTagName('canvas');
         if (canvas.length > 0) {
