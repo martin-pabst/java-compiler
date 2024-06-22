@@ -48,9 +48,23 @@
 
 ### fine-grained next todos on current issue:
 
-## next todos
+## next 
+  * Classes BigInteger, Console, Gamepad, Input, Math, MathToolsClass, System, SystemTools, Timer, Vector2 
+  * Missing Collections 
+  * GNG classes
+  * JavaKara
+  * JavaHamster
+  * Robot
+  * classes for graphical GUI-Elements
   * if method overrides or implements other method and has no comment, then take the overriden method's comment
   * detect cyclic calling of constructors
+
+## after integrating new compiler into online-ide
+  * class Sound
+  * Database classes
+  * class Files
+  * HTTP-Client and JSON-Converter
+
 
 
   
