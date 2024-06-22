@@ -3189,4 +3189,50 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "de": "Instanziert eine neue Position den Komponenten x und y.",
     "en": "Creates a new Position object with components x and y",
     })
+
+    /**
+     * class BigInteger
+     */
+
+    static BigIntegerClassComment = () => lm({
+    "de": "Repräsentiert eine ganze Zahl mit 'beliebig' vielen Stellen.",
+    "en": "Integer number with arbitrary number of digits.",
+    })
+
+    static BigIntegerConstructorComment = () => lm({
+    "de": "Instanziert ein neues BigInteger-Objekt.",
+    "en": "Creates a new BigInteger-object.",
+    })
+
+    static BigIntegerAddComment = () => lm({
+    "de": "Addiert das übergebene BigInteger-Objekt zum aktuellen BigInteger-Objekt und gibt ein neues BigInteger-Objekt zurück, dessen Wert die errechnete Summe ist. Die Methode add ändert nicht das aktuelle BigInteger-Objekt!",
+    "en": "Adds given BigInteger-object to this BigInteger-object and returns a NEW BigInteger-object whose value is the sum of the two.",
+    })
+
+    static BigIntegerDivideComment = () => lm({
+    "de": "Dividiert das BigInteger-Objekt durch das übergebene undd gibt ein neues BigInteger-Objekt zurück, dessen Wert der errechnete Quotient ist. Die Methode add ändert nicht das aktuelle BigInteger-Objekt!",
+    "en": "Divides this BigInteger-object by given one and returns a NEW BigInteger-object whose value is the quotient of the two.",
+    })
+
+    static BigIntegerRemainderComment = () => lm({
+    "de": "Dividiert das BigInteger-Objekt durch das übergebene undd gibt ein neues BigInteger-Objekt zurück, dessen Wert der Rest der Division ist. Die Methode add ändert nicht das aktuelle BigInteger-Objekt!",
+    "en": "Divides this BigInteger-object by given one and returns a NEW BigInteger-object whose value is the remainder of this division.",
+    })
+
+    static BigIntegerMultiplyComment = () => lm({
+    "de": "Multipliziert das aktuelle Objekt mit dem übergebenen BigInteger-Objekt und gibt ein neues BigInteger-Objekt zurück, dessen Wert das Produkt der beiden Zahlen ist. Die Methode multiply ändert nicht das aktuelle BigInteger-Objekt!",
+    "en": "Multiplies this BigInteger-object by given one and returns a NEW BigInteger-object whose value is the product of the two.",
+    })
+
+    static BigIntegerToStringComment = () => lm({
+    "de": "Gibt das BigInteger-Objekt als Zeichenkette (dezimal!) zurück.",
+    "en": "Returns this BigInteger-object as string in decimal representation.",
+    })
+
+    static BigIntegerIntValueComment = () => lm({
+    "de": "Gibt das BigInteger-Objekt mod (2^53) als int-Wert zurück.",
+    "en": "Returns this BigInteger-object mod (2^53) as int-value.",
+    })
+
+
 }  

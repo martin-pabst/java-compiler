@@ -79,6 +79,7 @@ import { PAppletClass } from "../graphics/PAppletClass.ts";
 import { PositionClass } from "../graphics/PositionClass.ts";
 import { JavaKaraClass, JavaKaraWorldClass } from "../graphics/JavaKaraClass.ts";
 import { JavaHamsterClass, JavaHamsterWorldClass } from "../graphics/JavaHamsterClass.ts";
+import { BigIntegerClass } from "./javalang/BigIntegerClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -108,7 +109,7 @@ export class SystemModule extends JavaLibraryModule {
             ObjectClass, StringClass, EnumClass,                  // These two MUST come first!
             
             //additional system classes
-            KeyClass, LocalDateTimeClass, DayOfWeekEnum, PositionClass,
+            KeyClass, LocalDateTimeClass, DayOfWeekEnum, PositionClass, BigIntegerClass,
 
             // Functional
             ConsumerInterface, FunctionInterface,
