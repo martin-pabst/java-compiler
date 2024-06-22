@@ -37,6 +37,9 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
         return fields;
     }
 
+    getCompletionItemDetail(): string {
+        return JCM.class();
+    }
 
     getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string,
         rangeToReplace: monaco.IRange, methodContext: JavaMethod | undefined, onlyStatic?: false): monaco.languages.CompletionItem[] {
@@ -58,7 +61,7 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
             });
         }
 
-        for (let method of this.getAllMethods().filter(m => (m.classEnumInterface == this || m.visibility != TokenType.keywordPrivate) && (m.isStatic || !onlyStatic))) {
+        for (let method of this.getOwnMethods().filter(m => (m.classEnumInterface == this || m.visibility != TokenType.keywordPrivate) && (m.isStatic || !onlyStatic))) {
             if (method.isConstructor) {
                 if (methodContext?.isConstructor && methodContext != method && method.classEnumInterface == this.getExtends()) {
                     this.pushSuperCompletionItem(itemList, method, leftBracketAlreadyThere, rangeToReplace);

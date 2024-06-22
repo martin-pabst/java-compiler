@@ -15,6 +15,7 @@ import { Klass } from "../../common/interpreter/StepFunction.ts";
 import { JavaArrayType } from "./JavaArrayType.ts";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
 import { JavaParameter } from "./JavaParameter.ts";
+import { JCM } from "../../../tools/language/JavaCompilerMessages.ts";
 
 
 export class JavaEnum extends JavaTypeWithInstanceInitializer {
@@ -27,6 +28,10 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule, public baseEnumClass: JavaClass) {
         super(identifier, identifierRange, path, module);
+    }
+
+    getCompletionItemDetail(): string {
+        return JCM.enum();
     }
 
     getField(identifier: string, uptoVisibility: Visibility, forceStatic: boolean = false): JavaField | undefined {

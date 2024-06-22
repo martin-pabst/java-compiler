@@ -27,6 +27,12 @@ export abstract class BaseSymbol {
      */
     abstract getType(): BaseType;
 
+    getDocumentation(): string | undefined {
+        if(!this.documentation) return undefined;
+        if(typeof this.documentation === "string") return this.documentation;
+        return this.documentation();
+    }
+
 }
 
 export abstract class SymbolOnStackframe extends BaseSymbol {

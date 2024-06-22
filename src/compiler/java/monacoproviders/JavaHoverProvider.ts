@@ -104,6 +104,9 @@ export class JavaHoverProvider {
         if (usagePosition && symbol && symbol.identifier != "var") {
             if (symbol instanceof NonPrimitiveType || symbol instanceof JavaMethod) {
                 declarationAsString = "```\n" + symbol.getDeclaration() + "\n```";
+                if(symbol.documentation){
+                    declarationAsString += "\n" + symbol.getDocumentation();
+                }
                 return {
                     range: usagePosition.range,
                     contents: [{ value: declarationAsString }],

@@ -9,11 +9,16 @@ import { JavaType } from "./JavaType";
 import { JavaMethod } from "./JavaMethod";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility";
+import { JCM } from "../../../tools/language/JavaCompilerMessages";
 
 export abstract class IJavaInterface extends NonPrimitiveType {
 
     constructor(public identifier: string, public identifierRange: IRange, path: string, public module: JavaBaseModule) {
         super(identifier, identifierRange, path, module);
+    }
+
+    getCompletionItemDetail(): string {
+        return JCM.interface();
     }
 
     getFile(): File {

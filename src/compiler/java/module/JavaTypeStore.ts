@@ -1,7 +1,7 @@
 import { JCM } from "../../../tools/language/JavaCompilerMessages";
 import { KlassObjectRegistry } from "../../common/interpreter/StepFunction";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
-import { JavaClass } from "../types/JavaClass";
+import { IJavaClass, JavaClass } from "../types/JavaClass";
 import { JavaEnum } from "../types/JavaEnum";
 import { IJavaInterface } from "../types/JavaInterface";
 import { JavaType } from "../types/JavaType";
@@ -89,14 +89,15 @@ export class JavaTypeStore {
 
         this.typeMap.forEach((type, identifier) => {
 
-            if (type instanceof PrimitiveType) {
+            if (type instanceof PrimitiveType || type.identifier == "null") {
 
                 if (!withPrimitiveTypes) return;
 
                 completionItems.push({
                     label: type.identifier,
-                    detail: JCM.primitiveType(),
+                    detail: type.getCompletionItemDetail(),
                     insertText: type.identifier,
+                    documentation: type.getDocumentation(),
                     kind: monaco.languages.CompletionItemKind.Struct,
                     range: rangeToReplace,
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
@@ -126,8 +127,9 @@ export class JavaTypeStore {
 
                 completionItems.push({
                     label: type.identifier,
-                    detail: isGeneric ? JCM.genericType() : "",
+                    detail: type.getCompletionItemDetail() + (isGeneric ? "(" + JCM.genericType() + ")" : ""),
                     insertText: npt.pathAndIdentifier + suffix,
+                    documentation: type.getDocumentation(),
                     kind: kind,
                     range: rangeToReplace,
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,

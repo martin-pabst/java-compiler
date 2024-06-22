@@ -746,5 +746,23 @@ export class JCM {
         "en": "generic type"
     })
 
+    static class = () => lm({
+    "de": "Klass",
+    "en": "class",
+    })
 
+    static enum = () => lm({
+    "de": "Enum",
+    "en": "enum",
+    })
+
+    static interface = () => lm({
+    "de": "Interface",
+    "en": "interface",
+    })
+
+    static nullType = () => lm({
+    "de": "Der Wert null",
+    "en": "null value",
+    })
 }            

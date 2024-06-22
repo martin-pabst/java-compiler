@@ -1,3 +1,4 @@
+import { JCM } from "../../../../../tools/language/JavaCompilerMessages";
 import { File } from "../../../../common/module/File";
 import { EmptyRange, IRange } from "../../../../common/range/Range";
 import { TokenType } from "../../../TokenType";
@@ -30,6 +31,11 @@ export abstract class PrimitiveType extends JavaType {
     }
 
     abstract isUsableAsIndex(): boolean;
+
+    getCompletionItemDetail(): string {
+        return JCM.primitiveType();
+    }
+
 
     getFile(): File {
         return this.module.file;

@@ -15,6 +15,8 @@ export abstract class BaseType extends BaseSymbol {
         return this;
     }
 
+    abstract getCompletionItemDetail(): string;
+
 }
 
 export interface BaseObjectType {

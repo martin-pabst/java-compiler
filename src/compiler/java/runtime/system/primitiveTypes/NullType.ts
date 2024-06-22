@@ -1,3 +1,4 @@
+import { JCM } from "../../../../../tools/language/JavaCompilerMessages";
 import { EmptyRange } from "../../../../common/range/Range";
 import { JavaBaseModule } from "../../../module/JavaBaseModule";
 import { GenericTypeParameter } from "../../../types/GenericTypeParameter";
@@ -10,6 +11,11 @@ export class NullType extends JavaType {
         super("null", EmptyRange.instance, module);
     }
     
+    getCompletionItemDetail(): string {
+        return JCM.nullType();
+    }
+
+
     isUsableAsIndex(): boolean {
         return false;
     }
@@ -33,4 +39,5 @@ export class NullType extends JavaType {
         return "null";    
     }
 
+    
 }
