@@ -81,12 +81,13 @@ import { JavaKaraClass, JavaKaraWorldClass } from "../graphics/JavaKaraClass.ts"
 import { JavaHamsterClass, JavaHamsterWorldClass } from "../graphics/JavaHamsterClass.ts";
 import { BigIntegerClass } from "./javalang/BigIntegerClass.ts";
 import { ConsoleClass } from "./additional/Console.ts";
+import { Vector2Class } from "./additional/Vector2Class.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
     public primitiveStringClass: Klass & LibraryKlassType = PrimitiveStringClass;
 
-    constructor(){
+    constructor() {
         super();
         this.types.push(
             new BooleanPrimitiveType(this),
@@ -103,15 +104,15 @@ export class SystemModule extends JavaLibraryModule {
         )
 
         ColorClass._initPredefinedColors();
-        
+
         this.classes.push(
             ComparableInterface, ComparatorInterface,
-            
+
             ObjectClass, StringClass, EnumClass,                  // These two MUST come first!
-            
+
             //additional system classes
             KeyClass, LocalDateTimeClass, DayOfWeekEnum, PositionClass, BigIntegerClass,
-            ConsoleClass,
+            ConsoleClass, Vector2Class,
 
             // Functional
             ConsumerInterface, FunctionInterface,
@@ -121,7 +122,7 @@ export class SystemModule extends JavaLibraryModule {
             OptionalClass,
 
             MathClass, RandomClass, DecimalFormatClass,
-            ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass, 
+            ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass,
             ClassCastExceptionClass, IndexOutOfBoundsExceptionClass, IllegalMonitorStateExceptionClass,
 
             // Collections
@@ -150,7 +151,8 @@ export class SystemModule extends JavaLibraryModule {
 
             // Java Hamster
             JavaHamsterWorldClass, JavaHamsterClass,
-        )
+        );
+
 
     }
 

@@ -3243,8 +3243,121 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     })
 
     static ConsoleLogComment = () => lm({
-    "de": "Gibt das  in die Konsole des Browsers.",
-    "en": "Writes Object to Console.",
+        "de": "Gibt das  in die Konsole des Browsers.",
+        "en": "Writes Object to Console.",
+    })
+
+    /**
+     * Vector2
+     */
+    static Vector2ClassComment = () => lm({
+        "de": "Ein zweidimensionaler Vektor mit double-Koordinaten.",
+        "en": "2-dimensional vector with double-precision.",
+    })
+
+    static Vector2ConstructorComment = () => lm({
+        "de": "Erstellt einen neuen Vektor mit den Koordinaten (x, y).",
+        "en": "Creates a new vector with given coordinates.",
+    })
+
+    static Vector2ToStringComment = () => lm({
+        "de": "Wandelt den Vektor in einen String der Form (x, y) um.",
+        "en": "Transforms vector into String (x, y).",
+    })
+
+    static Vector2FromPolarCoordinatesComment = () => lm({
+        "de": "Gibt einen neuen zweidimensionalen Vektor zurück, der mit den Polarkoordinaten (r/alphaDeg) gebildet wird. Datei ist r (Abstand zum Ursprung des Koordinatensystems) und alphaDeg (Winkel zur positiven x-Achse in Grad).",
+        "en": "Creates a new Vector2-object from given polar coordinates r, alphaDeg. r is it's length, alphaDeg it's angle towards the positive x-axis.",
+    })
+
+    static Vector2GetAngleDegComment = () => lm({
+        "de": "Gibt den Winkel zur positiven x-Achse in Grad zurück.",
+        "en": "Returns angle towards positive x-axis in degrees.",
+    })
+
+    static Vector2GetAngleRadComment = () => lm({
+        "de": "Gibt den Winkel zur positiven x-Achse im Bogenmaß (rad) zurück.",
+        "en": "Returns angle towards positive x-axis in radians.",
+    })
+
+    static Vector2GetLengthComment = () => lm({
+        "de": "Gibt die Länge des Vektors zurück.",
+        "en": "Returns length of this vector.",
+    })
+
+    static Vector2GetUnitVectorComment = () => lm({
+        "de": "Gibt einen NEUEN Vektor zurück, der parallel zu diesem ist aber die Länge 1 besitzt.",
+        "en": "Returns a NEW Vector parallel to this one but with length 1.",
+    })
+
+    static Vector2SetLengthComment = () => lm({
+        "de": "Streckt/staucht das Vector2-Objekt auf die angegebene Länge und gibt es zurück (für Method-Chaining!). Das Vector2-Objekt wird dabei verändert!",
+        "en": "Scales this Vector2-object to given length and returns it for method chaining.",
+    })
+
+    static Vector2ScaledByComment = () => lm({
+        "de": "Gibt ein NEUES Vector2-Objekt zurück, das parallel zu diesem ist aber um den angegebenen Faktor gestreckt ist.",
+        "en": "Returns a NEW Vector2-object parallel to this one but with given length.",
+    })
+
+    static Vector2ScaleComment = () => lm({
+    "de": "Streckt das Vector2-Objekt um den angegebenen Faktor und gibt es zurück (für Method-Chaining!). Diese Methode VERÄNDERT dieses Objekt!",
+    "en": "Scales Vector2-object by given factor and returns it (for method chaining). This method ALTERS this object!",
+    })
+
+    static Vector2RotateComment = () => lm({
+        "de": "Rotiert das Vector2-Objekt um den angegebenen Winkel (in Grad) und gibt es zurück (für Method-Chaining!). Positive Winkel bedeuten eine Drehung ENTGEGEN dem Uhrzeigersinn.",
+        "en": "Rotates this Vector2-object by given angle (in degrees) and returns it for method chaining. Positve angles lead to COUNTERCLOCKWISE rotation.",
+    })
+
+    static Vector2RotatedByComment = () => lm({
+        "de": "Gibt ein NEUES Vector2-Objekt zurück, das um den angegebenen Winkel (in Grad) gedreht ist. Positive Winkel bedeuten eine Drehung ENTGEGEN dem Uhrzeigersinn.",
+        "en": "Returns a NEW Vector2-object rotated by given angle (in degrees). Positve angles lead to COUNTERCLOCKWISE rotation.",
+    })
+
+    static Vector2PlusComment = () => lm({
+        "de": "Gibt ein NEUES Vector2-Objekt zurück, das aus Addition der beiden Vektoren entsteht.",
+        "en": "Returns a NEW Vector2-object which is the sum of the two vectors.",
+    })
+
+    static Vector2MinusComment = () => lm({
+        "de": "Gibt ein NEUES Vector2-Objekt zurück, das aus Subtraktion der beiden Vektoren entsteht.",
+        "en": "Returns a NEW Vector2-object which is the difference of the two vectors.",
+    })
+
+    static Vector2AddComment = () => lm({
+        "de": "Addiert den übergebenen Vektor zu diesem und gibt diesen zurück (für Method-Chaining!). Diese Methode VERÄNDERT dieses Objekt!",
+        "en": "Adds given vector to this one and returns this one. This Method ALTERS this object!",
+    })
+
+    static Vector2SubComment = () => lm({
+        "de": "Subtrahiert den übergebenen Vektor von diesem und gibt diesen zurück (für Method-Chaining!). Diese Methode VERÄNDERT dieses Objekt!",
+        "en": "Subtracts given vector from this one and returns this one. This Method ALTERS this object!",
+    })
+
+    static Vector2ScalarProductComment = () => lm({
+    "de": "Gibt das Skalarprodukt der beiden Vektoren zurück.",
+    "en": "Returns scalar product of vectors.",
+    })
+
+    static Vector2DistanceComment = () => lm({
+    "de": "Berechnet den Abstand der beiden Punkte (x1, y1) und (x2, y2).",
+    "en": "Returns distance of given points (x1, y1) and (x2, y2).",
+    })
+
+    static Vector2DistanceToComment = () => lm({
+    "de": "Berechnet die Länge der Differenz der beiden Vektoren.",
+    "en": "Returns the length of the difference of both vectors.",
+    })
+
+    static Vector2XComment = () => lm({
+    "de": "X-Komponente des Vektors",
+    "en": "x-component",
+    })
+
+    static Vector2YComment = () => lm({
+    "de": "Y-Komponente des Vektors",
+    "en": "y-component",
     })
 
 }  

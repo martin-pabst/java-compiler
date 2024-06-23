@@ -131,7 +131,7 @@ export class RectangleClass extends FilledShapeClass {
         return;
     }
 
-    _debugOutput(){
+    _debugOutput(): string {
         let s = `{width: ${this.width * this.scaleFactor}, height: ${this.height * this.scaleFactor}, centerX: ${this._getCenterX()}, centerY: ${this._getCenterY()} }`;
         return s;
     }
