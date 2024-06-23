@@ -2009,23 +2009,23 @@ export class JRC {
     })
 
     static PAppletLoopComment = () => lm({
-    "de": "Startet nach noLoop() die Renderer-Loop wieder neu, so dass draw() wieder periodisch aufgerufen wird.",
-    "en": "",
+        "de": "Startet nach noLoop() die Renderer-Loop wieder neu, so dass draw() wieder periodisch aufgerufen wird.",
+        "en": "",
     })
 
     static PAppletNoLoopComment = () => lm({
-    "de": "Stoppt die Render-Loop, so dass draw() nicht mehr aufgerufen wird. Kann mit loop() wieder gestartet werden.",
-    "en": "",
+        "de": "Stoppt die Render-Loop, so dass draw() nicht mehr aufgerufen wird. Kann mit loop() wieder gestartet werden.",
+        "en": "",
     })
 
     static PAppletSizeComment = () => lm({
-    "de": "Definiert die Abmessungen des Processing-Ausgabebereichs in Pixeln.",
-    "en": "",
+        "de": "Definiert die Abmessungen des Processing-Ausgabebereichs in Pixeln.",
+        "en": "",
     })
 
     static PAppletCreateCanvasComment = () => lm({
-    "de": "Definiert die Abmessungen des Processing-Ausgabebereichs in Pixeln.",
-    "en": "",
+        "de": "Definiert die Abmessungen des Processing-Ausgabebereichs in Pixeln.",
+        "en": "",
     })
 
 
@@ -2103,173 +2103,173 @@ export class JRC {
 
     // Fields
     static PAppletMouseXComment = () => lm({
-    "de": "aktuelle x-Koordinate des Mauszeigers",
-    "en": "current x-coordinate of mouse pointer",
+        "de": "aktuelle x-Koordinate des Mauszeigers",
+        "en": "current x-coordinate of mouse pointer",
     })
 
     static PAppletMouseYComment = () => lm({
         "de": "aktuelle y-Koordinate des Mauszeigers",
         "en": "current y-coordinate of mouse pointer",
     })
-    
+
     static PAppletPMouseXComment = () => lm({
-    "de": "x-Koordinate des Mauszeigers im vorherigen Frame",
-    "en": "x-coordinate of mouse pointer in previous frame",
+        "de": "x-Koordinate des Mauszeigers im vorherigen Frame",
+        "en": "x-coordinate of mouse pointer in previous frame",
     })
 
     static PAppletPMouseYComment = () => lm({
-    "de": "y-Koordinate des Mauszeigers im vorherigen Frame",
-    "en": "y-coordinate of mouse pointer in previous frame",
+        "de": "y-Koordinate des Mauszeigers im vorherigen Frame",
+        "en": "y-coordinate of mouse pointer in previous frame",
     })
 
     static PAppletLEFTComment = () => lm({
-    "de": "links",
-    "en": "left",
+        "de": "links",
+        "en": "left",
     })
 
     static PAppletCENTERComment = () => lm({
-    "de": "Mitte",
-    "en": "center",
+        "de": "Mitte",
+        "en": "center",
     })
 
     static PAppletRIGHTComment = () => lm({
-    "de": "rechts",
-    "en": "right",
+        "de": "rechts",
+        "en": "right",
     })
 
     static PAppletTOPComment = () => lm({
-    "de": "obenbündig",
-    "en": "top",
+        "de": "obenbündig",
+        "en": "top",
     })
 
     static PAppletBASELINEComment = () => lm({
-    "de": "bündig auf der Grundlinie",
-    "en": "baseline",
+        "de": "bündig auf der Grundlinie",
+        "en": "baseline",
     })
 
     static PAppletBOTTOMComment = () => lm({
-    "de": "untenbündig",
-    "en": "bottom",
+        "de": "untenbündig",
+        "en": "bottom",
     })
 
     static PAppletWidthComment = () => lm({
-    "de": "Breite des Zeichenbereichs",
-    "en": "width of canvas",
+        "de": "Breite des Zeichenbereichs",
+        "en": "width of canvas",
     })
 
     static PAppletHeightComment = () => lm({
-    "de": "Höhe des Zeichenbereichs",
-    "en": "height of canvas",
+        "de": "Höhe des Zeichenbereichs",
+        "en": "height of canvas",
     })
 
     static PAppletKeyCodeComment = () => lm({
-    "de": "Zahlencode der zuletzt gedrückten Taste",
-    "en": "keycode of previously pressed key",
+        "de": "Zahlencode der zuletzt gedrückten Taste",
+        "en": "keycode of previously pressed key",
     })
 
     static PAppletMouseButtonComment = () => lm({
-    "de": "Zuletzt gedrückte Maustaste, kann die Werte LEFT, RIGHT und CENTER annehmen.",
-    "en": "Previously pressed mouse button. Possible values are LEFT, RIGHT or CENTER.",
+        "de": "Zuletzt gedrückte Maustaste, kann die Werte LEFT, RIGHT und CENTER annehmen.",
+        "en": "Previously pressed mouse button. Possible values are LEFT, RIGHT or CENTER.",
     })
 
     static PAppletCORNERComment = () => lm({
-    "de": "Modus zum Zeichnen von Rechtecken.",
-    "en": "Mode to draw rectangles.",
+        "de": "Modus zum Zeichnen von Rechtecken.",
+        "en": "Mode to draw rectangles.",
     })
 
     static PAppletCORNERSComment = () => lm({
-    "de": "Modus zum Zeichnen von Rechtecken.",
-    "en": "Mode to draw rectangles.",
+        "de": "Modus zum Zeichnen von Rechtecken.",
+        "en": "Mode to draw rectangles.",
     })
 
     static PAppletRADIUSComment = () => lm({
-    "de": "Modus zum Zeichnen von Rechtecken.",
-    "en": "Mode to draw rectangles.",
+        "de": "Modus zum Zeichnen von Rechtecken.",
+        "en": "Mode to draw rectangles.",
     })
 
     static PAppletPOINTSComment = () => lm({
-    "de": "zeichne nachfolgend Einzelpunkte",
-    "en": "draw points only",
+        "de": "zeichne nachfolgend Einzelpunkte",
+        "en": "draw points only",
     })
 
     static PAppletLINESComment = () => lm({
-    "de": "zeichne nachfolgend einzelne Linien",
-    "en": "draw lines subsequently",
+        "de": "zeichne nachfolgend einzelne Linien",
+        "en": "draw lines subsequently",
     })
 
     static PAppletTRIANGLESComment = () => lm({
-    "de": "zeichne nachfolgend einzelne Dreiecke",
-    "en": "draw triangles subsequently",
+        "de": "zeichne nachfolgend einzelne Dreiecke",
+        "en": "draw triangles subsequently",
     })
 
     static PAppletTRIANGLE_STRIPComment = () => lm({
-    "de": "zeichne nachfolgend einen Triangle-Strip",
-    "en": "draw triangle-strip subesequently",
+        "de": "zeichne nachfolgend einen Triangle-Strip",
+        "en": "draw triangle-strip subesequently",
     })
 
     static PAppletTRIANGLE_FANComment = () => lm({
-    "de": "zeichne nachfolgend einen Triangle-Fan",
-    "en": "draw triangle-fan subesequently",
+        "de": "zeichne nachfolgend einen Triangle-Fan",
+        "en": "draw triangle-fan subesequently",
     })
 
     static PAppletQUADSComment = () => lm({
-    "de": "zeichne nachfolgend Vierecke",
-    "en": "draw quads subsequently",
+        "de": "zeichne nachfolgend Vierecke",
+        "en": "draw quads subsequently",
     })
 
     static PAppletQUAD_STRIPComment = () => lm({
-    "de": "zeichne nachfolgend einen Quad-Strip",
-    "en": "draw quad-strip subsequently",
+        "de": "zeichne nachfolgend einen Quad-Strip",
+        "en": "draw quad-strip subsequently",
     })
 
     static PAppletTESSComment = () => lm({
-    "de": "zeichne nachfolgend ein TESS - geht nur bei createCanvas(width, height, WEBGL)",
-    "en": "draw TESS subsequently - only possible with createCanvas(width, height, WEBGL)",
+        "de": "zeichne nachfolgend ein TESS - geht nur bei createCanvas(width, height, WEBGL)",
+        "en": "draw TESS subsequently - only possible with createCanvas(width, height, WEBGL)",
     })
 
     static PAppletCLOSEComment = () => lm({
-    "de": "endShape(CLOSE) schließt den Linienzug",
-    "en": "endShape(CLOSE) closes line-strip",
+        "de": "endShape(CLOSE) schließt den Linienzug",
+        "en": "endShape(CLOSE) closes line-strip",
     })
 
     static PAppletDEGREESComment = () => lm({
-    "de": "angleMode(DEGREES) sorgt dafür, dass nachfolgende Winkelangaben in Grad interpretiert werden.",
-    "en": "angleMode(DEGREES) makes processing interpret subsequent angle values as degrees",
+        "de": "angleMode(DEGREES) sorgt dafür, dass nachfolgende Winkelangaben in Grad interpretiert werden.",
+        "en": "angleMode(DEGREES) makes processing interpret subsequent angle values as degrees",
     })
 
     static PAppletRADIANSComment = () => lm({
-    "de": "angleMode(RADIANS) sorgt dafür, dass nachfolgende Winkelangaben im Bogenmaß interpretiert werden.",
-    "en": "angleMode(RADIANS) makes processing interpret subsequent angle values as radians",
+        "de": "angleMode(RADIANS) sorgt dafür, dass nachfolgende Winkelangaben im Bogenmaß interpretiert werden.",
+        "en": "angleMode(RADIANS) makes processing interpret subsequent angle values as radians",
     })
 
     static PAppletWEBGLComment = () => lm({
-    "de": "WebGL-Renderer zur 3D-Ausgabe",
-    "en": "WebGL-Renderer for 3D-output",
+        "de": "WebGL-Renderer zur 3D-Ausgabe",
+        "en": "WebGL-Renderer for 3D-output",
     })
 
     static PAppletP2DComment = () => lm({
-    "de": "Renderer zur zweidimensionalen Ausgabe",
-    "en": "Renderer for 2D-Output",
+        "de": "Renderer zur zweidimensionalen Ausgabe",
+        "en": "Renderer for 2D-Output",
     })
 
     static PAppletRGBComment = () => lm({
-    "de": "Color-Mode RGB (rot, grün, blau)",
-    "en": "color mode RGB (red, green, blue)",
+        "de": "Color-Mode RGB (rot, grün, blau)",
+        "en": "color mode RGB (red, green, blue)",
     })
 
     static PAppletHSLComment = () => lm({
-    "de": "Color-Mode HSL",
-    "en": "color mode HSL",
+        "de": "Color-Mode HSL",
+        "en": "color mode HSL",
     })
 
     static PAppletHSBComment = () => lm({
-    "de": "Color-Mode HSB",
-    "en": "color mode HSB",
+        "de": "Color-Mode HSB",
+        "en": "color mode HSB",
     })
 
     static PAppletKeyComment = () => lm({
-    "de": "Letzte gedrückte Taste",
-    "en": "previously pressed key",
+        "de": "Letzte gedrückte Taste",
+        "en": "previously pressed key",
     })
 
     // methods:
@@ -2277,127 +2277,127 @@ export class JRC {
         "de": `Löscht die Zeichenfläche.`,
         "en": `Clears the pixels on the canvas. clear() makes every pixel 100% transparent.`,
     })
- 
+
     static PAppletBackground1Comment = () => lm({
         "de": `Übermalt die komplette Zeichenfläche mit der übergebenen Farbe.`,
         "en": `Sets the color used for the background of the canvas.`,
     })
- 
+
     static PAppletBackground2Comment = () => lm({
         "de": `Übermalt die komplette Zeichenfläche mit der übergebenen Farbe. Übergeben wird eine Zeichenkette der Form 'rgb(0,0,255)' oder 'rgb(0%, 0%, 100%)' oder 'rgba(0, 0, 255, 1)' oder 'rgba(0%, 0%, 100%, 1)' und all diese Kombinationen statt rgb auch mit hsl und hsb.`,
         "en": `Sets the color used for the background of the canvas. Write color as 'rgb(0,0,255)' or 'rgb(0%, 0%, 100%)' or 'rgba(0, 0, 255, 1)' or 'rgba(0%, 0%, 100%, 1)' or use hsl or hsb instead of rgb.`,
     })
- 
+
     static PAppletBackground3Comment = () => lm({
         "de": `Übermalt die komplette Zeichenfläche mit der übergebenen Farbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
         "en": `Sets the color used for the background of the canvas. v1, v2 and v3 are red, green and blue or - dependent on current color mode - color, saturation and luminescence.`,
     })
- 
+
     static PAppletFill1Comment = () => lm({
         "de": `Setzt die Füllfarbe.`,
         "en": `Sets the color used to fill shapes.`,
     })
- 
+
     static PAppletFill1aComment = () => lm({
         "de": `Setzt die Füllfarbe.`,
         "en": `Sets the color used to fill shapes.`,
     })
- 
+
     static PAppletFill2Comment = () => lm({
         "de": `Setzt die Füllfarbe.`,
         "en": `Sets the color used to fill shapes.`,
     })
- 
+
     static PAppletFill3Comment = () => lm({
         "de": `Setzt die Füllfarbe.`,
         "en": `Sets the color used to fill shapes.`,
     })
- 
+
     static PAppletFill4Comment = () => lm({
         "de": `Setzt die Füllfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
         "en": `Sets the color used to fill shapes. v1, v2 and v3 are red, green and blue or - dependent on current color mode - color, saturation and luminescence.`,
     })
- 
+
     static PAppletFill5Comment = () => lm({
         "de": `Setzt die Füllfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
         "en": `Sets the color used to fill shapes. v1, v2 and v3 are red, green and blue or - dependent on current color mode - color, saturation and luminescence.`,
     })
- 
+
     static PAppletNoFill0Comment = () => lm({
         "de": `Die nachfolgend gezeichneten Figuren werden nicht gefüllt.`,
         "en": `Subsequently drawn shapes will not get filled.`,
     })
- 
+
     static PAppletStroke1Comment = () => lm({
         "de": `Setzt die Linienfarbe.`,
         "en": `Sets the color used to draw points, lines, and the outlines of shapes.`,
     })
- 
+
     static PAppletStroke1aComment = () => lm({
         "de": `Setzt die Linienfarbe.`,
         "en": `Sets the color used to draw points, lines, and the outlines of shapes.`,
     })
- 
+
     static PAppletStroke2Comment = () => lm({
         "de": `Setzt die Linienfarbe.`,
         "en": `Sets the color used to draw points, lines, and the outlines of shapes.`,
     })
- 
+
     static PAppletStroke3Comment = () => lm({
         "de": `Setzt die Linienfarbe.`,
         "en": `Sets the color used to draw points, lines, and the outlines of shapes.`,
     })
- 
+
     static PAppletStroke4Comment = () => lm({
         "de": `Setzt die Linienfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
         "en": `Sets the color used to draw points, lines, and the outlines of shapes. v1, v2 and v3 are red, green and blue or - dependent on current color mode - color, saturation and luminescence.`,
     })
- 
+
     static PAppletStroke5Comment = () => lm({
         "de": `Setzt die Linienfarbe. v1, v2 und v3 sind - abhängig vom aktuellen color mode - rot, grün und blauwert oder Farbe, Sättigung und Helligkeit`,
         "en": `Sets the color used to draw points, lines, and the outlines of shapes. v1, v2 and v3 are red, green and blue or - dependent on current color mode - color, saturation and luminescence.`,
     })
- 
+
     static PAppletStrokeWeight1Comment = () => lm({
         "de": `Setzt die Linienbreite.`,
         "en": `Sets the width of the stroke used for points, lines, and the outlines of shapes.`,
     })
- 
+
     static PAppletNoStroke0Comment = () => lm({
         "de": `Die nachfolgend gezeichneten Figuren werden ohne Rand gezeichnet.`,
         "en": ``,
     })
- 
+
     static PAppletColor1Comment = () => lm({
         "de": `Gibt den Grauton als String-kodierte Farbe zurück.`,
         "en": `Disables drawing points, lines, and the outlines of shapes.`,
     })
- 
+
     static PAppletColor2Comment = () => lm({
         "de": `Gibt die Farbe zurück. Übergeben kann eine Zeichenkette der Form 'rgb(0,0,255)' oder 'rgb(0%, 0%, 100%)' oder 'rgba(0, 0, 255, 1)' oder 'rgba(0%, 0%, 100%, 1)' und all diese Kombinationen statt rgb auch mit hsl und hsb.`,
         "en": `Converts string like 'rgb(0,0,255)' or 'rgb(0%, 0%, 100%)' or 'rgba(0, 0, 255, 1)' or 'rgba(0%, 0%, 100%, 1)' to a color.`,
     })
- 
+
     static PAppletColor3Comment = () => lm({
         "de": `Gibt den Grauton als String-kodierte Farbe zurück.`,
         "en": `Returns gray value of given color`,
     })
- 
+
     static PAppletColor4Comment = () => lm({
         "de": `Gibt die aus v1, v2, v3 gebildete Farbe String-kodiert zurück.`,
         "en": `Returns color given by v1, v2 and v3. v1, v2 and v3 are red, green and blue or - dependent on current color mode - color, saturation and luminescence.`,
     })
- 
+
     static PAppletColor5Comment = () => lm({
         "de": `Gibt die aus v1, v2, v3 und alpha gebildete Farbe String-kodiert zurück.`,
         "en": `Returns color given by v1, v2 and v3. v1, v2 and v3 are red, green and blue or - dependent on current color mode - color, saturation and luminescence.`,
     })
- 
+
     static PAppletLerpColor3Comment = () => lm({
         "de": `Gibt eine Zwischenfarbe zwischen colorA und colorB zurück. t == 0 bedeutet: colorA, t == 1 bedeutet: colorB, t == 0.5 bedeutet: genau zwischen beiden, usw.`,
         "en": `Blends two colors to find a third color between them. The amt parameter specifies the amount to interpolate between the two values. 0 is equal to the first color, 0.1 is very near the first color, 0.5 is halfway between the two colors, and so on.`,
     })
- 
+
     static PAppletColorMode1Comment = () => lm({
         "de": `Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB.`,
         "en": `Changes the way color values are interpreted. 
@@ -2405,7 +2405,7 @@ By default, the Number parameters for fill(), stroke(), background(), and color(
 Calling colorMode(RGB, 100) sets colors to use RGB color values between 0 and 100. Pure red is color(100, 0, 0) in this model.
 Calling colorMode(HSB) or colorMode(HSL) changes to HSB or HSL system instead of RGB. Pure red is color(0, 100, 100) in HSB and color(0, 100, 50) in HSL.`,
     })
- 
+
     static PAppletColorMode2Comment = () => lm({
         "de": `Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB für Mode. Max ist der Maximalwert jeder Farbkomponente.`,
         "en": `Changes the way color values are interpreted. 
@@ -2413,7 +2413,7 @@ By default, the Number parameters for fill(), stroke(), background(), and color(
 Calling colorMode(RGB, 100) sets colors to use RGB color values between 0 and 100. Pure red is color(100, 0, 0) in this model.
 Calling colorMode(HSB) or colorMode(HSL) changes to HSB or HSL system instead of RGB. Pure red is color(0, 100, 100) in HSB and color(0, 100, 50) in HSL.`,
     })
- 
+
     static PAppletColorMode4Comment = () => lm({
         "de": `Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB für Mode. Max ist der Maximalwert jeder Farbkomponente.`,
         "en": `Changes the way color values are interpreted. 
@@ -2421,7 +2421,7 @@ By default, the Number parameters for fill(), stroke(), background(), and color(
 Calling colorMode(RGB, 100) sets colors to use RGB color values between 0 and 100. Pure red is color(100, 0, 0) in this model.
 Calling colorMode(HSB) or colorMode(HSL) changes to HSB or HSL system instead of RGB. Pure red is color(0, 100, 100) in HSB and color(0, 100, 50) in HSL.`,
     })
- 
+
     static PAppletColorMode5Comment = () => lm({
         "de": `Setzt den Modus, in dem nachfolgende Aufrufe von color(...) interpretiert werden. Möglich sind die Werte RGB, HSL und HSB für Mode. Max ist der Maximalwert jeder Farbkomponente.`,
         "en": `Changes the way color values are interpreted. 
@@ -2429,7 +2429,7 @@ By default, the Number parameters for fill(), stroke(), background(), and color(
 Calling colorMode(RGB, 100) sets colors to use RGB color values between 0 and 100. Pure red is color(100, 0, 0) in this model.
 Calling colorMode(HSB) or colorMode(HSL) changes to HSB or HSL system instead of RGB. Pure red is color(0, 100, 100) in HSB and color(0, 100, 50) in HSL.`,
     })
- 
+
     static PAppletRectMode1Comment = () => lm({
         "de": `Setzt den Modus, in dem nachfolgende Aufrufe von rect(...) interpretiert werden. Möglich sind die Werte CORNER, CORNERS, RADIUS und CENTER.`,
         "en": `Changes where rectangles and squares are drawn.
@@ -2438,472 +2438,472 @@ rectMode(CORNERS) also uses the first two parameters as the location of one of t
 rectMode(CENTER) uses the first two parameters as the x- and y-coordinates of the shape's center. The next parameters are its width and height.
 rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates of the shape's center. The next parameters are half of the shape's width and height.`,
     })
- 
+
     static PAppletRect1Comment = () => lm({
         "de": `Zeichnet ein Rechteck. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks.`,
         "en": `Draws a rectangle.`,
     })
- 
+
     static PAppletRect1aComment = () => lm({
         "de": `Zeichnet ein Rechteck mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks.`,
         "en": `Draws a rectangle with rounded edges.`,
     })
- 
+
     static PAppletRect1bComment = () => lm({
         "de": `Zeichnet ein Rechteck mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks.`,
         "en": `Draws a rectangle with rounded edges.`,
     })
- 
+
     static PAppletSquare1Comment = () => lm({
         "de": `Zeichnet ein Quadrat. (left, top) ist die linke obere Ecke, width Seitenlänge des Quadrats.`,
         "en": `Draws a square.`,
     })
- 
+
     static PAppletSquare1aComment = () => lm({
         "de": `Zeichnet ein Quadrat mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width Seitenlänge des Quadrats. Radius ist der Eckenradius.`,
         "en": `Draws a sqare with rounded eges.`,
     })
- 
+
     static PAppletSquare1bComment = () => lm({
         "de": `Zeichnet ein Quadrat mit abgerundeten Ecken. (left, top) ist die linke obere Ecke, width Seitenlänge des Quadrats. Radius ist der Eckenradius.`,
         "en": `Draws a sqare with rounded eges.`,
     })
- 
+
     static PAppletRect1cComment = () => lm({
         "de": `Zeichnet ein Rechteck. (left, top) ist die linke obere Ecke, width die Breite und height die Höhe des Rechtecks. Radius ist der Eckenradius`,
         "en": `Draws a rectangle with rounded edges.`,
     })
- 
+
     static PAppletEllipse1Comment = () => lm({
         "de": `Zeichnet eine Ellipse. (left, top) ist die linke obere Ecke der Boundingbox der Ellipse, width ihre Breite und height ihre Höhe. Das lässt sich aber mit ellipseMode(...) ändern!`,
         "en": `Draws an ellipse.`,
     })
- 
+
     static PAppletCircle1Comment = () => lm({
         "de": `Zeichnet einen Kreis. (x, y) ist der Mittelpunkt des Kreises, extent der doppelte Radius.`,
         "en": `Draws a circle with center at (x, y). Extent is it's double radius.`,
     })
- 
+
     static PAppletEllipseMode1Comment = () => lm({
         "de": `Setzt den Modus, in dem nachfolgende Aufrufe von ellipse(...) interpretiert werden. Möglich sind die Werte CORNER, CORNERS, RADIUS und CENTER.`,
         "en": ``,
     })
- 
+
     static PAppletLine1Comment = () => lm({
         "de": `Zeichnet eine Strecke von (x1, y1) nach (x2, y2).`,
         "en": ``,
     })
- 
+
     static PAppletLine1aComment = () => lm({
         "de": `Zeichnet eine Strecke von (x1, y1, z1) nach (x2, y2, z2).`,
         "en": ``,
     })
- 
+
     static PAppletTriangle1Comment = () => lm({
         "de": `Zeichnet eine Dreieck mit den Eckpunkten (x1, y1), (x2, y2) und (x3, y3).`,
         "en": ``,
     })
- 
+
     static PAppletQuad1Comment = () => lm({
         "de": `Zeichnet eine Viereck mit den Eckpunkten (x1, y1), (x2, y2), (x3, y3) und (x4, y4).`,
         "en": ``,
     })
- 
+
     static PAppletBezier1Comment = () => lm({
         "de": `Zeichnet eine kubische Bezierkurve mit den Ankerpunkten (x1, y1), (x4, y4) und den Kontrollpunkten (x2, y2), (x3, y3).`,
         "en": ``,
     })
- 
+
     static PAppletCurve1Comment = () => lm({
         "de": `Zeichnet eine Catmull-Rom-Kurve vom Punkt (x2, y2) nach (x3, y3) so, als würde sie von (x1, x2) kommen und es am Ende zu (x4, y4) weitergehen.`,
         "en": ``,
     })
- 
+
     static PAppletCurvePoint1Comment = () => lm({
         "de": `Will man die Zwischenpunkte einer Curve erhalten (Beginn b, Ende c, als würde sie von a kommen und nach d gehen), so verwendet man sowohl für die x- als auch für die y-Koordinate diese Funktion. t gibt an, welchen Punkt der Kurve man haben möchte. t hat Werte zwischen 0 (Startpunkt) und 1 (Endpunkt).`,
         "en": ``,
     })
- 
+
     static PAppletCurveTangent1Comment = () => lm({
         "de": `Will man die Zwischentangenten einer Curve erhalten (Beginn b, Ende c, als würde sie von a kommen und nach d gehen), so verwendet man sowohl für die x- als auch für die y-Koordinate diese Funktion. t gibt an, welchen Punkt der Kurve man haben möchte. t hat Werte zwischen 0 (Startpunkt) und 1 (Endpunkt).`,
         "en": ``,
     })
- 
+
     static PAppletBezierPoint1Comment = () => lm({
         "de": `Will man die Zwischenpunkte einer Bezierkurve erhalten (Ankerkoordinaten x1, x4 und Stützkoordinaten x2, x3), so nutzt man - einzeln sowohl für die x- also auch für die y-Koordinate - diese Funktion. t gibt an, welchen Punkt der Kurve man haben möchte. t hat Werte zwischen 0 (Startpunkt) und 1 (Endpunkt).`,
         "en": ``,
     })
- 
+
     static PAppletBezierTangent1Comment = () => lm({
         "de": `Will man die Zwischentangenten einer Bezierkurve erhalten (Ankerkoordinaten x1, x4 und Stützkoordinaten x2, x3), so nutzt man - einzeln sowohl für die x- also auch für die y-Koordinate - diese Funktion. t gibt an, welchen Punkt der Kurve man haben möchte. t hat Werte zwischen 0 (Startpunkt) und 1 (Endpunkt).`,
         "en": ``,
     })
- 
+
     static PAppletBeginShape0Comment = () => lm({
         "de": `Beginnt mit dem Zeichnen eines Polygons. Die einzelnen Punkte werden mit der Methode vertex(x, y) gesetzt.`,
         "en": ``,
     })
- 
+
     static PAppletEndShape0Comment = () => lm({
         "de": `Endet das Zeichnen eines Polygons.`,
         "en": ``,
     })
- 
+
     static PAppletBeginShape1Comment = () => lm({
         "de": `Beginnt mit dem Zeichnen eines Polygons. Die einzelnen Punkte werden mit der Methode vertex(x, y) gesetzt. Mögliche Werte für kind sind: POINTS, LINES, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP`,
         "en": ``,
     })
- 
+
     static PAppletEndShape1Comment = () => lm({
         "de": `endShape(CLOSE) schließt den Linienzug.`,
         "en": ``,
     })
- 
+
     static PAppletVertex1Comment = () => lm({
         "de": `Setzt zwischen beginShape() und endShape() einen Punkt.`,
         "en": ``,
     })
- 
+
     static PAppletPoint1Comment = () => lm({
         "de": `Zeichnet einen Punkt.`,
         "en": ``,
     })
- 
+
     static PAppletSet3Comment = () => lm({
         "de": `Setzt die Farbe des Pixels bei (x, y).`,
         "en": ``,
     })
- 
+
     static PAppletVertex1aComment = () => lm({
         "de": `Setzt zwischen beginShape() und endShape() einen Punkt.`,
         "en": ``,
     })
- 
+
     static PAppletPoint1aComment = () => lm({
         "de": `Zeichnet einen Punkt.`,
         "en": ``,
     })
- 
+
     static PAppletCurveVertex1Comment = () => lm({
         "de": `Setzt zwischen beginShape() und endShape() einen Punkt. Processing zeichnet damit eine Kurve nach dem Catmull-Rom-Algorithmus.`,
         "en": ``,
     })
- 
+
     static PAppletCurvevertex1Comment = () => lm({
         "de": `Setzt zwischen beginShape() und endShape() einen Punkt. Processing zeichnet damit eine Kurve nach dem Catmull-Rom-Algorithmus.`,
         "en": ``,
     })
- 
+
     static PAppletBox1Comment = () => lm({
         "de": `Zeichnet einen 3D-Würfel mit der Seitenlänge size.`,
         "en": ``,
     })
- 
+
     static PAppletBox1aComment = () => lm({
         "de": `Zeichnet einen 3D-Würfel mit den angegebenen Seitenlängen.`,
         "en": ``,
     })
- 
+
     static PAppletResetMatrix0Comment = () => lm({
         "de": `Setzt alle erfolgten Transformationen zurück.`,
         "en": ``,
     })
- 
+
     static PAppletPush0Comment = () => lm({
         "de": `Sichert den aktuellen Zeichenzustand, d.h. die Farben und Transformationen, auf einen Stack.`,
         "en": ``,
     })
- 
+
     static PAppletPop0Comment = () => lm({
         "de": `Holt den obersten Zeichenzustand, d.h. die Farben und Transformationen, vom Stack.`,
         "en": ``,
     })
- 
+
     static PAppletScale1Comment = () => lm({
         "de": `Streckt die nachfolgend gezeichneten Figuren.`,
         "en": ``,
     })
- 
+
     static PAppletScale1aComment = () => lm({
         "de": `Streckt die nachfolgend gezeichneten Figuren.`,
         "en": ``,
     })
- 
+
     static PAppletScale1bComment = () => lm({
         "de": `Streckt die nachfolgend gezeichneten Figuren.`,
         "en": ``,
     })
- 
+
     static PAppletTranslate1Comment = () => lm({
         "de": `Verschiebt die nachfolgend gezeichneten Figuren.`,
         "en": ``,
     })
- 
+
     static PAppletTranslate1aComment = () => lm({
         "de": `Verschiebt die nachfolgend gezeichneten Figuren.`,
         "en": ``,
     })
- 
+
     static PAppletRotate1Comment = () => lm({
         "de": `Rotiert die nachfolgend gezeichneten Figuren. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.`,
         "en": ``,
     })
- 
+
     static PAppletRotateX1Comment = () => lm({
         "de": `Rotiert die nachfolgend gezeichneten Figuren um die X-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.`,
         "en": ``,
     })
- 
+
     static PAppletRotateY1Comment = () => lm({
         "de": `Rotiert die nachfolgend gezeichneten Figuren um die Y-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.`,
         "en": ``,
     })
- 
+
     static PAppletShearX1Comment = () => lm({
         "de": `Schert die nachfolgend gezeichneten Figuren in Richtung derX-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.`,
         "en": ``,
     })
- 
+
     static PAppletShearY1Comment = () => lm({
         "de": `Schert die nachfolgend gezeichneten Figuren in Richtung der Y-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.`,
         "en": ``,
     })
- 
+
     static PAppletRotateZ1Comment = () => lm({
         "de": `Rotiert die nachfolgend gezeichneten Figuren um die Z-Achse. Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie angle interpretiert wird. Default ist RADIANS.`,
         "en": ``,
     })
- 
+
     static PAppletAngleMode1Comment = () => lm({
         "de": `Mit angleMode(RADIANS) bzw. angleMode(DEGREES) kann beeinflusst werden, wie winkel bei Rotationen interpretiert werden. Default ist RADIANS.`,
         "en": ``,
     })
- 
+
     static PAppletTextSize1Comment = () => lm({
         "de": `Setzt die Schriftgröße in Pixel.`,
         "en": ``,
     })
- 
+
     static PAppletTextAlign1Comment = () => lm({
         "de": `Setzt die Ausrichtung des nächsten ausgegebenen Textes in x-Richtung. Mögliche Werte sind CENTER, LEFT, RIGHT`,
         "en": ``,
     })
- 
+
     static PAppletTextAlign1aComment = () => lm({
         "de": `Setzt die Ausrichtung des nächsten ausgegebenen Textes. Mögliche Werte für alignX sind CENTER, LEFT, RIGHT, mögliche Werte für alignY sind TOP, CENTER, BASELINE, BOTTOM`,
         "en": ``,
     })
- 
+
     static PAppletText3Comment = () => lm({
         "de": `Gibt Text aus.`,
         "en": ``,
     })
- 
+
     static PAppletText5Comment = () => lm({
         "de": `Gibt Text aus. x2 und y2 sind die Breite und Höhe des Textausgabebereichs. Hat der Text horizontal nicht Platz, so wird er entsprechend umgebrochen.`,
         "en": ``,
     })
- 
+
     static PAppletRandom1Comment = () => lm({
         "de": `Gibt eine Zufallszahl zwischen low und high zurück.`,
         "en": ``,
     })
- 
+
     static PAppletRandom1aComment = () => lm({
         "de": `Gibt eine Zufallszahl zwischen 0 und high zurück.`,
         "en": ``,
     })
- 
+
     static PAppletSqrt1Comment = () => lm({
         "de": `Gibt die Quadratwurzel von n zurück.`,
         "en": ``,
     })
- 
+
     static PAppletPow1Comment = () => lm({
         "de": `Gibt die den Wert der Potenz ("basis hoch exponent") zurück.`,
         "en": ``,
     })
- 
+
     static PAppletMax1Comment = () => lm({
         "de": `Gibt den größeren der beiden Werte zurück.`,
         "en": ``,
     })
- 
+
     static PAppletMin1Comment = () => lm({
         "de": `Gibt den kleineren der beiden Werte zurück.`,
         "en": ``,
     })
- 
+
     static PAppletAbs1Comment = () => lm({
         "de": `Gibt den Betrag des Wertes zurück.`,
         "en": ``,
     })
- 
+
     static PAppletSin1Comment = () => lm({
         "de": `Gibt den Sinus des Wertes zurück.`,
         "en": ``,
     })
- 
+
     static PAppletCos1Comment = () => lm({
         "de": `Gibt den Cosinus des Wertes zurück.`,
         "en": ``,
     })
- 
+
     static PAppletTan1Comment = () => lm({
         "de": `Gibt den Tangens des Wertes zurück.`,
         "en": ``,
     })
- 
+
     static PAppletAsin1Comment = () => lm({
         "de": `Gibt den Arcussinus des Wertes zurück.`,
         "en": ``,
     })
- 
+
     static PAppletAcos1Comment = () => lm({
         "de": `Gibt den Arcussosinus des Wertes zurück.`,
         "en": ``,
     })
- 
+
     static PAppletRadians1Comment = () => lm({
         "de": `Wandelt einen Winkel vom Gradmaß ins Bogenmaß um.`,
         "en": ``,
     })
- 
+
     static PAppletDegrees1Comment = () => lm({
         "de": `Wandelt einen Winkel vom Bogenmaß ins Gradmaß um.`,
         "en": ``,
     })
- 
+
     static PAppletAtan1Comment = () => lm({
         "de": `Gibt den Arcussangens des Wertes zurück.`,
         "en": ``,
     })
- 
+
     static PAppletAtan21Comment = () => lm({
         "de": `Gibt den Arcussangens des Wertes zurück.`,
         "en": ``,
     })
- 
+
     static PAppletSqrt1aComment = () => lm({
         "de": `Gibt die Quadratwurzel des Wertes zurück.`,
         "en": ``,
     })
- 
+
     static PAppletSq1Comment = () => lm({
         "de": `Gibt das Quadrat des Wertes zurück.`,
         "en": ``,
     })
- 
+
     static PAppletAbs1aComment = () => lm({
         "de": `Gibt den Betrag des Wertes zurück.`,
         "en": ``,
     })
- 
+
     static PAppletRound1Comment = () => lm({
         "de": `Rundet den Wert auf eine ganze Zahl.`,
         "en": ``,
     })
- 
+
     static PAppletCeil1Comment = () => lm({
         "de": `Rundet den Wert auf eine ganze Zahl (Aufrunden!).`,
         "en": ``,
     })
- 
+
     static PAppletFloor1Comment = () => lm({
         "de": `Rundet den Wert auf eine ganze Zahl (Abfrunden!).`,
         "en": ``,
     })
- 
+
     static PAppletDist1Comment = () => lm({
         "de": `Berechnet den Abstand der Punkte (x1, y1) und (x2, y2).`,
         "en": ``,
     })
- 
+
     static PAppletLerp1Comment = () => lm({
         "de": `Berechnet den a + (b - a)*t. Wählt man t zwischen 0 und 1, so kann man damit die Zwischenwerte zwischen a und b errechnen.`,
         "en": ``,
     })
- 
+
     static PAppletConstrain1Comment = () => lm({
         "de": `Beschränkt value auf den Bereich [min, max], genauer: Ist value < min, so wird min zurückgegeben. Ist value > max, so wird max zurückgegeben. Ansonsten wird value zurückgegeben.`,
         "en": ``,
     })
- 
+
     static PAppletYear0Comment = () => lm({
         "de": `Aktuelle Jahreszahl`,
         "en": ``,
     })
- 
+
     static PAppletMonth0Comment = () => lm({
         "de": `Monat: 1 == Januar, 12 == Dezember`,
         "en": ``,
     })
- 
+
     static PAppletDay0Comment = () => lm({
         "de": `Tag (innerhalb des Monats) des aktuellen Datums`,
         "en": ``,
     })
- 
+
     static PAppletHour0Comment = () => lm({
         "de": `Stundenzahl der aktuellen Uhrzeit`,
         "en": ``,
     })
-  
+
     static PAppletMinute0Comment = () => lm({
         "de": `Minutenzahl der aktuellen Uhrzeit`,
         "en": ``,
     })
- 
+
     static PAppletSecond0Comment = () => lm({
         "de": `Sekundenzahl der aktuellen Uhrzeit`,
         "en": ``,
     })
- 
+
     static PAppletFrameRate1Comment = () => lm({
         "de": `Setzt die Framerate (Anzahl der Aufrufe von draw() pro Sekunde)`,
         "en": ``,
     })
- 
+
     static PAppletTextWidth1Comment = () => lm({
         "de": `Gibt die Breite des Texts zurück.`,
         "en": ``,
     })
- 
+
     static PAppletTextAscent1Comment = () => lm({
         "de": `Gibt den Ascent Textes zurück ( = Höhe des größten Zeichens über der Grundlinie).`,
         "en": ``,
     })
- 
+
     static PAppletTextDescent1Comment = () => lm({
         "de": `Gibt den Descent Textes zurück ( = Tiefe des tiefsten Zeichens unter der Grundlinie).`,
         "en": ``,
     })
- 
+
     static PAppletTextLeading1Comment = () => lm({
         "de": `Setzt den Abstand zweier aufeinanderfolgender Textzeilen.`,
         "en": ``,
     })
- 
+
     static PAppletCursor1Comment = () => lm({
         "de": `Ändert das Aussehen des Mauscursors. Type ist einer der Werte "arrow", "cross", "text", "move", "hand", "wait", "progress".`,
         "en": ``,
     })
- 
+
     static PAppletNoCursor1Comment = () => lm({
         "de": `Hat zur Folge, dass der Mauscursor über dem Zeichenbereich unsichtbar ist.`,
         "en": ``,
     })
- 
+
     static PAppletCopy1Comment = () => lm({
         "de": `Kopiert den rechteckigen Bereich mit der linken oberen Ecke (sx, sy) sowie der Breite sw und der Höhe sh in den Bereich mit der linken oberen Ecke (dx, dy), der Breite dw und der Höhe dh.`,
         "en": ``,
     })
- 
+
     static PAppletMillis0Comment = () => lm({
         "de": `Gibt die Millisekunden zurück, die vergangen sind, seit setup() aufgerufen wurde.`,
         "en": ``,
     })
- 
+
     static PAppletRedraw0Comment = () => lm({
         "de": `Führt draw() genau ein Mal aus. Macht ggf. Sinn, wenn die Render-Loop zuvor mit noLoop() gestoppt wurde.`,
         "en": ``,
@@ -2913,53 +2913,53 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
      * JavaKara
      */
     static JavaKaraWorldClassComment = () => lm({
-    "de": "JavaKara-Welt",
-    "en": "JavaKara-World",
+        "de": "JavaKara-Welt",
+        "en": "JavaKara-World",
     })
 
     static JavaKaraWorldConstructorComment = () => lm({
-    "de": "",
-    "en": "",
+        "de": "",
+        "en": "",
     })
 
     static JavaKaraWorldGetSizeXComment = () => lm({
-    "de": "Gibt zurück, wie viele Felder breit die Welt ist.",
-    "en": "Returns number of tiles in x-direction.",
+        "de": "Gibt zurück, wie viele Felder breit die Welt ist.",
+        "en": "Returns number of tiles in x-direction.",
     })
-    
+
     static JavaKaraWorldGetSizeYComment = () => lm({
-    "de": "Gibt zurück, wie viele Felder hoch die Welt ist.",
-    "en": "Returns number of tiles in y-direction.",
+        "de": "Gibt zurück, wie viele Felder hoch die Welt ist.",
+        "en": "Returns number of tiles in y-direction.",
     })
 
     static JavaKaraWorldClearAllComment = () => lm({
-    "de": "Löscht alles aus der Welt bis auf Kara.",
-    "en": "Removes everything except Kara the beatle.",
+        "de": "Löscht alles aus der Welt bis auf Kara.",
+        "en": "Removes everything except Kara the beatle.",
     })
 
     static JavaKaraWorldSetLeafComment = () => lm({
-    "de": "Setzt oder entfernt an der Position (x, y) ein Kleeblatt.",
-    "en": "Adds or removes a leaf at position (x, y).",
+        "de": "Setzt oder entfernt an der Position (x, y) ein Kleeblatt.",
+        "en": "Adds or removes a leaf at position (x, y).",
     })
 
     static JavaKaraWorldSetTreeComment = () => lm({
-    "de": "Setzt oder entfernt an der Position (x, y) einen Baumstumpf.",
-    "en": "Adds or removes a tree stump at position (x, y).",
+        "de": "Setzt oder entfernt an der Position (x, y) einen Baumstumpf.",
+        "en": "Adds or removes a tree stump at position (x, y).",
     })
 
     static JavaKaraWorldSetMushroomComment = () => lm({
-    "de": "Setzt oder entfernt an der Position (x, y) einen Pilz.",
-    "en": "Adds or removes a mushroom at position (x, y).",
+        "de": "Setzt oder entfernt an der Position (x, y) einen Pilz.",
+        "en": "Adds or removes a mushroom at position (x, y).",
     })
 
     static JavaKaraWorldIsEmptyComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn sich auf dem angegebenen Feld nichts befindet (auch nicht Kara).",
-    "en": "Returns true if and only if there's nothing at position (x, y).",
+        "de": "Gibt genau dann true zurück, wenn sich auf dem angegebenen Feld nichts befindet (auch nicht Kara).",
+        "en": "Returns true if and only if there's nothing at position (x, y).",
     })
 
     static JavaKaraWorldInitComment = () => lm({
-    "de": "Baut die Welt mithilfe eines mehrzeiligen Strings. Dabei bedeutet \\n einen Zeilenumbruch, l ein Kleeblatt, t einen Baumstumpf und m einen Pilz.",
-    "en": "Creates world based on a multiline string. \\n is a line break, l a leaf, t a tree stump and m a Mushroom.",
+        "de": "Baut die Welt mithilfe eines mehrzeiligen Strings. Dabei bedeutet \\n einen Zeilenumbruch, l ein Kleeblatt, t einen Baumstumpf und m einen Pilz.",
+        "en": "Creates world based on a multiline string. \\n is a line break, l a leaf, t a tree stump and m a Mushroom.",
     })
 
 
@@ -2970,78 +2970,78 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
 
 
     static KaraClassComment = () => lm({
-    "de": "JavaKara-Marienkäfer",
-    "en": "Kara, the beatle",
+        "de": "JavaKara-Marienkäfer",
+        "en": "Kara, the beatle",
     })
 
     static KaraConstructorComment = () => lm({
-    "de": "Instanziert ein neues Kara-Objekt.",
-    "en": "Creates a new Kara beatle.",
+        "de": "Instanziert ein neues Kara-Objekt.",
+        "en": "Creates a new Kara beatle.",
     })
 
     static KaraGetPositionComment = () => lm({
-    "de": "Gibt Karas Position zurück. Dabei ist (0/0) die Position der linken oberen Ecke.",
-    "en": "Returns Kara's position. (0/0) is position at top left corner.",
+        "de": "Gibt Karas Position zurück. Dabei ist (0/0) die Position der linken oberen Ecke.",
+        "en": "Returns Kara's position. (0/0) is position at top left corner.",
     })
 
     static KaraMoveComment = () => lm({
-    "de": "Bewegt Kara um ein Feld nach vorne.",
-    "en": "Moves Kara one tile forward.",
+        "de": "Bewegt Kara um ein Feld nach vorne.",
+        "en": "Moves Kara one tile forward.",
     })
 
     static KaraGetWorldComment = () => lm({
-    "de": "Gibt das JavaKaraWorld-Objekt zurück, in dem sich Kara befindet.",
-    "en": "Returns world-object.",
+        "de": "Gibt das JavaKaraWorld-Objekt zurück, in dem sich Kara befindet.",
+        "en": "Returns world-object.",
     })
 
     static KaraGetDirectionComment = () => lm({
-    "de": "Gibt die Blickrichtung von Kara zurück: 0 == Norden, 1 == Westen, 2 == Süden, 3 == Osten",
-    "en": "Returns direction of beatle Kara. 0 == north, 1 == west, 2 == south, 3 == east.",
+        "de": "Gibt die Blickrichtung von Kara zurück: 0 == Norden, 1 == Westen, 2 == Süden, 3 == Osten",
+        "en": "Returns direction of beatle Kara. 0 == north, 1 == west, 2 == south, 3 == east.",
     })
 
     static KaraOnLeafComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn sich Kara auf einem Kleeblatt befindet.",
-    "en": "Returns true if and only if Kara is located on a leaf.",
+        "de": "Gibt genau dann true zurück, wenn sich Kara auf einem Kleeblatt befindet.",
+        "en": "Returns true if and only if Kara is located on a leaf.",
     })
 
     static KaraTreeFrontComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn sich vor Kara ein Baumstumpf befindet.",
-    "en": "Returns true if and only if on the tile IN FRONT OF Kara there is a tree stump.",
+        "de": "Gibt genau dann true zurück, wenn sich vor Kara ein Baumstumpf befindet.",
+        "en": "Returns true if and only if on the tile IN FRONT OF Kara there is a tree stump.",
     })
 
     static KaraTreeLeftComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn sich auf dem Feld unmmittelbar links von Kara ein Baumstumpf befindet.",
-    "en": "Returns true if and only if directly left of Kara there is a tree stump.",
+        "de": "Gibt genau dann true zurück, wenn sich auf dem Feld unmmittelbar links von Kara ein Baumstumpf befindet.",
+        "en": "Returns true if and only if directly left of Kara there is a tree stump.",
     })
 
     static KaraTreeRightComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn sich auf dem Feld unmmittelbar rechts von Kara ein Baumstumpf befindet.",
-    "en": "Returns true if and only if directly right of Kara there is a tree stump.",
+        "de": "Gibt genau dann true zurück, wenn sich auf dem Feld unmmittelbar rechts von Kara ein Baumstumpf befindet.",
+        "en": "Returns true if and only if directly right of Kara there is a tree stump.",
     })
 
     static KaraMushroomFrontComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn sich vor Kara ein Pilz befindet.",
-    "en": "Returns true if and only if on the tile IN FRONT OF Kara there is a mushroom.",
+        "de": "Gibt genau dann true zurück, wenn sich vor Kara ein Pilz befindet.",
+        "en": "Returns true if and only if on the tile IN FRONT OF Kara there is a mushroom.",
     })
 
     static KaraTurnLeftComment = () => lm({
-    "de": "Dreht Kara um 90° nach links (d.h. gegen den Uhrzeigersinn).",
-    "en": "Turns Kara 90° leftwards (that is: counterclockwise).",
+        "de": "Dreht Kara um 90° nach links (d.h. gegen den Uhrzeigersinn).",
+        "en": "Turns Kara 90° leftwards (that is: counterclockwise).",
     })
 
     static KaraTurnRightComment = () => lm({
-    "de": "Dreht Kara um 90° nach rechts (d.h. im Uhrzeigersinn).",
-    "en": "Turns Kara 90° rightwards (that is: clockwise).",
+        "de": "Dreht Kara um 90° nach rechts (d.h. im Uhrzeigersinn).",
+        "en": "Turns Kara 90° rightwards (that is: clockwise).",
     })
 
     static KaraPutLeafComment = () => lm({
-    "de": "Legt ein Kleeblatt auf die Position, an der Kara gerade steht.",
-    "en": "Deposits a leaf beneath Kara.",
+        "de": "Legt ein Kleeblatt auf die Position, an der Kara gerade steht.",
+        "en": "Deposits a leaf beneath Kara.",
     })
 
     static KaraRemoveLeafComment = () => lm({
-    "de": "Kara nimmt das Kleeblatt, das sich auf seiner aktuellen Position befindet.",
-    "en": "Removes a leaf beneath Kara.",
+        "de": "Kara nimmt das Kleeblatt, das sich auf seiner aktuellen Position befindet.",
+        "en": "Removes a leaf beneath Kara.",
     })
 
     /**
@@ -3049,145 +3049,145 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
      */
 
     static HamsterWorldClassComment = () => lm({
-    "de": "JavaHamster-Welt"
+        "de": "JavaHamster-Welt"
     })
 
     static HamsterWorldConstructorComment = () => lm({
-    "de": "Instanziert eine neue JavaHamster-Welt"
+        "de": "Instanziert eine neue JavaHamster-Welt"
     })
 
     static HamsterWorldGetBreiteComment = () => lm({
-    "de": "Gibt zurück, wie viele Felder breit die Welt ist.",
-    "en": "",
+        "de": "Gibt zurück, wie viele Felder breit die Welt ist.",
+        "en": "",
     })
 
     static HamsterWorldGetHoeheComment = () => lm({
-    "de": "Gibt zurück, wie viele Felder hoch die Welt ist.",
-    "en": "",
+        "de": "Gibt zurück, wie viele Felder hoch die Welt ist.",
+        "en": "",
     })
 
     static HamsterWorldLoescheAllesComment = () => lm({
-    "de": "Löscht alles aus der Welt bis auf den Hamster.",
-    "en": "",
+        "de": "Löscht alles aus der Welt bis auf den Hamster.",
+        "en": "",
     })
 
     static HamsterWorldSetzeMauerComment = () => lm({
-    "de": "Setzt oder entfernt an der Position (x, y) eine Mauer.",
-    "en": "",
+        "de": "Setzt oder entfernt an der Position (x, y) eine Mauer.",
+        "en": "",
     })
 
     static HamsterWorldSetzeGetreideComment = () => lm({
-    "de": "Setzt an der Position (x, y) die Anzahl der Getreidekörner.",
-    "en": "",
+        "de": "Setzt an der Position (x, y) die Anzahl der Getreidekörner.",
+        "en": "",
     })
 
     static HamsterWorldInitComment = () => lm({
-    "de": "Baut die Welt mithilfe eines mehrzeiligen Strings. Dabei bedeutet \\n einen Zeilenumbruch, m eine Mauer und 1 ... 9, a ... f die entsprechende Anzahl an Getreidekörnern.",
-    "en": "",
+        "de": "Baut die Welt mithilfe eines mehrzeiligen Strings. Dabei bedeutet \\n einen Zeilenumbruch, m eine Mauer und 1 ... 9, a ... f die entsprechende Anzahl an Getreidekörnern.",
+        "en": "",
     })
 
 
 
     static HamsterClassComment = () => lm({
-    "de": "JavaHamster-Hamster"
+        "de": "JavaHamster-Hamster"
     })
 
     static HamsterConstructorComment = () => lm({
-    "de": "Instanziert ein neues Hamster-Objekt",
-    "en": "",
+        "de": "Instanziert ein neues Hamster-Objekt",
+        "en": "",
     })
 
     static HamsterVorComment = () => lm({
-    "de": "Bewegt den Hamster um ein Feld nach vorne.",
-    "en": "",
+        "de": "Bewegt den Hamster um ein Feld nach vorne.",
+        "en": "",
     })
 
     static HamsterGetWorldComment = () => lm({
-    "de": "Gibt das JavaHamsterWorld-Objekt zurück, in dem sich Hamster befindet.",
-    "en": "",
+        "de": "Gibt das JavaHamsterWorld-Objekt zurück, in dem sich Hamster befindet.",
+        "en": "",
     })
 
     static HamsterGetBlickrichtungComment = () => lm({
-    "de": "Gibt die Blickrichtung von Hamster zurück: 0 == Norden, 1 == Osten, 2 == Süden, 3 == Westen",
-    "en": "",
+        "de": "Gibt die Blickrichtung von Hamster zurück: 0 == Norden, 1 == Osten, 2 == Süden, 3 == Westen",
+        "en": "",
     })
 
     static HamsterGetReiheComment = () => lm({
-    "de": "Gibt die Reihe zurück, in der sich der Hamster gerade befindet. Reihe 0 ist ganz oben.",
-    "en": "",
+        "de": "Gibt die Reihe zurück, in der sich der Hamster gerade befindet. Reihe 0 ist ganz oben.",
+        "en": "",
     })
 
     static HamsterGetSpalteComment = () => lm({
-    "de": "Gibt die Spalte zurück, in der sich der Hamster gerade befindet. Reihe 0 ist ganz links.",
-    "en": "",
+        "de": "Gibt die Spalte zurück, in der sich der Hamster gerade befindet. Reihe 0 ist ganz links.",
+        "en": "",
     })
 
     static HamsterGetKoernerComment = () => lm({
-    "de": "Gibt die Anzahl der Körner zurück, die der Hamster gerade im Mund hat.",
-    "en": "",
+        "de": "Gibt die Anzahl der Körner zurück, die der Hamster gerade im Mund hat.",
+        "en": "",
     })
 
     static HamsterLinksUmComment = () => lm({
-    "de": "Dreht Hamster um 90° nach links",
-    "en": "",
+        "de": "Dreht Hamster um 90° nach links",
+        "en": "",
     })
 
     static HamsterRechtsUmComment = () => lm({
-    "de": "Dreht Hamster um 90° nach rechts",
-    "en": "",
+        "de": "Dreht Hamster um 90° nach rechts",
+        "en": "",
     })
 
     static HamsterGibComment = () => lm({
-    "de": "Der Hamster legt ein Korn in der Zelle ab, in der er sich gerade befindet.",
-    "en": "",
+        "de": "Der Hamster legt ein Korn in der Zelle ab, in der er sich gerade befindet.",
+        "en": "",
     })
 
     static HamsterNimmComment = () => lm({
-    "de": "Der Hamster nimmt ein Korn aus der Zelle, in der er sich gerade befindet.",
-    "en": "",
+        "de": "Der Hamster nimmt ein Korn aus der Zelle, in der er sich gerade befindet.",
+        "en": "",
     })
 
     static HamsterVornFreiComment = () => lm({
-    "de": "Liefert genau dann true, wenn sich in Blickrichtung vor dem aufgerufenen Hamster keine Mauer befindet (wenn sich der Hamster in Blickrichtung am Rand des Territoriums befindet, wird false geliefert)",
-    "en": "",
+        "de": "Liefert genau dann true, wenn sich in Blickrichtung vor dem aufgerufenen Hamster keine Mauer befindet (wenn sich der Hamster in Blickrichtung am Rand des Territoriums befindet, wird false geliefert)",
+        "en": "",
     })
 
     static HamsterMaulLeerComment = () => lm({
-    "de": "Liefert genau dann true, wenn der Hamster keine Körner im Mund hat.",
-    "en": "",
+        "de": "Liefert genau dann true, wenn der Hamster keine Körner im Mund hat.",
+        "en": "",
     })
 
     static HamsterKornDaComment = () => lm({
-    "de": "Liefert genau dann true, wenn sich in der Zelle, auf der der Hamster sich befindet, mindestens ein Korn befindet.",
-    "en": "",
+        "de": "Liefert genau dann true, wenn sich in der Zelle, auf der der Hamster sich befindet, mindestens ein Korn befindet.",
+        "en": "",
     })
 
     static HamsterSchreibComment = () => lm({
-    "de": "Gibt den Text auf dem Bildschirm aus.",
-    "en": "",
+        "de": "Gibt den Text auf dem Bildschirm aus.",
+        "en": "",
     })
 
     /**
      * class Position
      */
     static PositionClassComment = () => lm({
-    "de": "Repräsentiert einen Position auf einem Gitternetz (nur ganzzahlige Koordinaten)",
-    "en": "Position inside a grid (only integer coordinates)",
+        "de": "Repräsentiert einen Position auf einem Gitternetz (nur ganzzahlige Koordinaten)",
+        "en": "Position inside a grid (only integer coordinates)",
     })
 
     static PositionXComment = () => lm({
-    "de": "x-Komponente der Position",
-    "en": "x-component of Position",
+        "de": "x-Komponente der Position",
+        "en": "x-component of Position",
     })
 
     static PositionYComment = () => lm({
-    "de": "y-Komponente der Position",
-    "en": "y-component of Position",
+        "de": "y-Komponente der Position",
+        "en": "y-component of Position",
     })
 
     static PositionConstructorComment = () => lm({
-    "de": "Instanziert eine neue Position den Komponenten x und y.",
-    "en": "Creates a new Position object with components x and y",
+        "de": "Instanziert eine neue Position den Komponenten x und y.",
+        "en": "Creates a new Position object with components x and y",
     })
 
     /**
@@ -3195,44 +3195,56 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
      */
 
     static BigIntegerClassComment = () => lm({
-    "de": "Repräsentiert eine ganze Zahl mit 'beliebig' vielen Stellen.",
-    "en": "Integer number with arbitrary number of digits.",
+        "de": "Repräsentiert eine ganze Zahl mit 'beliebig' vielen Stellen.",
+        "en": "Integer number with arbitrary number of digits.",
     })
 
     static BigIntegerConstructorComment = () => lm({
-    "de": "Instanziert ein neues BigInteger-Objekt.",
-    "en": "Creates a new BigInteger-object.",
+        "de": "Instanziert ein neues BigInteger-Objekt.",
+        "en": "Creates a new BigInteger-object.",
     })
 
     static BigIntegerAddComment = () => lm({
-    "de": "Addiert das übergebene BigInteger-Objekt zum aktuellen BigInteger-Objekt und gibt ein neues BigInteger-Objekt zurück, dessen Wert die errechnete Summe ist. Die Methode add ändert nicht das aktuelle BigInteger-Objekt!",
-    "en": "Adds given BigInteger-object to this BigInteger-object and returns a NEW BigInteger-object whose value is the sum of the two.",
+        "de": "Addiert das übergebene BigInteger-Objekt zum aktuellen BigInteger-Objekt und gibt ein neues BigInteger-Objekt zurück, dessen Wert die errechnete Summe ist. Die Methode add ändert nicht das aktuelle BigInteger-Objekt!",
+        "en": "Adds given BigInteger-object to this BigInteger-object and returns a NEW BigInteger-object whose value is the sum of the two.",
     })
 
     static BigIntegerDivideComment = () => lm({
-    "de": "Dividiert das BigInteger-Objekt durch das übergebene undd gibt ein neues BigInteger-Objekt zurück, dessen Wert der errechnete Quotient ist. Die Methode add ändert nicht das aktuelle BigInteger-Objekt!",
-    "en": "Divides this BigInteger-object by given one and returns a NEW BigInteger-object whose value is the quotient of the two.",
+        "de": "Dividiert das BigInteger-Objekt durch das übergebene undd gibt ein neues BigInteger-Objekt zurück, dessen Wert der errechnete Quotient ist. Die Methode add ändert nicht das aktuelle BigInteger-Objekt!",
+        "en": "Divides this BigInteger-object by given one and returns a NEW BigInteger-object whose value is the quotient of the two.",
     })
 
     static BigIntegerRemainderComment = () => lm({
-    "de": "Dividiert das BigInteger-Objekt durch das übergebene undd gibt ein neues BigInteger-Objekt zurück, dessen Wert der Rest der Division ist. Die Methode add ändert nicht das aktuelle BigInteger-Objekt!",
-    "en": "Divides this BigInteger-object by given one and returns a NEW BigInteger-object whose value is the remainder of this division.",
+        "de": "Dividiert das BigInteger-Objekt durch das übergebene undd gibt ein neues BigInteger-Objekt zurück, dessen Wert der Rest der Division ist. Die Methode add ändert nicht das aktuelle BigInteger-Objekt!",
+        "en": "Divides this BigInteger-object by given one and returns a NEW BigInteger-object whose value is the remainder of this division.",
     })
 
     static BigIntegerMultiplyComment = () => lm({
-    "de": "Multipliziert das aktuelle Objekt mit dem übergebenen BigInteger-Objekt und gibt ein neues BigInteger-Objekt zurück, dessen Wert das Produkt der beiden Zahlen ist. Die Methode multiply ändert nicht das aktuelle BigInteger-Objekt!",
-    "en": "Multiplies this BigInteger-object by given one and returns a NEW BigInteger-object whose value is the product of the two.",
+        "de": "Multipliziert das aktuelle Objekt mit dem übergebenen BigInteger-Objekt und gibt ein neues BigInteger-Objekt zurück, dessen Wert das Produkt der beiden Zahlen ist. Die Methode multiply ändert nicht das aktuelle BigInteger-Objekt!",
+        "en": "Multiplies this BigInteger-object by given one and returns a NEW BigInteger-object whose value is the product of the two.",
     })
 
     static BigIntegerToStringComment = () => lm({
-    "de": "Gibt das BigInteger-Objekt als Zeichenkette (dezimal!) zurück.",
-    "en": "Returns this BigInteger-object as string in decimal representation.",
+        "de": "Gibt das BigInteger-Objekt als Zeichenkette (dezimal!) zurück.",
+        "en": "Returns this BigInteger-object as string in decimal representation.",
     })
 
     static BigIntegerIntValueComment = () => lm({
-    "de": "Gibt das BigInteger-Objekt mod (2^53) als int-Wert zurück.",
-    "en": "Returns this BigInteger-object mod (2^53) as int-value.",
+        "de": "Gibt das BigInteger-Objekt mod (2^53) als int-Wert zurück.",
+        "en": "Returns this BigInteger-object mod (2^53) as int-value.",
     })
 
+    /**
+     * class Console
+     */
+    static ConsoleClassComment = () => lm({
+        "de": "Klasse zur Ausgabe von Objekten in der Konsole des Browsers.",
+        "en": "Class to Output text in console.",
+    })
+
+    static ConsoleLogComment = () => lm({
+    "de": "Gibt das  in die Konsole des Browsers.",
+    "en": "Writes Object to Console.",
+    })
 
 }  

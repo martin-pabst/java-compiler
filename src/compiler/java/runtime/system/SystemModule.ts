@@ -80,6 +80,7 @@ import { PositionClass } from "../graphics/PositionClass.ts";
 import { JavaKaraClass, JavaKaraWorldClass } from "../graphics/JavaKaraClass.ts";
 import { JavaHamsterClass, JavaHamsterWorldClass } from "../graphics/JavaHamsterClass.ts";
 import { BigIntegerClass } from "./javalang/BigIntegerClass.ts";
+import { ConsoleClass } from "./additional/Console.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -110,6 +111,7 @@ export class SystemModule extends JavaLibraryModule {
             
             //additional system classes
             KeyClass, LocalDateTimeClass, DayOfWeekEnum, PositionClass, BigIntegerClass,
+            ConsoleClass,
 
             // Functional
             ConsumerInterface, FunctionInterface,
