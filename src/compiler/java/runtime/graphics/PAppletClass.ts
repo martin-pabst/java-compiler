@@ -1,4 +1,4 @@
-import p5 from "p5";
+// import p5 from "p5";  // unfortunately this breaks vite-test
 import { JRC } from "../../../../tools/language/JavaRuntimeLibraryComments.ts";
 import { CallbackFunction } from "../../../common/interpreter/StepFunction.ts";
 import { Thread } from "../../../common/interpreter/Thread.ts";
@@ -9,6 +9,9 @@ import { DOM } from "../../../../tools/DOM.ts";
 import { Interpreter } from "../../../common/interpreter/Interpreter.ts";
 import { SchedulerState } from "../../../common/interpreter/Scheduler.ts";
 import { render } from "lit";
+
+type p5 = any;
+
 
 export class PAppletClass extends ObjectClass {
     static __javaDeclarations: LibraryDeclarations = (<LibraryDeclarations>[
@@ -225,7 +228,8 @@ export class PAppletClass extends ObjectClass {
 
     p5o!: p5;
 
-    renderer: p5.RENDERER = "webgl";
+    //
+    renderer: string = "webgl";
     loopStopped: boolean = false;
 
     onSizeChanged: () => void = () => { };
@@ -321,7 +325,7 @@ export class PAppletClass extends ObjectClass {
 
     }
 
-    _createCanvas(width: number, height: number, renderer?: p5.RENDERER) {
+    _createCanvas(width: number, height: number, renderer?: string) {
         renderer ||= this.renderer;
         this.renderer = renderer;
         
