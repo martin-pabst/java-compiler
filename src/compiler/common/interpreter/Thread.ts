@@ -33,7 +33,6 @@ export type ProgramState = {
 
     lastExecutedStep?: Step;
 
-
 }
 
 export type ThreadStateInfoAfterRun = {
@@ -85,6 +84,8 @@ export class Thread {
     stacksizeBeforeREPLProgram: number  = 0;
     replReturnValue: any;
 
+    numberOfSteps: number = 0;
+
     callbackAfterTerminated?: () => void;
 
     get assertionObservers() {
@@ -100,12 +101,12 @@ export class Thread {
      * returns true if Thread exits
      */
     run(maxNumberOfSteps: number): ThreadStateInfoAfterRun {
-        let numberOfSteps = 0;
+        this.numberOfSteps = 0;
         let stack = this.s; // for performance reasons
 
         try {
             //@ts-ignore
-            while (numberOfSteps < maxNumberOfSteps && this.state == ThreadState.runnable) {
+            while (this.numberOfSteps < maxNumberOfSteps && this.state == ThreadState.runnable) {
                 // For performance reasons: store all necessary data in local variables
                 let currentProgramState = this.currentProgramState;
                 let stepIndex = currentProgramState.stepIndex;
@@ -114,7 +115,7 @@ export class Thread {
 
                 if (this.stepEndsWhenProgramstackLengthLowerOrEqual >= 0) {
                     // singlestep-mode (slower...)
-                    while (numberOfSteps < maxNumberOfSteps &&
+                    while (this.numberOfSteps < maxNumberOfSteps &&
                         this.state == ThreadState.runnable && !this.isSingleStepCompleted()) {
                         let step = currentStepList[stepIndex];
 
@@ -132,17 +133,17 @@ export class Thread {
                         }
 
                         this.currentProgramState.stepIndex = stepIndex;
-                        numberOfSteps++;
+                        this.numberOfSteps++;
                         this.lastRange = step.range as IRange;
                     }
                     if (this.isSingleStepCompleted()) {
                         this.stepCallback();
-                        return { state: this._state, stepsExecuted: numberOfSteps }
+                        return { state: this._state, stepsExecuted: this.numberOfSteps }
                     }
 
                 } else {
                     // not in singlestep-mode (faster!)
-                    while (numberOfSteps < maxNumberOfSteps && this.state == ThreadState.runnable) {
+                    while (this.numberOfSteps < maxNumberOfSteps && this.state == ThreadState.runnable) {
                         let step = currentStepList[stepIndex];
 
                         /**
@@ -166,7 +167,7 @@ export class Thread {
                             stackBase = currentProgramState.stackBase;
                         }
 
-                        numberOfSteps++;
+                        this.numberOfSteps++;
                     }
                 }
 
@@ -187,7 +188,7 @@ export class Thread {
 
         }
 
-        return { state: this._state, stepsExecuted: numberOfSteps }
+        return { state: this._state, stepsExecuted: this.numberOfSteps }
     }
 
     public set state(state: ThreadState) {
@@ -500,6 +501,9 @@ export class Thread {
         this.scheduler.interpreter.printManager.print(text, true, color);
     }
 
+    clearScreen(){
+        this.scheduler.interpreter.printManager.clear();
+    }
 
     /**
      * Runtime method to throw Arithmetic exception

@@ -1,6 +1,7 @@
 import { Editor } from "../../../testgui/editor/Editor.ts";
 import { IMain } from "../../common/IMain.ts";
 import { RuntimeObject } from "../../common/debugger/DebuggerSymbolEntry.ts";
+import { ValueRenderer } from "../../common/debugger/ValueRenderer.ts";
 import { SchedulerState } from "../../common/interpreter/Scheduler.ts";
 import { Module } from "../../common/module/Module.ts";
 import { Range } from "../../common/range/Range.ts";
@@ -8,6 +9,7 @@ import { JavaLocalVariable } from "../codegenerator/JavaLocalVariable.ts";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
 import { JavaField } from "../types/JavaField.ts";
 import { JavaMethod } from "../types/JavaMethod.ts";
+import { JavaParameter } from "../types/JavaParameter.ts";
 import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
 
 export class JavaHoverProvider {
@@ -117,7 +119,7 @@ export class JavaHoverProvider {
                     range: usagePosition.range,
                     contents: [{ value: declarationAsString }],
                 }
-            } else if(symbol instanceof JavaLocalVariable || symbol instanceof JavaField) {
+            } else if(symbol instanceof JavaLocalVariable || symbol instanceof JavaField || symbol instanceof JavaParameter) {
                 // Variable
                 
                 declarationAsString =  symbol.getDeclaration() ;
@@ -148,16 +150,16 @@ export class JavaHoverProvider {
             }
 
             let resultAsString: string | undefined = repl.executeSynchronously('"" + ' + identifier);
-            let resultObject: any = repl.executeSynchronously(identifier);
+//            let resultObject: any = repl.executeSynchronously(identifier);
 
-            let typeIdentifier = "";
-            if(resultObject.getType){
-                let type = (<RuntimeObject>resultObject).getType();
-                typeIdentifier = type.identifier + " ";
-            }
-
+            let typeIdentifier = symbol?.getType().identifier;
+            // if(resultObject?.getType){
+            //     // let type = (<RuntimeObject>resultObject).getType();
+            //     declarationAsString = typeIdentifier + " " + identifier + ": " + ValueRenderer.renderValue(resultObject, 12);
+            // } else 
+            
             if (resultAsString != null) {
-                declarationAsString = identifier + ": " + typeIdentifier + resultAsString;
+                declarationAsString = typeIdentifier + " " + identifier + ": " + ValueRenderer.renderValue(resultAsString, 12);
             }
 
         }

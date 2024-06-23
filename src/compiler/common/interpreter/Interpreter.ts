@@ -67,6 +67,8 @@ export class Interpreter {
         "restart": [false, true, true, true]
     }
 
+    static ProgramPointerIndentifier = "ProgramPointer";
+
     mainThread?: Thread;
     public stepsPerSecondGoal: number = 1e8;
     public isMaxSpeed: boolean = true;
@@ -173,7 +175,7 @@ export class Interpreter {
                 if (_textPositionWithModule.range.startLineNumber >= 0) {
 
                     this.programPointerManager.show(_textPositionWithModule, {
-                        key: "programPointer",
+                        key: Interpreter.ProgramPointerIndentifier,
                         isWholeLine: true,
                         className: "jo_revealProgramPointer",
                         rulerColor: "#6fd61b",
@@ -183,7 +185,7 @@ export class Interpreter {
 
                 }
             } else {
-                this.programPointerManager.hide("programPointer");
+                this.programPointerManager.hide(Interpreter.ProgramPointerIndentifier);
             }
 
         }
@@ -344,6 +346,7 @@ export class Interpreter {
         if (state == SchedulerState.stopped) {
             this.showProgramPointer(undefined);
             this.updateDebugger();
+            this.keyboardManager?.unsubscribeAllListeners();
             this.eventManager.fire("stop");
             // TODO
             // this.closeAllWebsockets();
@@ -445,7 +448,7 @@ export class Interpreter {
     }
 
     hideProgrampointerPosition() {
-        this.programPointerManager?.hide("ProgramPointer");
+        this.programPointerManager?.hide(Interpreter.ProgramPointerIndentifier);
     }
 
     registerCodeReached(key: string) {

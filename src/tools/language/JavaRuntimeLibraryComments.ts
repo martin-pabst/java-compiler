@@ -3301,8 +3301,8 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     })
 
     static Vector2ScaleComment = () => lm({
-    "de": "Streckt das Vector2-Objekt um den angegebenen Faktor und gibt es zurück (für Method-Chaining!). Diese Methode VERÄNDERT dieses Objekt!",
-    "en": "Scales Vector2-object by given factor and returns it (for method chaining). This method ALTERS this object!",
+        "de": "Streckt das Vector2-Objekt um den angegebenen Faktor und gibt es zurück (für Method-Chaining!). Diese Methode VERÄNDERT dieses Objekt!",
+        "en": "Scales Vector2-object by given factor and returns it (for method chaining). This method ALTERS this object!",
     })
 
     static Vector2RotateComment = () => lm({
@@ -3336,61 +3336,61 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     })
 
     static Vector2ScalarProductComment = () => lm({
-    "de": "Gibt das Skalarprodukt der beiden Vektoren zurück.",
-    "en": "Returns scalar product of vectors.",
+        "de": "Gibt das Skalarprodukt der beiden Vektoren zurück.",
+        "en": "Returns scalar product of vectors.",
     })
 
     static Vector2DistanceComment = () => lm({
-    "de": "Berechnet den Abstand der beiden Punkte (x1, y1) und (x2, y2).",
-    "en": "Returns distance of given points (x1, y1) and (x2, y2).",
+        "de": "Berechnet den Abstand der beiden Punkte (x1, y1) und (x2, y2).",
+        "en": "Returns distance of given points (x1, y1) and (x2, y2).",
     })
 
     static Vector2DistanceToComment = () => lm({
-    "de": "Berechnet die Länge der Differenz der beiden Vektoren.",
-    "en": "Returns the length of the difference of both vectors.",
+        "de": "Berechnet die Länge der Differenz der beiden Vektoren.",
+        "en": "Returns the length of the difference of both vectors.",
     })
 
     static Vector2XComment = () => lm({
-    "de": "X-Komponente des Vektors",
-    "en": "x-component",
+        "de": "X-Komponente des Vektors",
+        "en": "x-component",
     })
 
     static Vector2YComment = () => lm({
-    "de": "Y-Komponente des Vektors",
-    "en": "y-component",
+        "de": "Y-Komponente des Vektors",
+        "en": "y-component",
     })
 
     /**
      * class MathTools
      */
     static MathToolsClassComment = () => lm({
-    "de": "Klasse mit mathematischen Hilfsfunktionen als statische Methoden",
-    "en": "Class with mathematical/geometrical tools.",
+        "de": "Klasse mit mathematischen Hilfsfunktionen als statische Methoden",
+        "en": "Class with mathematical/geometrical tools.",
     })
 
     static MathToolsIntersectCircleWithPolygonComment = () => lm({
-    "de": "Zu einem gegebenen Kreis werden die Punkte berechnet, die auf den Seiten eines gegebenen Polygons liegen.",
-    "en": "Intersects given circle with given polygon.",
+        "de": "Zu einem gegebenen Kreis werden die Punkte berechnet, die auf den Seiten eines gegebenen Polygons liegen.",
+        "en": "Intersects given circle with given polygon.",
     })
 
     static MathToolsIntersectLineSegmentsComment = () => lm({
-    "de": "Berechnet den Schnittpunkt der Strecken [p0, p1] und [p2, p3]. Gibt null zurück, wenn sich die Strecken nicht schneiden oder wenn sie parallel sind und teilweise aufeinander liegen.",
-    "en": "Calculates intersection of Line segments [p0, p1] and [p2, p3]. Returns null if line segments don't intersect.",
+        "de": "Berechnet den Schnittpunkt der Strecken [p0, p1] und [p2, p3]. Gibt null zurück, wenn sich die Strecken nicht schneiden oder wenn sie parallel sind und teilweise aufeinander liegen.",
+        "en": "Calculates intersection of Line segments [p0, p1] and [p2, p3]. Returns null if line segments don't intersect.",
     })
 
     static MathToolsPolygonContainsPointComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn das Polygon den Punkt enthält.",
-    "en": "Returns true if and only if given Polygon contains given point.",
+        "de": "Gibt genau dann true zurück, wenn das Polygon den Punkt enthält.",
+        "en": "Returns true if and only if given Polygon contains given point.",
     })
 
     static MathToolsDistancePointToLineComment = () => lm({
-    "de": "Berechnet den Abstand des Punktes P zur Gerade AB.",
-    "en": "Calculates distance from point P to line AB.",
+        "de": "Berechnet den Abstand des Punktes P zur Gerade AB.",
+        "en": "Calculates distance from point P to line AB.",
     })
 
     static MathToolsDistancePointToLineSegmentComment = () => lm({
-    "de": "Berechnet den Abstand des Punktes P zur Gerade AB.",
-    "en": "Calculates distance from point P to line segment [AB].",
+        "de": "Berechnet den Abstand des Punktes P zur Gerade AB.",
+        "en": "Calculates distance from point P to line segment [AB].",
     })
 
     /**
@@ -3398,71 +3398,125 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
      */
 
     static SystemClassComment = () => lm({
-    "de": "Klasse mit statischen Methoden für Systemfunktionen.",
-    "en": "Class with static methods for system function.",
+        "de": "Klasse mit statischen Methoden für Systemfunktionen.",
+        "en": "Class with static methods for system function.",
     })
 
     static SystemExitComment = () => lm({
-    "de": "Beendet das Programm und gibt den übergebenen Wert in der Konsole aus.",
-    "en": "Exits program and prints given value to console.",
+        "de": "Beendet das Programm und gibt den übergebenen Wert in der Konsole aus.",
+        "en": "Exits program and prints given value to console.",
     })
 
     static SystemCurrentTimeMillisComment = () => lm({
-    "de": "Gibt die Anzahl der Millisekunden, die seit dem 01.01.1970 00:00:00 UTC vergangen sind, zurück.",
-    "en": "Milliseconds since 1970-01-01 00:00:00 UTC.",
+        "de": "Gibt die Anzahl der Millisekunden, die seit dem 01.01.1970 00:00:00 UTC vergangen sind, zurück.",
+        "en": "Milliseconds since 1970-01-01 00:00:00 UTC.",
     })
 
     static SystemOutComment = () => lm({
-    "de": "PrintStream-Objekt, mit dem Text ausgegeben werden kann.",
-    "en": "PrintStream-object to print text.",
+        "de": "PrintStream-Objekt, mit dem Text ausgegeben werden kann.",
+        "en": "PrintStream-object to print text.",
     })
 
     /**
      * class PrintStream
      */
     static PrintStreamClassComment = () => lm({
-    "de": "Interne Hilfsklasse, um System.out.println zu ermöglichen. Das Objekt System.out ist von der Klasse PrintStream.",
-    "en": "Internal auxiliary class to make System.out.println possible. Object System.out is of class PrintStream.",
+        "de": "Interne Hilfsklasse, um System.out.println zu ermöglichen. Das Objekt System.out ist von der Klasse PrintStream.",
+        "en": "Internal auxiliary class to make System.out.println possible. Object System.out is of class PrintStream.",
     })
 
     static PrintStreamPrintComment = () => lm({
-    "de": "Gibt den Text aus.",
-    "en": "Prints Text.",
+        "de": "Gibt den Text aus.",
+        "en": "Prints Text.",
     })
 
     static PrintStreamPrintlnComment = () => lm({
-    "de": "Gibt den Text aus, gefolgt von einem Zeilenumbruch.",
-    "en": "Prints Text followed by a line break.",
+        "de": "Gibt den Text aus, gefolgt von einem Zeilenumbruch.",
+        "en": "Prints Text followed by a line break.",
     })
 
     static PrintStreamPrintlnComment2 = () => lm({
-    "de": "Gibt einen Zeilenumbruch aus.",
-    "en": "Prints a line break.",
+        "de": "Gibt einen Zeilenumbruch aus.",
+        "en": "Prints a line break.",
     })
 
     /**
      * class Gamepad
      */
     static GamepadClassComment = () => lm({
-    "de": "Klasse mit statischen Methoden zur Abfrage der Gamepads.",
-    "en": "class with static methods to get gamepad state.",
+        "de": "Klasse mit statischen Methoden zur Abfrage der Gamepads.",
+        "en": "class with static methods to get gamepad state.",
     })
 
     static GamepadIsButtonDownComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn der Button buttonIndex des Gamepads GamepadIndex gedrückt ist. VORSICHT: Das erste Gamepad hat Index 0.",
-    "en": "Returns true if and only if button buttonIndex is pressed on gamepad with index gamepadIndex. BEWARE: First gamepad has index 0.",
+        "de": "Gibt genau dann true zurück, wenn der Button buttonIndex des Gamepads GamepadIndex gedrückt ist. VORSICHT: Das erste Gamepad hat Index 0.",
+        "en": "Returns true if and only if button buttonIndex is pressed on gamepad with index gamepadIndex. BEWARE: First gamepad has index 0.",
     })
 
     static GamepadIsConnectedComment = () => lm({
-    "de": "Gibt true zurück, falls das Gamepad mit dem übergebenen Index angeschlossen ist. VORSICHT: Das erste Gamepad hat Index 0.",
-    "en": "Returns true if gamepad with given index is connected. BEWARE: First gamepad has index 0.",
+        "de": "Gibt true zurück, falls das Gamepad mit dem übergebenen Index angeschlossen ist. VORSICHT: Das erste Gamepad hat Index 0.",
+        "en": "Returns true if gamepad with given index is connected. BEWARE: First gamepad has index 0.",
     })
 
     static GamepadGetAxisValueComment = () => lm({
-    "de": "Gibt den Wert des Gamepad-Steuerknüppels mit Index axisIndex zurück.",
-    "en": "Returns value of gamepad-stick with given index",
+        "de": "Gibt den Wert des Gamepad-Steuerknüppels mit Index axisIndex zurück.",
+        "en": "Returns value of gamepad-stick with given index",
     })
 
-    
+    /**
+     * class SystemTools
+     */
+    static SystemToolsClassComment = () => lm({
+        "de": "Klasse mit statischen Methoden für Systemfunktionen, z.B. Löschen der Ausgabe, Registrieren eines Tastaturlisteners usw.",
+        "en": "Class with static system Methods, e.g. clear text output, register keyboard listener",
+    })
 
+    static SystemToolsClearScreenComment = () => lm({
+        "de": "Löscht den Textausgabe-Bildschirm",
+        "en": "Clears text output.",
+    })
+
+    static SystemToolsSetSpeedComment = () => lm({
+        "de": "Setzt die Ausführungsgeschwindigkeit. Der Parameter speed wir in Steps/Sekunde angegeben. Eine negative Zahl bedeutet: 'maximal'.",
+        "en": "Sets speed in which program is executed. Parameter speed is given in steps/second. A negative value for speed means: maximum speed.",
+    })
+
+    static SystemToolsGetSpeedComment = () => lm({
+        "de": "Gibt die Ausführungsgeschwindigkeit in Steps pro Sekunde zurück.",
+        "en": "Returns execution speed in steps/second.",
+    })
+
+    static SystemToolsPauseComment = () => lm({
+        "de": "Pausiert das Programm für die angegebene Zeit in ms.",
+        "en": "Makes current thread pause execution for given time in ms.",
+    })
+
+    static SystemToolsGetStepCountComment = () => lm({
+        "de": "Gibt die Anzahl der seit dem Start des Programms ausgeführten Steps (== Programmschritte) zurück.",
+        "en": "Gets number of steps since program start.",
+    })
+
+    static SystemToolsAddKeyListenerComment = () => lm({
+        "de": "Fügt einen KeyListener hinzu, dessen Methode keyTyped immer dann aufgerufen wird, wenn eine Taste gedrückt und anschließend losgelassen wird.",
+        "en": "Adds a KeyListener whose method keyTyped is called every time a key was pressed and subsequently released.",
+    })
+
+    static SystemToolsPauseTimeLower0 = () => lm({
+        "de": "Der Parameter milliseconds der Methode SystemTools.pause muss >= 0 sein.",
+        "en": "Parameter milliseconds of method SystemTools.pause has to be >= 0.",
+    })
+
+
+    /**
+     * interface KeyListener
+     */
+    static KeyListenerInterfaceComment = () => lm({
+        "de": "Interface mit Methode onKeyTyped. Eine Klasse, die dieses Interface implementiert, kann auf Tastatureingaben reagieren. Ein Objekt dieser Klasse muss zuvor aber mit System.addKeyListener() registriert werden.",
+        "en": "Interface with method onKeyTyped. Register a KeyListener with SystemTools.addKeyListener().",
+    })
+
+    static KeyListenerOnKeyTypedComment = () => lm({
+        "de": "Wird aufgerufen, nachdem eine Taste gedrückt und wieder losgelassen wurde.",
+        "en": "Is called if a key was pressed and then released.",
+    })
 }  

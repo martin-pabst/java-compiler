@@ -163,6 +163,7 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
         for (let i = 0; i < method.parameters.length; i++) {
             method.parameters[i].identifier = node.parameters[i].identifier;
             method.parameters[i].type = methodToImplementParameterTypes[i];
+            method.parameters[i].identifierRange = node.parameters[i].identifierRange;
         }
         method.takeInternalJavaNameWithGenericParamterIdentifiersFrom(methodToImplement);
 
@@ -507,6 +508,7 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
 
         for (let parameter of method.parameters) {
             this.currentSymbolTable.addSymbol(parameter);
+            this.registerUsagePosition(parameter, parameter.identifierRange);
         }
 
 

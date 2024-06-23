@@ -21,7 +21,6 @@ export class Scheduler {
     runningThreads: Thread[] = [];
     suspendedThreads: Thread[] = [];
     storedThreads?: Thread[] = undefined;
-    storedCurrentThreadIndex: number = 0;
 
     currentThreadIndex: number = 0;
     state!: SchedulerState;
@@ -475,7 +474,6 @@ export class Scheduler {
     }
 
     saveAllThreadsBut(currentThread: Thread) {
-        this.storedCurrentThreadIndex = this.currentThreadIndex;
         this.storedThreads = this.runningThreads.filter(t => t != currentThread);
         this.runningThreads = [currentThread];
         this.currentThreadIndex = 0;
@@ -484,7 +482,7 @@ export class Scheduler {
     retrieveThreads() {
         if (this.storedThreads) {
             this.runningThreads = this.runningThreads.concat(this.storedThreads);
-            this.currentThreadIndex = this.storedCurrentThreadIndex;
+            this.currentThreadIndex = 0;
         }
     }
 
