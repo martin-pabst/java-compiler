@@ -3360,4 +3360,37 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "y-component",
     })
 
+    /**
+     * class MathTools
+     */
+    static MathToolsClassComment = () => lm({
+    "de": "Klasse mit mathematischen Hilfsfunktionen als statische Methoden",
+    "en": "Class with mathematical/geometrical tools.",
+    })
+
+    static MathToolsIntersectCircleWithPolygonComment = () => lm({
+    "de": "Zu einem gegebenen Kreis werden die Punkte berechnet, die auf den Seiten eines gegebenen Polygons liegen.",
+    "en": "Intersects given circle with given polygon.",
+    })
+
+    static MathToolsIntersectLineSegmentsComment = () => lm({
+    "de": "Berechnet den Schnittpunkt der Strecken [p0, p1] und [p2, p3]. Gibt null zurück, wenn sich die Strecken nicht schneiden oder wenn sie parallel sind und teilweise aufeinander liegen.",
+    "en": "Calculates intersection of Line segments [p0, p1] and [p2, p3]. Returns null if line segments don't intersect.",
+    })
+
+    static MathToolsPolygonContainsPointComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn das Polygon den Punkt enthält.",
+    "en": "Returns true if and only if given Polygon contains given point.",
+    })
+
+    static MathToolsDistancePointToLineComment = () => lm({
+    "de": "Berechnet den Abstand des Punktes P zur Gerade AB.",
+    "en": "Calculates distance from point P to line AB.",
+    })
+
+    static MathToolsDistancePointToLineSegmentComment = () => lm({
+    "de": "Berechnet den Abstand des Punktes P zur Gerade AB.",
+    "en": "Calculates distance from point P to line segment [AB].",
+    })
+
 }  

@@ -45,14 +45,14 @@
   * debugger: show fields of base classes
   * JavaKara
   * JavaHamster
-  * classes BigInteger, Console, Vector2
+  * classes BigInteger, Console, Vector2, MathToolsClass
 
 ## working status on current issue:
 
 ### fine-grained next todos on current issue:
 
 ## next 
-  * Classes Gamepad, Input, MathToolsClass, System, SystemTools, Timer 
+  * Classes Gamepad, Input, System, SystemTools, Timer 
   * Missing Collections 
   * GNG classes
   * Robot
