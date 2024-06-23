@@ -3393,4 +3393,51 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Calculates distance from point P to line segment [AB].",
     })
 
+    /**
+     * System class
+     */
+
+    static SystemClassComment = () => lm({
+    "de": "Klasse mit statischen Methoden für Systemfunktionen.",
+    "en": "Class with static methods for system function.",
+    })
+
+    static SystemExitComment = () => lm({
+    "de": "Beendet das Programm und gibt den übergebenen Wert in der Konsole aus.",
+    "en": "Exits program and prints given value to console.",
+    })
+
+    static SystemCurrentTimeMillisComment = () => lm({
+    "de": "Gibt die Anzahl der Millisekunden, die seit dem 01.01.1970 00:00:00 UTC vergangen sind, zurück.",
+    "en": "Milliseconds since 1970-01-01 00:00:00 UTC.",
+    })
+
+    static SystemOutComment = () => lm({
+    "de": "PrintStream-Objekt, mit dem Text ausgegeben werden kann.",
+    "en": "PrintStream-object to print text.",
+    })
+
+    /**
+     * class PrintStream
+     */
+    static PrintStreamClassComment = () => lm({
+    "de": "Interne Hilfsklasse, um System.out.println zu ermöglichen. Das Objekt System.out ist von der Klasse PrintStream.",
+    "en": "Internal auxiliary class to make System.out.println possible. Object System.out is of class PrintStream.",
+    })
+
+    static PrintStreamPrintComment = () => lm({
+    "de": "Gibt den Text aus.",
+    "en": "Prints Text.",
+    })
+
+    static PrintStreamPrintlnComment = () => lm({
+    "de": "Gibt den Text aus, gefolgt von einem Zeilenumbruch.",
+    "en": "Prints Text followed by a line break.",
+    })
+
+    static PrintStreamPrintlnComment2 = () => lm({
+    "de": "Gibt einen Zeilenumbruch aus.",
+    "en": "Prints a line break.",
+    })
+
 }  

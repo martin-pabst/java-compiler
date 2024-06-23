@@ -208,6 +208,11 @@ export abstract class StatementParser extends TermParser {
 
             this.expect(TokenType.rightBracket);
 
+            if(this.comesToken(TokenType.rightCurlyBracket, false)){
+                this.pushError(JCM.statementOrBlockExpected());
+                return undefined;
+            }
+
             let statementIfTrue = this.parseStatementOrExpression();
 
             let statementIfFalse: ASTStatementNode | undefined;

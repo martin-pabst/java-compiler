@@ -488,5 +488,10 @@ export class Scheduler {
         }
     }
 
+    exit(status: number){
+        console.log("Exited with status " + status);
+        this.interpreter.printManager?.print("Exited with status " + status, true, 0xffffff);
+        this.setState(SchedulerState.stopped);
+    }
 
 }
