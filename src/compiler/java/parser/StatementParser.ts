@@ -87,7 +87,7 @@ export abstract class StatementParser extends TermParser {
 
         if ((expectSemicolonAfterStatement && !this.expectSemicolon(true, true))
             || !statement) {
-            if(this.cct.range.startLineNumber == line){
+            if (this.cct.range.startLineNumber == line) {
                 this.skipTillNextTokenAfter([TokenType.semicolon, TokenType.newline, TokenType.rightCurlyBracket]);
             }
         }
@@ -143,23 +143,23 @@ export abstract class StatementParser extends TermParser {
     parseWhile(): ASTWhileNode | undefined {
 
         let whileTokenRange = this.getCurrentRangeCopy();
-        
+
         let whileToken = this.getAndSkipToken();
-        
+
         if (this.comesToken(TokenType.leftBracket, true)) {
             let condition = this.parseTerm();
             this.expect(TokenType.rightBracket);
-            
+
             let statementToRepeat = this.parseStatementOrExpression();
-            
+
             if (condition && statementToRepeat) {
-                
+
                 return this.nodeFactory.buildWhileNode(whileToken,
                     this.cct, condition, statementToRepeat);
-                    
-                }
-                
-            } else {
+
+            }
+
+        } else {
             this.module.pushMethodCallPosition(whileTokenRange, [], "while", Range.getStartPosition(this.cct.range));
             this.skipTokensTillEndOfLineOr([TokenType.rightBracket]);
         }
@@ -236,7 +236,10 @@ export abstract class StatementParser extends TermParser {
         let blockNode = this.nodeFactory.buildBlockNode(this.cct);
         this.nextToken(); // skip {
 
-        while (!this.isEnd() && this.tt != TokenType.rightCurlyBracket) {
+        let posLastSeen: number = -1;   // watchdog!
+        while (!this.isEnd() && this.tt != TokenType.rightCurlyBracket
+            && posLastSeen != this.pos) {
+            posLastSeen = this.pos;
             let statement = this.parseStatementOrExpression();
             if (statement) blockNode.statements.push(statement);
         }
@@ -248,10 +251,10 @@ export abstract class StatementParser extends TermParser {
     }
 
     parseFor(): ASTForLoopNode | ASTEnhancedForLoopNode | undefined {
-        
+
         let forTokenRange = this.getCurrentRangeCopy();
         let semicolonPositions: monaco.IPosition[] = [];
-        
+
         let tokenFor = this.getAndSkipToken();  // preserve first token to compute range later on
 
         if (!this.expect(TokenType.leftBracket, true)) return undefined;
@@ -266,7 +269,7 @@ export abstract class StatementParser extends TermParser {
         this.expect(TokenType.semicolon, true);
         let condition = this.parseTerm();
         if (!condition) this.skipTokensTillEndOfLineOr(TokenType.semicolon)
-            semicolonPositions.push(Range.getStartPosition(this.cct.range));
+        semicolonPositions.push(Range.getStartPosition(this.cct.range));
         this.expect(TokenType.semicolon, true);
         let lastStatement = this.parseTerm();
         let rightBracketPosition = Range.getStartPosition(this.cct.range);
