@@ -3440,4 +3440,29 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Prints a line break.",
     })
 
+    /**
+     * class Gamepad
+     */
+    static GamepadClassComment = () => lm({
+    "de": "Klasse mit statischen Methoden zur Abfrage der Gamepads.",
+    "en": "class with static methods to get gamepad state.",
+    })
+
+    static GamepadIsButtonDownComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn der Button buttonIndex des Gamepads GamepadIndex gedrückt ist. VORSICHT: Das erste Gamepad hat Index 0.",
+    "en": "Returns true if and only if button buttonIndex is pressed on gamepad with index gamepadIndex. BEWARE: First gamepad has index 0.",
+    })
+
+    static GamepadIsConnectedComment = () => lm({
+    "de": "Gibt true zurück, falls das Gamepad mit dem übergebenen Index angeschlossen ist. VORSICHT: Das erste Gamepad hat Index 0.",
+    "en": "Returns true if gamepad with given index is connected. BEWARE: First gamepad has index 0.",
+    })
+
+    static GamepadGetAxisValueComment = () => lm({
+    "de": "Gibt den Wert des Gamepad-Steuerknüppels mit Index axisIndex zurück.",
+    "en": "Returns value of gamepad-stick with given index",
+    })
+
+    
+
 }  

@@ -84,6 +84,7 @@ import { ConsoleClass } from "./additional/ConsoleClass.ts";
 import { Vector2Class } from "./additional/Vector2Class.ts";
 import { MathToolsClass } from "./additional/MathToolsClass.ts";
 import { PrintStreamClass, SystemClass } from "./javalang/SystemClass.ts";
+import { GamepadClass } from "./additional/GamepadClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -115,6 +116,7 @@ export class SystemModule extends JavaLibraryModule {
             //additional system classes
             KeyClass, LocalDateTimeClass, DayOfWeekEnum, PositionClass, BigIntegerClass,
             ConsoleClass, Vector2Class, MathToolsClass, PrintStreamClass, SystemClass,
+            GamepadClass,
 
             // Functional
             ConsumerInterface, FunctionInterface,
