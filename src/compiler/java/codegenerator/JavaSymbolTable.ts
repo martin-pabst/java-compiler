@@ -77,7 +77,7 @@ export class JavaSymbolTable extends BaseSymbolTable {
         // parameter?
         // Topmost Symbol table inside method has parameters...
         if(this.methodContext != null && this.parent != null){
-            let parent = this.parent;
+            let parent: JavaSymbolTable = this;
             while(parent && parent.parent?.methodContext == this.methodContext){
                 parent = parent.parent;
             }
