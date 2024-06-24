@@ -52,7 +52,7 @@
 ### fine-grained next todos on current issue:
 
 ## next 
-  * Classes Input 
+  * Class Input 
   * Missing Collections 
   * GNG classes
   * Robot
