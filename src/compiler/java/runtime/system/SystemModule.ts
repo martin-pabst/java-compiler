@@ -87,6 +87,7 @@ import { PrintStreamClass, SystemClass } from "./javalang/SystemClass.ts";
 import { GamepadClass } from "./additional/GamepadClass.ts";
 import { SystemToolsClass } from "./additional/SystemToolsClass.ts";
 import { KeyListenerInterface } from "./additional/KeyListenerInterface.ts";
+import { TimerClass } from "./additional/TimerClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -136,6 +137,9 @@ export class SystemModule extends JavaLibraryModule {
 
             // Thread
             RunnableInterface, ThreadClass, ThreadStateEnum, SemaphoreClass,
+
+            // Timer
+            TimerClass,
 
             // Assertions
             AssertionsClass,

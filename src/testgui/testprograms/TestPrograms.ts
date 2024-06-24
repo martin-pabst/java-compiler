@@ -1,5 +1,22 @@
 export var testProgramsList = [
    ['', ``],
+   ['Timer-Test', `Timer t = new Timer();
+
+   t.repeat(() -> {
+         println("Hello!");
+      }, 500); 
+   
+   t.repeat(() -> {
+         println("now!");
+      }, 1000); 
+   
+   Timer.executeLater(() -> {
+      t.pause();
+      }, 2000);
+   
+   while (true) {
+      
+   }`],
    ['JavaHamster', `new World(1000, 1000);
 JavaHamsterWorld jhw = new JavaHamsterWorld(10, 4);
 jhw.scale(2);

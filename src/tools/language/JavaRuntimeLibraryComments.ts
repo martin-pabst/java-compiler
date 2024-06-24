@@ -3519,4 +3519,32 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
         "de": "Wird aufgerufen, nachdem eine Taste gedrückt und wieder losgelassen wurde.",
         "en": "Is called if a key was pressed and then released.",
     })
+
+    /**
+     * class Timer
+     */
+    static TimerClassComment = () => lm({
+    "de": "Timer Klasse zur periodischen Ausführung von Methoden",
+    "en": "Class Timer to execute methods periodically",
+    })
+
+    static TimerClassRepeatComment = () => lm({
+    "de": "Fügt ein neues Runnable-Objekt hinzu und ruft dessen tick-Methode immer wieder auf.",
+    "en": "Adds a new Runnable object and call it's run-method periodically.",
+    })
+
+    static TimerClassPauseComment = () => lm({
+    "de": "Hält den Timer an. Er kann später mit der Methode restart() wieder gestartet werden.",
+    "en": "Pauses timer. Use method restart() to restart it later.",
+    })
+
+    static TimerClassRestartComment = () => lm({
+    "de": "Startet den Timer erneut, nachdem er mit pause() pausiert wurde.",
+    "en": "Restart timer if it had been paused with pause()-method.",
+    })
+
+    static TimerClassExecuteLaterComment = () => lm({
+    "de": "Führt die übergebene Methode nach dt millisekunden ein Mal aus.",
+    "en": "Waits dt milliseconds and then executes given method once.",
+    })
 }  
