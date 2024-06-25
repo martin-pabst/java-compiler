@@ -55,6 +55,7 @@ import { ErrorMarker } from "./compiler/common/monacoproviders/ErrorMarker.ts";
 import { ReplGUI } from "./testgui/editor/ReplGUI.ts";
 import { Repl } from "./compiler/java/parser/repl/Repl.ts";
 import { ReplCompiledModule } from "./compiler/java/parser/repl/ReplCompiledModule.ts";
+import { TestInputManager } from "./testgui/TestInputManager.ts";
 
 export class Main implements IMain {
 
@@ -71,6 +72,7 @@ export class Main implements IMain {
   testDiv: HTMLDivElement;
   graphicsDiv: HTMLDivElement;
   debuggerDiv: HTMLDivElement;
+  inputDiv: HTMLDivElement;
 
   programControlButtons!: ProgramControlButtons;
   actionManager: ActionManager;
@@ -103,7 +105,7 @@ export class Main implements IMain {
     //let testProgram: string = testPrograms.listeVorlage.trim();
 
     this.insightTabsManager = new TabManager(document.getElementById('insighttabs')!,
-      ['token', 'ast', 'code', 'errors', 'tests', 'graphics', 'debugger']);
+      ['token', 'ast', 'code', 'errors', 'tests', 'graphics', 'debugger', 'input']);
 
     this.insightTabsManager.setBodyElementClass('tabBodyElement');
     this.tokenDiv = this.insightTabsManager.getBodyElement(0);
@@ -116,6 +118,7 @@ export class Main implements IMain {
     this.testDiv = this.insightTabsManager.getBodyElement(4);
     this.graphicsDiv = this.insightTabsManager.getBodyElement(5);
     this.debuggerDiv = this.insightTabsManager.getBodyElement(6);
+    this.inputDiv = this.insightTabsManager.getBodyElement(7);
 
     this.debuggerDiv.id = "debuggerdiv";
 
@@ -155,10 +158,12 @@ export class Main implements IMain {
 
     let testManager = new TestManager(this, this.actionManager, this.testResultViewer);
 
+    let inputManager = new TestInputManager(this.inputDiv);
+
     this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager,
       new GraphicsManager(this.graphicsDiv), keyboardManager, 
       this.breakpointManager, _debugger, new ProgramPointerManager(this),
-    testManager);
+    testManager, inputManager);
 
     this.testResultViewer.addEventListener('run-all-tests',
       (e) => { if (e.type == "run-all-tests") testManager.executeAllTests(); });

@@ -162,3 +162,33 @@
     width: 100%;
     height: 100%;
 }
+
+/* Input manager */
+.jo_inputManagerOuter {
+    margin: 5px;
+}
+
+.jo_inputManagerQuestion {
+    height: 16px;
+}
+
+.jo_inputManagerDiv {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 30px;
+    align-items: center;
+}
+
+.jo_inputManagerLabel {
+    margin-right: 10px;
+}
+
+.jo_inputManagerInput {
+    width: 300px;
+}
+
+.jo_inputManagerError {
+    height: 16px;
+    color: red;
+}

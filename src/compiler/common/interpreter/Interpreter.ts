@@ -16,6 +16,7 @@ import { Program } from "./Program.ts";
 import { TestManager } from "./TestManager.ts";
 import { ActionManager } from "./IActionManager.ts";
 import { Repl } from "../../java/parser/repl/Repl.ts";
+import { IInputManager } from "./IInputManager.ts";
 
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
@@ -77,6 +78,7 @@ export class Interpreter {
         public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager,
         public breakpointManager?: BreakpointManager, public _debugger?: Debugger,
         public programPointerManager?: ProgramPointerManager, public testManager?: TestManager,
+        public inputManager?: IInputManager,
         public repl?: Repl
     ) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {

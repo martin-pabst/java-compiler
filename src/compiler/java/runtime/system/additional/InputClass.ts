@@ -4,7 +4,7 @@ import { ObjectClass } from "../javalang/ObjectClassStringClass.ts";
 
 export class InputClass extends ObjectClass {
     static __javaDeclarations: LibraryDeclarations = [
-
+        
     ];
 
     static type: NonPrimitiveType;

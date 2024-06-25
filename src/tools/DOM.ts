@@ -34,6 +34,13 @@ export class DOM {
         return div;
     }
 
+    public static makeElement(parent: HTMLElement | undefined, type: string, ...classes: string[]): HTMLElement {
+        let div = document.createElement(type);
+        if (classes != null) div.classList.add(...classes);
+        if (parent) parent.appendChild(div);
+        return div;
+    }
+
     public static makeSpan(parent: HTMLElement, ...classes: string[]): HTMLSpanElement {
         let span = document.createElement('span');
         if (classes != null) span.classList.add(...classes);
