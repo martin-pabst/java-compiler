@@ -3547,4 +3547,26 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "de": "Führt die übergebene Methode nach dt millisekunden ein Mal aus.",
     "en": "Waits dt milliseconds and then executes given method once.",
     })
+
+    /**
+     * class Input
+     */
+    static InpugClassComment = () => lm({
+    "de": "Klasse mit statischen Methoden zur Eingabe von Text per Tastatur",
+    "en": "Class with static Method to retrieve input from keyboard.",
+    })
+
+    static InputClassReadCharComment = () => lm({
+    "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp char",
+    "en": "Takes char-input from user.",
+    })
+
+    static InputClassReadIntComment = () => lm({
+    "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp int",
+    "en": "Takes int-input from user.",
+    })
+    static InputClassReadIntComment = () => lm({
+    "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp int",
+    "en": "Takes int-input from user.",
+    })
 }  
