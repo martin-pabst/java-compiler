@@ -3551,7 +3551,7 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     /**
      * class Input
      */
-    static InpugClassComment = () => lm({
+    static InputClassComment = () => lm({
     "de": "Klasse mit statischen Methoden zur Eingabe von Text per Tastatur",
     "en": "Class with static Method to retrieve input from keyboard.",
     })
@@ -3565,8 +3565,45 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp int",
     "en": "Takes int-input from user.",
     })
-    static InputClassReadIntComment = () => lm({
-    "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp int",
-    "en": "Takes int-input from user.",
+
+    static InputClassReadDoubleComment = () => lm({
+    "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp double",
+    "en": "Takes double-input from user.",
     })
+
+    static InputClassReadFloatComment = () => lm({
+    "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp float",
+    "en": "Takes float-input from user.",
+    })
+
+    static InputClassReadBooleanComment = () => lm({
+    "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp boolean",
+    "en": "Takes boolean-input from user.",
+    })
+
+    static InputClassReadStringComment = () => lm({
+    "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp String",
+    "en": "Takes String-input from user.",
+    })
+
+    static InputClassBooleanError = () => lm({
+    "de": "Erwartet wird true oder false.",
+    "en": "true or false expected.",
+    })
+
+    static InputClassFloatError = () => lm({
+    "de": "Erwartet wird eine Fließkommazahl mit Dezimalpunkt, z.B. 1.2 oder 1.34e-10 oder -3e-10.",
+    "en": "Floating point value with decimal point expected, e.g. 1.2 or 1.34e-10 or -3e-10.",
+    })
+
+    static InputClassCharError = () => lm({
+    "de": "Erwartet wird ein einzelnes Zeichen.",
+    "en": "Single character expected.",
+    })
+
+    static InputClassIntError = () => lm({
+    "de": "Erwartet wird eine ganze Zahl.",
+    "en": "Integer value expected.",
+    })
+
 }  

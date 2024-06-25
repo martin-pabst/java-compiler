@@ -46,7 +46,11 @@ export class TabManager {
     }
 
 
-    setActive(heading: HTMLDivElement){
+    setActive(heading: HTMLDivElement | number){
+        if(typeof heading == 'number'){
+            heading = this.headingDivs[heading];
+        }
+
         for(let h of this.headingDivs){
             h.classList.remove('jo_tabs_active');
         }

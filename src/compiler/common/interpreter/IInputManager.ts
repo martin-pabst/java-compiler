@@ -1,6 +1,11 @@
-export type InputManagerCallback = (value: string) => string;  // Return parameter for error message
+export type InputManagerValidator = (value: string) => {
+    convertedValue: any,
+    errorMessage: string | undefined
+}
+
+export type InputManagerCallback = (value: any) => void;
 
 export interface IInputManager {
-    readInput(question: string, defaultValue: string, callback: InputManagerCallback): void;
+    readInput(question: string, defaultValue: string | undefined, validator: InputManagerValidator, successCallback: InputManagerCallback): void;
 }
 

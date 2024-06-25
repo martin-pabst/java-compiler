@@ -171,13 +171,14 @@ export class Interpreter {
         }
     }
 
-    showProgramPointer(_textPositionWithModule: ProgramPointerPositionInfo | undefined) {
+    showProgramPointer(_textPositionWithModule?: ProgramPointerPositionInfo, tag?: string) {
         if (this.programPointerManager) {
+            if(!_textPositionWithModule) _textPositionWithModule = this.scheduler.getNextStepPosition();
             if (_textPositionWithModule?.range) {
                 if (_textPositionWithModule.range.startLineNumber >= 0) {
 
                     this.programPointerManager.show(_textPositionWithModule, {
-                        key: Interpreter.ProgramPointerIndentifier,
+                        key: tag || Interpreter.ProgramPointerIndentifier,
                         isWholeLine: true,
                         className: "jo_revealProgramPointer",
                         rulerColor: "#6fd61b",
@@ -187,7 +188,7 @@ export class Interpreter {
 
                 }
             } else {
-                this.programPointerManager.hide(Interpreter.ProgramPointerIndentifier);
+                this.programPointerManager.hide(tag || Interpreter.ProgramPointerIndentifier);
             }
 
         }
@@ -220,7 +221,7 @@ export class Interpreter {
 
     stop(restart: boolean) {
 
-        this.showProgramPointer(undefined);
+        this.hideProgrampointerPosition();
         this.updateDebugger();
 
         // this.inputManager.hide();
@@ -346,7 +347,7 @@ export class Interpreter {
     setState(state: SchedulerState) {
 
         if (state == SchedulerState.stopped) {
-            this.showProgramPointer(undefined);
+            this.hideProgrampointerPosition();
             this.updateDebugger();
             this.keyboardManager?.unsubscribeAllListeners();
             this.eventManager.fire("stop");
@@ -449,8 +450,8 @@ export class Interpreter {
 
     }
 
-    hideProgrampointerPosition() {
-        this.programPointerManager?.hide(Interpreter.ProgramPointerIndentifier);
+    hideProgrampointerPosition(tag?: string) {
+        this.programPointerManager?.hide(tag || Interpreter.ProgramPointerIndentifier);
     }
 
     registerCodeReached(key: string) {

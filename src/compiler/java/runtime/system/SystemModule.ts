@@ -88,6 +88,7 @@ import { GamepadClass } from "./additional/GamepadClass.ts";
 import { SystemToolsClass } from "./additional/SystemToolsClass.ts";
 import { KeyListenerInterface } from "./additional/KeyListenerInterface.ts";
 import { TimerClass } from "./additional/TimerClass.ts";
+import { InputClass } from "./additional/InputClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -119,7 +120,7 @@ export class SystemModule extends JavaLibraryModule {
             //additional system classes
             KeyClass, LocalDateTimeClass, DayOfWeekEnum, PositionClass, BigIntegerClass,
             ConsoleClass, Vector2Class, MathToolsClass, PrintStreamClass, SystemClass,
-            GamepadClass, KeyListenerInterface, SystemToolsClass,
+            GamepadClass, KeyListenerInterface, SystemToolsClass, InputClass,
 
             // Functional
             ConsumerInterface, FunctionInterface,

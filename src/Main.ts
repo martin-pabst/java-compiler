@@ -158,7 +158,7 @@ export class Main implements IMain {
 
     let testManager = new TestManager(this, this.actionManager, this.testResultViewer);
 
-    let inputManager = new TestInputManager(this.inputDiv);
+    let inputManager = new TestInputManager(this.inputDiv, this.insightTabsManager);
 
     this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager,
       new GraphicsManager(this.graphicsDiv), keyboardManager, 

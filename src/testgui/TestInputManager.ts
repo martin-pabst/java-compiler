@@ -1,5 +1,6 @@
-import { IInputManager, InputManagerCallback } from "../compiler/common/interpreter/IInputManager.ts";
+import { IInputManager, InputManagerCallback, InputManagerValidator } from "../compiler/common/interpreter/IInputManager.ts";
 import { DOM } from "../tools/DOM.ts";
+import { TabManager } from "../tools/TabManager.ts";
 
 export class TestInputManager implements IInputManager{
     
@@ -7,7 +8,7 @@ export class TestInputManager implements IInputManager{
     question: HTMLDivElement;
     errorDiv: HTMLDivElement;
 
-    constructor(private div: HTMLDivElement){
+    constructor(private div: HTMLDivElement, private tabManager: TabManager){
         let outerDiv = DOM.makeDiv(div, 'jo_inputManagerOuter');
         outerDiv.style.display = 'flex';
         outerDiv.style.flexDirection = 'column';
@@ -25,16 +26,31 @@ export class TestInputManager implements IInputManager{
     }
 
 
-    readInput(question: string, defaultValue: string, callback: InputManagerCallback): void { 
+    readInput(question: string, defaultValue: string | undefined, validator: InputManagerValidator, successCallback: InputManagerCallback): void { 
         this.question.textContent = question;
-        this.inputField.textContent = defaultValue;
-        this.inputField.selectionStart = 0;
-        this.inputField.selectionEnd = defaultValue.length;
+        this.inputField.value = defaultValue ? defaultValue : "";
+        this.tabManager.setActive(7);
+        this.enable(true);
+        this.inputField.focus();
+        if(defaultValue){
+            this.inputField.selectionStart = 0;
+            this.inputField.selectionEnd = defaultValue.length;
+        }
         this.inputField.onkeydown = (event) => {
-            if(event.key == '\n'){
-                this.inputField.onkeydown = null;
-                let error: string | undefined = callback(this.inputField.textContent || '');
-                this.errorDiv.textContent = error ? error : '';
+            if(event.key == 'Enter'){
+
+                let validatorRet = validator(this.inputField.value || '');
+                if(validatorRet.errorMessage){
+                    this.errorDiv.textContent = validatorRet.errorMessage;
+                    this.inputField.selectionStart = 0;
+                    this.inputField.selectionEnd = (this.inputField.value || '').length;
+                    return;
+                } else {
+                    this.enable(false);
+                    this.inputField.onkeydown = null;
+                    successCallback(validatorRet.convertedValue);
+                }
+
             }
         }
     }

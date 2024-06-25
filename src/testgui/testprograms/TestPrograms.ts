@@ -1,5 +1,8 @@
 export var testProgramsList = [
    ['', ``],
+   ['InputTest', `String s = Input.readString("Name: ");
+   println(s);
+   `],
    ['Timer-Test', `Timer t = new Timer();
 
    t.repeat(() -> {

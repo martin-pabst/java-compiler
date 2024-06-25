@@ -14,7 +14,7 @@ export class JavaLocalVariable extends SymbolOnStackframe {
         getDeclaration(): string {
             let decl: string = "";
             if(this.isFinal) decl += "final ";
-            return decl + this.type.toString() + " " + this.identifier;
+            return decl + this.type?.toString() + " " + this.identifier;
         }
         
         getType(): BaseType {
