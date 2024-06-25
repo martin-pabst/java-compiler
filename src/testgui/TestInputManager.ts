@@ -34,7 +34,7 @@ export class TestInputManager implements IInputManager{
         this.inputField.focus();
         if(defaultValue){
             this.inputField.selectionStart = 0;
-            this.inputField.selectionEnd = defaultValue.length;
+            this.inputField.selectionEnd = ("" + defaultValue).length;
         }
         this.inputField.onkeydown = (event) => {
             if(event.key == 'Enter'){
