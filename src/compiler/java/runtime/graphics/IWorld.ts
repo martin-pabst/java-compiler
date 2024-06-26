@@ -26,4 +26,5 @@ export interface IWorld {
     registerActor(actor: IActor, type: ActorType): void;
     unregisterActor(actor: IActor): void;
     hasActors(): boolean;
+    _setBackgroundColor(color: string | number): void;
 }

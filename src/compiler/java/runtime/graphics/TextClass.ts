@@ -92,6 +92,7 @@ export class TextClass extends FilledShapeClass {
 
 
             this.render();
+            if(callback) callback();
         });   // call base class constructor
 
 

@@ -54,6 +54,7 @@ export class RectangleClass extends FilledShapeClass {
             ];    
     
             this.render();
+            if(callback) callback();
         });   // call base class constructor
 
 

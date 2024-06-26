@@ -65,7 +65,7 @@ export class ShapeClass extends ActorClass {
     centerXInitial: number = 0;
     centerYInitial: number = 0;
 
-    angle: number = 0;
+    angle: number = 0;      // in Degrees
 
     hitPolygonInitial: Punkt[] = [];
     hitPolygonTransformed: Punkt[] = [];

@@ -89,6 +89,11 @@ import { SystemToolsClass } from "./additional/SystemToolsClass.ts";
 import { KeyListenerInterface } from "./additional/KeyListenerInterface.ts";
 import { TimerClass } from "./additional/TimerClass.ts";
 import { InputClass } from "./additional/InputClass.ts";
+import { GNGBaseFigur } from "../graphics/gng/GNGBaseFigur.ts";
+import { GNGKreis } from "../graphics/gng/GNGKreis.ts";
+import { GNGRechteck } from "../graphics/gng/GNGRechteck.ts";
+import { GNGDreieck } from "../graphics/gng/GNGDreieck.ts";
+import { GNGText } from "../graphics/gng/GNGText.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -162,6 +167,9 @@ export class SystemModule extends JavaLibraryModule {
 
             // Java Hamster
             JavaHamsterWorldClass, JavaHamsterClass,
+
+            // Graphics'n Games (GNG)
+            GNGBaseFigur, GNGKreis, GNGRechteck, GNGDreieck, GNGText,
         );
 
 

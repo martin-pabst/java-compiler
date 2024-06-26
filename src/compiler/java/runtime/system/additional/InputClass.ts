@@ -6,8 +6,6 @@ import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { ObjectClass, StringClass } from "../javalang/ObjectClassStringClass.ts";
 
-type InputCallback = (value: string) => { valueToPushToStack: any, error: string | undefined };
-
 type InputTask = {
     thread: Thread,
     message: string,

@@ -48,6 +48,7 @@ export class CircleClass extends FilledShapeClass {
             this.radius = radius;
     
             this.render();
+            if(callback) callback();
         });   // call base class constructor
 
 

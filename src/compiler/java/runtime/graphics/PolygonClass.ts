@@ -122,6 +122,7 @@ export class PolygonClass extends FilledShapeClass {
 
 
             this.render();
+            if(callback) callback();
         });   // call base class constructor
 
 
