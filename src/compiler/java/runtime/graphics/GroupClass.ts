@@ -42,6 +42,7 @@ export class GroupClass extends ShapeClass {
             for(let shape of shapes){
                 this.add(shape);
             }
+            if(callback) callback();
         });
     }
 
