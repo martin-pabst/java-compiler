@@ -4,6 +4,8 @@ import { GroupClass } from './GroupClass';
 import { ShapeClass } from './ShapeClass';
 import { Interpreter } from '../../../common/interpreter/Interpreter';
 import { MouseManager } from './MouseManager';
+import { GNGEventListenerType, IGNGEventListener } from './gng/IGNGEventListener.ts';
+import { GNGEventlistenerManager } from './gng/GNGEventlistenerManager.ts';
 
 
 export interface IWorld {
@@ -23,8 +25,13 @@ export interface IWorld {
     width: number;
     height: number;
 
+    gngEventlistenerManager: GNGEventlistenerManager;
+
     registerActor(actor: IActor, type: ActorType): void;
     unregisterActor(actor: IActor): void;
     hasActors(): boolean;
+
     _setBackgroundColor(color: string | number): void;
+
+    registerGNGEventListener(listener: IGNGEventListener, type: GNGEventListenerType): void;
 }

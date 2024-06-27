@@ -158,6 +158,10 @@ export class PolygonClass extends FilledShapeClass {
             }
         }
 
+        if (this.closeAndFill || this.isClosed) {
+            g.closePath();
+        }
+
         if (this.fillColor != null) {
             g.fill(this.fillColor);
             g.alpha = this.fillAlpha;
@@ -172,9 +176,6 @@ export class PolygonClass extends FilledShapeClass {
             })
         }
 
-        if (this.closeAndFill || this.isClosed) {
-            g.closePath();
-        }
 
 
 

@@ -366,7 +366,10 @@ export class ShapeClass extends ActorClass {
     public destroy() {
         if (this.isDestroyed) return;
         if (this.belongsToGroup) {
-            this.belongsToGroup.shapes.splice(this.belongsToGroup.indexOf(this), 1);
+            let index = this.belongsToGroup.shapes.indexOf(this);
+            if(index >= 0){
+                this.belongsToGroup.shapes.splice(index, 1);
+            }
             this.belongsToGroup.container.removeChildAt(this.belongsToGroup.container.getChildIndex(this.container))
         }
         this.container.destroy();

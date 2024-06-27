@@ -31,9 +31,11 @@ export class GroupClass extends ShapeClass {
     shapes: ShapeClass[] = [];
 
     _cj$_constructor_$Group$(t: Thread, callback: CallbackFunction) {
-        this._cj$_constructor_$Shape$(t, callback);
-        this.container = new PIXI.Container();
-        this.world.app.stage.addChild(this.container);
+        this._cj$_constructor_$Shape$(t, () => {
+            this.container = new PIXI.Container();
+            this.world.app.stage.addChild(this.container);
+            if(callback) callback();
+        });
     }
 
     _cj$_constructor_$Group$T(t: Thread, callback: CallbackFunction, shapes: ShapeClass[]){
@@ -138,8 +140,8 @@ export class GroupClass extends ShapeClass {
     }
 
     public destroyAllChildren(){
-        for(let shape of this.shapes){
-            shape.destroy();
+        while(this.shapes.length > 0){
+            this.shapes.pop()!.destroy();
         }
     }
 

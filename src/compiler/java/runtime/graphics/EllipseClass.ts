@@ -54,6 +54,7 @@ export class EllipseClass extends FilledShapeClass {
             this.radiusY = radiusY;
     
             this.render();
+            if(callback) callback();
         });   // call base class constructor
 
 

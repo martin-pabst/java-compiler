@@ -1,5 +1,62 @@
 export var testProgramsList = [
    ['', ``],
+   ['GNGFigurTest', `var m = new Männchen();
+   m.nachLinksSchauen();
+   
+   
+   class Männchen extends Figur {
+   
+      void nachLinksSchauen() {
+         EigeneFigurLöschen();
+         FigurteilFestlegenRechteck(-20, -20, 40, 80, "blau");
+         FigurteilFestlegenEllipse(-40, -40, 80, 80, "gelb");
+         FigurteilFestlegenDreieck(0, -80, 30, -30, -30, -30, "rot");
+         FigurteilFestlegenEllipse(-20, -15, 7, 7, "schwarz");
+      }
+   
+      void nachRechtsSchauen() {
+         EigeneFigurLöschen();
+         FigurteilFestlegenRechteck(-20, -20, 40, 80, "blau");
+         FigurteilFestlegenEllipse(-40, -40, 80, 80, "gelb");
+         FigurteilFestlegenDreieck(0, -80, 30, -30, -30, -30, "rot");
+         FigurteilFestlegenEllipse(20, -15, 7, 7, "schwarz");
+      }
+   
+      void verschieben(int dx, int dy) {
+         PositionSetzen(XPositionGeben() + dx, YPositionGeben() + dy);
+      }
+   
+      @Override void SonderTasteGedrückt(int taste)
+      {
+         if(taste == 37)
+         {
+            nachLinksSchauen();
+            verschieben(-10, 0);
+         }
+         else
+         {
+            if(taste == 38)
+            {
+               verschieben(0, -10);
+            }
+            else
+            {
+               if(taste == 39)
+               {
+                  nachRechtsSchauen();
+                  verschieben(10, 0);
+               }
+               else
+               {
+                  if(taste == 40)
+                  {
+                     verschieben(0, 10);
+                  }
+               }
+            }
+         }
+      }
+   }`],
    ['InputTest', `String s = Input.readString("Name: ");
    println(s);
    `],

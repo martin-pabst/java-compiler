@@ -14,6 +14,8 @@ import { ActorType, IActor } from './IActor.ts';
 import { IWorld } from './IWorld.ts';
 import { MouseManager } from './MouseManager.ts';
 import { ShapeClass } from './ShapeClass.ts';
+import { GNGEventListenerType, IGNGEventListener } from './gng/IGNGEventListener.ts';
+import { GNGEventlistenerManager } from './gng/GNGEventlistenerManager.ts';
 
 
 export class WorldClass extends ObjectClass implements IWorld {
@@ -65,6 +67,7 @@ export class WorldClass extends ObjectClass implements IWorld {
     resizeObserver?: ResizeObserver;
 
     actorManager!: ActorManager;
+    gngEventlistenerManager!: GNGEventlistenerManager;
 
     defaultGroup?: GroupClass;
 
@@ -93,6 +96,7 @@ export class WorldClass extends ObjectClass implements IWorld {
         }
 
         this.actorManager = new ActorManager(interpreter);
+        this.gngEventlistenerManager = new GNGEventlistenerManager(interpreter, this);
 
         interpreter.objectStore["World"] = this;
 
@@ -161,7 +165,10 @@ export class WorldClass extends ObjectClass implements IWorld {
     }
 
     destroyWorld(interpreter: Interpreter) {
+        
         this.actorManager.clear();
+        this.gngEventlistenerManager.clear();
+
         this.app?.ticker.remove(this.tickerFunction!);
         interpreter.isExternalTimer = false;
         this.app?.destroy({ removeView: true }, {});
@@ -249,7 +256,11 @@ export class WorldClass extends ObjectClass implements IWorld {
     }
 
     hasActors(): boolean {
-        return this.actorManager.hasActors();
+        return this.actorManager.hasActors() || this.gngEventlistenerManager.hasEventListeners();
+    }
+
+    registerGNGEventListener(listener: IGNGEventListener, type: GNGEventListenerType): void {
+        this.gngEventlistenerManager.registerEventlistener(listener, type);
     }
 
     _setBackgroundColor(color: string | number) {

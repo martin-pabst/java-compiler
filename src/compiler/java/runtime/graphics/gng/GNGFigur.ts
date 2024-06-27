@@ -2,7 +2,7 @@ import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts
 import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
-import { ObjectClass } from "../../system/javalang/ObjectClassStringClass.ts";
+import { ObjectClass, StringClass } from "../../system/javalang/ObjectClassStringClass.ts";
 import { CircleClass } from "../CircleClass.ts";
 import { EllipseClass } from "../EllipseClass.ts";
 import { FilledShapeClass } from "../FilledShapeClass.ts";
@@ -11,13 +11,14 @@ import { PolygonClass } from "../PolygonClass.ts";
 import { RectangleClass } from "../RectangleClass.ts";
 import { GNGBaseFigur } from "./GNGBaseFigur.ts";
 import { GNGFarben } from "./GNGFarben.ts";
+import { IGNGEventListener } from "./IGNGEventListener.ts";
 
 type GNGPoint = {
     x: number,
     y: number
 }
 
-export class GNGFigur extends ObjectClass {
+export class GNGFigur extends ObjectClass implements IGNGEventListener {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "class Figur extends Object", comment: "Figur-Klasse der Graphics'n Games-Bibliothek (Cornelsen-Verlag)" },
         { type: "method", signature: "Figur()", java: GNGFigur.prototype._cj$_constructor_$Figur$, comment: "Instanziert ein neues, achsenparalleles Figur-Objekt." },
@@ -50,10 +51,11 @@ export class GNGFigur extends ObjectClass {
         { type: "method", signature: "void FigurteilFestlegenDreieck(int x1, int y1, int x2, int y2, int x3, int y3, string farbe)", java: GNGFigur.prototype._j_figurteilFestlegenDreieck, comment: "Erzeugt ein neues, dreieckiges Element und fügt es der Figur hinzu." },
         { type: "method", signature: "void FigurteilFestlegenRechteck(int x, int y, int breite, int höhe, string farbe)", java: GNGFigur.prototype._j_figurteilFestlegenRechteck, comment: "Erzeugt ein neues, rechteckiges Element einer eigenen Darstellung der Figur." },
         { type: "method", signature: "void FigurteilFestlegenEllipse(int x, int y, int breite, int höhe, string farbe)", java: GNGFigur.prototype._j_figurteilFestlegenEllipse, comment: "Erzeugt ein neues, elliptisches Element einer eigenen Darstellung der Figur." },
-        { type: "method", signature: "void AktionAusführen()", java: GNGFigur.prototype._j_emptyMethod, comment: "Diese Methode wird vom Taktgeber aufgerufen." },
-        { type: "method", signature: "void TasteGedrückt(char taste)", java: GNGFigur.prototype._j_emptyMethod, comment: "Wird aufgerufen, wenn eine Taste gedrückt wird." },
-        { type: "method", signature: "void SonderTasteGedrückt(int sondertaste)", java: GNGFigur.prototype._j_emptyMethod, comment: "Wird aufgerufen, wenn eine SonderTaste gedrückt wird." },
-        { type: "method", signature: "void MausGeklickt(int x, int y, int anzahl)", java: GNGFigur.prototype._j_emptyMethod, comment: "Wird aufgerufen, wenn eine die linke Maustaste gedrückt wird." },
+        
+        { type: "method", signature: "void AktionAusführen()", java: GNGFigur.prototype._mj$AktionAusführen$void$, comment: "Diese Methode wird vom Taktgeber aufgerufen." },
+        { type: "method", signature: "void TasteGedrückt(char taste)", java: GNGFigur.prototype._mj$TasteGedrückt$void$char, comment: "Wird aufgerufen, wenn eine Taste gedrückt wird." },
+        { type: "method", signature: "void SonderTasteGedrückt(int sondertaste)", java: GNGFigur.prototype._mj$SondertasteGedrückt$void$int, comment: "Wird aufgerufen, wenn eine SonderTaste gedrückt wird." },
+        { type: "method", signature: "void MausGeklickt(int x, int y, int anzahl)", java: GNGFigur.prototype._mj$MausGeklickt$void$int$int$int, comment: "Wird aufgerufen, wenn eine die linke Maustaste gedrückt wird." },
 
 
     ];
@@ -66,6 +68,8 @@ export class GNGFigur extends ObjectClass {
         y: 200
     }
 
+    isInitialTriangle: boolean = false;
+
 
     _cj$_constructor_$Figur$(t: Thread, callback: CallbackFunction) {
 
@@ -76,11 +80,28 @@ export class GNGFigur extends ObjectClass {
             t.s.push(this);
             this.setGNGBackgroundColor();
             this.drawInitialTriangle(t, () => {
-                this.group._scale(0.4, this.center.x, this.center.y);
+                
                 // registerEvents();
                 if (callback) callback();
             }, this.center)
         });
+
+        if(this._mj$AktionAusführen$void$ != GNGFigur.prototype._mj$AktionAusführen$void$){
+            this.group.world.registerGNGEventListener(this, "aktionAusführen");
+        }
+
+        if(this._mj$TasteGedrückt$void$char != GNGFigur.prototype._mj$TasteGedrückt$void$char){
+            this.group.world.registerGNGEventListener(this, "tasteGedrückt");
+        }
+
+        if(this._mj$SondertasteGedrückt$void$int != GNGFigur.prototype._mj$SondertasteGedrückt$void$int){
+            this.group.world.registerGNGEventListener(this, "sondertasteGedrückt");
+        }
+
+        if(this._mj$MausGeklickt$void$int$int$int != GNGFigur.prototype._mj$MausGeklickt$void$int$int$int){
+            this.group.world.registerGNGEventListener(this, "mausGeklickt");
+        }
+
 
     }
 
@@ -91,6 +112,7 @@ export class GNGFigur extends ObjectClass {
     }
 
     drawInitialTriangle(t: Thread, callback: CallbackFunction, center: GNGPoint) {
+        this.group._scale(1/this.group.scaleFactor);
         let polygon: PolygonClass = new PolygonClass();
         polygon._cj$_constructor_$Polygon$boolean$double_I(t, () => {
             t.s.pop();
@@ -108,6 +130,8 @@ export class GNGFigur extends ObjectClass {
                 circle._setBorderColorString("black");
                 circle._setBorderWidth(2);
                 this.group.add(circle);
+                this.isInitialTriangle = true;
+                this.group._scale(0.4, center.x, center.y);
                 if (callback) callback();
             }, 0, 0, 10)
         }, true, [-50, -50, 50, 0, -50, 50]);
@@ -234,6 +258,9 @@ export class GNGFigur extends ObjectClass {
         let farbe = GNGFarben[farbeString];
         if (farbe == null) farbe = 0;
 
+        if(this.isInitialTriangle) this.group.destroyAllChildren();
+        this.isInitialTriangle = false;
+
         let triangle = new PolygonClass();
         triangle._cj$_constructor_$Polygon$boolean$double_I(t, () => {   
             triangle._rotate(this.group.angle, 0, 0);
@@ -251,6 +278,9 @@ export class GNGFigur extends ObjectClass {
     _j_figurteilFestlegenRechteck(t: Thread, callback: CallbackFunction, x: number, y: number, breite: number, hoehe: number, farbeString: string){
         let farbe = GNGFarben[farbeString];
         if (farbe == null) farbe = 0;
+
+        if(this.isInitialTriangle) this.group.destroyAllChildren();
+        this.isInitialTriangle = false;
 
         let rectangle = new RectangleClass();
         rectangle._cj$_constructor_$Rectangle$double$double$double$double(t, () => {   
@@ -271,6 +301,9 @@ export class GNGFigur extends ObjectClass {
         let farbe = GNGFarben[farbeString];
         if (farbe == null) farbe = 0;
 
+        if(this.isInitialTriangle) this.group.destroyAllChildren();
+        this.isInitialTriangle = false;
+
         hoehe = hoehe - 0.1;      // hack to ensure collision-handling identical to gng (also 0.05 two lines below)
         breite = breite - 0.1;
 
@@ -287,8 +320,22 @@ export class GNGFigur extends ObjectClass {
         },x + breite / 2 + 0.05, y + hoehe / 2 + 0.05, breite / 2, hoehe / 2);
     }
 
-    _j_emptyMethod(t: Thread, callback: CallbackFunction){
-        // Dummy
+    // Eventlistener-dummies:
+    _mj$AktionAusführen$void$(t: Thread, callback: () => {} | undefined): void {
+        throw new Error("Method not implemented.");
+    }
+    _mj$TasteGedrückt$void$char(t: Thread, callback: () => {} | undefined, key: StringClass): void {
+        throw new Error("Method not implemented.");
+    }
+    _mj$SondertasteGedrückt$void$int(t: Thread, callback: () => {} | undefined, key: number): void {
+        throw new Error("Method not implemented.");
+    }
+    _mj$MausGeklickt$void$int$int$int(t: Thread, callback: () => {} | undefined, x: number, y: number, anzahl: number): void {
+        throw new Error("Method not implemented.");
+    }
+
+    _mj$TaktImpulsAusführen$void$(t: Thread, callback: (() => void) | undefined): void {
+        throw new Error("Method not implemented.");
     }
 
 }

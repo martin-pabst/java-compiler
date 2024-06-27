@@ -94,6 +94,7 @@ import { GNGKreis } from "../graphics/gng/GNGKreis.ts";
 import { GNGRechteck } from "../graphics/gng/GNGRechteck.ts";
 import { GNGDreieck } from "../graphics/gng/GNGDreieck.ts";
 import { GNGText } from "../graphics/gng/GNGText.ts";
+import { GNGFigur } from "../graphics/gng/GNGFigur.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -169,7 +170,7 @@ export class SystemModule extends JavaLibraryModule {
             JavaHamsterWorldClass, JavaHamsterClass,
 
             // Graphics'n Games (GNG)
-            GNGBaseFigur, GNGKreis, GNGRechteck, GNGDreieck, GNGText,
+            GNGBaseFigur, GNGKreis, GNGRechteck, GNGDreieck, GNGText, GNGFigur
         );
 
 
