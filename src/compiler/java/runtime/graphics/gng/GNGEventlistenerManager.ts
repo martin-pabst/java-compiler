@@ -14,6 +14,10 @@ export class GNGEventlistenerManager implements InternalMouseListener {
         "tasteGedrückt": [],
         "sondertasteGedrückt": [],
         "mausGeklickt": [],
+        "ausführen": [],
+        "taste": [],
+        "sondertaste": [],
+        "geklickt": [],
         "taktImpulsAusführen": []
     };
 
@@ -95,6 +99,12 @@ export class GNGEventlistenerManager implements InternalMouseListener {
         list.push(eventListener);
     }
 
+    removeEventlistener(eventListener: IGNGEventListener, type: GNGEventListenerType): void {
+        let list = this.listeners[type];
+        let index = list.indexOf(eventListener);
+        if(index >= 0) list.splice(index, 1);
+    }
+
     runningactThread?: Thread;
     tickHappenedWhenThreadNotEmpty: boolean = false;
     aktionenAusfuehren(dt: number) {
@@ -105,7 +115,7 @@ export class GNGEventlistenerManager implements InternalMouseListener {
 
         this.tickHappenedWhenThreadNotEmpty = false;
 
-        if (this.listeners["aktionAusführen"].length == 0 && this.listeners["taktImpulsAusführen"].length == 0) return;
+        if (this.listeners["aktionAusführen"].length == 0 && this.listeners["taktImpulsAusführen"].length == 0 && this.listeners["ausführen"].length == 0) return;
 
         this.runningactThread = this.interpreter.scheduler.createThread("GNG AktionAusführen method-thread");
         for (let actor of this.listeners["aktionAusführen"]) {
@@ -114,6 +124,10 @@ export class GNGEventlistenerManager implements InternalMouseListener {
 
         for(let actor of this.listeners["taktImpulsAusführen"]){
             actor._mj$TaktImpulsAusführen$void$(this.runningactThread, undefined);
+        }
+
+        for(let actor of this.listeners["ausführen"]){
+            actor._mj$Ausführen$void$(this.runningactThread, undefined);
         }
 
         if (this.runningactThread.programStack.length > 0) {
@@ -158,23 +172,32 @@ export class GNGEventlistenerManager implements InternalMouseListener {
     }
 
     onKeyPressed(key: string): void {
-        if (this.listeners["tasteGedrückt"].length == 0) return;
-        let t = this.interpreter.scheduler.createThread("GNG TasteGedrückt event thread");
-
-        for (let actor of this.listeners["tasteGedrückt"]) {
-            actor._mj$TasteGedrückt$void$char(t, undefined, new StringClass(key));
+        if (this.listeners["tasteGedrückt"].length + this.listeners["taste"].length > 0) {
+            let t = this.interpreter.scheduler.createThread("GNG TasteGedrückt event thread");
+    
+            for (let actor of this.listeners["tasteGedrückt"]) {
+                actor._mj$TasteGedrückt$void$char(t, undefined, key);
+            }
+            for (let actor of this.listeners["taste"]) {
+                actor._mj$Taste$void$char(t, undefined, key);
+            }
+            t.state = ThreadState.runnable;
         }
-        t.state = ThreadState.runnable;
 
         let keyCode = this.keyToKeyCodeMap[key];
         if (keyCode) {
-            if (this.listeners["sondertasteGedrückt"].length == 0) return;
-            let t = this.interpreter.scheduler.createThread("GNG SondertasteGedrückt event thread");
+            if (this.listeners["sondertasteGedrückt"].length + this.listeners["sondertaste"].length > 0){
+                let t = this.interpreter.scheduler.createThread("GNG SondertasteGedrückt event thread");
+    
+                for (let actor of this.listeners["sondertasteGedrückt"]) {
+                    actor._mj$SondertasteGedrückt$void$int(t, undefined, keyCode);
+                }
+                for (let actor of this.listeners["sondertaste"]) {
+                    actor._mj$SonderTaste$void$int(t, undefined, keyCode);
+                }
+                t.state = ThreadState.runnable;
 
-            for (let actor of this.listeners["sondertasteGedrückt"]) {
-                actor._mj$SondertasteGedrückt$void$int(t, undefined, keyCode);
-            }
-            t.state = ThreadState.runnable;
+            } 
         }
     }
 
