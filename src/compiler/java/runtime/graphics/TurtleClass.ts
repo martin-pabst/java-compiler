@@ -150,6 +150,10 @@ export class TurtleClass extends FilledShapeClass {
         this.moveTurtleTo(lastLineElement.x, lastLineElement.y, this.turtleAngleDeg);
     }
 
+    _setAngle(angleDeg: number){
+        this._turn(angleDeg + this.turtleAngleDeg)
+    }
+
     newTurtleX!: number;
     newTurtleY!: number;
     newAngleDeg!: number;

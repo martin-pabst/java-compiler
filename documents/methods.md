@@ -100,3 +100,9 @@ type MethodObject = {
   steps: Step[]
 }
 ```
+
+
+# constructors
+  * native constructors
+  * java constructors
+  * later: typescript constructors

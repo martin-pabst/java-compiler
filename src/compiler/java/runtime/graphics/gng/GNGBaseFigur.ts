@@ -17,7 +17,7 @@ export class GNGBaseFigur extends ObjectClass {
         {type: "field", signature: "protected string farbe", comment: "Farbe des Grafikobjekts"},
         {type: "field", signature: "protected int x", template: `§1.moveAnchor.x`, comment: "x-Position des Grafikobjekts"},
         {type: "field", signature: "protected int y", template: `§1.moveAnchor.y`, comment: "y-Position des Grafikobjekts"},
-        {type: "field", signature: "protected int angle", template: `Math.round(§1.angle)`, comment: "Blickrichtung des Grafikobjekts in Grad"},
+        {type: "field", signature: "protected int winkel", template: `Math.round(§1.angle)`, comment: "Blickrichtung des Grafikobjekts in Grad"},
         {type: "field", signature: "protected int größe", template: `§1.width`, comment: "Größe des Grafikobjekts (100 entspricht 'normalgroß')"},
         {type: "field", signature: "protected boolean sichtbar", template: `§1.filledShape.container.visible`, comment: "true, wenn das Grafikobjekt sichtbar ist"},
 
@@ -73,9 +73,8 @@ export class GNGBaseFigur extends ObjectClass {
 
     _farbeSetzen(farbe: string){
         this.colorString = farbe;
-
+        if(!farbe) farbe = "schwarz";
         let color: number = GNGFarben[farbe.toLocaleLowerCase()];
-        if (color == null) color = 0x000000; // default: schwarz
 
         this.filledShape._setFillColorInt(color);
         this.filledShape.render();
