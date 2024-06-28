@@ -324,7 +324,7 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
     _mj$AktionAusführen$void$(t: Thread, callback: () => {} | undefined): void {
         throw new Error("Method not implemented.");
     }
-    _mj$TasteGedrückt$void$char(t: Thread, callback: () => {} | undefined, key: StringClass): void {
+    _mj$TasteGedrückt$void$char(t: Thread, callback: () => {} | undefined, key: string): void {
         throw new Error("Method not implemented.");
     }
     _mj$SondertasteGedrückt$void$int(t: Thread, callback: () => {} | undefined, key: number): void {
@@ -335,6 +335,19 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
     }
 
     _mj$TaktImpulsAusführen$void$(t: Thread, callback: (() => void) | undefined): void {
+        throw new Error("Method not implemented.");
+    }
+
+    _mj$Ausführen$void$(t: Thread, callback: (() => void) | undefined): void {
+        throw new Error("Method not implemented.");
+    }
+    _mj$Taste$void$char(t: Thread, callback: (() => void) | undefined, key: string): void {
+        throw new Error("Method not implemented.");
+    }
+    _mj$SonderTaste$void$int(t: Thread, callback: (() => void) | undefined, key: number): void {
+        throw new Error("Method not implemented.");
+    }
+    _mj$Geklickt$void$int$int$int(t: Thread, callback: (() => void) | undefined, x: number, y: number, anzahl: number): void {
         throw new Error("Method not implemented.");
     }
 

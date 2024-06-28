@@ -96,7 +96,6 @@ export class WorldClass extends ObjectClass implements IWorld {
         }
 
         this.actorManager = new ActorManager(interpreter);
-        this.gngEventlistenerManager = new GNGEventlistenerManager(interpreter, this);
 
         interpreter.objectStore["World"] = this;
 
@@ -131,6 +130,8 @@ export class WorldClass extends ObjectClass implements IWorld {
             interpreter.isExternalTimer = true;
 
             this.mouseManager = new MouseManager(this);
+
+            this.gngEventlistenerManager = new GNGEventlistenerManager(interpreter, this);
 
             t.state = ThreadState.runnable;
 
