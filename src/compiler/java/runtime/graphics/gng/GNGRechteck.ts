@@ -20,10 +20,12 @@ export class GNGRechteck extends GNGBaseFigur {
     static type: NonPrimitiveType;
 
     get breite(): number {
+        if(!this.filledShape?.container?.scale) return 0;
         return Math.round(Math.abs(this.width * this.filledShape.container.scale.x));
     }
     
     get höhe(): number {
+        if(!this.filledShape?.container?.scale) return 0;
         return Math.round(Math.abs(this.height * this.filledShape.container.scale.y));
     }
     
@@ -41,7 +43,7 @@ export class GNGRechteck extends GNGBaseFigur {
 
         rectangle.container.localTransform.identity();
         rectangle.container.localTransform.translate(-rotationCenterX, -rotationCenterY);
-        rectangle.container.localTransform.rotate(-rectangle.container / 180 * Math.PI);
+        rectangle.container.localTransform.rotate(-this.filledShape.angle / 180 * Math.PI);
         rectangle.container.localTransform.translate(rotationCenterX, rotationCenterY);
         rectangle.container.setFromMatrix(rectangle.container.localTransform);
         rectangle.container.updateLocalTransform();

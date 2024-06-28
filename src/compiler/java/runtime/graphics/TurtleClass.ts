@@ -10,10 +10,10 @@ import { CallbackParameter } from '../../../common/interpreter/CallbackParameter
 import { StringClass } from '../system/javalang/ObjectClassStringClass';
 import { Punkt, abstandPunktZuStrecke, polygonBerührtPolygon, polygonEnthältPunkt, steckenzugSchneidetStreckenzug, streckenzugEnthältPunkt } from '../../../../tools/MatheTools.ts';
 
-type LineElement = {
+export type LineElement = {
     x: number,
     y: number,
-    color: number | undefined,
+    color: number | null,
     alpha: number,
     lineWidth: number
 }
@@ -66,7 +66,7 @@ export class TurtleClass extends FilledShapeClass {
     penIsDown: boolean = true;
 
     lastLineWidth: number = 0;
-    lastColor: number | undefined = 0;
+    lastColor: number | null = 0;
     lastAlpha: number = 0;
 
     lastTurtleAngleDeg: number = 0; // angle in Rad
@@ -114,6 +114,8 @@ export class TurtleClass extends FilledShapeClass {
 
 
             this.render();
+
+            if(callback) callback();
         });   // call base class constructor
 
 
@@ -168,7 +170,7 @@ export class TurtleClass extends FilledShapeClass {
 
         let lastLineElement: LineElement = this.lineElements[this.lineElements.length - 1];
 
-        let newBorderColor = this.penIsDown ? this.borderColor : undefined;
+        let newBorderColor = this.penIsDown ? this.borderColor! : null;
         let turtleAngleRad = this.turtleAngleDeg / 180.0 * Math.PI;
 
         let newLineElement: LineElement;
@@ -216,7 +218,7 @@ export class TurtleClass extends FilledShapeClass {
         let newLineElement: LineElement = {
             x: x,
             y: y,
-            color: undefined,
+            color: null,
             alpha: this.borderAlpha,
             lineWidth: this.borderWidth
         }
@@ -523,7 +525,7 @@ export class TurtleClass extends FilledShapeClass {
                     if (le.lineWidth != this.lastLineWidth || le.color != this.lastColor || le.alpha != this.lastAlpha) {
                         g.stroke({
                             width: this.lastLineWidth,
-                            color: this.lastColor,
+                            color: this.lastColor == null ? 0x0 : this.lastColor,
                             alpha: this.lastAlpha,
                             alignment: 0.5
                         })
@@ -553,7 +555,7 @@ export class TurtleClass extends FilledShapeClass {
                 let lastLineElement = this.lineElements[this.lineElements.length - 1];
                 g.stroke({
                     width: lastLineElement.lineWidth,
-                    color: lastLineElement.color,
+                    color: lastLineElement.color == null ? 0x0 : lastLineElement.color,
                     alpha: lastLineElement.alpha,
                     alignment: 0.5
                 })
