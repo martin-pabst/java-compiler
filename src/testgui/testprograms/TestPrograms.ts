@@ -1,8 +1,9 @@
 export var testProgramsList = [
    ['', ``],
    ['GNGFlowerTest', `Blumenwelt b = new Blumenwelt();
-
-   println();
+Console.log(b.blume1);
+Console.log(b.blume2);
+println();
    // Florian f = new Florian();
    //f.WinkelSetzen(270);
    // f.LinksDrehen();
@@ -14,30 +15,33 @@ export var testProgramsList = [
     * @author Peter Brichzin
     * @version 12.12.19
     */
-   class Blumenwelt
-   {
+class Blumenwelt
+{
     
+   Blume blume1;
+   Blume blume2;
        /**
         * Baut das Szenario auf.
         */
-      Blumenwelt()
-      {
+   Blumenwelt()
+   {
            // Diesen Abschnitt ignorieren, es werden die 10x10 Zellen der Welt erzeugt und positioniert
-         for (int zellenNummerX = 0; zellenNummerX < 10; zellenNummerX = zellenNummerX + 1)
+      for (int zellenNummerX = 0; zellenNummerX < 10; zellenNummerX = zellenNummerX + 1)
+      {
+         for (int zellenNummerY = 0; zellenNummerY < 10; zellenNummerY += 1)
          {
-            for (int zellenNummerY = 0; zellenNummerY < 10; zellenNummerY += 1)
-            {
      
-               new Zelle(50 * zellenNummerX + 2, 50 * zellenNummerY + 2, "grün");
-            }
+            new Zelle(50 * zellenNummerX + 2, 50 * zellenNummerY + 2, "grün");
          }
+      }
            // Abschnittsende
    
-         new Blume(6, 4);
-         new Blume(5, 4);
+      blume1 = new Blume(6, 4);
+      blume2 = new Blume(5, 4);
            
-      }
-   } 
+   }
+} 
+
    
    class Zelle extends Rechteck 
    {

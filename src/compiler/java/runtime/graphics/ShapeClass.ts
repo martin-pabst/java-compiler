@@ -183,6 +183,7 @@ export class ShapeClass extends ActorClass {
         this.container._didLocalTransformChangeId = this.container._didChangeId;
 
         this.setWorldTransformAndHitPolygonDirty();
+
     }
 
     _rotate(angleInDeg: number, cX?: number, cY?: number) {
