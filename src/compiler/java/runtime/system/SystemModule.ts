@@ -97,6 +97,7 @@ import { GNGText } from "../graphics/gng/GNGText.ts";
 import { GNGFigur } from "../graphics/gng/GNGFigur.ts";
 import { GNGAktionsempfaenger } from "../graphics/gng/GNGAktionsempfaengerInterface.ts";
 import { GNGZeichenfensterClass } from "../graphics/gng/GNGZeichenfenster.ts";
+import { GNGTurtle } from "../graphics/gng/GNGTurtle.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -173,7 +174,7 @@ export class SystemModule extends JavaLibraryModule {
 
             // Graphics'n Games (GNG)
             GNGBaseFigur, GNGKreis, GNGRechteck, GNGDreieck, GNGText, GNGFigur,
-            GNGAktionsempfaenger, GNGZeichenfensterClass
+            GNGAktionsempfaenger, GNGZeichenfensterClass, GNGTurtle
         );
 
 

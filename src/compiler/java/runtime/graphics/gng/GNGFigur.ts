@@ -351,4 +351,7 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
         throw new Error("Method not implemented.");
     }
 
+    _containsPoint(x: number, y: number){
+        return this.group._containsPoint(x, y);
+    }
 }

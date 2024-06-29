@@ -34,46 +34,46 @@ export class GroupClass extends ShapeClass {
         this._cj$_constructor_$Shape$(t, () => {
             this.container = new PIXI.Container();
             this.world.app.stage.addChild(this.container);
-            if(callback) callback();
+            if (callback) callback();
         });
     }
 
-    _cj$_constructor_$Group$T(t: Thread, callback: CallbackFunction, shapes: ShapeClass[]){
+    _cj$_constructor_$Group$T(t: Thread, callback: CallbackFunction, shapes: ShapeClass[]) {
         this._cj$_constructor_$Group$(t, () => {
-            if(!shapes) return;
-            for(let shape of shapes){
+            if (!shapes) return;
+            for (let shape of shapes) {
                 this.add(shape);
             }
-            if(callback) callback();
+            if (callback) callback();
         });
     }
 
-    render(){
-        
+    render() {
+
     }
 
     indexOf(shape: ShapeClass): number {
         return this.shapes.indexOf(shape);
     }
 
-    checkIndex(index: number){
-        if(index < 0) throw new RuntimeExceptionClass("Der Index ist kleiner als 0.");
-        if(index >= this.shapes.length) throw new RuntimeExceptionClass("Zugriff auf das Shape mit Index " + index + " einer Gruppe mit " + this.shapes.length + " Elementen.");
+    checkIndex(index: number) {
+        if (index < 0) throw new RuntimeExceptionClass("Der Index ist kleiner als 0.");
+        if (index >= this.shapes.length) throw new RuntimeExceptionClass("Zugriff auf das Shape mit Index " + index + " einer Gruppe mit " + this.shapes.length + " Elementen.");
     }
 
     removeWithIndex(index: number): void {
         this.checkIndex(index);
         this.remove(this.shapes[index]);
     }
-    
+
     get(index: number): ShapeClass {
         this.checkIndex(index);
         return this.shapes[index];
     }
 
 
-    addMultiple(shapes: ShapeClass[]){
-        for(let shape of shapes){
+    addMultiple(shapes: ShapeClass[]) {
+        for (let shape of shapes) {
             this.add(shape);
         }
     }
@@ -95,7 +95,9 @@ export class GroupClass extends ShapeClass {
             shape.belongsToGroup.remove(shape);
         } else {
             let index = this.world.shapesWhichBelongToNoGroup.indexOf(shape);
-            this.world.shapesWhichBelongToNoGroup.splice(index, 1);
+            if(index >= 0){
+                this.world.shapesWhichBelongToNoGroup.splice(index, 1);
+            }
         }
         
         this.shapes.push(shape);
@@ -124,7 +126,7 @@ export class GroupClass extends ShapeClass {
         let x: number = (p0.x * (count - 1) + centerOfAddedShape.x) / count;
         let y: number = (p0.y * (count - 1) + centerOfAddedShape.y) / count;
 
-        let p1: PIXI.Point =  this.getWorldTransform().applyInverse(new PIXI.Point(x, y));
+        let p1: PIXI.Point = this.getWorldTransform().applyInverse(new PIXI.Point(x, y));
 
         this.centerXInitial = p1.x;
         this.centerYInitial = p1.y;
@@ -139,8 +141,8 @@ export class GroupClass extends ShapeClass {
         return false;
     }
 
-    public destroyAllChildren(){
-        while(this.shapes.length > 0){
+    public destroyAllChildren() {
+        while (this.shapes.length > 0) {
             this.shapes.pop()!.destroy();
         }
     }
@@ -167,7 +169,7 @@ export class GroupClass extends ShapeClass {
         shape.getWorldTransform();
         this.container.removeChild(shape.container);
         this.world.app.stage.addChild(shape.container);
-        
+
         let inverseStageTransform = new PIXI.Matrix().copyFrom(this.world.app.stage.localTransform).invert();
         inverseStageTransform.append(shape.getWorldTransform());
         // shape.container.localTransform.copyFrom(inverseStageTransform);
@@ -187,7 +189,7 @@ export class GroupClass extends ShapeClass {
         let x: number = (p0.x * (count + 1) - centerOfRemovedShape.x) / (count);
         let y: number = (p0.y * (count + 1) - centerOfRemovedShape.y) / (count);
 
-        let p1: PIXI.Point =  this.getWorldTransform().applyInverse(new PIXI.Point(x, y));
+        let p1: PIXI.Point = this.getWorldTransform().applyInverse(new PIXI.Point(x, y));
 
         this.centerXInitial = p1.x;
         this.centerYInitial = p1.y;
@@ -203,7 +205,7 @@ export class GroupClass extends ShapeClass {
     }
 
     public destroy(): void {
-        for(let shape of this.shapes){
+        for (let shape of this.shapes) {
             shape.destroy();
         }
         super.destroy();
@@ -211,7 +213,7 @@ export class GroupClass extends ShapeClass {
 
     setWorldTransformAndHitPolygonDirty(): void {
         this.worldTransformDirty = true;
-        for(let shape of this.shapes) shape.setWorldTransformAndHitPolygonDirty();
+        for (let shape of this.shapes) shape.setWorldTransformAndHitPolygonDirty();
     }
 
 

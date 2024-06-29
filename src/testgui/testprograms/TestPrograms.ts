@@ -1,5 +1,119 @@
 export var testProgramsList = [
    ['', ``],
+   ['GNGFlowerTest', `Blumenwelt b = new Blumenwelt();
+Console.log(b.blume1);
+Console.log(b.blume2);
+println();
+   // Florian f = new Florian();
+   //f.WinkelSetzen(270);
+   // f.LinksDrehen();
+   //f.NachNordenGehen();    
+   
+   /**
+    * Legt die Blumenwelt an und die nicht beweglichen Objekte. 
+    * 
+    * @author Peter Brichzin
+    * @version 12.12.19
+    */
+class Blumenwelt
+{
+    
+   Blume blume1;
+   Blume blume2;
+       /**
+        * Baut das Szenario auf.
+        */
+   Blumenwelt()
+   {
+           // Diesen Abschnitt ignorieren, es werden die 10x10 Zellen der Welt erzeugt und positioniert
+      for (int zellenNummerX = 0; zellenNummerX < 10; zellenNummerX = zellenNummerX + 1)
+      {
+         for (int zellenNummerY = 0; zellenNummerY < 10; zellenNummerY += 1)
+         {
+     
+            new Zelle(50 * zellenNummerX + 2, 50 * zellenNummerY + 2, "grün");
+         }
+      }
+           // Abschnittsende
+   
+      blume1 = new Blume(6, 4);
+      blume2 = new Blume(5, 4);
+           
+   }
+} 
+
+   
+   class Zelle extends Rechteck 
+   {
+   
+       /**
+        * Platziert eine Zelle
+        */
+      Zelle(int xLinksOben, int yLinksOben, String farbeNeu)
+      {
+         // super();
+         PositionSetzen(xLinksOben, yLinksOben);
+         GrößeSetzen(46, 46);
+         FarbeSetzen(farbeNeu);
+      }
+       
+   }
+   
+   
+   /**
+    *  Blume, die darauf wartet gesammelt zu werden
+    * 
+    * @author Peter Brichzin
+    * @version 1.0
+    */
+   public class Blume extends Figur
+   {
+      /**
+      * Der Konstruktor1 erzeugt eine Blume an der Pixel-Position (225/125). 
+       */
+      Blume() 
+      {
+         super();
+         this.FigurteilFestlegenEllipse(0, 0, 25, 25, "gelb");
+         this.FigurteilFestlegenEllipse(0, -20, 20, 20, "blau");
+         this.FigurteilFestlegenEllipse(20, -10, 20, 20, "blau");
+         this.FigurteilFestlegenEllipse(20, 10, 20, 20, "blau");
+         this.FigurteilFestlegenEllipse(0, 20, 20, 20, "blau");
+         this.FigurteilFestlegenEllipse(-20, -10, 20, 20, "blau");
+         this.FigurteilFestlegenEllipse(-20, 10, 20, 20, "blau");
+         this.PositionSetzen(225, 125);
+         this.GanzNachVornBringen();
+      }
+       
+      /**
+      * Der Konstruktor2 erzeugt eine Blume in einem Spielfeld mit 10x10 Zellen.
+      * 
+      * @param xNeu  x-Position der Blume
+      * @param yNeu  y-Position der Blume
+      * 
+      */
+      Blume(int xNeu, int yNeu)
+      {
+         super();
+         this.FigurteilFestlegenEllipse(0, 0, 25, 25, "gelb");
+         this.FigurteilFestlegenEllipse(0, -20, 20, 20, "blau");
+         this.FigurteilFestlegenEllipse(20, -10, 20, 20, "blau");
+         this.FigurteilFestlegenEllipse(20, 10, 20, 20, "blau");
+         this.FigurteilFestlegenEllipse(0, 20, 20, 20, "blau");
+         this.FigurteilFestlegenEllipse(-20, -10, 20, 20, "blau");
+         this.FigurteilFestlegenEllipse(-20, 10, 20, 20, "blau");
+         this.GanzNachVornBringen();
+          
+         if(xNeu < 10 && xNeu >= 0 && yNeu < 10 && yNeu >= 0)
+         {
+            this.PositionSetzen(xNeu * 50 + 25, yNeu * 50 + 25);
+         }
+      }
+       
+   }
+   
+   
+   `],
    ['GNGFigurTest', `var m = new Männchen();
    m.nachLinksSchauen();
    

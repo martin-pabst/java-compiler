@@ -109,4 +109,8 @@ export class GNGBaseFigur extends ObjectClass {
     _nachHintenBringen(){
         this.filledShape.bringOnePlaneFurtherToBack();
     }
+
+    _containsPoint(x: number, y: number){
+        return this.filledShape._containsPoint(x, y);
+    }
 }
