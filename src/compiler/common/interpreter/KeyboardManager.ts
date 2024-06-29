@@ -6,6 +6,11 @@ export type KeyPressedListener = (key: string) => void;
 export type KeyUpListener = (key: string) => void;
 export type KeyDownListener = (key: string, isShift: boolean, isCtrl: boolean, isAlt: boolean) => void;
 
+export interface InternalKeyboardListener {
+    onKeyDown(key: string, isShift: boolean, isCtrl: boolean, isAlt: boolean): void;
+    looseKeyboardFocus(): void;
+}
+
 /**
  * Replaces old KeyboardTool
  */
@@ -16,6 +21,8 @@ export class KeyboardManager {
     private keyPressedCallbacks: KeyPressedListener[] = [];
     private keyUpCallbacks: KeyUpListener[] = [];
     private keyDownCallbacks: KeyDownListener[] = [];
+
+    private internalKeyboardListener: InternalKeyboardListener[] = [];
 
     constructor(private element: JQuery<any>, private main: IMain) {
         this.registerListeners(element);
@@ -91,6 +98,14 @@ export class KeyboardManager {
             return true;
         });
 
+        element.on("keydown", (e) => {
+            let k = e.key;
+            for (let kpc of that.internalKeyboardListener) {
+                kpc.onKeyDown(k, e.shiftKey, e.ctrlKey, e.altKey);
+            }
+            return true;
+        });
+
     }
 
     isPressed(key: string) {
@@ -102,6 +117,7 @@ export class KeyboardManager {
         this.keyPressedCallbacks = [];
         this.keyDownCallbacks = [];
         this.keyUpCallbacks = [];
+        this.internalKeyboardListener = [];
     }
 
     addKeyPressedListener(listener: KeyPressedListener) {
@@ -114,6 +130,15 @@ export class KeyboardManager {
 
     addKeyDownListener(listener: KeyDownListener) {
         this.keyDownCallbacks.push(listener);
+    }
+
+    addInternalKeyboardListener(listener: InternalKeyboardListener){
+        this.internalKeyboardListener.push(listener);
+    }
+
+    removeInternalKeyboardListener(listener: InternalKeyboardListener){
+        let  index = this.internalKeyboardListener.indexOf(listener);
+        if(index >= 0) this.internalKeyboardListener.splice(index, 1);
     }
 
     removeKeyPressedListener(listener: KeyPressedListener){

@@ -3606,4 +3606,25 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Integer value expected.",
     })
 
+    /**
+     * class GUIComponent
+     */
+    static GUIComponentClassComment = () => lm({
+    "de": "Oberklasse für alle GUI-Komponenten",
+    "en": "Base class of all GUI components",
+    })
+
+
+    /**
+     * interface ChangeListener
+     */
+    static ChangeListenerInterfaceComment = () => lm({
+    "de": "Listener-Interface für GUI-Klassen (Button, TextField, Checkbox, Radiobutton)",
+    "en": "Listener interface for GUI classes (Button, TextField, Checkbox, Radiobutton)",
+    })
+
+    static ChangeListenerOnChangeComment = () => lm({
+    "de": "Wird immer dann aufgerufen, wenn sich das GUI-Objekt verändert hat.",
+    "en": "Is being called whenever the GUI-object has changed.",
+    })
 }  
