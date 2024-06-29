@@ -3614,6 +3614,63 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Base class of all GUI components",
     })
 
+    static GUIComponentOnChangeComment = () => lm({
+    "de": "Wird aufgerufen, wenn sich der Wert der GUI-Komponente aufgrund von Benutzeraktionen ändert.",
+    "en": "Gets called whenever this GUI-Component changes it's value.",
+    })
+
+    static GUIComponentAddChangeListenerComment = () => lm({
+    "de": "Fügt einen ChangeListener hinzu, dessen onChange-Methode immer dann aufgerufen wird, wenn sich der Wert der GUI-Komponente aufgrund von Benutzeraktionen ändert.",
+    "en": "Adds a ChangeListener whose onChange-method gets called whenever this component's value changes.",
+    })
+
+    static GUIComponentGetWidthComment = () => lm({
+    "de": "Gibt die Breite des GUI-Objekts zurück.",
+    "en": "Returns width of this GUI object.",
+    })
+
+    static GUIComponentGetHeightComment = () => lm({
+    "de": "Gibt die Höhe des GUI-Objekts zurück.",
+    "en": "Returns height of this GUI object.",
+    })
+
+    /**
+     * class GuiTextComponent
+     */
+    static GuiTextComponentClassComment = () => lm({
+    "de": "Abstrakte Oberklasse für alle Gui-Komponenten mit Textanteil",
+    "en": "Abstract base class for all GUI components that display text",
+    })
+
+    static GuiTextComponentSetFontsizeComment = () => lm({
+    "de": "Setzt die Schriftgröße des Textes (Einheit: Pixel).",
+    "en": "Set fontsize in pixels.",
+    })
+
+    static GuiTextComponentGetFontsizeComment = () => lm({
+    "de": "Gibt die Schriftgröße zurück.",
+    "en": "Returns fontsize.",
+    })
+
+    static GuiTextComponentSetTextComment = () => lm({
+    "de": "Setzt den Text.",
+    "en": "Set text of this component.",
+    })
+
+    static GuiTextComponentGetTextComment = () => lm({
+    "de": "Gibt den Text zurück.",
+    "en": "Returns text of this component.",
+    })
+
+    static GuiTextComponentSetStyleComment = () => lm({
+    "de": "Setzt die Eigenschaften Fettdruck (bold) und Schrägschrift (italic).",
+    "en": "Set style of text (bold, italic).",
+    })
+
+    static GuiTextComponentSetTextColor = () => lm({
+    "de": "Setzt die Textfarbe. Die Farbe wird als int-Wert gegeben, wobei farbe == 256*256*rot + 256*grün + blau",
+    "en": "Set text color. Color is given as int value: color == 256*256*red + 256*green + blue",
+    })
 
     /**
      * interface ChangeListener
@@ -3625,6 +3682,8 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
 
     static ChangeListenerOnChangeComment = () => lm({
     "de": "Wird immer dann aufgerufen, wenn sich das GUI-Objekt verändert hat.",
-    "en": "Is being called whenever the GUI-object has changed.",
+    "en": "Gets called whenever the GUI-object has changed.",
     })
+
+
 }  
