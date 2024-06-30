@@ -26,9 +26,9 @@ export class LoadController {
      */
     tick(timerIntervalInMs: number) {
         let t0 = performance.now();
-        
-        if(this.scheduler.runningThreads.length > 0)
-        console.log("started batch: " + t0);
+
+        // if(this.scheduler.runningThreads.length > 0)
+        // console.log("started batch: " + t0);
 
         // we don't trust given timerIntervalInMs if we can measure
         // elapsed time since last call ourselves:

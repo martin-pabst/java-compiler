@@ -96,6 +96,9 @@ export class Interpreter {
         // TODO: This wires up speedcontrol with interpreter
         // controlButtons.setInterpreter(this);
 
+        //@ts-ignore
+        p5.disableFriendlyErrors = true
+
         this.printManager = printManager || new DummyPrintManager();
 
         this.registerActions();
@@ -113,14 +116,14 @@ export class Interpreter {
         if (!executable) return;
         this.executable = executable;
         // if (executable.mainModule || executable.hasTests()) {
-            executable.compileToJavascript();
-            if (executable.isCompiledToJavascript) {
-                this.init(executable);
-                this.setState(SchedulerState.stopped);
-                this.testManager?.markTestsInEditor();
-            } else {
-                this.setState(SchedulerState.not_initialized);
-            }
+        executable.compileToJavascript();
+        if (executable.isCompiledToJavascript) {
+            this.init(executable);
+            this.setState(SchedulerState.stopped);
+            this.testManager?.markTestsInEditor();
+        } else {
+            this.setState(SchedulerState.not_initialized);
+        }
         // } else {
         //     this.setState(SchedulerState.not_initialized);
         // }
@@ -173,7 +176,7 @@ export class Interpreter {
 
     showProgramPointer(_textPositionWithModule?: ProgramPointerPositionInfo, tag?: string) {
         if (this.programPointerManager) {
-            if(!_textPositionWithModule) _textPositionWithModule = this.scheduler.getNextStepPosition();
+            if (!_textPositionWithModule) _textPositionWithModule = this.scheduler.getNextStepPosition();
             if (_textPositionWithModule?.range) {
                 if (_textPositionWithModule.range.startLineNumber >= 0) {
 
@@ -269,8 +272,8 @@ export class Interpreter {
         this.start();
         this.runREPLSynchronously();
     }
-    
-    runREPLSynchronously(){
+
+    runREPLSynchronously() {
         this.scheduler.runsSynchronously = true;
         this.scheduler.setState(SchedulerState.running);
         try {
@@ -465,7 +468,7 @@ export class Interpreter {
 
     hasActorsOrPApplet(): boolean {
 
-        if(this.objectStore["PApplet"]) return true;
+        if (this.objectStore["PApplet"]) return true;
 
         let world: IWorld = this.objectStore["World"];
         if (!world) return false;

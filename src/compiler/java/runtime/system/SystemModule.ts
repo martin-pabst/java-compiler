@@ -98,6 +98,10 @@ import { GNGFigur } from "../graphics/gng/GNGFigur.ts";
 import { GNGAktionsempfaenger } from "../graphics/gng/GNGAktionsempfaengerInterface.ts";
 import { GNGZeichenfensterClass } from "../graphics/gng/GNGZeichenfenster.ts";
 import { GNGTurtle } from "../graphics/gng/GNGTurtle.ts";
+import { GuiComponentClass } from "../graphics/gui/GuiComponentClass.ts";
+import { GuiTextComponentClass } from "../graphics/gui/GuiTextComponentClass.ts";
+import { ChangeListenerInterface } from "../graphics/gui/ChangeListenerInterface.ts";
+import { ButtonClass } from "../graphics/gui/ButtonClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -171,6 +175,9 @@ export class SystemModule extends JavaLibraryModule {
 
             // Java Hamster
             JavaHamsterWorldClass, JavaHamsterClass,
+
+            // Gui components
+            ChangeListenerInterface, GuiComponentClass, GuiTextComponentClass, ButtonClass,
 
             // Graphics'n Games (GNG)
             GNGBaseFigur, GNGKreis, GNGRechteck, GNGDreieck, GNGText, GNGFigur,

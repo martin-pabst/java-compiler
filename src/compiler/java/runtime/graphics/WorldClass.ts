@@ -158,6 +158,7 @@ export class WorldClass extends ObjectClass implements IWorld {
         let onProgramStoppedCallback = () => {
             this.onProgramStopped();
             interpreter.eventManager.off(onProgramStoppedCallback);
+            this.mouseManager.unregisterListeners();
         }
 
         interpreter.eventManager.on("resetRuntime", onResetRuntimeCallback)

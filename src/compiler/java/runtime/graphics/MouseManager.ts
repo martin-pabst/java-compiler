@@ -19,8 +19,17 @@ export class MouseManager {
 
     shapesWithImplementedMouseMethods: ShapeClass[] = [];
 
+    listeners: Map<string, any> = new Map();
+
     constructor(private world: IWorld) {
         this.registerListeners();
+    }
+
+    unregisterListeners(){
+        let canvas = this.world.app!.canvas;
+        for (let mouseEventKind of ["mouseup", "mousedown", "mousemove", "mouseenter", "mouseleave"]) {
+            canvas.removeEventListener(mouseEventKind, this.listeners.get(mouseEventKind));
+        }
     }
 
     registerListeners() {
@@ -35,8 +44,9 @@ export class MouseManager {
                 eventType = eventType.replace('mouse', 'pointer');
             }
 
+            let listener: any;
             //@ts-ignore
-            canvas.addEventListener(mouseEventKind, (e: MouseEvent) => {
+            canvas.addEventListener(mouseEventKind,  listener = (e: MouseEvent) => {
                 let x = that.world.width * e.offsetX / canvas.width;
                 let y = that.world.height * e.offsetY / canvas.height;
 
@@ -75,6 +85,8 @@ export class MouseManager {
                 // }
 
             });
+
+            this.listeners.set(mouseEventKind, listener);
 
         }
 

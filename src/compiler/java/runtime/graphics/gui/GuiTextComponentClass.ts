@@ -53,18 +53,20 @@ export class GuiTextComponentClass extends GuiComponentClass {
         _cj$_constructor_$GuiTextComponent$(t: Thread, callback: CallbackFunction, 
             registerAsMouseListener: boolean, registerAsKeyboardListener: boolean,
             fontsize: number, text: string, fontFamily?: string){
-                this._cj$_constructor$GuiComponent$(t, callback, registerAsMouseListener, registerAsKeyboardListener);
+                this._cj$_constructor$GuiComponent$(t, () => {
+                    this.fontsize = fontsize || 10;
+                    this.fontFamily = fontFamily || "sans serif";
+                    this.text = text;
+                    if (this.fontsize == 0) this.fontsize = 10;
+            
+                    this.textStyle.fontSize = fontsize;
+            
+                    if (fontFamily != null) {
+                        this.textStyle.fontFamily = fontFamily;
+                    }
+                    if(callback) callback();
+                }, registerAsMouseListener, registerAsKeyboardListener);
 
-                this.fontsize = fontsize || 10;
-                this.fontFamily = fontFamily || "sans serif";
-                this.text = text;
-                if (this.fontsize == 0) this.fontsize = 10;
-        
-                this.textStyle.fontSize = fontsize;
-        
-                if (fontFamily != null) {
-                    this.textStyle.fontFamily = fontFamily;
-                }
         }
 
     setStyle(isBold: boolean, isItalic: boolean) {

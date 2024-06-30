@@ -3685,5 +3685,22 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Gets called whenever the GUI-object has changed.",
     })
 
+    /**
+     * class Button
+     */
+    static ButtonClassComment = () => lm({
+    "de": "Button, der innerhalb der Grafikausgabe dargestellt werden kann",
+    "en": "Button inside graphics pane",
+    })
+
+    static ButtonConstructorComment = () => lm({
+    "de": "Instanziert ein neues Button-Objekt. (x, y) sind die Koordinaten der linken oberen Ecke, fontsize die Höhe des Textes in Pixeln.",
+    "en": "Creates a new Button object. (x,y) is it's top left corner, fontsize the height of it's caption in pixels.",
+    })
+
+    static ButtonCopyComment = () => lm({
+    "de": "Erstellt eine Kopie des Button-Objekts und git sie zurück.",
+    "en": "Creates a copy of this button and returns it.",
+    })
 
 }  

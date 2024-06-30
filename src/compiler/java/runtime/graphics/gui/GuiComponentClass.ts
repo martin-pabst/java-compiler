@@ -1,5 +1,6 @@
 import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
 import { InternalKeyboardListener, KeyDownListener, KeyboardManager } from "../../../../common/interpreter/KeyboardManager.ts";
+import { Scheduler } from "../../../../common/interpreter/Scheduler.ts";
 import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts";
 import { Thread, ThreadState } from "../../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
@@ -37,15 +38,20 @@ export class GuiComponentClass extends FilledShapeClass implements InternalMouse
 
     changeListeners: ChangeListenerInterface[] = [];
 
+    scheduler!: Scheduler;
+
     _cj$_constructor$GuiComponent$(t: Thread, callback: CallbackFunction, registerAsMouseListener: boolean, registerAsKeyboardListener: boolean){
-        this.registerAsMouseListener = registerAsMouseListener;
-        this.registerAsKeyboardListener = registerAsKeyboardListener;
-        this.registerAsListener(t);
 
-        this.centerXInitial = 0;
-        this.centerYInitial = 0;
-
-        this._cj$_constructor_$FilledShape$(t, callback);
+        this._cj$_constructor_$FilledShape$(t, () => {            
+            this.scheduler = t.scheduler;
+            this.registerAsMouseListener = registerAsMouseListener;
+            this.registerAsKeyboardListener = registerAsKeyboardListener;
+            this.registerAsListener(t);
+            
+            this.centerXInitial = 0;
+            this.centerYInitial = 0;
+            if(callback) callback();
+        });
 
     }
 
@@ -113,9 +119,9 @@ export class GuiComponentClass extends FilledShapeClass implements InternalMouse
         this.changeListeners.push(listener);
     }
 
-    callOnChange(t: Thread, newValue: string){
+    callOnChange(newValue: string){
         if(this._mj$onChange$void$String != GuiComponentClass.prototype._mj$onChange$void$String || this.changeListeners.length > 0){
-            let thread = t.scheduler.createThread("onChange-method thread");
+            let thread = this.scheduler.createThread("onChange-method thread");
 
             if(this._mj$onChange$void$String != GuiComponentClass.prototype._mj$onChange$void$String){
                 this._mj$onChange$void$String(thread, undefined, new StringClass(newValue));

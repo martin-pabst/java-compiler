@@ -3,41 +3,54 @@ import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { GuiComponentClass } from "./GuiComponentClass.ts";
+import { Thread } from '../../../../common/interpreter/Thread.ts';
+import { CallbackFunction } from '../../../../common/interpreter/StepFunction.ts';
+import { GuiTextComponentClass } from './GuiTextComponentClass.ts';
+import { lightenDarkenIntColor } from '../../../../../tools/HtmlTools.ts';
+import { MouseEventKind } from '../MouseManager.ts';
 
-export class ButtonClass extends GuiComponentClass {
+export class ButtonClass extends GuiTextComponentClass {
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "declaration", signature: "class Button extends GuiTextComponent", comment: JRC.Button}
+        {type: "declaration", signature: "class Button extends GuiTextComponent", comment: JRC.ButtonClassComment},
+        {type: "method", signature: "Button(double x, double y, double fontsize, string text)", java: ButtonClass.prototype._cj$_constructor_$Button$double$double$double$string, comment: JRC.ButtonConstructorComment},
+        {type: "method", signature: "Button getCopy()", java: ButtonClass.prototype._mj$getCopy$Button$, comment: JRC.ButtonCopyComment},
+
     ];
 
     static type: NonPrimitiveType;
 
+    x!: number;
+    y!: number;
 
-    backgroundGraphics: PIXI.Container;
-    higlightGraphics: PIXI.Container;
+    backgroundGraphics!: PIXI.Graphics;
+    higlightGraphics!: PIXI.Graphics;
 
     mouseIsDown: boolean = false;
 
     isMouseOver: boolean = false;
 
-    constructor(public x: number, public y: number, public fontsize: number,
-        public text: string,
-        interpreter: Interpreter, runtimeObject: RuntimeObject, public fontFamily?: string) {
-            
-        super(interpreter, runtimeObject, true, false, fontsize, text, fontFamily);
-        
-        this.centerXInitial = x;
-        this.centerYInitial = y;
+    _cj$_constructor_$Button$double$double$double$string(t: Thread, callback: CallbackFunction, 
+        x: number, y: number, fontsize: number, text: string, fontFamily?: string
+    ){
 
+        this.x = x;
+        this.y = y;
         
-        this.borderColor = 0x808080;
-        this.borderWidth = fontsize / 8;
-        this.fillColor = 0x0000ff;
-        
-        this.hitPolygonInitial = [];
-        
-        this.render();
-        
-        this.addToDefaultGroupAndSetDefaultVisibility();
+        this._cj$_constructor_$GuiTextComponent$(t, () => {
+            this.centerXInitial = x;
+            this.centerYInitial = y;
+            
+            this.borderColor = 0x808080;
+            this.borderWidth = fontsize / 8;
+            this.fillColor = 0x0000ff;
+            
+            this.hitPolygonInitial = [];
+            
+            this.render();
+
+            if(callback) callback();
+            
+        }, true, false, fontsize, text, fontFamily);
         
     }
     
@@ -45,20 +58,15 @@ export class ButtonClass extends GuiComponentClass {
 
     looseKeyboardFocus(): void {}
 
-    getCopy(klass: Klass): RuntimeObject {
-        
-        let ro: RuntimeObject = new RuntimeObject(klass);
-        let rh: ButtonHelper = new ButtonHelper(this.x, this.y, this.fontsize, this.text, this.worldHelper.interpreter, ro);
-        ro.intrinsicData["Actor"] = rh;
-        rh.textColor = this.textColor;
-        rh.text = this.text;
+    _mj$getCopy$Button$(t: Thread, callback: CallbackFunction) {
 
-        rh.copyFrom(this);
-        rh.render();
-        
-        return ro;
+        let button = new ButtonClass();
+        button.textColor = this.textColor;
+        this._cj$_constructor_$Button$double$double$double$string(t, () => {
+            if(callback) callback();            
+        }, this.x, this.y, this.fontsize, this.text, this.fontFamily);
+
     }
-    
     
     render(): void {
 
@@ -66,22 +74,27 @@ export class ButtonClass extends GuiComponentClass {
 
         let padding = this.fontsize / 5;
 
-        if (this.displayObject == null) {
+        if (this.container == null) {
             this.backgroundGraphics = new PIXI.Graphics();
             this.higlightGraphics = new PIXI.Graphics();
 
-            this.pixiText = new PIXI.Text(this.text, this.textStyle);
+            this.pixiText = new PIXI.Text({
+                text: this.text,
+                style: this.textStyle
+            });
 
-            this.displayObject = new PIXI.Container();
-            this.displayObject.localTransform.translate(this.x, this.y);
+            this.container = new PIXI.Container();
             //@ts-ignore
-            this.displayObject.transform.onChange();
-            this.worldHelper.stage.addChild(this.displayObject);
-            let container = <PIXI.Container>this.displayObject;
+            this.container["Test"] = "Hier!";
+            this.container.localTransform.translate(this.x, this.y);
+            this.container.setFromMatrix(this.container.localTransform);
+            this.container.updateLocalTransform();
 
-            container.addChild(this.higlightGraphics);
-            container.addChild(this.backgroundGraphics);
-            container.addChild(this.pixiText);
+            this.world.app!.stage.addChild(this.container);
+
+            this.container.addChild(this.higlightGraphics);
+            this.container.addChild(this.backgroundGraphics);
+            this.container.addChild(this.pixiText);
 
         } else {
             this.pixiText.text = this.text;
@@ -98,15 +111,15 @@ export class ButtonClass extends GuiComponentClass {
 
 
         if (this.text != null) {
-            let tm = PIXI.TextMetrics.measureText(this.text, this.textStyle);
+            let tm = PIXI.CanvasTextMetrics.measureText(this.text, this.textStyle);
 
             this.textWidth = tm.width;
             this.textHeight = tm.height;
 
             this.pixiText.localTransform.identity();
             this.pixiText.localTransform.translate(padding, padding);
-            // @ts-ignore
-            this.pixiText.transform.onChange();
+            this.pixiText.setFromMatrix(this.pixiText.localTransform);
+            this.pixiText.updateLocalTransform();
 
             this.centerXInitial = this.textWidth / 2 + padding;
             this.centerYInitial = this.textHeight / 2 + padding;
@@ -123,31 +136,34 @@ export class ButtonClass extends GuiComponentClass {
         ];
         this.hitPolygonDirty = true;
 
+        this.backgroundGraphics.roundRect(0, 0, this.width, this.height, this.height / 8);
+
         if (this.fillColor != null) {
-            this.backgroundGraphics.beginFill(this.fillColor, this.fillAlpha);
+            this.backgroundGraphics.fill(this.fillColor);
+            this.backgroundGraphics.alpha = this.fillAlpha;
         }
+
         if (this.borderColor != null) {
-            this.backgroundGraphics.lineStyle(this.borderWidth, this.borderColor, this.borderAlpha, 1.0)
+            this.backgroundGraphics.stroke({
+                width: this.borderWidth,
+                color: this.borderColor,
+                alpha: this.borderAlpha,
+                alignment: 1.0
+            })
         }
 
-        this.backgroundGraphics.drawRoundedRect(0, 0, this.width, this.height, this.height / 8);
-
-        if (this.fillColor != null) {
-            this.backgroundGraphics.endFill();
-        }
 
         let highlightWidth = this.height / 10 + this.borderWidth;
-        this.higlightGraphics.beginFill(lightenDarkenIntColor(this.fillColor, 0.4), 1.0);
-        this.higlightGraphics.drawRoundedRect(-highlightWidth, -highlightWidth, this.width + 2 * highlightWidth, this.height + 2 * highlightWidth, this.height / 4);
+        this.higlightGraphics.roundRect(-highlightWidth, -highlightWidth, this.width + 2 * highlightWidth, this.height + 2 * highlightWidth, this.height / 4);
         if (this.fillColor != null) {
-            this.higlightGraphics.endFill();
+            this.higlightGraphics.fill(lightenDarkenIntColor(this.fillColor, 0.4));
         }
 
         this.higlightGraphics.visible = this.mouseIsDown;
     }
 
-    onMouseEvent(kind: JOMouseEvent, x: number, y: number): void {
-        let containsPointer = this.containsPoint(x, y);
+    onMouseEvent(kind: MouseEventKind, x: number, y: number): void {
+        let containsPointer = this._containsPoint(x, y);
 
         switch (kind) {
             case "mousedown":
@@ -159,21 +175,21 @@ export class ButtonClass extends GuiComponentClass {
             case "mouseup": {
                 if (containsPointer && this.mouseIsDown) {
                     this.higlightGraphics.visible = false;
-                    this.onChange("clicked");
+                    this.callOnChange("clicked");
                 }
                 this.mouseIsDown = false;
             }
                 break;
             case "mouseleave": {
                 this.isMouseOver = false;
-                this.worldHelper.setCursor('default');
+                this.world._setCursor('default');
             }
                 break;
             case "mousemove": {
 
                 if (this.isMouseOver != containsPointer) {
                     this.isMouseOver = containsPointer;
-                    this.worldHelper.setCursor(containsPointer ? "pointer" : "default");
+                    this.world._setCursor(containsPointer ? "pointer" : "default");
                 }
 
             }
