@@ -72,7 +72,7 @@ export class ButtonClass extends GuiTextComponentClass {
 
         this.textCompomentPrerender();
 
-        let padding = this.fontsize / 5;
+        let padding = this.fontsize / 3;
 
         if (this.container == null) {
             this.backgroundGraphics = new PIXI.Graphics();
@@ -164,6 +164,7 @@ export class ButtonClass extends GuiTextComponentClass {
 
     onMouseEvent(kind: MouseEventKind, x: number, y: number): void {
         let containsPointer = this._containsPoint(x, y);
+        console.log("x: " + x + ", y: " + y);
 
         switch (kind) {
             case "mousedown":

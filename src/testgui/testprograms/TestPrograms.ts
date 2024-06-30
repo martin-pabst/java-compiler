@@ -1,5 +1,15 @@
 export var testProgramsList = [
    ['', ``],
+   ['ButtonTest', `Button b = new Button(100, 100, 20, "Test");
+
+b.addChangeListener((object, value) -> {
+   println(value);
+   });
+
+while (true) {
+   
+}
+`],
    ['GNGFlowerTest', `Blumenwelt b = new Blumenwelt();
 Console.log(b.blume1);
 Console.log(b.blume2);

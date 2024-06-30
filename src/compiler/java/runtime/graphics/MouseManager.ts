@@ -47,8 +47,9 @@ export class MouseManager {
             let listener: any;
             //@ts-ignore
             canvas.addEventListener(mouseEventKind,  listener = (e: MouseEvent) => {
-                let x = that.world.width * e.offsetX / canvas.width;
-                let y = that.world.height * e.offsetY / canvas.height;
+                let canvasRect = canvas.getBoundingClientRect();
+                let x = that.world.width * e.offsetX / canvasRect.width;
+                let y = that.world.height * e.offsetY / canvasRect.height;
 
                 let p = new PIXI.Point(x, y);
                 that.world.app.stage.localTransform.applyInverse(p, p);

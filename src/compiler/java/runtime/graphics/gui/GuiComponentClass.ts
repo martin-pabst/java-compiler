@@ -17,7 +17,7 @@ export class GuiComponentClass extends FilledShapeClass implements InternalMouse
         
         {type: "method", signature: "GuiComponent()", java: GuiComponentClass.prototype._cj$_constructor$GuiComponent$ },
 
-        {type: "method", signature: "void addChangeListener(ChangeListener changeListener)", comment: JRC.GUIComponentAddChangeListenerComment},
+        {type: "method", signature: "void addChangeListener(ChangeListener changeListener)", native: GuiComponentClass.prototype.addChangeListener, comment: JRC.GUIComponentAddChangeListenerComment},
         {type: "method", signature: "final double getWidth()", template: `§1.width`,  comment: JRC.GUIComponentGetWidthComment},
         {type: "method", signature: "final double getHeight()", template: `§1.height`, comment: JRC.GUIComponentGetHeightComment},
         
