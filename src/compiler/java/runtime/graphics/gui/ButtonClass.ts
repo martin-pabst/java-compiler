@@ -13,7 +13,8 @@ export class ButtonClass extends GuiTextComponentClass {
     static __javaDeclarations: LibraryDeclarations = [
         {type: "declaration", signature: "class Button extends GuiTextComponent", comment: JRC.ButtonClassComment},
         {type: "method", signature: "Button(double x, double y, double fontsize, string text)", java: ButtonClass.prototype._cj$_constructor_$Button$double$double$double$string, comment: JRC.ButtonConstructorComment},
-        {type: "method", signature: "Button getCopy()", java: ButtonClass.prototype._mj$getCopy$Button$, comment: JRC.ButtonCopyComment},
+        {type: "method", signature: "Button(double x, double y, double fontsize, string text, string fontFamily)", java: ButtonClass.prototype._cj$_constructor_$Button$double$double$double$string, comment: JRC.ButtonConstructorComment},
+        {type: "method", signature: "Button copy()", java: ButtonClass.prototype._mj$copy$Button$, comment: JRC.ButtonCopyComment},
 
     ];
 
@@ -58,7 +59,7 @@ export class ButtonClass extends GuiTextComponentClass {
 
     looseKeyboardFocus(): void {}
 
-    _mj$getCopy$Button$(t: Thread, callback: CallbackFunction) {
+    _mj$copy$Button$(t: Thread, callback: CallbackFunction) {
 
         let button = new ButtonClass();
         button.textColor = this.textColor;
@@ -164,7 +165,6 @@ export class ButtonClass extends GuiTextComponentClass {
 
     onMouseEvent(kind: MouseEventKind, x: number, y: number): void {
         let containsPointer = this._containsPoint(x, y);
-        console.log("x: " + x + ", y: " + y);
 
         switch (kind) {
             case "mousedown":

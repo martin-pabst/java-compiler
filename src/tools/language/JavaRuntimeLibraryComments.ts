@@ -3703,4 +3703,40 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Creates a copy of this button and returns it.",
     })
 
+    /**
+     * class CheckBox
+     */
+
+    static CheckBoxClassComment = () => lm({
+    "de": "Checkbox, die innerhalb der Grafikausgabe dargestellt werden kann",
+    "en": "Checkbox inside graphics pane",
+    })
+
+    static CheckBoxConstructorComment = () => lm({
+    "de": "Instanziert ein neues CheckBox-Objekt. (x, y) sind die Koordinaten der linken oberen Ecke, fontsize die Höhe des Textes in Pixeln.",
+    "en": "Creates a new CheckBox object. (x,y) is it's top left corner, fontsize the height of it's caption in pixels.",
+    })
+
+    static CheckBoxCopyComment = () => lm({
+    "de": "Erstellt eine Kopie der CheckBox.",
+    "en": "Creates a copy of this CheckBox.",
+    })
+
+    static CheckBoxSetCrossColorComment = () => lm({
+    "de": "Setzt die Farbe des Kreuzchens. Die Farbe wird als int-Wert gegeben, wobei farbe == 256*256*rot + 256*grün + blau",
+    "en": "Sets color of cross. Color is given as int value: color = 256<*256*red + 256*green + blue.",
+    })
+
+    static CheckBoxSetCheckedComment = () => lm({
+    "de": "Setzt den Zustand der Checkbox: angekreuzt bzw. nicht angekreuzt",
+    "en": "Sets state checked/unchecked of this checkbox.",
+    })
+
+    static CheckBoxIsCheckedComment = () => lm({
+    "de": "Gibt genau dann true zurück, falls die Checkbox angekreuzt ist.",
+    "en": "Returns true if and only if this checkbox is checked.",
+    })
+
+    
+
 }  

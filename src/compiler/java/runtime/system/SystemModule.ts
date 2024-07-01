@@ -102,6 +102,7 @@ import { GuiComponentClass } from "../graphics/gui/GuiComponentClass.ts";
 import { GuiTextComponentClass } from "../graphics/gui/GuiTextComponentClass.ts";
 import { ChangeListenerInterface } from "../graphics/gui/ChangeListenerInterface.ts";
 import { ButtonClass } from "../graphics/gui/ButtonClass.ts";
+import { CheckBoxClass } from "../graphics/gui/CheckboxClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -177,7 +178,7 @@ export class SystemModule extends JavaLibraryModule {
             JavaHamsterWorldClass, JavaHamsterClass,
 
             // Gui components
-            ChangeListenerInterface, GuiComponentClass, GuiTextComponentClass, ButtonClass,
+            ChangeListenerInterface, GuiComponentClass, GuiTextComponentClass, ButtonClass, CheckBoxClass,
 
             // Graphics'n Games (GNG)
             GNGBaseFigur, GNGKreis, GNGRechteck, GNGDreieck, GNGText, GNGFigur,
