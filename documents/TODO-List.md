@@ -46,24 +46,24 @@
   * JavaKara
   * JavaHamster
   * classes BigInteger, Console, Vector2, MathToolsClass, System, Gamepad, SystemTools, Timer, Input
+  * GNG classes
+  * classes for graphical GUI-Elements
 
 ## working status on current issue:
 
 ### fine-grained next todos on current issue:
 
 ## next 
+  * class Sound
+  * class Files
+  * HTTP-Client and JSON-Converter
   * Missing Collections 
-  * GNG classes
   * Robot
-  * classes for graphical GUI-Elements
   * if method overrides or implements other method and has no comment, then take the overriden method's comment
   * detect cyclic calling of constructors
 
 ## after integrating new compiler into online-ide
-  * class Sound
   * Database classes
-  * class Files
-  * HTTP-Client and JSON-Converter
 
 
 
