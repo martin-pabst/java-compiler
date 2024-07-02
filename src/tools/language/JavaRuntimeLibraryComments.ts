@@ -3847,4 +3847,28 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
    "de": "Konnte die Datei '" + filename + "' nicht finden.",
    "en": "File not found: '" + filename + "'",
    })
+
+   /**
+    * class Files
+    */
+   static FilesClassComment = () => lm({
+   "de": "Klasse mit statischen Methoden zum Lesen/Schreiben von Dateien.",
+   "en": "Class with static methods to read/write files.",
+   })
+
+   static FilesReadComment = () => lm({
+   "de": "Gibt den Inhalt der Workspacedatei zurück.",
+   "en": "Returns content of workspace file with given filename.",
+   })
+
+   static FilesWriteComment = () => lm({
+   "de": "Schreibt den Text in die Workspacedatei.",
+   "en": "Erases workspace file and then writes given text into it.",
+   })
+
+   static FilesAppendComment = () => lm({
+   "de": "Fügt den Text hinten an die Workspacedatei an.",
+   "en": "Appends given text to workspace file.",
+   })
+
 }  
