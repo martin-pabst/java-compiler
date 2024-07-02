@@ -48,13 +48,13 @@
   * classes BigInteger, Console, Vector2, MathToolsClass, System, Gamepad, SystemTools, Timer, Input
   * GNG classes
   * classes for graphical GUI-Elements
+  * class Sound
 
 ## working status on current issue:
 
 ### fine-grained next todos on current issue:
 
 ## next 
-  * class Sound
   * class Files
   * HTTP-Client and JSON-Converter
   * Missing Collections 

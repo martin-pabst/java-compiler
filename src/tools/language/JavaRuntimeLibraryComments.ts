@@ -3840,4 +3840,11 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
    "en": "Plays given sound. Possible sounds are given by static fields of Sound class.",
    })
 
+   /**
+    * FileNotFoundException
+    */
+   static FileNotFoundExceptionComment = (filename: string) => lm({
+   "de": "Konnte die Datei '" + filename + "' nicht finden.",
+   "en": "File not found: '" + filename + "'",
+   })
 }  
