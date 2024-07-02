@@ -1,5 +1,18 @@
 export var testProgramsList = [
-   ['', ``],
+   ['', ''],
+   ['RadiobuttonTest', `Radiobutton rb1 = new Radiobutton(100, 100, 10, 20, "Test1", 1);
+   Radiobutton rb2 = new Radiobutton(100, 200, 10, 20, "Test1", 2);
+   Radiobutton rb3 = new Radiobutton(100, 300, 10, 20, "Test3", 3);
+         
+   rb1.connectTo(new Radiobutton[] { rb2, rb3 });
+   
+   rb1.addChangeListener((obj, newValue) -> {
+      println(newValue);
+      });
+      
+   while (true) {
+            
+   }`],
    ['CheckboxTest', `Checkbox cb = new Checkbox(100, 100, 16, 20, "Test");
 
    cb.addChangeListener((object, value) -> {

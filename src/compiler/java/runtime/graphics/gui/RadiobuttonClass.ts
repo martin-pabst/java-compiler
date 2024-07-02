@@ -9,16 +9,20 @@ import { GuiTextComponentClass } from './GuiTextComponentClass.ts';
 import { lightenDarkenIntColor } from '../../../../../tools/HtmlTools.ts';
 import { MouseEventKind } from '../MouseManager.ts';
 
-export class CheckboxClass extends GuiTextComponentClass {
+export class RadiobuttonClass extends GuiTextComponentClass {
     static __javaDeclarations: LibraryDeclarations = [
-        { type: "declaration", signature: "class Checkbox extends GuiTextComponent", comment: JRC.CheckBoxClassComment },
-        { type: "method", signature: "Checkbox(double x, double y, double width, double fontsize, string text)", java: CheckboxClass.prototype._cj$_constructor_$CheckBox$double$double$double$double$string, comment: JRC.CheckBoxConstructorComment },
-        { type: "method", signature: "Checkbox(double x, double y, double width, double fontsize, string text, string fontFamily)", java: CheckboxClass.prototype._cj$_constructor_$CheckBox$double$double$double$double$string, comment: JRC.CheckBoxConstructorComment },
-        { type: "method", signature: "Checkbox(double x, double y, double width, double fontsize, string text, boolean checked)", java: CheckboxClass.prototype._cj$_constructor_$CheckBox$double$double$double$double$string, comment: JRC.CheckBoxConstructorComment },
-        { type: "method", signature: "Checkbox copy()", java: CheckboxClass.prototype._mj$copy$Button$, comment: JRC.CheckBoxCopyComment },
-        { type: "method", signature: "void setCrossColor(int color)", native: CheckboxClass.prototype.setCrossColor, comment: JRC.CheckBoxSetCrossColorComment },
-        { type: "method", signature: "void setChecked(boolean checked)", native: CheckboxClass.prototype.setChecked, comment: JRC.CheckBoxSetCheckedComment },
-        { type: "method", signature: "boolean isChecked()", native: CheckboxClass.prototype._isChecked, comment: JRC.CheckBoxIsCheckedComment },
+        { type: "declaration", signature: "class Radiobutton extends GuiTextComponent", comment: JRC.RadiobuttonClassComment },
+        { type: "method", signature: "Radiobutton(double x, double y, double width, double fontsize, string text, int index)", java: RadiobuttonClass.prototype._cj$_constructor_$Radiobutton$double$double$double$double$string$int, comment: JRC.RadiobuttonConstructorComment },
+        { type: "method", signature: "Radiobutton(double x, double y, double width, double fontsize, string text, string fontFamily, int index)", java: RadiobuttonClass.prototype._cj$_constructor_$Radiobutton$double$double$double$double$string$string$int, comment: JRC.RadiobuttonConstructorComment },
+        { type: "method", signature: "Radiobutton copy()", java: RadiobuttonClass.prototype._mj$copy$Button$, comment: JRC.RadiobuttonCopyComment },
+        { type: "method", signature: "int getIndex()", template: '§1.index', comment: JRC.RadiobuttonGetIndexComment },
+        { type: "method", signature: "int getIndexOfSelectedRadiobutton()", native: RadiobuttonClass.prototype.getIndexOfSelectedRadiobutton, comment: JRC.RadiobuttonGetIndexOfSelectedRadiobuttonComment},
+        { type: "method", signature: "int getTextOfSelectedRadiobutton()", native: RadiobuttonClass.prototype.getTextOfSelectedRadiobutton, comment: JRC.RadiobuttonGetTextOfSelectedRadiobuttonComment},
+        { type: "method", signature: "void setIndex()", native: RadiobuttonClass.prototype.setIndex, comment: JRC.RadiobuttonSetIndexComment},
+        { type: "method", signature: "void setDotColor()", native: RadiobuttonClass.prototype.setDotColor, comment: JRC.RadiobuttonSetDotColorComment},
+        { type: "method", signature: "void connectTo(Radiobutton[] otherButtons)", native: RadiobuttonClass.prototype.connectTo, comment: JRC.RadiobuttonConnectToComment},
+        { type: "method", signature: "void select()", native: RadiobuttonClass.prototype.setSelected, comment: JRC.RadiobuttonSelectComment},
+        { type: "method", signature: "boolean isSelected()", template: `§1.isSelected`, comment: JRC.RadiobuttonIsSelectedComment},
     ];
 
     static type: NonPrimitiveType;
@@ -28,31 +32,37 @@ export class CheckboxClass extends GuiTextComponentClass {
     dotWidth!: number;
 
     backgroundGraphics!: PIXI.Graphics;
-    cross!: PIXI.Graphics;
+    dot!: PIXI.Graphics;
 
     distanceToText: number = 4;
 
-    crossColor: number = 0x000000;
+    dotColor: number = 0x000000;
 
-    isChecked: boolean = true;
+    isSelected: boolean = true;
 
     mouseIsDown: boolean = false;
 
     isMouseOver: boolean = false;
 
-    _cj$_constructor_$CheckBox$double$double$double$double$string(t: Thread, callback: CallbackFunction,
-        x: number, y: number, width: number, fontsize: number, text: string, fontFamilyOrChecked?: string | boolean
+    index!: number;
+
+    otherButtons: RadiobuttonClass[] = [];
+
+    _cj$_constructor_$Radiobutton$double$double$double$double$string$int(t: Thread, callback: CallbackFunction,
+        x: number, y: number, width: number, fontsize: number, text: string, index: number
+    ) {
+        this._cj$_constructor_$Radiobutton$double$double$double$double$string$string$int(t, callback, x, y, width, fontsize, text, undefined, index);
+    }
+
+    _cj$_constructor_$Radiobutton$double$double$double$double$string$string$int(t: Thread, callback: CallbackFunction,
+        x: number, y: number, width: number, fontsize: number, text: string, fontFamily: string | undefined, index:  number
     ) {
 
-        this.isChecked = false;
-        let fontFamily: string = "sans serif";
-        if (fontFamilyOrChecked) {
-            if (typeof fontFamilyOrChecked == 'boolean') {
-                this.isChecked = fontFamilyOrChecked;
-            } else {
-                fontFamily = fontFamilyOrChecked;
-            }
-        }
+        this.isSelected = false;
+
+        this.fontFamily = fontFamily || "sans serif";
+
+        this.index = index;
 
         this.x = x;
         this.y = y;
@@ -82,17 +92,81 @@ export class CheckboxClass extends GuiTextComponentClass {
 
     _mj$copy$Button$(t: Thread, callback: CallbackFunction) {
 
-        let checkBox = new CheckboxClass();
-        checkBox.textColor = this.textColor;
-        checkBox.crossColor = this.crossColor;
-        checkBox._cj$_constructor_$CheckBox$double$double$double$double$string(t, () => {
+        let radiobutton = new RadiobuttonClass();
+        radiobutton.textColor = this.textColor;
+        radiobutton.dotColor = this.dotColor;
+
+        radiobutton.distanceToText = this.distanceToText;
+        radiobutton.isSelected = this.isSelected;
+
+        radiobutton._cj$_constructor_$Radiobutton$double$double$double$double$string$string$int(t, () => {
             if (callback) callback();
-        }, this.x, this.y, this.dotWidth, this.fontsize, this.text, this.fontFamily);
+        }, this.x, this.y, this.dotWidth, this.fontsize, this.text, this.fontFamily, this.index + 1);
 
     }
 
+    setIndex(index: number){
+        this.index = index;
+    }
+
+    getIndexOfSelectedRadiobutton(): number {
+        if (this.isSelected) {
+            return this.index;
+        }
+        for (let rb of this.otherButtons) {
+            if (rb.isSelected) return rb.index;
+        }
+
+        return -1;
+    }
+
+    getTextOfSelectedRadiobutton(): string {
+        if (this.isSelected) {
+            return this.text;
+        }
+        for (let rb of this.otherButtons) {
+            if (rb.isSelected) return rb.text;
+        }
+
+        return "";
+    }
+
+    setSelected() {
+        this.isSelected = true;
+        this.render();
+        for (let ob of this.otherButtons) {
+            ob.isSelected = false;
+            ob.render();
+        }
+    }
+
+    connectTo(otherButtons: RadiobuttonClass[]) {
+        if(otherButtons == null) return;
+
+        for (let rb of otherButtons) {
+            if (this.otherButtons.indexOf(rb) < 0 && rb != this) {
+                this.otherButtons.push(rb);
+            }
+        }
+
+        for(let rb of otherButtons){
+            let list = this.otherButtons.slice();
+            list.push(this);
+            let othersIndex = list.indexOf(rb);
+            if(othersIndex >= 0) list.splice(othersIndex, 1);
+
+            rb.otherButtons = list;
+        }
+    }
+
+    setDotColor(color: number) {
+        this.dotColor = color;
+        this.render();
+    }
+
+
     setCrossColor(color: number) {
-        this.crossColor = color;
+        this.dotColor = color;
         this.render();
     }
 
@@ -102,7 +176,7 @@ export class CheckboxClass extends GuiTextComponentClass {
 
         if (this.container == null) {
             this.backgroundGraphics = new PIXI.Graphics();
-            this.cross = new PIXI.Graphics();
+            this.dot = new PIXI.Graphics();
 
             this.textStyle.align = "left";
             this.pixiText = new PIXI.Text({ text: this.text, style: this.textStyle });
@@ -115,7 +189,7 @@ export class CheckboxClass extends GuiTextComponentClass {
             
             this.container.addChild(this.backgroundGraphics);
             this.container.addChild(this.pixiText);
-            this.container.addChild(this.cross);
+            this.container.addChild(this.dot);
 
             this.container.localTransform.translate(this.x, this.y);
             this.container.setFromMatrix(this.container.localTransform);
@@ -126,7 +200,7 @@ export class CheckboxClass extends GuiTextComponentClass {
         } else {
             this.pixiText.text = this.text;
             this.backgroundGraphics.clear();
-            this.cross.clear();
+            this.dot.clear();
 
         }
 
@@ -170,8 +244,7 @@ export class CheckboxClass extends GuiTextComponentClass {
         ];
         this.hitPolygonDirty = true;
 
-
-        this.backgroundGraphics.roundRect(0, 0, this.dotWidth, this.dotWidth, this.dotWidth / 8);
+        this.backgroundGraphics.circle(this.dotWidth / 2, this.dotWidth / 2, this.dotWidth / 2);
 
         if (this.fillColor != null) {
             this.backgroundGraphics.fill(this.fillColor);
@@ -190,25 +263,17 @@ export class CheckboxClass extends GuiTextComponentClass {
         let df = 3.0;
         let bwdf = this.borderWidth * df;
 
-        // this.cross.lineStyle(this.borderWidth * 2, this.crossColor, this.fillAlpha, 0.5);
-        this.cross.moveTo(bwdf, bwdf);
-        this.cross.lineTo(this.dotWidth - bwdf, this.dotWidth - bwdf);
-        this.cross.moveTo(this.dotWidth - bwdf, bwdf);
-        this.cross.lineTo(bwdf, this.dotWidth - bwdf);
 
-        this.cross.stroke({
-            width: this.borderWidth * 2,
-            color: this.crossColor,
-            alpha: this.fillAlpha,
-            alignment: 0.5,
-            cap: "round"
-        });
+        this.dot.circle(this.dotWidth / 2, this.dotWidth / 2, this.dotWidth / 6);
+        if (this.dotColor != null) {
+            this.dot.fill(this.dotColor);
+        }
 
-        this.cross.visible = this.isChecked;
+        this.dot.visible = this.isSelected;
     }
 
     setChecked(checked: boolean) {
-        this.isChecked = checked;
+        this.isSelected = checked;
         this.render();
     }
 
@@ -223,9 +288,12 @@ export class CheckboxClass extends GuiTextComponentClass {
                 break;
             case "mouseup": {
                 if (containsPointer && this.mouseIsDown) {
-                    this.isChecked = !this.isChecked;
+                    this.setSelected();
                     this.render();
-                    this.callOnChange("" + this.isChecked);
+                    this.callOnChange("" + this.index);
+                    for(let rb of this.otherButtons){
+                        rb.callOnChange("" + this.index);
+                    }
                 }
                 this.mouseIsDown = false;
             }
@@ -248,7 +316,7 @@ export class CheckboxClass extends GuiTextComponentClass {
     }
 
     _isChecked(): boolean {
-        return this.isChecked;
+        return this.isSelected;
     }
 
 

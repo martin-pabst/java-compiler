@@ -128,16 +128,16 @@ export class ButtonClass extends GuiTextComponentClass {
 
         let left = 0;
         let top = 0;
-        this.boxWidth = this.textWidth + 2 * padding;
+        this.dotWidth = this.textWidth + 2 * padding;
         this.height = this.textHeight + 2 * padding;
 
         this.hitPolygonInitial = [
-            { x: left, y: top }, { x: left + this.boxWidth, y: top }, { x: left + this.boxWidth, y: top + this.height },
+            { x: left, y: top }, { x: left + this.dotWidth, y: top }, { x: left + this.dotWidth, y: top + this.height },
             { x: left, y: top + this.height }
         ];
         this.hitPolygonDirty = true;
 
-        this.backgroundGraphics.roundRect(0, 0, this.boxWidth, this.height, this.height / 8);
+        this.backgroundGraphics.roundRect(0, 0, this.dotWidth, this.height, this.height / 8);
 
         if (this.fillColor != null) {
             this.backgroundGraphics.fill(this.fillColor);
@@ -155,7 +155,7 @@ export class ButtonClass extends GuiTextComponentClass {
 
 
         let highlightWidth = this.height / 10 + this.borderWidth;
-        this.higlightGraphics.roundRect(-highlightWidth, -highlightWidth, this.boxWidth + 2 * highlightWidth, this.height + 2 * highlightWidth, this.height / 4);
+        this.higlightGraphics.roundRect(-highlightWidth, -highlightWidth, this.dotWidth + 2 * highlightWidth, this.height + 2 * highlightWidth, this.height / 4);
         if (this.fillColor != null) {
             this.higlightGraphics.fill(lightenDarkenIntColor(this.fillColor, 0.4));
         }

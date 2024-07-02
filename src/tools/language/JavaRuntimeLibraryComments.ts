@@ -3524,183 +3524,183 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
      * class Timer
      */
     static TimerClassComment = () => lm({
-    "de": "Timer Klasse zur periodischen Ausführung von Methoden",
-    "en": "Class Timer to execute methods periodically",
+        "de": "Timer Klasse zur periodischen Ausführung von Methoden",
+        "en": "Class Timer to execute methods periodically",
     })
 
     static TimerClassRepeatComment = () => lm({
-    "de": "Fügt ein neues Runnable-Objekt hinzu und ruft dessen tick-Methode immer wieder auf.",
-    "en": "Adds a new Runnable object and call it's run-method periodically.",
+        "de": "Fügt ein neues Runnable-Objekt hinzu und ruft dessen tick-Methode immer wieder auf.",
+        "en": "Adds a new Runnable object and call it's run-method periodically.",
     })
 
     static TimerClassPauseComment = () => lm({
-    "de": "Hält den Timer an. Er kann später mit der Methode restart() wieder gestartet werden.",
-    "en": "Pauses timer. Use method restart() to restart it later.",
+        "de": "Hält den Timer an. Er kann später mit der Methode restart() wieder gestartet werden.",
+        "en": "Pauses timer. Use method restart() to restart it later.",
     })
 
     static TimerClassRestartComment = () => lm({
-    "de": "Startet den Timer erneut, nachdem er mit pause() pausiert wurde.",
-    "en": "Restart timer if it had been paused with pause()-method.",
+        "de": "Startet den Timer erneut, nachdem er mit pause() pausiert wurde.",
+        "en": "Restart timer if it had been paused with pause()-method.",
     })
 
     static TimerClassExecuteLaterComment = () => lm({
-    "de": "Führt die übergebene Methode nach dt millisekunden ein Mal aus.",
-    "en": "Waits dt milliseconds and then executes given method once.",
+        "de": "Führt die übergebene Methode nach dt millisekunden ein Mal aus.",
+        "en": "Waits dt milliseconds and then executes given method once.",
     })
 
     /**
      * class Input
      */
     static InputClassComment = () => lm({
-    "de": "Klasse mit statischen Methoden zur Eingabe von Text per Tastatur",
-    "en": "Class with static Method to retrieve input from keyboard.",
+        "de": "Klasse mit statischen Methoden zur Eingabe von Text per Tastatur",
+        "en": "Class with static Method to retrieve input from keyboard.",
     })
 
     static InputClassReadCharComment = () => lm({
-    "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp char",
-    "en": "Takes char-input from user.",
+        "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp char",
+        "en": "Takes char-input from user.",
     })
 
     static InputClassReadIntComment = () => lm({
-    "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp int",
-    "en": "Takes int-input from user.",
+        "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp int",
+        "en": "Takes int-input from user.",
     })
 
     static InputClassReadDoubleComment = () => lm({
-    "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp double",
-    "en": "Takes double-input from user.",
+        "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp double",
+        "en": "Takes double-input from user.",
     })
 
     static InputClassReadFloatComment = () => lm({
-    "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp float",
-    "en": "Takes float-input from user.",
+        "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp float",
+        "en": "Takes float-input from user.",
     })
 
     static InputClassReadBooleanComment = () => lm({
-    "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp boolean",
-    "en": "Takes boolean-input from user.",
+        "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp boolean",
+        "en": "Takes boolean-input from user.",
     })
 
     static InputClassReadStringComment = () => lm({
-    "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp String",
-    "en": "Takes String-input from user.",
+        "de": "Erwartet vom Benutzer die Eingabe eines Wertes vom Datentyp String",
+        "en": "Takes String-input from user.",
     })
 
     static InputClassBooleanError = () => lm({
-    "de": "Erwartet wird true oder false.",
-    "en": "true or false expected.",
+        "de": "Erwartet wird true oder false.",
+        "en": "true or false expected.",
     })
 
     static InputClassFloatError = () => lm({
-    "de": "Erwartet wird eine Fließkommazahl mit Dezimalpunkt, z.B. 1.2 oder 1.34e-10 oder -3e-10.",
-    "en": "Floating point value with decimal point expected, e.g. 1.2 or 1.34e-10 or -3e-10.",
+        "de": "Erwartet wird eine Fließkommazahl mit Dezimalpunkt, z.B. 1.2 oder 1.34e-10 oder -3e-10.",
+        "en": "Floating point value with decimal point expected, e.g. 1.2 or 1.34e-10 or -3e-10.",
     })
 
     static InputClassCharError = () => lm({
-    "de": "Erwartet wird ein einzelnes Zeichen.",
-    "en": "Single character expected.",
+        "de": "Erwartet wird ein einzelnes Zeichen.",
+        "en": "Single character expected.",
     })
 
     static InputClassIntError = () => lm({
-    "de": "Erwartet wird eine ganze Zahl.",
-    "en": "Integer value expected.",
+        "de": "Erwartet wird eine ganze Zahl.",
+        "en": "Integer value expected.",
     })
 
     /**
      * class GUIComponent
      */
     static GUIComponentClassComment = () => lm({
-    "de": "Oberklasse für alle GUI-Komponenten",
-    "en": "Base class of all GUI components",
+        "de": "Oberklasse für alle GUI-Komponenten",
+        "en": "Base class of all GUI components",
     })
 
     static GUIComponentOnChangeComment = () => lm({
-    "de": "Wird aufgerufen, wenn sich der Wert der GUI-Komponente aufgrund von Benutzeraktionen ändert.",
-    "en": "Gets called whenever this GUI-Component changes it's value.",
+        "de": "Wird aufgerufen, wenn sich der Wert der GUI-Komponente aufgrund von Benutzeraktionen ändert.",
+        "en": "Gets called whenever this GUI-Component changes it's value.",
     })
 
     static GUIComponentAddChangeListenerComment = () => lm({
-    "de": "Fügt einen ChangeListener hinzu, dessen onChange-Methode immer dann aufgerufen wird, wenn sich der Wert der GUI-Komponente aufgrund von Benutzeraktionen ändert.",
-    "en": "Adds a ChangeListener whose onChange-method gets called whenever this component's value changes.",
+        "de": "Fügt einen ChangeListener hinzu, dessen onChange-Methode immer dann aufgerufen wird, wenn sich der Wert der GUI-Komponente aufgrund von Benutzeraktionen ändert.",
+        "en": "Adds a ChangeListener whose onChange-method gets called whenever this component's value changes.",
     })
 
     static GUIComponentGetWidthComment = () => lm({
-    "de": "Gibt die Breite des GUI-Objekts zurück.",
-    "en": "Returns width of this GUI object.",
+        "de": "Gibt die Breite des GUI-Objekts zurück.",
+        "en": "Returns width of this GUI object.",
     })
 
     static GUIComponentGetHeightComment = () => lm({
-    "de": "Gibt die Höhe des GUI-Objekts zurück.",
-    "en": "Returns height of this GUI object.",
+        "de": "Gibt die Höhe des GUI-Objekts zurück.",
+        "en": "Returns height of this GUI object.",
     })
 
     /**
      * class GuiTextComponent
      */
     static GuiTextComponentClassComment = () => lm({
-    "de": "Abstrakte Oberklasse für alle Gui-Komponenten mit Textanteil",
-    "en": "Abstract base class for all GUI components that display text",
+        "de": "Abstrakte Oberklasse für alle Gui-Komponenten mit Textanteil",
+        "en": "Abstract base class for all GUI components that display text",
     })
 
     static GuiTextComponentSetFontsizeComment = () => lm({
-    "de": "Setzt die Schriftgröße des Textes (Einheit: Pixel).",
-    "en": "Set fontsize in pixels.",
+        "de": "Setzt die Schriftgröße des Textes (Einheit: Pixel).",
+        "en": "Set fontsize in pixels.",
     })
 
     static GuiTextComponentGetFontsizeComment = () => lm({
-    "de": "Gibt die Schriftgröße zurück.",
-    "en": "Returns fontsize.",
+        "de": "Gibt die Schriftgröße zurück.",
+        "en": "Returns fontsize.",
     })
 
     static GuiTextComponentSetTextComment = () => lm({
-    "de": "Setzt den Text.",
-    "en": "Set text of this component.",
+        "de": "Setzt den Text.",
+        "en": "Set text of this component.",
     })
 
     static GuiTextComponentGetTextComment = () => lm({
-    "de": "Gibt den Text zurück.",
-    "en": "Returns text of this component.",
+        "de": "Gibt den Text zurück.",
+        "en": "Returns text of this component.",
     })
 
     static GuiTextComponentSetStyleComment = () => lm({
-    "de": "Setzt die Eigenschaften Fettdruck (bold) und Schrägschrift (italic).",
-    "en": "Set style of text (bold, italic).",
+        "de": "Setzt die Eigenschaften Fettdruck (bold) und Schrägschrift (italic).",
+        "en": "Set style of text (bold, italic).",
     })
 
     static GuiTextComponentSetTextColor = () => lm({
-    "de": "Setzt die Textfarbe. Die Farbe wird als int-Wert gegeben, wobei farbe == 256*256*rot + 256*grün + blau",
-    "en": "Set text color. Color is given as int value: color == 256*256*red + 256*green + blue",
+        "de": "Setzt die Textfarbe. Die Farbe wird als int-Wert gegeben, wobei farbe == 256*256*rot + 256*grün + blau",
+        "en": "Set text color. Color is given as int value: color == 256*256*red + 256*green + blue",
     })
 
     /**
      * interface ChangeListener
      */
     static ChangeListenerInterfaceComment = () => lm({
-    "de": "Listener-Interface für GUI-Klassen (Button, TextField, Checkbox, Radiobutton)",
-    "en": "Listener interface for GUI classes (Button, TextField, Checkbox, Radiobutton)",
+        "de": "Listener-Interface für GUI-Klassen (Button, TextField, Checkbox, Radiobutton)",
+        "en": "Listener interface for GUI classes (Button, TextField, Checkbox, Radiobutton)",
     })
 
     static ChangeListenerOnChangeComment = () => lm({
-    "de": "Wird immer dann aufgerufen, wenn sich das GUI-Objekt verändert hat.",
-    "en": "Gets called whenever the GUI-object has changed.",
+        "de": "Wird immer dann aufgerufen, wenn sich das GUI-Objekt verändert hat.",
+        "en": "Gets called whenever the GUI-object has changed.",
     })
 
     /**
      * class Button
      */
     static ButtonClassComment = () => lm({
-    "de": "Button, der innerhalb der Grafikausgabe dargestellt werden kann",
-    "en": "Button inside graphics pane",
+        "de": "Button, der innerhalb der Grafikausgabe dargestellt werden kann",
+        "en": "Button inside graphics pane",
     })
 
     static ButtonConstructorComment = () => lm({
-    "de": "Instanziert ein neues Button-Objekt. (x, y) sind die Koordinaten der linken oberen Ecke, fontsize die Höhe des Textes in Pixeln.",
-    "en": "Creates a new Button object. (x,y) is it's top left corner, fontsize the height of it's caption in pixels.",
+        "de": "Instanziert ein neues Button-Objekt. (x, y) sind die Koordinaten der linken oberen Ecke, fontsize die Höhe des Textes in Pixeln.",
+        "en": "Creates a new Button object. (x,y) is it's top left corner, fontsize the height of it's caption in pixels.",
     })
 
     static ButtonCopyComment = () => lm({
-    "de": "Erstellt eine Kopie des Button-Objekts und git sie zurück.",
-    "en": "Creates a copy of this button and returns it.",
+        "de": "Erstellt eine Kopie des Button-Objekts und git sie zurück.",
+        "en": "Creates a copy of this button and returns it.",
     })
 
     /**
@@ -3708,35 +3708,94 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
      */
 
     static CheckBoxClassComment = () => lm({
-    "de": "Checkbox, die innerhalb der Grafikausgabe dargestellt werden kann",
-    "en": "Checkbox inside graphics pane",
+        "de": "Checkbox, die innerhalb der Grafikausgabe dargestellt werden kann",
+        "en": "Checkbox inside graphics pane",
     })
 
     static CheckBoxConstructorComment = () => lm({
-    "de": "Instanziert ein neues CheckBox-Objekt. (x, y) sind die Koordinaten der linken oberen Ecke, fontsize die Höhe des Textes in Pixeln.",
-    "en": "Creates a new CheckBox object. (x,y) is it's top left corner, fontsize the height of it's caption in pixels.",
+        "de": "Instanziert ein neues CheckBox-Objekt. (x, y) sind die Koordinaten der linken oberen Ecke, fontsize die Höhe des Textes in Pixeln.",
+        "en": "Creates a new CheckBox object. (x,y) is it's top left corner, fontsize the height of it's caption in pixels.",
     })
 
     static CheckBoxCopyComment = () => lm({
-    "de": "Erstellt eine Kopie der CheckBox.",
-    "en": "Creates a copy of this CheckBox.",
+        "de": "Erstellt eine Kopie der CheckBox.",
+        "en": "Creates a copy of this CheckBox.",
     })
 
     static CheckBoxSetCrossColorComment = () => lm({
-    "de": "Setzt die Farbe des Kreuzchens. Die Farbe wird als int-Wert gegeben, wobei farbe == 256*256*rot + 256*grün + blau",
-    "en": "Sets color of cross. Color is given as int value: color = 256<*256*red + 256*green + blue.",
+        "de": "Setzt die Farbe des Kreuzchens. Die Farbe wird als int-Wert gegeben, wobei farbe == 256*256*rot + 256*grün + blau",
+        "en": "Sets color of cross. Color is given as int value: color = 256<*256*red + 256*green + blue.",
     })
 
     static CheckBoxSetCheckedComment = () => lm({
-    "de": "Setzt den Zustand der Checkbox: angekreuzt bzw. nicht angekreuzt",
-    "en": "Sets state checked/unchecked of this checkbox.",
+        "de": "Setzt den Zustand der Checkbox: angekreuzt bzw. nicht angekreuzt",
+        "en": "Sets state checked/unchecked of this checkbox.",
     })
 
     static CheckBoxIsCheckedComment = () => lm({
-    "de": "Gibt genau dann true zurück, falls die Checkbox angekreuzt ist.",
-    "en": "Returns true if and only if this checkbox is checked.",
+        "de": "Gibt genau dann true zurück, falls die Checkbox angekreuzt ist.",
+        "en": "Returns true if and only if this checkbox is checked.",
     })
 
+
+    /**
+     * Radiobutton class
+     */
+
+    static RadiobuttonClassComment = () => lm({
+        "de": "Radiobutton, der innerhalb der Grafikausgabe dargestellt werden kann",
+        "en": "Radiobutton inside graphics pane",
+    })
+
+    static RadiobuttonConstructorComment = () => lm({
+        "de": "Instanziert ein neues Radiobutton-Objekt. (x, y) sind die Koordinaten der linken oberen Ecke, fontsize die Höhe des Textes in Pixeln.",
+        "en": "Creates a new Radiobutton object. (x,y) is it's top left corner, fontsize the height of it's caption in pixels.",
+    })
+
+    static RadiobuttonCopyComment = () => lm({
+        "de": "Erstellt eine Kopie des Radiobutton.",
+        "en": "Creates a copy of this Radiobutton.",
+    })
+
+    static RadiobuttonGetIndexComment = () => lm({
+    "de": "Gibt den Index des Radiobuttons zurück.",
+    "en": "Returns this radiobutton's index.",
+    })
+
+    static RadiobuttonGetIndexOfSelectedRadiobuttonComment = () => lm({
+    "de": "Sind mehrere Radiobuttons mittels connectTo mit dieserm logisch verbunden, so ist genau einer davon selektiert. Diese Methode gibt den Index dieses selektierten Radiobuttons zurück.",
+    "en": "If threre are several radiobuttons grouped together via method connectTo then this method returns the selected radiobutton's index.",
+    })
+
+    static RadiobuttonGetTextOfSelectedRadiobuttonComment = () => lm({
+    "de": "Sind mehrere Radiobuttons mittels connectTo mit dieserm logisch verbunden, so ist genau einer davon selektiert. Diese Methode gibt den Text dieses selektierten Radiobuttons zurück.",
+    "en": "If threre are several radiobuttons grouped together via method connectTo then this method returns the selected radiobutton's text.",
+    })
+
+    static RadiobuttonSetIndexComment = () => lm({
+    "de": "Setzt den Index des Radiobuttons.",
+    "en": "Set this radiobutton's index.",
+    })
+
+    static RadiobuttonSetDotColorComment = () => lm({
+    "de": "Setzt die Farbe des Punktes. Die Farbe wird als int-Wert gegeben, wobei farbe == 256*256*rot + 256*grün + blau",
+    "en": "Sets dot color of this radiobutton. Color is given as int-value: color = 256*256*red + 256*green + blue",
+    })
+
+    static RadiobuttonConnectToComment = () => lm({
+    "de": "Verbindet diesen Radiobutton logisch mit den anderen Radiobuttons. Wird anschließend auf einen davon geklickt, so wird dieser selektiert, die anderen deselektiert.",
+    "en": "Connects this radiobutton with given radiobuttons to a radiobutton group. If you click at one of them subsequently then all others get deselected so that only one of them is selected at any given time.",
+    })
+
+    static RadiobuttonIsSelectedComment = () => lm({
+    "de": "Gibt genau dann true zurück, falls die RadioButton selektiert ist.",
+    "en": "Returns true if and only if this radiobutton is selected.",
+    })
+
+    static RadiobuttonSelectComment = () => lm({
+    "de": "Selektiert diesen Radiobutton und deselektiert alle via connectTo mit ihm verbundenen Radiobuttons.",
+    "en": "Selects this Radiobutton and deselects all Radiobuttons in same group as this one.",
+    })
     
 
 }  
