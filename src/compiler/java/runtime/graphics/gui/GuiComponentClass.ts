@@ -27,7 +27,7 @@ export class GuiComponentClass extends FilledShapeClass implements InternalMouse
 
     static type: NonPrimitiveType;
 
-    width: number = 0;
+    boxWidth: number = 0;
     height: number = 0;
 
     registerAsMouseListener!: boolean;
@@ -108,7 +108,7 @@ export class GuiComponentClass extends FilledShapeClass implements InternalMouse
     }
 
     getWidth(): number {
-        return this.width;
+        return this.boxWidth;
     }
 
     getHeight(): number {

@@ -11,11 +11,11 @@ import { MouseEventKind } from '../MouseManager.ts';
 
 export class CheckBoxClass extends GuiTextComponentClass {
     static __javaDeclarations: LibraryDeclarations = [
-        { type: "declaration", signature: "class CheckBox extends GuiTextComponent", comment: JRC.CheckBoxClassComment },
-        { type: "method", signature: "CheckBox(double x, double y, double width, double fontsize, string text)", java: CheckBoxClass.prototype._cj$_constructor_$CheckBox$double$double$double$double$string, comment: JRC.CheckBoxConstructorComment },
-        { type: "method", signature: "CheckBox(double x, double y, double width, double fontsize, string text, string fontFamily)", java: CheckBoxClass.prototype._cj$_constructor_$CheckBox$double$double$double$double$string, comment: JRC.CheckBoxConstructorComment },
-        { type: "method", signature: "CheckBox(double x, double y, double width, double fontsize, string text, boolean checked)", java: CheckBoxClass.prototype._cj$_constructor_$CheckBox$double$double$double$double$string, comment: JRC.CheckBoxConstructorComment },
-        { type: "method", signature: "CheckBox copy()", java: CheckBoxClass.prototype._mj$copy$Button$, comment: JRC.CheckBoxCopyComment },
+        { type: "declaration", signature: "class Checkbox extends GuiTextComponent", comment: JRC.CheckBoxClassComment },
+        { type: "method", signature: "Checkbox(double x, double y, double width, double fontsize, string text)", java: CheckBoxClass.prototype._cj$_constructor_$CheckBox$double$double$double$double$string, comment: JRC.CheckBoxConstructorComment },
+        { type: "method", signature: "Checkbox(double x, double y, double width, double fontsize, string text, string fontFamily)", java: CheckBoxClass.prototype._cj$_constructor_$CheckBox$double$double$double$double$string, comment: JRC.CheckBoxConstructorComment },
+        { type: "method", signature: "Checkbox(double x, double y, double width, double fontsize, string text, boolean checked)", java: CheckBoxClass.prototype._cj$_constructor_$CheckBox$double$double$double$double$string, comment: JRC.CheckBoxConstructorComment },
+        { type: "method", signature: "Checkbox copy()", java: CheckBoxClass.prototype._mj$copy$Button$, comment: JRC.CheckBoxCopyComment },
         { type: "method", signature: "void setCrossColor(int color)", native: CheckBoxClass.prototype.setCrossColor, comment: JRC.CheckBoxSetCrossColorComment },
         { type: "method", signature: "void setChecked(boolean checked)", native: CheckBoxClass.prototype.setChecked, comment: JRC.CheckBoxSetCheckedComment },
         { type: "method", signature: "boolean isChecked()", native: CheckBoxClass.prototype._isChecked, comment: JRC.CheckBoxIsCheckedComment },
@@ -25,7 +25,7 @@ export class CheckBoxClass extends GuiTextComponentClass {
 
     x!: number;
     y!: number;
-    width!: number;
+    boxWidth!: number;
 
     backgroundGraphics!: PIXI.Graphics;
     cross!: PIXI.Graphics;
@@ -56,7 +56,7 @@ export class CheckBoxClass extends GuiTextComponentClass {
 
         this.x = x;
         this.y = y;
-        this.width = width;
+        this.boxWidth = width;
 
         this._cj$_constructor_$GuiTextComponent$(t, () => {
             this.centerXInitial = x;
@@ -87,7 +87,7 @@ export class CheckBoxClass extends GuiTextComponentClass {
         checkBox.crossColor = this.crossColor;
         this._cj$_constructor_$CheckBox$double$double$double$double$string(t, () => {
             if (callback) callback();
-        }, this.x, this.y, this.width, this.fontsize, this.text, this.fontFamily);
+        }, this.x, this.y, this.boxWidth, this.fontsize, this.text, this.fontFamily);
 
     }
 
@@ -104,31 +104,30 @@ export class CheckBoxClass extends GuiTextComponentClass {
             this.backgroundGraphics = new PIXI.Graphics();
             this.cross = new PIXI.Graphics();
 
+            this.textStyle.align = "left";
             this.pixiText = new PIXI.Text({ text: this.text, style: this.textStyle });
-            this.pixiText.x = this.width + this.distanceToText;
+            this.pixiText.x = this.boxWidth + this.distanceToText;
+            this.pixiText.alpha = this.fillAlpha;
+            this.pixiText.anchor.x = 0;
             this.pixiText.y = 0;
 
             this.container = new PIXI.Container();
+            
+            this.container.addChild(this.backgroundGraphics);
+            this.container.addChild(this.pixiText);
+            this.container.addChild(this.cross);
+
             this.container.localTransform.translate(this.x, this.y);
             this.container.setFromMatrix(this.container.localTransform);
             this.container.updateLocalTransform();
 
             this.world.app!.stage.addChild(this.container);
-            let container = <PIXI.Container>this.container;
-
-            container.addChild(this.backgroundGraphics);
-            container.addChild(this.pixiText);
-            container.addChild(this.cross);
 
         } else {
             this.pixiText.text = this.text;
             this.backgroundGraphics.clear();
             this.cross.clear();
 
-            this.pixiText.alpha = this.fillAlpha;
-            this.pixiText.anchor.x = 0;
-            this.textStyle.align = "left";
-            this.pixiText.style = this.textStyle;
         }
 
         this.centerXInitial = 0;
@@ -143,37 +142,36 @@ export class CheckBoxClass extends GuiTextComponentClass {
             this.textHeight = tm.height;
             let ascent = tm.fontProperties.ascent
 
-            textTop = (this.width - this.textHeight) / 2;
+            textTop = (this.boxWidth - this.textHeight) / 2;
             this.distanceToText = tm.fontProperties.descent * 3;
 
             this.pixiText.localTransform.identity();
-            this.pixiText.localTransform.translate(this.width + this.distanceToText, textTop);
+            this.pixiText.localTransform.translate(this.boxWidth + this.distanceToText, textTop);
             this.pixiText.setFromMatrix(this.pixiText.localTransform);
             this.pixiText.updateLocalTransform();
 
-            this.centerXInitial = (this.width + this.textWidth + this.distanceToText) / 2;
-            this.centerYInitial = this.width / 2;
+            this.centerXInitial = (this.boxWidth + this.textWidth + this.distanceToText) / 2;
+            this.centerYInitial = this.boxWidth / 2;
         }
 
         let left = 0;
         let top = 0;
-        let textBottom = top + this.width - textTop;
-        let overallWidth = this.textWidth + this.width + this.distanceToText;
-        this.width = overallWidth;
-        this.height = Math.max(this.width, this.textHeight);
+        let textBottom = top + this.boxWidth - textTop;
+        let overallWidth = this.textWidth + this.boxWidth + this.distanceToText;
+        this.height = Math.max(this.boxWidth, this.textHeight);
 
         this.hitPolygonInitial = [
-            { x: left, y: top }, { x: left + this.width, y: top }, { x: left + this.width + this.distanceToText, y: textTop },
+            { x: left, y: top }, { x: left + this.boxWidth, y: top }, { x: left + this.boxWidth + this.distanceToText, y: textTop },
             { x: left + overallWidth, y: textTop },
             { x: left + overallWidth, y: textBottom },
-            { x: left + this.width + this.distanceToText, y: textBottom },
-            { x: left + this.width, y: top + this.width },
-            { x: left, y: top + this.width }
+            { x: left + this.boxWidth + this.distanceToText, y: textBottom },
+            { x: left + this.boxWidth, y: top + this.boxWidth },
+            { x: left, y: top + this.boxWidth }
         ];
         this.hitPolygonDirty = true;
 
 
-        this.backgroundGraphics.roundRect(0, 0, this.width, this.width, this.width / 8);
+        this.backgroundGraphics.roundRect(0, 0, this.boxWidth, this.boxWidth, this.boxWidth / 8);
 
         if (this.fillColor != null) {
             this.backgroundGraphics.fill(this.fillColor);
@@ -194,9 +192,9 @@ export class CheckBoxClass extends GuiTextComponentClass {
 
         // this.cross.lineStyle(this.borderWidth * 2, this.crossColor, this.fillAlpha, 0.5);
         this.cross.moveTo(bwdf, bwdf);
-        this.cross.lineTo(this.width - bwdf, this.width - bwdf);
-        this.cross.moveTo(this.width - bwdf, bwdf);
-        this.cross.lineTo(bwdf, this.width - bwdf);
+        this.cross.lineTo(this.boxWidth - bwdf, this.boxWidth - bwdf);
+        this.cross.moveTo(this.boxWidth - bwdf, bwdf);
+        this.cross.lineTo(bwdf, this.boxWidth - bwdf);
 
         this.cross.stroke({
             width: this.borderWidth * 2,
@@ -227,6 +225,7 @@ export class CheckBoxClass extends GuiTextComponentClass {
                 if (containsPointer && this.mouseIsDown) {
                     this.isChecked = !this.isChecked;
                     this.render();
+                    this.callOnChange("" + this.isChecked);
                 }
                 this.mouseIsDown = false;
             }
