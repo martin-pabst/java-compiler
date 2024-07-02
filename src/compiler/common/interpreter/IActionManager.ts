@@ -1,4 +1,5 @@
 import jQuery from 'jquery';
+import { SoundTools } from '../../../tools/SoundTools';
 
 export type ButtonToggler = (state: boolean) => void;
 
@@ -93,6 +94,9 @@ export class ActionManager {
             if(!actionEntry) return;
             if(actionEntry.active){
                 actionEntry.action(actionIdentifier, undefined, "mousedown");
+            }
+            if(actionIdentifier == "interpreter.start"){
+                SoundTools.init();
             }
         });
 

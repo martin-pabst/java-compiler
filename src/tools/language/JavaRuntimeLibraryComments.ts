@@ -3821,6 +3821,23 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Sets the padding between text and surrounding rectangle.",
     })
 
-    
+   /**
+    *  class Sound
+    */
+
+   static SoundClassComment = () => lm({
+   "de": "Klasse mit statischen Methoden und statischen Konstanten zur Ausgabe von Sound",
+   "en": "Class with static methods and static constants to play sound.",
+   })
+
+   static SoundGetVolumeComment = () => lm({
+   "de": "Gibt die aktuelle Mikrofonlautstärke zurück. Beim ersten Aufruf muss der Benutzer dem Browser die Erlaubnis zur Benutzung des Mikrofons geben. Solange dies noch nicht erfolgt ist, gibt die Funktion den Wert -1 zurück.",
+   "en": "Returns current microphone level.",
+   })
+
+   static SoundPlaySoundComment = () => lm({
+   "de": "Spielt einen Sound ab. Die Möglichen Sounds sind als statische Variablen der Klasse Sound hinterlegt. Tippe als Parameter also Sound gefolgt von einem Punkt ein, um eine Auswahl zu sehen!",
+   "en": "Plays given sound. Possible sounds are given by static fields of Sound class.",
+   })
 
 }  
