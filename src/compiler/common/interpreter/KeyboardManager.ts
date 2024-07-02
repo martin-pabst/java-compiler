@@ -22,7 +22,7 @@ export class KeyboardManager {
     private keyUpCallbacks: KeyUpListener[] = [];
     private keyDownCallbacks: KeyDownListener[] = [];
 
-    private internalKeyboardListener: InternalKeyboardListener[] = [];
+    public internalKeyboardListeners: InternalKeyboardListener[] = [];
 
     constructor(private element: JQuery<any>, private main: IMain) {
         this.registerListeners(element);
@@ -100,7 +100,7 @@ export class KeyboardManager {
 
         element.on("keydown", (e) => {
             let k = e.key;
-            for (let kpc of that.internalKeyboardListener) {
+            for (let kpc of that.internalKeyboardListeners) {
                 kpc.onKeyDown(k, e.shiftKey, e.ctrlKey, e.altKey);
             }
             return true;
@@ -117,7 +117,7 @@ export class KeyboardManager {
         this.keyPressedCallbacks = [];
         this.keyDownCallbacks = [];
         this.keyUpCallbacks = [];
-        this.internalKeyboardListener = [];
+        this.internalKeyboardListeners = [];
     }
 
     addKeyPressedListener(listener: KeyPressedListener) {
@@ -133,12 +133,12 @@ export class KeyboardManager {
     }
 
     addInternalKeyboardListener(listener: InternalKeyboardListener){
-        this.internalKeyboardListener.push(listener);
+        this.internalKeyboardListeners.push(listener);
     }
 
     removeInternalKeyboardListener(listener: InternalKeyboardListener){
-        let  index = this.internalKeyboardListener.indexOf(listener);
-        if(index >= 0) this.internalKeyboardListener.splice(index, 1);
+        let  index = this.internalKeyboardListeners.indexOf(listener);
+        if(index >= 0) this.internalKeyboardListeners.splice(index, 1);
     }
 
     removeKeyPressedListener(listener: KeyPressedListener){

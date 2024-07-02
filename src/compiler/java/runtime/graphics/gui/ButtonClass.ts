@@ -85,8 +85,6 @@ export class ButtonClass extends GuiTextComponentClass {
             });
 
             this.container = new PIXI.Container();
-            //@ts-ignore
-            this.container["Test"] = "Hier!";
             this.container.localTransform.translate(this.x, this.y);
             this.container.setFromMatrix(this.container.localTransform);
             this.container.updateLocalTransform();

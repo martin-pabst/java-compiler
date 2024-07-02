@@ -3797,5 +3797,30 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Selects this Radiobutton and deselects all Radiobuttons in same group as this one.",
     })
     
+    /**
+     * class Textfield
+     */
+
+    static TextfieldClassComment = () => lm({
+    "de": "Textfeld, das innerhalb der Grafikausgabe dargestellt werden kann",
+    "en": "Textfield inside graphic panel",
+    })
+
+    static TextfieldConstructorComment = () => lm({
+    "de": "Instanziert ein neues TextField-Objekt. (x, y) sind die Koordinaten der linken oberen Ecke, fontsize die Höhe des Textes in Pixeln.",
+    "en": "Creates a new Textfield. (x, y) is it's top left edge, fontsize it's text height in pixels.",
+    })
+
+    static TextfieldCopyComment = () => lm({
+    "de": "Erzeugt eine Kopie des Textfield-Objekts",
+    "en": "Creates a clone of this Textfield object",
+    })
+
+    static TextfieldSetPaddingComment = () => lm({
+    "de": "'Setzt den Innenabstand (padding) des Textes zum umgebenden Rechteck.",
+    "en": "Sets the padding between text and surrounding rectangle.",
+    })
+
+    
 
 }  

@@ -104,6 +104,7 @@ import { ChangeListenerInterface } from "../graphics/gui/ChangeListenerInterface
 import { ButtonClass } from "../graphics/gui/ButtonClass.ts";
 import { CheckboxClass } from "../graphics/gui/CheckboxClass.ts";
 import { RadiobuttonClass } from "../graphics/gui/RadiobuttonClass.ts";
+import { TextfieldClass } from "../graphics/gui/TextfieldClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -180,7 +181,7 @@ export class SystemModule extends JavaLibraryModule {
 
             // Gui components
             ChangeListenerInterface, GuiComponentClass, GuiTextComponentClass, ButtonClass, CheckboxClass,
-            RadiobuttonClass,
+            RadiobuttonClass, TextfieldClass,
 
             // Graphics'n Games (GNG)
             GNGBaseFigur, GNGKreis, GNGRechteck, GNGDreieck, GNGText, GNGFigur,

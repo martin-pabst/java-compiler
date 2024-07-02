@@ -1,5 +1,10 @@
 export var testProgramsList = [
-   ['', ''],
+   ['', ``],
+   ['TextfieldTest', `Textfield tf = new Textfield(100, 100, 300, 20, "Test");
+
+   while (true) {
+      
+   }`],
    ['RadiobuttonTest', `Radiobutton rb1 = new Radiobutton(100, 100, 10, 20, "Test1", 1);
    Radiobutton rb2 = new Radiobutton(100, 200, 10, 20, "Test1", 2);
    Radiobutton rb3 = new Radiobutton(100, 300, 10, 20, "Test3", 3);
