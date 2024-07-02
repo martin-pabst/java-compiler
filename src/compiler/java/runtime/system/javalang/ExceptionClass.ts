@@ -20,7 +20,7 @@ export class ExceptionClass extends ThrowableClass implements IThrowable {
 
     static type: NonPrimitiveType;
 
-    constructor(public message?: string, public cause?: ThrowableClass){
+    constructor(message?: string, public cause?: ThrowableClass){
         super();
     }
 

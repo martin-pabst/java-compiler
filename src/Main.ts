@@ -56,6 +56,7 @@ import { ReplGUI } from "./testgui/editor/ReplGUI.ts";
 import { Repl } from "./compiler/java/parser/repl/Repl.ts";
 import { ReplCompiledModule } from "./compiler/java/parser/repl/ReplCompiledModule.ts";
 import { TestInputManager } from "./testgui/TestInputManager.ts";
+import { TestFileManager } from "./testgui/TestFileManager.ts";
 
 export class Main implements IMain {
 
@@ -160,10 +161,12 @@ export class Main implements IMain {
 
     let inputManager = new TestInputManager(this.inputDiv, this.insightTabsManager);
 
+    let fileManager = new TestFileManager(this);
+
     this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager,
       new GraphicsManager(this.graphicsDiv), keyboardManager, 
       this.breakpointManager, _debugger, new ProgramPointerManager(this),
-    testManager, inputManager);
+    testManager, inputManager, fileManager);
 
     this.testResultViewer.addEventListener('run-all-tests',
       (e) => { if (e.type == "run-all-tests") testManager.executeAllTests(); });

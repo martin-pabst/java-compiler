@@ -1,3 +1,4 @@
+import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
 import { Stacktrace } from "../../../../common/interpreter/ThrowableType.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
@@ -20,8 +21,8 @@ export class FileNotFoundExceptionClass extends ExceptionClass {
 
     static type: NonPrimitiveType;
 
-    constructor(public filename?: string, public cause?: ThrowableClass){
-        super();
+    constructor(public filename: string, public cause?: ThrowableClass){
+        super(JRC.FileNotFoundExceptionComment(filename), cause);
     }
 
 
