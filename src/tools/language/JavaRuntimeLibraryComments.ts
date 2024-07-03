@@ -3871,4 +3871,94 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
    "en": "Appends given text to workspace file.",
    })
 
+   /**
+    * JsonElement
+    */
+   static JsonElementClassComment = () => lm({
+   "de": "Repräsentiert einen Knoten in einem Json-Objektbaum.",
+   "en": "Represents a single node inside a json object tree.",
+   })
+
+   static JsonElementGetTypeComment = () => lm({
+   "de": 'Gibt den Typ des Json-Elements zurück. Mögliche Werte sind "string", "number", "array", "boolean" und "object".',
+   "en": 'Returns the type of this Json-Element. Possible values are "string", "number", "array", "boolean" and "object".',
+   })
+
+   static JsonElementGetArrayValuesComment = () => lm({
+   "de": "Falls das Json-Element ein Array ist, gibt diese Funktion es als Array von Json-Elementen zurück, andernfalls wirft sie eine Exception.",
+   "en": "If this Json element is an array, this method returns the corresponding array of json elements, otherwise it throws an Exception.",
+   })
+
+   static JsonElementNoArrayException = () => lm({
+   "de": "Das Json-Element ist kein Array, daher kann getArrayValues() kein Array zurückgeben.",
+   "en": "This json element is no array, therefore getArrayValues() cannot return an array of json elements.",
+   })
+
+   static JsonElementNoObjectException = () => lm({
+   "de": "Das Json-Element ist kein Objekt, daher kann getAttributeValue() keinen Attributwert zurückgeben.",
+   "en": "This json element is no object, therefore getAttributeValue() cannot return an attribute value.",
+   })
+
+   static JsonElementGetAttributeValueComment = () => lm({
+   "de": "Falls das Json-Element ein Objekt ist, gibt diese Funktion den Wert seines Attributs mit dem übergebenen Bezeichner als JsonElement zurück.",
+   "en": "If this json element is an object, this method returns the value of it's field with given identifier.",
+   })
+
+   static JsonElementGetAsStringComment = () => lm({
+   "de": "Gibt den String-Wert des JSon-Elements zurück.",
+   "en": "Returns string-value of this json element.",
+   })
+
+   static JsonElementNoStringExceptionComment = () => lm({
+   "de": "Das Json-Element ist kein String, daher kann getAsString() keinen Wert zurückgeben.",
+   "en": "This json element is no string, therefore method getAsString() cannot return a string value.",
+   })
+
+   static JsonElementGetAsIntComment = () => lm({
+   "de": "Gibt den int-Wert des JSon-Elements zurück.",
+   "en": "Returns int value of this json element.",
+   })
+
+   static JsonElementNoIntValueException = () => lm({
+   "de": "Das Json-Element ist keine Zahl, daher kann getAsInt() keinen Wert zurückgeben.",
+   "en": "This json element is no number, therefore getAsInt() cannot return an int value.",
+   })
+
+   static JsonElementToJsonComment = () => lm({
+   "de": "Gibt den Wert des Json-Elements als Json-codierten String zurück.",
+   "en": "Returns value of this json element as json encoded string.",
+   })
+
+   static JsonElementGetAsDoubleComment = () => lm({
+   "de": "Gibt den double-Wert des JSon-Elements zurück.",
+   "en": "Returns double value of this json element.",
+   })
+
+   static JsonElementNoDoubleException = () => lm({
+   "de": "Das Json-Element ist keine Zahl, daher kann getAsDouble() keinen Wert zurückgeben.",
+   "en": "This json element is no number, therefore method getAsDouble() cannot return a double value.",
+   })
+
+   static JsonElementGetAsBooleanComment = () => lm({
+   "de": "Gibt den boolean-Wert des JSon-Elements zurück.",
+   "en": "Returns boolean value of this json element.",
+   })
+
+   static JsonElementNoBooleanException = () => lm({
+   "de": "Das Json-Element ist kein boolescher Wert, daher kann getAsBoolean() keinen Wert zurückgeben.",
+   "en": "This json element is no boolean value, therefore method getAsBoolean() cannot return a boolean value.",
+   })
+
+   static JsonElementGetAttributeIdentifiersComment = () => lm({
+   "de": "Falls das Json-Element ein Objekt ist, gibt diese Funktion ein Array mit seinen Attributbezeichnern zurück.",
+   "en": "If this json element is an object, this method returns an array with it's field identifiers.",
+   })
+
+   static JsonElementGetAttributeIdentifiersException = () => lm({
+   "de": "Das Json-Element ist kein Objekt, daher kann diese Methode kein Array von Attributbzeichnern liefern.",
+   "en": "This json element is no object, therefore this method cannot return an array with field identifiers.",
+   })
+
+   
+
 }  
