@@ -3758,207 +3758,225 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     })
 
     static RadiobuttonGetIndexComment = () => lm({
-    "de": "Gibt den Index des Radiobuttons zurück.",
-    "en": "Returns this radiobutton's index.",
+        "de": "Gibt den Index des Radiobuttons zurück.",
+        "en": "Returns this radiobutton's index.",
     })
 
     static RadiobuttonGetIndexOfSelectedRadiobuttonComment = () => lm({
-    "de": "Sind mehrere Radiobuttons mittels connectTo mit dieserm logisch verbunden, so ist genau einer davon selektiert. Diese Methode gibt den Index dieses selektierten Radiobuttons zurück.",
-    "en": "If threre are several radiobuttons grouped together via method connectTo then this method returns the selected radiobutton's index.",
+        "de": "Sind mehrere Radiobuttons mittels connectTo mit dieserm logisch verbunden, so ist genau einer davon selektiert. Diese Methode gibt den Index dieses selektierten Radiobuttons zurück.",
+        "en": "If threre are several radiobuttons grouped together via method connectTo then this method returns the selected radiobutton's index.",
     })
 
     static RadiobuttonGetTextOfSelectedRadiobuttonComment = () => lm({
-    "de": "Sind mehrere Radiobuttons mittels connectTo mit dieserm logisch verbunden, so ist genau einer davon selektiert. Diese Methode gibt den Text dieses selektierten Radiobuttons zurück.",
-    "en": "If threre are several radiobuttons grouped together via method connectTo then this method returns the selected radiobutton's text.",
+        "de": "Sind mehrere Radiobuttons mittels connectTo mit dieserm logisch verbunden, so ist genau einer davon selektiert. Diese Methode gibt den Text dieses selektierten Radiobuttons zurück.",
+        "en": "If threre are several radiobuttons grouped together via method connectTo then this method returns the selected radiobutton's text.",
     })
 
     static RadiobuttonSetIndexComment = () => lm({
-    "de": "Setzt den Index des Radiobuttons.",
-    "en": "Set this radiobutton's index.",
+        "de": "Setzt den Index des Radiobuttons.",
+        "en": "Set this radiobutton's index.",
     })
 
     static RadiobuttonSetDotColorComment = () => lm({
-    "de": "Setzt die Farbe des Punktes. Die Farbe wird als int-Wert gegeben, wobei farbe == 256*256*rot + 256*grün + blau",
-    "en": "Sets dot color of this radiobutton. Color is given as int-value: color = 256*256*red + 256*green + blue",
+        "de": "Setzt die Farbe des Punktes. Die Farbe wird als int-Wert gegeben, wobei farbe == 256*256*rot + 256*grün + blau",
+        "en": "Sets dot color of this radiobutton. Color is given as int-value: color = 256*256*red + 256*green + blue",
     })
 
     static RadiobuttonConnectToComment = () => lm({
-    "de": "Verbindet diesen Radiobutton logisch mit den anderen Radiobuttons. Wird anschließend auf einen davon geklickt, so wird dieser selektiert, die anderen deselektiert.",
-    "en": "Connects this radiobutton with given radiobuttons to a radiobutton group. If you click at one of them subsequently then all others get deselected so that only one of them is selected at any given time.",
+        "de": "Verbindet diesen Radiobutton logisch mit den anderen Radiobuttons. Wird anschließend auf einen davon geklickt, so wird dieser selektiert, die anderen deselektiert.",
+        "en": "Connects this radiobutton with given radiobuttons to a radiobutton group. If you click at one of them subsequently then all others get deselected so that only one of them is selected at any given time.",
     })
 
     static RadiobuttonIsSelectedComment = () => lm({
-    "de": "Gibt genau dann true zurück, falls die RadioButton selektiert ist.",
-    "en": "Returns true if and only if this radiobutton is selected.",
+        "de": "Gibt genau dann true zurück, falls die RadioButton selektiert ist.",
+        "en": "Returns true if and only if this radiobutton is selected.",
     })
 
     static RadiobuttonSelectComment = () => lm({
-    "de": "Selektiert diesen Radiobutton und deselektiert alle via connectTo mit ihm verbundenen Radiobuttons.",
-    "en": "Selects this Radiobutton and deselects all Radiobuttons in same group as this one.",
+        "de": "Selektiert diesen Radiobutton und deselektiert alle via connectTo mit ihm verbundenen Radiobuttons.",
+        "en": "Selects this Radiobutton and deselects all Radiobuttons in same group as this one.",
     })
-    
+
     /**
      * class Textfield
      */
 
     static TextfieldClassComment = () => lm({
-    "de": "Textfeld, das innerhalb der Grafikausgabe dargestellt werden kann",
-    "en": "Textfield inside graphic panel",
+        "de": "Textfeld, das innerhalb der Grafikausgabe dargestellt werden kann",
+        "en": "Textfield inside graphic panel",
     })
 
     static TextfieldConstructorComment = () => lm({
-    "de": "Instanziert ein neues TextField-Objekt. (x, y) sind die Koordinaten der linken oberen Ecke, fontsize die Höhe des Textes in Pixeln.",
-    "en": "Creates a new Textfield. (x, y) is it's top left edge, fontsize it's text height in pixels.",
+        "de": "Instanziert ein neues TextField-Objekt. (x, y) sind die Koordinaten der linken oberen Ecke, fontsize die Höhe des Textes in Pixeln.",
+        "en": "Creates a new Textfield. (x, y) is it's top left edge, fontsize it's text height in pixels.",
     })
 
     static TextfieldCopyComment = () => lm({
-    "de": "Erzeugt eine Kopie des Textfield-Objekts",
-    "en": "Creates a clone of this Textfield object",
+        "de": "Erzeugt eine Kopie des Textfield-Objekts",
+        "en": "Creates a clone of this Textfield object",
     })
 
     static TextfieldSetPaddingComment = () => lm({
-    "de": "'Setzt den Innenabstand (padding) des Textes zum umgebenden Rechteck.",
-    "en": "Sets the padding between text and surrounding rectangle.",
+        "de": "'Setzt den Innenabstand (padding) des Textes zum umgebenden Rechteck.",
+        "en": "Sets the padding between text and surrounding rectangle.",
     })
 
-   /**
-    *  class Sound
-    */
+    /**
+     *  class Sound
+     */
 
-   static SoundClassComment = () => lm({
-   "de": "Klasse mit statischen Methoden und statischen Konstanten zur Ausgabe von Sound",
-   "en": "Class with static methods and static constants to play sound.",
-   })
+    static SoundClassComment = () => lm({
+        "de": "Klasse mit statischen Methoden und statischen Konstanten zur Ausgabe von Sound",
+        "en": "Class with static methods and static constants to play sound.",
+    })
 
-   static SoundGetVolumeComment = () => lm({
-   "de": "Gibt die aktuelle Mikrofonlautstärke zurück. Beim ersten Aufruf muss der Benutzer dem Browser die Erlaubnis zur Benutzung des Mikrofons geben. Solange dies noch nicht erfolgt ist, gibt die Funktion den Wert -1 zurück.",
-   "en": "Returns current microphone level.",
-   })
+    static SoundGetVolumeComment = () => lm({
+        "de": "Gibt die aktuelle Mikrofonlautstärke zurück. Beim ersten Aufruf muss der Benutzer dem Browser die Erlaubnis zur Benutzung des Mikrofons geben. Solange dies noch nicht erfolgt ist, gibt die Funktion den Wert -1 zurück.",
+        "en": "Returns current microphone level.",
+    })
 
-   static SoundPlaySoundComment = () => lm({
-   "de": "Spielt einen Sound ab. Die Möglichen Sounds sind als statische Variablen der Klasse Sound hinterlegt. Tippe als Parameter also Sound gefolgt von einem Punkt ein, um eine Auswahl zu sehen!",
-   "en": "Plays given sound. Possible sounds are given by static fields of Sound class.",
-   })
+    static SoundPlaySoundComment = () => lm({
+        "de": "Spielt einen Sound ab. Die Möglichen Sounds sind als statische Variablen der Klasse Sound hinterlegt. Tippe als Parameter also Sound gefolgt von einem Punkt ein, um eine Auswahl zu sehen!",
+        "en": "Plays given sound. Possible sounds are given by static fields of Sound class.",
+    })
 
-   /**
-    * FileNotFoundException
-    */
-   static FileNotFoundExceptionComment = (filename: string) => lm({
-   "de": "Konnte die Datei '" + filename + "' nicht finden.",
-   "en": "File not found: '" + filename + "'",
-   })
+    /**
+     * FileNotFoundException
+     */
+    static FileNotFoundExceptionComment = (filename: string) => lm({
+        "de": "Konnte die Datei '" + filename + "' nicht finden.",
+        "en": "File not found: '" + filename + "'",
+    })
 
-   /**
-    * class Files
-    */
-   static FilesClassComment = () => lm({
-   "de": "Klasse mit statischen Methoden zum Lesen/Schreiben von Dateien.",
-   "en": "Class with static methods to read/write files.",
-   })
+    /**
+     * class Files
+     */
+    static FilesClassComment = () => lm({
+        "de": "Klasse mit statischen Methoden zum Lesen/Schreiben von Dateien.",
+        "en": "Class with static methods to read/write files.",
+    })
 
-   static FilesReadComment = () => lm({
-   "de": "Gibt den Inhalt der Workspacedatei zurück.",
-   "en": "Returns content of workspace file with given filename.",
-   })
+    static FilesReadComment = () => lm({
+        "de": "Gibt den Inhalt der Workspacedatei zurück.",
+        "en": "Returns content of workspace file with given filename.",
+    })
 
-   static FilesWriteComment = () => lm({
-   "de": "Schreibt den Text in die Workspacedatei.",
-   "en": "Erases workspace file and then writes given text into it.",
-   })
+    static FilesWriteComment = () => lm({
+        "de": "Schreibt den Text in die Workspacedatei.",
+        "en": "Erases workspace file and then writes given text into it.",
+    })
 
-   static FilesAppendComment = () => lm({
-   "de": "Fügt den Text hinten an die Workspacedatei an.",
-   "en": "Appends given text to workspace file.",
-   })
+    static FilesAppendComment = () => lm({
+        "de": "Fügt den Text hinten an die Workspacedatei an.",
+        "en": "Appends given text to workspace file.",
+    })
 
-   /**
-    * JsonElement
-    */
-   static JsonElementClassComment = () => lm({
-   "de": "Repräsentiert einen Knoten in einem Json-Objektbaum.",
-   "en": "Represents a single node inside a json object tree.",
-   })
+    /**
+     * JsonElement
+     */
+    static JsonElementClassComment = () => lm({
+        "de": "Repräsentiert einen Knoten in einem Json-Objektbaum.",
+        "en": "Represents a single node inside a json object tree.",
+    })
 
-   static JsonElementGetTypeComment = () => lm({
-   "de": 'Gibt den Typ des Json-Elements zurück. Mögliche Werte sind "string", "number", "array", "boolean" und "object".',
-   "en": 'Returns the type of this Json-Element. Possible values are "string", "number", "array", "boolean" and "object".',
-   })
+    static JsonElementGetTypeComment = () => lm({
+        "de": 'Gibt den Typ des Json-Elements zurück. Mögliche Werte sind "string", "number", "array", "boolean" und "object".',
+        "en": 'Returns the type of this Json-Element. Possible values are "string", "number", "array", "boolean" and "object".',
+    })
 
-   static JsonElementGetArrayValuesComment = () => lm({
-   "de": "Falls das Json-Element ein Array ist, gibt diese Funktion es als Array von Json-Elementen zurück, andernfalls wirft sie eine Exception.",
-   "en": "If this Json element is an array, this method returns the corresponding array of json elements, otherwise it throws an Exception.",
-   })
+    static JsonElementGetArrayValuesComment = () => lm({
+        "de": "Falls das Json-Element ein Array ist, gibt diese Funktion es als Array von Json-Elementen zurück, andernfalls wirft sie eine Exception.",
+        "en": "If this Json element is an array, this method returns the corresponding array of json elements, otherwise it throws an Exception.",
+    })
 
-   static JsonElementNoArrayException = () => lm({
-   "de": "Das Json-Element ist kein Array, daher kann getArrayValues() kein Array zurückgeben.",
-   "en": "This json element is no array, therefore getArrayValues() cannot return an array of json elements.",
-   })
+    static JsonElementNoArrayException = () => lm({
+        "de": "Das Json-Element ist kein Array, daher kann getArrayValues() kein Array zurückgeben.",
+        "en": "This json element is no array, therefore getArrayValues() cannot return an array of json elements.",
+    })
 
-   static JsonElementNoObjectException = () => lm({
-   "de": "Das Json-Element ist kein Objekt, daher kann getAttributeValue() keinen Attributwert zurückgeben.",
-   "en": "This json element is no object, therefore getAttributeValue() cannot return an attribute value.",
-   })
+    static JsonElementNoObjectException = () => lm({
+        "de": "Das Json-Element ist kein Objekt, daher kann getAttributeValue() keinen Attributwert zurückgeben.",
+        "en": "This json element is no object, therefore getAttributeValue() cannot return an attribute value.",
+    })
 
-   static JsonElementGetAttributeValueComment = () => lm({
-   "de": "Falls das Json-Element ein Objekt ist, gibt diese Funktion den Wert seines Attributs mit dem übergebenen Bezeichner als JsonElement zurück.",
-   "en": "If this json element is an object, this method returns the value of it's field with given identifier.",
-   })
+    static JsonElementGetAttributeValueComment = () => lm({
+        "de": "Falls das Json-Element ein Objekt ist, gibt diese Funktion den Wert seines Attributs mit dem übergebenen Bezeichner als JsonElement zurück.",
+        "en": "If this json element is an object, this method returns the value of it's field with given identifier.",
+    })
 
-   static JsonElementGetAsStringComment = () => lm({
-   "de": "Gibt den String-Wert des JSon-Elements zurück.",
-   "en": "Returns string-value of this json element.",
-   })
+    static JsonElementGetAsStringComment = () => lm({
+        "de": "Gibt den String-Wert des JSon-Elements zurück.",
+        "en": "Returns string-value of this json element.",
+    })
 
-   static JsonElementNoStringExceptionComment = () => lm({
-   "de": "Das Json-Element ist kein String, daher kann getAsString() keinen Wert zurückgeben.",
-   "en": "This json element is no string, therefore method getAsString() cannot return a string value.",
-   })
+    static JsonElementNoStringExceptionComment = () => lm({
+        "de": "Das Json-Element ist kein String, daher kann getAsString() keinen Wert zurückgeben.",
+        "en": "This json element is no string, therefore method getAsString() cannot return a string value.",
+    })
 
-   static JsonElementGetAsIntComment = () => lm({
-   "de": "Gibt den int-Wert des JSon-Elements zurück.",
-   "en": "Returns int value of this json element.",
-   })
+    static JsonElementGetAsIntComment = () => lm({
+        "de": "Gibt den int-Wert des JSon-Elements zurück.",
+        "en": "Returns int value of this json element.",
+    })
 
-   static JsonElementNoIntValueException = () => lm({
-   "de": "Das Json-Element ist keine Zahl, daher kann getAsInt() keinen Wert zurückgeben.",
-   "en": "This json element is no number, therefore getAsInt() cannot return an int value.",
-   })
+    static JsonElementNoIntValueException = () => lm({
+        "de": "Das Json-Element ist keine Zahl, daher kann getAsInt() keinen Wert zurückgeben.",
+        "en": "This json element is no number, therefore getAsInt() cannot return an int value.",
+    })
 
-   static JsonElementToJsonComment = () => lm({
-   "de": "Gibt den Wert des Json-Elements als Json-codierten String zurück.",
-   "en": "Returns value of this json element as json encoded string.",
-   })
+    static JsonElementToJsonComment = () => lm({
+        "de": "Gibt den Wert des Json-Elements als Json-codierten String zurück.",
+        "en": "Returns value of this json element as json encoded string.",
+    })
 
-   static JsonElementGetAsDoubleComment = () => lm({
-   "de": "Gibt den double-Wert des JSon-Elements zurück.",
-   "en": "Returns double value of this json element.",
-   })
+    static JsonElementGetAsDoubleComment = () => lm({
+        "de": "Gibt den double-Wert des JSon-Elements zurück.",
+        "en": "Returns double value of this json element.",
+    })
 
-   static JsonElementNoDoubleException = () => lm({
-   "de": "Das Json-Element ist keine Zahl, daher kann getAsDouble() keinen Wert zurückgeben.",
-   "en": "This json element is no number, therefore method getAsDouble() cannot return a double value.",
-   })
+    static JsonElementNoDoubleException = () => lm({
+        "de": "Das Json-Element ist keine Zahl, daher kann getAsDouble() keinen Wert zurückgeben.",
+        "en": "This json element is no number, therefore method getAsDouble() cannot return a double value.",
+    })
 
-   static JsonElementGetAsBooleanComment = () => lm({
-   "de": "Gibt den boolean-Wert des JSon-Elements zurück.",
-   "en": "Returns boolean value of this json element.",
-   })
+    static JsonElementGetAsBooleanComment = () => lm({
+        "de": "Gibt den boolean-Wert des JSon-Elements zurück.",
+        "en": "Returns boolean value of this json element.",
+    })
 
-   static JsonElementNoBooleanException = () => lm({
-   "de": "Das Json-Element ist kein boolescher Wert, daher kann getAsBoolean() keinen Wert zurückgeben.",
-   "en": "This json element is no boolean value, therefore method getAsBoolean() cannot return a boolean value.",
-   })
+    static JsonElementNoBooleanException = () => lm({
+        "de": "Das Json-Element ist kein boolescher Wert, daher kann getAsBoolean() keinen Wert zurückgeben.",
+        "en": "This json element is no boolean value, therefore method getAsBoolean() cannot return a boolean value.",
+    })
 
-   static JsonElementGetAttributeIdentifiersComment = () => lm({
-   "de": "Falls das Json-Element ein Objekt ist, gibt diese Funktion ein Array mit seinen Attributbezeichnern zurück.",
-   "en": "If this json element is an object, this method returns an array with it's field identifiers.",
-   })
+    static JsonElementGetAttributeIdentifiersComment = () => lm({
+        "de": "Falls das Json-Element ein Objekt ist, gibt diese Funktion ein Array mit seinen Attributbezeichnern zurück.",
+        "en": "If this json element is an object, this method returns an array with it's field identifiers.",
+    })
 
-   static JsonElementGetAttributeIdentifiersException = () => lm({
-   "de": "Das Json-Element ist kein Objekt, daher kann diese Methode kein Array von Attributbzeichnern liefern.",
-   "en": "This json element is no object, therefore this method cannot return an array with field identifiers.",
-   })
+    static JsonElementGetAttributeIdentifiersException = () => lm({
+        "de": "Das Json-Element ist kein Objekt, daher kann diese Methode kein Array von Attributbzeichnern liefern.",
+        "en": "This json element is no object, therefore this method cannot return an array with field identifiers.",
+    })
 
-   
+    /**
+     * class HttpHeader
+     */
+    static HttpHeaderComment = () => lm({
+        "de": "Ein Http-Header ist ein Schlüssel-Wert-Paar (key-value-pair).",
+        "en": "A Http-header is a key-value-pair.",
+    })
+
+    static HttpHeaderKeyComment = () => lm({
+        "de": "Schlüssel (key) des Http-Headers",
+        "en": "key of this header",
+    })
+
+    static HttpHeaderValueComment = () => lm({
+        "de": "Wert (value) des Http-Headers",
+        "en": "value of this header",
+    })
+
+    
 
 }  

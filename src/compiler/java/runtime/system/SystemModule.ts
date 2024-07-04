@@ -106,6 +106,7 @@ import { CheckboxClass } from "../graphics/gui/CheckboxClass.ts";
 import { RadiobuttonClass } from "../graphics/gui/RadiobuttonClass.ts";
 import { TextfieldClass } from "../graphics/gui/TextfieldClass.ts";
 import { SoundClass } from "./additional/SoundClass.ts";
+import { FilesClass } from "./additional/FilesClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -137,7 +138,7 @@ export class SystemModule extends JavaLibraryModule {
             //additional system classes
             KeyClass, LocalDateTimeClass, DayOfWeekEnum, PositionClass, BigIntegerClass,
             ConsoleClass, Vector2Class, MathToolsClass, PrintStreamClass, SystemClass,
-            GamepadClass, KeyListenerInterface, SystemToolsClass, InputClass, SoundClass,
+            GamepadClass, KeyListenerInterface, SystemToolsClass, InputClass, SoundClass, FilesClass,
 
             // Functional
             ConsumerInterface, FunctionInterface,
