@@ -25,8 +25,10 @@ export class HttpResponseClass extends ObjectClass {
 
     request!: HttpRequestClass;
     headers: HttpHeaderClass[] = [];
-    response!: Response;
-    body!: string;
+
+    constructor(private response: Response, private body: string){
+        super();
+    }
 
     _getUri(): string {
         return this.response.url;

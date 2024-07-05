@@ -24,7 +24,7 @@ export class HttpRequestClass extends ObjectClass {
     static type: NonPrimitiveType;
 
     headers: HttpHeaderClass[] = [];
-    uri?: string;
+    uri!: string;
     postData?: string;
     method: "GET" | "POST" = "GET";
 

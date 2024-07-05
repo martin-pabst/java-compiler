@@ -4070,6 +4070,20 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     })
 
 
+    static HttpClientComment = () => lm({
+    "de": "Ein Objekt der Klasse HttpClient kann Http-Requests senden.",
+    "en": "An object of class HttpClient can send HTTP-requests.",
+    })
+
+    static HttpClientSendComment = () => lm({
+    "de": "Sendet den Request an den Server.",
+    "en": "Sends request to server.",
+    })
+
+    static HttpClientConstructorComment = () => lm({
+    "de": "Instanziert ein neues HttpClient-Objekt.",
+    "en": "Creates a new HttpClient-object.",
+    })
 
 
 
