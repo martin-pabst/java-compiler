@@ -3977,6 +3977,23 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
         "en": "value of this header",
     })
 
+    /**
+     * class JsonParser
+     */
     
+    static JsonParserClassComment = () => lm({
+    "de": "Parst Json-Code und gibt ihn als Objektbaum zurück.",
+    "en": "Parses Json-code and builds object tree.",
+    })
+
+    static JsonParserParseComment = () => lm({
+    "de": "Wandelt einen Json-String in einen Objektbaum um.",
+    "en": "Transforms Json-string to object tree.",
+    })
+
+    static JsonParserParseException = (error: string) => lm({
+    "de": "Fehler beim Parsen des Json-Strings: " + error,
+    "en": "Error parsing json-string: " + error,
+    })
 
 }  
