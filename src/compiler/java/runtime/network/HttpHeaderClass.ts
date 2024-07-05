@@ -18,5 +18,10 @@ export class HttpHeaderClass extends ObjectClass {
     key: string = "";
     value: string = "";
 
+    constructor(key?: string, value?: string){
+        super();
+        if(key) this.key = key;
+        if(value) this.value = value;
+    }
 
 }

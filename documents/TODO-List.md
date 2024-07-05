@@ -48,15 +48,15 @@
   * classes BigInteger, Console, Vector2, MathToolsClass, System, Gamepad, SystemTools, Timer, Input
   * GNG classes
   * classes for graphical GUI-Elements
-  * class Sound
+  * class Sound, class Files
 
 ## working status on current issue:
 
 ### fine-grained next todos on current issue:
 
 ## next 
-  * class Files
   * HTTP-Client and JSON-Converter
+  * WebSocket client
   * Missing Collections 
   * Robot
   * if method overrides or implements other method and has no comment, then take the overriden method's comment

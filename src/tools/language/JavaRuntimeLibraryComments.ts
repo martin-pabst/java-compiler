@@ -3996,4 +3996,82 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Error parsing json-string: " + error,
     })
 
+    /**
+     * class HttpRequest
+     */
+    static HttpRequestClassComment = () => lm({
+    "de": "Ein Objekt der Klasse HttpRequest umfasst die URI, den Header und die Daten eines Http-Requests.",
+    "en": "An object of class HttpRequest consists of URI, Header and data (body).",
+    })
+
+    static HttpRequestConstructorComment = () => lm({
+    "de": "Instanziert ein neues HttpRequest-Objekt.",
+    "en": "Creates a new HttpRequest-object.",
+    })
+
+    static HttpRequestUriComment = () => lm({
+    "de": "Legt die URI des Requests fest. Gibt ein HttpRequest-Objekt zurück (zum method-chaining).",
+    "en": "Sets the URI of this request. Returns a HttpRequest-object for method chaining.",
+    })
+
+
+    static HttpRequestHeaderComment = () => lm({
+    "de": "Fügt dem Request einen Header hinzu.",
+    "en": "Adds a header to this request.",
+    })
+
+    static HttpRequestPOSTComment = () => lm({
+    "de": "Setzt die Request-Methode auf POST und fügt dem Request die übergebenen Daten hinzu.",
+    "en": "Sets request method to POST and adds given data to this request.",
+    })
+
+    static HttpRequestGETComment = () => lm({
+    "de": "Setzt die Request-Methode auf GET.",
+    "en": "Sets request method to GET.",
+    })
+
+
+    /**
+     * class HttpResponse
+     */
+    static HttpResponseClassComment = () => lm({
+    "de": "Ein Objekt der Klasse HttpResponse umfasst den Statuscode, die Header und den Body (d.h. die Daten) eines http-Response.",
+    "en": "An object of class HttpResponse consists of status code, headers and body (that is: data) of an http-response.",
+    })
+
+    static HttpResponseUriComment = () => lm({
+    "de": "Gibt die URI des Responses zurück.",
+    "en": "Returns the URI of this response.",
+    })
+
+    static HttpResponseBodyComment = () => lm({
+    "de": "Gibt den Body dieses Responses zurück.",
+    "en": "Returns the body of this response.",
+    })
+
+    static HttpResponseStatusCodeComment = () => lm({
+    "de": "Gibt den Statuscode dieses Responses zurück.",
+    "en": "Returns the status code of this response.",
+    })
+
+    static HttpResponseStatusTextComment = () => lm({
+    "de": "Gibt den den http-Status dieses Responses in Textform zurück.",
+    "en": "Returns the status of this response as text (string).",
+    })
+
+    static HttpResponseRequestComment = () => lm({
+    "de": "Gibt das Request-Objekt zurück, das diesen Response zur Folge hatte.",
+    "en": "Returns the request-object whicht lead to this response.",
+    })    
+
+    static HttpResponseHeadersComment = () => lm({
+    "de": "Gibt die Header dieses Responses zurück.",
+    "en": "Returns the headers of this response.",
+    })
+
+
+
+
+
+
 }  
