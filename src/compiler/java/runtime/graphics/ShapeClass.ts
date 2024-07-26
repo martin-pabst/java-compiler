@@ -35,6 +35,7 @@ export class ShapeClass extends ActorClass {
         { type: "method", signature: "final double getCenterX()", native: ShapeClass.prototype._getCenterX, comment: JRC.shapeCenterXComment },
         { type: "method", signature: "final double getCenterY()", native: ShapeClass.prototype._getCenterY, comment: JRC.shapeCenterYComment },
         { type: "method", signature: "final double getAngle()", template: '(§1.angle)', comment: JRC.shapeAngleComment },
+        { type: "method", signature: "final void setAngle(double newAngle)", native: ShapeClass.prototype._setAngle, comment: JRC.shapeSetAngleComment },
         { type: "method", signature: "final boolean containsPoint(double x, double y)", native: ShapeClass.prototype._containsPoint, comment: JRC.shapeContainsPointComment },
         { type: "method", signature: "final void moveTo(double x, double y)", native: ShapeClass.prototype._moveTo, comment: JRC.shapeMoveToComment },
         { type: "method", signature: "final void defineCenter(double x, double y)", native: ShapeClass.prototype._defineCenter, comment: JRC.shapeDefineCenterComment },
@@ -521,6 +522,10 @@ export class ShapeClass extends ActorClass {
 
     public borderContainsPoint(x: number, y: number, color: number = -1): boolean {
         return false;
+    }
+
+    _setAngle(angle: number){
+        this._rotate(angle - this.angle);
     }
 
 }

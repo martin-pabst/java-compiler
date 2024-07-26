@@ -19,7 +19,7 @@ export class TextClass extends FilledShapeClass {
         { type: "method", signature: "Text(double x, double y, double fontSize, string text, string fontFamily)", java: TextClass.prototype._cj$_constructor_$Text$double$double$double$string, comment: JRC.TextConstructorComment1 },
         
         { type: "method", signature: "void setFontsize(double fontsize)", native: TextClass.prototype._setFontsize, comment: JRC.TextSetFontsizeComment },
-        { type: "method", signature: "void setText(double text)", native: TextClass.prototype._setText, comment: JRC.TextSetTextComment },
+        { type: "method", signature: "void setText(string text)", native: TextClass.prototype._setText, comment: JRC.TextSetTextComment },
         { type: "method", signature: "void setAlignment(Alignment alignment)", native: TextClass.prototype._setAlignment, comment: JRC.TextSetAlignmentComment },
         { type: "method", signature: "void setStyle(boolean bold, boolean italic)", native: TextClass.prototype._setStyle, comment: JRC.TextSetStyleComment },
         

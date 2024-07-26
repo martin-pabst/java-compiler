@@ -429,6 +429,11 @@ export class JRC {
         "en": "Angle of object (in degrees)",
     })
 
+    static shapeSetAngleComment = () => lm({
+        "de": "Dreht das Objekt hin zur angegebenen Richtung (in Grad)",
+        "en": "Rotates object to given angle.",
+    })
+
     static shapeCenterXComment = () => lm({
         "de": "X-Koordinate des Diagonalenschnittpunkts der BoundingBox des Objekts",
         "en": "X coordinate of the diagonal intersection of the object's BoundingBox",
