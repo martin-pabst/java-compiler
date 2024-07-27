@@ -189,6 +189,11 @@ export class JCM {
      */
 
 
+    static cantRedeclareVariableError = (identifier: string) => le({
+    "de": "Die Variable " + identifier + " wurde zweifach deklariert.",
+    "en": "Variable " + identifier + " had been declared twice.",
+    })
+
     static breakNotExpected = () => le({
         "de": "An dieser Stelle kann kein break stehen, da der Ausdruck nicht innerhalb einer Schleife (for, while, do) oder switch-case Anweisung steht.",
         "en": `break statement is only expected inside loops (for, while, do...while) and switch-statements.`,

@@ -877,6 +877,11 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         let variable = new JavaLocalVariable(node.identifier, node.identifierRange,
             node.type.resolvedType!, this.currentSymbolTable);
         variable.isFinal = node.isFinal;
+
+        if(this.currentSymbolTable.findSymbolButNotInParentScopes(variable.identifier)){
+            this.pushError(JCM.cantRedeclareVariableError(variable.identifier), "error", node.range);
+        }
+
         this.currentSymbolTable.addSymbol(variable);    // sets stackOffset
 
         this.module.compiledSymbolsUsageTracker.registerUsagePosition(variable, this.module.file, node.identifierRange);

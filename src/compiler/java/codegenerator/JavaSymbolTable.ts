@@ -62,6 +62,10 @@ export class JavaSymbolTable extends BaseSymbolTable {
     }
 
 
+    findSymbolButNotInParentScopes(identifier: string): JavaLocalVariable | undefined {
+        return this.identifierToSymbolMap.get(identifier);
+    }
+
     findSymbol(identifier: string): LocalVariableInformation | undefined {
         return this.findSymbolIntern(identifier, TokenType.keywordPrivate, true, 0);
     }
