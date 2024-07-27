@@ -28,7 +28,9 @@ export class HttpResponseClass extends ObjectClass {
 
     constructor(private response: Response, private body: string){
         super();
+        response.headers.forEach((value, key) => this.headers.push(new HttpHeaderClass(key, value)));
     }
+
 
     _getUri(): string {
         return this.response.url;

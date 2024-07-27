@@ -14,7 +14,7 @@ export class HttpClientClass extends ObjectClass {
         { type: "declaration", signature: "class HttpClient extends Object", comment: JRC.HttpClientComment },
 
         {type: "method", signature: "HttpClient()", native: HttpClientClass.prototype._httpClientConstructor, comment: JRC.HttpClientConstructorComment},
-        {type: "method", signature: "HttpResponse send(HttpRequest request)", native: HttpClientClass.prototype._mj$send$HttpResponse$HttpRequest, comment: JRC.HttpClientSendComment},
+        {type: "method", signature: "HttpResponse send(HttpRequest request)", java: HttpClientClass.prototype._mj$send$HttpResponse$HttpRequest, comment: JRC.HttpClientSendComment},
 
     ]
 

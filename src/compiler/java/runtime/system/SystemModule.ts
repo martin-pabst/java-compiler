@@ -107,6 +107,12 @@ import { RadiobuttonClass } from "../graphics/gui/RadiobuttonClass.ts";
 import { TextfieldClass } from "../graphics/gui/TextfieldClass.ts";
 import { SoundClass } from "./additional/SoundClass.ts";
 import { FilesClass } from "./additional/FilesClass.ts";
+import { HttpClientClass } from "../network/HttpClientClass.ts";
+import { HttpHeaderClass } from "../network/HttpHeaderClass.ts";
+import { HttpRequestClass } from "../network/HttpRequestClass.ts";
+import { HttpResponseClass } from "../network/HttpResponseClass.ts";
+import { JsonElementClass } from "../network/JsonElementClass.ts";
+import { JsonParserClass } from "../network/JsonParserClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -162,6 +168,15 @@ export class SystemModule extends JavaLibraryModule {
 
             // Assertions
             AssertionsClass,
+
+            // HttpClient
+            HttpHeaderClass,
+            HttpRequestClass,
+            HttpResponseClass,
+            HttpClientClass,
+            JsonElementClass,
+            JsonParserClass,
+
 
             // Graphics
             ColorClass, DirectionEnum, AlignmentEnum,

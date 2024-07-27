@@ -1,5 +1,19 @@
 export var testProgramsList = [
    ['', ``],
+   ['HttpClient', `HttpClient client = new HttpClient();
+HttpRequest request = new HttpRequest();
+request.uri("https://ostrich-api.datausa.io/api/data?measure=Average%20Wage,Average%20Wage%20Appx%20MOE,Record%20Count&drilldowns=Major%20Occupation%20Group&Workforce%20Status=true&Record%20Count>=5");
+
+HttpResponse response = client.send(request);
+println(response.body());
+
+println("\\nResponse-Status: " + response.statusCode(), Color.green);
+// Ausgabe der Response-Header:
+println("\\nHeader:");
+for (HttpHeader header : response.headers()) {
+   print(header.key + ": ", Color.lightblue);
+   println(header.value, Color.lightcoral);
+}`],
    ['TextfieldTest', `Textfield tf = new Textfield(100, 100, 300, 20, "Test");
 
    while (true) {
