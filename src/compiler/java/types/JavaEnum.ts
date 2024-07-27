@@ -124,6 +124,10 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
         return this.identifier;
     }
 
+    getAbsoluteName(): string {
+        return this.pathAndIdentifier;
+    }
+
     getDeclaration(): string {
         let decl: string = TokenTypeReadable[this.visibility] + " ";
         if (this.isStatic) decl += "static ";

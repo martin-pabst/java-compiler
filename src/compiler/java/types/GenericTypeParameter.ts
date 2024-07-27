@@ -49,6 +49,14 @@ export class GenericTypeParameter extends NonPrimitiveType {
         (this.upperBounds.length > 0 ? " extends " + this.upperBounds.map(ub => ub.identifier).join(" & ") : "");
     }
 
+    getAbsoluteName(): string {
+        return this.pathAndIdentifier + 
+        (this.lowerBound ? " super " + this.lowerBound?.pathAndIdentifier : "") + 
+        // (this.lowerBound ? " super " + this.lowerBound?.toString() : "") + 
+        // (this.upperBounds.length > 0 ? " extends " + this.upperBounds.map(ub => ub.toString()).join(" & ") : "");
+        (this.upperBounds.length > 0 ? " extends " + this.upperBounds.map(ub => ub.pathAndIdentifier).join(" & ") : "");
+    }
+
     isGenericVariant(): boolean {
         return false;
     }

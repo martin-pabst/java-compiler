@@ -32,6 +32,8 @@ export class TypeResolver {
     interfaceDeclarationNodes: ASTInterfaceDefinitionNode[] = [];
     enumDeclarationNodes: ASTEnumDefinitionNode[] = [];
 
+    absoluteNameToResolvedTypeMap: Map<string, JavaType> = new Map();
+
     constructor(private moduleManager: JavaModuleManager, private libraryModuleManager: JavaLibraryModuleManager) {
         this.dirtyModules = this.moduleManager.getNewOrDirtyModules();
     }
@@ -244,13 +246,31 @@ export class TypeResolver {
                 } else {
                     genericTypeNode.resolvedType = baseType;
                 }
+                
+                let newType = genericTypeNode.resolvedType;
+                let absoluteName = newType.getAbsoluteName();
+                let cachedType = this.absoluteNameToResolvedTypeMap.get(absoluteName);
+                if(cachedType){
+                    genericTypeNode.resolvedType = cachedType;
+                } else {
+                    this.absoluteNameToResolvedTypeMap.set(absoluteName, newType);
+                }
 
                 return genericTypeNode.resolvedType;
             case TokenType.arrayType:
                 let arrayTypeNode = <ASTArrayTypeNode>typeNode;
                 let baseType1 = this.resolveTypeNode(arrayTypeNode.arrayOf, module);
                 if (!baseType1) return undefined;
-                return typeNode.resolvedType = new JavaArrayType(baseType1, arrayTypeNode.arrayDimensions, module, arrayTypeNode.range);
+                typeNode.resolvedType = new JavaArrayType(baseType1, arrayTypeNode.arrayDimensions, module, arrayTypeNode.range);
+
+                let absoluteName1 = typeNode.resolvedType.getAbsoluteName();
+                let cachedType1 = this.absoluteNameToResolvedTypeMap.get(absoluteName1);
+                if(cachedType1){
+                    typeNode.resolvedType = cachedType1;
+                } else {
+                    this.absoluteNameToResolvedTypeMap.set(absoluteName1, typeNode.resolvedType);
+                }
+                return typeNode.resolvedType;
             case TokenType.voidType:
                 return typeNode.resolvedType = this.libraryModuleManager.typestore.getType("void");
             case TokenType.varType:

@@ -355,7 +355,7 @@ export class StringClass extends ObjectClass {
     _mj$compareTo$int$T(t: Thread, callback: CallbackFunction, otherString: StringClass) {
         //if(otherString === null) throw new NullPointerExceptionClass("compareTo called with argument null");
         t.s.push(this.value.localeCompare(otherString.value));
-        if (callback) callback;
+        if (callback) callback();
     }
 
     _nHashCode() {

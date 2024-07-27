@@ -41,4 +41,7 @@ export abstract class JavaType extends BaseType {
         return this.identifier;
     }
 
+    abstract getAbsoluteName(): string;
+
+
 }

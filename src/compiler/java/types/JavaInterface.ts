@@ -62,6 +62,15 @@ export abstract class IJavaInterface extends NonPrimitiveType {
         return s;
     }
 
+    getAbsoluteName(): string {
+        let s: string = this.pathAndIdentifier;
+
+        if (this.genericTypeParameters && this.genericTypeParameters.length > 0) {
+            s += "<" + this.genericTypeParameters.map(gi => gi.getAbsoluteName()).join(", ") + ">";
+        }
+        return s;
+    }
+
     getReifiedIdentifier(): string {
         return this.identifier;
     }
@@ -274,6 +283,20 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
             s += "<" + genericTypeParameters.map(gi => {
                 let type = this.typeMap.get(gi);
                 return type?.toString();
+            }).join(", ") + ">";
+        }
+        return s;
+    }
+
+    getAbsoluteName(): string {
+        let s: string = this.pathAndIdentifier;
+
+        let genericTypeParameters = this.isGenericVariantOf.genericTypeParameters;
+
+        if (genericTypeParameters && genericTypeParameters.length > 0) {
+            s += "<" + genericTypeParameters.map(gi => {
+                let type = this.typeMap.get(gi);
+                return type?.getAbsoluteName();
             }).join(", ") + ">";
         }
         return s;

@@ -1150,10 +1150,12 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             }
 
             let errors = bestMethodSoFar.checkCatches(methodCallPosition);
-            if (errors.length > 0) {
-                this.module.errors.push(...errors);
-                return { best: undefined, possible: possibleMethods };
-            }
+            // TODO!
+            
+            // if (errors.length > 0) {
+            //     this.module.errors.push(...errors);
+            //     return { best: undefined, possible: possibleMethods };
+            // }
 
             return { best: bestMethodSoFar.getCopyWithConcreteTypes(), possible: possibleMethods };
 

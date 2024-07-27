@@ -70,4 +70,7 @@ export abstract class PrimitiveType extends JavaType {
         return this.identifier;
     }
 
+    getAbsoluteName(): string {
+        return this.toString();
+    }
 }

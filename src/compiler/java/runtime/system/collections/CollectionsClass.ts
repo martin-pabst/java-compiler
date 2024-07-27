@@ -13,7 +13,7 @@ export class CollectionsClass extends ObjectClass {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "class Collections extends Object", comment: JRC.CollectionsClassComment},
         { type: "method", signature: "static void shuffle(List<?> list)", java: CollectionsClass.shuffle, comment: JRC.CollectionsShuffleComment},
-        { type: "method", signature: "static <T extends Comparable<? super T>> void sort(List<T> list)", java: CollectionsClass.sortComparableList, comment: JRC.CollectionsSortComparableListComment},
+        { type: "method", signature: "static <T extends Comparable> void sort(List<T> list)", java: CollectionsClass.sortComparableList, comment: JRC.CollectionsSortComparableListComment},
         { type: "method", signature: "static <T> void sort(List<T> list, Comparator<? super T> comparator)", java: CollectionsClass.sortComparableList, comment: JRC.CollectionsSortComparableListComment},
 
     ];

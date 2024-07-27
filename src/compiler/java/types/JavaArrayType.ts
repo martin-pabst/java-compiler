@@ -9,6 +9,9 @@ import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParame
 import { JavaType } from "./JavaType";
 
 export class JavaArrayType extends JavaType implements BaseArrayType {
+    getCompletionItemDetail(): string {
+        return "";
+    }
 
     constructor(public elementType: JavaType, public dimension: number,
         module: JavaBaseModule, identifierRange: IRange) {
@@ -58,6 +61,12 @@ export class JavaArrayType extends JavaType implements BaseArrayType {
 
     toString(): string {
         let s: string = this.elementType.toString();
+        for(let i = 0; i < this.dimension; i++) s += "[]";
+        return s;
+    }
+
+    getAbsoluteName(): string {
+        let s: string = this.elementType.getAbsoluteName();
         for(let i = 0; i < this.dimension; i++) s += "[]";
         return s;
     }

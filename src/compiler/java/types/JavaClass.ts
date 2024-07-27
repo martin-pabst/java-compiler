@@ -158,6 +158,15 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
         return s;
     }
 
+    getAbsoluteName(): string {
+        let s: string = this.pathAndIdentifier;
+
+        if (this.genericTypeParameters && this.genericTypeParameters.length > 0) {
+            s += "<" + this.genericTypeParameters.map(gi => gi.getAbsoluteName()).join(", ") + ">";
+        }
+        return s;
+    }
+
     getReifiedIdentifier(): string {
         return this.identifier;
     }
@@ -505,6 +514,20 @@ export class GenericVariantOfJavaClass extends IJavaClass {
             s += "<" + genericInformation.map(gi => {
                 let type = this.typeMap.get(gi);
                 return type?.toString();
+            }).join(", ") + ">";
+        }
+        return s;
+    }
+
+    getAbsoluteName(): string {
+        let s: string = this.pathAndIdentifier;
+
+        let genericInformation = this.isGenericVariantOf.genericTypeParameters;
+
+        if (genericInformation && genericInformation.length > 0) {
+            s += "<" + genericInformation.map(gi => {
+                let type = this.typeMap.get(gi);
+                return type?.getAbsoluteName();
             }).join(", ") + ">";
         }
         return s;
