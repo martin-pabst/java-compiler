@@ -1,5 +1,19 @@
 export var testProgramsList = [
    ['', ``],
+   ['JSonParser', `HttpClient client = new HttpClient();
+HttpRequest request = new HttpRequest();
+request.uri("https://ostrich-api.datausa.io/api/data?measure=Average%20Wage,Average%20Wage%20Appx%20MOE,Record%20Count&drilldowns=Major Occupation%20Group&Workforce%20Status=true&Record%20Count>=5");
+
+HttpResponse response = client.send(request);
+
+JsonElement rootElement = JsonParser.parse(response.body());
+JsonElement data = rootElement.getAttributeValue("data");
+
+for (JsonElement row : data.getArrayValues()) {
+   print(row.getAsString("Major Occupation Group"), Color.lightsteelblue);
+   print(" -> ", Color.red);
+   println(Math.round(row.getAsDouble("Average Wage")) + " $", Color.lightgreen);
+}`],
    ['HttpClient', `HttpClient client = new HttpClient();
 HttpRequest request = new HttpRequest();
 request.uri("https://ostrich-api.datausa.io/api/data?measure=Average%20Wage,Average%20Wage%20Appx%20MOE,Record%20Count&drilldowns=Major%20Occupation%20Group&Workforce%20Status=true&Record%20Count>=5");

@@ -9,6 +9,7 @@ export class JsonElementClass extends ObjectClass {
     static __javaDeclarations: LibraryDeclarations = [
         {type: "declaration", signature: "class JsonElement extends Object", comment: JRC.JsonElementClassComment},
         {type: "method", signature: "string getType()", native: JsonElementClass.prototype._jsonElementGetType, comment: JRC.JsonElementGetTypeComment},
+        {type: "method", signature: "JsonElement getAttributeValue(string identifier)", native: JsonElementClass.prototype._getAttributeValue, comment: JRC.JsonElementGetAttributeValueComment},
         {type: "method", signature: "JsonElement[] getArrayValues()", native: JsonElementClass.prototype._getArrayValues, comment: JRC.JsonElementGetArrayValuesComment},
         {type: "method", signature: "JsonElement getArrayValue(string identifier)", native: JsonElementClass.prototype._getAttributeValue, comment: JRC.JsonElementGetAttributeValueComment},
         {type: "method", signature: "string getAsString()", native: JsonElementClass.prototype._getAsString1, comment: JRC.JsonElementGetAsStringComment},
