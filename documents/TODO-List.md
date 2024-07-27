@@ -49,13 +49,14 @@
   * GNG classes
   * classes for graphical GUI-Elements
   * class Sound, class Files
+  * HTTP-Client and JSON-Converter
+  * BigInteger
 
 ## working status on current issue:
 
 ### fine-grained next todos on current issue:
 
 ## next 
-  * HTTP-Client and JSON-Converter
   * WebSocket client
   * Missing Collections 
   * Robot

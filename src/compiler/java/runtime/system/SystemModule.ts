@@ -114,6 +114,7 @@ import { HttpResponseClass } from "../network/HttpResponseClass.ts";
 import { JsonElementClass } from "../network/JsonElementClass.ts";
 import { JsonParserClass } from "../network/JsonParserClass.ts";
 import { URLEncoder as URLEncoderClass } from "../network/URLEncoderClass.ts";
+import { CollectionsClass } from "./collections/CollectionsClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -160,6 +161,8 @@ export class SystemModule extends JavaLibraryModule {
 
             // Collections
             IteratorInterface, IterableInterface, CollectionInterface, ListInterface, ArrayListClass,
+
+            CollectionsClass,
 
             // Thread
             RunnableInterface, ThreadClass, ThreadStateEnum, SemaphoreClass,

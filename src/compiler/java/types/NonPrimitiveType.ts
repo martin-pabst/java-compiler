@@ -110,10 +110,11 @@ export abstract class NonPrimitiveType extends JavaType implements BaseObjectTyp
         if (isConstructor) {
             let type: NonPrimitiveType | undefined = this;
             while (type) {
+                let constructorList = type.getOwnMethods().filter(m => m.isConstructor);
                 methodsWithArbitraryParameterCount = methodsWithArbitraryParameterCount
-                .concat(type.getOwnMethods().filter(m => m.isConstructor));
+                .concat(constructorList);
                 //@ts-ignore
-                if (type["getExtends"] && type.getOwnMethods().filter(m => m.isConstructor).length == 0){
+                if (type["getExtends"] && constructorList.length == 0){
                     //@ts-ignore
                     type = type.getExtends();
                 } else {

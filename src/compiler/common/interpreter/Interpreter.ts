@@ -494,4 +494,8 @@ export class Interpreter {
         return this.stepsPerSecondGoal;
     }
 
+    runsEmbedded(): boolean {
+        return false; // TODO
+    }
+
 }

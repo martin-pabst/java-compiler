@@ -43,8 +43,10 @@ export class GenericTypeParameter extends NonPrimitiveType {
 
     toString(): string {
         return this.identifier + 
-        (this.lowerBound ? " super " + this.lowerBound?.toString() : "") + 
-        (this.upperBounds.length > 0 ? " extends " + this.upperBounds.map(ub => ub.toString()).join(" & ") : "");
+        (this.lowerBound ? " super " + this.lowerBound?.identifier : "") + 
+        // (this.lowerBound ? " super " + this.lowerBound?.toString() : "") + 
+        // (this.upperBounds.length > 0 ? " extends " + this.upperBounds.map(ub => ub.toString()).join(" & ") : "");
+        (this.upperBounds.length > 0 ? " extends " + this.upperBounds.map(ub => ub.identifier).join(" & ") : "");
     }
 
     isGenericVariant(): boolean {
@@ -203,6 +205,11 @@ export class GenericTypeParameter extends NonPrimitiveType {
     getCompletionItems(visibilityUpTo: Visibility, leftBracketAlreadyThere: boolean, identifierAndBracketAfterCursor: string, rangeToReplace: monaco.IRange, methodContext: JavaMethod | undefined, onlyStatic?: boolean | undefined): monaco.languages.CompletionItem[] {
         return [];
     }
+
+    getCompletionItemDetail(): string {
+        return "";
+    }
+
 
 }
 

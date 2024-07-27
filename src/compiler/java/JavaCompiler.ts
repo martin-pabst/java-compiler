@@ -57,6 +57,8 @@ export class JavaCompiler implements Compiler {
 
     compileIfDirty(): Executable | undefined {
 
+        let time = performance.now();
+
         if (this.askBeforeCompilingCallback && !this.askBeforeCompilingCallback()) return;
 
         /**
@@ -65,6 +67,7 @@ export class JavaCompiler implements Compiler {
         this.moduleManager.setDirtyFlags();
         this.moduleManager.setupModulesBeforeCompiliation(this.files);
         let newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
+        console.log(Math.round(performance.now() - time) + " ms: Found " + newOrDirtyModules.length + " new or dirty modules.");
         if (newOrDirtyModules.length == 0) return this.lastCompiledExecutable;
 
         this.errors = [];
@@ -91,16 +94,16 @@ export class JavaCompiler implements Compiler {
         let typeResolver = new TypeResolver(this.moduleManager, this.libraryModuleManager);
 
         let exceptionTree = new ExceptionTree(this.libraryModuleManager.typestore, this.moduleManager.typestore);
-
+        
         // resolve returns false if cyclic references are found. In this case we don't continue compiling.
         if (typeResolver.resolve()) {
             this.moduleManager.typestore.initFastExtendsImplementsLookup();
-
-
+            
+            
             for (let module of newOrDirtyModules) {
                 let codegenerator = new CodeGenerator(module, this.libraryModuleManager.typestore,
                     this.moduleManager.typestore, exceptionTree);
-                codegenerator.start();
+                    codegenerator.start();
             }
 
         }
@@ -125,6 +128,8 @@ export class JavaCompiler implements Compiler {
         if (this.compilationFinishedCallback) {
             this.compilationFinishedCallback(executable);
         }
+
+        console.log(Math.round(performance.now() - time) + " ms: Done compiling!");
 
         return executable;
 

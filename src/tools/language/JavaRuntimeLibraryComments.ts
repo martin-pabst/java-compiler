@@ -4103,5 +4103,73 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Encodes URL as described in RFC3986.",
     })
 
+    /**
+     * class WebSocket
+     */
+    static WebSocketClassComment = () => lm({
+    "de": "Ein Objekt der Klasse WebSocket kann Daten über das Internet senden und empfangen. Um die Klasse benutzen zu können, musst Du eine eigene Klasse schreiben, die die Klasse WebSocket erweitert und die Methoden onConnect, onMessage, onOtherClientConnected und onOtherClientDisconnected überschreibt.",
+    "en": "An Object of class WebSocket can send/receive data over the internet. To use this class you have to write your own class extending this one. By overwriting methods onConnect, onMessage, onOtherClientConnected and onOtherclientDisconnected you can react to these events.",
+    })
+
+    static WebSocketConstructorComment = () => lm({
+    "de": "Instanziert ein neues WebSocket-Objekt.",
+    "en": "Creates a new WebSocket object.",
+    })
+
+    /**
+     * class WebSocketClient
+     */
+    static WebSocketClientClassComment = () => lm({
+    "de": "Ein Objekt der Klasse WebSocketClient repräsentiert einen anderen Rechner, mit dem dieser Rechner über den WebSocket in Kontakt steht.",
+    "en": "An Object of class WebSocketClient represents an other ",
+    })
+
+    static WebSocketClientSendComment = () => lm({
+    "de": "Sendet Daten (message) an diesen Client. Den messageType kannst Du frei wählen. Die client bekommt ihn zusammen mit den Daten übermittelt. Tipp: Du kannst auch Objekte senden, musst sie dazu aber vorher serialisieren, d.h. mithilfe der Methode toJson in eine Zeichenkette verwandeln.",
+    "en": "Sends data (message) to this client. You may choose messageType freely. Receiving client gets it along with the sent data. Hint: You may send objects if you serialize them beforehand by calling toJSon on them. This creates a string representing this object.",
+    })
+
+    static WebSocketClientSetUserDataComment = () => lm({
+    "de": "Mit dieser Methode kannst Du beliebige Objektreferenzen in diesem WebSocketClient-Objekt speichern. Den Schlüssel kannst Du dabei frei wählen und später nutzen, um den Wert durch die Methode getUserData wieder zu holen.",
+    "en": "This method lets you save arbitrary object references alongside this WebSocketClient-object. You may choose the key freely and use it later on to retreive the value by calling getUserData.",
+    })    
+
+    static WebSocketClientGetUserDataComment = () => lm({
+    "de": "Mit dieser Methode kannst Du eine Objektreferenz erhalten, die Du zuvor mit der Methode setUserData gespeichert hast. Bemerkung1: Diese Methode entfernt die Objekreferenz nicht aus dem WebSocketClient-Objekt. Bemerkung2: Damit Du alle Methoden des erhaltenen Objekts aufrufen kannst, musst Du dem Computer mitteilen, von welcher Klasse es ist ('casten'). Das geht für die Klasse MeineNutzerDaten bspw. so: MeineNutzerDaten mnd = (MeineNutzerDaten)client.getUserData('schlüssel');",
+    "en": "Method GetUserData lets you retrieve object references you stored beforehand with method setUserData. Hint: you can cast the object to it's proper data type like so: (String) getUserData(\"key\")",
+    })
+
+    static WebSocketClientGetNumberComment = () => lm({
+    "de": "Gehört ein Client zu einer mit findClient bzw. findClients gefundenen Gruppe, so erhältst Du mit dieser Methode die 'Rangfolge' dieses Clients in dieser Gruppe. Allen Clients wird dieselbe Rangfolgeordnung vom Server mitgeteilt. So lässt sich bspw. einfach festlegen, welcher Client eine besondere Rolle (Server) in der Gruppe erhalten soll (z.B. Client mit Nummer 1). Bemerkung: Die Nummer ist eine Zahl zwischen 1 und der Anzahl der Clients in der Gruppe.",
+    "en": "If this client belongs to a group obtained by method findClient or findClients then you get this client's order with this method. This order is given each client by the server so you get the identical value on every computer.",
+    })
+
+    static WebSocketClientGetIndexComment = () => lm({
+    "de": "Diese Methode ist veraltet. Benutze stattdessen getNumber.",
+    "en": "This method is deprecated. Use getNumber instead.",
+    })
+
+    static WebSocketNotInEmbeddedException = () => lm({
+    "de": "Die Netzwerkfunktionalitäten stehen nur eingeloggten Nutzern in der Entwicklungsumgebung zur Verfügung und können daher leider hier nicht ausprobiert werden.",
+    "en": "Network functionality doesn't run in embedded mode.",
+    })
+
+    /**
+     * Class Collections
+     */
+    static CollectionsClassComment = () => lm({
+    "de": "Diese Klasse besteht aus Methoden, die auf Collections operieren oder Collections zurückgeben.",
+    "en": "This class consists exclusively of static methods that operate on or return collections. It contains polymorphic algorithms that operate on collections, 'wrappers', which return a new collection backed by a specified collection, and a few other odds and ends.",
+    })
+
+    static CollectionsShuffleComment = () => lm({
+    "de": "Vertauscht die Elemente der Liste in zufälliger Weise.",
+    "en": "Randomly permutes the specified list.",
+    })
+
+    static CollectionsSortComparableListComment = () => lm({
+    "de": "Sortiert eine Liste von Elementen, die das Interface Comparable implementieren.",
+    "en": "Sorts a List of Comparable elements.",
+    })
 
 }  

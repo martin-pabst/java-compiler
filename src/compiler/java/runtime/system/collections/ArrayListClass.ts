@@ -319,78 +319,81 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
     }
 
     _mj$sort$void$Comparator(t: Thread, callback: CallbackFunction, comparator: ComparatorInterface) {
-
-        let that = this;
-
-        if (this.elements.length <= 1) {
-            if (callback) callback(); // nothing to do
-        } else {
-            ArrayListClass.prototype.quicksort.call(that, t, callback, comparator, 0, this.elements.length - 1);
-        }
+        SystemCollection.sortWithComparator(t, callback, comparator, this);
     }
+    // _mj$sort$void$Comparator(t: Thread, callback: CallbackFunction, comparator: ComparatorInterface) {
 
-    quicksort(t: Thread, callback: CallbackFunction, comparator: ComparatorInterface, fromIndex: number, toIndex: number) {
-        let that = this;
+    //     let that = this;
 
-        if (toIndex - fromIndex <= 1) {
-            if (callback) callback(); // nothing to do
-            return;
-        }
+    //     if (this.elements.length <= 1) {
+    //         if (callback) callback(); // nothing to do
+    //     } else {
+    //         ArrayListClass.prototype.quicksort.call(that, t, callback, comparator, 0, this.elements.length - 1);
+    //     }
+    // }
 
-        ArrayListClass.prototype.partition.call(that, t, () => {
+    // quicksort(t: Thread, callback: CallbackFunction, comparator: ComparatorInterface, fromIndex: number, toIndex: number) {
+    //     let that = this;
 
-            let partitionIndex: number = t.s.pop();
-            ArrayListClass.prototype.quicksort.call(that, t, () => {
-                ArrayListClass.prototype.quicksort.call(that, t, () => {
-                    if (callback) callback();
-                    return;
-                }, comparator, partitionIndex + 1, toIndex);
-            }, comparator, fromIndex, partitionIndex - 1);
+    //     if (toIndex - fromIndex <= 1) {
+    //         if (callback) callback(); // nothing to do
+    //         return;
+    //     }
 
+    //     ArrayListClass.prototype.partition.call(that, t, () => {
 
-        }, comparator, fromIndex, toIndex);
-
-    }
-
-    private partition(t: Thread, callback: () => void, comparator: ComparatorInterface, begin: number, end: number) {
-
-        let that = this;
-
-        let pivot: ObjectClass = that.elements[end];
-        let i: number = begin - 1;
-
-        let j = begin;
-        let loop = () => {
-            if (j < end) {
-                comparator._mj$compare$int$T$T(t, () => {
-                    if (t.s.pop() <= 0) {
-                        i++;
-
-                        let z = that.elements[i];
-                        that.elements[i] = that.elements[j];
-                        that.elements[j] = z;
-                        j++;
-                        loop();
-                    } else {
-                        j++;
-                        loop();
-                    }
-                }, that.elements[j], pivot);
-            } else {
-                // after for-loop
-                let z = that.elements[i + 1];
-                that.elements[i + 1] = that.elements[end];
-                that.elements[end] = z;
-                t.s.push(i + 1);
-                callback();
-                return;
-            }
-        }
-
-        loop();
+    //         let partitionIndex: number = t.s.pop();
+    //         ArrayListClass.prototype.quicksort.call(that, t, () => {
+    //             ArrayListClass.prototype.quicksort.call(that, t, () => {
+    //                 if (callback) callback();
+    //                 return;
+    //             }, comparator, partitionIndex + 1, toIndex);
+    //         }, comparator, fromIndex, partitionIndex - 1);
 
 
-    }
+    //     }, comparator, fromIndex, toIndex);
+
+    // }
+
+    // private partition(t: Thread, callback: () => void, comparator: ComparatorInterface, begin: number, end: number) {
+
+    //     let that = this;
+
+    //     let pivot: ObjectClass = that.elements[end];
+    //     let i: number = begin - 1;
+
+    //     let j = begin;
+    //     let loop = () => {
+    //         if (j < end) {
+    //             comparator._mj$compare$int$T$T(t, () => {
+    //                 if (t.s.pop() <= 0) {
+    //                     i++;
+
+    //                     let z = that.elements[i];
+    //                     that.elements[i] = that.elements[j];
+    //                     that.elements[j] = z;
+    //                     j++;
+    //                     loop();
+    //                 } else {
+    //                     j++;
+    //                     loop();
+    //                 }
+    //             }, that.elements[j], pivot);
+    //         } else {
+    //             // after for-loop
+    //             let z = that.elements[i + 1];
+    //             that.elements[i + 1] = that.elements[end];
+    //             that.elements[end] = z;
+    //             t.s.push(i + 1);
+    //             callback();
+    //             return;
+    //         }
+    //     }
+
+    //     loop();
+
+
+    // }
 
     isBaseListType(): boolean {
         return true;

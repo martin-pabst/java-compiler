@@ -4,6 +4,7 @@ import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { InterfaceClass } from "../javalang/InterfaceClass.ts";
+import { ObjectClass } from "../javalang/ObjectClassStringClass.ts";
 
 export class ComparableInterface extends InterfaceClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -13,6 +14,6 @@ export class ComparableInterface extends InterfaceClass {
 
     static type: NonPrimitiveType;
 
-    _mj$compareTo$int$T(t: Thread, callback: CallbackFunction){}
+    _mj$compareTo$int$T(t: Thread, callback: CallbackFunction, otherObject: ObjectClass){}
 
 }
