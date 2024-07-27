@@ -4090,7 +4090,18 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Creates a new HttpClient-object.",
     })
 
+    /**
+     * class URLEncoder
+     */
+    static URLEncoderClassComment = () => lm({
+    "de": "Klasse mit einer statischen Methode zum Encodieren von URLs.",
+    "en": "Class with static methods to encode URLs",
+    })
 
+    static URLEncoderEncodeComment = () => lm({
+    "de": "Encodiert eine URL gemäß RFC3986.",
+    "en": "Encodes URL as described in RFC3986.",
+    })
 
 
 }  

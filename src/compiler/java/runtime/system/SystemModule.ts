@@ -113,6 +113,7 @@ import { HttpRequestClass } from "../network/HttpRequestClass.ts";
 import { HttpResponseClass } from "../network/HttpResponseClass.ts";
 import { JsonElementClass } from "../network/JsonElementClass.ts";
 import { JsonParserClass } from "../network/JsonParserClass.ts";
+import { URLEncoder as URLEncoderClass } from "../network/URLEncoderClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -176,6 +177,7 @@ export class SystemModule extends JavaLibraryModule {
             HttpClientClass,
             JsonElementClass,
             JsonParserClass,
+            URLEncoderClass,
 
 
             // Graphics
