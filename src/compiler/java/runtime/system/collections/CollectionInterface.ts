@@ -4,8 +4,9 @@ import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { InterfaceClass } from "../javalang/InterfaceClass.ts";
+import { IterableInterface } from "./IterableInterface.ts";
 
-export class CollectionInterface extends InterfaceClass {
+export class CollectionInterface extends IterableInterface {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "interface Collection<E> extends Iterable<E>" },
         { type: "method", signature: "boolean add(E e)", java: CollectionInterface.prototype._mj$add$boolean$E, comment: JRC.collectionAddElementComment },

@@ -4172,4 +4172,105 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Sorts a List of Comparable elements.",
     })
 
+    /**
+     * interface queue
+     */
+
+    static queueInterfaceComment = () => lm({
+    "de": "",
+    "en": "",
+    })
+
+    static queueRemoveComment = () => lm({
+    "de": "Entfernt das Element am Kopf der Liste und gibt es zurück. Führt zum Fehler, wenn die Liste leer ist.",
+    "en": "Retrieves and removes the head of this queue.",
+    })
+
+    static queuePollComment = () => lm({
+    "de": "Entfernt das Element am Kopf der Liste und gibt es zurück. Gibt null zurück, wenn die Liste leer ist.",
+    "en": "Retrieves and removes the head of this queue, or returns null if this queue is empty.",
+    })
+
+    static queuePeekComment = () => lm({
+    "de": "Gibt das Element am Kopf der Liste zurück, entfernt es aber nicht. Gib null zurück, wenn die Liste leer ist.",
+    "en": "Retrieves, but does not remove, the head of this queue, or returns null if this queue is empty.",
+    })
+
+    /**
+     * interface dequeue
+     */
+
+    static dequeInterfaceComment = () => lm({
+    "de": "Interface für Liste mit zweiseitigem Zugriff (insbesondere Anfügen an beiden Enden). Der Name steht für 'double ended queue' und wird meist 'deck' ausgesprochen.",
+    "en": `A linear collection that supports element insertion and removal at both ends. The name deque is short for "double ended queue" and is usually pronounced "deck"`,
+    })
+
+    static dequeRemoveFirstOccurrenceComment = () => lm({
+    "de": "Löscht das erste Vorkommen des Objekts. Gibt true zurück, wenn die Liste dadurch verändert wurde.",
+    "en": "Removes the first occurrence of the specified element from this deque.",
+    })
+
+    static dequeRemoveLastOccurrenceComment = () => lm({
+    "de": "Löscht das letzte Vorkommen des Objekts. Gibt true zurück, wenn die Liste dadurch verändert wurde.",
+    "en": "Removes the last occurrence of the specified element from this deque.",
+    })
+
+    static dequeAddFirstComment = () => lm({
+    "de": "Fügt das Element am Anfang der Liste ein.",
+    "en": "Inserts the specified element at the front of this deque.",
+    })
+
+    static dequeAddLastComment = () => lm({
+    "de": "Fügt das Element am Ende der Liste ein.",
+    "en": "Inserts the specified element at the end of this deque.",
+    })
+
+    static dequeRemoveFirstComment = () => lm({
+    "de": "Entfernt das Element am Anfang der Liste und gibt es zurück. Führt zum Fehler, wenn die Liste leer ist.",
+    "en": "Retrieves and removes the first element of this deque.",
+    })
+
+    static dequeRemoveLastComment = () => lm({
+    "de": "Entfernt das Element am Ende der Liste und gibt es zurück. Führt zum Fehler, wenn die Liste leer ist.",
+    "en": "Retrieves and removes the last element of this deque.",
+    })
+
+    static dequePeekFirstComment = () => lm({
+    "de": "Gibt das Element am Anfang der Liste zurück, entfernt es aber nicht. Gib null zurück, wenn die Liste leer ist.",
+    "en": "Retrieves, but does not remove, the first element of this deque, or returns null if this deque is empty.",
+    })
+
+    static dequePeekLastComment = () => lm({
+    "de": "Gibt das Element am Ende der Liste zurück, entfernt es aber nicht. Gib null zurück, wenn die Liste leer ist.",
+    "en": "Retrieves, but does not remove, the last element of this deque, or returns null if this deque is empty.",
+    })
+
+    static dequePushComment = () => lm({
+    "de": "Fügt das Element am Ende der Liste hinzu.",
+    "en": "Pushes an element onto the stack represented by this deque (in other words, at the head of this deque).",
+    })
+
+    static dequePopComment = () => lm({
+    "de": "Gibt das Element am Ende der Liste zurück und entfernt es von der Liste. Erzeugt einen Fehler, wenn die Liste leer ist.",
+    "en": "Pops an element from the stack represented by this deque.",
+    })
+
+    static dequeDescendingIteratorComment = () => lm({
+    "de": "Gibt einen Iterator über die Elemente dieser Collection zurück, der die Liste in umgekehrter Reihenfolge (Ende -> Anfang) durchläuft.",
+    "en": "Returns an iterator over the elements in this deque in reverse sequential order.",
+    })
+
+    /**
+     * class LinkedList
+     */
+    static linkedListConstructorComment = () => lm({
+    "de": "Erzeugt eine neue, leere LinkedList.",
+    "en": "Creates a new empty LinkedList.",
+    })
+
+    static linkedListIsEmptyError = () => lm({
+    "de": "Die Liste ist leer, daher kann kein Element entnommen werden.",
+    "en": "Empty list, therefore you can't remove an element from it.",
+    })
+
 }  

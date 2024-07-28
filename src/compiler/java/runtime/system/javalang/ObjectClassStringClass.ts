@@ -14,7 +14,7 @@ export class ObjectClass {
         { type: "declaration", signature: "class Object" },
         { type: "method", signature: "public Object()", native: ObjectClass.prototype._constructor },
         { type: "method", signature: "public String toString()", native: ObjectClass.prototype._nToString , comment: JRC.objectToStringComment},
-        { type: "method", signature: "public boolean equals(Object otherObject)", native: ObjectClass.prototype._nEquals , comment: JRC.objectEqualsComment},
+        { type: "method", signature: "public boolean equals(Object otherObject)", java: ObjectClass.prototype._mj$equals$boolean$Object , comment: JRC.objectEqualsComment},
         { type: "method", signature: "public final void wait()", java: ObjectClass.prototype._mj$wait$void$ , comment: JRC.objectWaitComment},
         { type: "method", signature: "public final void wait(int milliseconds)", java: ObjectClass.prototype._mj$wait$void$ , comment: JRC.objectWaitWithTimeoutComment},
         { type: "method", signature: "public final void notify()", java: ObjectClass.prototype._mj$notify$void$ , comment: JRC.objectNotifyComment},
@@ -133,8 +133,10 @@ export class ObjectClass {
         // `t.stack.push(new ${Helpers.classes}["String"]("Object"));`
     }
 
-    _nEquals(otherObject: ObjectClass) {
-        return this == otherObject;
+    _mj$equals$boolean$Object(t: Thread, callback: CallbackFunction, otherObject: ObjectClass) {
+        t.s.push(this == otherObject);
+        if(callback) callback();
+        return;
     }
 
     beforeEnteringSynchronizedBlock(t: Thread, pushLockObject: boolean = false) {

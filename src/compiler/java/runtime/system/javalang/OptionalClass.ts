@@ -64,7 +64,7 @@ export class OptionalClass extends ObjectClass {
                 t.s.push(false);
             }
             else {
-                t.s.push(this.element._nEquals(otherOptional.element));
+                t.s.push(this.element._mj$equals$boolean$Object(otherOptional.element));
             }
         }  
     }

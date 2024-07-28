@@ -115,6 +115,9 @@ import { JsonElementClass } from "../network/JsonElementClass.ts";
 import { JsonParserClass } from "../network/JsonParserClass.ts";
 import { URLEncoder as URLEncoderClass } from "../network/URLEncoderClass.ts";
 import { CollectionsClass } from "./collections/CollectionsClass.ts";
+import { QueueInterface } from "./collections/QueueInterface.ts";
+import { DequeInterface } from "./collections/DequeueInterface.ts";
+import { LinkedListClass } from "./collections/LinkedListClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -163,6 +166,8 @@ export class SystemModule extends JavaLibraryModule {
             IteratorInterface, IterableInterface, CollectionInterface, ListInterface, ArrayListClass,
 
             CollectionsClass,
+
+            QueueInterface, DequeInterface, LinkedListClass,
 
             // Thread
             RunnableInterface, ThreadClass, ThreadStateEnum, SemaphoreClass,
