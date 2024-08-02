@@ -77,7 +77,7 @@ assertEquals(2, j1, "Test break in while-loop");
 assertEquals(3, i1, "Test break in while-loop");
 
 int n = 0;
-int i = 0;
+i = 0;
 while(i < 10){
     i++;
     if(i < 8) continue;
@@ -117,7 +117,7 @@ assertEquals(2, j1, "Test break in do..while-loop");
 assertEquals(3, i1, "Test break in do..while-loop");
 
 int n = 0;
-int i = 0;
+i = 0;
 do{
     i++;
     if(i < 8) continue;

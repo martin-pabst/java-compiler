@@ -29,10 +29,10 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
         { type: "method", signature: "boolean add(E e)", native: ArrayListClass.prototype._add, template: "(§1.elements.push(§2) >= 0)" , comment: JRC.collectionAddElementComment},
         { type: "method", signature: "boolean addAll(Collection<? extends E> c)", java: ArrayListClass.prototype._addAll , comment: JRC.collectionAddAllComment},
         { type: "method", signature: "void clear()", native: ArrayListClass.prototype._clear, template: "§1.elements.length = 0" , comment: JRC.collectionClearComment},
-        { type: "method", signature: "boolean contains(Object o)", native: ArrayListClass.prototype._contains, template: "(§1.elements.indexOf(§2) >= 0)" , comment: JRC.collectionContainsComment},
-        { type: "method", signature: "boolean containsAll(Collection<?> c)", java: ArrayListClass.prototype._containsAll , comment: JRC.collectionContainsAllComment},
+        { type: "method", signature: "boolean contains(E Element)", java: ArrayListClass.prototype._mj$contains$boolean$Object, comment: JRC.collectionContainsComment},
+        { type: "method", signature: "boolean containsAll(Collection<?> c)", java: ArrayListClass.prototype._mj$containsAll$boolean$Collection , comment: JRC.collectionContainsAllComment},
         { type: "method", signature: "boolean isEmpty()", native: ArrayListClass.prototype._isEmpty, template: "(§1.elements.length == 0)" , comment: JRC.collectionIsEmptyComment},
-        { type: "method", signature: "boolean remove(Object o)", native: ArrayListClass.prototype._remove , comment: JRC.collectionRemoveObjectComment},
+        { type: "method", signature: "boolean remove(E element)", java: ArrayListClass.prototype._mj$remove$boolean$E , comment: JRC.collectionRemoveObjectComment},
         { type: "method", signature: "boolean removeAll(Collection<?> c)", java: ArrayListClass.prototype._removeAll , comment: JRC.collectionRemoveAllComment},
         { type: "method", signature: "int size()", native: ArrayListClass.prototype._size, template: "§1.elements.length" , comment: JRC.collectionSizeComment},
 
@@ -219,50 +219,51 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
         this.elements.length = 0;
     }
 
-    _contains(o: ObjectClass) {
-        return this.elements.indexOf(o) >= 0;
+    _mj$contains$boolean$Object(t: Thread, callback: CallbackFunction, element: ObjectClass) {
+        this._mj$indexOf$int$E(t, () => {
+            let index = t.s.pop();
+            t.s.push(index >= 0);
+            if(callback) callback();
+        }, element);
     }
 
-    _containsAll(t: Thread, callback: CallbackFunction, collection: CollectionInterface) {
+    _mj$containsAll$boolean$Collection(t: Thread, callback: CallbackFunction, collection: CollectionInterface) {
 
         if (collection == null) {
             t.throwException(new NullPointerExceptionClass("ArrayList.containsAll wurde mit null als Argument aufgerufen."));
             return;
         }
 
-        let otherElements: ObjectClass[] = [];
 
-        if (collection instanceof SystemCollection) {
-            otherElements = collection.getAllElements();
-            for (let e1 of otherElements) {
-                if (this.elements.indexOf(e1) < 0) {
-                    t.s.push(false);
-                    if (callback) callback();
-                    return;
-                }
+        let f = (t: Thread, callback: CallbackFunction, elementsToCheck: any[]) => {
+
+            if(elementsToCheck.length > 0){
+                this._mj$contains$boolean$Object(t, () => {
+                    if(t.s.pop()){
+                        f(t, callback, elementsToCheck);
+                    } else {
+                        t.s.push(false);
+                        if(callback) callback();
+                    }
+                }, elementsToCheck.pop());
+            } else {
+                t.s.push(true);
+                if(callback) callback();
             }
-            t.s.push(true);
-            if (callback) callback();
-            return;
+
         }
 
-
-        collection._mj$toArray$Object_I$(t, () => {
-            let newElements = t.s.pop();
-            if (newElements != null && Array.isArray(newElements)) {
-                for (let e1 of newElements) {
-                    if (this.elements.indexOf(e1) < 0) {
-                        t.s.push(false);
-                        if (callback) callback();
-                        return;
-                    }
-                }
-                t.s.push(true);
-                if (callback) callback();
+        if (collection instanceof SystemCollection) {
+            let elementsToCheck = collection.getAllElements().slice();
+            f(t, callback, elementsToCheck);
+            return;
+        } else {
+            collection._mj$toArray$Object_I$(t, () => {
+                let elementsToCheck = <any[]>t.s.pop();
+                f(t, callback, elementsToCheck.slice());
                 return;
-            }
-        })
-
+            })
+        }
     }
 
     _isEmpty() {
@@ -277,13 +278,19 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
         return this.elements.slice();
     }
 
-    _remove(o: ObjectClass) {
-        let index = this.elements.indexOf(o);
-        if (index >= 0) {
-            this.elements.splice(index, 1)
-            return true;
-        }
-        return false;
+    _mj$remove$boolean$E(t: Thread, callback: CallbackFunction, o: ObjectClass) {
+
+        this._mj$indexOf$int$E(t, () => {
+            let index = t.s.pop();
+            if(index >= 0){
+                this.elements.splice(index, 1)
+                t.s.push(true);
+            } else {
+                t.s.push(false);
+            }
+            if(callback) callback();
+            return;
+        }, o)
     }
 
     _removeAll(t: Thread, callback: CallbackFunction, collection: CollectionInterface) {
@@ -293,24 +300,30 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
             return;
         }
 
-        if (collection instanceof SystemCollection) {
-            let oldLength = this.elements.length;
-            let elementsToRemove = collection.getAllElements();
-            this.elements = this.elements.filter(element => elementsToRemove.indexOf(element) < 0);
-            t.s.push(this.elements.length != oldLength);
-            if (callback) callback();
-            return;
+        let oldLength = this.elements.length;
+
+        let f = (t: Thread, callback: CallbackFunction, elementsToRemove: any[]) => {
+
+            if(elementsToRemove.length > 0){
+                this._mj$remove$boolean$E(t, () => {f(t, callback, elementsToRemove);}, elementsToRemove.pop());
+            } else {
+                t.s.push(this.elements.length != oldLength);
+                if(callback) callback();
+            }
+
         }
 
-        collection._mj$toArray$Object_I$(t, () => {
-            let elementsToRemove = t.s.pop();
-            let oldLength = this.elements.length;
-            if (elementsToRemove != null && Array.isArray(elementsToRemove)) {
-                this.elements = this.elements.filter(element => elementsToRemove.indexOf(element) < 0);
-                t.s.push(this.elements.length != oldLength);
-                if (callback) callback();
-            }
-        })
+        if (collection instanceof SystemCollection) {
+            let elementsToRemove = collection.getAllElements().slice();
+            f(t, callback, elementsToRemove);
+            return;
+        } else {
+            collection._mj$toArray$Object_I$(t, () => {
+                let elementsToRemove = <any[]>t.s.pop();
+                f(t, callback, elementsToRemove.slice());
+                return;
+            })
+        }
 
     }
 
