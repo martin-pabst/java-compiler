@@ -841,6 +841,7 @@ list.add("two");
 list.add("three");
 
 println(list.get(1));
+println(list.indexOf("two"));
 
 String[] list2 = new String[1];
 

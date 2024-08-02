@@ -35,9 +35,9 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
         { type: "method", signature: "int size()", native: LinkedListClass.prototype._size, template: "§1.elements.length", comment: JRC.collectionSizeComment },
 
         // from Queue
-        { type: "method", signature: "E remove()", java: LinkedListClass.prototype._mj$remove$E, comment: JRC.queueRemoveComment },
-        { type: "method", signature: "E poll()", java: LinkedListClass.prototype._mj$poll$E, comment: JRC.queuePollComment },
-        { type: "method", signature: "E peek()", java: LinkedListClass.prototype._mj$peek$E, comment: JRC.queuePeekComment },
+        { type: "method", signature: "E remove()", java: LinkedListClass.prototype._mj$remove$E$, comment: JRC.queueRemoveComment },
+        { type: "method", signature: "E poll()", java: LinkedListClass.prototype._mj$poll$E$, comment: JRC.queuePollComment },
+        { type: "method", signature: "E peek()", java: LinkedListClass.prototype._mj$peek$E$, comment: JRC.queuePeekComment },
 
         // from Deque
         { type: "method", signature: "boolean removeFirstOccurrence(E element)", java: LinkedListClass.prototype._mj$removeFirstOccurrence$boolean$E, comment: JRC.dequeRemoveFirstOccurrenceComment },
@@ -50,7 +50,7 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
         { type: "method", signature: "E peekLast()", java: LinkedListClass.prototype._mj$peekLast$E$, comment: JRC.dequePeekLastComment },
         { type: "method", signature: "E pop()", java: LinkedListClass.prototype._mj$pop$E$, comment: JRC.dequePopComment },
         { type: "method", signature: "void push(E element)", java: LinkedListClass.prototype._mj$push$void$E, comment: JRC.dequePushComment },
-        { type: "method", signature: "Interator<E> descendingIterator()", java: LinkedListClass.prototype._mj$descendingIterator$Iterator$, comment: JRC.dequeDescendingIteratorComment },
+        { type: "method", signature: "Iterator<E> descendingIterator()", java: LinkedListClass.prototype._mj$descendingIterator$Iterator$, comment: JRC.dequeDescendingIteratorComment },
 
 
         // override toString-method
@@ -68,14 +68,14 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
 
 
     // from Queue:
-    _mj$remove$E(t: Thread, callback: CallbackFunction) {
+    _mj$remove$E$(t: Thread, callback: CallbackFunction) {
         if (this.elements.length == 0) throw new RuntimeExceptionClass(JRC.linkedListIsEmptyError());
         t.s.push(this.elements.shift());
         if (callback) callback();
         return;
     }
 
-    _mj$poll$E(t: Thread, callback: CallbackFunction) {
+    _mj$poll$E$(t: Thread, callback: CallbackFunction) {
         if (this.elements.length == 0) {
             t.s.push(null);
         } else {
@@ -85,7 +85,7 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
         return;
     }
 
-    _mj$peek$E(t: Thread, callback: CallbackFunction) {
+    _mj$peek$E$(t: Thread, callback: CallbackFunction) {
         if (this.elements.length == 0) {
             t.s.push(null);
         } else {
@@ -99,7 +99,7 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
     // from Deque:
     _mj$removeFirstOccurrence$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClass) {
         let firstIndex: number = -1;
-        if (this._mj$equals$boolean$Object == ObjectClass.prototype._mj$equals$boolean$Object || element == null) {
+        if (element == null || element._mj$equals$boolean$Object == ObjectClass.prototype._mj$equals$boolean$Object) {
             firstIndex = this.elements.indexOf(element);
             if (firstIndex < 0) {
                 t.s.push(false);
@@ -129,12 +129,13 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
                     }, this.elements[index])
                 }
             }
+            f();
         }
     }
 
     _mj$removeLastOccurrence$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClass) {
         let lastIndex: number = -1;
-        if (this._mj$equals$boolean$Object == ObjectClass.prototype._mj$equals$boolean$Object || element == null) {
+        if (element == null || element._mj$equals$boolean$Object == ObjectClass.prototype._mj$equals$boolean$Object) {
             lastIndex = this.elements.lastIndexOf(element);
             if (lastIndex < 0) {
                 t.s.push(false);
@@ -164,6 +165,7 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
                     }, this.elements[index])
                 }
             }
+            f();
         }
     }
 

@@ -21,7 +21,7 @@ export class DequeInterface extends QueueInterface {
         { type: "method", signature: "E peekLast()", java: DequeInterface.prototype._mj$peekLast$E$, comment: JRC.dequePeekLastComment },
         { type: "method", signature: "E pop()", java: DequeInterface.prototype._mj$pop$E$, comment: JRC.dequePopComment },
         { type: "method", signature: "void push(E element)", java: DequeInterface.prototype._mj$push$void$E, comment: JRC.dequePushComment },
-        { type: "method", signature: "Interator<E> descendingIterator()", java: DequeInterface.prototype._mj$descendingIterator$Iterator$, comment: JRC.dequeDescendingIteratorComment },
+        { type: "method", signature: "Iterator<E> descendingIterator()", java: DequeInterface.prototype._mj$descendingIterator$Iterator$, comment: JRC.dequeDescendingIteratorComment },
         
     ]
 

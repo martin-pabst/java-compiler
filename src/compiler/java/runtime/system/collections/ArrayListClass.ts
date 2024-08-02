@@ -40,7 +40,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
         { type: "method", signature: "boolean add(int index, E element)", native: ArrayListClass.prototype._addWithIndex , comment: JRC.listAddElementComment},
         { type: "method", signature: "boolean addAll(int index, Collection<? extends E> c)", java: ArrayListClass.prototype._addAllWithIndex , comment: JRC.listAddAllElementsComment},
         { type: "method", signature: "E get (int index)", native: ArrayListClass.prototype._getWithIndex , comment: JRC.listGetComment},
-        { type: "method", signature: "int indexOf (Object o)", native: ArrayListClass.prototype._indexOf , comment: JRC.listIndexOfComment},
+        { type: "method", signature: "int indexOf (E Element)", java: ArrayListClass.prototype._mj$indexOf$int$E , comment: JRC.listIndexOfComment},
         { type: "method", signature: "E remove (int index)", native: ArrayListClass.prototype._removeWithIndex , comment: JRC.listRemoveComment},
         { type: "method", signature: "E set (int index, E Element)", native: ArrayListClass.prototype._setWithIndex , comment: JRC.listSetComment},
         { type: "method", signature: "void sort(Comparator<? super E> comparator)", java: ArrayListClass.prototype._mj$sort$void$Comparator , comment: JRC.listSortComment},
@@ -314,8 +314,36 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
 
     }
 
-    _indexOf(element: ObjectClass): number {
-        return this.elements.indexOf(element);
+    _mj$indexOf$int$E(t: Thread, callback: CallbackFunction, element: ObjectClass) { 
+        let firstIndex: number = -1;
+        if (element == null || element._mj$equals$boolean$Object == ObjectClass.prototype._mj$equals$boolean$Object) {
+            firstIndex = this.elements.indexOf(element);
+            t.s.push(firstIndex);
+            if (callback) callback();
+        } else {
+            let index = 0;
+            let f = () => {
+                if(index >= this.elements.length){
+                    t.s.push(-1);
+                    if(callback) callback();
+                    return;
+                } else {
+                    element._mj$equals$boolean$Object(t, () => {
+                        if(t.s.pop()){
+                            t.s.push(index);
+                            if(callback) callback();
+                            return;            
+                        } else {
+                            index++;
+                            f();
+                        }
+                    }, this.elements[index])
+                }
+            }
+            f();
+        }
+
+
     }
 
     _mj$sort$void$Comparator(t: Thread, callback: CallbackFunction, comparator: ComparatorInterface) {

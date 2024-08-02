@@ -13,9 +13,9 @@ export class ListInterface extends CollectionInterface {
         { type: "method", signature: "boolean add(int index, E element)", java: ListInterface.prototype._mj$add$boolean$int$E, comment: JRC.listAddElementComment },
         { type: "method", signature: "boolean addAll(int index, Collection<? extends E> c)", java: ListInterface.prototype._mj$addAll$boolean$int$Collection, comment: JRC.listAddAllElementsComment },
         { type: "method", signature: "E get (int index)", java: ListInterface.prototype._mj$get$E$int, comment: JRC.listGetComment },
-        { type: "method", signature: "int indexOf (Object o)", java: ListInterface.prototype._mj$indexOf$int$Object, comment: JRC.listIndexOfComment },
+        { type: "method", signature: "int indexOf (E element)", java: ListInterface.prototype._mj$indexOf$int$E, comment: JRC.listIndexOfComment },
         { type: "method", signature: "E remove (int index)", java: ListInterface.prototype._mj$remove$E$int, comment: JRC.listRemoveComment },
-        { type: "method", signature: "E set (int index, E Element)", java: ListInterface.prototype._mj$set$E$int$E, comment: JRC.listSetComment },
+        { type: "method", signature: "E set (int index, E element)", java: ListInterface.prototype._mj$set$E$int$E, comment: JRC.listSetComment },
         { type: "method", signature: "default void sort(Comparator<? super E> comparator)", java: ListInterface.prototype._mj$sort$void$Comparator, comment: JRC.listSortComment },
 
         // TODO: sort, subList, ...
@@ -29,9 +29,9 @@ export class ListInterface extends CollectionInterface {
 
     _mj$get$E$int(t: Thread, callback: CallbackFunction, index: number) { }
 
-    _mj$indexOf$int$Object(t: Thread, callback: CallbackFunction) { }
+    _mj$indexOf$int$E(t: Thread, callback: CallbackFunction, element: ObjectClass) { }
 
-    _mj$remove$E$int(t: Thread, callback: CallbackFunction) { }
+    _mj$remove$E$int(t: Thread, callback: CallbackFunction, index: number) { }
 
     _mj$set$E$int$E(t: Thread, callback: CallbackFunction, index: number, element: ObjectClass) { }
 

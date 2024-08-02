@@ -199,8 +199,8 @@ export class StringClass extends ObjectClass {
         { type: "method", signature: "public final boolean contains(string otherString)", native: StringClass.prototype._nContains, template: "(§1.value.indexOf(§2) >= 0)" , comment: JRC.stringContainsComment},
         { type: "method", signature: "public final boolean endsWith(string otherString)", native: StringClass.prototype._nEndsWith, template: "§1.value.endsWith(§2)" , comment: JRC.stringEndsWithComment},
         { type: "method", signature: "public final boolean startsWith(string otherString)", native: StringClass.prototype._nStartsWith, template: "§1.value.startsWith(§2)" , comment: JRC.stringStartsWithComment},
-        { type: "method", signature: "public boolean equals(Object otherObject)", java: StringClass.prototype._mjEquals , comment: JRC.objectEqualsComment},
-        { type: "method", signature: "public boolean equals(String otherObject)", java: StringClass.prototype._mjEquals , comment: JRC.objectEqualsComment},
+        { type: "method", signature: "public boolean equals(Object otherObject)", java: StringClass.prototype._mj$equals$boolean$Object , comment: JRC.objectEqualsComment},
+        { type: "method", signature: "public boolean equals(String otherObject)", java: StringClass.prototype._mj$equals$boolean$Object , comment: JRC.objectEqualsComment},
         { type: "method", signature: "public final boolean equalsIgnoreCase(string otherString)", native: StringClass.prototype._nEqualsIgnoreCase, template: "§1.value.toLocaleUpperCase() == §2.toLocaleUpperCase()" , comment: JRC.stringEqualsIgnoreCaseComment},
         { type: "method", signature: "public final boolean isEmpty()", native: StringClass.prototype._nIsEmpty, template: "(§1.value.length == 0)" , comment: JRC.stringIsEmptyComment},
         { type: "method", signature: "public final int lastIndexOf(string str)", native: StringClass.prototype._nLastIndexOf1, template: "§1.value.lastIndexOf(§2)" , comment: JRC.stringLastIndexOfComment1},
@@ -345,7 +345,7 @@ export class StringClass extends ObjectClass {
         return new StringClass(this.value + secondString);
     }
 
-    _mjEquals(t: Thread, callback: CallbackFunction, otherString: StringClass) {
+    _mj$equals$boolean$Object(t: Thread, callback: CallbackFunction, otherString: StringClass) {
         let ret = false;
         if (otherString instanceof StringClass) {
             ret = this.value == otherString.value;
