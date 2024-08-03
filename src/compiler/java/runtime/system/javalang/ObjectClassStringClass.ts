@@ -175,6 +175,10 @@ export class ObjectClass {
         }
     }
 
+    __internalHashCode(): any {
+        return this;
+    }
+
 }
 
 export class StringClass extends ObjectClass {
@@ -228,6 +232,10 @@ export class StringClass extends ObjectClass {
     constructor(value?: string) {
         super();
         this.value = value || "";
+    }
+
+    __internalHashCode(): any {
+        return this.value;
     }
 
     _emptyConstructor() {

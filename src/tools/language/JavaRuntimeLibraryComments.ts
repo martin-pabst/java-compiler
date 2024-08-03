@@ -4273,4 +4273,62 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Empty list, therefore you can't remove an element from it.",
     })
 
+    /**
+     * interface Map
+     */
+    static mapInterfaceComment = () => lm({
+    "de": "Eine Map ist ein Schlüssel-Wert-Speicher (key-value store). Eine Map kann keinen Schlüssel mehrfach enthalten.",
+    "en": "An object that maps keys to values. A map cannot contain duplicate keys; each key can map to at most one value.",
+    })
+
+    static mapSizeComment = () => lm({
+    "de": "Gibt die Anzahl der Schlüssel-Wert-Paare der Map zurück.",
+    "en": "Returns the number of key-value mappings in this map.",
+    })
+
+    static mapIsEmptyComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn die Map keine Schlüssel-Wert-Paare enthält.",
+    "en": "Returns true if this map contains no key-value mappings.",
+    })
+
+    static mapContainsValueComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn die Map den Wert enthält.",
+    "en": "Returns true if this map maps one or more keys to the specified value. More formally, returns true if and only if this map contains at least one mapping to a value v such that Objects.equals(value, v). This operation will probably require time linear in the map size for most implementations of the Map interface.",
+    })
+
+    static mapContainsKeyComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn die Map zum Schlüssel key einen Wert enthält.",
+    "en": "Returns true if this map contains a mapping for the specified key.",
+    })
+
+    static mapGetComment = () => lm({
+    "de": "Gibt den Wert zum Schlüssel key zurück. Gibt null zurück, falls die Map zum Schlüssel key keinen Wert enthält.",
+    "en": "Returns the value to which the specified key is mapped, or null if this map contains no mapping for the key. \nMore formally, if this map contains a mapping from a key k to a value v such that Objects.equals(key, k), then this method returns v; otherwise it returns null.",
+    })
+
+    static mapPutComment = () => lm({
+    "de": "Speichert das key-value pair in der Map. Falls zum key vorher schon ein Value gespeichert war, wird dieser zurückgegeben. In der Map wird er dann durch den neuen Value überschrieben. Falls es zum key noch keinen value in der Map gab, wird null zurückgegeben.",
+    "en": "Associates the specified value with the specified key in this map (optional operation). If the map previously contained a mapping for the key, the old value is replaced by the specified value. Returns the previous value associated with key, or null if there was no mapping for key.",
+    })
+
+    static mapClearComment = () => lm({
+    "de": "Entfernt alle Schlüssel-Wert-Paare aus der Map.",
+    "en": "Removes all of the mappings from this map",
+    })
+
+    /**
+     * Class HashMap
+     */
+    static hashMapClassComment = () => lm({
+    "de": "Map-Klasse mit Zugriffszeit proportional zu log(Anzahl der Elemente)",
+    "en": "A mutable hash map providing O(1) lookup.",
+    })
+
+    static hashMapConstructorComment = () => lm({
+    "de": "Erstellt ein neues HashMap-Objekt",
+    "en": "Creates a new HashMap-object.",
+    })
+
+    
+
 }  

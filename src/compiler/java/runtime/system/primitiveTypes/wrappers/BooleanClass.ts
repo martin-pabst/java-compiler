@@ -31,6 +31,10 @@ export class BooleanClass extends ObjectClass {
         super();
     }
 
+    __internalHashCode(): any {
+        return this.value;
+    }
+
     _compareTo(otherValue: BooleanClass){
         return this == otherValue ? 0 : 1;
     }

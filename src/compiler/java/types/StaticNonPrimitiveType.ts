@@ -7,6 +7,13 @@ import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility.ts";
 
 export class StaticNonPrimitiveType extends JavaType {
+    
+    getAbsoluteName(): string {
+        return this.nonPrimitiveType.getAbsoluteName();
+    }
+    getCompletionItemDetail(): string {
+        return "";
+    }
 
     get runtimeClass(): Klass | undefined {
         return this.nonPrimitiveType.runtimeClass;

@@ -33,6 +33,11 @@ export abstract class IJavaInterface extends NonPrimitiveType {
 
     abstract isFunctionalInterface(): boolean;
 
+    getPossibleMethods(identifier: string, isConstructor: boolean, hasToBeStatic: boolean): JavaMethod[] {
+        if(isConstructor) return [];
+        return super.getPossibleMethods(identifier, isConstructor, hasToBeStatic);
+    }
+
     findImplementedInterface(identifier: string): IJavaInterface | undefined {
         if (this.identifier == identifier) return this;
         for (let ext of this.getExtends()) {

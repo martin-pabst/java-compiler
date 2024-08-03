@@ -118,6 +118,7 @@ import { CollectionsClass } from "./collections/CollectionsClass.ts";
 import { QueueInterface } from "./collections/QueueInterface.ts";
 import { DequeInterface } from "./collections/DequeueInterface.ts";
 import { LinkedListClass } from "./collections/LinkedListClass.ts";
+import { CharacterClass } from "./primitiveTypes/wrappers/CharacterClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -154,7 +155,7 @@ export class SystemModule extends JavaLibraryModule {
             // Functional
             ConsumerInterface, FunctionInterface,
 
-            NumberClass, IntegerClass, LongClass, FloatClass, DoubleClass, ShortClass, BooleanClass,  // boxed primitive types
+            NumberClass, IntegerClass, LongClass, FloatClass, DoubleClass, ShortClass, BooleanClass, CharacterClass,  // boxed primitive types
 
             OptionalClass,
 

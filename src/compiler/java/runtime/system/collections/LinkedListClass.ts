@@ -27,10 +27,10 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
         { type: "method", signature: "boolean add(E e)", native: LinkedListClass.prototype._add, template: "(§1.elements.push(§2) >= 0)", comment: JRC.collectionAddElementComment },
         { type: "method", signature: "boolean addAll(Collection<? extends E> c)", java: LinkedListClass.prototype._addAll, comment: JRC.collectionAddAllComment },
         { type: "method", signature: "void clear()", native: LinkedListClass.prototype._clear, template: "§1.elements.length = 0", comment: JRC.collectionClearComment },
-        { type: "method", signature: "boolean contains(Object o)", native: LinkedListClass.prototype._contains, template: "(§1.elements.indexOf(§2) >= 0)", comment: JRC.collectionContainsComment },
-        { type: "method", signature: "boolean containsAll(Collection<?> c)", java: LinkedListClass.prototype._containsAll, comment: JRC.collectionContainsAllComment },
+        { type: "method", signature: "boolean contains(E Element)", java: LinkedListClass.prototype._mj$contains$boolean$Object, comment: JRC.collectionContainsComment },
+        { type: "method", signature: "boolean containsAll(Collection<?> c)", java: LinkedListClass.prototype._mj$containsAll$boolean$Collection, comment: JRC.collectionContainsAllComment },
         { type: "method", signature: "boolean isEmpty()", native: LinkedListClass.prototype._isEmpty, template: "(§1.elements.length == 0)", comment: JRC.collectionIsEmptyComment },
-        { type: "method", signature: "boolean remove(Object o)", native: LinkedListClass.prototype._remove, comment: JRC.collectionRemoveObjectComment },
+        { type: "method", signature: "boolean remove(E element)", java: LinkedListClass.prototype._mj$remove$boolean$E, comment: JRC.collectionRemoveObjectComment },
         { type: "method", signature: "boolean removeAll(Collection<?> c)", java: LinkedListClass.prototype._removeAll, comment: JRC.collectionRemoveAllComment },
         { type: "method", signature: "int size()", native: LinkedListClass.prototype._size, template: "§1.elements.length", comment: JRC.collectionSizeComment },
 
@@ -111,17 +111,17 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
         } else {
             let index = 0;
             let f = () => {
-                if(index >= this.elements.length){
+                if (index >= this.elements.length) {
                     t.s.push(false);
-                    if(callback) callback();
+                    if (callback) callback();
                     return;
                 } else {
                     element._mj$equals$boolean$Object(t, () => {
-                        if(t.s.pop()){
+                        if (t.s.pop()) {
                             this.elements.splice(index, 1);
                             t.s.push(true);
-                            if(callback) callback();
-                            return;            
+                            if (callback) callback();
+                            return;
                         } else {
                             index++;
                             f();
@@ -147,17 +147,17 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
         } else {
             let index = this.elements.length - 1;
             let f = () => {
-                if(index < 0){
+                if (index < 0) {
                     t.s.push(false);
-                    if(callback) callback();
+                    if (callback) callback();
                     return;
                 } else {
                     element._mj$equals$boolean$Object(t, () => {
-                        if(t.s.pop()){
+                        if (t.s.pop()) {
                             this.elements.splice(index, 1);
                             t.s.push(true);
-                            if(callback) callback();
-                            return;            
+                            if (callback) callback();
+                            return;
                         } else {
                             index--;
                             f();
@@ -351,55 +351,104 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
         this.elements.length = 0;
     }
 
-    _contains(o: ObjectClass) {
-        return this.elements.indexOf(o) >= 0;
+    _mj$contains$boolean$Object(t: Thread, callback: CallbackFunction, element: ObjectClass) {
+        this._mj$indexOf$int$E(t, () => {
+            let index = t.s.pop();
+            t.s.push(index >= 0);
+            if (callback) callback();
+        }, element);
     }
 
-    _containsAll(t: Thread, callback: CallbackFunction, collection: CollectionInterface) {
+    _mj$containsAll$boolean$Collection(t: Thread, callback: CallbackFunction, collection: CollectionInterface) {
 
         if (collection == null) {
-            t.throwException(new NullPointerExceptionClass("LinkedList.containsAll wurde mit null als Argument aufgerufen."));
-            return;
-        }
-
-        let otherElements: ObjectClass[] = [];
-
-        if (collection instanceof SystemCollection) {
-            otherElements = collection.getAllElements();
-            for (let e1 of otherElements) {
-                if (this.elements.indexOf(e1) < 0) {
-                    t.s.push(false);
-                    if (callback) callback();
-                    return;
-                }
-            }
-            t.s.push(true);
-            if (callback) callback();
+            t.throwException(new NullPointerExceptionClass("ArrayList.containsAll wurde mit null als Argument aufgerufen."));
             return;
         }
 
 
-        collection._mj$toArray$Object_I$(t, () => {
-            let newElements = t.s.pop();
-            if (newElements != null && Array.isArray(newElements)) {
-                for (let e1 of newElements) {
-                    if (this.elements.indexOf(e1) < 0) {
+        let f = (t: Thread, callback: CallbackFunction, elementsToCheck: any[]) => {
+
+            if (elementsToCheck.length > 0) {
+                this._mj$contains$boolean$Object(t, () => {
+                    if (t.s.pop()) {
+                        f(t, callback, elementsToCheck);
+                    } else {
                         t.s.push(false);
                         if (callback) callback();
-                        return;
                     }
-                }
+                }, elementsToCheck.pop());
+            } else {
                 t.s.push(true);
                 if (callback) callback();
-                return;
             }
-        })
 
+        }
+
+        if (collection instanceof SystemCollection) {
+            let elementsToCheck = collection.getAllElements().slice();
+            f(t, callback, elementsToCheck);
+            return;
+        } else {
+            collection._mj$toArray$Object_I$(t, () => {
+                let elementsToCheck = <any[]>t.s.pop();
+                f(t, callback, elementsToCheck.slice());
+                return;
+            })
+        }
     }
 
     _isEmpty() {
         return this.elements.length == 0;
     }
+
+    _mj$remove$boolean$E(t: Thread, callback: CallbackFunction, o: ObjectClass) {
+
+        this._mj$indexOf$int$E(t, () => {
+            let index = t.s.pop();
+            if (index >= 0) {
+                this.elements.splice(index, 1)
+                t.s.push(true);
+            } else {
+                t.s.push(false);
+            }
+            if (callback) callback();
+            return;
+        }, o)
+    }
+
+    _mj$indexOf$int$E(t: Thread, callback: CallbackFunction, element: ObjectClass) {
+        let firstIndex: number = -1;
+        if (element == null || element._mj$equals$boolean$Object == ObjectClass.prototype._mj$equals$boolean$Object) {
+            firstIndex = this.elements.indexOf(element);
+            t.s.push(firstIndex);
+            if (callback) callback();
+        } else {
+            let index = 0;
+            let f = () => {
+                if (index >= this.elements.length) {
+                    t.s.push(-1);
+                    if (callback) callback();
+                    return;
+                } else {
+                    element._mj$equals$boolean$Object(t, () => {
+                        if (t.s.pop()) {
+                            t.s.push(index);
+                            if (callback) callback();
+                            return;
+                        } else {
+                            index++;
+                            f();
+                        }
+                    }, this.elements[index])
+                }
+            }
+            f();
+        }
+
+
+    }
+
 
     _size() {
         return this.elements.length;
@@ -407,15 +456,6 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
 
     _toArray() {
         return this.elements.slice();
-    }
-
-    _remove(o: ObjectClass) {
-        let index = this.elements.indexOf(o);
-        if (index >= 0) {
-            this.elements.splice(index, 1)
-            return true;
-        }
-        return false;
     }
 
     _removeAll(t: Thread, callback: CallbackFunction, collection: CollectionInterface) {

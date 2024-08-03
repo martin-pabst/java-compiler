@@ -13,6 +13,7 @@ import { JavaClass } from "../types/JavaClass";
 import { JavaInterface } from "../types/JavaInterface";
 import { JavaType } from "../types/JavaType";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
+import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType";
 import { CodeSnippet, ConstantValue, StringCodeSnippet } from "./CodeSnippet";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";
 import { SnippetFramer } from "./CodeSnippetTools";
@@ -51,7 +52,6 @@ var primitiveTypeMap: { [identifier: string]: number | undefined } = {
 var assignmentOperators: TokenType[] = [TokenType.assignment, TokenType.plusAssignment, TokenType.minusAssignment, TokenType.multiplicationAssignment, TokenType.divisionAssignment, TokenType.moduloAssignment];
 var logicOperators: TokenType[] = [TokenType.and, TokenType.or, TokenType.XOR];
 var shiftOperators: TokenType[] = [TokenType.shiftLeft, TokenType.shiftRight, TokenType.shiftRightUnsigned];
-var logicOperators: TokenType[] = [TokenType.and, TokenType.or, TokenType.XOR];
 var plusMinusMultDivAssignmentOperators: TokenType[] = [TokenType.plusAssignment, TokenType.minusAssignment, TokenType.multiplicationAssignment, TokenType.divisionAssignment, TokenType.moduloAssignment, TokenType.assignment];
 var comparisonOperators: TokenType[] = [TokenType.lower, TokenType.greater, TokenType.lowerOrEqual, TokenType.greaterOrEqual, TokenType.notEqual, TokenType.equal];
 
@@ -111,8 +111,13 @@ export abstract class BinopCastCodeGenerator {
             return undefined;
         }
 
+        if(operator == TokenType.keywordInstanceof){
+            return this.compileInstanceOf(leftSnippet, rightSnippet, operatorRange, wholeRange);
+        }
+
         let leftType: JavaType = leftSnippet.type;
         let rightType: JavaType = rightSnippet.type;
+
 
         let lIdentifier = leftType.identifier;
         let rIdentifier = rightType.identifier;
@@ -178,7 +183,26 @@ export abstract class BinopCastCodeGenerator {
         // operators are +, -, *, /, %
         let resultType = this.primitiveTypes[Math.max(lTypeIndex, rTypeIndex)];
         return new BinaryOperatorTemplate(operatorIdentifier, false).applyToSnippet(resultType, wholeRange, leftSnippet, rightSnippet);
-
+        
+    }
+    
+    compileInstanceOf(leftSnippet: CodeSnippet, rightSnippet: CodeSnippet, operatorRange: IRange, wholeRange: IRange): CodeSnippet | undefined {
+        let leftType = leftSnippet.type!;
+        let rightType = rightSnippet.type!; 
+        
+        if(!(rightType instanceof StaticNonPrimitiveType)){
+            this.pushError(JCM.rightSideOfInstanceofError(), "error", operatorRange);
+            return undefined;
+        }
+        
+        if(!(leftType instanceof NonPrimitiveType)){
+            this.pushError(JCM.leftSideOfInstanceofError(), "error", operatorRange);
+            return undefined;
+        }
+        
+        return SnippetFramer.frame(leftSnippet, `${Helpers.instanceof}(§1, "${(<StaticNonPrimitiveType>rightType).nonPrimitiveType.pathAndIdentifier}")`
+            , this.booleanType)
+        
     }
 
     /**

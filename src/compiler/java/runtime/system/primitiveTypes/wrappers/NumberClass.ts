@@ -31,6 +31,10 @@ export class NumberClass extends ObjectClass {
         this.value = n;
     }
 
+    __internalHashCode(): any {
+        return this.value;
+    }
+
     byteValue(){
         return (Math.trunc(this.value) + 0x80) % 0x100 - 0x80;
     }

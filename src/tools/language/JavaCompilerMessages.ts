@@ -24,6 +24,16 @@ export class JCM {
         "en": "Operator " + operatorIdentifier + " is not defined for operands of type " + lIdentifier + " and " + rIdentifier + ".",
     });
 
+    static rightSideOfInstanceofError = () => le({
+        "de": "Rechts vom Operator instanceof muss eine Klasse/ein Interface/ein Enum-Typ stehen.",
+        "en": "Class/interface/enum-type expected on righthand side of operator instanceof.",
+    });
+
+    static leftSideOfInstanceofError = () => le({
+        "de": "Links vom Operator instanceof muss ein Objekt stehen.",
+        "en": "Object expected on righthand side of operator instanceof.",
+    });
+
     static cantAssignValueToTerm = () => le({
         "de": "Dem Term auf der linken Seite des Zuweisungsoperators kann nichts zugewiesen werden.",
         "en": "Can't assign value to expression on left side of assignment operator.",

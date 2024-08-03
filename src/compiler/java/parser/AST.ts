@@ -23,7 +23,7 @@ export type ComparisonOperator = TokenType.lower | TokenType.greater | TokenType
 
 export type BinaryOperator = AssignmentOperator |
     TokenType.plus | TokenType.minus | TokenType.multiplication | TokenType.division | TokenType.modulo |
-    ShiftOperator | LogicOperator | ComparisonOperator;
+    ShiftOperator | LogicOperator | ComparisonOperator | TokenType.keywordInstanceof;
 
 export type UnaryPrefixOperator = TokenType.minus | TokenType.not | TokenType.tilde | TokenType.plus | TokenType.plusPlus | TokenType.minusMinus;
 

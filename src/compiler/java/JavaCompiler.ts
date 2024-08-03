@@ -67,7 +67,7 @@ export class JavaCompiler implements Compiler {
         this.moduleManager.setDirtyFlags();
         this.moduleManager.setupModulesBeforeCompiliation(this.files);
         let newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
-        console.log(Math.round(performance.now() - time) + " ms: Found " + newOrDirtyModules.length + " new or dirty modules.");
+        // console.log(Math.round(performance.now() - time) + " ms: Found " + newOrDirtyModules.length + " new or dirty modules.");
         if (newOrDirtyModules.length == 0) return this.lastCompiledExecutable;
 
         this.errors = [];
@@ -129,7 +129,7 @@ export class JavaCompiler implements Compiler {
             this.compilationFinishedCallback(executable);
         }
 
-        console.log(Math.round(performance.now() - time) + " ms: Done compiling!");
+        // console.log(Math.round(performance.now() - time) + " ms: Done compiling!");
 
         return executable;
 

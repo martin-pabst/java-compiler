@@ -12,7 +12,7 @@ export class CollectionInterface extends IterableInterface {
         { type: "method", signature: "boolean add(E e)", java: CollectionInterface.prototype._mj$add$boolean$E, comment: JRC.collectionAddElementComment },
         { type: "method", signature: "boolean addAll(Collection<? extends E> c)", java: CollectionInterface.prototype._mj$addAll$boolean$Collection, comment: JRC.collectionAddAllComment },
         { type: "method", signature: "void clear()", java: CollectionInterface.prototype._mj$clear$void$, comment: JRC.collectionClearComment },
-        { type: "method", signature: "boolean contains(E element)", java: CollectionInterface.prototype._mj$contains$boolean$Object, comment: JRC.collectionContainsComment },
+        { type: "method", signature: "boolean contains(E element)", java: CollectionInterface.prototype._mj$contains$boolean$E, comment: JRC.collectionContainsComment },
         { type: "method", signature: "boolean containsAll(Collection<?> c)", java: CollectionInterface.prototype._mj$containsAll$boolean$Collection, comment: JRC.collectionContainsAllComment },
         { type: "method", signature: "boolean isEmpty()", java: CollectionInterface.prototype._mj$isEmpty$boolean$, comment: JRC.collectionIsEmptyComment },
         { type: "method", signature: "boolean remove(Object o)", java: CollectionInterface.prototype._mj$remove$boolean$Object, comment: JRC.collectionRemoveObjectComment },
@@ -32,7 +32,7 @@ export class CollectionInterface extends IterableInterface {
 
     _mj$clear$void$(t: Thread, callback: CallbackFunction) { };
 
-    _mj$contains$boolean$Object(t: Thread, callback: CallbackFunction) { };
+    _mj$contains$boolean$E(t: Thread, callback: CallbackFunction) { };
 
     _mj$containsAll$boolean$Collection(t: Thread, callback: CallbackFunction) { };
 

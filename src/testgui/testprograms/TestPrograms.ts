@@ -1,5 +1,14 @@
 export var testProgramsList = [
    ['', ``],
+   ['instanceof', `
+Test t = new Test();
+
+t instanceof Test;
+
+
+class Test {
+   
+}`],
    ['JSonParser', `HttpClient client = new HttpClient();
 HttpRequest request = new HttpRequest();
 request.uri("https://ostrich-api.datausa.io/api/data?measure=Average%20Wage,Average%20Wage%20Appx%20MOE,Record%20Count&drilldowns=Major Occupation%20Group&Workforce%20Status=true&Record%20Count>=5");

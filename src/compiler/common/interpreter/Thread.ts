@@ -586,6 +586,12 @@ export class Thread {
         throw exception;
     }
 
+    Instanceof(object: ObjectClass, type: string): boolean {
+        if(object == null) return false;
+        let objType = object.getType() as NonPrimitiveType;
+        return objType.fastExtendsImplements(type);
+    }
+
     NullstringIfNull(s: StringClass): string {
         return s == null ? "null" : s.value;
     }
