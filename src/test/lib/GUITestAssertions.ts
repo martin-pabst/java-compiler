@@ -22,12 +22,10 @@ export class GUITestAssertions implements AssertionObserver {
         }
     }
     notifyOnAssertEqualsObject(thread: Thread, step: Step, expected: string, actual: string, message: string): void {
-        if (expected != actual) {
-            this.logFailedTest(thread, step, message, "Expected: " + expected + ", actual " + actual);
-        }
+        this.logFailedTest(thread, step, message, "Expected: " + expected + ", actual " + actual);
     }
     notifyOnFail(thread: Thread, step: Step, message: string): void {
-        this.logFailedTest(thread, step, message,"");
+        this.logFailedTest(thread, step, message, "");
     }
 
     notifyOnAssertTrue(thread: Thread, step: Step, condition: boolean, message: string): void {
@@ -37,7 +35,7 @@ export class GUITestAssertions implements AssertionObserver {
         // expect(condition).to.equal(true, message);
     }
 
-    logFailedTest(thread: Thread, step: Step, message: string, detail: string){
+    logFailedTest(thread: Thread, step: Step, message: string, detail: string) {
         this.testRunner.log(message, detail);
 
     }

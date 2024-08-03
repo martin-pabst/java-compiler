@@ -1121,9 +1121,18 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 }
 
                 if (fromType != toType) {
-                    if (fromType?.toString() != toType.toString()) {
+                    let toTypeString = toType.toString().toLocaleLowerCase();
+                    let fromTypeString = fromType.toString().toLocaleLowerCase();
+                    if (fromTypeString != toTypeString) {
+                        let toTypeIsString = toTypeString == 'string';                        
                         if (this.canCastTo(fromType, toType, "implicit")) {
-                            castsNeeded++;
+                            if(toTypeIsString){
+                                castsNeeded += 3;
+                            } else if(toTypeString == 'object'){
+                                castsNeeded += 2;
+                            } else {
+                                castsNeeded++;
+                            }
                             if (castsNeeded >= castsNeededWithBestMethodSoFar) {
                                 suitable = false;
                                 break;

@@ -1,5 +1,13 @@
 export var testProgramsList = [
    ['', ``],
+   ['AssertionsTest', `
+class Tests {
+   @Test
+   void test() {
+      assertEquals(Integer.valueOf(10), Integer.valueOf(12), "Test!"); 
+   }
+}
+`],
    ['HashMap', `HashMap<String, Integer> hm = new HashMap<>();
 
 hm.put("Martin", 74);
