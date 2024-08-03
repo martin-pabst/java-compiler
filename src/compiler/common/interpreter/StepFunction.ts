@@ -1,3 +1,4 @@
+import { ObjectClass } from "../../java/runtime/system/javalang/ObjectClassStringClass.ts";
 import { IRange } from "../range/Range.ts";
 import { Thread } from "./Thread.ts";
 
@@ -28,6 +29,7 @@ export class Helpers {
     static throwNPE = StepParams.thread + "." + Thread.prototype.NPE.name;
     static checkCast = StepParams.thread + "." + Thread.prototype.CheckCast.name;
     static instanceof = StepParams.thread + "." + Thread.prototype.Instanceof.name;
+    static toString = StepParams.thread + "." + Thread.prototype.ToString.name;
     static exit = StepParams.thread + "." + Thread.prototype.exit.name;
     static assertionObservers = StepParams.thread + ".assertionObservers"; 
     static registerCodeReached = StepParams.thread + "." + Thread.prototype.registerCodeReached.name;
@@ -47,6 +49,7 @@ export class Helpers {
     static checkNPE(object: string, range: IRange){
         return `(${object} || ${Helpers.throwNPE}(${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn}))`;
     }
+
 
     static outerClassAttributeIdentifier = "__outerClass";
 }

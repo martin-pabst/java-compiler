@@ -6,6 +6,7 @@ export interface AssertionObserver {
     notifyOnAssertFalse(thread: Thread, step: Step, condition: boolean, message: string): void;
     notifyOnAssertEqualsNumber(thread: Thread, step: Step, expected: number, actual: number, message: string): void;
     notifyOnAssertEqualsString(thread: Thread, step: Step, expected: string, actual: string, message: string): void;
+    notifyOnAssertEqualsObject(thread: Thread, step: Step, expected: string, actual: string, message: string): void;
     notifyOnFail(thread: Thread, step: Step, message: string): void;
 }
 
@@ -21,6 +22,9 @@ export class DummyAssertionObserver implements AssertionObserver {
     }
     
     notifyOnAssertEqualsString(thread: Thread, step: Step, expected: string, actual: string, message: string): void {
+    }
+
+    notifyOnAssertEqualsObject(thread: Thread, step: Step, expected: string, actual: string, message: string): void {
     }
 
     notifyOnFail(thread: Thread, step: Step, message: string): void {

@@ -119,6 +119,8 @@ import { QueueInterface } from "./collections/QueueInterface.ts";
 import { DequeInterface } from "./collections/DequeueInterface.ts";
 import { LinkedListClass } from "./collections/LinkedListClass.ts";
 import { CharacterClass } from "./primitiveTypes/wrappers/CharacterClass.ts";
+import { MapInterface } from "./collections/MapInterface.ts";
+import { HashMapClass } from "./collections/HashMapClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -169,6 +171,8 @@ export class SystemModule extends JavaLibraryModule {
             CollectionsClass,
 
             QueueInterface, DequeInterface, LinkedListClass,
+
+            MapInterface, HashMapClass,
 
             // Thread
             RunnableInterface, ThreadClass, ThreadStateEnum, SemaphoreClass,

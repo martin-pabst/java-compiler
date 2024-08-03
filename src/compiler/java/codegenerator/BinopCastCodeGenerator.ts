@@ -36,6 +36,18 @@ var boxedTypesMap: { [identifier: string]: number | undefined } = {
     "String": nString,
 }
 
+var unboxedNullValuesMap: {[identifier: string]: string } = {
+    "Boolean": "false",
+    "Character": "'_'",
+    "Byte": "0",
+    "Short": "0",
+    "Integer": "0",
+    "Long": "0",
+    "Float": "0.0",
+    "Double": "0.0",
+    "String": "'null'",
+}
+
 var primitiveTypeMap: { [identifier: string]: number | undefined } = {
     "void": nVoid,
     "boolean": nBoolean,
@@ -310,13 +322,15 @@ export abstract class BinopCastCodeGenerator {
             }
         }
 
-        let newSnippet1 = SnippetFramer.frame(leftSnippet, `${Helpers.checkNPE('§1', leftSnippet.range!)}._mj$toString$String$(__t, undefined);\n`, this.stringNonPrimitiveType);
+
+        // let newSnippet1 = SnippetFramer.frame(leftSnippet, `${Helpers.checkNPE('§1', leftSnippet.range!)}._mj$toString$String$(__t, undefined);\n`, this.stringNonPrimitiveType);
+        let newSnippet1 = SnippetFramer.frame(leftSnippet, `${Helpers.toString}(__t, undefined, §1);\n`, this.stringNonPrimitiveType);
         newSnippet1.finalValueIsOnStack = true;
         let newSnippet2 = new CodeSnippetContainer(newSnippet1);
         newSnippet2.addNextStepMark();
 
         if (primitiveOrClassNeeded == "string") {
-            let newSnippet3 = SnippetFramer.frame(newSnippet2, `${Helpers.nullstringIfNull}(§1)`, this.stringType);
+            let newSnippet3 = SnippetFramer.frame(newSnippet2, `(§1 ||${Helpers.classes}["String"].null).value`, this.stringType);
             return newSnippet3;
         } else {
             return newSnippet2;
@@ -398,7 +412,6 @@ export abstract class BinopCastCodeGenerator {
         if (snippet.type == castTo) return snippet;
 
         if (!type.isPrimitive) {
-            if(type == this.nullType) return snippet;
             if (castTo.identifier == "string" || castTo.identifier == "String") {
                 if(type instanceof JavaArrayType){
                     snippet = this.wrapWithArrayToString(snippet, castTo.identifier);
@@ -407,6 +420,9 @@ export abstract class BinopCastCodeGenerator {
                 }
                 return snippet;
             }
+            if(type == this.nullType){
+                return snippet;
+            } 
             if (castTo.isPrimitive) {
                 let boxedIndex = boxedTypesMap[type.identifier];
                 if (boxedIndex) {
@@ -428,7 +444,7 @@ export abstract class BinopCastCodeGenerator {
 
         if (!castTo.isPrimitive) {
             if(castTo == this.stringNonPrimitiveType){
-                let templ = type == this.stringType ? '§1' : '"" + §1'
+                let templ = type == this.stringType ? '§1' : '"" + (§1)'
                 return SnippetFramer.frame(snippet, `new ${Helpers.classes}["String"](${templ})`, this.stringNonPrimitiveType);
             }
             // snippet has primitive type. boxing?
@@ -443,7 +459,7 @@ export abstract class BinopCastCodeGenerator {
 
         // now snippet.type and castTo are primitive.
         // nVoid = 2, nBoolean = 3, nChar = 4, nByte = 5, nShort = 6, nInteger = 7, nLong = 8, nFloat = 9, nDouble = 10, nString = 11
-        let snippetTypeIndex = primitiveTypeMap[type.identifier]!;
+        let snippetTypeIndex = primitiveTypeMap[snippet.type!.identifier]!;
         let castToTypeIndex = primitiveTypeMap[castTo.identifier]!;
         if (snippetTypeIndex == castToTypeIndex) {
             if (castType == "explicit") this.pushError(JCM.unneccessaryCast(), "info", snippet.range!);
@@ -469,7 +485,7 @@ export abstract class BinopCastCodeGenerator {
 
         if (castToTypeIndex == nString) {
             if (snippet.isConstant()) return new StringCodeSnippet(`"${snippet.getConstantValue()}"`, snippet.range, this.stringType, "" + snippet.getConstantValue);
-            return new OneParameterTemplate('("" + §1)').applyToSnippet(this.stringType, snippet.range!, snippet);
+            return new OneParameterTemplate('("" + (§1))').applyToSnippet(this.stringType, snippet.range!, snippet);
         }
 
         // no cast from string, no cast from/to void, boolean
@@ -605,7 +621,7 @@ export abstract class BinopCastCodeGenerator {
 
         let unboxedType = this.primitiveTypes[boxedTypeIndex];
 
-        return SnippetFramer.frame(snippet, '(§1).value', unboxedType);
+        return SnippetFramer.frame(snippet, `(§1 || {value: ${unboxedNullValuesMap[snippet.type.identifier]}}).value`, unboxedType);
     }
 
     box(snippet: CodeSnippet): CodeSnippet {

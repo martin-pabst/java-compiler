@@ -592,6 +592,18 @@ export class Thread {
         return objType.fastExtendsImplements(type);
     }
 
+    ToString(t: Thread, callback: CallbackParameter, object: ObjectClass){
+        if(object == null){
+            t.s.push(null);
+            if(callback) callback();
+            return;
+        }
+        object._mj$toString$String$(t, () => {
+            if(callback) callback();
+            return;
+        });
+    }
+
     NullstringIfNull(s: StringClass): string {
         return s == null ? "null" : s.value;
     }

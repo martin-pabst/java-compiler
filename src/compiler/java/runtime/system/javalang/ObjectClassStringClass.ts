@@ -8,7 +8,7 @@ import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
 
 export class ObjectClass {
 
-    declare _m$toString$String$: (t: Thread) => void;
+    declare _mj$toString$String$: (t: Thread, callback: CallbackFunction) => void;
 
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "class Object" },
@@ -228,6 +228,8 @@ export class StringClass extends ObjectClass {
     public value: string;
 
     static type: NonPrimitiveType;
+
+    static null = new StringClass("null");
 
     constructor(value?: string) {
         super();

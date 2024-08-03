@@ -21,6 +21,11 @@ export class GUITestAssertions implements AssertionObserver {
             this.logFailedTest(thread, step, message, "Expected: " + expected + ", actual " + actual);
         }
     }
+    notifyOnAssertEqualsObject(thread: Thread, step: Step, expected: string, actual: string, message: string): void {
+        if (expected != actual) {
+            this.logFailedTest(thread, step, message, "Expected: " + expected + ", actual " + actual);
+        }
+    }
     notifyOnFail(thread: Thread, step: Step, message: string): void {
         this.logFailedTest(thread, step, message,"");
     }

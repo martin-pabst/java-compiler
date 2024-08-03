@@ -43,6 +43,14 @@ export class ViteTestAssertions implements AssertionObserver {
         // assert.equal(actual, expected, message);
     }
 
+    notifyOnAssertEqualsObject(thread: Thread, step: Step, expected: string, actual: string, message: string): void {
+        if(expected != actual){
+            this.logFailedTest(thread, step, message, "Expected: " + chalk.green(expected) + ", actual: " + chalk.yellow(actual));
+        }
+        // expect(actual).to.equal(expected, message);
+        // assert.equal(actual, expected, message);
+    }
+
     notifyOnFail(thread: Thread, step: Step, message: string): void {
         this.logFailedTest(thread, step, "Intentional fail", message);
     }

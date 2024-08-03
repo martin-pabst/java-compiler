@@ -1,5 +1,17 @@
 export var testProgramsList = [
    ['', ``],
+   ['HashMap', `HashMap<String, Integer> hm = new HashMap<>();
+
+hm.put("Martin", 74);
+hm.put("Gerhard", 75);
+hm.put("Mona", 76);
+
+println(hm.get(75));
+
+String s1 = null;
+String s2 = "Gerhard";
+
+println(s1 == s2);`],
    ['instanceof', `
 Test t = new Test();
 
