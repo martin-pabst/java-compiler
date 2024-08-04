@@ -1,6 +1,9 @@
 import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
+import { ObjectClass } from "../javalang/ObjectClassStringClass";
+import { ArrayListClass } from "./ArrayListClass";
+import { EmptyStackExceptionClass } from "./EmptyStackException";
 import { VectorClass } from "./VectorClass";
 
 export class StackClass extends VectorClass {
@@ -11,10 +14,32 @@ export class StackClass extends VectorClass {
         {type: "method", signature: "E pop()", native: StackClass.prototype._pop, comment: JRC.stackPopComment},
         {type: "method", signature: "E peek()", native: StackClass.prototype._peek, comment: JRC.stackPeekComment},
         {type: "method", signature: "boolean empty()", native: StackClass.prototype._empty, comment: JRC.stackEmptyComment},
-        {type: "method", signature: "int search(E element)", native: StackClass.prototype._search, comment: JRC.stackSearchComment},
+        {type: "method", signature: "int search(E element)", native: StackClass.prototype._mj$indexOf$int$E, comment: JRC.stackSearchComment},
     ];
 
     static type: NonPrimitiveType;
 
+    _push(element: ObjectClass): ObjectClass {
+        this.elements.push(element);
+        return element;
+    }
+
+    _pop(): ObjectClass {
+        if(this.elements.length == 0){
+            throw new EmptyStackExceptionClass();
+        }
+        return this.elements.pop()!;
+    }
+
+    _peek(): ObjectClass {
+        if(this.elements.length == 0){
+            throw new EmptyStackExceptionClass();
+        }
+        return this.elements[this.elements.length - 1];
+    }
+
+    _empty(): boolean {
+        return this.elements.length == 0;
+    }
 
 }

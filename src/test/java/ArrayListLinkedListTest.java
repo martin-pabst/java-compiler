@@ -88,3 +88,43 @@ for (Iterator<String> iter = list3.descendingIterator(); iter.hasNext(); ) {
 }
 
 assertEquals("Veronika, Martin, Claudia, Bonny, ", text, "LinkedList.descendingIterator not working.");
+
+/**::
+ * Stack tests
+ */
+
+Stack<String> stack = new Stack<>();
+
+stack.add("Anton");
+stack.add("Bonny");
+stack.push("Charlie");
+stack.push("Dennis");
+stack.push("Emma");
+
+assertEquals(2, stack.indexOf("Charlie"), "Stack.indexOf not working.");
+assertEquals(2, stack.search("Charlie"), "Stack.search not working.");
+
+stack.remove("Charlie");
+
+assertTrue(stack.contains("Bonny"), "Stack.contains");
+assertEquals("Emma", stack.peek(), "Stack.peek");
+assertFalse(stack.contains("Bonnyx"), "Stack.contains");
+
+Collection<String> coll = stack;
+assertTrue(coll.contains("Dennis"), "Collection.contains");
+assertFalse(coll.contains("Dennisx"), "Collection.contains");
+
+Stack<String> stack2 = new Stack<>();
+
+stack2.add("Bonny");
+stack2.add("Emma");
+
+assertTrue(stack.containsAll(stack2), "Stack.containsAll");
+
+stack2.add("Tony");
+assertFalse(stack.containsAll(stack2), "Stack.containsAll");
+
+stack.push("Zach");
+assertEquals("Zach", stack.pop(), "Stack.pop()");
+assertFalse(stack.contains("Zach"), "Stack.pop()");
+

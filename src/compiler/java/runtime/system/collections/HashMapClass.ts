@@ -17,13 +17,13 @@ export class HashMapClass extends ObjectClass {
         { type: "method", signature: "HashMap()", native: HashMapClass.prototype._constructor , comment: JRC.hashMapConstructorComment},
 
         // from Map-interface
-        { type: "method", signature: "int size()", java: HashMapClass.prototype._mj$size$int$, comment: JRC.mapSizeComment },
-        { type: "method", signature: "boolean isEmpty()", java: HashMapClass.prototype._mj$isEmpty$boolean$, comment: JRC.mapIsEmptyComment },
-        { type: "method", signature: "boolean containsKey(K key)", java: HashMapClass.prototype._mj$containsKey$boolean$K, comment: JRC.mapContainsKeyComment },
-        { type: "method", signature: "boolean containsValue(V value)", java: HashMapClass.prototype._mj$containsValue$boolean$V, comment: JRC.mapContainsValueComment },
-        { type: "method", signature: "V get(K key)", java: HashMapClass.prototype._mj$get$V$K, comment: JRC.mapGetComment },
-        { type: "method", signature: "V put(K key, V value)", java: HashMapClass.prototype._mj$put$V$K$V, comment: JRC.mapPutComment },
-        { type: "method", signature: "void clear()", java: HashMapClass.prototype._mj$clear$void$, comment: JRC.mapClearComment },
+        { type: "method", signature: "int size()", native: HashMapClass.prototype._size, comment: JRC.mapSizeComment },
+        { type: "method", signature: "boolean isEmpty()", native: HashMapClass.prototype._isEmpty, comment: JRC.mapIsEmptyComment },
+        { type: "method", signature: "boolean containsKey(K key)", native: HashMapClass.prototype._containsKey, comment: JRC.mapContainsKeyComment },
+        { type: "method", signature: "boolean containsValue(V value)", native: HashMapClass.prototype._containsValue, comment: JRC.mapContainsValueComment },
+        { type: "method", signature: "V get(K key)", native: HashMapClass.prototype._get, comment: JRC.mapGetComment },
+        { type: "method", signature: "V put(K key, V value)", native: HashMapClass.prototype._put, comment: JRC.mapPutComment },
+        { type: "method", signature: "void clear()", native: HashMapClass.prototype._clear, comment: JRC.mapClearComment },
 
     ]
 
@@ -35,30 +35,24 @@ export class HashMapClass extends ObjectClass {
         return this;
     }
 
-    _mj$size$int$(t: Thread, callback: CallbackFunction) {
-        t.s.push(this.map.size);
-        if(callback) callback();
-        return;
+    _size() {
+        return this.map.size;
      }
 
-    _mj$isEmpty$boolean$(t: Thread, callback: CallbackFunction) { 
-        t.s.push(this.map.size == 0);
-        if(callback) callback();
-        return;
+    _isEmpty() { 
+        return this.map.size == 0;
     }
 
-    _mj$containsKey$boolean$K(t: Thread, callback: CallbackFunction, key: ObjectClass) {
+    _containsKey(key: ObjectClass) {
         if(key == null){
-            t.s.push((typeof this.map.get(null)) !== "undefined");
+            return (typeof this.map.get(null)) !== "undefined";
         } else {
             let hashCode = key.__internalHashCode();
-            t.s.push((typeof this.map.get(hashCode)) !== "undefined");
+            return (typeof this.map.get(hashCode)) !== "undefined";
         }
-        if(callback) callback();
-        return;
      }
 
-    _mj$containsValue$boolean$V(t: Thread, callback: CallbackFunction, value: ObjectClass) { 
+    _containsValue(value: ObjectClass) { 
         let ret: boolean = false;
         for(let v of this.map.values()){
             if(v.v == value){
@@ -66,38 +60,32 @@ export class HashMapClass extends ObjectClass {
                 break;
             }
         }
-        t.s.push(ret);
-        if(callback) callback();
-        return;
+        return ret;
     }
 
-    _mj$get$V$K(t: Thread, callback: CallbackFunction, key: ObjectClass) { 
+    _get(key: ObjectClass) { 
         if(key == null){
-            t.s.push(this.map.get(null)?.v  || null);
+             return this.map.get(null)?.v  || null;
         } else {
             let hashCode = key.__internalHashCode();
-            t.s.push(this.map.get(hashCode)?.v || null);
+             return this.map.get(hashCode)?.v || null;
         }
-        if(callback) callback();
-        return;
     }
 
-    _mj$put$V$K$V(t: Thread, callback: CallbackFunction, key: ObjectClass, value: ObjectClass) { 
+    _put(key: ObjectClass, value: ObjectClass) { 
         if(key == null){
             let oldValue = this.map.get(null) || null;
-            t.s.push(oldValue);
             this.map.set(null, {k: null, v: value});
+            return oldValue;
         } else {
             let hashCode = key.__internalHashCode();
             let oldValue = this.map.get(hashCode);
-            t.s.push(oldValue);
             this.map.set(hashCode, {k: key, v: value});
+            return oldValue;
         }
-        if(callback) callback();
-        return;
     }
 
-    _mj$clear$void$(t: Thread, callback: CallbackFunction) { 
+    _clear() { 
         this.map.clear();
     }
 

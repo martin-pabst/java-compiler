@@ -123,6 +123,9 @@ import { MapInterface } from "./collections/MapInterface.ts";
 import { HashMapClass } from "./collections/HashMapClass.ts";
 import { SetInterface } from "./collections/SetInterface.ts";
 import { HashSetClass } from "./collections/HashSetClass.ts";
+import { EmptyStackExceptionClass } from "./collections/EmptyStackException.ts";
+import { VectorClass } from "./collections/VectorClass.ts";
+import { StackClass } from "./collections/StackClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -166,15 +169,15 @@ export class SystemModule extends JavaLibraryModule {
             MathClass, RandomClass, DecimalFormatClass,
             ThrowableClass, ExceptionClass, RuntimeExceptionClass, ArithmeticExceptionClass, NullPointerExceptionClass,
             ClassCastExceptionClass, IndexOutOfBoundsExceptionClass, IllegalMonitorStateExceptionClass,
+            EmptyStackExceptionClass,
 
             // Collections
             IteratorInterface, IterableInterface, CollectionInterface, ListInterface, ArrayListClass,
 
             CollectionsClass,
-
             QueueInterface, DequeInterface, LinkedListClass,
-
             MapInterface, HashMapClass, SetInterface, HashSetClass,
+            VectorClass, StackClass,
 
             // Thread
             RunnableInterface, ThreadClass, ThreadStateEnum, SemaphoreClass,

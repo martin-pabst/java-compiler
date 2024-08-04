@@ -4398,4 +4398,47 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
         "de": "Erstellt ein neues HashSet-Objekt.",
         "en": "Creates a new HashSet object.",
     })
+
+    /**
+     * Class Stack
+     */
+    static stackClassComment = () => lm({
+    "de": "Stack (Stapelspeicher/Kellerspeicher)",
+    "en": "Stack implementation using Javascript array",
+    })
+
+    static stackConstructorComment = () => lm({
+    "de": "Erstellt ein neues, leeres Stack-Objekt.",
+    "en": "Creates a new, empty stack object.",
+    })
+
+    static stackPushComment = () => lm({
+    "de": "Legt ein Element 'oben' auf den Stack.",
+    "en": "Pushes an element on top of this stack.",
+    })
+
+    static stackPopComment = () => lm({
+    "de": "Nimmt ein Element 'von oben' vom Stack.",
+    "en": "Pops an element from the top of this stack.",
+    })
+
+    static stackPeekComment = () => lm({
+    "de": "Gibt das oberste Elements des Stacks zurück ohne es vom Stack zu nehmen.",
+    "en": "Returns element at top of this stack without removing it from this stack.",
+    })
+
+    static stackEmptyComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn der Stack leer ist.",
+    "en": "Returns true if and only if this stack is empty.",
+    })
+
+    static stackSearchComment = () => lm({
+    "de": "Sucht das Element vom 'Boden' des Stack aus und gibt seinen Index zurück, falls das Element gefunden wurde. Das unterste Element hat Index 0. Falls das Element nicht gefunden wurde, wird -1 zurückgegeben.",
+    "en": "Returns the index of the first occurrence of the specified element in this vector, or -1 if this vector does not contain the element.",
+    })
+
+    static emptyStackException = () => lm({
+    "de": "Der Stack ist leer, daher kann diese Methode nicht aufgerufen werden.",
+    "en": "This stack is empty.",
+    })
 }  
