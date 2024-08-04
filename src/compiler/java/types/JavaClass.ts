@@ -26,6 +26,9 @@ export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
     abstract getExtends(): IJavaClass | undefined;
     abstract getImplements(): IJavaInterface[];
 
+    abstract getAllImplementedInterfaces(): ConcatArray<IJavaInterface>;
+
+
     getOwnAndInheritedFields(): JavaField[] {
         let fields: JavaField[] = this.getFields();
 
@@ -376,6 +379,25 @@ export class JavaClass extends IJavaClass {
         return this.implements;
     }
 
+    cachedAllImplementedInterfaces?: IJavaInterface[];
+    getAllImplementedInterfaces(): IJavaInterface[] {
+        
+        if(!this.cachedAllImplementedInterfaces){
+            this.cachedAllImplementedInterfaces = [];
+            for(let intf of this.getImplements()){
+                this.cachedAllImplementedInterfaces.push(intf);
+                this.cachedAllImplementedInterfaces = this.cachedAllImplementedInterfaces.concat(intf.getAllImplementedInterfaces());
+            }
+            let baseClass = this.getExtends();
+            if(baseClass){
+                this.cachedAllImplementedInterfaces = this.cachedAllImplementedInterfaces.concat(baseClass.getAllImplementedInterfaces());
+            }
+        }
+
+        return this.cachedAllImplementedInterfaces;
+
+    }
+
     isAbstract(): boolean {
         return this._isAbstract;
     }
@@ -636,6 +658,14 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         return this.cachedImplements;
     }
 
+    cachedAllImplementedInterfaces?: IJavaInterface[];
+    getAllImplementedInterfaces(): IJavaInterface[] {
+        if(!this.cachedAllImplementedInterfaces){
+            this.cachedAllImplementedInterfaces = this.isGenericVariantOf.getAllImplementedInterfaces().map(impl => <IJavaInterface>impl.getCopyWithConcreteType(this.typeMap));            
+        }
+        return this.cachedAllImplementedInterfaces!;
+    }
+
     canImplicitlyCastTo(otherType: JavaType): boolean {
 
         if (otherType instanceof GenericTypeParameter) {
@@ -741,7 +771,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
 
     findInterfaceImplementedByMeWhichIsGenericVariantOf(otherType: GenericVariantOfJavaInterface): GenericVariantOfJavaInterface | null {
 
-        for (let st of this.getImplements()) {
+        for (let st of this.getAllImplementedInterfaces()) {
             if (st instanceof GenericVariantOfJavaInterface) {
                 let found = st.findSuperTypeOfMeWhichIsGenericVariantOf(otherType);
                 if (found != null) return found;

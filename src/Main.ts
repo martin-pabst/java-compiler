@@ -179,6 +179,10 @@ export class Main implements IMain {
 
     this.registerMonacoProviders();
 
+    // document.addEventListener('keydown', (key) => {
+    //   console.log(key.code);
+    // });
+
   }
 
   getCurrentlyEditedModule(): Module | undefined {

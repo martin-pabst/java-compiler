@@ -12,10 +12,12 @@ import { Visibility } from "./Visibility";
 import { JCM } from "../../../tools/language/JavaCompilerMessages";
 
 export abstract class IJavaInterface extends NonPrimitiveType {
-
+    
     constructor(public identifier: string, public identifierRange: IRange, path: string, public module: JavaBaseModule) {
         super(identifier, identifierRange, path, module);
     }
+
+    abstract getAllImplementedInterfaces(): IJavaInterface[];
 
     getCompletionItemDetail(): string {
         return JCM.interface();
@@ -167,6 +169,19 @@ export class JavaInterface extends IJavaInterface {
     getExtends(): IJavaInterface[] {
         return this.extends;
     }
+
+    cachedAllImplementedInterfaces?: IJavaInterface[];
+    getAllImplementedInterfaces(): IJavaInterface[] {
+        if(!this.cachedAllImplementedInterfaces){
+            this.cachedAllImplementedInterfaces = [];
+            for(let intf of this.getExtends()){
+                this.cachedAllImplementedInterfaces.push(intf);
+                this.cachedAllImplementedInterfaces = this.cachedAllImplementedInterfaces?.concat(intf.getAllImplementedInterfaces());
+            }
+        }
+        return this.cachedAllImplementedInterfaces!;
+    }
+
 
     public getOwnMethods(): JavaMethod[] {
         return this.methods;
@@ -377,6 +392,15 @@ export class GenericVariantOfJavaInterface extends IJavaInterface {
 
         return this.cachedExtends;
     }
+
+    cachedAllImplementedInterfaces?: IJavaInterface[];
+    getAllImplementedInterfaces(): IJavaInterface[] {
+        if(!this.cachedAllImplementedInterfaces){
+            this.cachedAllImplementedInterfaces = this.isGenericVariantOf.getAllImplementedInterfaces().map(impl => <IJavaInterface>impl.getCopyWithConcreteType(this.typeMap));
+        }
+        return this.cachedAllImplementedInterfaces!;
+    }
+
 
     canExplicitlyCastTo(otherType: JavaType): boolean {
         if (this.canImplicitlyCastTo(otherType)) return true;
