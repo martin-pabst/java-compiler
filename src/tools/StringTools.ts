@@ -72,6 +72,27 @@ export function formatAsJavadocComment(s: string, indent: number|string = ""): s
   return s;
 }
 
+export function removeJavadocSyntax(s: string, indent: number|string = ""): string {
+  let indentString = "";
+
+  if(typeof indent == "string"){
+    indentString = indent;
+  } else {
+    for(let i = 0; i < indent; i++){
+      indentString += " ";
+    }
+  }
+
+  s = s.replace(/\/\*\*/g, "");
+  s = s.replace(/\n\s*\*\//g, "\n");
+  s = s.replace(/\n\s*\*/g, "\n");
+  s = s.trim();
+
+  s = stringWrap(s, 60);
+  s = indentString + s.replace(/\n\s*/g, "  \n" + indentString);
+  return s;
+}
+
 /** Function that count occurrences of a substring in a string;
  * @param {String} text               The string
  * @param {String} subString            The sub string to search for

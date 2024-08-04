@@ -73,6 +73,7 @@ export interface ASTNodeWithModifiers {
     isAbstract: boolean;
     isDefault: boolean;
     isSynchronized: boolean;
+    documentation?: string;
 }
 
 
@@ -229,6 +230,7 @@ export interface ASTEnumValueNode extends ASTNode {
     identifier: string;
     identifierRange: IRange;
     parameterValues: ASTTermNode[];
+    documentation?: string;
 }
 
 export interface ASTEnumDefinitionNode

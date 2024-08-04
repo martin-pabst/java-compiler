@@ -1,4 +1,5 @@
 import { Editor } from "../../../testgui/editor/Editor.ts";
+import { formatAsJavadocComment, removeJavadocSyntax } from "../../../tools/StringTools.ts";
 import { IMain } from "../../common/IMain.ts";
 import { RuntimeObject } from "../../common/debugger/DebuggerSymbolEntry.ts";
 import { ValueRenderer } from "../../common/debugger/ValueRenderer.ts";
@@ -107,7 +108,7 @@ export class JavaHoverProvider {
             if (symbol instanceof NonPrimitiveType || symbol instanceof JavaMethod) {
                 declarationAsString = "```\n" + symbol.getDeclaration() + "\n```";
                 if(symbol.documentation){
-                    declarationAsString += "\n" + symbol.getDocumentation();
+                    declarationAsString += "\n" + this.formatDocumentation(symbol.getDocumentation());
                 }
                 return {
                     range: usagePosition.range,
@@ -115,6 +116,9 @@ export class JavaHoverProvider {
                 }
             } else if (symbol instanceof PrimitiveType) {
                 declarationAsString = "```\n" + symbol.identifier + "\n```  \nprimitiver Datentyp";
+                if(symbol.documentation){
+                    declarationAsString += "\n" + this.formatDocumentation(symbol.getDocumentation());
+                }
                 return {
                     range: usagePosition.range,
                     contents: [{ value: declarationAsString }],
@@ -123,6 +127,9 @@ export class JavaHoverProvider {
                 // Variable
                 
                 declarationAsString =  symbol.getDeclaration() ;
+                if(symbol.documentation){
+                    declarationAsString += "\n" + this.formatDocumentation(symbol.getDocumentation());
+                }
             }
         } else {
             let word = this.getWordUnderCursor(model, position);
@@ -186,6 +193,13 @@ export class JavaHoverProvider {
             contents: contents,
         }
 
+    }
+
+    formatDocumentation(documentation: string | undefined) {
+        if(documentation?.startsWith("/*")){
+            documentation = removeJavadocSyntax(documentation, 1);
+        }
+        return documentation;
     }
 
     getWordUnderCursor(model: monaco.editor.ITextModel, position: monaco.Position)

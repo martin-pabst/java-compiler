@@ -73,7 +73,7 @@ export class Parser extends StatementParser {
         mainMethod.statement = mainStatement;
         this.mainMethodStatements = mainStatement.statements;
 
-        
+
         let stringArrayType = this.nodeFactory.buildArrayTypeNode(this.buildBaseType("String"));
         this.javaCompiledModule.ast?.collectedTypeNodes.push(stringArrayType);
         let parameter = this.nodeFactory.buildParameterNode(EmptyRange.instance, { tt: TokenType.identifier, value: "args", range: EmptyRange.instance }, stringArrayType, false, true);
@@ -91,7 +91,7 @@ export class Parser extends StatementParser {
             let pos = this.pos;
 
             if (this.comesToken(Parser.visibilityModifiersOrTopLevelTypeDeclaration, false)) {
-                this.parseClassOrInterfaceOrEnum(this.javaCompiledModule.ast!);
+                this.parseClassOrInterfaceOrEnum(this.javaCompiledModule.ast!, undefined);
                 this.currentClassOrInterface = undefined;
             } else if (this.tt == TokenType.at) {
                 this.maybeParseAndSkipAnnotation();
@@ -119,18 +119,20 @@ export class Parser extends StatementParser {
         while (!this.isEnd() && Parser.visibilityModifiersOrTopLevelTypeDeclaration.indexOf(this.tt) < 0) {
             let pos = this.pos;
             let statement = this.parseStatementOrExpression();
-            
+
             if (statement) {
                 this.mainMethodStatements.push(statement);
             }
-            
+
             if (pos == this.pos) this.nextToken(); // prevent endless loop
         }
         this.isCodeOutsideClassdeclarations = false;
-        
+
     }
 
-    parseClassOrInterfaceOrEnum(parent: TypeScope, modifiers?: ASTNodeWithModifiers) {
+    parseClassOrInterfaceOrEnum(parent: TypeScope, documentation1: string | undefined, modifiers?: ASTNodeWithModifiers) {
+
+        let documentation = documentation1 || <string>this.cct.commentBefore?.value;
         if (modifiers == null) modifiers = this.parseModifiers();
 
         let tt = this.tt; // preserve "class", "interface", "enum" for switch-case below
@@ -138,7 +140,7 @@ export class Parser extends StatementParser {
         if (this.expect(Parser.classOrInterfaceOrEnum, true)) {
 
             //let annotation = this.maybeParseAndSkipAnnotation();
-            
+
             let identifier = this.expectAndSkipIdentifierAsToken();
 
             // back up current class before entering child class
@@ -147,13 +149,13 @@ export class Parser extends StatementParser {
             if (identifier.value != "") {
                 switch (tt) {
                     case TokenType.keywordClass:
-                        this.parseClassDeclaration(modifiers, identifier, parent, this.collectedAnnotations);
+                        this.parseClassDeclaration(modifiers, identifier, parent, this.collectedAnnotations, documentation);
                         break;
                     case TokenType.keywordEnum:
-                        this.parseEnumDeclaration(modifiers, identifier, parent);
+                        this.parseEnumDeclaration(modifiers, identifier, parent, documentation);
                         break;
                     case TokenType.keywordInterface:
-                        this.parseInterfaceDeclaration(modifiers, identifier, parent);
+                        this.parseInterfaceDeclaration(modifiers, identifier, parent, documentation);
                         break;
                 }
             }
@@ -163,10 +165,11 @@ export class Parser extends StatementParser {
         }
 
     }
-    
 
-    parseClassDeclaration(modifiers: ASTNodeWithModifiers, identifier: Token, parent: TypeScope, annotation: ASTAnnotationNode[]) {
+
+    parseClassDeclaration(modifiers: ASTNodeWithModifiers, identifier: Token, parent: TypeScope, annotation: ASTAnnotationNode[], documentation: string | undefined) {
         let classASTNode = this.nodeFactory.buildClassNode(modifiers, identifier, parent, this.collectedAnnotations, this.javaCompiledModule);
+        classASTNode.documentation = documentation;
         this.currentClassOrInterface = classASTNode;
 
         classASTNode.genericParameterDeclarations = this.parseGenericParameterDefinition();
@@ -184,29 +187,35 @@ export class Parser extends StatementParser {
 
     private parseClassBody(classASTNode: ASTClassDefinitionNode) {
         if (this.expect(TokenType.leftCurlyBracket, true)) {
+            let documentation: string | undefined;
             while (!this.comesToken([TokenType.rightCurlyBracket, TokenType.endofSourcecode], false)) {
 
+                documentation = <string>this.cct.commentBefore?.value;
                 let modifiers = this.parseModifiers();
 
                 switch (this.tt) {
                     case TokenType.identifier:
                     case TokenType.keywordVoid:
                     case TokenType.lower:
-                        this.parseFieldOrMethodDeclaration(classASTNode, modifiers);
+                        this.parseFieldOrMethodDeclaration(classASTNode, modifiers, documentation);
+                        documentation = undefined;
                         break;
                     case TokenType.keywordClass:
                     case TokenType.keywordEnum:
                     case TokenType.keywordInterface:
-                        this.parseClassOrInterfaceOrEnum(classASTNode, modifiers);
+                        this.parseClassOrInterfaceOrEnum(classASTNode, documentation, modifiers);
+                        documentation = undefined;
                         break;
                     case TokenType.at:
                         this.maybeParseAndSkipAnnotation();
                         break;
                     case TokenType.leftCurlyBracket:
                         this.parseInstanceInitializer(classASTNode);
+                        documentation = undefined;
                         break;
                     case TokenType.keywordStatic:
                         this.parseStaticInitializer(classASTNode);
+                        documentation = undefined;
                         break;
                     default: this.pushErrorAndSkipToken();
                 }
@@ -248,27 +257,27 @@ export class Parser extends StatementParser {
 
     }
 
-    parseFieldOrMethodDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers) {
+    parseFieldOrMethodDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers, documentation: string | undefined) {
         /**
          * Problem:
          * class Test { Test a; Test(); Test getValue(); <E> Test<E> genericMethod()}
          */
 
         if (this.comesIdentifier(classASTNode.identifier) && this.lookahead(1).tt == TokenType.leftBracket) {
-            this.parseMethodDeclaration(classASTNode, modifiers, true, undefined, []);     // Constructor
+            this.parseMethodDeclaration(classASTNode, modifiers, true, undefined, [], documentation);     // Constructor
         } else {
             let genericParameters = this.parseGenericParameterDefinition();
 
             let type = this.parseType();
 
             if (this.lookahead(1).tt == TokenType.leftBracket) {
-                this.parseMethodDeclaration(classASTNode, modifiers, false, type, genericParameters);
+                this.parseMethodDeclaration(classASTNode, modifiers, false, type, genericParameters, documentation);
             } else {
                 if (genericParameters.length > 0) {
                     this.pushError(JCM.fieldDefinitionDoesntStartWithGenericParamter(), "error", genericParameters[0].range);
                 }
                 do {
-                    this.parseFieldDeclaration(classASTNode, modifiers, type);
+                    this.parseFieldDeclaration(classASTNode, modifiers, type, documentation);
                 } while (this.comesToken(TokenType.comma, true));
 
                 this.expectSemicolon(true, true);
@@ -280,11 +289,12 @@ export class Parser extends StatementParser {
     }
 
     parseMethodDeclaration(parentNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers,
-        isContructor: boolean, returnType: ASTTypeNode | undefined, genericParameters: ASTGenericParameterDeclarationNode[]) {
+        isContructor: boolean, returnType: ASTTypeNode | undefined, genericParameters: ASTGenericParameterDeclarationNode[], documentation: string | undefined) {
         let rangeStart = modifiers.range;
         let identifier = this.expectAndSkipIdentifierAsToken();
         let methodNode = this.nodeFactory.buildMethodNode(returnType, isContructor, modifiers, identifier,
             rangeStart, this.collectedAnnotations, parentNode);
+        methodNode.documentation = documentation;
 
         this.currentMethod = methodNode;
         if (returnType) {
@@ -334,7 +344,7 @@ export class Parser extends StatementParser {
         }
     }
 
-    parseFieldDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers, type: ASTTypeNode | undefined) {
+    parseFieldDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers, type: ASTTypeNode | undefined, documentation: string | undefined) {
         let rangeStart = this.cct.range;
         let identifier = this.expectAndSkipIdentifierAsToken();
 
@@ -345,6 +355,7 @@ export class Parser extends StatementParser {
         if (identifier.value != "" && type != null) {
             let node = this.nodeFactory.buildFieldDeclarationNode(rangeStart, identifier, type, initialization,
                 modifiers, this.collectedAnnotations);
+            node.documentation = documentation;
             classASTNode.fieldsOrInstanceInitializers.push(node);
             this.setEndOfRange(node);
         }
@@ -394,41 +405,48 @@ export class Parser extends StatementParser {
         return astNodeWithModifiers;
     }
 
-    parseEnumDeclaration(modifiers: ASTNodeWithModifiers, identifier: Token, parent: TypeScope) {
+    parseEnumDeclaration(modifiers: ASTNodeWithModifiers, identifier: Token, parent: TypeScope, documentation: string | undefined) {
         let enumNode = this.nodeFactory.buildEnumNode(modifiers, identifier, parent, this.collectedAnnotations, this.javaCompiledModule);
+        enumNode.documentation = documentation;
 
         if (this.expect(TokenType.leftCurlyBracket, true)) {
 
             do {
-                let enumValue: ASTEnumValueNode | undefined = this.parseEnumValue();
+                let enumValue: ASTEnumValueNode | undefined = this.parseEnumValue(<string>this.cct.commentBefore?.value);
                 if (enumValue) enumNode.valueNodes.push(enumValue);
             } while (this.comesToken(TokenType.comma, true));
 
             this.comesToken(TokenType.semicolon, true); // skip if present
 
+            let documentation1: string | undefined;
             while (!this.comesToken([TokenType.rightCurlyBracket, TokenType.endofSourcecode], false)) {
 
+                documentation1 = <string>this.cct.commentBefore?.value;
                 let modifiers = this.parseModifiers();
 
                 switch (this.tt) {
                     case TokenType.keywordClass:
                     case TokenType.keywordEnum:
                     case TokenType.keywordInterface:
-                        this.parseClassOrInterfaceOrEnum(enumNode, modifiers);
+                        this.parseClassOrInterfaceOrEnum(enumNode, documentation, modifiers);
+                        documentation = undefined;
                         break;
                     case TokenType.identifier:
                     case TokenType.keywordVoid:
                     case TokenType.lower:
-                        this.parseFieldOrMethodDeclaration(enumNode, modifiers);
+                        this.parseFieldOrMethodDeclaration(enumNode, modifiers, documentation);
+                        documentation = undefined;
                         break;
                     case TokenType.at:
                         this.maybeParseAndSkipAnnotation();
                         break;
                     case TokenType.leftCurlyBracket:
                         this.parseInstanceInitializer(enumNode);
+                        documentation = undefined;
                         break;
                     case TokenType.keywordStatic:
                         this.parseStaticInitializer(enumNode);
+                        documentation = undefined;
                         break;
 
                     default: this.pushErrorAndSkipToken();
@@ -441,7 +459,7 @@ export class Parser extends StatementParser {
         this.setEndOfRange(enumNode);
     }
 
-    parseEnumValue(): ASTEnumValueNode | undefined {
+    parseEnumValue(documentation: string | undefined): ASTEnumValueNode | undefined {
         let identifier = this.expectAndSkipIdentifierAsToken();
         if (!identifier) return undefined;
 
@@ -460,8 +478,10 @@ export class Parser extends StatementParser {
 
     }
 
-    parseInterfaceDeclaration(modifiers: ASTNodeWithModifiers, identifier: Token, parent: TypeScope) {
+    parseInterfaceDeclaration(modifiers: ASTNodeWithModifiers, identifier: Token, parent: TypeScope, documentation: string | undefined) {
         let interfaceNode = this.nodeFactory.buildInterfaceNode(modifiers, identifier, parent, this.collectedAnnotations, this.javaCompiledModule);
+        interfaceNode.documentation = documentation;
+
         this.currentClassOrInterface = interfaceNode;
 
         interfaceNode.genericParameterDeclarations = this.parseGenericParameterDefinition();
@@ -469,20 +489,24 @@ export class Parser extends StatementParser {
         if (this.comesToken(TokenType.keywordExtends, true)) this.parseImplements(interfaceNode);
 
         if (this.expect(TokenType.leftCurlyBracket, true)) {
+            let documentation1: string | undefined;
             while (!this.comesToken([TokenType.rightCurlyBracket, TokenType.endofSourcecode], false)) {
 
+                documentation1 = <string>this.cct.commentBefore?.value;
                 let modifiers = this.parseModifiers();
 
                 switch (this.tt) {
                     case TokenType.keywordClass:
                     case TokenType.keywordEnum:
                     case TokenType.keywordInterface:
-                        this.parseClassOrInterfaceOrEnum(interfaceNode, modifiers);
+                        this.parseClassOrInterfaceOrEnum(interfaceNode, documentation1, modifiers);
+                        documentation1 = undefined;
                         break;
                     case TokenType.identifier:
                     case TokenType.keywordVoid:
                     case TokenType.lower:
-                        this.parseFieldOrMethodDeclaration(interfaceNode, modifiers);
+                        this.parseFieldOrMethodDeclaration(interfaceNode, modifiers, documentation1);
+                        documentation1 = undefined;
                         // let returnType = this.parseType();
                         // if (returnType) this.parseMethodDeclaration(interfaceNode, modifiers, false, returnType);
                         break;
@@ -584,7 +608,6 @@ export class Parser extends StatementParser {
         }
 
     }
-
 
 }
 

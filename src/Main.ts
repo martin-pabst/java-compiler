@@ -57,6 +57,7 @@ import { Repl } from "./compiler/java/parser/repl/Repl.ts";
 import { ReplCompiledModule } from "./compiler/java/parser/repl/ReplCompiledModule.ts";
 import { TestInputManager } from "./testgui/TestInputManager.ts";
 import { TestFileManager } from "./testgui/TestFileManager.ts";
+import { OnDidTypeProvider } from "./compiler/common/monacoproviders/OnDidTypeProvider.ts";
 
 export class Main implements IMain {
 
@@ -146,6 +147,8 @@ export class Main implements IMain {
     this.tabbedEditorManager = new TabbedEditorManager(document.getElementById('editorOuter')!,
       this.files);
 
+    OnDidTypeProvider.configureEditor(this.tabbedEditorManager.editor.editor);
+
     this.setProgram("simpleWhileLoops");
 
     this.compiler = new JavaCompiler();
@@ -164,9 +167,9 @@ export class Main implements IMain {
     let fileManager = new TestFileManager(this);
 
     this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager,
-      new GraphicsManager(this.graphicsDiv), keyboardManager, 
+      new GraphicsManager(this.graphicsDiv), keyboardManager,
       this.breakpointManager, _debugger, new ProgramPointerManager(this),
-    testManager, inputManager, fileManager);
+      testManager, inputManager, fileManager);
 
     this.testResultViewer.addEventListener('run-all-tests',
       (e) => { if (e.type == "run-all-tests") testManager.executeAllTests(); });
@@ -187,7 +190,7 @@ export class Main implements IMain {
 
   getCurrentlyEditedModule(): Module | undefined {
     let model = this.getEditor().getModel();
-    if(!model) return;
+    if (!model) return;
     return this.getModuleForMonacoModel(model);
   }
 
@@ -208,7 +211,7 @@ export class Main implements IMain {
   }
 
   ensureModuleIsCompiled(module: JavaCompiledModule): void {
-    if(module instanceof ReplCompiledModule){
+    if (module instanceof ReplCompiledModule) {
       this.repl.compileAndShowErrors(module.file.getText());
     } else {
       this.compiler.updateSingleModuleForCodeCompletion(module);
@@ -224,7 +227,7 @@ export class Main implements IMain {
       }
     }
 
-    if(model == this.replGUI.editor.getModel()){
+    if (model == this.replGUI.editor.getModel()) {
       return this.repl.getCurrentModule();
     }
 
@@ -261,7 +264,7 @@ export class Main implements IMain {
 
   }
 
-  initRepl(){
+  initRepl() {
 
     let buttonDiv = document.getElementById('bottomleft')!;
     this.replGUI = new ReplGUI(this, buttonDiv);
@@ -332,18 +335,18 @@ export class Main implements IMain {
     let that = this;
     monaco.editor.registerEditorOpener({
       openCodeEditor(source: monaco.editor.ICodeEditor, resource: monaco.Uri, selectionOrPosition?: monaco.IRange | monaco.IPosition): boolean | Promise<boolean> {
-        
+
         let module = that.getCompiler().moduleManager.modules.find(m => m.file.getMonacoModel()?.uri == resource);
 
-        if(module){
+        if (module) {
           let model = module.file.getMonacoModel();
-          if(model){
+          if (model) {
             editor.setModel(model);
             editor.setPosition(Range.getStartPosition(<monaco.IRange>selectionOrPosition));
             return true;
           }
         }
-        
+
         return false;
       }
     })
@@ -363,23 +366,23 @@ export class Main implements IMain {
     return this.getCompiler().moduleManager.modules;
   }
 
-  loadSpritesheet(){
+  loadSpritesheet() {
     fetch(`${spritesheetjson}`)
-    .then((response) => response.json())
-    .then((spritesheetData: any) => {
+      .then((response) => response.json())
+      .then((spritesheetData: any) => {
         PIXI.Assets.load(`${spritesheetpng}`).then((texture: PIXI.Texture) => {
-            let source: PIXI.ImageSource = texture.source;
-            source.minFilter = "nearest";
-            source.magFilter = "nearest";
+          let source: PIXI.ImageSource = texture.source;
+          source.minFilter = "nearest";
+          source.magFilter = "nearest";
 
-            spritesheetData.meta.size.w = texture.width;
-            spritesheetData.meta.size.h = texture.height;
-            let spritesheet = new PIXI.Spritesheet(texture, spritesheetData);
-            spritesheet.parse().then(() => {
-                PIXI.Assets.cache.set('spritesheet', spritesheet);
-            });
+          spritesheetData.meta.size.w = texture.width;
+          spritesheetData.meta.size.h = texture.height;
+          let spritesheet = new PIXI.Spritesheet(texture, spritesheetData);
+          spritesheet.parse().then(() => {
+            PIXI.Assets.cache.set('spritesheet', spritesheet);
+          });
         })
-    });
+      });
 
   }
 

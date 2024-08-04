@@ -51,6 +51,11 @@
   * class Sound, class Files
   * HTTP-Client and JSON-Converter
   * BigInteger
+  * Missing Collections 
+    * Map, HashMap:
+    * Set, HashSet, LinkedHashSet (omitted)
+    * Vector
+    * Stack
 
 ## working status on current issue:
 
@@ -58,11 +63,6 @@
 
 ## next 
   * WebSocket client
-  * Missing Collections 
-    * Map, HashMap: Done
-    * Set, HashSet, LinkedHashSet
-    * Vector
-    * Stack
   * Display method comment on hover and in Code completion items
   * collect JavaDoc in user sourcecode to enrich code completion and hover-tooltips
   * Robot

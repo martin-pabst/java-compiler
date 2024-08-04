@@ -105,6 +105,7 @@ export class JavaMethod extends BaseSymbol {
         newMethod.template = this.template;
         newMethod.classEnumInterface = genericClassOrInterfaceOrEnum;
         newMethod.isCopyOf = this;
+        newMethod.documentation = this.documentation;
 
         this.getInternalName("java");
         this.getInternalName("native");

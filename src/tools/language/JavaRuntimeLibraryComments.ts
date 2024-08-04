@@ -1613,6 +1613,12 @@ export class JRC {
     /**
      * ArrayList
      */
+
+    static arrayListClassComment = () => lm({
+    "de": "Die Klasse ArrayList ist eine Liste, deren Elemente in einem Array gespeichert sind. Wird das Array zu klein, kopiert die ArrayList es automatisch in ein größeres Array.",
+    "en": "An ArrayList is a List backed by an array. If the array gets too small it's automatically copied into a larger one.",
+    })
+
     static arrayListConstructorComment = () => lm({
         "de": "Instanziert (d.h. erzeugt) eine neue, leere Liste.",
         "en": "Constructs an empty list.",

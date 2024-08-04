@@ -6,6 +6,7 @@ import { Token, TokenList } from "../lexer/Token";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { ASTNode } from "./AST";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
+import { formatAsJavadocComment } from "../../../tools/StringTools.ts";
 
 export class TokenIterator {
 
@@ -453,4 +454,4 @@ export class TokenIterator {
 
     }
 
-}
+ }

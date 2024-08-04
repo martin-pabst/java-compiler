@@ -95,7 +95,7 @@ export abstract class StatementParser extends TermParser {
         return statement;
     }
 
-    abstract parseFieldOrMethodDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers): void;
+    abstract parseFieldOrMethodDeclaration(classASTNode: ASTClassDefinitionNode | ASTEnumDefinitionNode | ASTInterfaceDefinitionNode, modifiers: ASTNodeWithModifiers, documentation: string | undefined): void;
 
     parseLocalVariableDeclaration(): ASTStatementNode | undefined {
 

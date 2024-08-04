@@ -525,6 +525,7 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         super(isGenericVariantOf.identifier, isGenericVariantOf.identifierRange, isGenericVariantOf.pathAndIdentifier, isGenericVariantOf.module);
         this.runtimeClass = this.isGenericVariantOf.runtimeClass;
         this.isFinal = this.isGenericVariantOf.isFinal;
+        this.documentation = this.isGenericVariantOf.documentation;
     }
 
     toString(): string {

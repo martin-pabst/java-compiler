@@ -96,6 +96,7 @@ export class TypeResolver {
             resolvedType.visibility = klassNode.visibility;
             resolvedType.isStatic = klassNode.isStatic;
             resolvedType._isAbstract = klassNode.isAbstract;
+            resolvedType.documentation = klassNode.documentation;
 
             if(klassNode.identifier != ""){
                 this.moduleManager.typestore.addType(resolvedType);
@@ -115,6 +116,7 @@ export class TypeResolver {
             this.generateGenericParameters(interfaceNode, <JavaInterface>resolvedType);
             interfaceNode.resolvedType = resolvedType;
             resolvedType.visibility = interfaceNode.visibility;
+            resolvedType.documentation = interfaceNode.documentation;
             this.moduleManager.typestore.addType(resolvedType);
             module.types.push(interfaceNode.resolvedType);
 
@@ -132,6 +134,7 @@ export class TypeResolver {
             let module = enumNode.module;
             enumNode.resolvedType = resolvedType;
             resolvedType.visibility = enumNode.visibility;
+            resolvedType.documentation = enumNode.documentation;
             resolvedType.isStatic = true;                       // "Nested enum types are implicitly static. It is permissible to explicitly declare a nested enum type to be static.", see https://docs.oracle.com/javase/specs/jls/se7/html/jls-8.html#jls-8.9
             this.moduleManager.typestore.addType(resolvedType);
             module.types.push(enumNode.resolvedType);
@@ -555,6 +558,7 @@ export class TypeResolver {
             method.isConstructor = methodNode.isContructor;
             method.isDefault = methodNode.isDefault;
             method.isSynchronized = methodNode.isSynchronized;
+            method.documentation = methodNode.documentation;
 
             method.returnParameterType = methodNode.isContructor ? type : methodNode.returnParameterType?.resolvedType;
             for (let p of methodNode.parameters) {
@@ -611,6 +615,7 @@ export class TypeResolver {
                     f._isStatic = field.isStatic;
                     f._isFinal = field.isFinal;
                     f.classEnum = javaEnum;
+                    f.documentation = field.documentation;
                     javaEnum.fields.push(f);
                 }
             }
@@ -621,6 +626,7 @@ export class TypeResolver {
                 f._isStatic = true;
                 f._isFinal = true;
                 f.classEnum = javaEnum;
+                f.documentation = enumValue.documentation;
                 javaEnum.fields.push(f);
             }
 

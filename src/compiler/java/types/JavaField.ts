@@ -41,6 +41,7 @@ export class JavaField extends BaseField {
         
         let copy = new JavaField(this.identifier, this.identifierRange, this.module,
              newType, this.visibility);
+        copy.documentation = this.documentation;
 
         return copy;
     }

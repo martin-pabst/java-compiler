@@ -15,7 +15,7 @@ import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts
 
 export class ArrayListClass extends SystemCollection implements BaseListType {
     static __javaDeclarations: LibraryDeclarations = [
-        { type: "declaration", signature: "class ArrayList<E> implements List<E>" },
+        { type: "declaration", signature: "class ArrayList<E> implements List<E>", comment: JRC.arrayListClassComment },
 
         { type: "method", signature: "ArrayList()", native: ArrayListClass.prototype._constructor , comment: JRC.arrayListConstructorComment},
 
