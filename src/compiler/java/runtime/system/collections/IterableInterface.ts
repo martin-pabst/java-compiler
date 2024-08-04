@@ -10,6 +10,7 @@ import { IteratorInterface } from "./IteratorInterface.ts";
 export class IterableInterface extends InterfaceClass {
     static __javaDeclarations: LibraryDeclarations = [
         {type: "declaration", signature: "interface Iterable<T>" , comment: JRC.iterableInterfaceComment},
+
         {type: "method", signature: "Iterator<T> iterator()", java: IterableInterface.prototype._mj$iterator$Iterator$ , comment: JRC.iterableIteratorComment},
         {type: "method", signature: "default void forEach(Consumer<? super T> action)", java: IterableInterface.prototype._mj$forEach$void$Consumer , comment: JRC.iterableForEachComment},
     ]

@@ -1,6 +1,5 @@
 /**::
  * ArrayList-functions
- * // { "expectOutput": "abcdf" }
  */
 
 ArrayList<String> list = new ArrayList<>();
@@ -35,7 +34,6 @@ assertFalse(list.containsAll(list2), "ArrayList.containsAll");
 
 /**::
  * LinkedList-functions
- * // { "expectOutput": "abcdf" }
  */
 
 LinkedList<String> list3 = new LinkedList<>();

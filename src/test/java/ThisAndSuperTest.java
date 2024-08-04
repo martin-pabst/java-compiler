@@ -75,7 +75,7 @@ class C extends B {
 
 /**::
  * This and super to call other constructors
- * { "expectOutput": "B: 14\nA: 12\nA1\n" }
+ * { "expectedOutput": "B: 14\nA: 12\nA1\n" }
  */
 new A();
 

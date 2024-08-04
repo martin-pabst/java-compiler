@@ -1,6 +1,6 @@
 /**::
  * Test methods outside class definition
- * { "expectOutput": "Success!\n" }
+ * { "expectedOutput": "Success!\n" }
  */
 test();
 

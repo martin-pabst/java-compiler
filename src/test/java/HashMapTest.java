@@ -1,6 +1,5 @@
 /**::
  * HashMap-functions
- * // { "expectOutput": "abcdf" }
  */
 
 HashMap<String, Integer> hm = new HashMap<>();

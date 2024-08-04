@@ -1,6 +1,6 @@
 /**::
  * Test assertions
- * { "expectOutput": "Here!" }
+ * { "expectedOutput": "Here!" }
  */
 
 Assertions.assertTrue(1 == 1, "1 == 1 should be true");

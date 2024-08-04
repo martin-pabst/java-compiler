@@ -1,6 +1,6 @@
 /**::
  * test switch case with int
- * { "expectOutput": "Here!" }
+ * { "expectedOutput": "Here!" }
  */
     int x = 1;
 
@@ -16,7 +16,7 @@
 
 /**::
  * Test switch case with constant
- * { "expectOutput": "Here!" }
+ * { "expectedOutput": "Here!" }
  */
 
   public class A {

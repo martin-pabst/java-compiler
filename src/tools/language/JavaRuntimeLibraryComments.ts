@@ -1557,6 +1557,21 @@ export class JRC {
         "en": "Returns the number of elements in this list.",
     })
 
+    static collectionAddAllNullPointerException = () => lm({
+        "de": "addAll wurde mit null als Argument aufgerufen.",
+        "en": "addAll had been called with null as argument.",
+    })
+
+    static collectionContainsAllNullPointerException = () => lm({
+        "de": "containsAll wurde mit null als Argument aufgerufen.",
+        "en": "containsAll had been called with null as argument.",
+    })
+
+    static collectionRemoveAllNullPointerException = () => lm({
+        "de": "removeAll wurde mit null als Argument aufgerufen.",
+        "en": "removeAll had been called with null as argument.",
+    })
+
     /**
      * List
      */
@@ -1612,6 +1627,30 @@ export class JRC {
         "de": "Führt die angegebene Methode (Aktion) für jedes Element der ArrayList aus.\nTipp: Die Aktion kann in Lambda-Schreibweise angegeben werden, z.B. foreach((element) -> {...})",
         "en": "Performs the given action for each element of the Iterable until all elements have been processed or the action throws an exception. Unless otherwise specified by the implementing class, actions are performed in the order of iteration (if an iteration order is specified).",
     })
+
+    /**
+     * Vector
+     */
+    static vectorConstructorComment = () => lm({
+        "de": "Instanziert (d.h. erzeugt) eine neue, leere Liste.",
+        "en": "Constructs an empty list.",
+    })
+
+    static vectorIteratorComment = () => lm({
+        "de": "Gibt ein Iterator-Objekt zurück, mit dem über alle Elemente der Liste in der gespeicherten Reihenfolge iteriert werden kann.",
+        "en": "Returns an iterator over the elements in this list in proper sequence.",
+    })
+
+    static vectorForeachComment = () => lm({
+        "de": "Führt die angegebene Methode (Aktion) für jedes Element der ArrayList aus.\nTipp: Die Aktion kann in Lambda-Schreibweise angegeben werden, z.B. foreach((element) -> {...})",
+        "en": "Performs the given action for each element of the Iterable until all elements have been processed or the action throws an exception. Unless otherwise specified by the implementing class, actions are performed in the order of iteration (if an iteration order is specified).",
+    })
+
+    static indexOutOfBoundsException = (index: number, maxIndex: number) => lm({
+        "de": `Der Index ${index} liegt außerhalb des zulässigen Bereichs (0 bis ${maxIndex})`,
+        "en": `Index ${index} is out of bounds (from 0 up to ${maxIndex})`,
+    })
+
 
     /**
      * Comparable
@@ -3985,54 +4024,54 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     /**
      * class JsonParser
      */
-    
+
     static JsonParserClassComment = () => lm({
-    "de": "Parst Json-Code und gibt ihn als Objektbaum zurück.",
-    "en": "Parses Json-code and builds object tree.",
+        "de": "Parst Json-Code und gibt ihn als Objektbaum zurück.",
+        "en": "Parses Json-code and builds object tree.",
     })
 
     static JsonParserParseComment = () => lm({
-    "de": "Wandelt einen Json-String in einen Objektbaum um.",
-    "en": "Transforms Json-string to object tree.",
+        "de": "Wandelt einen Json-String in einen Objektbaum um.",
+        "en": "Transforms Json-string to object tree.",
     })
 
     static JsonParserParseException = (error: string) => lm({
-    "de": "Fehler beim Parsen des Json-Strings: " + error,
-    "en": "Error parsing json-string: " + error,
+        "de": "Fehler beim Parsen des Json-Strings: " + error,
+        "en": "Error parsing json-string: " + error,
     })
 
     /**
      * class HttpRequest
      */
     static HttpRequestClassComment = () => lm({
-    "de": "Ein Objekt der Klasse HttpRequest umfasst die URI, den Header und die Daten eines Http-Requests.",
-    "en": "An object of class HttpRequest consists of URI, Header and data (body).",
+        "de": "Ein Objekt der Klasse HttpRequest umfasst die URI, den Header und die Daten eines Http-Requests.",
+        "en": "An object of class HttpRequest consists of URI, Header and data (body).",
     })
 
     static HttpRequestConstructorComment = () => lm({
-    "de": "Instanziert ein neues HttpRequest-Objekt.",
-    "en": "Creates a new HttpRequest-object.",
+        "de": "Instanziert ein neues HttpRequest-Objekt.",
+        "en": "Creates a new HttpRequest-object.",
     })
 
     static HttpRequestUriComment = () => lm({
-    "de": "Legt die URI des Requests fest. Gibt ein HttpRequest-Objekt zurück (zum method-chaining).",
-    "en": "Sets the URI of this request. Returns a HttpRequest-object for method chaining.",
+        "de": "Legt die URI des Requests fest. Gibt ein HttpRequest-Objekt zurück (zum method-chaining).",
+        "en": "Sets the URI of this request. Returns a HttpRequest-object for method chaining.",
     })
 
 
     static HttpRequestHeaderComment = () => lm({
-    "de": "Fügt dem Request einen Header hinzu.",
-    "en": "Adds a header to this request.",
+        "de": "Fügt dem Request einen Header hinzu.",
+        "en": "Adds a header to this request.",
     })
 
     static HttpRequestPOSTComment = () => lm({
-    "de": "Setzt die Request-Methode auf POST und fügt dem Request die übergebenen Daten hinzu.",
-    "en": "Sets request method to POST and adds given data to this request.",
+        "de": "Setzt die Request-Methode auf POST und fügt dem Request die übergebenen Daten hinzu.",
+        "en": "Sets request method to POST and adds given data to this request.",
     })
 
     static HttpRequestGETComment = () => lm({
-    "de": "Setzt die Request-Methode auf GET.",
-    "en": "Sets request method to GET.",
+        "de": "Setzt die Request-Methode auf GET.",
+        "en": "Sets request method to GET.",
     })
 
 
@@ -4040,136 +4079,136 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
      * class HttpResponse
      */
     static HttpResponseClassComment = () => lm({
-    "de": "Ein Objekt der Klasse HttpResponse umfasst den Statuscode, die Header und den Body (d.h. die Daten) eines http-Response.",
-    "en": "An object of class HttpResponse consists of status code, headers and body (that is: data) of an http-response.",
+        "de": "Ein Objekt der Klasse HttpResponse umfasst den Statuscode, die Header und den Body (d.h. die Daten) eines http-Response.",
+        "en": "An object of class HttpResponse consists of status code, headers and body (that is: data) of an http-response.",
     })
 
     static HttpResponseUriComment = () => lm({
-    "de": "Gibt die URI des Responses zurück.",
-    "en": "Returns the URI of this response.",
+        "de": "Gibt die URI des Responses zurück.",
+        "en": "Returns the URI of this response.",
     })
 
     static HttpResponseBodyComment = () => lm({
-    "de": "Gibt den Body dieses Responses zurück.",
-    "en": "Returns the body of this response.",
+        "de": "Gibt den Body dieses Responses zurück.",
+        "en": "Returns the body of this response.",
     })
 
     static HttpResponseStatusCodeComment = () => lm({
-    "de": "Gibt den Statuscode dieses Responses zurück.",
-    "en": "Returns the status code of this response.",
+        "de": "Gibt den Statuscode dieses Responses zurück.",
+        "en": "Returns the status code of this response.",
     })
 
     static HttpResponseStatusTextComment = () => lm({
-    "de": "Gibt den den http-Status dieses Responses in Textform zurück.",
-    "en": "Returns the status of this response as text (string).",
+        "de": "Gibt den den http-Status dieses Responses in Textform zurück.",
+        "en": "Returns the status of this response as text (string).",
     })
 
     static HttpResponseRequestComment = () => lm({
-    "de": "Gibt das Request-Objekt zurück, das diesen Response zur Folge hatte.",
-    "en": "Returns the request-object whicht lead to this response.",
-    })    
+        "de": "Gibt das Request-Objekt zurück, das diesen Response zur Folge hatte.",
+        "en": "Returns the request-object whicht lead to this response.",
+    })
 
     static HttpResponseHeadersComment = () => lm({
-    "de": "Gibt die Header dieses Responses zurück.",
-    "en": "Returns the headers of this response.",
+        "de": "Gibt die Header dieses Responses zurück.",
+        "en": "Returns the headers of this response.",
     })
 
 
     static HttpClientComment = () => lm({
-    "de": "Ein Objekt der Klasse HttpClient kann Http-Requests senden.",
-    "en": "An object of class HttpClient can send HTTP-requests.",
+        "de": "Ein Objekt der Klasse HttpClient kann Http-Requests senden.",
+        "en": "An object of class HttpClient can send HTTP-requests.",
     })
 
     static HttpClientSendComment = () => lm({
-    "de": "Sendet den Request an den Server.",
-    "en": "Sends request to server.",
+        "de": "Sendet den Request an den Server.",
+        "en": "Sends request to server.",
     })
 
     static HttpClientConstructorComment = () => lm({
-    "de": "Instanziert ein neues HttpClient-Objekt.",
-    "en": "Creates a new HttpClient-object.",
+        "de": "Instanziert ein neues HttpClient-Objekt.",
+        "en": "Creates a new HttpClient-object.",
     })
 
     /**
      * class URLEncoder
      */
     static URLEncoderClassComment = () => lm({
-    "de": "Klasse mit einer statischen Methode zum Encodieren von URLs.",
-    "en": "Class with static methods to encode URLs",
+        "de": "Klasse mit einer statischen Methode zum Encodieren von URLs.",
+        "en": "Class with static methods to encode URLs",
     })
 
     static URLEncoderEncodeComment = () => lm({
-    "de": "Encodiert eine URL gemäß RFC3986.",
-    "en": "Encodes URL as described in RFC3986.",
+        "de": "Encodiert eine URL gemäß RFC3986.",
+        "en": "Encodes URL as described in RFC3986.",
     })
 
     /**
      * class WebSocket
      */
     static WebSocketClassComment = () => lm({
-    "de": "Ein Objekt der Klasse WebSocket kann Daten über das Internet senden und empfangen. Um die Klasse benutzen zu können, musst Du eine eigene Klasse schreiben, die die Klasse WebSocket erweitert und die Methoden onConnect, onMessage, onOtherClientConnected und onOtherClientDisconnected überschreibt.",
-    "en": "An Object of class WebSocket can send/receive data over the internet. To use this class you have to write your own class extending this one. By overwriting methods onConnect, onMessage, onOtherClientConnected and onOtherclientDisconnected you can react to these events.",
+        "de": "Ein Objekt der Klasse WebSocket kann Daten über das Internet senden und empfangen. Um die Klasse benutzen zu können, musst Du eine eigene Klasse schreiben, die die Klasse WebSocket erweitert und die Methoden onConnect, onMessage, onOtherClientConnected und onOtherClientDisconnected überschreibt.",
+        "en": "An Object of class WebSocket can send/receive data over the internet. To use this class you have to write your own class extending this one. By overwriting methods onConnect, onMessage, onOtherClientConnected and onOtherclientDisconnected you can react to these events.",
     })
 
     static WebSocketConstructorComment = () => lm({
-    "de": "Instanziert ein neues WebSocket-Objekt.",
-    "en": "Creates a new WebSocket object.",
+        "de": "Instanziert ein neues WebSocket-Objekt.",
+        "en": "Creates a new WebSocket object.",
     })
 
     /**
      * class WebSocketClient
      */
     static WebSocketClientClassComment = () => lm({
-    "de": "Ein Objekt der Klasse WebSocketClient repräsentiert einen anderen Rechner, mit dem dieser Rechner über den WebSocket in Kontakt steht.",
-    "en": "An Object of class WebSocketClient represents an other ",
+        "de": "Ein Objekt der Klasse WebSocketClient repräsentiert einen anderen Rechner, mit dem dieser Rechner über den WebSocket in Kontakt steht.",
+        "en": "An Object of class WebSocketClient represents an other ",
     })
 
     static WebSocketClientSendComment = () => lm({
-    "de": "Sendet Daten (message) an diesen Client. Den messageType kannst Du frei wählen. Die client bekommt ihn zusammen mit den Daten übermittelt. Tipp: Du kannst auch Objekte senden, musst sie dazu aber vorher serialisieren, d.h. mithilfe der Methode toJson in eine Zeichenkette verwandeln.",
-    "en": "Sends data (message) to this client. You may choose messageType freely. Receiving client gets it along with the sent data. Hint: You may send objects if you serialize them beforehand by calling toJSon on them. This creates a string representing this object.",
+        "de": "Sendet Daten (message) an diesen Client. Den messageType kannst Du frei wählen. Die client bekommt ihn zusammen mit den Daten übermittelt. Tipp: Du kannst auch Objekte senden, musst sie dazu aber vorher serialisieren, d.h. mithilfe der Methode toJson in eine Zeichenkette verwandeln.",
+        "en": "Sends data (message) to this client. You may choose messageType freely. Receiving client gets it along with the sent data. Hint: You may send objects if you serialize them beforehand by calling toJSon on them. This creates a string representing this object.",
     })
 
     static WebSocketClientSetUserDataComment = () => lm({
-    "de": "Mit dieser Methode kannst Du beliebige Objektreferenzen in diesem WebSocketClient-Objekt speichern. Den Schlüssel kannst Du dabei frei wählen und später nutzen, um den Wert durch die Methode getUserData wieder zu holen.",
-    "en": "This method lets you save arbitrary object references alongside this WebSocketClient-object. You may choose the key freely and use it later on to retreive the value by calling getUserData.",
-    })    
+        "de": "Mit dieser Methode kannst Du beliebige Objektreferenzen in diesem WebSocketClient-Objekt speichern. Den Schlüssel kannst Du dabei frei wählen und später nutzen, um den Wert durch die Methode getUserData wieder zu holen.",
+        "en": "This method lets you save arbitrary object references alongside this WebSocketClient-object. You may choose the key freely and use it later on to retreive the value by calling getUserData.",
+    })
 
     static WebSocketClientGetUserDataComment = () => lm({
-    "de": "Mit dieser Methode kannst Du eine Objektreferenz erhalten, die Du zuvor mit der Methode setUserData gespeichert hast. Bemerkung1: Diese Methode entfernt die Objekreferenz nicht aus dem WebSocketClient-Objekt. Bemerkung2: Damit Du alle Methoden des erhaltenen Objekts aufrufen kannst, musst Du dem Computer mitteilen, von welcher Klasse es ist ('casten'). Das geht für die Klasse MeineNutzerDaten bspw. so: MeineNutzerDaten mnd = (MeineNutzerDaten)client.getUserData('schlüssel');",
-    "en": "Method GetUserData lets you retrieve object references you stored beforehand with method setUserData. Hint: you can cast the object to it's proper data type like so: (String) getUserData(\"key\")",
+        "de": "Mit dieser Methode kannst Du eine Objektreferenz erhalten, die Du zuvor mit der Methode setUserData gespeichert hast. Bemerkung1: Diese Methode entfernt die Objekreferenz nicht aus dem WebSocketClient-Objekt. Bemerkung2: Damit Du alle Methoden des erhaltenen Objekts aufrufen kannst, musst Du dem Computer mitteilen, von welcher Klasse es ist ('casten'). Das geht für die Klasse MeineNutzerDaten bspw. so: MeineNutzerDaten mnd = (MeineNutzerDaten)client.getUserData('schlüssel');",
+        "en": "Method GetUserData lets you retrieve object references you stored beforehand with method setUserData. Hint: you can cast the object to it's proper data type like so: (String) getUserData(\"key\")",
     })
 
     static WebSocketClientGetNumberComment = () => lm({
-    "de": "Gehört ein Client zu einer mit findClient bzw. findClients gefundenen Gruppe, so erhältst Du mit dieser Methode die 'Rangfolge' dieses Clients in dieser Gruppe. Allen Clients wird dieselbe Rangfolgeordnung vom Server mitgeteilt. So lässt sich bspw. einfach festlegen, welcher Client eine besondere Rolle (Server) in der Gruppe erhalten soll (z.B. Client mit Nummer 1). Bemerkung: Die Nummer ist eine Zahl zwischen 1 und der Anzahl der Clients in der Gruppe.",
-    "en": "If this client belongs to a group obtained by method findClient or findClients then you get this client's order with this method. This order is given each client by the server so you get the identical value on every computer.",
+        "de": "Gehört ein Client zu einer mit findClient bzw. findClients gefundenen Gruppe, so erhältst Du mit dieser Methode die 'Rangfolge' dieses Clients in dieser Gruppe. Allen Clients wird dieselbe Rangfolgeordnung vom Server mitgeteilt. So lässt sich bspw. einfach festlegen, welcher Client eine besondere Rolle (Server) in der Gruppe erhalten soll (z.B. Client mit Nummer 1). Bemerkung: Die Nummer ist eine Zahl zwischen 1 und der Anzahl der Clients in der Gruppe.",
+        "en": "If this client belongs to a group obtained by method findClient or findClients then you get this client's order with this method. This order is given each client by the server so you get the identical value on every computer.",
     })
 
     static WebSocketClientGetIndexComment = () => lm({
-    "de": "Diese Methode ist veraltet. Benutze stattdessen getNumber.",
-    "en": "This method is deprecated. Use getNumber instead.",
+        "de": "Diese Methode ist veraltet. Benutze stattdessen getNumber.",
+        "en": "This method is deprecated. Use getNumber instead.",
     })
 
     static WebSocketNotInEmbeddedException = () => lm({
-    "de": "Die Netzwerkfunktionalitäten stehen nur eingeloggten Nutzern in der Entwicklungsumgebung zur Verfügung und können daher leider hier nicht ausprobiert werden.",
-    "en": "Network functionality doesn't run in embedded mode.",
+        "de": "Die Netzwerkfunktionalitäten stehen nur eingeloggten Nutzern in der Entwicklungsumgebung zur Verfügung und können daher leider hier nicht ausprobiert werden.",
+        "en": "Network functionality doesn't run in embedded mode.",
     })
 
     /**
      * Class Collections
      */
     static CollectionsClassComment = () => lm({
-    "de": "Diese Klasse besteht aus Methoden, die auf Collections operieren oder Collections zurückgeben.",
-    "en": "This class consists exclusively of static methods that operate on or return collections. It contains polymorphic algorithms that operate on collections, 'wrappers', which return a new collection backed by a specified collection, and a few other odds and ends.",
+        "de": "Diese Klasse besteht aus Methoden, die auf Collections operieren oder Collections zurückgeben.",
+        "en": "This class consists exclusively of static methods that operate on or return collections. It contains polymorphic algorithms that operate on collections, 'wrappers', which return a new collection backed by a specified collection, and a few other odds and ends.",
     })
 
     static CollectionsShuffleComment = () => lm({
-    "de": "Vertauscht die Elemente der Liste in zufälliger Weise.",
-    "en": "Randomly permutes the specified list.",
+        "de": "Vertauscht die Elemente der Liste in zufälliger Weise.",
+        "en": "Randomly permutes the specified list.",
     })
 
     static CollectionsSortComparableListComment = () => lm({
-    "de": "Sortiert eine Liste von Elementen, die das Interface Comparable implementieren.",
-    "en": "Sorts a List of Comparable elements.",
+        "de": "Sortiert eine Liste von Elementen, die das Interface Comparable implementieren.",
+        "en": "Sorts a List of Comparable elements.",
     })
 
     /**
@@ -4177,23 +4216,23 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
      */
 
     static queueInterfaceComment = () => lm({
-    "de": "",
-    "en": "",
+        "de": "",
+        "en": "",
     })
 
     static queueRemoveComment = () => lm({
-    "de": "Entfernt das Element am Kopf der Liste und gibt es zurück. Führt zum Fehler, wenn die Liste leer ist.",
-    "en": "Retrieves and removes the head of this queue.",
+        "de": "Entfernt das Element am Kopf der Liste und gibt es zurück. Führt zum Fehler, wenn die Liste leer ist.",
+        "en": "Retrieves and removes the head of this queue.",
     })
 
     static queuePollComment = () => lm({
-    "de": "Entfernt das Element am Kopf der Liste und gibt es zurück. Gibt null zurück, wenn die Liste leer ist.",
-    "en": "Retrieves and removes the head of this queue, or returns null if this queue is empty.",
+        "de": "Entfernt das Element am Kopf der Liste und gibt es zurück. Gibt null zurück, wenn die Liste leer ist.",
+        "en": "Retrieves and removes the head of this queue, or returns null if this queue is empty.",
     })
 
     static queuePeekComment = () => lm({
-    "de": "Gibt das Element am Kopf der Liste zurück, entfernt es aber nicht. Gib null zurück, wenn die Liste leer ist.",
-    "en": "Retrieves, but does not remove, the head of this queue, or returns null if this queue is empty.",
+        "de": "Gibt das Element am Kopf der Liste zurück, entfernt es aber nicht. Gib null zurück, wenn die Liste leer ist.",
+        "en": "Retrieves, but does not remove, the head of this queue, or returns null if this queue is empty.",
     })
 
     /**
@@ -4201,134 +4240,162 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
      */
 
     static dequeInterfaceComment = () => lm({
-    "de": "Interface für Liste mit zweiseitigem Zugriff (insbesondere Anfügen an beiden Enden). Der Name steht für 'double ended queue' und wird meist 'deck' ausgesprochen.",
-    "en": `A linear collection that supports element insertion and removal at both ends. The name deque is short for "double ended queue" and is usually pronounced "deck"`,
+        "de": "Interface für Liste mit zweiseitigem Zugriff (insbesondere Anfügen an beiden Enden). Der Name steht für 'double ended queue' und wird meist 'deck' ausgesprochen.",
+        "en": `A linear collection that supports element insertion and removal at both ends. The name deque is short for "double ended queue" and is usually pronounced "deck"`,
     })
 
     static dequeRemoveFirstOccurrenceComment = () => lm({
-    "de": "Löscht das erste Vorkommen des Objekts. Gibt true zurück, wenn die Liste dadurch verändert wurde.",
-    "en": "Removes the first occurrence of the specified element from this deque.",
+        "de": "Löscht das erste Vorkommen des Objekts. Gibt true zurück, wenn die Liste dadurch verändert wurde.",
+        "en": "Removes the first occurrence of the specified element from this deque.",
     })
 
     static dequeRemoveLastOccurrenceComment = () => lm({
-    "de": "Löscht das letzte Vorkommen des Objekts. Gibt true zurück, wenn die Liste dadurch verändert wurde.",
-    "en": "Removes the last occurrence of the specified element from this deque.",
+        "de": "Löscht das letzte Vorkommen des Objekts. Gibt true zurück, wenn die Liste dadurch verändert wurde.",
+        "en": "Removes the last occurrence of the specified element from this deque.",
     })
 
     static dequeAddFirstComment = () => lm({
-    "de": "Fügt das Element am Anfang der Liste ein.",
-    "en": "Inserts the specified element at the front of this deque.",
+        "de": "Fügt das Element am Anfang der Liste ein.",
+        "en": "Inserts the specified element at the front of this deque.",
     })
 
     static dequeAddLastComment = () => lm({
-    "de": "Fügt das Element am Ende der Liste ein.",
-    "en": "Inserts the specified element at the end of this deque.",
+        "de": "Fügt das Element am Ende der Liste ein.",
+        "en": "Inserts the specified element at the end of this deque.",
     })
 
     static dequeRemoveFirstComment = () => lm({
-    "de": "Entfernt das Element am Anfang der Liste und gibt es zurück. Führt zum Fehler, wenn die Liste leer ist.",
-    "en": "Retrieves and removes the first element of this deque.",
+        "de": "Entfernt das Element am Anfang der Liste und gibt es zurück. Führt zum Fehler, wenn die Liste leer ist.",
+        "en": "Retrieves and removes the first element of this deque.",
     })
 
     static dequeRemoveLastComment = () => lm({
-    "de": "Entfernt das Element am Ende der Liste und gibt es zurück. Führt zum Fehler, wenn die Liste leer ist.",
-    "en": "Retrieves and removes the last element of this deque.",
+        "de": "Entfernt das Element am Ende der Liste und gibt es zurück. Führt zum Fehler, wenn die Liste leer ist.",
+        "en": "Retrieves and removes the last element of this deque.",
     })
 
     static dequePeekFirstComment = () => lm({
-    "de": "Gibt das Element am Anfang der Liste zurück, entfernt es aber nicht. Gib null zurück, wenn die Liste leer ist.",
-    "en": "Retrieves, but does not remove, the first element of this deque, or returns null if this deque is empty.",
+        "de": "Gibt das Element am Anfang der Liste zurück, entfernt es aber nicht. Gib null zurück, wenn die Liste leer ist.",
+        "en": "Retrieves, but does not remove, the first element of this deque, or returns null if this deque is empty.",
     })
 
     static dequePeekLastComment = () => lm({
-    "de": "Gibt das Element am Ende der Liste zurück, entfernt es aber nicht. Gib null zurück, wenn die Liste leer ist.",
-    "en": "Retrieves, but does not remove, the last element of this deque, or returns null if this deque is empty.",
+        "de": "Gibt das Element am Ende der Liste zurück, entfernt es aber nicht. Gib null zurück, wenn die Liste leer ist.",
+        "en": "Retrieves, but does not remove, the last element of this deque, or returns null if this deque is empty.",
     })
 
     static dequePushComment = () => lm({
-    "de": "Fügt das Element am Ende der Liste hinzu.",
-    "en": "Pushes an element onto the stack represented by this deque (in other words, at the head of this deque).",
+        "de": "Fügt das Element am Ende der Liste hinzu.",
+        "en": "Pushes an element onto the stack represented by this deque (in other words, at the head of this deque).",
     })
 
     static dequePopComment = () => lm({
-    "de": "Gibt das Element am Ende der Liste zurück und entfernt es von der Liste. Erzeugt einen Fehler, wenn die Liste leer ist.",
-    "en": "Pops an element from the stack represented by this deque.",
+        "de": "Gibt das Element am Ende der Liste zurück und entfernt es von der Liste. Erzeugt einen Fehler, wenn die Liste leer ist.",
+        "en": "Pops an element from the stack represented by this deque.",
     })
 
     static dequeDescendingIteratorComment = () => lm({
-    "de": "Gibt einen Iterator über die Elemente dieser Collection zurück, der die Liste in umgekehrter Reihenfolge (Ende -> Anfang) durchläuft.",
-    "en": "Returns an iterator over the elements in this deque in reverse sequential order.",
+        "de": "Gibt einen Iterator über die Elemente dieser Collection zurück, der die Liste in umgekehrter Reihenfolge (Ende -> Anfang) durchläuft.",
+        "en": "Returns an iterator over the elements in this deque in reverse sequential order.",
     })
 
     /**
      * class LinkedList
      */
     static linkedListConstructorComment = () => lm({
-    "de": "Erzeugt eine neue, leere LinkedList.",
-    "en": "Creates a new empty LinkedList.",
+        "de": "Erzeugt eine neue, leere LinkedList.",
+        "en": "Creates a new empty LinkedList.",
     })
 
     static linkedListIsEmptyError = () => lm({
-    "de": "Die Liste ist leer, daher kann kein Element entnommen werden.",
-    "en": "Empty list, therefore you can't remove an element from it.",
+        "de": "Die Liste ist leer, daher kann kein Element entnommen werden.",
+        "en": "Empty list, therefore you can't remove an element from it.",
     })
 
     /**
      * interface Map
      */
     static mapInterfaceComment = () => lm({
-    "de": "Eine Map ist ein Schlüssel-Wert-Speicher (key-value store). Eine Map kann keinen Schlüssel mehrfach enthalten.",
-    "en": "An object that maps keys to values. A map cannot contain duplicate keys; each key can map to at most one value.",
+        "de": "Eine Map ist ein Schlüssel-Wert-Speicher (key-value store). Eine Map kann keinen Schlüssel mehrfach enthalten.",
+        "en": "An object that maps keys to values. A map cannot contain duplicate keys; each key can map to at most one value.",
     })
 
     static mapSizeComment = () => lm({
-    "de": "Gibt die Anzahl der Schlüssel-Wert-Paare der Map zurück.",
-    "en": "Returns the number of key-value mappings in this map.",
+        "de": "Gibt die Anzahl der Schlüssel-Wert-Paare der Map zurück.",
+        "en": "Returns the number of key-value mappings in this map.",
     })
 
     static mapIsEmptyComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn die Map keine Schlüssel-Wert-Paare enthält.",
-    "en": "Returns true if this map contains no key-value mappings.",
+        "de": "Gibt genau dann true zurück, wenn die Map keine Schlüssel-Wert-Paare enthält.",
+        "en": "Returns true if this map contains no key-value mappings.",
     })
 
     static mapContainsValueComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn die Map den Wert enthält.",
-    "en": "Returns true if this map maps one or more keys to the specified value. More formally, returns true if and only if this map contains at least one mapping to a value v such that Objects.equals(value, v). This operation will probably require time linear in the map size for most implementations of the Map interface.",
+        "de": "Gibt genau dann true zurück, wenn die Map den Wert enthält.",
+        "en": "Returns true if this map maps one or more keys to the specified value. More formally, returns true if and only if this map contains at least one mapping to a value v such that Objects.equals(value, v). This operation will probably require time linear in the map size for most implementations of the Map interface.",
     })
 
     static mapContainsKeyComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn die Map zum Schlüssel key einen Wert enthält.",
-    "en": "Returns true if this map contains a mapping for the specified key.",
+        "de": "Gibt genau dann true zurück, wenn die Map zum Schlüssel key einen Wert enthält.",
+        "en": "Returns true if this map contains a mapping for the specified key.",
     })
 
     static mapGetComment = () => lm({
-    "de": "Gibt den Wert zum Schlüssel key zurück. Gibt null zurück, falls die Map zum Schlüssel key keinen Wert enthält.",
-    "en": "Returns the value to which the specified key is mapped, or null if this map contains no mapping for the key. \nMore formally, if this map contains a mapping from a key k to a value v such that Objects.equals(key, k), then this method returns v; otherwise it returns null.",
+        "de": "Gibt den Wert zum Schlüssel key zurück. Gibt null zurück, falls die Map zum Schlüssel key keinen Wert enthält.",
+        "en": "Returns the value to which the specified key is mapped, or null if this map contains no mapping for the key. \nMore formally, if this map contains a mapping from a key k to a value v such that Objects.equals(key, k), then this method returns v; otherwise it returns null.",
     })
 
     static mapPutComment = () => lm({
-    "de": "Speichert das key-value pair in der Map. Falls zum key vorher schon ein Value gespeichert war, wird dieser zurückgegeben. In der Map wird er dann durch den neuen Value überschrieben. Falls es zum key noch keinen value in der Map gab, wird null zurückgegeben.",
-    "en": "Associates the specified value with the specified key in this map (optional operation). If the map previously contained a mapping for the key, the old value is replaced by the specified value. Returns the previous value associated with key, or null if there was no mapping for key.",
+        "de": "Speichert das key-value pair in der Map. Falls zum key vorher schon ein Value gespeichert war, wird dieser zurückgegeben. In der Map wird er dann durch den neuen Value überschrieben. Falls es zum key noch keinen value in der Map gab, wird null zurückgegeben.",
+        "en": "Associates the specified value with the specified key in this map (optional operation). If the map previously contained a mapping for the key, the old value is replaced by the specified value. Returns the previous value associated with key, or null if there was no mapping for key.",
     })
 
     static mapClearComment = () => lm({
-    "de": "Entfernt alle Schlüssel-Wert-Paare aus der Map.",
-    "en": "Removes all of the mappings from this map",
+        "de": "Entfernt alle Schlüssel-Wert-Paare aus der Map.",
+        "en": "Removes all of the mappings from this map",
     })
 
     /**
      * Class HashMap
      */
     static hashMapClassComment = () => lm({
-    "de": "Map-Klasse mit Zugriffszeit proportional zu log(Anzahl der Elemente)",
-    "en": "A mutable hash map providing O(1) lookup.",
+        "de": "Map-Klasse mit Zugriffszeit proportional zu log(Anzahl der Elemente)",
+        "en": "A mutable hash map providing O(1) lookup.",
     })
 
     static hashMapConstructorComment = () => lm({
-    "de": "Erstellt ein neues HashMap-Objekt",
-    "en": "Creates a new HashMap-object.",
+        "de": "Erstellt ein neues HashMap-Objekt",
+        "en": "Creates a new HashMap-object.",
     })
 
-    
+    /**
+     * Interface Set
+     */
+    static setInterfaceComment = () => lm({
+        "de": "Interface mit Methoden eines Set, d.h. einer Menge, die jedes Element maximal einmal enthält",
+        "en": "A collection that contains no duplicate elements.",
+    })
 
+    static setContainsComment = () => lm({
+        "de": "Gibt genau dann true zurück, wenn das Set das Element enthält.",
+        "en": "Returns true if this set contains the specified element.",
+    })
+
+    static setContainsAllComment = () => lm({
+        "de": "Gibt genau dann true zurück, wenn das Set alle Elemente der übergebenen Collection enthält.",
+        "en": "Returns true if this set contains all of the elements of the specified collection.",
+    })
+
+    /**
+     * Class HashSet
+     */
+    static hashSetClassComment = () => lm({
+        "de": "Set mit konstanter Zugriffszeit",
+        "en": "This class implements the Set interface, backed by a hash table (actually a HashMap instance). It makes no guarantees as to the iteration order of the set; in particular, it does not guarantee that the order will remain constant over time. This class permits the null element.",
+    })
+
+    static hashSetConstructorComment = () => lm({
+        "de": "Erstellt ein neues HashSet-Objekt.",
+        "en": "Creates a new HashSet object.",
+    })
 }  

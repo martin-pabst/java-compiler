@@ -1,6 +1,6 @@
 /**::
  * Test correct handling of exceptions
- * { "expectOutput": "finally-block reached\nCode in catch block reached!\nAfter exception handling" }
+ * { "expectedOutput": "finally-block reached\nCode in catch block reached!\nAfter exception handling\n" }
  */
 
 Test t = new Test();

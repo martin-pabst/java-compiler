@@ -1,6 +1,6 @@
 /**::
  * Test ellipsis
- * { "expectOutput": "12\nNick\nEmma\n14\n" }
+ * { "expectedOutput": "12\nNick\nEmma\n14\n" }
  */
 
 new A().test(12, "Nick", "Emma",14);

@@ -52,7 +52,7 @@ type TestInfo = {
 function test1(sourcecode: string, file: string) {
     /**::
      * Test switch case with constant
-     * {expectOutput: "Here!", expectedError: { id: "id13", line: 10 }}
+     * {expectedOutput: "Here!", expectedError: { id: "id13", line: 10 }}
      */
 
     sourcecode = sourcecode.replace(/\r\n/g, "\n");
@@ -77,7 +77,7 @@ function test1(sourcecode: string, file: string) {
         let leftCurlyBraceIndex = sourcecode.indexOf("{", testBegin);
         if (leftCurlyBraceIndex >= 0 && leftCurlyBraceIndex < headerEnd) {
             let infoText = sourcecode.substring(leftCurlyBraceIndex, headerEnd);
-            infoText = infoText.replace(/\s*\s/g, "");
+            // infoText = infoText.replace(/\s*\s/g, "");
 
             let testInfo: TestInfo = JSON.parse(infoText);
             if (testInfo) {
@@ -173,7 +173,7 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
             }
 
             if (expectedOutput) {
-                let actualOutput = printManager.output.replace(/\n/g, "\\n");
+                let actualOutput = printManager.output; // printManager.output.replace(/\n/g, "\\n");
                 if (expectedOutput != actualOutput) {
                     console.log(chalk.gray("Position:    ") + chalk.white("Test beginning with Line ") + chalk.blue(lineOffset));
                     console.log(chalk.red("Test failed: ") + "Output doesn't match expected output.");

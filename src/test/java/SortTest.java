@@ -1,6 +1,6 @@
 /**::
  * Sort ArrayList with java Comparator
- * { "expectOutput": "abcdf" }
+ * { "expectedOutput": "abcdf" }
  */
 
 ArrayList<String> list = new ArrayList<>();

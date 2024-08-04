@@ -29,7 +29,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
         { type: "method", signature: "boolean add(E e)", native: ArrayListClass.prototype._add, template: "(§1.elements.push(§2) >= 0)" , comment: JRC.collectionAddElementComment},
         { type: "method", signature: "boolean addAll(Collection<? extends E> c)", java: ArrayListClass.prototype._addAll , comment: JRC.collectionAddAllComment},
         { type: "method", signature: "void clear()", native: ArrayListClass.prototype._clear, template: "§1.elements.length = 0" , comment: JRC.collectionClearComment},
-        { type: "method", signature: "boolean contains(E Element)", java: ArrayListClass.prototype._mj$contains$boolean$Object, comment: JRC.collectionContainsComment},
+        { type: "method", signature: "boolean contains(E Element)", java: ArrayListClass.prototype._mj$contains$boolean$E, comment: JRC.collectionContainsComment},
         { type: "method", signature: "boolean containsAll(Collection<?> c)", java: ArrayListClass.prototype._mj$containsAll$boolean$Collection , comment: JRC.collectionContainsAllComment},
         { type: "method", signature: "boolean isEmpty()", native: ArrayListClass.prototype._isEmpty, template: "(§1.elements.length == 0)" , comment: JRC.collectionIsEmptyComment},
         { type: "method", signature: "boolean remove(E element)", java: ArrayListClass.prototype._mj$remove$boolean$E , comment: JRC.collectionRemoveObjectComment},
@@ -126,7 +126,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
 
     _addWithIndex(element: ObjectClass, index: number) {
         if (index < 0 || index > this.elements.length) {
-            throw new IndexOutOfBoundsExceptionClass(`Der Index beim Einfügen in die ArrayList (${index}) liegt außerhalb des zulässigen Bereichs (0 bis ${this.elements.length})`);
+            throw new IndexOutOfBoundsExceptionClass(JRC.indexOutOfBoundsException(index, this.elements.length - 1));
         }
 
         this.elements.splice(index, 0, element);
@@ -135,7 +135,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
 
     _removeWithIndex(index: number) {
         if (index < 0 || index >= this.elements.length) {
-            throw new IndexOutOfBoundsExceptionClass(`Der Index beim Löschen aus der ArrayList (${index}) liegt außerhalb des zulässigen Bereichs (0 bis ${this.elements.length})`);
+            throw new IndexOutOfBoundsExceptionClass(JRC.indexOutOfBoundsException(index, this.elements.length - 1));
         }
 
         return this.elements.splice(index, 1);
@@ -143,7 +143,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
 
     _setWithIndex(index: number, element: ObjectClass) {
         if (index < 0 || index >= this.elements.length) {
-            throw new IndexOutOfBoundsExceptionClass(`Der Index beim Setzen eines Elements der ArrayList (${index}) liegt außerhalb des zulässigen Bereichs (0 bis ${this.elements.length})`);
+            throw new IndexOutOfBoundsExceptionClass(JRC.indexOutOfBoundsException(index, this.elements.length - 1));
         }
 
         let ret = this.elements[index];
@@ -154,7 +154,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
 
     _getWithIndex(index: number) {
         if (index < 0 || index >= this.elements.length) {
-            throw new IndexOutOfBoundsExceptionClass(`Der Index beim Einfügen in die ArrayList (${index}) liegt außerhalb des zulässigen Bereichs (0 bis ${this.elements.length - 1})`);
+            throw new IndexOutOfBoundsExceptionClass(JRC.indexOutOfBoundsException(index, this.elements.length - 1));
         }
 
         return this.elements[index];
@@ -163,7 +163,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
     _addAll(t: Thread, callback: CallbackFunction, collection: CollectionInterface) {
 
         if (collection == null) {
-            t.throwException(new NullPointerExceptionClass("ArrayList.addAll wurde mit null als Argument aufgerufen."));
+            throw new NullPointerExceptionClass(JRC.collectionAddAllNullPointerException());
             return;
         }
 
@@ -188,13 +188,11 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
     _addAllWithIndex(t: Thread, callback: CallbackFunction, index: number, collection: CollectionInterface) {
 
         if (index < 0 || index > this.elements.length) {
-            t.throwException(new IndexOutOfBoundsExceptionClass(`Der Index beim Einfügen in die ArrayList (${index}) liegt außerhalb des zulässigen Bereichs (0 bis ${this.elements.length})`));
-            return;
+            throw new IndexOutOfBoundsExceptionClass(JRC.indexOutOfBoundsException(index, this.elements.length - 1));
         }
 
         if (collection == null) {
-            t.throwException(new NullPointerExceptionClass("ArrayList.addAll wurde mit null als Argument aufgerufen."));
-            return;
+            throw new NullPointerExceptionClass(JRC.collectionAddAllNullPointerException());
         }
 
         if (collection instanceof SystemCollection) {
@@ -219,7 +217,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
         this.elements.length = 0;
     }
 
-    _mj$contains$boolean$Object(t: Thread, callback: CallbackFunction, element: ObjectClass) {
+    _mj$contains$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClass) {
         this._mj$indexOf$int$E(t, () => {
             let index = t.s.pop();
             t.s.push(index >= 0);
@@ -230,7 +228,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
     _mj$containsAll$boolean$Collection(t: Thread, callback: CallbackFunction, collection: CollectionInterface) {
 
         if (collection == null) {
-            t.throwException(new NullPointerExceptionClass("ArrayList.containsAll wurde mit null als Argument aufgerufen."));
+            throw new NullPointerExceptionClass(JRC.collectionContainsAllNullPointerException());
             return;
         }
 
@@ -238,7 +236,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
         let f = (t: Thread, callback: CallbackFunction, elementsToCheck: any[]) => {
 
             if(elementsToCheck.length > 0){
-                this._mj$contains$boolean$Object(t, () => {
+                this._mj$contains$boolean$E(t, () => {
                     if(t.s.pop()){
                         f(t, callback, elementsToCheck);
                     } else {
@@ -296,7 +294,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
     _removeAll(t: Thread, callback: CallbackFunction, collection: CollectionInterface) {
 
         if (collection == null) {
-            t.throwException(new NullPointerExceptionClass("ArrayList.removeAll wurde mit null als Argument aufgerufen."));
+            throw new NullPointerExceptionClass(JRC.collectionRemoveAllNullPointerException());
             return;
         }
 

@@ -8,31 +8,31 @@ import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
 
 export class ObjectClass {
 
-    declare _mj$toString$String$: (t: Thread, callback: CallbackFunction) => void;
-
+    // declare _mj$toString$String$: (t: Thread, callback: CallbackFunction) => void;
+    
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "class Object" },
         { type: "method", signature: "public Object()", native: ObjectClass.prototype._constructor },
-        { type: "method", signature: "public String toString()", native: ObjectClass.prototype._nToString , comment: JRC.objectToStringComment},
+        { type: "method", signature: "public String toString()", java: ObjectClass.prototype._mj$toString$String$ , comment: JRC.objectToStringComment},
         { type: "method", signature: "public boolean equals(Object otherObject)", java: ObjectClass.prototype._mj$equals$boolean$Object , comment: JRC.objectEqualsComment},
         { type: "method", signature: "public final void wait()", java: ObjectClass.prototype._mj$wait$void$ , comment: JRC.objectWaitComment},
         { type: "method", signature: "public final void wait(int milliseconds)", java: ObjectClass.prototype._mj$wait$void$ , comment: JRC.objectWaitWithTimeoutComment},
         { type: "method", signature: "public final void notify()", java: ObjectClass.prototype._mj$notify$void$ , comment: JRC.objectNotifyComment},
         { type: "method", signature: "public final void notifyAll()", java: ObjectClass.prototype._mj$notifyAll$void$ , comment: JRC.objectNotifyAllComment},
     ]
-
+    
     // declare __programs: Program[]; // only for compatibility with java classes; not used in library classes
-
+    
     static type: NonPrimitiveType;
-
+    
     private waitingThreads?: Thread[];
     private threadHoldingLockToThisObject?: Thread;
     private reentranceCounter?: number;                 // == 1 when thread first entered synchronized block
-
+    
     constructor() {
         
     }
-
+    
     /**
      * 
      * To understand wait and notify see this answer:
@@ -43,33 +43,33 @@ export class ObjectClass {
      * @param t 
      * @param callback 
      * @param milliseconds 
-     */
-    _mj$wait$void$(t: Thread, callback: CallbackFunction, milliseconds?: number) {
-        if (this.threadHoldingLockToThisObject != t) {
-            this.throwIllegalMonitorException(t, JCM.threadWantsToWaitAndHasNoLockOnObject());
+    */
+   _mj$wait$void$(t: Thread, callback: CallbackFunction, milliseconds?: number) {
+       if (this.threadHoldingLockToThisObject != t) {
+           this.throwIllegalMonitorException(t, JCM.threadWantsToWaitAndHasNoLockOnObject());
         }
-
+        
         let that = this;
-
+        
         if (milliseconds) {
             setTimeout(() => {
                 if (t.state == ThreadState.timedWaiting) t.state = ThreadState.blocked;
             }, milliseconds);
-
+            
             t.state = ThreadState.timedWaiting;
         } else {
             t.state = ThreadState.waiting;
         }
-
+        
         if (!that.waitingThreads) that.waitingThreads = [];
         if (that.waitingThreads.indexOf(t) < 0) that.waitingThreads.push(t);
-
+        
         t.scheduler.suspendThread(t);
-
+        
         if (callback) callback();
     }
-
-
+    
+    
     _mj$notify$void$(t: Thread, callback: CallbackFunction) {
         if (this.threadHoldingLockToThisObject != t) {
             this.throwIllegalMonitorException(t, JCM.threadWantsToNotifyAndHasNoLockOnObject());
@@ -84,7 +84,7 @@ export class ObjectClass {
         }
         if (callback) callback();
     }
-
+    
     _mj$notifyAll$void$(t: Thread, callback: CallbackFunction) {
         if (this.threadHoldingLockToThisObject != t) {
             this.throwIllegalMonitorException(t, JCM.threadWantsToNotifyAndHasNoLockOnObject());
@@ -96,7 +96,7 @@ export class ObjectClass {
         }
         if (callback) callback();
     }
-
+    
     restoreOneBlockedThread() {
         if (this.waitingThreads) {
             for (let i = 0; i < this.waitingThreads.length - 1; i++) {
@@ -109,60 +109,61 @@ export class ObjectClass {
             }
         }
     }
-
+    
     throwIllegalMonitorException(t: Thread, message: string) {
         throw new t.classes["IllegalMonitorStateException"](message);
     }
-
+    
     _constructor() {
         return this;
     }
-
+    
     getType(): NonPrimitiveType {
         //@ts-ignore
         return this.constructor.type;
     }
-
+    
     getClassName(): string {
         return this.getType().identifier;
     }
-
-
-    _nToString() {
-        return new StringClass(ValueRenderer.renderValue(this, 200));
-        // `t.stack.push(new ${Helpers.classes}["String"]("Object"));`
+    
+    
+    _mj$toString$String$(t: Thread, callback: CallbackFunction){
+        t.s.push(new StringClass(ValueRenderer.renderValue(this, 200)));
+        if(callback) callback();
+        return;
     }
-
+    
     _mj$equals$boolean$Object(t: Thread, callback: CallbackFunction, otherObject: ObjectClass) {
         t.s.push(this == otherObject);
         if(callback) callback();
         return;
     }
-
+    
     beforeEnteringSynchronizedBlock(t: Thread, pushLockObject: boolean = false) {
         if (pushLockObject) t.s.push(this);
-
+        
         if (this.threadHoldingLockToThisObject && this.threadHoldingLockToThisObject != t) {
             t.state == ThreadState.blocked;
             t.scheduler.suspendThread(t);
         }
     }
-
-
+    
+    
     enterSynchronizedBlock(t: Thread, pushLockObject: boolean = false) {
-
+        
         if (pushLockObject) t.s.push(this);
-
+        
         if (!this.threadHoldingLockToThisObject) {
             this.threadHoldingLockToThisObject = t;
             this.reentranceCounter = 1;
         } else {
             this.reentranceCounter!++;
         }
-
+        
         t.registerEnteringSynchronizedBlock(this);
     }
-
+    
     leaveSynchronizedBlock(t: Thread) {
         if (this.threadHoldingLockToThisObject == t) {
             this.reentranceCounter!--;
@@ -174,23 +175,23 @@ export class ObjectClass {
             }
         }
     }
-
+    
     __internalHashCode(): any {
         return this;
     }
-
+    
 }
 
 export class StringClass extends ObjectClass {
-
+    
     static isPrimitiveTypeWrapper: boolean = true;
-
+    
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "class String extends Object implements Comparable<String>" , comment: JRC.stringClassComment},
         { type: "method", signature: "public String()", native: StringClass.prototype._emptyConstructor , comment: JRC.stringConstructorComment},
         { type: "method", signature: "public String(String original)", native: StringClass.prototype._constructor2 , comment: JRC.stringConstructorComment2},
         { type: "method", signature: "public final String toString()", native: StringClass.prototype._nToString, template: "§1", comment: JRC.objectToStringComment},
-
+        
         { type: "method", signature: "public final int length()", native: StringClass.prototype._nLength, template: "§1.value.length" , comment: JRC.stringLengthComment},
         { type: "method", signature: "public final int indexOf(string str)", native: StringClass.prototype._nIndexOf1, template: "§1.value.indexOf(§2)" , comment: JRC.stringIndexOfComment1},
         { type: "method", signature: "public final int indexOf(string str, int fromIndex)", native: StringClass.prototype._nIndexOf2, template: "§1.value.indexOf(§2, §3)" , comment: JRC.stringIndexOfComment2},

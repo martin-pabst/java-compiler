@@ -5,6 +5,11 @@ import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { ObjectClass } from "../javalang/ObjectClassStringClass.ts";
 
+type Value = {
+    k: any;
+    v: any;
+}
+
 export class HashMapClass extends ObjectClass {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "class HashMap<K, V> implements Map<K, V>", comment: JRC.hashMapClassComment},
@@ -20,12 +25,11 @@ export class HashMapClass extends ObjectClass {
         { type: "method", signature: "V put(K key, V value)", java: HashMapClass.prototype._mj$put$V$K$V, comment: JRC.mapPutComment },
         { type: "method", signature: "void clear()", java: HashMapClass.prototype._mj$clear$void$, comment: JRC.mapClearComment },
 
-
     ]
 
     static type: NonPrimitiveType;
     
-    map: Map<any, any> = new Map();
+    map: Map<any, Value> = new Map();
 
     _constructor() {
         return this;
@@ -45,10 +49,10 @@ export class HashMapClass extends ObjectClass {
 
     _mj$containsKey$boolean$K(t: Thread, callback: CallbackFunction, key: ObjectClass) {
         if(key == null){
-            t.s.push(typeof (this.map.get(null) !== "undefined"));
+            t.s.push((typeof this.map.get(null)) !== "undefined");
         } else {
             let hashCode = key.__internalHashCode();
-            t.s.push(typeof (this.map.get(hashCode) !== "undefined"));
+            t.s.push((typeof this.map.get(hashCode)) !== "undefined");
         }
         if(callback) callback();
         return;
@@ -57,7 +61,7 @@ export class HashMapClass extends ObjectClass {
     _mj$containsValue$boolean$V(t: Thread, callback: CallbackFunction, value: ObjectClass) { 
         let ret: boolean = false;
         for(let v of this.map.values()){
-            if(v == value){
+            if(v.v == value){
                 ret = true;
                 break;
             }
@@ -69,10 +73,10 @@ export class HashMapClass extends ObjectClass {
 
     _mj$get$V$K(t: Thread, callback: CallbackFunction, key: ObjectClass) { 
         if(key == null){
-            t.s.push(this.map.get(null)  || null);
+            t.s.push(this.map.get(null)?.v  || null);
         } else {
             let hashCode = key.__internalHashCode();
-            t.s.push(this.map.get(hashCode) || null);
+            t.s.push(this.map.get(hashCode)?.v || null);
         }
         if(callback) callback();
         return;
@@ -82,12 +86,12 @@ export class HashMapClass extends ObjectClass {
         if(key == null){
             let oldValue = this.map.get(null) || null;
             t.s.push(oldValue);
-            this.map.set(null, value);
+            this.map.set(null, {k: null, v: value});
         } else {
             let hashCode = key.__internalHashCode();
             let oldValue = this.map.get(hashCode);
             t.s.push(oldValue);
-            this.map.set(hashCode, value);
+            this.map.set(hashCode, {k: key, v: value});
         }
         if(callback) callback();
         return;

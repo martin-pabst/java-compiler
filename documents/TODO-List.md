@@ -59,6 +59,12 @@
 ## next 
   * WebSocket client
   * Missing Collections 
+    * Map, HashMap: Done
+    * Set, HashSet, LinkedHashSet
+    * Vector
+    * Stack
+  * Display method comment on hover and in Code completion items
+  * collect JavaDoc in user sourcecode to enrich code completion and hover-tooltips
   * Robot
   * if method overrides or implements other method and has no comment, then take the overriden method's comment
   * detect cyclic calling of constructors

@@ -134,7 +134,7 @@ assertEquals(6, n, "Test continue in do..while-loop");
 
 /**::
  * for-loop with ArrayList as iterator
- * { "expectOutput": "12\n13\n14\n" } 
+ * { "expectedOutput": "12\n13\n14\n" } 
  */
 
 var list = new ArrayList<Integer>();
@@ -152,7 +152,7 @@ for (Iterator<Integer> i = list.iterator(); i.hasNext(); ) {
 
 /**::
  * Enhanced for loop
- * { "expectOutput": "1\n2\n3\n4\n12\n13\n14\n" }
+ * { "expectedOutput": "1\n2\n3\n4\n12\n13\n14\n" }
  */
 
 int[] array = {1, 2, 3, 4};
@@ -173,7 +173,7 @@ for(var n: list){
 
 /**::
  * Enhanced for loop with java-Iterable using inner class
- * { "expectOutput": "200\n201\n202\n203\n204\n" }
+ * { "expectedOutput": "200\n201\n202\n203\n204\n" }
  */
 class A implements Iterable<String> {
    Iterator<String> iterator(){
@@ -196,7 +196,7 @@ for(var n: new A()){
 
 /**::
  * forEach with inner class as Consumer
- * {"expectOutput": "first\nsecond\nthird\nDone!\n"}
+ * {"expectedOutput": "first\nsecond\nthird\nDone!\n"}
  */
 var list = new ArrayList<String>();
 
@@ -217,7 +217,7 @@ println("Done!");
 
 /**::
  * forEach with lambda function as Consumer
- * {"expectOutput": "first\nsecond\nthird\nDone!\n" }
+ * {"expectedOutput": "first\nsecond\nthird\nDone!\n" }
  */
 var list = new ArrayList<String>();
 
@@ -228,12 +228,12 @@ list.add("third");
 
 list.forEach(e -> { println(e); });
 
-println("Fertig!");
+println("Done!");
 
 
 /**::
  * Enhanced for loop with java-Iterable using inner class
- * { "expectOutput": "First\nSecond\n" }
+ * { "expectedOutput": "First\nSecond\n" }
  */
 class A implements Iterable<String> {
    Iterator<String> iterator(){

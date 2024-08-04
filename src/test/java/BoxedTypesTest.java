@@ -1,6 +1,5 @@
 /**::
  * Boxed types
- * // { "expectOutput": "abcdf" }
  */
 
 
