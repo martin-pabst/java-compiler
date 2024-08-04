@@ -63,13 +63,13 @@
 ### fine-grained next todos on current issue:
 
 ## next 
-  * WebSocket client
   * Robot
   * if method overrides or implements other method and has no comment, then take the overriden method's comment
   * detect cyclic calling of constructors
 
 ## after integrating new compiler into online-ide
   * Database classes
+  * WebSocket client
 
 
 
