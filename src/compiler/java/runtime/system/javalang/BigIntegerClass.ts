@@ -27,6 +27,10 @@ export class BigIntegerClass extends ObjectClass {
         this.value = value!;
     }
 
+    __internalHashCode(): any {
+        return this.value;
+    }
+
     _cj$_constructor_$BigInteger$long(t: Thread, callback: CallbackFunction, value: number){
         this.value = BigInt(value);
         t.s.push(this);
