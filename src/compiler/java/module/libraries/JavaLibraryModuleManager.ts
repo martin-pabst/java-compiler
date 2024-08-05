@@ -9,10 +9,11 @@ export class JavaLibraryModuleManager {
     libraryModules: JavaLibraryModule[] = [];
     javaTypes: JavaType[] = [];
     typestore: JavaTypeStore;
+    systemModule: SystemModule;
 
     constructor(...additionalModules: JavaLibraryModule[]){
-        let systemModule = new SystemModule();
-        this.libraryModules.push(systemModule)
+        this.systemModule = new SystemModule();
+        this.libraryModules.push(this.systemModule)
         if(additionalModules){
             this.libraryModules.push(...additionalModules);
         }
@@ -20,17 +21,17 @@ export class JavaLibraryModuleManager {
         this.typestore = new JavaTypeStore();
         this.compileClassesToTypes();
 
-        let ldp: LibraryDeclarationParser = new LibraryDeclarationParser();
-        ldp.parseClassOrEnumOrInterfaceDeclarationWithoutGenerics(systemModule.primitiveStringClass, systemModule);
-        ldp.parseAttributesAndMethods(systemModule.primitiveStringClass, this.typestore, systemModule);
-        ldp.parseClassOrInterfaceDeclarationGenericsAndExtendsImplements(systemModule.primitiveStringClass, this.typestore, systemModule);
+        let ldp: LibraryDeclarationParser = new LibraryDeclarationParser(this.systemModule);
+        ldp.parseClassOrEnumOrInterfaceDeclarationWithoutGenerics(this.systemModule.primitiveStringClass, this.systemModule);
+        ldp.parseAttributesAndMethods(this.systemModule.primitiveStringClass, this.typestore, this.systemModule);
+        ldp.parseClassOrInterfaceDeclarationGenericsAndExtendsImplements(this.systemModule.primitiveStringClass, this.typestore, this.systemModule);
 
         this.typestore.initFastExtendsImplementsLookup();
 
     }
 
     compileClassesToTypes(){
-        let ldp: LibraryDeclarationParser = new LibraryDeclarationParser();
+        let ldp: LibraryDeclarationParser = new LibraryDeclarationParser(this.systemModule);
         this.typestore.empty;
         this.javaTypes = [];
 

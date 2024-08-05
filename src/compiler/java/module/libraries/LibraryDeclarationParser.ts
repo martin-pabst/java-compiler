@@ -19,6 +19,7 @@ import { JavaTypeStore } from "../JavaTypeStore";
 import { LibraryAttributeDeclaration, LibraryMethodDeclaration, LibraryMethodOrAttributeDeclaration } from "./DeclareType";
 import { LibraryKlassType, JavaTypeMap, JavaLibraryModule } from "./JavaLibraryModule";
 import { LdToken, LibraryDeclarationLexer } from "./LibraryDeclarationLexer";
+import { SystemModule } from "../../runtime/system/SystemModule.ts";
 
 type ModifiersAndType = {
     visibility: Visibility,
@@ -48,7 +49,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     startBracketList: TokenType[] = [TokenType.leftBracket, TokenType.leftCurlyBracket, TokenType.leftSquareBracket, TokenType.lower];
     endBracketList: TokenType[] = [TokenType.rightBracket, TokenType.rightCurlyBracket, TokenType.rightSquareBracket, TokenType.greater];
 
-    constructor() {
+    constructor(public systemModule: SystemModule) {
         super();
     }
 
@@ -106,7 +107,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
                 npt2.pathAndIdentifier = pathAndIdentifier;
                 npt2.baseEnumClass = <any>this.findType("Enum");
                 this.initEnumValues(npt2, klass, module);
-                npt2.addValuesMethod(klass, this.currentTypeStore.getType("string") as PrimitiveType);
+                npt2.addValuesMethod(klass, this.systemModule.types.find(type => type.identifier == "string") as PrimitiveType);
                 break;
         }
 
