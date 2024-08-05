@@ -43,7 +43,7 @@ export class Parser extends StatementParser {
     initializeAST() {
         let globalRange = {
             startLineNumber: 0, startColumn: 0,
-            endLineNumber: this.endToken.range.endLineNumber, endColumn: this.endToken.range.endColumn
+            endLineNumber: this.endToken.range.endLineNumber + 1, endColumn: this.endToken.range.endColumn + 1
         };
 
         this.javaCompiledModule.ast = {
