@@ -1,5 +1,40 @@
 export var testProgramsList = [
    ['', ``],
+   ['Collisiontest 1', `Ship ship = new Ship();
+for (int column = 0; column < 20; column++) {
+   for (int row = 0; row < 20; row++) {
+      new Dot(ship, column, row);
+   }
+}
+
+
+class Dot extends Circle {
+   Sprite ship;
+   Dot(Sprite ship, int column, int row) {
+      super(20*column, 20*row, 10);
+      this.ship = ship;
+   }
+
+   public void act() {
+      if(collidesWith(ship)) {
+         setFillColor(Color.white);
+      } else {
+         setFillColor(Color.red);
+      }
+   }
+
+}
+
+class Ship extends Sprite {
+   Ship() {
+      super(400, 300, SpriteLibrary.Ship_1);
+      scale(3);
+   }
+
+   public void act() {
+      rotate(2);
+   }
+}`],
    ['AssertionsTest', `
 class Tests {
    @Test

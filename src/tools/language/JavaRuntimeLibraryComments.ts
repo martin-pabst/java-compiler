@@ -479,6 +479,11 @@ export class JRC {
         "en": "setStatic(true) makes the object not follow subsequent transformations of world object.",
     })
 
+    static shapeCollidesWithComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn die Figur mit der anderen Figur überlappt.",
+    "en": "Returns true if graphic objects collide.",
+    })
+
     /**
      * Class FilledShape
      */

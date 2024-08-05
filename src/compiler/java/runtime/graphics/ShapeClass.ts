@@ -46,6 +46,8 @@ export class ShapeClass extends ActorClass {
         { type: "method", signature: "final boolean isVisible()", template: '§1.container.visible', comment: JRC.shapeSetVisibleComment },
         { type: "method", signature: "final void setStatic(boolean isStatic)", native: ShapeClass.prototype._setStatic, comment: JRC.shapeSetStaticComment },
 
+        { type: "method", signature: "final boolean collidesWith(Shape otherShape)", native: ShapeClass.prototype._collidesWith, comment: JRC.shapeCollidesWithComment },
+        
         { type: "method", signature: "void onMouseUp(double x, double y, int button)", java: ShapeClass.prototype._mj$onMouseUp$void$double$double$int, comment: JRC.shapeOnMouseUpComment },
         { type: "method", signature: "void onMouseDown(double x, double y, int button)", java: ShapeClass.prototype._mj$onMouseDown$void$double$double$int, comment: JRC.shapeOnMouseDownComment },
         { type: "method", signature: "void onMouseEnter(double x, double y)", java: ShapeClass.prototype._mj$onMouseEnter$void$double$double, comment: JRC.shapeOnMouseEnterComment },
@@ -453,7 +455,7 @@ export class ShapeClass extends ActorClass {
     _mj$onMouseLeave$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number, button: number) { }
     _mj$onMouseMove$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number, button: number) { }
 
-    collidesWith(otherShape: ShapeClass): boolean {
+    _collidesWith(otherShape: ShapeClass): boolean {
 
         // if(!(this instanceof TurtleHelper) && (shapeHelper instanceof TurtleHelper)){
         // if (this["lineElements"] == null && (otherShape["lineElements"] != null)) {
@@ -462,7 +464,7 @@ export class ShapeClass extends ActorClass {
 
         //@ts-ignore  check if other shape is group:
         if (otherShape["shapes"]) {
-            return otherShape.collidesWith(this);
+            return otherShape._collidesWith(this);
         }
 
         if (this.isDestroyed == null || otherShape.isDestroyed == null) return false;

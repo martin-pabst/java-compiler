@@ -211,7 +211,7 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
 
     _beruehrt() {
         for (let shape of this.group.world.shapesWhichBelongToNoGroup) {
-            if (shape != this.group && shape.collidesWith(this.group)) {
+            if (shape != this.group && shape._collidesWith(this.group)) {
                 return true;
             }
         }
@@ -226,7 +226,7 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
                 if (shape instanceof GroupClass) {   // andere zusammengesetzte Figur!
                     for (let part of shape.shapes) {
                         if (part instanceof FilledShapeClass && farbe == part.fillColor) {
-                            if (this.group.collidesWith(part)) {
+                            if (this.group._collidesWith(part)) {
                                 return true;
                             }
                         }
@@ -234,7 +234,7 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
                 } else {
 
                     if (shape instanceof FilledShapeClass && farbe == shape.fillColor) {
-                        if (this.group.collidesWith(shape)) return true;
+                        if (this.group._collidesWith(shape)) return true;
                     }
                 }
 
@@ -244,11 +244,11 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
 
     _beruehrtObjekt(objekt: ObjectClass){
         if(objekt instanceof GNGFigur){
-            return this.group.collidesWith(objekt.group);
+            return this.group._collidesWith(objekt.group);
         }
 
         if(objekt instanceof GNGBaseFigur){
-            return this.group.collidesWith(objekt.filledShape);
+            return this.group._collidesWith(objekt.filledShape);
         }
 
         return false;

@@ -129,7 +129,7 @@ export class CircleClass extends FilledShapeClass {
 
     }
 
-    collidesWith(otherShape: ShapeClass) {
+    _collidesWith(otherShape: ShapeClass) {
         if (otherShape instanceof CircleClass) {
 
             let p1 = new PIXI.Point(this.centerXInitial, this.centerYInitial);
@@ -149,7 +149,7 @@ export class CircleClass extends FilledShapeClass {
 
 
         } else {
-            return super.collidesWith(otherShape);
+            return super._collidesWith(otherShape);
         }
     }
 

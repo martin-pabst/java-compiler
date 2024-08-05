@@ -299,7 +299,7 @@ export class TurtleClass extends FilledShapeClass {
 
         //@ts-ignore
         if (shape["shapes"]) {
-            return shape.collidesWith(this);
+            return shape._collidesWith(this);
         }
 
         if (this.hitPolygonInitial == null || shape.hitPolygonInitial == null) return true;
