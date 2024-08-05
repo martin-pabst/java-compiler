@@ -47,7 +47,8 @@ export class ShapeClass extends ActorClass {
         { type: "method", signature: "final void setStatic(boolean isStatic)", native: ShapeClass.prototype._setStatic, comment: JRC.shapeSetStaticComment },
 
         { type: "method", signature: "final boolean collidesWith(Shape otherShape)", native: ShapeClass.prototype._collidesWith, comment: JRC.shapeCollidesWithComment },
-        
+        { type: "method", signature: "final boolean collidesWithAnyShape()", native: ShapeClass.prototype._collidesWithAnyShape, comment: JRC.shapeCollidesWithComment },
+
         { type: "method", signature: "void onMouseUp(double x, double y, int button)", java: ShapeClass.prototype._mj$onMouseUp$void$double$double$int, comment: JRC.shapeOnMouseUpComment },
         { type: "method", signature: "void onMouseDown(double x, double y, int button)", java: ShapeClass.prototype._mj$onMouseDown$void$double$double$int, comment: JRC.shapeOnMouseDownComment },
         { type: "method", signature: "void onMouseEnter(double x, double y)", java: ShapeClass.prototype._mj$onMouseEnter$void$double$double, comment: JRC.shapeOnMouseEnterComment },
@@ -208,7 +209,7 @@ export class ShapeClass extends ActorClass {
         this.container.localTransform.translate(cX, cY);
 
         this.container.setFromMatrix(this.container.localTransform);
-        
+
         this.container.updateLocalTransform();
         //@ts-ignore
         this.container._didLocalTransformChangeId = this.container._didChangeId;
@@ -371,7 +372,7 @@ export class ShapeClass extends ActorClass {
         if (this.isDestroyed) return;
         if (this.belongsToGroup) {
             let index = this.belongsToGroup.shapes.indexOf(this);
-            if(index >= 0){
+            if (index >= 0) {
                 this.belongsToGroup.shapes.splice(index, 1);
             }
             this.belongsToGroup.container.removeChildAt(this.belongsToGroup.container.getChildIndex(this.container))
@@ -386,7 +387,7 @@ export class ShapeClass extends ActorClass {
     }
 
     transformHitPolygon() {
-        if(!this.hitPolygonDirty) return;
+        if (!this.hitPolygonDirty) return;
 
         this.hitPolygonTransformed = [];
         let m = this.getWorldTransform();
@@ -492,9 +493,58 @@ export class ShapeClass extends ActorClass {
 
     }
 
+
+    _collidesWithAnyShape(): boolean {
+
+        if (this.isDestroyed) return false;
+
+        let bb = this.container.getBounds();
+        // boundig boxes collide, so check further:
+        if (this.hitPolygonDirty) this.transformHitPolygon();
+
+        let collisionDetected: boolean = false;
+        for (let otherShape of this.world.shapesWhichBelongToNoGroup) {
+
+            if (otherShape.isDestroyed) continue;
+
+            //@ts-ignore  check if other shape is group:
+            if (otherShape["shapes"]) {
+                if (otherShape._collidesWith(this)) {
+                    collisionDetected = true;
+                    break;
+                }
+            } else {
+                let bb1 = otherShape.container.getBounds();
+
+                if (bb.left > bb1.right || bb1.left > bb.right) continue;
+
+                if (bb.top > bb1.bottom || bb1.top > bb.bottom) continue;
+
+                if (this.hitPolygonInitial == null || otherShape.hitPolygonInitial == null) {
+                    collisionDetected = true;
+                    break;
+                }
+
+                if (otherShape.hitPolygonDirty) otherShape.transformHitPolygon();
+
+                if (polygonBerührtPolygonExakt(this.hitPolygonTransformed, otherShape.hitPolygonTransformed, true, true)) {
+                    collisionDetected = true;
+                    break;
+                }
+            }
+
+        }
+
+        return collisionDetected;
+
+    }
+
+
+
+
     worldTransformDirty: boolean = true;
 
-    setWorldTransformAndHitPolygonDirty(){
+    setWorldTransformAndHitPolygonDirty() {
         this.worldTransformDirty = true;
         this.hitPolygonDirty = true;
     }
@@ -526,7 +576,7 @@ export class ShapeClass extends ActorClass {
         return false;
     }
 
-    _setAngle(angle: number){
+    _setAngle(angle: number) {
         this._rotate(angle - this.angle);
     }
 

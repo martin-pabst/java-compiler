@@ -484,6 +484,11 @@ export class JRC {
     "en": "Returns true if graphic objects collide.",
     })
 
+    static shapeCollidesWithAnyShapeComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn die Figur mit irgendeiner anderen Figur überlappt.",
+    "en": "Returns true if graphic object collides with any other graphic object.",
+    })
+
     /**
      * Class FilledShape
      */
