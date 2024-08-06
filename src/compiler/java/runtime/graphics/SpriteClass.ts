@@ -26,6 +26,7 @@ export class SpriteClass extends ShapeClass {
         { type: "method", signature: "void setImage(SpriteLibrary spriteLibrary, int imageIndex)", template: `§1.setTexture(§2.name, §3)`, comment: JRC.spriteSetImageComment },
         { type: "method", signature: "void setImageIndex(int imageIndex)", template: `§1.setTexture(§1.textureName, §2)`, comment: JRC.spriteSetImageIndexComment },
         { type: "method", signature: "void playAnimation(int[] imageIndexArray, RepeatType repeatType, int imagesPerSecond)", native: SpriteClass.prototype._playAnimation, comment: JRC.spritePlayAnimationComment },
+        { type: "method", signature: "void playAnimation(int fromIndex, int toIndex, RepeatType repeatType, int imagesPerSecond)", native: SpriteClass.prototype._playAnimation1, comment: JRC.spritePlayAnimationComment },
         { type: "method", signature: "void stopAnimation()", native: SpriteClass.prototype._stopAnimation, comment: JRC.spriteStopAnimationComment },
         { type: "method", signature: "void pauseAnimation()", native: SpriteClass.prototype._pauseAnimation, comment: JRC.spritePauseAnimationComment },
         { type: "method", signature: "void resumeAnimation()", native: SpriteClass.prototype._resumeAnimation, comment: JRC.spriteResumeAnimationComment },
@@ -361,6 +362,15 @@ export class SpriteClass extends ShapeClass {
 
     };
 
+    _playAnimation1(fromIndex: number, toIndex: number, repeatType: RepeatTypeEnum, imagesPerSecond: number) {
+        let animationArray: number[] = [];
+        for(let i = fromIndex; i <= toIndex; i++){
+            animationArray.push(i);
+        }
+        this._playAnimation(animationArray, repeatType, imagesPerSecond);
+    }
+
+
     _playAnimation(indexArray: number[], repeatType: RepeatTypeEnum, imagesPerSecond: number) {
         this._stopAnimation(false);
         this.animationIndices = indexArray;
@@ -379,6 +389,11 @@ export class SpriteClass extends ShapeClass {
         }
         this.animationRuns = false;
         if (setInvisible) this._setVisible(false);
+    }
+
+    public destroy(): void {
+        this._stopAnimation(false);
+        super.destroy();
     }
 
     _pauseAnimation() {
