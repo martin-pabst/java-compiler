@@ -81,7 +81,7 @@ export abstract class StatementParser extends TermParser {
             case "methoddeclaration":
                 let modifiers = this.nodeFactory.buildNodeWithModifiers(this.cct.range);
                 modifiers.isStatic = true;
-                this.parseFieldOrMethodDeclaration(this.module.mainClass!, modifiers);
+                this.parseFieldOrMethodDeclaration(this.module.mainClass!, modifiers, undefined);
                 return undefined;
         }
 

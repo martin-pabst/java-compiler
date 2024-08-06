@@ -10,6 +10,10 @@ export class NullType extends JavaType {
     constructor(module: JavaBaseModule){
         super("null", EmptyRange.instance, module);
     }
+
+    getAbsoluteName(): string {
+        return "null";
+    }
     
     getCompletionItemDetail(): string {
         return JCM.nullType();

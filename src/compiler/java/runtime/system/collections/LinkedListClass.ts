@@ -2,7 +2,7 @@ import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts
 import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { NullPointerExceptionClass } from "../javalang/NullPointerExceptionClass.ts";
-import { ObjectClass, StringClass } from "../javalang/ObjectClassStringClass.ts";
+import { ObjectClass, ObjectClassOrNull, StringClass } from "../javalang/ObjectClassStringClass.ts";
 import { CollectionInterface } from "./CollectionInterface.ts";
 import { SystemCollection } from "./SystemCollection.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
@@ -60,7 +60,7 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
 
     static type: NonPrimitiveType;
 
-    protected elements: ObjectClass[] = [];
+    protected elements: ObjectClassOrNull[] = [];
 
     _constructor() {
         return this;
@@ -97,7 +97,7 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
 
 
     // from Deque:
-    _mj$removeFirstOccurrence$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClass) {
+    _mj$removeFirstOccurrence$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) {
         let firstIndex: number = -1;
         if (element == null || element._mj$equals$boolean$Object == ObjectClass.prototype._mj$equals$boolean$Object) {
             firstIndex = this.elements.indexOf(element);
@@ -133,7 +133,7 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
         }
     }
 
-    _mj$removeLastOccurrence$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClass) {
+    _mj$removeLastOccurrence$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) {
         let lastIndex: number = -1;
         if (element == null || element._mj$equals$boolean$Object == ObjectClass.prototype._mj$equals$boolean$Object) {
             lastIndex = this.elements.lastIndexOf(element);
@@ -169,13 +169,13 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
         }
     }
 
-    _mj$addFirst$void$E(t: Thread, callback: CallbackFunction, element: ObjectClass) {
+    _mj$addFirst$void$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) {
         this.elements.unshift(element);
         if (callback) callback();
         return;
     }
 
-    _mj$addLast$void$E(t: Thread, callback: CallbackFunction, element: ObjectClass) {
+    _mj$addLast$void$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) {
         this.elements.push(element);
         if (callback) callback();
         return;
@@ -223,7 +223,7 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
         return;
     }
 
-    _mj$push$void$E(t: Thread, callback: CallbackFunction, element: ObjectClass) {
+    _mj$push$void$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) {
         this.elements.push(element);
         if (callback) callback();
         return;
@@ -313,11 +313,11 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
         return iterator;
     }
 
-    getAllElements(): ObjectClass[] {
+    getAllElements(): ObjectClassOrNull[] {
         return this.elements;
     }
 
-    _add(element: ObjectClass) {
+    _add(element: ObjectClassOrNull) {
         this.elements.push(element);
     }
 
@@ -351,7 +351,7 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
         this.elements.length = 0;
     }
 
-    _mj$contains$boolean$Object(t: Thread, callback: CallbackFunction, element: ObjectClass) {
+    _mj$contains$boolean$Object(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) {
         this._mj$indexOf$int$E(t, () => {
             let index = t.s.pop();
             t.s.push(index >= 0);
@@ -402,7 +402,7 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
         return this.elements.length == 0;
     }
 
-    _mj$remove$boolean$E(t: Thread, callback: CallbackFunction, o: ObjectClass) {
+    _mj$remove$boolean$E(t: Thread, callback: CallbackFunction, o: ObjectClassOrNull) {
 
         this._mj$indexOf$int$E(t, () => {
             let index = t.s.pop();
@@ -417,7 +417,7 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
         }, o)
     }
 
-    _mj$indexOf$int$E(t: Thread, callback: CallbackFunction, element: ObjectClass) {
+    _mj$indexOf$int$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) {
         let firstIndex: number = -1;
         if (element == null || element._mj$equals$boolean$Object == ObjectClass.prototype._mj$equals$boolean$Object) {
             firstIndex = this.elements.indexOf(element);

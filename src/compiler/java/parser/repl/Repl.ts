@@ -124,7 +124,7 @@ export class Repl {
                 resolve(returnValue);
             }
 
-            let thread = this.prepareThread(programAndModule, callback, withMaxSpeed);
+            let thread = this.prepareThread(programAndModule!, callback, withMaxSpeed);
             if (!thread) {
                 resolve(undefined);
                 return;

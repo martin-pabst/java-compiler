@@ -5,7 +5,7 @@ import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { ConsumerInterface } from "../functional/ConsumerInterface.ts";
 import { NullPointerExceptionClass } from "../javalang/NullPointerExceptionClass.ts";
-import { ObjectClass, StringClass } from "../javalang/ObjectClassStringClass.ts";
+import { ObjectClass, ObjectClassOrNull, StringClass } from "../javalang/ObjectClassStringClass.ts";
 import { CollectionInterface } from "./CollectionInterface.ts";
 import { IteratorInterface } from "./IteratorInterface.ts";
 import { SystemCollection } from "./SystemCollection.ts";
@@ -75,7 +75,7 @@ export class HashSetClass extends ObjectClass {
         }
 
 
-        let f = (t: Thread, callback: CallbackFunction, elementsToCheck: ObjectClass[]) => {
+        let f = (t: Thread, callback: CallbackFunction, elementsToCheck: ObjectClassOrNull[]) => {
 
             if (elementsToCheck.length > 0) {
                 this._mj$contains$boolean$E(t, () => {
@@ -107,7 +107,7 @@ export class HashSetClass extends ObjectClass {
 
     }
 
-    _add(element: ObjectClass): boolean {
+    _add(element: ObjectClassOrNull): boolean {
         if (element == null) {
             let oldValue = this.map.get(null);
             this.map.set(null, element);
@@ -143,7 +143,7 @@ export class HashSetClass extends ObjectClass {
 
     };
 
-    _mj$remove$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClass) {
+    _mj$remove$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) {
         if (element == null) {
             let oldValue = this.map.get(null);
             t.s.push(typeof oldValue == "undefined");

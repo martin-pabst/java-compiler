@@ -3,7 +3,7 @@ import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts
 import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
-import { ObjectClass } from "../javalang/ObjectClassStringClass.ts";
+import { ObjectClass, ObjectClassOrNull } from "../javalang/ObjectClassStringClass.ts";
 import { CollectionInterface } from "./CollectionInterface.ts";
 import { ComparatorInterface } from "./ComparatorInterface.ts";
 
@@ -18,7 +18,7 @@ export class SetInterface extends CollectionInterface {
 
     static type: NonPrimitiveType;
 
-    _mj$Contains$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClass) { }
+    _mj$Contains$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) { }
     _mj$ContainsAll$boolean$Collection(t: Thread, callback: CallbackFunction, collection: CollectionInterface) { }
 
 }

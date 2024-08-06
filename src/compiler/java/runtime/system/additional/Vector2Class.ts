@@ -32,7 +32,7 @@ export class Vector2Class extends ObjectClass {
         { type: "method", signature: "final double distanceTo(Vector2 otherVector)", native: Vector2Class.prototype._distanceTo, comment: JRC.Vector2DistanceToComment },
         { type: "method", signature: "final static double distance(double x1, double y1, double x2, double y2)", native: Vector2Class._distance, comment: JRC.Vector2DistanceComment },
 
-        { type: "method", signature: "public boolean equals(Vector2 otherVector)", native: Vector2Class.prototype._mj$equals$boolean$Object , comment: JRC.objectEqualsComment},
+        { type: "method", signature: "public boolean equals(Vector2 otherVector)", native: Vector2Class.prototype._equals , comment: JRC.objectEqualsComment},
         { type: "method", signature: "String toString()", java: Vector2Class.prototype._mj$toString$String$, comment: JRC.Vector2ToStringComment },
     ];
 
@@ -53,7 +53,7 @@ export class Vector2Class extends ObjectClass {
         return this;
     }
 
-    _mj$equals$boolean$Object(other: Vector2Class): boolean {
+    _equals(other: Vector2Class): boolean {
         return Math.abs(this.x - other.x) + Math.abs(this.y - other.y) < 1e-14;
     }
 

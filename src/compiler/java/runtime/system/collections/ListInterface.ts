@@ -3,7 +3,7 @@ import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts
 import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
-import { ObjectClass } from "../javalang/ObjectClassStringClass.ts";
+import { ObjectClass, ObjectClassOrNull } from "../javalang/ObjectClassStringClass.ts";
 import { CollectionInterface } from "./CollectionInterface.ts";
 import { ComparatorInterface } from "./ComparatorInterface.ts";
 
@@ -29,11 +29,11 @@ export class ListInterface extends CollectionInterface {
 
     _mj$get$E$int(t: Thread, callback: CallbackFunction, index: number) { }
 
-    _mj$indexOf$int$E(t: Thread, callback: CallbackFunction, element: ObjectClass) { }
+    _mj$indexOf$int$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) { }
 
     _mj$remove$E$int(t: Thread, callback: CallbackFunction, index: number) { }
 
-    _mj$set$E$int$E(t: Thread, callback: CallbackFunction, index: number, element: ObjectClass) { }
+    _mj$set$E$int$E(t: Thread, callback: CallbackFunction, index: number, element: ObjectClassOrNull) { }
 
     _mj$sort$void$Comparator(t: Thread, callback: CallbackFunction, comparator: ComparatorInterface) {
 

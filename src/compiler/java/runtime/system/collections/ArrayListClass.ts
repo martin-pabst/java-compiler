@@ -2,7 +2,7 @@ import { CallbackFunction, Klass } from "../../../../common/interpreter/StepFunc
 import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { NullPointerExceptionClass } from "../javalang/NullPointerExceptionClass.ts";
-import { ObjectClass, StringClass } from "../javalang/ObjectClassStringClass.ts";
+import { ObjectClass, ObjectClassOrNull, StringClass } from "../javalang/ObjectClassStringClass.ts";
 import { CollectionInterface } from "./CollectionInterface.ts";
 import { SystemCollection } from "./SystemCollection.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
@@ -52,9 +52,9 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
 
     static type: NonPrimitiveType;
 
-    protected elements: ObjectClass[] = [];
+    protected elements: ObjectClassOrNull[] = [];
 
-    constructor(elements?: ObjectClass[]){
+    constructor(elements?: ObjectClassOrNull[]){
         super();
         this.elements = elements || [];
     }
@@ -121,15 +121,15 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
         return iterator;
     }
 
-    getAllElements(): ObjectClass[] {
+    getAllElements(): ObjectClassOrNull[] {
         return this.elements;
     }
 
-    _add(element: ObjectClass) {
+    _add(element: ObjectClassOrNull) {
         this.elements.push(element);
     }
 
-    _addWithIndex(element: ObjectClass, index: number) {
+    _addWithIndex(element: ObjectClassOrNull, index: number) {
         if (index < 0 || index > this.elements.length) {
             throw new IndexOutOfBoundsExceptionClass(JRC.indexOutOfBoundsException(index, this.elements.length - 1));
         }
@@ -146,7 +146,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
         return this.elements.splice(index, 1);
     }
 
-    _setWithIndex(index: number, element: ObjectClass) {
+    _setWithIndex(index: number, element: ObjectClassOrNull) {
         if (index < 0 || index >= this.elements.length) {
             throw new IndexOutOfBoundsExceptionClass(JRC.indexOutOfBoundsException(index, this.elements.length - 1));
         }
@@ -222,7 +222,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
         this.elements.length = 0;
     }
 
-    _mj$contains$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClass) {
+    _mj$contains$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) {
         this._mj$indexOf$int$E(t, () => {
             let index = t.s.pop();
             t.s.push(index >= 0);
@@ -281,7 +281,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
         return this.elements.slice();
     }
 
-    _mj$remove$boolean$E(t: Thread, callback: CallbackFunction, o: ObjectClass) {
+    _mj$remove$boolean$E(t: Thread, callback: CallbackFunction, o: ObjectClassOrNull) {
 
         this._mj$indexOf$int$E(t, () => {
             let index = t.s.pop();
@@ -330,7 +330,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
 
     }
 
-    _mj$indexOf$int$E(t: Thread, callback: CallbackFunction, element: ObjectClass) { 
+    _mj$indexOf$int$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) { 
         let firstIndex: number = -1;
         if (element == null || element._mj$equals$boolean$Object == ObjectClass.prototype._mj$equals$boolean$Object) {
             firstIndex = this.elements.indexOf(element);

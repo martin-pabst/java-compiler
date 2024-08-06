@@ -4,6 +4,7 @@ import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { InterfaceClass } from "../javalang/InterfaceClass.ts";
+import { ObjectClassOrNull } from "../javalang/ObjectClassStringClass.ts";
 import { IterableInterface } from "./IterableInterface.ts";
 
 export class CollectionInterface extends IterableInterface {
@@ -26,25 +27,25 @@ export class CollectionInterface extends IterableInterface {
 
     static type: NonPrimitiveType;
 
-    _mj$add$boolean$E(t: Thread, callback: CallbackFunction) { };
+    _mj$add$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) { };
 
-    _mj$addAll$boolean$Collection(t: Thread, callback: CallbackFunction) { };
+    _mj$addAll$boolean$Collection(t: Thread, callback: CallbackFunction, collection: CollectionInterface) { };
 
     _mj$clear$void$(t: Thread, callback: CallbackFunction) { };
 
-    _mj$contains$boolean$E(t: Thread, callback: CallbackFunction) { };
+    _mj$contains$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) { };
 
-    _mj$containsAll$boolean$Collection(t: Thread, callback: CallbackFunction) { };
+    _mj$containsAll$boolean$Collection(t: Thread, callback: CallbackFunction, collection: CollectionInterface) { };
 
     _mj$isEmpty$boolean$(t: Thread, callback: CallbackFunction) { };
 
-    _mj$remove$boolean$E(t: Thread, callback: CallbackFunction) { };
+    _mj$remove$boolean$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) { };
 
-    _mj$removeAll$boolean$Collection(t: Thread, callback: CallbackFunction) { };
+    _mj$removeAll$boolean$Collection(t: Thread, callback: CallbackFunction, collection: CollectionInterface) { };
 
     _mj$size$int$(t: Thread, callback: CallbackFunction) { };
 
     _mj$toArray$Object_I$(t: Thread, callback: CallbackFunction) { };
 
-    _mj$toArray$T_I$T_I(t: Thread, callback: CallbackFunction) { };
+    _mj$toArray$T_I$T_I(t: Thread, callback: CallbackFunction, arrayTemplate: ObjectClassOrNull[]) { };
 }

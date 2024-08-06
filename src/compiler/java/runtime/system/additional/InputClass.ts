@@ -46,7 +46,7 @@ export class InputClass extends ObjectClass {
 
         let interpreter = t.scheduler.interpreter;
 
-        let list = this.taskMap.get(interpreter);
+        let list = this.taskMap.get(interpreter)!;
         if (!list) {
             list = [];
             this.taskMap.set(interpreter, list);

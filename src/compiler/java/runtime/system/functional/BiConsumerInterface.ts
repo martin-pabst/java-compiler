@@ -3,7 +3,7 @@ import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { InterfaceClass } from "../javalang/InterfaceClass.ts";
-import { ObjectClass } from "../javalang/ObjectClassStringClass.ts";
+import { ObjectClass, ObjectClassOrNull } from "../javalang/ObjectClassStringClass.ts";
 
 export class BiConsumerInterface extends InterfaceClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -13,6 +13,6 @@ export class BiConsumerInterface extends InterfaceClass {
 
     static type: NonPrimitiveType;
 
-    _mj$accept$void$T$U(t: Thread, callback: CallbackFunction, tElement: ObjectClass, uElement: ObjectClass){}
+    _mj$accept$void$T$U(t: Thread, callback: CallbackFunction, tElement: ObjectClassOrNull, uElement: ObjectClassOrNull){}
 
 }

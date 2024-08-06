@@ -1,7 +1,7 @@
 import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
-import { ObjectClass } from "../javalang/ObjectClassStringClass";
+import { ObjectClass, ObjectClassOrNull } from "../javalang/ObjectClassStringClass";
 import { ArrayListClass } from "./ArrayListClass";
 import { EmptyStackExceptionClass } from "./EmptyStackException";
 import { VectorClass } from "./VectorClass";
@@ -19,19 +19,19 @@ export class StackClass extends VectorClass {
 
     static type: NonPrimitiveType;
 
-    _push(element: ObjectClass): ObjectClass {
+    _push(element: ObjectClassOrNull): ObjectClassOrNull {
         this.elements.push(element);
         return element;
     }
 
-    _pop(): ObjectClass {
+    _pop(): ObjectClassOrNull {
         if(this.elements.length == 0){
             throw new EmptyStackExceptionClass();
         }
         return this.elements.pop()!;
     }
 
-    _peek(): ObjectClass {
+    _peek(): ObjectClassOrNull {
         if(this.elements.length == 0){
             throw new EmptyStackExceptionClass();
         }

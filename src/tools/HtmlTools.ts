@@ -9,6 +9,12 @@ export function makeEditable(elementWithText: JQuery<HTMLElement> | HTMLElement,
         elementWithText = jQuery(elementWithText);
     }
 
+    if(elementToReplace instanceof HTMLElement){
+        elementToReplace = jQuery(elementToReplace);
+    }
+
+    let etr: JQuery<HTMLElement> = <any>elementToReplace;
+
     if(elementToReplace && elementToReplace instanceof HTMLElement){
         elementToReplace = jQuery(elementToReplace);
     }
@@ -48,7 +54,7 @@ export function makeEditable(elementWithText: JQuery<HTMLElement> | HTMLElement,
             $input.off("keydown.me");
             $input.off("focusout.me");
             $input.remove();
-            elementToReplace!.show();
+            etr!.show();
             let newValue = escapeHtml(<string>$input.val());
             renameDoneCallback(newValue);
             return;
@@ -59,7 +65,7 @@ export function makeEditable(elementWithText: JQuery<HTMLElement> | HTMLElement,
         $input.off("keydown.me");
         $input.off("focusout.me");
         $input.remove();
-        elementToReplace!.show();
+        etr!.show();
         let newValue = escapeHtml(<string>$input.val());
         renameDoneCallback(newValue);
         return;

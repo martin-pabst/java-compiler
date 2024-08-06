@@ -4,7 +4,7 @@ import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { BiConsumerInterface } from "../functional/BiConsumerInterface.ts";
-import { ObjectClass } from "../javalang/ObjectClassStringClass.ts";
+import { ObjectClass, ObjectClassOrNull } from "../javalang/ObjectClassStringClass.ts";
 
 export class MapInterface extends ObjectClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -26,13 +26,13 @@ export class MapInterface extends ObjectClass {
 
     _mj$size$int$(t: Thread, callback: CallbackFunction) { }
     _mj$isEmpty$boolean$(t: Thread, callback: CallbackFunction) { }
-    _mj$containsKey$boolean$K(t: Thread, callback: CallbackFunction, key: ObjectClass) { }
-    _mj$containsValue$boolean$V(t: Thread, callback: CallbackFunction, value: ObjectClass) { }
-    _mj$get$V$K(t: Thread, callback: CallbackFunction, key: ObjectClass) { }
-    _mj$put$V$K$V(t: Thread, callback: CallbackFunction, key: ObjectClass, value: ObjectClass) { }
+    _mj$containsKey$boolean$K(t: Thread, callback: CallbackFunction, key: ObjectClassOrNull) { }
+    _mj$containsValue$boolean$V(t: Thread, callback: CallbackFunction, value: ObjectClassOrNull) { }
+    _mj$get$V$K(t: Thread, callback: CallbackFunction, key: ObjectClassOrNull) { }
+    _mj$put$V$K$V(t: Thread, callback: CallbackFunction, key: ObjectClassOrNull, value: ObjectClassOrNull) { }
     _mj$clear$void$(t: Thread, callback: CallbackFunction) { }
     _mj$forEach$void$BiConsumer(t: Thread, callback: CallbackFunction, biConsumer: BiConsumerInterface) { }
     _mj$values$Collection$(t: Thread, callback: CallbackFunction) {}
     _mj$keySet$Set$(t: Thread, callback: CallbackFunction) {}
-    
+
 }

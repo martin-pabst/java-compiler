@@ -6,7 +6,7 @@ import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { ConsumerInterface } from "../functional/ConsumerInterface.ts";
 import { FunctionInterface } from "../functional/FunctionInterface.ts";
 import { InterfaceClass } from "../javalang/InterfaceClass.ts";
-import { ObjectClass, StringClass } from "../javalang/ObjectClassStringClass.ts";
+import { ObjectClass, ObjectClassOrNull, StringClass } from "../javalang/ObjectClassStringClass.ts";
 
 export class OptionalClass extends ObjectClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -49,7 +49,7 @@ export class OptionalClass extends ObjectClass {
         t.s.push(this.element==undefined);
     }
 
-    _mj$equals$boolean$Object(t: Thread, callback: CallbackFunction, o: ObjectClass) {
+    _mj$equals$boolean$Object(t: Thread, callback: CallbackFunction, o: ObjectClassOrNull) {
         if (! (o instanceof ObjectClass)) {
             t.s.push(false);
             return;
@@ -64,7 +64,7 @@ export class OptionalClass extends ObjectClass {
                 t.s.push(false);
             }
             else {
-                t.s.push(this.element._mj$equals$boolean$Object(otherOptional.element));
+                t.s.push(this.element._mj$equals$boolean$Object(t, callback, otherOptional.element));
             }
         }  
     }
@@ -111,10 +111,14 @@ export class OptionalClass extends ObjectClass {
     _mj$toString$String$(t: Thread, callback: CallbackFunction) {
         let s = "Nothing";
         if(this.element) {
-            let content = this.element._nToString().value;
-            s = `Just ${content}`;
+            this.element._mj$toString$String$(t, () => {
+                t.s.push(new StringClass('Just ' + t.s.pop().value))
+                if(callback) callback();
+            });
+        } else {
+            t.s.push(new StringClass(s));
+            if(callback) callback();
         }
-        t.s.push(new StringClass(s));
     }
 
 }

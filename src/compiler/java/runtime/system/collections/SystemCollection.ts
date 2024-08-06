@@ -1,11 +1,11 @@
 import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts";
 import { Thread } from "../../../../common/interpreter/Thread.ts";
-import { ObjectClass } from "../javalang/ObjectClassStringClass.ts";
+import { ObjectClass, ObjectClassOrNull } from "../javalang/ObjectClassStringClass.ts";
 import { ComparatorInterface } from "./ComparatorInterface.ts";
 
 export abstract class SystemCollection extends ObjectClass {
 
-    abstract getAllElements(): ObjectClass[];
+    abstract getAllElements(): ObjectClassOrNull[];
 
     static shuffle(list: SystemCollection){
         let elements = list.getAllElements();
@@ -31,7 +31,7 @@ export abstract class SystemCollection extends ObjectClass {
         }
     }
 
-    static quicksort(t: Thread, callback: CallbackFunction, comparator: ComparatorInterface, fromIndex: number, toIndex: number, elements: ObjectClass[]) {
+    static quicksort(t: Thread, callback: CallbackFunction, comparator: ComparatorInterface, fromIndex: number, toIndex: number, elements: ObjectClassOrNull[]) {
         let that = this;
 
         if (toIndex - fromIndex <= 1) {
@@ -54,9 +54,9 @@ export abstract class SystemCollection extends ObjectClass {
 
     }
 
-    private static partition(t: Thread, callback: () => void, comparator: ComparatorInterface, begin: number, end: number, elements: ObjectClass[]) {
+    private static partition(t: Thread, callback: () => void, comparator: ComparatorInterface, begin: number, end: number, elements: ObjectClassOrNull[]) {
 
-        let pivot: ObjectClass = elements[end];
+        let pivot: ObjectClassOrNull = elements[end];
         let i: number = begin - 1;
 
         let j = begin;

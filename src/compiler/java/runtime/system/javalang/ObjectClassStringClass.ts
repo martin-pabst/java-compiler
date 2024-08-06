@@ -6,6 +6,8 @@ import { Thread, ThreadState } from "../../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
 
+export type ObjectClassOrNull = ObjectClass | null;
+
 export class ObjectClass {
 
     // declare _mj$toString$String$: (t: Thread, callback: CallbackFunction) => void;
@@ -134,7 +136,7 @@ export class ObjectClass {
         return;
     }
     
-    _mj$equals$boolean$Object(t: Thread, callback: CallbackFunction, otherObject: ObjectClass) {
+    _mj$equals$boolean$Object(t: Thread, callback: CallbackFunction, otherObject: ObjectClassOrNull) {
         t.s.push(this == otherObject);
         if(callback) callback();
         return;
