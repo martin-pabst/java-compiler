@@ -1,9 +1,62 @@
 export var testProgramsList = [
    ['', ``],
-   ['Collisiontest 1', `Ship ship = new Ship();
-for (int column = 0; column < 20; column++) {
-   for (int row = 0; row < 20; row++) {
-      new Dot(ship, column, row);
+   ['ConstructorTest', `new RotatingRectangle(300, 200, 200, 100);
+
+class RotatingRectangle extends Rectangle {
+   public void act() {
+      rotate(2);
+   }
+}`],
+   ['Collisiontest 2', `Group dots = new Group();
+
+for (int column = 0; column < 40; column++) {
+   for (int row = 0; row < 40; row++) {
+      dots.add(new Dot1(column, row));
+   }
+}
+
+var rr1 = new RotatingRectangle(100, 100, 200, 100);
+rr1.setFillColor(0x0000ff);
+
+var rr2 = new RotatingRectangle(300, 200, 200, 100);
+rr2.setFillColor(0x00ff00);
+
+Group g = new Group(rr1, rr2);
+
+
+
+class Dot1 extends Circle {
+   Sprite ship;
+   Dot1(int column, int row) {
+      super(10 * column + 100, 10 * row + 100, 5);
+      this.ship = ship;
+   }
+
+   public void act() {
+      if(collidesWithFillColor(0x0000ff)) {
+         setFillColor(Color.white);
+      } else {
+         setFillColor(Color.red);
+      }
+   }
+
+}
+
+
+class RotatingRectangle extends Rectangle {
+   public void act() {
+      rotate(-2);
+   }
+}
+`],
+   ['Collisiontest 1', `
+
+Group dots = new Group();
+Ship ship = new Ship(dots);
+
+for (int column = 0; column < 40; column++) {
+   for (int row = 0; row < 40; row++) {
+      dots.add(new Dot(ship, column, row));
    }
 }
 
@@ -11,7 +64,7 @@ for (int column = 0; column < 20; column++) {
 class Dot extends Circle {
    Sprite ship;
    Dot(Sprite ship, int column, int row) {
-      super(20*column, 20*row, 10);
+      super(10 * column + 100, 10 * row + 100, 5);
       this.ship = ship;
    }
 
@@ -26,13 +79,16 @@ class Dot extends Circle {
 }
 
 class Ship extends Sprite {
-   Ship() {
+   Group dots;
+   Ship(Group dots) {
       super(400, 300, SpriteLibrary.Ship_1);
+      this.dots = dots;
       scale(3);
    }
 
    public void act() {
       rotate(2);
+      dots.rotate(-2);
    }
 }`],
    ['AssertionsTest', `

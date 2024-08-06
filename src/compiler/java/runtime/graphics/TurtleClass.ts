@@ -44,6 +44,8 @@ export class TurtleClass extends FilledShapeClass {
 
         { type: "method", signature: "String toString()", java: TurtleClass.prototype._mj$toString$String$, comment: JRC.objectToStringComment },
 
+        { type: "method", signature: "final boolean collidesWith(Shape otherShape)", native: TurtleClass.prototype._collidesWith, comment: JRC.shapeCollidesWithComment },
+
     ]
 
     static type: NonPrimitiveType;
@@ -53,7 +55,7 @@ export class TurtleClass extends FilledShapeClass {
 
     isFilled: boolean = false;
 
-    turtle!: PIXI.Graphics;
+    turtle!: PIXI.Graphics;             // If you change this identifier then you have to change corresponding declaration in class ShapeClass
     lineGraphic!: PIXI.Graphics;
 
     xSum: number = 0;
@@ -276,8 +278,6 @@ export class TurtleClass extends FilledShapeClass {
         this.lastTurtleAngleDeg = this.turtleAngleDeg;
     }
 
-
-
     _collidesWith(shape: ShapeClass): boolean {
 
         if (shape instanceof TurtleClass && shape.initialHitPolygonDirty) {
@@ -290,15 +290,9 @@ export class TurtleClass extends FilledShapeClass {
             this.render();
         }
 
-        let bb = this.container.getBounds();
-        let bb1 = shape.container.getBounds();
+        if(!this.hasOverlappingBoundingBoxWith(shape)) return false;
 
-        if (bb.left > bb1.right || bb1.left > bb.right) return false;
-
-        if (bb.top > bb1.bottom || bb1.top > bb.bottom) return false;
-
-        //@ts-ignore
-        if (shape["shapes"]) {
+        if (shape.shapes) {
             return shape._collidesWith(this);
         }
 

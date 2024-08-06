@@ -6,29 +6,32 @@ import { ShapeClass } from './ShapeClass';
 import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { ExceptionClass } from '../system/javalang/ExceptionClass';
 import { RuntimeExceptionClass } from '../system/javalang/RuntimeException';
+import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
 
 export class GroupClass extends ShapeClass {
     static __javaDeclarations: LibraryDeclarations = [
-        { type: "declaration", signature: "class Group<T extends Shape> extends Shape" },
+        { type: "declaration", signature: "class Group<T extends Shape> extends Shape", comment: JRC.groupClassComment },
 
-        { type: "method", signature: "Group()", java: GroupClass.prototype._cj$_constructor_$Group$ },
-        { type: "method", signature: "Group(T... shapes)", java: GroupClass.prototype._cj$_constructor_$Group$T },
-        { type: "method", signature: "final void add(T shape)", native: GroupClass.prototype.add },
-        { type: "method", signature: "final void add(T... shapes)", native: GroupClass.prototype.addMultiple },
-        { type: "method", signature: "final void remove(T shape)", native: GroupClass.prototype.remove },
-        { type: "method", signature: "final void remove(int index)", native: GroupClass.prototype.removeWithIndex },
-        { type: "method", signature: "final T get(int index)", native: GroupClass.prototype.get },
-        { type: "method", signature: "final int indexOf(T shape)", native: GroupClass.prototype.indexOf },
-        { type: "method", signature: "final int size()", template: `&1.shapes.length` },
-        { type: "method", signature: "final void empty()", native: GroupClass.prototype.removeAllChildren },
-        { type: "method", signature: "final void destroyAllChildren()", native: GroupClass.prototype.destroyAllChildren },
+        { type: "method", signature: "Group()", java: GroupClass.prototype._cj$_constructor_$Group$, comment: JRC.groupConstructorComment },
+        { type: "method", signature: "Group(T... shapes)", java: GroupClass.prototype._cj$_constructor_$Group$T, comment: JRC.groupConstructorComment },
+        { type: "method", signature: "final void add(T shape)", native: GroupClass.prototype.add, comment: JRC.groupAddComment },
+        { type: "method", signature: "final void add(T... shapes)", native: GroupClass.prototype.addMultiple, comment: JRC.groupAddComment },
+        { type: "method", signature: "final void remove(T shape)", native: GroupClass.prototype.remove, comment: JRC.groupRemoveComment },
+        { type: "method", signature: "final void remove(int index)", native: GroupClass.prototype.removeWithIndex, comment: JRC.groupRemoveWithIndexComment },
+        { type: "method", signature: "final T get(int index)", native: GroupClass.prototype.get, comment: JRC.groupGetComment },
+        { type: "method", signature: "final int indexOf(T shape)", native: GroupClass.prototype.indexOf, comment: JRC.groupIndexOfComment },
+        { type: "method", signature: "final int size()", template: `&1.shapes.length`, comment: JRC.groupSizeComment },
+        { type: "method", signature: "final void empty()", native: GroupClass.prototype.removeAllChildren, comment: JRC.groupEmptyComment },
+        { type: "method", signature: "final void destroyAllChildren()", native: GroupClass.prototype.destroyAllChildren, comment: JRC.groupDestroyAllChildrenComment },
         // { type: "method", signature: "Rectangle(double left, double top, double width, double height)", java: GroupClass.prototype._cj$_constructor_$Rectangle$double$double$double$double },
+
+        { type: "method", signature: "final boolean collidesWith(Shape otherShape)", native: GroupClass.prototype._collidesWith, comment: JRC.shapeCollidesWithComment },
 
     ]
 
     static type: NonPrimitiveType;
 
-    shapes: ShapeClass[] = [];
+    shapes: ShapeClass[] = [];      // If you change this identifier then you have to change corresponding declaration in class ShapeClass
 
     _cj$_constructor_$Group$(t: Thread, callback: CallbackFunction) {
         this._cj$_constructor_$Shape$(t, () => {
@@ -50,6 +53,16 @@ export class GroupClass extends ShapeClass {
 
     render() {
 
+    }
+
+    _collidesWith(otherShape: ShapeClass): boolean {
+        if(!this.hasOverlappingBoundingBoxWith(otherShape)) return false;
+
+        for(let shape of this.shapes){
+            if(shape._collidesWith(otherShape)) return true;
+        }
+
+        return false;
     }
 
     indexOf(shape: ShapeClass): number {
@@ -215,6 +228,7 @@ export class GroupClass extends ShapeClass {
         this.worldTransformDirty = true;
         for (let shape of this.shapes) shape.setWorldTransformAndHitPolygonDirty();
     }
+
 
 
 }

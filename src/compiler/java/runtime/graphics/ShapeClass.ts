@@ -47,7 +47,10 @@ export class ShapeClass extends ActorClass {
         { type: "method", signature: "final void setStatic(boolean isStatic)", native: ShapeClass.prototype._setStatic, comment: JRC.shapeSetStaticComment },
 
         { type: "method", signature: "final boolean collidesWith(Shape otherShape)", native: ShapeClass.prototype._collidesWith, comment: JRC.shapeCollidesWithComment },
-        { type: "method", signature: "final boolean collidesWithAnyShape()", native: ShapeClass.prototype._collidesWithAnyShape, comment: JRC.shapeCollidesWithComment },
+        { type: "method", signature: "final boolean collidesWithAnyShape()", native: ShapeClass.prototype._collidesWithAnyShape, comment: JRC.shapeCollidesWithAnyShapeComment },
+        { type: "method", signature: "final boolean collidesWithFillColor(int color)", native: ShapeClass.prototype._collidesWithAnyShape, comment: JRC.shapeCollidesWithFillColorComment },
+        { type: "method", signature: "final boolean collidesWithFillColor(string color)", native: ShapeClass.prototype._collidesWithAnyShape, comment: JRC.shapeCollidesWithFillColorComment },
+        { type: "method", signature: "final Sprite getFirstCollidingSprite(int imageIndex)", native: ShapeClass.prototype._getFirstCollidingSprite, comment: JRC.shapeGetFirstCollidingSpriteComment },
 
         { type: "method", signature: "void onMouseUp(double x, double y, int button)", java: ShapeClass.prototype._mj$onMouseUp$void$double$double$int, comment: JRC.shapeOnMouseUpComment },
         { type: "method", signature: "void onMouseDown(double x, double y, int button)", java: ShapeClass.prototype._mj$onMouseDown$void$double$double$int, comment: JRC.shapeOnMouseDownComment },
@@ -64,7 +67,11 @@ export class ShapeClass extends ActorClass {
 
     belongsToGroup?: GroupClass;
 
-    // belongsToGroup: GroupHelper;
+    // fields of child classes:
+    declare fillColor: number | undefined;  // fillColor is a number if this shape is a FilledShapeClass.
+    declare shapes: ShapeClass[] | undefined;    // shapes is defined if this shape is a GroupClass
+    declare turtle: PIXI.Graphics | undefined;  // turtle is defined if this shape is a TurtleClass
+    declare imageIndex: number | undefined; // index is defined if this shape is a SpriteClass
 
     centerXInitial: number = 0;
     centerYInitial: number = 0;
@@ -458,13 +465,13 @@ export class ShapeClass extends ActorClass {
 
     _collidesWith(otherShape: ShapeClass): boolean {
 
-        // if(!(this instanceof TurtleHelper) && (shapeHelper instanceof TurtleHelper)){
-        // if (this["lineElements"] == null && (otherShape["lineElements"] != null)) {
-        //     return otherShape.collidesWith(this);
-        // }
+        // is other shape a turtle?
+        if (!this.turtle && otherShape.turtle) {
+            return otherShape._collidesWith(this);
+        }
 
-        //@ts-ignore  check if other shape is group:
-        if (otherShape["shapes"]) {
+        // is other shape a group?
+        if (otherShape.shapes) {
             return otherShape._collidesWith(this);
         }
 
@@ -475,12 +482,7 @@ export class ShapeClass extends ActorClass {
         // updateWorldTransformRecursively(otherShape.container, false);
 
 
-        let bb = this.container.getBounds();
-        let bb1 = otherShape.container.getBounds();
-
-        if (bb.left > bb1.right || bb1.left > bb.right) return false;
-
-        if (bb.top > bb1.bottom || bb1.top > bb.bottom) return false;
+        if (!this.hasOverlappingBoundingBoxWith(otherShape)) return false;
 
         if (this.hitPolygonInitial == null || otherShape.hitPolygonInitial == null) return true;
 
@@ -493,50 +495,115 @@ export class ShapeClass extends ActorClass {
 
     }
 
+    hasOverlappingBoundingBoxWith(otherShape: ShapeClass, bb?: PIXI.Bounds) {
+        if (!bb) bb = this.container.getBounds();
 
-    _collidesWithAnyShape(): boolean {
+        let bb1 = otherShape.container.getBounds();
 
-        if (this.isDestroyed) return false;
+        if (bb.left > bb1.right || bb1.left > bb.right) return false;
 
-        let bb = this.container.getBounds();
-        // boundig boxes collide, so check further:
-        if (this.hitPolygonDirty) this.transformHitPolygon();
+        if (bb.top > bb1.bottom || bb1.top > bb.bottom) return false;
 
-        let collisionDetected: boolean = false;
-        for (let otherShape of this.world.shapesWhichBelongToNoGroup) {
+        return true;
+    }
+
+    getFirstCollidingSpriteHelper(imageIndex: number, shapes: ShapeClass[], bounds: PIXI.Bounds): ShapeClass | null {
+        let collidingSprite: ShapeClass | null = null;
+
+        for (let otherShape of shapes) {
+
+            if (otherShape == this) continue;
 
             if (otherShape.isDestroyed) continue;
 
-            //@ts-ignore  check if other shape is group:
-            if (otherShape["shapes"]) {
-                if (otherShape._collidesWith(this)) {
-                    collisionDetected = true;
-                    break;
-                }
+            if (otherShape.shapes) {
+                collidingSprite = this.getFirstCollidingSpriteHelper(imageIndex, otherShape.shapes, bounds);
+                if (collidingSprite) break;
             } else {
-                let bb1 = otherShape.container.getBounds();
+                let spriteIndex = otherShape.imageIndex;
+                if (!spriteIndex || spriteIndex != imageIndex) continue;
 
-                if (bb.left > bb1.right || bb1.left > bb.right) continue;
-
-                if (bb.top > bb1.bottom || bb1.top > bb.bottom) continue;
+                if (!this.hasOverlappingBoundingBoxWith(otherShape, bounds)) continue;
 
                 if (this.hitPolygonInitial == null || otherShape.hitPolygonInitial == null) {
-                    collisionDetected = true;
+                    collidingSprite = otherShape;
                     break;
                 }
 
                 if (otherShape.hitPolygonDirty) otherShape.transformHitPolygon();
 
                 if (polygonBerührtPolygonExakt(this.hitPolygonTransformed, otherShape.hitPolygonTransformed, true, true)) {
+                    collidingSprite = otherShape;
+                    break;
+                }
+            }
+
+
+        }
+
+        return collidingSprite;
+
+    }
+
+    _getFirstCollidingSprite(imageIndex: number): ShapeClass | null {
+        if (this.hitPolygonDirty) this.transformHitPolygon();
+        return this.getFirstCollidingSpriteHelper(imageIndex, this.world.shapesWhichBelongToNoGroup, this.container.getBounds());
+    }
+
+    collidesWithAnyShapeHelper(color: number | undefined, shapes: ShapeClass[], bounds: PIXI.Bounds): boolean {
+
+        if (this.hitPolygonDirty) this.transformHitPolygon();
+
+        let collisionDetected: boolean = false;
+        for (let otherShape of shapes) {
+
+            if (otherShape == this) continue;
+
+            if (otherShape.isDestroyed) continue;
+
+            if (otherShape.shapes) {
+                if (this.collidesWithAnyShapeHelper(color, otherShape.shapes, bounds)) {
                     collisionDetected = true;
                     break;
                 }
+            }
+
+            if (color != null) {
+                if (otherShape.fillColor != color) continue;
+            }
+
+            if (!this.hasOverlappingBoundingBoxWith(otherShape, bounds)) continue;
+
+            if (this.hitPolygonInitial == null || otherShape.hitPolygonInitial == null) {
+                collisionDetected = false;
+                break;
+            }
+
+            if (otherShape.hitPolygonDirty) otherShape.transformHitPolygon();
+
+            if (polygonBerührtPolygonExakt(this.hitPolygonTransformed, otherShape.hitPolygonTransformed, true, true)) {
+                collisionDetected = true;
+                break;
             }
 
         }
 
         return collisionDetected;
 
+    }
+
+    _collidesWithAnyShape(color?: number | string): boolean {
+
+        if (color && (typeof color == "string")) {
+            color = ColorHelper.parseColorToOpenGL(color).color;
+        }
+
+        if (this.isDestroyed) return false;
+
+        let bb = this.container.getBounds();
+        if (this.hitPolygonDirty) this.transformHitPolygon();
+
+        return this.collidesWithAnyShapeHelper(<number>color, this.world.shapesWhichBelongToNoGroup, bb);
     }
 
 

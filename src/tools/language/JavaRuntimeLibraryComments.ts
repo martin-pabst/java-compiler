@@ -489,6 +489,16 @@ export class JRC {
     "en": "Returns true if graphic object collides with any other graphic object.",
     })
 
+    static shapeCollidesWithFillColorComment = () => lm({
+    "de": "Gibt genau dann true zurück, wenn die Figur mit irgendeiner anderen Figur mit der angegebenen Füllfarbe überlappt.",
+    "en": "Returns true if graphic object collides with any other graphic object with given fillColor.",
+    })
+
+    static shapeGetFirstCollidingSpriteComment = () => lm({
+    "de": "Falls dieses Grafikobjekt gerade mindestens ein Sprite mit dem übergebenen Bildindex (-1 bedeutet: mit irgendeinem BildIndex) berührt, wird das erste dieser Sprites zurückgegeben.",
+    "en": "If this graphic object collides with any sprite with given imageIndex then this method returns the first one. Use imageIndex == -1 to search for ANY colliding Sprite.",
+    })
+
     /**
      * Class FilledShape
      */
@@ -578,7 +588,58 @@ export class JRC {
         "en": "Sets default fill color. All subsequently created objects get this fill color.",
     })
 
+    /**
+     * class Group
+     */
+    static groupClassComment = () => lm({
+    "de": "Eine Gruppe kann mehrere graphische Objekte (auch andere Gruppen) enthalten und miteinander verschieben, drehen, ...",
+    "en": "A group can contain several graphic objects (also other groups) and move, rotate, ... them together.",
+    })
 
+    static groupConstructorComment = () => lm({
+    "de": "Erstellt eine neue Gruppe",
+    "en": "Creates a new Group",
+    })
+
+    static groupAddComment = () => lm({
+    "de": "Fügt der Gruppe graphische Elemente hinzu. Tipp: Diese Methode kann beliebig viele Parameter haben.",
+    "en": "Adds graphic elements to this group. Hint: This method can have multiple parameters. ",
+    })
+
+    static groupRemoveComment = () => lm({
+    "de": "Entfernt das übergebene Objekt aus der Gruppe. Das Objekt wird dadurch nicht verändert.",
+    "en": "Removes given object from this group.",
+    })
+
+    static groupRemoveWithIndexComment = () => lm({
+    "de": "Entfernt das Element mit dem gegebenen Index aus der Gruppe. Das erste Element hat Index 0.",
+    "en": "Removes element with given index from group. First element has index 0.",
+    })
+
+    static groupGetComment = () => lm({
+    "de": "Gibt das Element mit dem angegebenen Index zurück. Das erste Element der Gruppe hat Index 0.",
+    "en": "Returns element with given index. First element in group has index 0.",
+    })
+
+    static groupIndexOfComment = () => lm({
+    "de": "Gibt den Index des elements innerhalb der Gruppe zurück. Falls das Element nicht in der Gruppe enthalten ist, wird -1 zurückgegeben.",
+    "en": "Returns index of given element inside group. First element in group has index 0.",
+    })
+
+    static groupSizeComment = () => lm({
+    "de": "Gibt die Anzahl der Elemente in dieser Gruppe zurück.",
+    "en": "Returns the number of elements in this group.",
+    })
+
+    static groupEmptyComment = () => lm({
+    "de": "Leert die Gruppe. Die in der Gruppe enthaltenen Elemente werden dadurch nicht verändert.",
+    "en": "Removes all elements from this group. This operation doesn't affect the elements themselves.",
+    })
+
+    static groupDestroyAllChildrenComment = () => lm({
+    "de": "Zerstört alle Elemente der Gruppe, nicht aber die Gruppe selbst.",
+    "en": "Destroys all elements inside this group, but not this group itself.",
+    })
 
     /**
      * Class Circle

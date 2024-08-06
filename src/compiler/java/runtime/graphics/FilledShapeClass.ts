@@ -42,7 +42,7 @@ export class FilledShapeClass extends ShapeClass {
 
     static type: NonPrimitiveType;
 
-    fillColor: number = FilledShapeDefaults.defaultFillColor;
+    fillColor: number = FilledShapeDefaults.defaultFillColor;       // If you change this identifier then you have to change corresponding declaration in class ShapeClass
     fillAlpha: number = FilledShapeDefaults.defaultFillAlpha;
 
     borderColor?: number = FilledShapeDefaults.defaultBorderColor;
