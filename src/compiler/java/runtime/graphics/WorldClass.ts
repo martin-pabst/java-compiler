@@ -170,8 +170,10 @@ export class WorldClass extends ObjectClass implements IWorld {
         
         this.actorManager.clear();
         this.gngEventlistenerManager.clear();
-
-        this.app?.ticker.remove(this.tickerFunction!);
+        
+        // it doesn't suffice to remove listener of this object because
+        // there may be sprites playing animations which are also ticker-listeners
+        this.app?.ticker.destroy();     
         interpreter.isExternalTimer = false;
         this.app?.destroy({ removeView: true }, {});
 
