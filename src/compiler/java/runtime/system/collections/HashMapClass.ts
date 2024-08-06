@@ -5,6 +5,8 @@ import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { BiConsumerInterface } from "../functional/BiConsumerInterface.ts";
 import { ObjectClass } from "../javalang/ObjectClassStringClass.ts";
+import { ArrayListClass } from "./ArrayListClass.ts";
+import { HashSetClass } from "./HashSetClass.ts";
 
 type Value = {
     k: any;
@@ -26,6 +28,8 @@ export class HashMapClass extends ObjectClass {
         { type: "method", signature: "V put(K key, V value)", native: HashMapClass.prototype._put, comment: JRC.mapPutComment },
         { type: "method", signature: "void clear()", native: HashMapClass.prototype._clear, comment: JRC.mapClearComment },
         { type: "method", signature: "void forEach(BiConsumer<? super K, ? super V> action)", java: HashMapClass.prototype._mj$forEach$void$BiConsumer , comment: JRC.mapForeachComment},
+        { type: "method", signature: "Collection<V> values()", java: HashMapClass.prototype._mj$values$Collection$, comment: JRC.mapValuesComment },
+        { type: "method", signature: "Set<K> keySet()", java: HashMapClass.prototype._mj$keySet$Set$, comment: JRC.mapKeySetComment },
 
     ]
 
@@ -54,7 +58,7 @@ export class HashMapClass extends ObjectClass {
         }
      }
 
-     _values(){
+     _values(): ObjectClass[]{
         let values: ObjectClass[] = [];
         this.map.forEach((v, k) => values.push(v.v));
         return values;
@@ -115,5 +119,20 @@ export class HashMapClass extends ObjectClass {
         f();
 
     }
+
+    _mj$values$Collection$(t: Thread, callback: CallbackFunction) {
+        t.s.push(new ArrayListClass(this._values()))
+        if(callback) callback();
+    }
+
+    _mj$keySet$Set$(t: Thread, callback: CallbackFunction) {
+        let set = new HashSetClass();
+        this.map.forEach((v, k) => {
+            set._add(v.k);
+        })
+        t.s.push(set);
+        if(callback) callback;
+    }
+
 
 }

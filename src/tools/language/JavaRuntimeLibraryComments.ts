@@ -4437,6 +4437,15 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     "en": "Performs the given action for each key-value pair in this map until all entries have been processed.",
     })
 
+    static mapValuesComment = () => lm({
+    "de": "Gibt eine Collection zurück, die alle Werte der Map enthält (ggf. auch mehrfach).",
+    "en": "Returns a Collection containing all values of this map.",
+    })
+
+    static mapKeySetComment = () => lm({
+    "en": "Returns a Set containing all keys of this map.",
+    "de": "Gibt ein Set zurück, das alle Schlüssel dieser Map enthält.",
+    })
     /**
      * Class HashMap
      */

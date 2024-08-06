@@ -17,6 +17,8 @@ export class MapInterface extends ObjectClass {
         { type: "method", signature: "V put(K key, V value)", java: MapInterface.prototype._mj$put$V$K$V, comment: JRC.mapPutComment },
         { type: "method", signature: "void clear()", java: MapInterface.prototype._mj$clear$void$, comment: JRC.mapClearComment },
         { type: "method", signature: "void forEach(BiConsumer<? super K, ? super V> action)", java: MapInterface.prototype._mj$forEach$void$BiConsumer , comment: JRC.mapForeachComment},
+        { type: "method", signature: "Collection<V> values()", java: MapInterface.prototype._mj$values$Collection$, comment: JRC.mapValuesComment },
+        { type: "method", signature: "Set<K> keySet()", java: MapInterface.prototype._mj$keySet$Set$, comment: JRC.mapKeySetComment },
 
     ]
 
@@ -30,5 +32,7 @@ export class MapInterface extends ObjectClass {
     _mj$put$V$K$V(t: Thread, callback: CallbackFunction, key: ObjectClass, value: ObjectClass) { }
     _mj$clear$void$(t: Thread, callback: CallbackFunction) { }
     _mj$forEach$void$BiConsumer(t: Thread, callback: CallbackFunction, biConsumer: BiConsumerInterface) { }
-
+    _mj$values$Collection$(t: Thread, callback: CallbackFunction) {}
+    _mj$keySet$Set$(t: Thread, callback: CallbackFunction) {}
+    
 }

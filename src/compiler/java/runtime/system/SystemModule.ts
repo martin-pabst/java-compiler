@@ -177,7 +177,7 @@ export class SystemModule extends JavaLibraryModule {
 
             CollectionsClass,
             QueueInterface, DequeInterface, LinkedListClass,
-            MapInterface, HashMapClass, SetInterface, HashSetClass,
+            SetInterface, MapInterface, HashMapClass, HashSetClass,
             VectorClass, StackClass,
 
             // Thread
