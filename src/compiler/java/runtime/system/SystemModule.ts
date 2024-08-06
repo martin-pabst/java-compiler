@@ -126,6 +126,7 @@ import { HashSetClass } from "./collections/HashSetClass.ts";
 import { EmptyStackExceptionClass } from "./collections/EmptyStackException.ts";
 import { VectorClass } from "./collections/VectorClass.ts";
 import { StackClass } from "./collections/StackClass.ts";
+import { BiConsumerInterface } from "./functional/BiConsumerInterface.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -160,7 +161,7 @@ export class SystemModule extends JavaLibraryModule {
             GamepadClass, KeyListenerInterface, SystemToolsClass, InputClass, SoundClass, FilesClass,
 
             // Functional
-            ConsumerInterface, FunctionInterface,
+            ConsumerInterface, BiConsumerInterface, FunctionInterface,
 
             NumberClass, IntegerClass, LongClass, FloatClass, DoubleClass, ShortClass, BooleanClass, CharacterClass,  // boxed primitive types
 

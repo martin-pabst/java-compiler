@@ -4432,6 +4432,11 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
         "en": "Removes all of the mappings from this map",
     })
 
+    static mapForeachComment = () => lm({
+    "de": "Führt die angegebene Aktion für jedes Schlüssel-Wert-Paar dieser Map aus.",
+    "en": "Performs the given action for each key-value pair in this map until all entries have been processed.",
+    })
+
     /**
      * Class HashMap
      */

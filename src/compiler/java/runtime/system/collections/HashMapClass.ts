@@ -3,6 +3,7 @@ import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts
 import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
+import { BiConsumerInterface } from "../functional/BiConsumerInterface.ts";
 import { ObjectClass } from "../javalang/ObjectClassStringClass.ts";
 
 type Value = {
@@ -24,6 +25,7 @@ export class HashMapClass extends ObjectClass {
         { type: "method", signature: "V get(K key)", native: HashMapClass.prototype._get, comment: JRC.mapGetComment },
         { type: "method", signature: "V put(K key, V value)", native: HashMapClass.prototype._put, comment: JRC.mapPutComment },
         { type: "method", signature: "void clear()", native: HashMapClass.prototype._clear, comment: JRC.mapClearComment },
+        { type: "method", signature: "void forEach(BiConsumer<? super K, ? super V> action)", java: HashMapClass.prototype._mj$forEach$void$BiConsumer , comment: JRC.mapForeachComment},
 
     ]
 
@@ -50,6 +52,12 @@ export class HashMapClass extends ObjectClass {
             let hashCode = key.__internalHashCode();
             return (typeof this.map.get(hashCode)) !== "undefined";
         }
+     }
+
+     _values(){
+        let values: ObjectClass[] = [];
+        this.map.forEach((v, k) => values.push(v.v));
+        return values;
      }
 
     _containsValue(value: ObjectClass) { 
@@ -87,6 +95,25 @@ export class HashMapClass extends ObjectClass {
 
     _clear() { 
         this.map.clear();
+    }
+
+    _mj$forEach$void$BiConsumer(t: Thread, callback: CallbackFunction, biConsumer: BiConsumerInterface) { 
+
+        let index: number = -1;
+        let elements: Value[] = [];
+        this.map.forEach((v, k) => elements.push(v));
+
+        let f = () => {
+            index++;
+            if (index < elements.length) {
+                biConsumer._mj$accept$void$T$U(t, f, elements[index].k, elements[index].v);
+            } else {
+                if (callback) callback();
+            }
+        }
+
+        f();
+
     }
 
 }

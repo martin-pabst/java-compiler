@@ -3,6 +3,7 @@ import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts
 import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
+import { BiConsumerInterface } from "../functional/BiConsumerInterface.ts";
 import { ObjectClass } from "../javalang/ObjectClassStringClass.ts";
 
 export class MapInterface extends ObjectClass {
@@ -15,6 +16,8 @@ export class MapInterface extends ObjectClass {
         { type: "method", signature: "V get(K key)", java: MapInterface.prototype._mj$get$V$K, comment: JRC.mapGetComment },
         { type: "method", signature: "V put(K key, V value)", java: MapInterface.prototype._mj$put$V$K$V, comment: JRC.mapPutComment },
         { type: "method", signature: "void clear()", java: MapInterface.prototype._mj$clear$void$, comment: JRC.mapClearComment },
+        { type: "method", signature: "void forEach(BiConsumer<? super K, ? super V> action)", java: MapInterface.prototype._mj$forEach$void$BiConsumer , comment: JRC.mapForeachComment},
+
     ]
 
     static type: NonPrimitiveType;
@@ -26,5 +29,6 @@ export class MapInterface extends ObjectClass {
     _mj$get$V$K(t: Thread, callback: CallbackFunction, key: ObjectClass) { }
     _mj$put$V$K$V(t: Thread, callback: CallbackFunction, key: ObjectClass, value: ObjectClass) { }
     _mj$clear$void$(t: Thread, callback: CallbackFunction) { }
+    _mj$forEach$void$BiConsumer(t: Thread, callback: CallbackFunction, biConsumer: BiConsumerInterface) { }
 
 }
