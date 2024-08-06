@@ -316,7 +316,7 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
 
             if (classContext.instanceInitializer?.length == 0 && !method.hasOuterClassParameter) {
                 method.hasImplementationWithNativeCallingConvention = baseConstructor.hasImplementationWithNativeCallingConvention;
-                return; // unaltered implementation of base class constructor suffices for child class
+                continue; // unaltered implementation of base class constructor suffices for child class
             }
 
             // let's build a new method!
