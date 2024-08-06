@@ -1,5 +1,14 @@
 export var testProgramsList = [
    ['', ``],
+   ['InnerClassInstanceInitializer', `
+Map<String, String> myMap = new HashMap<>() { {
+      put("a", "b");
+      put("c", "d");
+   }
+};
+
+println(myMap.get("a")); 
+`],
    ['ConstructorTest', `new RotatingRectangle(300, 200, 200, 100);
 
 class RotatingRectangle extends Rectangle {

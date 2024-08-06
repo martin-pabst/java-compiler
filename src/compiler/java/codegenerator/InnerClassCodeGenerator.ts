@@ -265,7 +265,7 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
                     }
                     break;
                 case TokenType.instanceInitializerBlock:
-                    let snippet1 = this.compileInstanceInitializerBlock(fieldOrInitializer);
+                    let snippet1 = this.compileInstanceInitializerBlock(fieldOrInitializer, classContext);
                     if (snippet1) {
                         fieldSnippets.push(snippet1);
                     }
@@ -279,8 +279,9 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
         classContext.instanceInitializer = fieldSnippets;
     }
 
-    compileInstanceInitializerBlock(node: ASTInstanceInitializerNode): CodeSnippetContainer | undefined {
+    compileInstanceInitializerBlock(node: ASTInstanceInitializerNode, classContext: JavaClass | JavaEnum): CodeSnippetContainer | undefined {
 
+        this.pushAndGetNewSymbolTable(node.range, true, classContext)
         this.missingStatementManager.beginMethodBody([]);
 
         let snippet = new CodeSnippetContainer([], node.range);
@@ -290,6 +291,8 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
         }
 
         this.missingStatementManager.endMethodBody(undefined, this.module.errors);
+
+        this.popSymbolTable();
 
         return snippet;
     }

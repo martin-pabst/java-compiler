@@ -356,7 +356,7 @@ export class Main implements IMain {
     for (let program of testProgramsList) {
       if (program[0] == programName) {
         let currentTab = this.tabbedEditorManager.activeIndex;
-        this.files[currentTab].setText(program[1]);
+        this.files[currentTab].setText(program[1].trim());
         return;
       }
     }
