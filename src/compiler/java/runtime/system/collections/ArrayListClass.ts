@@ -52,7 +52,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
 
     static type: NonPrimitiveType;
 
-    protected elements: ObjectClass[];
+    protected elements: ObjectClass[] = [];
 
     constructor(elements?: ObjectClass[]){
         super();
