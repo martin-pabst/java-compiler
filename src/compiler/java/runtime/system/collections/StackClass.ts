@@ -14,7 +14,7 @@ export class StackClass extends VectorClass {
         {type: "method", signature: "E pop()", native: StackClass.prototype._pop, comment: JRC.stackPopComment},
         {type: "method", signature: "E peek()", native: StackClass.prototype._peek, comment: JRC.stackPeekComment},
         {type: "method", signature: "boolean empty()", native: StackClass.prototype._empty, comment: JRC.stackEmptyComment},
-        {type: "method", signature: "int search(E element)", native: StackClass.prototype._mj$indexOf$int$E, comment: JRC.stackSearchComment},
+        {type: "method", signature: "int search(E element)", java: StackClass.prototype._mj$indexOf$int$E, comment: JRC.stackSearchComment},
     ];
 
     static type: NonPrimitiveType;
