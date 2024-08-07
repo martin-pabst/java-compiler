@@ -55,7 +55,7 @@ export class JavaModuleManager {
                 if(module.isDirty()) continue;
                 // does module depend on dirty other module?
                 if(module.dependsOnOtherDirtyModule()){
-                    module.setDirty();
+                    module.setDirty(true);
                     done = false;
                     break;
                 }
