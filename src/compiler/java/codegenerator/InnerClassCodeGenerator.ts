@@ -491,6 +491,8 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
 
     compileMethodDeclaration(methodNode: ASTMethodDeclarationNode, classContext: JavaClass | JavaEnum | JavaInterface) {
 
+        this.module.methodDeclarationRanges.push(methodNode.range);
+
         const method = methodNode.method;
         if (!method) return;
 

@@ -44,6 +44,23 @@ export abstract class CompilerWorkspace {
         return this.getModuleForMonacoModel(model);
     }
 
+    getFileForMonacoModel(model: monaco.editor.ITextModel | null): CompilerFile | undefined {
+        if (model == null) return undefined;
+
+        for (let file of this.getFiles()) {
+            if (file.getMonacoModel() == model) {
+                return file;
+            }
+        }
+
+        return undefined;
+    }
+
+    getCurrentlyEditedFile(): CompilerFile | undefined {
+        let model = this.cmain.getMainEditor().getModel();
+        if (!model) return;
+
+    }
 
 
 }

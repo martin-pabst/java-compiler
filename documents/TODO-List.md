@@ -70,6 +70,7 @@
 ## after integrating new compiler into online-ide
   * Database classes
   * WebSocket client
+  * CodeActionProvider needed?
 
 
 

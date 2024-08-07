@@ -135,7 +135,7 @@ export class JavaRepl {
 
         let p = new Promise<any>((resolve, reject) => {
             let callback = (returnValue: any) => {
-
+                if(returnValue && returnValue["value"]) returnValue = returnValue.value;
                 resolve(returnValue);
             }
 

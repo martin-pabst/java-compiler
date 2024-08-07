@@ -17,6 +17,7 @@ import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { JavaBaseModule } from "./JavaBaseModule";
 import { JavaModuleManager } from "./JavaModuleManager";
 import { TypePosition } from "./TypePosition.ts";
+import { IRange } from "../../common/range/Range.ts";
 
 export type JavaMethodCallPosition = {
     identifierRange: monaco.IRange,
@@ -44,6 +45,8 @@ export class JavaCompiledModule extends JavaBaseModule {
 
     methodCallPositions: {[line: number]: JavaMethodCallPosition[]} = {};
 
+    methodDeclarationRanges: IRange[] = [];
+
     constructor(file: CompilerFile, public moduleManager?: JavaModuleManager){
         super(file, false);
     }
@@ -51,7 +54,7 @@ export class JavaCompiledModule extends JavaBaseModule {
     isReplModule(): boolean {
         return false;
     }
-    
+
     setLexerOutput(lexerOutput: LexerOutput) {
         this.tokens = lexerOutput.tokens;
         this.errors = lexerOutput.errors;

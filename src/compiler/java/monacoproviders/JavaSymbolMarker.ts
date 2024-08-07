@@ -1,4 +1,5 @@
 import { IMain } from "../../common/IMain.ts";
+import { Range } from "../../common/range/Range.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 
 export class JavaSymbolMarker {
@@ -49,6 +50,25 @@ export class JavaSymbolMarker {
                         darkColor: { id: "editorIndentGuide.activeBackground" },
                         position: monaco.editor.OverviewRulerLane.Left
                     }
+                }
+            })
+        }
+
+        let methodRange = module.methodDeclarationRanges.find(range => Range.containsPosition(range, event.position));
+        if(methodRange){
+            decorations.push({
+                range: { startColumn: 0, startLineNumber: methodRange.startLineNumber, endColumn: 100, endLineNumber: methodRange.endLineNumber },
+                options: {
+                    className: 'jo_highlightMethod', isWholeLine: true, overviewRuler: {
+                        color: { id: "jo_highlightMethod" },
+                        darkColor: { id: "jo_highlightMethod" },
+                        position: monaco.editor.OverviewRulerLane.Left
+                    },
+                    minimap: {
+                        color: { id: 'jo_highlightMethod' },
+                        position: monaco.editor.MinimapPosition.Inline
+                    },
+                    zIndex: -100
                 }
             })
         }
