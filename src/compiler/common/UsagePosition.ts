@@ -1,12 +1,12 @@
 import chalk from "chalk";
 import { BaseSymbol } from "./BaseSymbolTable";
-import { File } from "./module/File";
+import { CompilerFile } from "./module/CompilerFile";
 import { Module } from "./module/Module";
 import { Position } from "./range/Position";
 import { IRange, Range } from "./range/Range";
 
 export class UsagePosition {
-    constructor(public symbol: BaseSymbol, public file: File, public range: IRange){}
+    constructor(public symbol: BaseSymbol, public file: CompilerFile, public range: IRange){}
 }
 
 
@@ -33,7 +33,7 @@ export class UsageTracker {
         this.dependsOnModules.clear();
     }
 
-    registerUsagePosition(symbol: BaseSymbol, file: File, range: IRange){
+    registerUsagePosition(symbol: BaseSymbol, file: CompilerFile, range: IRange){
         if(!range) return;
         let up = new UsagePosition(symbol, file, range);
 

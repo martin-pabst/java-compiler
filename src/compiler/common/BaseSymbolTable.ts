@@ -1,5 +1,5 @@
 import { BaseType } from "./BaseType.ts";
-import { File } from "./module/File";
+import { CompilerFile } from "./module/CompilerFile";
 import { Module } from "./module/Module.ts";
 import { IPosition, Position } from "./range/Position.ts";
 import { IRange, Range } from "./range/Range";

@@ -1,4 +1,4 @@
-import { File } from "../../common/module/File";
+import { CompilerFile } from "../../common/module/CompilerFile";
 import { JavaTypeStore } from "./JavaTypeStore";
 import { JavaCompiledModule as JavaCompiledModule } from "./JavaCompiledModule";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
@@ -33,11 +33,11 @@ export class JavaModuleManager {
         this.modules.push(module);
     }
 
-    getModuleFromFile(file: File){
+    getModuleFromFile(file: CompilerFile){
         return this.modules.find(m => m.file == file);
     }
 
-    setupModulesBeforeCompiliation(files: File[]){
+    setupModulesBeforeCompiliation(files: CompilerFile[]){
         this.removeUnusedModules(files);
         this.createNewModules(files);
     }
@@ -70,7 +70,7 @@ export class JavaModuleManager {
 
     }
 
-    createNewModules(files: File[]){
+    createNewModules(files: CompilerFile[]){
         for(let file of files){
             if(!this.getModuleFromFile(file)){
                 let newModule = new JavaCompiledModule(file, this);
@@ -79,7 +79,7 @@ export class JavaModuleManager {
         }
     }
 
-    removeUnusedModules(files: File[]){
+    removeUnusedModules(files: CompilerFile[]){
         this.modules = this.modules.filter(m => files.indexOf(m.file) >= 0);
     }
 
@@ -103,7 +103,7 @@ export class JavaModuleManager {
     }
 
 
-    findModuleByFile(file: File){
+    findModuleByFile(file: CompilerFile){
         return this.modules.find(m => m.file == file);
     }
 

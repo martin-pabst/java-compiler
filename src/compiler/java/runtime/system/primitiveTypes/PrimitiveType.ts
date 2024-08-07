@@ -1,5 +1,5 @@
 import { JCM } from "../../../../../tools/language/JavaCompilerMessages";
-import { File } from "../../../../common/module/File";
+import { CompilerFile } from "../../../../common/module/CompilerFile";
 import { EmptyRange, IRange } from "../../../../common/range/Range";
 import { TokenType } from "../../../TokenType";
 import { JavaBaseModule } from "../../../module/JavaBaseModule";
@@ -37,7 +37,7 @@ export abstract class PrimitiveType extends JavaType {
     }
 
 
-    getFile(): File {
+    getFile(): CompilerFile {
         return this.module.file;
     }
 

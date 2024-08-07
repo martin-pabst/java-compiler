@@ -7,7 +7,7 @@ import { NonPrimitiveType } from "../java/types/NonPrimitiveType";
 import { Error } from "./Error";
 import { Program } from "./interpreter/Program";
 import { Klass, KlassObjectRegistry } from "./interpreter/StepFunction";
-import { File } from "./module/File";
+import { CompilerFile } from "./module/CompilerFile";
 import { Module } from "./module/Module";
 import { EmptyRange } from "./range/Range";
 import { JCM } from "../../tools/language/JavaCompilerMessages.ts";
@@ -34,7 +34,7 @@ export class Executable {
         public libraryModuleManager: JavaLibraryModuleManager,
         public globalErrors: Error[],
         public exceptionTree: ExceptionTree,
-        lastOpenedFile?: File, currentlyOpenedFile?: File) {
+        lastOpenedFile?: CompilerFile, currentlyOpenedFile?: CompilerFile) {
 
         this.findMainModule(false, lastOpenedFile, currentlyOpenedFile);
 
@@ -140,7 +140,7 @@ export class Executable {
         return this.testClassToTestMethodMap;
     }
 
-    findMainModule(test: boolean, lastOpenedFile?: File, currentlyOpenedFile?: File) {
+    findMainModule(test: boolean, lastOpenedFile?: CompilerFile, currentlyOpenedFile?: CompilerFile) {
         if (test) {
             let testModule = this.moduleManager.modules.find(m => m.file.filename == "TEST_FILE");
             if (testModule) {
@@ -165,7 +165,7 @@ export class Executable {
 
     }
 
-    findModuleByFile(file?: File): Module | undefined {
+    findModuleByFile(file?: CompilerFile): Module | undefined {
         if (!file) return undefined;
         return this.moduleManager.modules.find(m => m.file == file);
     }

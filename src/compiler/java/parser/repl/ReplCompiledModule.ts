@@ -1,4 +1,4 @@
-import { File } from "../../../common/module/File";
+import { CompilerFile } from "../../../common/module/CompilerFile";
 import { Position } from "../../../common/range/Position";
 import { JavaSymbolTable } from "../../codegenerator/JavaSymbolTable";
 import { JavaCompiledModule } from "../../module/JavaCompiledModule";
@@ -6,7 +6,7 @@ import { JavaCompiledModule } from "../../module/JavaCompiledModule";
 export class ReplCompiledModule extends JavaCompiledModule {
 
     constructor(code: string){
-        super(new File());
+        super(new CompilerFile());
         this.file.setText(code);
     }
 

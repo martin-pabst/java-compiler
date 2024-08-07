@@ -1,4 +1,4 @@
-import { File } from "../../common/module/File";
+import { CompilerFile } from "../../common/module/CompilerFile";
 import { IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { JavaBaseModule } from "../module/JavaBaseModule";
@@ -23,7 +23,7 @@ export abstract class IJavaInterface extends NonPrimitiveType {
         return JCM.interface();
     }
 
-    getFile(): File {
+    getFile(): CompilerFile {
         return this.module.file;
     }
 

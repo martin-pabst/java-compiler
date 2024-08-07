@@ -1,5 +1,5 @@
 import { Error } from "../../common/Error.ts";
-import { File } from "../../common/module/File";
+import { CompilerFile } from "../../common/module/CompilerFile";
 import { IRange } from "../../common/range/Range";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { JavaField } from "./JavaField";
@@ -65,7 +65,7 @@ export class GenericTypeParameter extends NonPrimitiveType {
         return true;
     }
 
-    getFile(): File {
+    getFile(): CompilerFile {
         return this.module.file;
     }
 

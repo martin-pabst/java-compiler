@@ -1,4 +1,4 @@
-import { File } from "../../common/module/File";
+import { CompilerFile } from "../../common/module/CompilerFile";
 import { EmptyRange, IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType.ts";
 import { JavaBaseModule } from "../module/JavaBaseModule";
@@ -65,7 +65,7 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
         return false;
     }
 
-    getFile(): File {
+    getFile(): CompilerFile {
         return this.module.file;
     }
 

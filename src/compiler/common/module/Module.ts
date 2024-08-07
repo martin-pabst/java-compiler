@@ -5,7 +5,7 @@ import { Program, Step } from "../interpreter/Program";
 import { Thread } from "../interpreter/Thread";
 import { Position } from "../range/Position.ts";
 import { IRange } from "../range/Range.ts";
-import { File } from "./File";
+import { CompilerFile } from "./CompilerFile";
 
 export abstract class Module {
 
@@ -22,7 +22,7 @@ export abstract class Module {
     systemSymbolsUsageTracker: UsageTracker = new UsageTracker(this);
 
 
-    constructor(public file: File, public isLibraryModule: boolean) {
+    constructor(public file: CompilerFile, public isLibraryModule: boolean) {
 
     }
 

@@ -3,7 +3,7 @@ import { Error } from "../../common/Error";
 import { UsagePosition } from "../../common/UsagePosition.ts";
 import { Program, Step } from "../../common/interpreter/Program";
 import { Thread } from "../../common/interpreter/Thread.ts";
-import { File } from "../../common/module/File";
+import { CompilerFile } from "../../common/module/CompilerFile";
 import { Position } from "../../common/range/Position.ts";
 import { JavaSymbolTable } from "../codegenerator/JavaSymbolTable.ts";
 import { LexerOutput } from "../lexer/Lexer.ts";
@@ -44,7 +44,7 @@ export class JavaCompiledModule extends JavaBaseModule {
 
     methodCallPositions: {[line: number]: JavaMethodCallPosition[]} = {};
 
-    constructor(file: File, public moduleManager?: JavaModuleManager){
+    constructor(file: CompilerFile, public moduleManager?: JavaModuleManager){
         super(file, false);
     }
 

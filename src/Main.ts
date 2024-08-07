@@ -1,6 +1,6 @@
 import { ErrorLevel } from "./compiler/common/Error.ts";
 import { Language } from "./compiler/common/Language.ts";
-import { File } from "./compiler/common/module/File.ts";
+import { CompilerFile } from "./compiler/common/module/CompilerFile.ts";
 import { Module } from "./compiler/common/module/Module.ts";
 import { JavaCompiler } from "./compiler/java/JavaCompiler.ts";
 import { JavaLanguage } from "./compiler/java/JavaLanguage.ts";
@@ -85,7 +85,7 @@ export class Main implements IMain {
 
   programViewerCompoment: ProgramViewerComponent;
 
-  files: File[] = [];
+  files: CompilerFile[] = [];
 
   compiler: JavaCompiler;
   interpreter: Interpreter;
@@ -133,12 +133,12 @@ export class Main implements IMain {
     this.programViewerCompoment = new ProgramViewerComponent(this.codeOutputDiv);
 
     for (let i = 0; i < 3; i++) {
-      let file = new File("module " + i);
+      let file = new CompilerFile("module " + i);
       file.createMonacolModel();
 
       this.files.push(file);
     }
-    let file = new File("Tests");
+    let file = new CompilerFile("Tests");
     file.createMonacolModel();
     //file.setText(testPrograms.testFuerListe.trim());
     this.files.push(file);

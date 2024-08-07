@@ -1,7 +1,7 @@
 import fs from "fs";
 import { test } from "vitest";
 import { it } from 'vitest';
-import { File } from "../compiler/common/module/File";
+import { CompilerFile } from "../compiler/common/module/CompilerFile";
 import { JavaCompiler } from "../compiler/java/JavaCompiler";
 import { Interpreter } from "../compiler/common/interpreter/Interpreter";
 import { ViteTestAssertions } from "./lib/ViteTestAssertions";
@@ -99,7 +99,7 @@ function test1(sourcecode: string, file: string) {
 function compileAndTest(name: string, program: string, lineOffset: number, expectedOutput: string | undefined, expectedCompiliationErrors: ExpectedError[]) {
 
     test(name, (context) => {
-        let file = new File();
+        let file = new CompilerFile();
 
         file.setText(program);
 

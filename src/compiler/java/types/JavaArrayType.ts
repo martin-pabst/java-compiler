@@ -1,5 +1,5 @@
 import { BaseArrayType, BaseType } from "../../common/BaseType";
-import { File } from "../../common/module/File";
+import { CompilerFile } from "../../common/module/CompilerFile";
 import { IRange } from "../../common/range/Range";
 import { CodeTemplate } from "../codegenerator/CodeTemplate";
 import { JavaBaseModule } from "../module/JavaBaseModule";
@@ -42,7 +42,7 @@ export class JavaArrayType extends JavaType implements BaseArrayType {
         return new JavaArrayType(mappedElemenType, this.dimension, this.module, this.identifierRange)
     }
 
-    getFile(): File {
+    getFile(): CompilerFile {
         throw new Error("Method not implemented.");
     }
 

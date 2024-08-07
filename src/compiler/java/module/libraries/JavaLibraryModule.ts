@@ -1,5 +1,5 @@
 import { Klass } from "../../../common/interpreter/StepFunction.ts";
-import { File } from "../../../common/module/File";
+import { CompilerFile } from "../../../common/module/CompilerFile";
 import { JavaType } from "../../types/JavaType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { JavaBaseModule } from "../JavaBaseModule";
@@ -18,7 +18,7 @@ export abstract class JavaLibraryModule extends JavaBaseModule {
     classes: (Klass & LibraryKlassType)[] = [];
     
     constructor() {
-        super(new File("Library file"), true);
+        super(new CompilerFile("Library file"), true);
         this.dirty = false;
     }
     

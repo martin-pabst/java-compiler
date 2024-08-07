@@ -10,7 +10,7 @@ import { Compiler } from "../common/Compiler.ts";
 import { Error } from "../common/Error.ts";
 import { Executable } from "../common/Executable.ts";
 import { KlassObjectRegistry } from "../common/interpreter/StepFunction.ts";
-import { File } from "../common/module/File";
+import { CompilerFile } from "../common/module/CompilerFile";
 import { TypeResolver } from "./TypeResolver/TypeResolver";
 import { CodeGenerator } from "./codegenerator/CodeGenerator";
 import { ExceptionTree } from "./codegenerator/ExceptionTree.ts";
@@ -32,16 +32,16 @@ type AskBeforeCompilingCallback = () => boolean;
 export class JavaCompiler implements Compiler {
 
     public moduleManager: JavaModuleManager;
-    lastOpenedFile?: File;
+    lastOpenedFile?: CompilerFile;
     public libraryModuleManager: JavaLibraryModuleManager;
 
     private errors: Error[] = [];
 
     public lastCompiledExecutable?: Executable;
 
-    public currentlyOpenFile?: File;
+    public currentlyOpenFile?: CompilerFile;
 
-    public files: File[] = [];
+    public files: CompilerFile[] = [];
 
     public compilationFinishedCallback?: CompiliationFinishedCallback;
     public askBeforeCompilingCallback?: AskBeforeCompilingCallback;
