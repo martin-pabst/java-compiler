@@ -5,7 +5,7 @@ import { Module } from "../../common/module/Module";
 import { JavaType } from "../types/JavaType";
 import { JavaTypeStore } from "./JavaTypeStore";
 
-export class JavaBaseModule extends Module {
+export abstract class JavaBaseModule extends Module {
     
     types: JavaType[] = [];
     codeReachedAssertions: CodeReachedAssertions = new CodeReachedAssertions();

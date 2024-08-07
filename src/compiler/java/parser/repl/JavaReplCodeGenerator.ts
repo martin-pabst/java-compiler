@@ -9,10 +9,11 @@ import { StatementCodeGenerator } from "../../codegenerator/StatementCodeGenerat
 import { JavaCompiledModule } from "../../module/JavaCompiledModule.ts";
 import { JavaTypeStore } from "../../module/JavaTypeStore.ts";
 import { JavaType } from "../../types/JavaType.ts";
+import { NonPrimitiveType } from "../../types/NonPrimitiveType.ts";
 import { ASTAnonymousClassNode, ASTLambdaFunctionDeclarationNode } from "../AST.ts";
 
 
-export class ReplCodeGenerator extends StatementCodeGenerator {
+export class JavaReplCodeGenerator extends StatementCodeGenerator {
 
     constructor(module: JavaCompiledModule, libraryTypestore: JavaTypeStore, compiledTypesTypestore: JavaTypeStore,
         exceptionTree: ExceptionTree) {
@@ -42,12 +43,20 @@ export class ReplCodeGenerator extends StatementCodeGenerator {
         if(snippet && snippet.type){
             if(snippet.type != this.voidType){
                 
+                
                 let snippetWithValueOnStack = new CodeSnippetContainer(snippet, snippet.range, snippet.type);
                 snippetWithValueOnStack.ensureFinalValueIsOnStack();
                 snippets.pop();
                 snippets.push(snippetWithValueOnStack);
+
+                // wrap with to String call
+                if(snippet.type instanceof NonPrimitiveType){
+                    snippets.push(new StringCodeSnippet(`${Helpers.toString}(__t, undefined, ${Helpers.threadStack}.pop());\n`));
+                }
+                
             }
         }
+
         snippets.push(new StringCodeSnippet(`${Helpers.returnFromReplProgram}();\n`))
         
         new SnippetLinker().link(snippets, program);

@@ -3,24 +3,12 @@ import { Lexer } from "../lexer/Lexer";
 import { Token, TokenList } from "../lexer/Token";
 import { TokenType } from "../TokenType";
 
-export class Formatter implements monaco.languages.DocumentFormattingEditProvider,
+export class JavaFormatter implements monaco.languages.DocumentFormattingEditProvider,
     monaco.languages.OnTypeFormattingEditProvider {
 
     autoFormatTriggerCharacters: string[] = ['\n'];
 
     displayName?: string = "Java-Autoformat";
-
-
-    constructor(
-        // private main: Main
-    ) {
-
-    }
-
-    init() {
-        monaco.languages.registerDocumentFormattingEditProvider('myJava', this);
-        monaco.languages.registerOnTypeFormattingEditProvider('myJava', this);
-    }
 
     provideOnTypeFormattingEdits(model: monaco.editor.ITextModel, position: monaco.Position, ch: string, options: monaco.languages.FormattingOptions, token: monaco.CancellationToken): monaco.languages.ProviderResult<monaco.languages.TextEdit[]> {
 

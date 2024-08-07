@@ -3,11 +3,10 @@ import { IMain } from "../IMain";
 export class ColorProvider implements monaco.languages.DocumentColorProvider {
 
     constructor(private main: IMain) {
-        monaco.languages.registerColorProvider('myJava', this);
     }
 
     provideDocumentColors(model: monaco.editor.ITextModel, token: monaco.CancellationToken): monaco.languages.ProviderResult<monaco.languages.IColorInformation[]> {
-        let module = this.main.getCurrentlyEditedModule();
+        let module = this.main.getCurrentWorkspace()?.getCurrentlyEditedModule();
 
         if (module == null) {
             return null;

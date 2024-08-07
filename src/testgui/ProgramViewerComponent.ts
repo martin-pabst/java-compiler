@@ -181,13 +181,13 @@ export class ProgramViewerComponent {
     addModuleNode(module: JavaCompiledModule, parent: ProgramViewerNode) {
         let node: ProgramViewerNode = {
             program: 
-                `/**\n * Module ${module.file.filename}\n */\n\n` + 
+                `/**\n * Module ${module.file.name}\n */\n\n` + 
                  `/* classes: ${module.types.filter(type => type instanceof IJavaClass).map(klass => klass.identifier).join(", ")} */\n` +
                  `/* enums: ${module.types.filter(type => type instanceof JavaEnum).map(klass => klass.identifier).join(", ")} */\n` +
                  `/* interfaces: ${module.types.filter(type => type instanceof IJavaInterface).map(klass => klass.identifier).join(", ")} /*\n` 
         }
 
-        this.treeview.addNode(false, module.file.filename, undefined, node, node, parent);
+        this.treeview.addNode(false, module.file.name, undefined, node, node, parent);
     }
 
     dontIndent(str: string){

@@ -25,7 +25,7 @@ export class ProgramPointerManager {
     keyToDecorationsMap: Map<string, monaco.editor.IEditorDecorationsCollection> = new Map();
 
     constructor(private main: IMain) {
-        this.editor = main.getEditor();
+        this.editor = main.getMainEditor();
     }
 
     show(position: ProgramPointerPositionInfo, style: ProgramPointerStyle) {

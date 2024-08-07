@@ -131,7 +131,7 @@ export class Program {
         } catch (ex) {
             let message = "";
             message += chalk.red("Error compiling program to javascript functions: ") + ex + "\n";
-            message += chalk.gray("file: ") + this.module.file.filename + chalk.gray(", steplist: ") + (stepList == this.stepsSingle ? "stepsSingle" : "stepsMultiple") + "\n";
+            message += chalk.gray("file: ") + this.module.file.name + chalk.gray(", steplist: ") + (stepList == this.stepsSingle ? "stepsSingle" : "stepsMultiple") + "\n";
             let step = stepList[i];
             message += chalk.gray("at java sourcecode position line ") + chalk.blue(step.range.startLineNumber) + chalk.gray(", column ") + chalk.blue(step.range.startColumn) + "\n";
             message += chalk.blue("\njava-code:") + "\n";

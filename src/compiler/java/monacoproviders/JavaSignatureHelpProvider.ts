@@ -5,8 +5,7 @@ import { JavaMethod } from "../types/JavaMethod.ts";
 
 export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelpProvider {
 
-    constructor(private editor: monaco.editor.IStandaloneCodeEditor,
-        private main: IMain) {
+    constructor(private main: IMain) {
     }
 
     signatureHelpTriggerCharacters?: readonly string[] = ['(', ',', ';', '<', '>', '=']; // semicolon, <, >, = for for-loop, if, while, ...
@@ -16,9 +15,9 @@ export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelp
         monaco.languages.ProviderResult<monaco.languages.SignatureHelpResult> {
 
         let that = this;
-        if (this.editor.getModel()?.getLanguageId() != 'myJava') return undefined;
+        if (model.getLanguageId() != 'myJava') return undefined;
 
-        let module = <JavaCompiledModule>this.main.getModuleForMonacoModel(this.editor.getModel());
+        let module = <JavaCompiledModule>this.main.getCurrentWorkspace()?.getModuleForMonacoModel(model);
         if (!module) return;
 
 
@@ -26,7 +25,7 @@ export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelp
 
             setTimeout(() => {
 
-                this.main.ensureModuleIsCompiled(module);
+                this.main.getCurrentWorkspace()?.ensureModuleIsCompiled(module);
 
                 resolve(that.provideSignatureHelpLater(module, model, position, token, context));
 
@@ -43,29 +42,29 @@ export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelp
         context: monaco.languages.SignatureHelpContext):
         monaco.languages.ProviderResult<monaco.languages.SignatureHelpResult> {
 
-            let methodCallPositions = module.methodCallPositions[position.lineNumber];
+        let methodCallPositions = module.methodCallPositions[position.lineNumber];
 
-            if (methodCallPositions == null) return null;
-    
-            let methodCallPosition: JavaMethodCallPosition | undefined = undefined;
-            let rightMostPosition: number = -1;
-    
-            for (let i = methodCallPositions.length - 1; i >= 0; i--) {
-                let mcp = methodCallPositions[i];
-                if (mcp.identifierRange.endColumn < position.column
-                    && mcp.identifierRange.startColumn > rightMostPosition) {
-                    if (mcp.rightBracketPosition == null ||
-                        (position.lineNumber <= mcp.rightBracketPosition.lineNumber && position.column <= mcp.rightBracketPosition.column)
-                        || (position.lineNumber < mcp.rightBracketPosition.lineNumber)) {
-                        methodCallPosition = mcp;
-                        rightMostPosition = mcp.identifierRange.startColumn;
-                    }
+        if (methodCallPositions == null) return null;
+
+        let methodCallPosition: JavaMethodCallPosition | undefined = undefined;
+        let rightMostPosition: number = -1;
+
+        for (let i = methodCallPositions.length - 1; i >= 0; i--) {
+            let mcp = methodCallPositions[i];
+            if (mcp.identifierRange.endColumn < position.column
+                && mcp.identifierRange.startColumn > rightMostPosition) {
+                if (mcp.rightBracketPosition == null ||
+                    (position.lineNumber <= mcp.rightBracketPosition.lineNumber && position.column <= mcp.rightBracketPosition.column)
+                    || (position.lineNumber < mcp.rightBracketPosition.lineNumber)) {
+                    methodCallPosition = mcp;
+                    rightMostPosition = mcp.identifierRange.startColumn;
                 }
             }
-    
-            if (methodCallPosition == null) return null;
-    
-            return this.getSignatureHelp(methodCallPosition, position);
+        }
+
+        if (methodCallPosition == null) return null;
+
+        return this.getSignatureHelp(methodCallPosition, position);
 
     }
 
@@ -93,7 +92,7 @@ export class JavaSignatureHelpProvider implements monaco.languages.SignatureHelp
                 if (m.parameters.length > parameterIndex) {
 
                     signatureInformationList.push(this.makeSignatureInformation(m));
-                    if(m == methodCallPosition.bestMethod){
+                    if (m == methodCallPosition.bestMethod) {
                         activeSignature = i;
                     }
                     i++;

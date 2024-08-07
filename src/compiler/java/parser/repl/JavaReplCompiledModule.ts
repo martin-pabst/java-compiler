@@ -3,7 +3,7 @@ import { Position } from "../../../common/range/Position";
 import { JavaSymbolTable } from "../../codegenerator/JavaSymbolTable";
 import { JavaCompiledModule } from "../../module/JavaCompiledModule";
 
-export class ReplCompiledModule extends JavaCompiledModule {
+export class JavaReplCompiledModule extends JavaCompiledModule {
 
     constructor(code: string){
         super(new CompilerFile());
@@ -14,5 +14,8 @@ export class ReplCompiledModule extends JavaCompiledModule {
         return this.symbolTables[0];
     }
 
+    isReplModule(): boolean {
+        return true;
+    }
 
 }

@@ -33,7 +33,7 @@ export class TestManager {
             this.executeAllTests();
         }, "Führt alle im aktuellen Workspace enthaltenen JUnit-Test aus.");
 
-        let editor = main.getEditor();
+        let editor = main.getMainEditor();
 
         editor.onMouseDown((e: monaco.editor.IEditorMouseEvent) => {
             if (e.target.type != monaco.editor.MouseTargetType.GUTTER_LINE_DECORATIONS) {
@@ -41,7 +41,7 @@ export class TestManager {
             }
 
             let model = editor.getModel();
-            let module = main.getModuleForMonacoModel(model);
+            let module = main.getCurrentWorkspace()?.getModuleForMonacoModel(model);
             if (!module) return;
 
             this.onMarginMouseDown(module, e.target.position.lineNumber);

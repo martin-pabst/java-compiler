@@ -23,7 +23,7 @@ export class BreakpointManager {
     moduleToBreakpointInfoForModuleMap: Map<Module, BreakpointInfoForModule> = new Map();
 
     constructor(private main: IMain) {
-        let editor = main.getEditor();
+        let editor = main.getMainEditor();
         editor.onMouseDown((e: monaco.editor.IEditorMouseEvent) => {
             if (e.target.type !== monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN &&
                 e.target.type !== monaco.editor.MouseTargetType.GUTTER_LINE_NUMBERS) {
@@ -155,7 +155,7 @@ export class BreakpointManager {
     }
 
     getBreakpointInfoForModule(module?: Module): BreakpointInfoForModule | undefined {
-        module = module || this.main.getCurrentlyEditedModule();
+        module = module || this.main.getCurrentWorkspace()?.getCurrentlyEditedModule();
         if (!module) return undefined;
 
         let breakpointInfoForModule = this.moduleToBreakpointInfoForModuleMap.get(module);

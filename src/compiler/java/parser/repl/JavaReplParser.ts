@@ -5,7 +5,7 @@ import { ASTAnonymousClassNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, A
 import { StatementParser } from "../StatementParser.ts";
 
 
-export class ReplParser extends StatementParser {
+export class JavaReplParser extends StatementParser {
 
 
     constructor(module: JavaCompiledModule) {

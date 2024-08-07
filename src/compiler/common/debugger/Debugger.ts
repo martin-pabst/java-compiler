@@ -39,7 +39,7 @@ export class Debugger {
         this.initCallstackTreeview();
         this.initThreadsTreeview();
 
-        this.watchSection = new DebuggerWatchSection(this.watchTreeview);
+        this.watchSection = new DebuggerWatchSection(this.watchTreeview, this);
     }
     
     initWatchTreeview(){

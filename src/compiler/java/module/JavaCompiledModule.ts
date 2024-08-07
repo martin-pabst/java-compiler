@@ -48,6 +48,10 @@ export class JavaCompiledModule extends JavaBaseModule {
         super(file, false);
     }
 
+    isReplModule(): boolean {
+        return false;
+    }
+    
     setLexerOutput(lexerOutput: LexerOutput) {
         this.tokens = lexerOutput.tokens;
         this.errors = lexerOutput.errors;

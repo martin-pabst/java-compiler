@@ -9,8 +9,11 @@
 import { Compiler } from "../common/Compiler.ts";
 import { Error } from "../common/Error.ts";
 import { Executable } from "../common/Executable.ts";
+import { IMain } from "../common/IMain.ts";
 import { KlassObjectRegistry } from "../common/interpreter/StepFunction.ts";
 import { CompilerFile } from "../common/module/CompilerFile";
+import { Module } from "../common/module/Module.ts";
+import { ErrorMarker } from "../common/monacoproviders/ErrorMarker.ts";
 import { TypeResolver } from "./TypeResolver/TypeResolver";
 import { CodeGenerator } from "./codegenerator/CodeGenerator";
 import { ExceptionTree } from "./codegenerator/ExceptionTree.ts";
@@ -39,27 +42,27 @@ export class JavaCompiler implements Compiler {
 
     public lastCompiledExecutable?: Executable;
 
-    public currentlyOpenFile?: CompilerFile;
-
     public files: CompilerFile[] = [];
-
-    public compilationFinishedCallback?: CompiliationFinishedCallback;
-    public askBeforeCompilingCallback?: AskBeforeCompilingCallback;
 
     public state: CompilerState = CompilerState.stopped;
     private maxMsBetweenRuns: number = 100;
 
 
-    constructor() {
+    constructor(public main?: IMain) {
         this.libraryModuleManager = new JavaLibraryModuleManager();
         this.moduleManager = new JavaModuleManager();
+        this.startCompilingPeriodically();
+    }
+
+    setFiles(files: CompilerFile[]) {
+        this.files = files;
     }
 
     compileIfDirty(): Executable | undefined {
 
         let time = performance.now();
 
-        if (this.askBeforeCompilingCallback && !this.askBeforeCompilingCallback()) return;
+        if (this.main?.getInterpreter().isRunningOrPaused()) return;
 
         /**
          * if no module has changed, return as fast as possible
@@ -94,17 +97,17 @@ export class JavaCompiler implements Compiler {
         let typeResolver = new TypeResolver(this.moduleManager, this.libraryModuleManager);
 
         let exceptionTree = new ExceptionTree(this.libraryModuleManager.typestore, this.moduleManager.typestore);
-        
+
         // resolve returns false if cyclic references are found. In this case we don't continue compiling.
         if (typeResolver.resolve()) {
             this.moduleManager.typestore.initFastExtendsImplementsLookup();
-            
-            
+
+
             for (let module of newOrDirtyModules) {
                 let codegenerator = new CodeGenerator(module, this.libraryModuleManager.typestore,
                     this.moduleManager.typestore, exceptionTree);
-                    codegenerator.start();
-                    module.setDirty(false);
+                codegenerator.start();
+                module.setDirty(false);
             }
 
         }
@@ -117,8 +120,8 @@ export class JavaCompiler implements Compiler {
 
         let executable = new Executable(klassObjectRegistry,
             this.moduleManager, this.libraryModuleManager,
-            this.errors, exceptionTree, 
-            this.lastOpenedFile, this.currentlyOpenFile);
+            this.errors, exceptionTree,
+            this.lastOpenedFile, this.main?.getCurrentWorkspace()?.getCurrentlyEditedModule());
 
         if (executable.mainModule) {
             this.lastOpenedFile = executable.mainModule.file;
@@ -126,8 +129,13 @@ export class JavaCompiler implements Compiler {
 
         this.lastCompiledExecutable = executable;
 
-        if (this.compilationFinishedCallback) {
-            this.compilationFinishedCallback(executable);
+        this.main?.onCompilationFinished(this.lastCompiledExecutable);
+
+        if (this.lastCompiledExecutable) {
+            for (let module of this.lastCompiledExecutable.moduleManager.modules) {
+                ErrorMarker.markErrorsOfModule(module);
+            }
+
         }
 
         // console.log(Math.round(performance.now() - time) + " ms: Done compiling!");
@@ -143,7 +151,7 @@ export class JavaCompiler implements Compiler {
     updateSingleModuleForCodeCompletion(module: JavaCompiledModule): "success" | "completeCompilingNecessary" {
         if (!module) return "completeCompilingNecessary";
 
-        if(!module.isDirty()) return "success";
+        if (!module.isDirty()) return "success";
 
         let moduleManagerCopy = this.moduleManager.copy(module);
 
@@ -201,6 +209,14 @@ export class JavaCompiler implements Compiler {
 
     stopCompilingPeriodically() {
         this.state = CompilerState.stopped;
+    }
+
+    findModuleByFile(file: CompilerFile): Module | undefined {
+        return this.lastCompiledExecutable?.moduleManager.findModuleByFile(file);
+    }
+
+    getAllModules(): Module[] {
+        return this.moduleManager.modules;
     }
 
 }

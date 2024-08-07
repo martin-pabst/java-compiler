@@ -15,7 +15,7 @@ import { ProgramPointerManager, ProgramPointerPositionInfo } from "../monacoprov
 import { Program } from "./Program.ts";
 import { TestManager } from "./TestManager.ts";
 import { ActionManager } from "./IActionManager.ts";
-import { Repl } from "../../java/parser/repl/Repl.ts";
+import { JavaRepl } from "../../java/parser/repl/JavaRepl.ts";
 import { IInputManager } from "./IInputManager.ts";
 import { IFilesManager as IFileManager } from "./IFilesManager.ts";
 
@@ -79,8 +79,7 @@ export class Interpreter {
         public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager,
         public breakpointManager?: BreakpointManager, public _debugger?: Debugger,
         public programPointerManager?: ProgramPointerManager, public testManager?: TestManager,
-        public inputManager?: IInputManager, public fileManager?: IFileManager,
-        public repl?: Repl
+        public inputManager?: IInputManager, public fileManager?: IFileManager
     ) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {
 

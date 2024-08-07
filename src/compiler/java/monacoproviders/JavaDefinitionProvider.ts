@@ -4,12 +4,14 @@ import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 
 export class JavaDefinitionProvider implements monaco.languages.DefinitionProvider {
 
-    constructor(private editor: monaco.editor.IStandaloneCodeEditor,
-        private main: IMain) {
+    constructor(private main: IMain) {
     }
 
     provideDefinition(model: monaco.editor.ITextModel, position: monaco.Position, token: monaco.CancellationToken): monaco.languages.ProviderResult<monaco.languages.Definition> {
-        let usagePosition = this.getUsagePosition(position);
+        let editor = monaco.editor.getEditors().find(e => e.getModel() == model);
+        if(!editor) return;
+
+        let usagePosition = this.getUsagePosition(position, editor);
         
         let uri = usagePosition?.symbol.module.file.getMonacoModel()?.uri;
 
@@ -23,10 +25,11 @@ export class JavaDefinitionProvider implements monaco.languages.DefinitionProvid
 
 
 
-    getUsagePosition(position: monaco.Position): UsagePosition | undefined {
-        if(this.editor.getModel()?.getLanguageId() != 'myJava') return undefined;
+    getUsagePosition(position: monaco.Position, editor: monaco.editor.ICodeEditor): UsagePosition | undefined {
 
-        let module = <JavaCompiledModule>this.main.getModuleForMonacoModel(this.editor.getModel());
+        if(editor.getModel()?.getLanguageId() != 'myJava') return undefined;
+
+        let module = <JavaCompiledModule>this.main.getCurrentWorkspace()?.getModuleForMonacoModel(editor.getModel());
         if(!module) return;
 
         return module.compiledSymbolsUsageTracker.findSymbolAtPosition(position);

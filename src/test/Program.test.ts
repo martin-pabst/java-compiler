@@ -35,7 +35,7 @@ test('test if simple program with for-loop compiles and runs as expected', () =>
     let printSpy = vi.spyOn(testPrintManager, 'print');
     
     let compiler = new JavaCompiler();
-    compiler.files = [file];
+    compiler.setFiles([file]);
     let executable = compiler.compileIfDirty();
     
     let interpreter = new Interpreter(testPrintManager);
@@ -80,7 +80,7 @@ test('test if program with simple if-else block compiles and runs as expected', 
     let printSpy = vi.spyOn(tpm, 'print');  
     
     let compiler = new JavaCompiler();
-    compiler.files = [file];
+    compiler.setFiles([file]);
     let executable = compiler.compileIfDirty();
 
     let interpreter = new Interpreter(tpm);

@@ -1,4 +1,3 @@
-import { ErrorLevel } from "./compiler/common/Error.ts";
 import { Language } from "./compiler/common/Language.ts";
 import { CompilerFile } from "./compiler/common/module/CompilerFile.ts";
 import { Module } from "./compiler/common/module/Module.ts";
@@ -6,7 +5,6 @@ import { JavaCompiler } from "./compiler/java/JavaCompiler.ts";
 import { JavaLanguage } from "./compiler/java/JavaLanguage.ts";
 import { TokenPrinter } from "./compiler/java/lexer/TokenPrinter.ts";
 import { AstComponent } from "./testgui/AstComponent.ts";
-import { Button } from "./tools/Button.ts";
 import { DOM } from "./tools/DOM.ts";
 import { TabManager } from "./tools/TabManager.ts";
 
@@ -18,46 +16,39 @@ import * as PIXI from 'pixi.js';
 import jQuery from "jquery";
 import { ProgramViewerComponent } from "./testgui/ProgramViewerComponent.ts";
 import { testProgramsList } from "./testgui/testprograms/TestPrograms.ts";
-import { TabbedEditorManager } from "./tools/TabbedEditorManager.ts";
 import { TestResultViewer } from "./testgui/TestResultViewer.ts";
+import { TabbedEditorManager } from "./tools/TabbedEditorManager.ts";
 
-import '/include/css/main.css';
-import '/include/css/button.css';
 import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts";
-import { JavaHoverProvider } from "./compiler/java/monacoproviders/JavaHoverProvider.ts";
-import { GUITestAssertions } from "./test/lib/GUITestAssertions.ts";
-import { GUITestRunner } from "./test/lib/GUITestRunner.ts";
-import { TerminalPrintManager } from "./testgui/TerminalPrintManager.ts";
 import { OptionView } from "./testgui/OptionView.ts";
+import { TerminalPrintManager } from "./testgui/TerminalPrintManager.ts";
+import '/include/css/button.css';
+import '/include/css/main.css';
 
-import { JavaCompletionItemProvider as JavaCompletionItemProvider } from "./compiler/java/monacoproviders/JavaCompletionItemProvider.ts";
-import { JavaSymbolMarker } from "./compiler/java/monacoproviders/JavaSymbolMarker.ts";
-import { JavaRenameProvider } from "./compiler/java/monacoproviders/JavaRenameProvider.ts";
-import { JavaDefinitionProvider } from "./compiler/java/monacoproviders/JavaDefinitionProvider.ts";
-import { Range } from "./compiler/common/range/Range.ts";
-import { JavaReferenceProvider } from "./compiler/java/monacoproviders/JavaReferenceProvider.ts";
-import { JavaSignatureHelpProvider } from "./compiler/java/monacoproviders/JavaSignatureHelpProvider.ts";
-import { GraphicsManager } from "./compiler/common/interpreter/GraphicsManager.ts";
-import { IMain } from "./compiler/common/IMain.ts";
-import { KeyboardManager } from "./compiler/common/interpreter/KeyboardManager.ts";
 import { BreakpointManager } from "./compiler/common/BreakpointManager.ts";
-import { Formatter as JavaFormatter } from "./compiler/java/monacoproviders/JavaFormatter.ts";
-import { ColorProvider } from "./compiler/common/monacoproviders/ColorProvider.ts";
+import { IMain } from "./compiler/common/IMain.ts";
+import { GraphicsManager } from "./compiler/common/interpreter/GraphicsManager.ts";
+import { KeyboardManager } from "./compiler/common/interpreter/KeyboardManager.ts";
+import { Range } from "./compiler/common/range/Range.ts";
 
+import { Debugger } from "./compiler/common/debugger/Debugger.ts";
+import { ActionManager } from "./compiler/common/interpreter/IActionManager.ts";
+import { TestManager } from "./compiler/common/interpreter/TestManager.ts";
+import { ErrorMarker } from "./compiler/common/monacoproviders/ErrorMarker.ts";
+import { JavaOnDidTypeProvider } from "./compiler/java/monacoproviders/JavaOnDidTypeProvider.ts";
+import { ProgramPointerManager } from "./compiler/common/monacoproviders/ProgramPointerManager.ts";
+import { JavaRepl } from "./compiler/java/parser/repl/JavaRepl.ts";
+import { JavaReplCompiledModule } from "./compiler/java/parser/repl/JavaReplCompiledModule.ts";
+import { ReplGUI } from "./testgui/editor/ReplGUI.ts";
+import { TestFileManager } from "./testgui/TestFileManager.ts";
+import { TestInputManager } from "./testgui/TestInputManager.ts";
 import spritesheetjson from '/include/graphics/spritesheet.json.txt';
 import spritesheetpng from '/include/graphics/spritesheet.png';
-import { Debugger } from "./compiler/common/debugger/Debugger.ts";
-import { ProgramPointerManager } from "./compiler/common/monacoproviders/ProgramPointerManager.ts";
-import { JavaMethod } from "./compiler/java/types/JavaMethod.ts";
-import { TestManager } from "./compiler/common/interpreter/TestManager.ts";
-import { ActionManager } from "./compiler/common/interpreter/IActionManager.ts";
-import { ErrorMarker } from "./compiler/common/monacoproviders/ErrorMarker.ts";
-import { ReplGUI } from "./testgui/editor/ReplGUI.ts";
-import { Repl } from "./compiler/java/parser/repl/Repl.ts";
-import { ReplCompiledModule } from "./compiler/java/parser/repl/ReplCompiledModule.ts";
-import { TestInputManager } from "./testgui/TestInputManager.ts";
-import { TestFileManager } from "./testgui/TestFileManager.ts";
-import { OnDidTypeProvider } from "./compiler/common/monacoproviders/OnDidTypeProvider.ts";
+import { Compiler } from "./compiler/common/Compiler.ts";
+import { Executable } from "./compiler/common/Executable.ts";
+import { CompilerWorkspace } from "./compiler/common/module/CompilerWorkspace.ts";
+import { CompilerWorkspaceImpl } from "./test/CompilerWorkspaceImpl.ts";
+import { EditorOpenerProvider } from "./compiler/common/monacoproviders/EditorOpenerProvider.ts";
 
 export class Main implements IMain {
 
@@ -85,25 +76,21 @@ export class Main implements IMain {
 
   programViewerCompoment: ProgramViewerComponent;
 
-  files: CompilerFile[] = [];
+  currentWorkspace: CompilerWorkspaceImpl;
 
-  compiler: JavaCompiler;
   interpreter: Interpreter;
 
   decorations?: monaco.editor.IEditorDecorationsCollection;
 
   replGUI!: ReplGUI;
-  repl!: Repl;
 
   constructor() {
     this.loadSpritesheet();
 
-    this.language = new JavaLanguage();
-    this.language.registerLanguageAtMonacoEditor();
 
     /*
-     * Test program:
-     */
+    * Test program:
+    */
     //let testProgram: string = testPrograms.listeVorlage.trim();
 
     this.insightTabsManager = new TabManager(document.getElementById('insighttabs')!,
@@ -132,27 +119,27 @@ export class Main implements IMain {
 
     this.programViewerCompoment = new ProgramViewerComponent(this.codeOutputDiv);
 
+    this.currentWorkspace = new CompilerWorkspaceImpl(this);
+
     for (let i = 0; i < 3; i++) {
       let file = new CompilerFile("module " + i);
       file.createMonacolModel();
 
-      this.files.push(file);
+      this.currentWorkspace.addFile(file);
     }
     let file = new CompilerFile("Tests");
     file.createMonacolModel();
     //file.setText(testPrograms.testFuerListe.trim());
-    this.files.push(file);
+    this.currentWorkspace.addFile(file);
 
 
     this.tabbedEditorManager = new TabbedEditorManager(document.getElementById('editorOuter')!,
-      this.files);
+      this.currentWorkspace.getFiles());
+    this.initReplGUI();
 
-    OnDidTypeProvider.configureEditor(this.tabbedEditorManager.editor.editor);
 
-    this.setProgram("simpleWhileLoops");
+    this.setProgram(testProgramsList[1][0]);
 
-    this.compiler = new JavaCompiler();
-    this.compiler.files = this.files;
 
     this.actionManager = new ActionManager();
     let keyboardManager = new KeyboardManager(jQuery('#insighttabs'), this);
@@ -171,27 +158,24 @@ export class Main implements IMain {
       this.breakpointManager, _debugger, new ProgramPointerManager(this),
       testManager, inputManager, fileManager);
 
+    /**
+     * Compiler and Repl are fields of language!
+    */
+    this.language = new JavaLanguage(this);
+    this.language.registerLanguageAtMonacoEditor(this);
+    this.language.getCompiler().setFiles(this.currentWorkspace.getFiles());
+
     this.testResultViewer.addEventListener('run-all-tests',
       (e) => { if (e.type == "run-all-tests") testManager.executeAllTests(); });
 
     this.initButtons();
-    this.initCompiler();
 
-    this.initRepl();
-    this.interpreter.repl = this.repl;
-
-    this.registerMonacoProviders();
+    new EditorOpenerProvider(this);
 
     // document.addEventListener('keydown', (key) => {
     //   console.log(key.code);
     // });
 
-  }
-
-  getCurrentlyEditedModule(): Module | undefined {
-    let model = this.getEditor().getModel();
-    if (!model) return;
-    return this.getModuleForMonacoModel(model);
   }
 
   isEmbedded(): boolean {
@@ -202,36 +186,16 @@ export class Main implements IMain {
     return this.interpreter;
   }
 
-  getEditor(): monaco.editor.IStandaloneCodeEditor {
+  getMainEditor(): monaco.editor.IStandaloneCodeEditor {
     return this.tabbedEditorManager.editor.editor;
   }
 
-  getCompiler(): JavaCompiler {
-    return this.compiler;
+  getCompiler(): Compiler {
+    return this.language.getCompiler();
   }
 
-  ensureModuleIsCompiled(module: JavaCompiledModule): void {
-    if (module instanceof ReplCompiledModule) {
-      this.repl.compileAndShowErrors(module.file.getText());
-    } else {
-      this.compiler.updateSingleModuleForCodeCompletion(module);
-    }
-  }
-
-  getModuleForMonacoModel(model: monaco.editor.ITextModel | null): JavaCompiledModule | undefined {
-    if (model == null) return undefined;
-
-    for (let file of this.files) {
-      if (file.getMonacoModel() == model) {
-        return this.compiler.lastCompiledExecutable?.moduleManager.findModuleByFile(file);
-      }
-    }
-
-    if (model == this.replGUI.editor.getModel()) {
-      return this.repl.getCurrentModule();
-    }
-
-    return undefined;
+  getLanguage(): Language {
+    return this.language;
   }
 
   initButtons() {
@@ -264,45 +228,36 @@ export class Main implements IMain {
 
   }
 
-  initRepl() {
+  initReplGUI() {
 
     let buttonDiv = document.getElementById('bottomleft')!;
     this.replGUI = new ReplGUI(this, buttonDiv);
 
-    this.repl = new Repl(this.interpreter, this.compiler.libraryModuleManager, this.replGUI.editor);
+  }
 
+  getReplEditor(): monaco.editor.IStandaloneCodeEditor {
+    return this.replGUI.editor;
   }
 
 
-  initCompiler() {
-    this.compiler.compilationFinishedCallback = (executable) => {
-      this.interpreter.setExecutable(executable);
-      if (executable) {
-        for (let module of executable.moduleManager.modules) {
-          ErrorMarker.markErrorsOfModule(module);
-          this.printErrors(module);
-        }
-
-        if (executable.mainModule) {
-          let jcm = <JavaCompiledModule>executable.mainModule;
-          this.astComponent.buildTreeView(jcm.ast);
-          TokenPrinter.print(jcm.tokens!, this.tokenDiv);
-        }
-
-        this.programViewerCompoment.buildTreeView(this.compiler.moduleManager);
-
+  onCompilationFinished(executable: Executable | undefined): void {
+    this.interpreter.setExecutable(executable);
+    if (executable) {
+      for (let module of executable.moduleManager.modules) {
+        this.printErrors(module);
       }
 
-    }
+      if (executable.mainModule) {
+        let jcm = <JavaCompiledModule>executable.mainModule;
+        this.astComponent.buildTreeView(jcm.ast);
+        TokenPrinter.print(jcm.tokens!, this.tokenDiv);
+      }
 
-    this.compiler.askBeforeCompilingCallback = () => {
-      return !this.interpreter.isRunningOrPaused();
-    }
+      this.programViewerCompoment.buildTreeView((<JavaCompiler>this.getCompiler()).moduleManager);
 
-    this.compiler.startCompilingPeriodically();
+    }
 
   }
-
 
 
   printErrors(module: Module) {
@@ -319,51 +274,14 @@ export class Main implements IMain {
 
   }
 
-  registerMonacoProviders() {
-    let editor = this.tabbedEditorManager.editor.editor;
-    monaco.languages.registerHoverProvider('myJava', new JavaHoverProvider(editor, this));
-    monaco.languages.registerCompletionItemProvider('myJava', new JavaCompletionItemProvider(editor, this));
-    monaco.languages.registerRenameProvider('myJava', new JavaRenameProvider(editor, this));
-    monaco.languages.registerDefinitionProvider('myJava', new JavaDefinitionProvider(editor, this));
-    monaco.languages.registerReferenceProvider('myJava', new JavaReferenceProvider(editor, this));
-    monaco.languages.registerSignatureHelpProvider('myJava', new JavaSignatureHelpProvider(editor, this));
-    new JavaSymbolMarker(this.tabbedEditorManager.editor.editor, this);
-    new ColorProvider(this);
-
-    new JavaFormatter().init();
-
-    let that = this;
-    monaco.editor.registerEditorOpener({
-      openCodeEditor(source: monaco.editor.ICodeEditor, resource: monaco.Uri, selectionOrPosition?: monaco.IRange | monaco.IPosition): boolean | Promise<boolean> {
-
-        let module = that.getCompiler().moduleManager.modules.find(m => m.file.getMonacoModel()?.uri == resource);
-
-        if (module) {
-          let model = module.file.getMonacoModel();
-          if (model) {
-            editor.setModel(model);
-            editor.setPosition(Range.getStartPosition(<monaco.IRange>selectionOrPosition));
-            return true;
-          }
-        }
-
-        return false;
-      }
-    })
-  }
-
   setProgram(programName: string) {
     for (let program of testProgramsList) {
       if (program[0] == programName) {
         let currentTab = this.tabbedEditorManager.activeIndex;
-        this.files[currentTab].setText(program[1].trim());
+        this.currentWorkspace.getFiles()[currentTab].setText(program[1].trim());
         return;
       }
     }
-  }
-
-  getAllModules(): Module[] {
-    return this.getCompiler().moduleManager.modules;
   }
 
   loadSpritesheet() {
@@ -386,8 +304,12 @@ export class Main implements IMain {
 
   }
 
-  getRepl(): Repl {
-    return this.repl;
+  getRepl(): JavaRepl {
+    return this.language.getRepl();
+  }
+
+  getCurrentWorkspace(): CompilerWorkspace | undefined {
+    return this.currentWorkspace;
   }
 
 }

@@ -5,21 +5,27 @@ export class JavaSymbolMarker {
 
     decorations?: monaco.editor.IEditorDecorationsCollection;
 
-    constructor(private editor: monaco.editor.IStandaloneCodeEditor,
-        private main: IMain) {
+    constructor(private main: IMain) {
+            if(!main.getMainEditor()){
+                console.error("Call construction of JavaSymbolMarker before creation of monaco editor.");
+                return;
+            }
 
-            editor.onDidChangeCursorPosition((event) => {
+            main.getMainEditor().onDidChangeCursorPosition((event) => {
                 this.onDidChangeCursorPosition(event);
             })
 
         }
 
     onDidChangeCursorPosition(event: monaco.editor.ICursorPositionChangedEvent) {
-        if(this.editor.getModel()?.getLanguageId() != 'myJava') return;
+        let editor = this.main.getMainEditor();
+        if(!editor) return;
+
+        if(editor.getModel()?.getLanguageId() != 'myJava') return;
 
         this.clearDecorations();
 
-        let module = <JavaCompiledModule>this.main.getModuleForMonacoModel(this.editor.getModel());
+        let module = <JavaCompiledModule>this.main.getCurrentWorkspace()?.getModuleForMonacoModel(editor.getModel());
         if(!module) return;
 
         let usagePosition = module.findSymbolAtPosition(event.position);
@@ -47,7 +53,7 @@ export class JavaSymbolMarker {
             })
         }
 
-        this.decorations = this.editor.createDecorationsCollection(decorations);
+        this.decorations = editor.createDecorationsCollection(decorations);
 
     }
 

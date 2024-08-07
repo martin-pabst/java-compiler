@@ -233,4 +233,8 @@ export class SystemModule extends JavaLibraryModule {
         return undefined;
     }
 
+    isReplModule(): boolean {
+        return false;
+    }
+
 }

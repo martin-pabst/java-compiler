@@ -104,7 +104,7 @@ function compileAndTest(name: string, program: string, lineOffset: number, expec
         file.setText(program);
 
         let compiler = new JavaCompiler();
-        compiler.files = [file];
+        compiler.setFiles([file]);
         let executable = compiler.compileIfDirty();
         if (!executable){
             return;

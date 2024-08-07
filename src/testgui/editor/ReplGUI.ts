@@ -29,6 +29,7 @@ export class ReplGUI {
                 setTimeout(async () => {
                     // let returnValue = main.getRepl().executeSynchronously(statement);
                     let returnValue = await main.getRepl().executeAsync(statement!, false);
+                    if(returnValue["value"]) returnValue = returnValue.value;
                     let outputDiv = DOM.makeDiv(this.upperDiv);
                     outputDiv.textContent = '' + returnValue;
                     this.editor.getModel()?.setValue('');

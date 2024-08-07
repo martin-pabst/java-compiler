@@ -1,16 +1,65 @@
+import { Compiler } from "../common/Compiler";
+import { IMain } from "../common/IMain";
 import { Language } from "../common/Language";
+import { ColorProvider } from "../common/monacoproviders/ColorProvider";
+import { JavaCompiler } from "./JavaCompiler";
+import { JavaCompletionItemProvider } from "./monacoproviders/JavaCompletionItemProvider";
+import { JavaDefinitionProvider } from "./monacoproviders/JavaDefinitionProvider";
+import { JavaFormatter } from "./monacoproviders/JavaFormatter";
+import { JavaHoverProvider } from "./monacoproviders/JavaHoverProvider";
+import { JavaOnDidTypeProvider } from "./monacoproviders/JavaOnDidTypeProvider";
+import { JavaReferenceProvider } from "./monacoproviders/JavaReferenceProvider";
+import { JavaRenameProvider } from "./monacoproviders/JavaRenameProvider";
+import { JavaSignatureHelpProvider } from "./monacoproviders/JavaSignatureHelpProvider";
+import { JavaSymbolMarker } from "./monacoproviders/JavaSymbolMarker";
+import { JavaRepl as JavaRepl } from "./parser/repl/JavaRepl";
 
 export class JavaLanguage extends Language {
-    constructor(){
+    
+    providersRegistered: boolean = false;
+    compiler: JavaCompiler;
+    repl: JavaRepl;
+
+    constructor(private main: IMain) {
         super("Java", ".java");
+        this.compiler = new JavaCompiler(main);
+        this.repl = new JavaRepl(main, this.compiler.libraryModuleManager);
     }
 
     registerLanguageAtMonacoEditor(): void {
-        monaco.languages.register({ id: 'myJava', 
-        extensions: ['.learnJava'],
-        //  mimetypes: ["text/x-java-source", "text/x-java"]  
+        this.registerLanguage();
+        this.registerProviders();
+    }  
+
+    private registerProviders(){
+
+        if(this.providersRegistered) return;
+        this.providersRegistered = true;
+
+        monaco.languages.registerHoverProvider('myJava', new JavaHoverProvider(this.main));
+        monaco.languages.registerCompletionItemProvider('myJava', new JavaCompletionItemProvider(this.main));
+        monaco.languages.registerRenameProvider('myJava', new JavaRenameProvider(this.main));
+        monaco.languages.registerDefinitionProvider('myJava', new JavaDefinitionProvider(this.main));
+        monaco.languages.registerReferenceProvider('myJava', new JavaReferenceProvider(this.main));
+        monaco.languages.registerSignatureHelpProvider('myJava', new JavaSignatureHelpProvider(this.main));
+        monaco.languages.registerColorProvider('myJava', new ColorProvider(this.main));
+        new JavaSymbolMarker(this.main);
+
+        let formatter = new JavaFormatter();
+        monaco.languages.registerDocumentFormattingEditProvider('myJava', formatter);
+        monaco.languages.registerOnTypeFormattingEditProvider('myJava', formatter);
+
+        JavaOnDidTypeProvider.configureEditor(this.main.getMainEditor());
+
+    }
+
+    private registerLanguage(): void {
+        monaco.languages.register({
+            id: 'myJava',
+            extensions: ['.learnJava'],
+            //  mimetypes: ["text/x-java-source", "text/x-java"]  
         });
-    
+
         let conf: monaco.languages.LanguageConfiguration = {
             indentationRules: {
                 // ^(.*\*/)?\s*\}.*$
@@ -79,7 +128,7 @@ export class JavaLanguage extends Language {
                     end: new RegExp("^\\s*//\\s*(?:(?:#?endregion\\b)|(?:</editor-fold>))")
                 }
             },
-    
+
         };
         let language = {
             defaultToken: '',
@@ -96,7 +145,7 @@ export class JavaLanguage extends Language {
             print: ['print', 'println'],
             statements: ['for', 'while', 'if', 'then', 'else', 'do', 'break', 'continue'],
             types: ['int', 'boolean', 'char', 'float', 'double', 'long', 'void', 'byte', 'short',
-            'class', 'enum', 'interface', 'var'],
+                'class', 'enum', 'interface', 'var'],
             operators: [
                 '=', '>', '<', '!', '~', '?', ':',
                 '==', '<=', '>=', '!=', '&&', '||', '++', '--',
@@ -199,17 +248,24 @@ export class JavaLanguage extends Language {
                     [/"""/, 'string', '@pop'],
                     [/"/, 'string', '@pop']
                 ],
-                
+
             },
         };
-    
+
         //@ts-ignore
         monaco.languages.setLanguageConfiguration('myJava', conf);
         //@ts-ignore
         monaco.languages.setMonarchTokensProvider('myJava', language);
-    
-   
+
+
     }
 
+    getCompiler(): Compiler {
+        return this.compiler;
+    }
+
+    getRepl(): JavaRepl {
+        return this.repl;
+    }
 
 }

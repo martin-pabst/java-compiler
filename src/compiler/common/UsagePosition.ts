@@ -93,7 +93,7 @@ export class UsageTracker {
         this.dependsOnModules.forEach((moduleUsage, module) => {
             let mu: string = moduleUsage.toString();
             if(mu.length > 0){
-                str += chalk.blue("Depends on module " + module.file.filename + ":\n");
+                str += chalk.blue("Depends on module " + module.file.name + ":\n");
                 str += chalk.white(moduleUsage.toString());
             }
         })

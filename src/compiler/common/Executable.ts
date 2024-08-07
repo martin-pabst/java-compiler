@@ -34,9 +34,9 @@ export class Executable {
         public libraryModuleManager: JavaLibraryModuleManager,
         public globalErrors: Error[],
         public exceptionTree: ExceptionTree,
-        lastOpenedFile?: CompilerFile, currentlyOpenedFile?: CompilerFile) {
+        lastOpenedFile?: CompilerFile, currentlyOpenedModule?: Module) {
 
-        this.findMainModule(false, lastOpenedFile, currentlyOpenedFile);
+        this.findMainModule(false, lastOpenedFile, currentlyOpenedModule);
 
         this.findAllMethods();
 
@@ -140,9 +140,9 @@ export class Executable {
         return this.testClassToTestMethodMap;
     }
 
-    findMainModule(test: boolean, lastOpenedFile?: CompilerFile, currentlyOpenedFile?: CompilerFile) {
+    findMainModule(test: boolean, lastOpenedFile?: CompilerFile, currentlyOpenedModule?: Module) {
         if (test) {
-            let testModule = this.moduleManager.modules.find(m => m.file.filename == "TEST_FILE");
+            let testModule = this.moduleManager.modules.find(m => m.file.name == "TEST_FILE");
             if (testModule) {
                 this.mainModule = testModule;
 
@@ -150,9 +150,9 @@ export class Executable {
             }
 
         }
-        let currentModule = this.findModuleByFile(currentlyOpenedFile);
-        if (currentModule?.isStartable()) {
-            this.mainModule = currentModule;
+        
+        if (currentlyOpenedModule?.isStartable()) {
+            this.mainModule = currentlyOpenedModule;
         } else {
             let lastOpenedModule = this.findModuleByFile(lastOpenedFile);
             if (lastOpenedModule?.isStartable()) {

@@ -1,16 +1,18 @@
 import { Treeview } from "../../../tools/components/treeview/Treeview.ts";
 import { TreeviewNode } from "../../../tools/components/treeview/TreeviewNode.ts";
-import { Repl } from "../../java/parser/repl/Repl.ts";
+import { JavaRepl } from "../../java/parser/repl/JavaRepl.ts";
 import { IMain } from "../IMain.ts";
 import { Interpreter } from "../interpreter/Interpreter.ts";
+import { Debugger } from "./Debugger.ts";
 import { DebuggerWatchEntry } from "./DebuggerWatchEntry.ts";
 import { ValueRenderer } from "./ValueRenderer.ts";
 
 export class DebuggerWatchSection {
 
-    private lastRepl?: Repl;
+    private lastRepl?: JavaRepl;
 
-    constructor(private treeview: Treeview<DebuggerWatchEntry>){
+    constructor(private treeview: Treeview<DebuggerWatchEntry>, private debugger_: Debugger){
+
         treeview.newNodeCallback = (text: string, node: TreeviewNode<DebuggerWatchEntry>): DebuggerWatchEntry => {
             let dwe = new DebuggerWatchEntry(text);
             node.renderCaptionAsHtml = true;
@@ -25,7 +27,7 @@ export class DebuggerWatchSection {
     }
 
     update(interpreter: Interpreter){
-        let repl = interpreter.repl;
+        let repl: JavaRepl | undefined = this.debugger_.main.getRepl();
         if(!repl){
             repl = this.lastRepl;
         } 
@@ -39,7 +41,7 @@ export class DebuggerWatchSection {
         }
     }
 
-    private updateNode(node: TreeviewNode<DebuggerWatchEntry>, debuggerWatchEntry: DebuggerWatchEntry, repl: Repl){
+    private updateNode(node: TreeviewNode<DebuggerWatchEntry>, debuggerWatchEntry: DebuggerWatchEntry, repl: JavaRepl){
 
         let valueAsString: string = "---"
         let value = repl.executeSynchronously(debuggerWatchEntry.term);

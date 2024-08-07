@@ -1,9 +1,11 @@
-import { IPosition } from "../range/Position";
+import { IPosition } from "../../common/range/Position";
 
-export class OnDidTypeProvider {
+export class JavaOnDidTypeProvider {
     static configureEditor(editor: monaco.editor.IStandaloneCodeEditor) {
         //@ts-ignore
-        editor.onDidType((text) => { 
+        editor.onDidType((text: string) => { 
+
+            if(editor.getModel()?.getLanguageId() != 'myJava') return;
 
             const insertTextAndSetCursor = (pos:IPosition, insertText: string, newLine: number, newColumn: number) => {
                 const range = new monaco.Range(

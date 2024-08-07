@@ -50,7 +50,7 @@ export class KeyboardManager {
             }
 
             // prevent <html>-Element from scrolling in embedded mode
-            if (this.main.isEmbedded() && this.main.getInterpreter().scheduler.state == SchedulerState.running && !this.main.getEditor().hasTextFocus()) {
+            if (this.main.isEmbedded() && this.main.getInterpreter().scheduler.state == SchedulerState.running && !this.main.getMainEditor().hasTextFocus()) {
                 if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.key) >= 0)
                     e.preventDefault();
             }

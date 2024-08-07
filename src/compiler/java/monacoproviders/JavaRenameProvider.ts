@@ -4,14 +4,16 @@ import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 
 export class JavaRenameProvider implements monaco.languages.RenameProvider {
 
-    constructor(private editor: monaco.editor.IStandaloneCodeEditor,
-        private main: IMain) {
+    constructor(private main: IMain) {
     }
 
     provideRenameEdits(model: monaco.editor.ITextModel, position: monaco.Position, newName: string, token: monaco.CancellationToken): 
     monaco.languages.ProviderResult<monaco.languages.WorkspaceEdit & monaco.languages.Rejection> {
 
-        let usagePosition = this.getUsagePosition(position);
+        let editor = monaco.editor.getEditors().find(e => e.getModel() == model);
+        if(!editor) return;
+
+        let usagePosition = this.getUsagePosition(position, editor);
 
         if(!usagePosition){
             return;
@@ -19,7 +21,7 @@ export class JavaRenameProvider implements monaco.languages.RenameProvider {
 
         let edits: monaco.languages.IWorkspaceTextEdit[] = [];
 
-        for(let module of this.main.getAllModules()){
+        for(let module of this.main.getCompiler().getAllModules()){
             
             let allUsagePositions = (<JavaCompiledModule>module).getUsagePositionsForSymbol(usagePosition?.symbol);
     
@@ -43,7 +45,10 @@ export class JavaRenameProvider implements monaco.languages.RenameProvider {
     }
 
     resolveRenameLocation?(model: monaco.editor.ITextModel, position: monaco.Position, token: monaco.CancellationToken): monaco.languages.ProviderResult<monaco.languages.RenameLocation & monaco.languages.Rejection> {
-        let usagePosition = this.getUsagePosition(position);
+        let editor = monaco.editor.getEditors().find(e => e.getModel() == model);
+        if(!editor) return;
+
+        let usagePosition = this.getUsagePosition(position, editor);
         if(!usagePosition) return;
         return {
             range: usagePosition?.range,
@@ -51,10 +56,10 @@ export class JavaRenameProvider implements monaco.languages.RenameProvider {
         }
     }
 
-    getUsagePosition(position: monaco.Position): UsagePosition | undefined {
-        if(this.editor.getModel()?.getLanguageId() != 'myJava') return undefined;
+    getUsagePosition(position: monaco.Position, editor: monaco.editor.ICodeEditor): UsagePosition | undefined {
+        if(editor.getModel()?.getLanguageId() != 'myJava') return undefined;
 
-        let module = <JavaCompiledModule>this.main.getModuleForMonacoModel(this.editor.getModel());
+        let module = <JavaCompiledModule>this.main.getCurrentWorkspace()?.getModuleForMonacoModel(editor.getModel());
         if(!module) return;
 
         return module.compiledSymbolsUsageTracker.findSymbolAtPosition(position);

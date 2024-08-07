@@ -58,14 +58,17 @@ export class JavaHoverProvider {
         "var": "```\nvar\n```  \nWird einer Variable beim Deklarieren sofort ein Startwert zugewiesen (z.B. Circle c = new Circle(100, 100, 10)), so kann statt des Datentyps das Schlüsselwort ```var``` verwendet werden (also var c = new Circle(100, 100, 10)).",
     }
 
-    constructor(private editor: monaco.editor.IStandaloneCodeEditor, private main: IMain) {
+    constructor(private main: IMain) {
 
     }
 
     provideHover(model: monaco.editor.ITextModel, position: monaco.Position, token: monaco.CancellationToken):
         monaco.languages.ProviderResult<monaco.languages.Hover> {
 
-        let selection: monaco.Selection | null = this.editor.getSelection();
+        let editor = monaco.editor.getEditors().find(e => e.getModel() == model);
+        if(!editor) return;
+
+        let selection: monaco.Selection | null = editor.getSelection();
 
         if (selection != null) {
             if (selection.startLineNumber != selection.endLineNumber || selection.startColumn != selection.endColumn) {
@@ -87,7 +90,7 @@ export class JavaHoverProvider {
             }
         }
 
-        let module: Module | undefined = this.main.getModuleForMonacoModel(model);
+        let module: Module | undefined = this.main.getCurrentWorkspace()?.getModuleForMonacoModel(model);
 
         if (!module) {
             return null;

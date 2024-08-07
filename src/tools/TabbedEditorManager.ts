@@ -27,7 +27,7 @@ export class TabbedEditorManager {
         for (let file of files) {
             let headingDiv = document.createElement('div');
             headingDiv.classList.add('jo_tabs_tabheading');
-            headingDiv.textContent = file.filename;
+            headingDiv.textContent = file.name;
 
             headingDiv.onclick = (ev: MouseEvent) => {
                 this.setActive(<HTMLDivElement>ev.target);

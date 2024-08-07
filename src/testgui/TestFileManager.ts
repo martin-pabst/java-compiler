@@ -27,7 +27,7 @@ export class TestFileManager implements IFileManager {
     }
     
     getFile(filename: string): CompilerFile {
-        let file = this.main.files.find(f => f.filename == filename);
+        let file = this.main.getCurrentWorkspace()?.getFiles().find(f => f.name == filename);
         if(!file){
             throw new FileNotFoundExceptionClass(filename);
         }

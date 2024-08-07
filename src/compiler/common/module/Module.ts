@@ -30,6 +30,8 @@ export abstract class Module {
 
     abstract startMainProgram(thread: Thread): boolean;
 
+    abstract isReplModule(): boolean;
+
     isStartable(): boolean {
         if (this.hasMainProgram()) {
             return !this.hasErrors();

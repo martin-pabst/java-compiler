@@ -19,8 +19,7 @@ export class JavaCompletionItemProvider implements monaco.languages.CompletionIt
 
     public triggerCharacters: string[] = ['.', 'abcdefghijklmnopqrstuvwxyzäöüß_ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ', ' '];
 
-    constructor(private editor: monaco.editor.IStandaloneCodeEditor,
-        private main: IMain) {
+    constructor(private main: IMain) {
     }
 
     first: boolean = true;
@@ -51,7 +50,7 @@ export class JavaCompletionItemProvider implements monaco.languages.CompletionIt
 
         if(model.getLanguageId() != 'myJava') return;
 
-        let module = <JavaCompiledModule>this.main.getModuleForMonacoModel(model);
+        let module = <JavaCompiledModule>this.main.getCurrentWorkspace()?.getModuleForMonacoModel(model);
 
         if (module == null) {
             return null;
@@ -110,7 +109,7 @@ export class JavaCompletionItemProvider implements monaco.languages.CompletionIt
             //     this.main.compileIfDirty();
             // }
 
-            this.main.ensureModuleIsCompiled(module);
+            this.main.getCurrentWorkspace()?.ensureModuleIsCompiled(module);
             symbolTable = module.findSymbolTableAtPosition(position);
             classContext = symbolTable == null ? undefined : symbolTable.classContext;
         }
@@ -307,7 +306,7 @@ export class JavaCompletionItemProvider implements monaco.languages.CompletionIt
 
         } else {
             // Use filename to generate completion-item for class ... ?
-            let name = module.file?.filename;
+            let name = module.file?.name;
             if (name != null) {
                 if (name.endsWith(".java")) name = name.substring(0, name.indexOf(".java"));
                 let m = name.match(/([\wöäüÖÄÜß]*)$/);

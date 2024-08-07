@@ -1,26 +1,32 @@
 import { Compiler } from "../common/Compiler.ts";
 import { Module } from "../common/module/Module.ts";
 import { JavaBaseModule } from "../java/module/JavaBaseModule.ts";
-import { Repl } from "../java/parser/repl/Repl.ts";
+import { JavaRepl } from "../java/parser/repl/JavaRepl.ts";
+import { Executable } from "./Executable.ts";
 import { Interpreter } from "./interpreter/Interpreter.ts";
+import { Language } from "./Language.ts";
+import { CompilerWorkspace } from "./module/CompilerWorkspace.ts";
 
 export interface IMain {
-
-    getModuleForMonacoModel(model: monaco.editor.ITextModel | null): Module | undefined;
-    
-    ensureModuleIsCompiled(module: Module): void;
-
-    getCompiler(): Compiler;
-
-    getAllModules(): Module[];
 
     isEmbedded(): boolean;
 
     getInterpreter(): Interpreter;
 
-    getEditor(): monaco.editor.IStandaloneCodeEditor;
+    getLanguage(): Language;
 
-    getCurrentlyEditedModule(): Module | undefined;
+    getCompiler(): Compiler;
 
-    getRepl(): Repl;
+    getRepl(): JavaRepl;
+
+
+
+    getMainEditor(): monaco.editor.IStandaloneCodeEditor;
+    
+    getReplEditor(): monaco.editor.IStandaloneCodeEditor;
+
+
+    getCurrentWorkspace(): CompilerWorkspace | undefined;
+
+    onCompilationFinished(executable: Executable | undefined): void;
 }
