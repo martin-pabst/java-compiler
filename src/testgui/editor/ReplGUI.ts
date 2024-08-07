@@ -1,7 +1,5 @@
-import { Main } from "../../Main";
 import { IMain } from "../../compiler/common/IMain";
 import { DOM } from "../../tools/DOM";
-import { Editor } from "./Editor";
 
 export class ReplGUI {
     editor!: monaco.editor.IStandaloneCodeEditor;
