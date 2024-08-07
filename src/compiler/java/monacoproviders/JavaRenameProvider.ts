@@ -33,7 +33,6 @@ export class JavaRenameProvider implements monaco.languages.RenameProvider {
                     versionId: up.file.getMonacoModel()!.getVersionId(),
                     textEdit: {range: up.range, text: newName}
                 })
-                up.file.isSaved = false;
             }
         }
 

@@ -31,8 +31,6 @@ export type JavaMethodCallPosition = {
  */
 export class JavaCompiledModule extends JavaBaseModule {
 
-    sourceCode: string = "";
-
     tokens?: TokenList;
 
     ast?: ASTGlobalNode;
@@ -137,13 +135,6 @@ export class JavaCompiledModule extends JavaBaseModule {
         this.typePositions = {};
         this.methodCallPositions = {};
         this.symbolTables = [];
-    }
-
-    setDirtyIfProgramCodeChanged(){
-        this.dirty = this.sourceCode != this.file.getText();
-        if(this.dirty){
-            this.sourceCode = this.file.getText();
-        } 
     }
 
     hasMainProgram(): boolean {

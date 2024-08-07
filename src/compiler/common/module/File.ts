@@ -1,12 +1,20 @@
 export class File {
 
+    /**
+     * filename == "" for test files
+     */
     public filename: string;
-    private _text: string = "";
+
+    /**
+     * When running tests we don't have monaco as dependency. Therefore 
+     * we store text in variable _testfileText in these cases.
+     */
+    private _testfileText: string = "";
     private monacoModel?: monaco.editor.ITextModel;
 
-    isSaved: boolean = true;
+    private lastSavedMonacoVersion: number = -1;
 
-    static uriMap: { [name: string]: number } = {};
+    private static uriMap: { [name: string]: number } = {};
 
     constructor(filename?: string){
         this.filename = filename || "";
@@ -14,16 +22,17 @@ export class File {
 
     getText(){
         if(this.monacoModel){
-            this._text = this.monacoModel.getValue(monaco.editor.EndOfLinePreference.LF);
+            return this.monacoModel.getValue(monaco.editor.EndOfLinePreference.LF);
+        } else {
+            return this._testfileText;
         }
-
-        return this._text;
     }    
 
     setText(text: string){
-        this._text = text;
         if(this.monacoModel){
             this.monacoModel.setValue(text);
+        } else {
+            this._testfileText = text;
         }
     }
 
@@ -49,6 +58,22 @@ export class File {
 
         if (uriCounter > 0) path += " (" + uriCounter + ")";
         let uri = monaco.Uri.from({ path: path, scheme: 'inmemory' });
-        this.monacoModel = monaco.editor.createModel(this._text, "myJava", uri);
+        this.monacoModel = monaco.editor.createModel(this._testfileText, "myJava", uri);
+    }
+
+    getMonacoVersion(): number {
+        if(this.monacoModel){
+            return this.monacoModel.getAlternativeVersionId();
+        } else {
+            return -1;
+        }
+    }
+
+    isSaved(): boolean {
+        return this.lastSavedMonacoVersion == this.getMonacoVersion();
+    }
+
+    setSaved() {
+        this.lastSavedMonacoVersion = this.getMonacoVersion();
     }
 }

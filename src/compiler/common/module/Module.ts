@@ -13,11 +13,7 @@ export abstract class Module {
     bracketError?: string;
     colorInformation: monaco.languages.IColorInformation[] = [];
 
-    /**
-     * dirty == true if program code of this module or program code of 
-     * module-dependencies has changed since last compilation.
-     */
-    dirty: boolean = true;
+    private lastCompiledMonacoVersion: number = -2;
 
     programsToCompileToFunctions: Program[] = [];
 
@@ -80,6 +76,12 @@ export abstract class Module {
         return nearestStep;
     }
 
+    isDirty(): boolean {
+        return this.file.getMonacoVersion() != this.lastCompiledMonacoVersion;
+    }
 
+    setDirty() {
+        this.lastCompiledMonacoVersion = -2;
+    }
 
 }

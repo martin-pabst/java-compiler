@@ -142,9 +142,10 @@ export class JavaCompiler implements Compiler {
     updateSingleModuleForCodeCompletion(module: JavaCompiledModule): "success" | "completeCompilingNecessary" {
         if (!module) return "completeCompilingNecessary";
 
+        if(!module.isDirty()) return "success";
+
         let moduleManagerCopy = this.moduleManager.copy(module);
 
-        module.dirty = true;
         module.compiledSymbolsUsageTracker.clear();
         module.systemSymbolsUsageTracker.clear();
 
@@ -175,7 +176,7 @@ export class JavaCompiler implements Compiler {
          * The compilation run we did is not sufficient to produce a up to date executable,
          * so we mark module as dirty to force new compilation
          */
-        module.sourceCode = "";
+        module.setDirty();
 
         return "success";
 

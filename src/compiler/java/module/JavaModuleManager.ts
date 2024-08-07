@@ -47,16 +47,15 @@ export class JavaModuleManager {
     }
 
     setDirtyFlags(){
-        this.modules.forEach( m => m.setDirtyIfProgramCodeChanged());
 
         let done: boolean = false;
         while(!done){
             done = true;
             for(let module of this.modules){
-                if(module.dirty) continue;
+                if(module.isDirty()) continue;
                 // does module depend on dirty other module?
                 if(module.dependsOnOtherDirtyModule()){
-                    module.dirty = true;
+                    module.setDirty();
                     done = false;
                     break;
                 }
@@ -64,11 +63,9 @@ export class JavaModuleManager {
         }
 
         for(let module of this.modules){
-            if(module.dirty){
+            if(module.isDirty()){
                 module.resetBeforeCompilation();
-            } else {
-
-            }
+            } 
         }
 
     }
@@ -87,11 +84,11 @@ export class JavaModuleManager {
     }
 
     getNewOrDirtyModules(): JavaCompiledModule[] {
-        return this.modules.filter(m => m.dirty);
+        return this.modules.filter(m => m.isDirty());
     }
 
     getUnChangedModules(): JavaCompiledModule[] {
-        return this.modules.filter(m => !m.dirty);
+        return this.modules.filter(m => !m.isDirty());
     }
 
     compileModulesToJavascript(): boolean {
