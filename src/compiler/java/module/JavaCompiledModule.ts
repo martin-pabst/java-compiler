@@ -141,7 +141,9 @@ export class JavaCompiledModule extends JavaBaseModule {
 
     setDirtyIfProgramCodeChanged(){
         this.dirty = this.sourceCode != this.file.getText();
-        this.sourceCode = this.file.getText();
+        if(this.dirty){
+            this.sourceCode = this.file.getText();
+        } 
     }
 
     hasMainProgram(): boolean {

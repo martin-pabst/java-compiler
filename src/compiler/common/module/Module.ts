@@ -13,6 +13,10 @@ export abstract class Module {
     bracketError?: string;
     colorInformation: monaco.languages.IColorInformation[] = [];
 
+    /**
+     * dirty == true if program code of this module or program code of 
+     * module-dependencies has changed since last compilation.
+     */
     dirty: boolean = true;
 
     programsToCompileToFunctions: Program[] = [];
