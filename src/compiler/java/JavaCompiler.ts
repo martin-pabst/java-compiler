@@ -104,6 +104,7 @@ export class JavaCompiler implements Compiler {
                 let codegenerator = new CodeGenerator(module, this.libraryModuleManager.typestore,
                     this.moduleManager.typestore, exceptionTree);
                     codegenerator.start();
+                    module.setDirty(false);
             }
 
         }
@@ -176,7 +177,7 @@ export class JavaCompiler implements Compiler {
          * The compilation run we did is not sufficient to produce a up to date executable,
          * so we mark module as dirty to force new compilation
          */
-        module.setDirty();
+        module.setDirty(true);
 
         return "success";
 

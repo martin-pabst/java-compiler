@@ -76,12 +76,23 @@ export abstract class Module {
         return nearestStep;
     }
 
+    /**
+     * A module is dirty if it's program code or the program code of other modules
+     * it depends on has changed since last compilation run.
+     */
     isDirty(): boolean {
         return this.file.getMonacoVersion() != this.lastCompiledMonacoVersion;
     }
 
-    setDirty() {
-        this.lastCompiledMonacoVersion = -2;
+    /**
+     * Set this modules' dirty-status"
+     */
+    setDirty(dirty: boolean) {
+        if(dirty){
+            this.lastCompiledMonacoVersion = -2;
+        } else {
+            this.lastCompiledMonacoVersion = this.file.getMonacoVersion();
+        }
     }
 
 }
