@@ -1,4 +1,4 @@
-import { JCM } from "../../tools/language/JavaCompilerMessages";
+import { JCM } from "./language/JavaCompilerMessages";
 
 export enum TokenType {
     identifier,

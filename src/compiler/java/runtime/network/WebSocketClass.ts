@@ -1,10 +1,7 @@
-import { JRC } from "../../../../tools/language/JavaRuntimeLibraryComments";
-import { CallbackParameter } from "../../../common/interpreter/CallbackParameter";
-import { Thread } from "../../../common/interpreter/Thread";
+import { JRC } from "../../language/JavaRuntimeLibraryComments";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { ObjectClass } from "../system/javalang/ObjectClassStringClass";
-import { RuntimeExceptionClass } from "../system/javalang/RuntimeException";
 import { WebSocketClientClass } from "./WebSocketClientClass";
 
 export class WebSocketClass extends ObjectClass {

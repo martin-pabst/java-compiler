@@ -1,15 +1,14 @@
 import { CompilerFile } from "../../common/module/CompilerFile";
 import { IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
+import { JCM } from "../language/JavaCompilerMessages";
 import { JavaBaseModule } from "../module/JavaBaseModule";
+import { GenericTypeParameter } from "./GenericTypeParameter";
 import { JavaField } from "./JavaField";
-import { GenericTypeParameters, GenericTypeParameter } from "./GenericTypeParameter";
-import { JavaClass } from "./JavaClass";
-import { JavaType } from "./JavaType";
 import { JavaMethod } from "./JavaMethod";
+import { JavaType } from "./JavaType";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility";
-import { JCM } from "../../../tools/language/JavaCompilerMessages";
 
 export abstract class IJavaInterface extends NonPrimitiveType {
     

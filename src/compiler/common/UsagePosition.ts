@@ -106,7 +106,7 @@ export class UsageTracker {
         for(let entry of this.dependsOnModules.entries()){
             // TODO: analyze if used signatures are available
 
-            if(entry[0].dirty){
+            if(entry[0].isDirty()){
                 return true;
             }
         }

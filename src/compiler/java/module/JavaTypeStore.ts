@@ -1,7 +1,7 @@
-import { JCM } from "../../../tools/language/JavaCompilerMessages";
 import { KlassObjectRegistry } from "../../common/interpreter/StepFunction";
+import { JCM } from "../language/JavaCompilerMessages";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
-import { IJavaClass, JavaClass } from "../types/JavaClass";
+import { JavaClass } from "../types/JavaClass";
 import { JavaEnum } from "../types/JavaEnum";
 import { IJavaInterface } from "../types/JavaInterface";
 import { JavaType } from "../types/JavaType";

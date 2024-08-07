@@ -1,4 +1,4 @@
-import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
+import { JRC } from "../../../language/JavaRuntimeLibraryComments";
 import { SchedulerState } from "../../../../common/interpreter/Scheduler.ts";
 import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts";
 import { Thread } from "../../../../common/interpreter/Thread.ts";

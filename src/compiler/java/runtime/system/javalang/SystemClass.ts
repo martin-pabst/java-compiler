@@ -1,5 +1,5 @@
 import { Punkt, abstandPunktZuGerade, abstandPunktZuStrecke, polygonEnthältPunkt, schnittpunkteKreisStrecke, streckeSchneidetStrecke } from "../../../../../tools/MatheTools";
-import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments";
+import { JRC } from "../../../language/JavaRuntimeLibraryComments";
 import { CallbackFunction } from "../../../../common/interpreter/StepFunction";
 import { Thread, ThreadState } from "../../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType";

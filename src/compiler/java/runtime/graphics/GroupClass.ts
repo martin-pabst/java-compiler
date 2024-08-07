@@ -1,12 +1,11 @@
 import * as PIXI from 'pixi.js';
+import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { Thread } from "../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
-import { ShapeClass } from './ShapeClass';
-import { CallbackFunction } from '../../../common/interpreter/StepFunction';
-import { ExceptionClass } from '../system/javalang/ExceptionClass';
 import { RuntimeExceptionClass } from '../system/javalang/RuntimeException';
-import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
+import { ShapeClass } from './ShapeClass';
+import { JRC } from '../../language/JavaRuntimeLibraryComments';
 
 export class GroupClass extends ShapeClass {
     static __javaDeclarations: LibraryDeclarations = [

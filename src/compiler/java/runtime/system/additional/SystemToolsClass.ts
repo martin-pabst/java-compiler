@@ -1,4 +1,4 @@
-import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments";
+import { JRC } from "../../../language/JavaRuntimeLibraryComments";
 import { Thread, ThreadState } from "../../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType";
 import { ObjectClass, StringClass } from "../javalang/ObjectClassStringClass";

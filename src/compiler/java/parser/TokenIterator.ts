@@ -1,12 +1,11 @@
 import { ErrormessageWithId } from "../../../tools/language/LanguageManager";
 import { ErrorLevel, QuickFix } from "../../common/Error";
 import { EmptyRange, IRange } from "../../common/range/Range";
-import { JCM } from "../../../tools/language/JavaCompilerMessages.ts";
+import { JCM } from "../language/JavaCompilerMessages.ts";
 import { Token, TokenList } from "../lexer/Token";
+import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType, TokenTypeReadable } from "../TokenType";
 import { ASTNode } from "./AST";
-import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
-import { formatAsJavadocComment } from "../../../tools/StringTools.ts";
 
 export class TokenIterator {
 

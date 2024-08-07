@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js';
 import { convexhull } from '../../../../tools/ConvexHull';
-import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
 import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { Thread } from "../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
@@ -13,6 +12,7 @@ import { RepeatType, RepeatTypeEnum } from './RepeatTypeEnum';
 import { ScaleMode, ScaleModeEnum } from './ScaleModeEnum';
 import { ShapeClass } from './ShapeClass';
 import { SpriteLibraryEnum } from './SpriteLibraryEnum';
+import { JRC } from '../../language/JavaRuntimeLibraryComments';
 
 export class SpriteClass extends ShapeClass {
     static __javaDeclarations: LibraryDeclarations = [

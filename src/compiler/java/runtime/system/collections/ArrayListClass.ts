@@ -11,7 +11,7 @@ import { ConsumerInterface } from "../functional/ConsumerInterface.ts";
 import { ComparatorInterface } from "./ComparatorInterface.ts";
 import { BaseListType, BaseType } from "../../../../common/BaseType.ts";
 import { ArrayToStringCaster } from "../../../../common/interpreter/ArrayToStringCaster.ts";
-import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
+import { JRC } from "../../../language/JavaRuntimeLibraryComments";
 
 export class ArrayListClass extends SystemCollection implements BaseListType {
     static __javaDeclarations: LibraryDeclarations = [

@@ -27,9 +27,8 @@ import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
 import { OuterClassFieldAccessTracker } from "./OuterClassFieldAccessTracker.ts";
 import { LabelCodeSnippet } from "./LabelManager.ts";
 import { CodeReacedAssertion, CodeReachedAssertions } from "../../common/interpreter/CodeReachedAssertions.ts";
-import { JCM } from "../../../tools/language/JavaCompilerMessages";
 import { JavaLibraryModule } from "../module/libraries/JavaLibraryModule.ts";
-import { EnumClass } from "../runtime/system/javalang/EnumClass.ts";
+import { JCM } from "../language/JavaCompilerMessages.ts";
 
 export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 

@@ -1,6 +1,6 @@
 import { Treeview } from "../../../tools/components/treeview/Treeview";
 import { TreeviewAccordion } from "../../../tools/components/treeview/TreeviewAccordion";
-import { DebM } from "../../../tools/language/DebuggerMessages";
+import { DebM } from "./DebuggerMessages";
 import { BaseSymbolTable } from "../BaseSymbolTable";
 import { IMain } from "../IMain.ts";
 import { Scheduler } from "../interpreter/Scheduler";

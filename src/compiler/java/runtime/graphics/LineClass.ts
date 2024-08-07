@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js';
-import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
 import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
 import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { Thread } from "../../../common/interpreter/Thread";
@@ -7,6 +6,7 @@ import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { StringClass } from '../system/javalang/ObjectClassStringClass';
 import { FilledShapeClass } from './FilledShapeClass';
+import { JRC } from '../../language/JavaRuntimeLibraryComments';
 
 export class LineClass extends FilledShapeClass {
     static __javaDeclarations: LibraryDeclarations = [

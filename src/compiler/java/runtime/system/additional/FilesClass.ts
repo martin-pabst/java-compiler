@@ -1,4 +1,4 @@
-import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
+import { JRC } from "../../../language/JavaRuntimeLibraryComments";
 import { Thread } from "../../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { ObjectClass } from "../javalang/ObjectClassStringClass";

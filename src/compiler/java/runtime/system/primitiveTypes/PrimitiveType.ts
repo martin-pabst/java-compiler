@@ -1,7 +1,7 @@
-import { JCM } from "../../../../../tools/language/JavaCompilerMessages";
 import { CompilerFile } from "../../../../common/module/CompilerFile";
 import { EmptyRange, IRange } from "../../../../common/range/Range";
 import { TokenType } from "../../../TokenType";
+import { JCM } from "../../../language/JavaCompilerMessages";
 import { JavaBaseModule } from "../../../module/JavaBaseModule";
 import { GenericTypeParameter } from "../../../types/GenericTypeParameter";
 import { JavaType } from "../../../types/JavaType";

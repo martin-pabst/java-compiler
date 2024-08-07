@@ -5,7 +5,7 @@ import { Interpreter } from "../../../common/interpreter/Interpreter.ts";
 import { Program } from "../../../common/interpreter/Program.ts";
 import { SchedulerState } from "../../../common/interpreter/Scheduler.ts";
 import { Thread, ThreadState } from "../../../common/interpreter/Thread.ts";
-import { File } from "../../../common/module/File.ts";
+import { CompilerFile } from "../../../common/module/CompilerFile.ts";
 import { ErrorMarker } from "../../../common/monacoproviders/ErrorMarker.ts";
 import { EmptyRange } from "../../../common/range/Range.ts";
 import { ExceptionTree } from "../../codegenerator/ExceptionTree.ts";
@@ -37,7 +37,7 @@ export class Repl {
     constructor(private interpreter: Interpreter, libraryModuleManager: JavaLibraryModuleManager,
         private editor?: monaco.editor.IStandaloneCodeEditor
     ) {
-        this.standaloneModule = new JavaCompiledModule(new File());
+        this.standaloneModule = new JavaCompiledModule(new CompilerFile());
         this.standaloneSymbolTable = new JavaSymbolTable(this.standaloneModule, EmptyRange.instance, true);
         this.standaloneThread = interpreter.scheduler.createThread("REPL standalone thread");
         this.standaloneModuleManager = new JavaModuleManager();

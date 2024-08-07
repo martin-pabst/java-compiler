@@ -1,4 +1,4 @@
-import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments";
+import { JRC } from "../../../language/JavaRuntimeLibraryComments";
 import { CallbackFunction } from "../../../../common/interpreter/StepFunction";
 import { Thread } from "../../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType";

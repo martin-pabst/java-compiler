@@ -1,8 +1,8 @@
-import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
-import { InternalKeyboardListener, KeyDownListener, KeyboardManager } from "../../../../common/interpreter/KeyboardManager.ts";
+import { InternalKeyboardListener, KeyboardManager } from "../../../../common/interpreter/KeyboardManager.ts";
 import { Scheduler } from "../../../../common/interpreter/Scheduler.ts";
 import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts";
 import { Thread, ThreadState } from "../../../../common/interpreter/Thread.ts";
+import { JRC } from "../../../language/JavaRuntimeLibraryComments.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { StringClass } from "../../system/javalang/ObjectClassStringClass.ts";

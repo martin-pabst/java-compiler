@@ -1,7 +1,7 @@
-import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
 import { Klass } from '../../../common/interpreter/StepFunction';
 import { EmptyRange } from '../../../common/range/Range';
 import { TokenType } from '../../TokenType';
+import { JRC } from '../../language/JavaRuntimeLibraryComments.js';
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { JavaEnum } from '../../types/JavaEnum';
 import { JavaField } from '../../types/JavaField';

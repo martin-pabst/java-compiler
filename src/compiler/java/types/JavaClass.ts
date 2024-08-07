@@ -1,6 +1,6 @@
-import { JCM } from "../../../tools/language/JavaCompilerMessages.ts";
 import { IRange } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
+import { JCM } from "../language/JavaCompilerMessages.ts";
 import { ColorHelper } from "../lexer/ColorHelper.ts";
 import { JavaBaseModule } from "../module/JavaBaseModule";
 import { GenericTypeParameter } from "./GenericTypeParameter.ts";

@@ -1,14 +1,14 @@
 import * as PIXI from 'pixi.js';
+import { Punkt, abstandPunktZuStrecke, polygonBerührtPolygon, polygonEnthältPunkt, steckenzugSchneidetStreckenzug, streckenzugEnthältPunkt } from '../../../../tools/MatheTools.ts';
+import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
+import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { Thread } from "../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
-import { ShapeClass } from './ShapeClass';
-import { FilledShapeClass } from './FilledShapeClass';
-import { CallbackFunction } from '../../../common/interpreter/StepFunction';
-import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
-import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
 import { StringClass } from '../system/javalang/ObjectClassStringClass';
-import { Punkt, abstandPunktZuStrecke, polygonBerührtPolygon, polygonEnthältPunkt, steckenzugSchneidetStreckenzug, streckenzugEnthältPunkt } from '../../../../tools/MatheTools.ts';
+import { FilledShapeClass } from './FilledShapeClass';
+import { ShapeClass } from './ShapeClass';
+import { JRC } from '../../language/JavaRuntimeLibraryComments.ts';
 
 export type LineElement = {
     x: number,

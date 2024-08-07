@@ -1,6 +1,5 @@
 
 import * as PIXI from 'pixi.js';
-import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
 import { CallbackParameter } from '../../../common/interpreter/CallbackParameter.ts';
 import { Interpreter } from '../../../common/interpreter/Interpreter.ts';
 import { Thread, ThreadState } from "../../../common/interpreter/Thread.ts";
@@ -16,6 +15,7 @@ import { MouseManager } from './MouseManager.ts';
 import { ShapeClass } from './ShapeClass.ts';
 import { GNGEventListenerType, IGNGEventListener } from './gng/IGNGEventListener.ts';
 import { GNGEventlistenerManager } from './gng/GNGEventlistenerManager.ts';
+import { JRC } from '../../language/JavaRuntimeLibraryComments.ts';
 
 
 export class WorldClass extends ObjectClass implements IWorld {

@@ -1,8 +1,7 @@
 import * as PIXI from 'pixi.js';
-import { Punkt, abstandPunktZuGerade, abstand } from '../../../../tools/MatheTools';
-import { SpriteClass } from './SpriteClass';
-import { WorldClass } from './WorldClass';
+import { Punkt, abstand, abstandPunktZuGerade } from '../../../../tools/MatheTools';
 import { IWorld } from './IWorld';
+import { SpriteClass } from './SpriteClass';
 
 export class HitPolygonStore {
 

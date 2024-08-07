@@ -1,13 +1,13 @@
 import { expect, test, vi } from 'vitest'
-import { File } from '../compiler/common/module/File';
 import { JavaCompiler } from '../compiler/java/JavaCompiler';
 import { Interpreter } from '../compiler/common/interpreter/Interpreter';
 import { TestPrintManager } from '../testgui/TestPrintManager';
+import { CompilerFile } from '../compiler/common/module/CompilerFile';
 
 
 
 test('test if simple program with for-loop compiles and runs as expected', () => {
-    let file = new File();
+    let file = new CompilerFile();
     let code =`
     int sum = 0;
     for(int i = 1; i <= 100; i++){
@@ -49,7 +49,7 @@ test('test if simple program with for-loop compiles and runs as expected', () =>
 
 
 test('test if program with simple if-else block compiles and runs as expected', () => {
-    let file = new File();
+    let file = new CompilerFile();
     let code =`
     int x = 7;
     if (x > 8) {

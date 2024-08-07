@@ -1,8 +1,7 @@
-import { standardProperty } from "lit/decorators.js";
-import { JCM } from "../../../../tools/language/JavaCompilerMessages.ts";
 import { TokenType } from "../../TokenType.ts";
+import { JCM } from "../../language/JavaCompilerMessages.ts";
 import { JavaCompiledModule } from "../../module/JavaCompiledModule.ts";
-import { ASTAnonymousClassNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTNewObjectNode, ASTNodeWithModifiers, ASTProgramNode } from "../AST.ts";
+import { ASTAnonymousClassNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTNewObjectNode, ASTNodeWithModifiers } from "../AST.ts";
 import { StatementParser } from "../StatementParser.ts";
 
 

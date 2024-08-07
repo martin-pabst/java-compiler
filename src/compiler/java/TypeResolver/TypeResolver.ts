@@ -21,7 +21,7 @@ import { GenericMethod, JavaMethod } from "../types/JavaMethod";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { JavaParameter } from "../types/JavaParameter";
 import { CycleFinder } from "./CycleFinder";
-import { JCM } from "../../../tools/language/JavaCompilerMessages.ts";
+import { JCM } from "../language/JavaCompilerMessages.ts";
 
 
 export class TypeResolver {

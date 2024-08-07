@@ -5,9 +5,9 @@ import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { ShapeClass } from './ShapeClass';
 import { FilledShapeClass } from './FilledShapeClass';
 import { CallbackFunction } from '../../../common/interpreter/StepFunction';
-import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
 import { StringClass } from '../system/javalang/ObjectClassStringClass';
 import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
+import { JRC } from '../../language/JavaRuntimeLibraryComments';
 
 export class CircleClass extends FilledShapeClass {
     static __javaDeclarations: LibraryDeclarations = [

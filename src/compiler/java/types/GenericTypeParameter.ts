@@ -9,7 +9,7 @@ import { JavaType } from "./JavaType";
 import { JavaMethod } from "./JavaMethod";
 import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility.ts";
-import { JCM } from "../../../tools/language/JavaCompilerMessages.ts";
+import { JCM } from "../language/JavaCompilerMessages.ts";
 
 export class GenericTypeParameter extends NonPrimitiveType {
 

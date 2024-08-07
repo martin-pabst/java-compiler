@@ -1,6 +1,4 @@
-
-
-import { File } from '../compiler/common/module/File.ts';
+import { CompilerFile } from '../compiler/common/module/CompilerFile.ts';
 import { Editor } from '../testgui/editor/Editor.ts';
 import '/include/css/tabs.css';
 
@@ -15,7 +13,7 @@ export class TabbedEditorManager {
 
     activeIndex: number = 0;
 
-    constructor(private container: HTMLElement, public files: File[]) {
+    constructor(private container: HTMLElement, public files: CompilerFile[]) {
         this.container.classList.add('jo_tabs_container');
 
         this.headingsDiv = document.createElement('div');
@@ -61,7 +59,7 @@ export class TabbedEditorManager {
 
     }
 
-    getCurrentlyOpenedFile(): File {
+    getCurrentlyOpenedFile(): CompilerFile {
         return this.files[this.activeIndex];
     }
 

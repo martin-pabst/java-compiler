@@ -1,5 +1,5 @@
 import { TreeviewNode } from "../../../tools/components/treeview/TreeviewNode";
-import { DebM } from "../../../tools/language/DebuggerMessages";
+import { DebM } from "./DebuggerMessages";
 import { GenericVariantOfJavaClass, IJavaClass, JavaClass } from "../../java/types/JavaClass";
 import { BaseField, BaseSymbol, SymbolOnStackframe } from "../BaseSymbolTable";
 import { BaseArrayType, BaseListType, BaseType } from "../BaseType";

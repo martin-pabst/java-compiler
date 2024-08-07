@@ -1,9 +1,8 @@
-import { JCM } from "../../../../../tools/language/JavaCompilerMessages";
 import { EmptyRange } from "../../../../common/range/Range";
+import { JCM } from "../../../language/JavaCompilerMessages";
 import { JavaBaseModule } from "../../../module/JavaBaseModule";
 import { GenericTypeParameter } from "../../../types/GenericTypeParameter";
 import { JavaType } from "../../../types/JavaType";
-import { PrimitiveType } from "./PrimitiveType";
 
 export class NullType extends JavaType {
     

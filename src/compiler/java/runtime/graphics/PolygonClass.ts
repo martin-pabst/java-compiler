@@ -5,12 +5,12 @@ import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { ShapeClass } from './ShapeClass';
 import { FilledShapeClass } from './FilledShapeClass';
 import { CallbackFunction } from '../../../common/interpreter/StepFunction';
-import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
 import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
 import { StringClass } from '../system/javalang/ObjectClassStringClass';
 import { convexhull } from '../../../../tools/ConvexHull.ts';
 import { GroupClass } from './GroupClass.ts';
 import { polygonEnthältPunkt, streckenzugEnthältPunkt } from '../../../../tools/MatheTools.ts';
+import { JRC } from '../../language/JavaRuntimeLibraryComments.ts';
 
 export class PolygonClass extends FilledShapeClass {
     static __javaDeclarations: LibraryDeclarations = [

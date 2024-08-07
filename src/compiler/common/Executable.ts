@@ -10,8 +10,8 @@ import { Klass, KlassObjectRegistry } from "./interpreter/StepFunction";
 import { CompilerFile } from "./module/CompilerFile";
 import { Module } from "./module/Module";
 import { EmptyRange } from "./range/Range";
-import { JCM } from "../../tools/language/JavaCompilerMessages.ts";
 import { ExceptionTree } from "../java/codegenerator/ExceptionTree.ts";
+import { JCM } from "../java/language/JavaCompilerMessages.ts";
 
 type StaticInitializationStep = {
     klass: Klass,

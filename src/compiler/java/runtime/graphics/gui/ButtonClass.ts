@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js';
-import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
 import { GuiComponentClass } from "./GuiComponentClass.ts";
@@ -8,6 +7,7 @@ import { CallbackFunction } from '../../../../common/interpreter/StepFunction.ts
 import { GuiTextComponentClass } from './GuiTextComponentClass.ts';
 import { lightenDarkenIntColor } from '../../../../../tools/HtmlTools.ts';
 import { MouseEventKind } from '../MouseManager.ts';
+import { JRC } from '../../../language/JavaRuntimeLibraryComments.ts';
 
 export class ButtonClass extends GuiTextComponentClass {
     static __javaDeclarations: LibraryDeclarations = [

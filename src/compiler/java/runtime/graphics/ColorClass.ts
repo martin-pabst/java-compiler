@@ -1,4 +1,3 @@
-import { Color } from "pixi.js";
 import { Klass } from "../../../common/interpreter/StepFunction";
 import { ColorHelper } from "../../lexer/ColorHelper";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";

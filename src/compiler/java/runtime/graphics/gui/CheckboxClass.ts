@@ -1,13 +1,11 @@
 import * as PIXI from 'pixi.js';
-import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
+import { CallbackFunction } from '../../../../common/interpreter/StepFunction.ts';
+import { Thread } from '../../../../common/interpreter/Thread.ts';
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
-import { GuiComponentClass } from "./GuiComponentClass.ts";
-import { Thread } from '../../../../common/interpreter/Thread.ts';
-import { CallbackFunction } from '../../../../common/interpreter/StepFunction.ts';
-import { GuiTextComponentClass } from './GuiTextComponentClass.ts';
-import { lightenDarkenIntColor } from '../../../../../tools/HtmlTools.ts';
 import { MouseEventKind } from '../MouseManager.ts';
+import { GuiTextComponentClass } from './GuiTextComponentClass.ts';
+import { JRC } from '../../../language/JavaRuntimeLibraryComments.ts';
 
 export class CheckboxClass extends GuiTextComponentClass {
     static __javaDeclarations: LibraryDeclarations = [

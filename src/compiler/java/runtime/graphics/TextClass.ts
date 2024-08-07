@@ -1,14 +1,13 @@
 import * as PIXI from 'pixi.js';
+import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
+import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { Thread } from "../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
-import { ShapeClass } from './ShapeClass';
-import { FilledShapeClass } from './FilledShapeClass';
-import { CallbackFunction } from '../../../common/interpreter/StepFunction';
-import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
-import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
 import { StringClass } from '../system/javalang/ObjectClassStringClass';
 import { AlignmentEnum } from './AlignmentEnum';
+import { FilledShapeClass } from './FilledShapeClass';
+import { JRC } from '../../language/JavaRuntimeLibraryComments';
 
 export class TextClass extends FilledShapeClass {
     static __javaDeclarations: LibraryDeclarations = [

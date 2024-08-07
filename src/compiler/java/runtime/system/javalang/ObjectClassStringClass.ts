@@ -1,10 +1,10 @@
-import { JCM } from "../../../../../tools/language/JavaCompilerMessages.ts";
-import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
+import { JRC } from "../../../language/JavaRuntimeLibraryComments";
 import { ValueRenderer } from "../../../../common/debugger/ValueRenderer.ts";
 import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts";
 import { Thread, ThreadState } from "../../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
+import { JCM } from "../../../language/JavaCompilerMessages.ts";
 
 export type ObjectClassOrNull = ObjectClass | null;
 

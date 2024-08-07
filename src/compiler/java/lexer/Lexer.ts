@@ -1,11 +1,10 @@
-import { TokenList, Token } from "./Token.js";
-import { ColorLexer } from "./ColorLexer.js";
-import { ColorHelper } from "./ColorHelper.js";
-import { Error, ErrorLevel } from "../../common/Error.js";
-import { EscapeSequenceList, TokenType, TokenTypeReadable, keywordList as KeywordList, specialCharList } from "../TokenType.js";
-import { JavaCompiledModule } from "../module/JavaCompiledModule.js";
 import { ErrormessageWithId } from "../../../tools/language/LanguageManager.js";
-import { JCM } from "../../../tools/language/JavaCompilerMessages.js";
+import { Error, ErrorLevel } from "../../common/Error.js";
+import { JCM } from "../language/JavaCompilerMessages.js";
+import { EscapeSequenceList, keywordList as KeywordList, specialCharList, TokenType, TokenTypeReadable } from "../TokenType.js";
+import { ColorHelper } from "./ColorHelper.js";
+import { ColorLexer } from "./ColorLexer.js";
+import { Token, TokenList } from "./Token.js";
 
 
 

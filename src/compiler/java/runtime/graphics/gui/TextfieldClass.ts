@@ -1,12 +1,12 @@
 import * as PIXI from 'pixi.js';
-import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments";
+import { copyTextToClipboard } from '../../../../../tools/HtmlTools';
+import { CallbackFunction } from '../../../../common/interpreter/StepFunction';
+import { Thread } from '../../../../common/interpreter/Thread';
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
-import { GuiTextComponentClass } from "./GuiTextComponentClass";
-import { Thread } from '../../../../common/interpreter/Thread';
-import { CallbackFunction } from '../../../../common/interpreter/StepFunction';
 import { MouseEventKind } from '../MouseManager';
-import { copyTextToClipboard } from '../../../../../tools/HtmlTools';
+import { GuiTextComponentClass } from "./GuiTextComponentClass";
+import { JRC } from '../../../language/JavaRuntimeLibraryComments';
 
 export class TextfieldClass extends GuiTextComponentClass {
 

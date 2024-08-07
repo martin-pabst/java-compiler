@@ -1,7 +1,7 @@
 import { Program } from "../../common/interpreter/Program";
 import { Helpers } from "../../common/interpreter/StepFunction.ts";
-import { JCM } from "../../../tools/language/JavaCompilerMessages";
 import { TokenType } from "../TokenType";
+import { JCM } from "../language/JavaCompilerMessages.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
 import { ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTStaticInitializerNode, TypeScope } from "../parser/AST";
@@ -12,8 +12,8 @@ import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
 import { CodeSnippetContainer } from "./CodeSnippetKinds.ts";
 import { OneParameterTemplate } from "./CodeTemplate.ts";
 import { ExceptionTree } from "./ExceptionTree.ts";
-import { SnippetLinker } from "./SnippetLinker";
 import { InnerClassCodeGenerator } from "./InnerClassCodeGenerator.ts";
+import { SnippetLinker } from "./SnippetLinker";
 
 export class CodeGenerator extends InnerClassCodeGenerator {
 

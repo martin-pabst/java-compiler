@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js';
 import { Punkt, polygonBerührtPolygonExakt, polygonEnthältPunkt } from '../../../../tools/MatheTools';
-import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
 import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
 import { Thread } from "../../../common/interpreter/Thread";
 import { ColorHelper } from '../../lexer/ColorHelper';
@@ -10,6 +9,7 @@ import { ActorClass } from "./ActorClass";
 import { FilledShapeDefaults } from './FilledShapeDefaults';
 import { GroupClass } from './GroupClass';
 import { updateWorldTransformRecursively } from './PixiHelper';
+import { JRC } from '../../language/JavaRuntimeLibraryComments';
 
 export type MouseEventMethod = (t: Thread, callback: CallbackParameter, x: number, y: number, button: number) => void;
 

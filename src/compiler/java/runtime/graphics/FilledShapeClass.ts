@@ -7,7 +7,7 @@ import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { FilledShapeDefaults } from './FilledShapeDefaults';
 import { ColorClass } from './ColorClass';
 import { ColorHelper } from '../../lexer/ColorHelper';
-import { JRC } from '../../../../tools/language/JavaRuntimeLibraryComments';
+import { JRC } from '../../language/JavaRuntimeLibraryComments';
 
 export class FilledShapeClass extends ShapeClass {
     static __javaDeclarations: LibraryDeclarations = [

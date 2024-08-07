@@ -1,5 +1,4 @@
 // import p5 from "p5";  // unfortunately this breaks vite-test
-import { JRC } from "../../../../tools/language/JavaRuntimeLibraryComments.ts";
 import { CallbackFunction } from "../../../common/interpreter/StepFunction.ts";
 import { Thread } from "../../../common/interpreter/Thread.ts";
 import { LibraryDeclarations, LibraryMethodOrAttributeDeclaration } from "../../module/libraries/DeclareType.ts";
@@ -9,6 +8,7 @@ import { DOM } from "../../../../tools/DOM.ts";
 import { Interpreter } from "../../../common/interpreter/Interpreter.ts";
 import { SchedulerState } from "../../../common/interpreter/Scheduler.ts";
 import { render } from "lit";
+import { JRC } from "../../language/JavaRuntimeLibraryComments.ts";
 
 type p5 = any;
 

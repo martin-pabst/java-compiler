@@ -8,7 +8,7 @@ import { SystemCollection } from "./SystemCollection.ts";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { ConsumerInterface } from "../functional/ConsumerInterface.ts";
 import { BaseListType } from "../../../../common/BaseType.ts";
-import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
+import { JRC } from "../../../language/JavaRuntimeLibraryComments";
 import { RuntimeExceptionClass } from "../javalang/RuntimeException.ts";
 
 export class LinkedListClass extends ObjectClass implements BaseListType {

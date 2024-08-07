@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js';
-import { JRC } from "../../../../tools/language/JavaRuntimeLibraryComments";
 import { CallbackFunction } from "../../../common/interpreter/StepFunction";
 import { Thread } from "../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
@@ -9,6 +8,7 @@ import { RuntimeExceptionClass } from '../system/javalang/RuntimeException';
 import { PolygonClass } from './PolygonClass';
 import { PositionClass } from './PositionClass';
 import { ObjectClass } from '../system/javalang/ObjectClassStringClass';
+import { JRC } from '../../language/JavaRuntimeLibraryComments';
 
 type KaraDirection = {
     index: number,

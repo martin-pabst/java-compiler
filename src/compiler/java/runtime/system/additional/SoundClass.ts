@@ -1,5 +1,5 @@
 import { SoundTools } from "../../../../../tools/SoundTools";
-import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments";
+import { JRC } from "../../../language/JavaRuntimeLibraryComments";
 import { LibraryDeclarations, LibraryMethodOrAttributeDeclaration } from "../../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
 import { ObjectClass } from "../javalang/ObjectClassStringClass";

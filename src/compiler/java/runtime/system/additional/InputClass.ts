@@ -1,4 +1,4 @@
-import { JRC } from "../../../../../tools/language/JavaRuntimeLibraryComments.ts";
+import { JRC } from "../../../language/JavaRuntimeLibraryComments";
 import { InputManagerValidator } from "../../../../common/interpreter/IInputManager.ts";
 import { Interpreter } from "../../../../common/interpreter/Interpreter.ts";
 import { Thread, ThreadState } from "../../../../common/interpreter/Thread.ts";

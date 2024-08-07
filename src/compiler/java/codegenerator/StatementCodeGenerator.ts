@@ -1,29 +1,29 @@
+import { CatchBlockInfo } from "../../common/interpreter/ExceptionInfo.ts";
 import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
+import { EmptyRange, IRange, Range } from "../../common/range/Range.ts";
 import { TokenType } from "../TokenType";
+import { JCM } from "../language/JavaCompilerMessages.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTDoWhileNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTSwitchCaseNode, ASTWhileNode, ASTAttributeDereferencingNode, ASTSymbolNode, ASTContinueNode, ASTLocalVariableDeclarations, ASTArrayLiteralNode, ASTEnhancedForLoopNode, ASTSynchronizedBlockNode } from "../parser/AST";
+import { ASTArrayLiteralNode, ASTAttributeDereferencingNode, ASTBinaryNode, ASTBlockNode, ASTBreakNode, ASTCaseNode, ASTContinueNode, ASTDoWhileNode, ASTEnhancedForLoopNode, ASTForLoopNode, ASTIfNode, ASTLambdaFunctionDeclarationNode, ASTLocalVariableDeclaration, ASTLocalVariableDeclarations, ASTNode, ASTPrintStatementNode, ASTReturnNode, ASTStatementNode, ASTSwitchCaseNode, ASTSymbolNode, ASTSynchronizedBlockNode, ASTTermNode, ASTThrowNode, ASTTryCatchNode, ASTUnaryPrefixNode, ASTWhileNode } from "../parser/AST";
+import { SystemCollection } from "../runtime/system/collections/SystemCollection.ts";
+import { ObjectClass } from "../runtime/system/javalang/ObjectClassStringClass.ts";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
-import { JavaType } from "../types/JavaType.ts";
-import { CodeSnippetContainer } from "./CodeSnippetKinds.ts";
-import { CodeSnippet as CodeSnippet, StringCodeSnippet } from "./CodeSnippet.ts";
-import { BinaryOperatorTemplate, OneParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
-import { JavaLocalVariable } from "./JavaLocalVariable";
-import { JumpToLabelCodeSnippet, LabelCodeSnippet } from "./LabelManager.ts";
-import { SnippetFramer } from "./CodeSnippetTools.ts";
-import { TermCodeGenerator } from "./TermCodeGenerator";
-import { JavaMethod } from "../types/JavaMethod.ts";
-import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
-import { CatchBlockInfo } from "../../common/interpreter/ExceptionInfo.ts";
-import { JavaEnum } from "../types/JavaEnum.ts";
-import { EmptyRange, IRange, Range } from "../../common/range/Range.ts";
-import { ExceptionTree } from "./ExceptionTree.ts";
 import { JavaArrayType } from "../types/JavaArrayType.ts";
 import { GenericVariantOfJavaClass, IJavaClass } from "../types/JavaClass.ts";
+import { JavaEnum } from "../types/JavaEnum.ts";
 import { GenericVariantOfJavaInterface, IJavaInterface } from "../types/JavaInterface.ts";
-import { SystemCollection } from "../runtime/system/collections/SystemCollection.ts";
-import { JCM } from "../../../tools/language/JavaCompilerMessages";
-import { ObjectClass } from "../runtime/system/javalang/ObjectClassStringClass.ts";
+import { JavaMethod } from "../types/JavaMethod.ts";
+import { JavaType } from "../types/JavaType.ts";
+import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
+import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet.ts";
+import { CodeSnippetContainer } from "./CodeSnippetKinds.ts";
+import { SnippetFramer } from "./CodeSnippetTools.ts";
+import { BinaryOperatorTemplate, OneParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
+import { ExceptionTree } from "./ExceptionTree.ts";
+import { JavaLocalVariable } from "./JavaLocalVariable";
+import { JumpToLabelCodeSnippet, LabelCodeSnippet } from "./LabelManager.ts";
+import { TermCodeGenerator } from "./TermCodeGenerator";
 
 export abstract class StatementCodeGenerator extends TermCodeGenerator {
 

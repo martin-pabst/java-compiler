@@ -1,13 +1,11 @@
-import { JCM } from "../../../tools/language/JavaCompilerMessages.ts";
 import { EmptyRange, Range } from "../../common/range/Range.ts";
+import { JCM } from "../language/JavaCompilerMessages.ts";
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 import { TokenType } from "../TokenType";
-import { JavaType } from "../types/JavaType.ts";
 import {
     ASTAnnotationNode,
     ASTAnonymousClassNode,
-    ASTBaseTypeNode,
     ASTBlockNode,
     ASTClassDefinitionNode,
     ASTEnumDefinitionNode,

@@ -1,6 +1,6 @@
-import { JRC } from "../../../../tools/language/JavaRuntimeLibraryComments";
 import { CallbackFunction } from "../../../common/interpreter/StepFunction.ts";
 import { Thread, ThreadState } from "../../../common/interpreter/Thread.ts";
+import { JRC } from "../../language/JavaRuntimeLibraryComments.ts";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { ObjectClass } from "../system/javalang/ObjectClassStringClass";
