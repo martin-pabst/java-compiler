@@ -13,7 +13,6 @@ import { NonPrimitiveType } from "./NonPrimitiveType";
 import { Visibility } from "./Visibility";
 
 export abstract class IJavaClass extends JavaTypeWithInstanceInitializer {
-    isPrimitive: false;
 
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule) {
         super(identifier, identifierRange, path, module);
