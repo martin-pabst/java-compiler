@@ -3,7 +3,9 @@ import { Module } from "../module/Module.ts";
 
 export class ErrorMarker {
 
-    static markErrors(errors: Error[], monacoModel: monaco.editor.IModel) {
+    monacoModelToDeltaDecorationsMap: Map<monaco.editor.IModel, any[]> = new Map();
+
+    markErrors(errors: Error[], monacoModel: monaco.editor.IModel) {
         let markers: monaco.editor.IMarkerData[] = errors.map((error) => {
             return {
                 startLineNumber: error.range.startLineNumber,
@@ -16,20 +18,63 @@ export class ErrorMarker {
         })
 
         monaco.editor.setModelMarkers(monacoModel, "martin", markers);
+
+        let decorations: monaco.editor.IModelDeltaDecoration[] = errors.map((error) => {
+            return {
+                range: error.range,
+                options: {
+                    linesDecorationsClassName: this.getLinesDecorationsClassName(error.level),
+                    minimap: {
+                        position: monaco.editor.MinimapPosition.Inline,
+                        color: this.getMinimapColor(error.level),
+                        darkColor: this.getMinimapColor(error.level)
+                    }
+                }
+            }
+        });
+
+        let oldDecorations = this.monacoModelToDeltaDecorationsMap.get(monacoModel) || [];
+        this.monacoModelToDeltaDecorationsMap.set(monacoModel,  monacoModel.deltaDecorations(oldDecorations, decorations));
+
     }
 
-    static markErrorsOfModule(module: Module) {
+    markErrorsOfModule(module: Module) {
 
-        ErrorMarker.markErrors(module.errors, module.file.getMonacoModel()!);
+        this.markErrors(module.errors, module.file.getMonacoModel()!);
 
     }
 
-    static errorLevelToMarkerSeverity(errorlevel: ErrorLevel): monaco.MarkerSeverity {
+    errorLevelToMarkerSeverity(errorlevel: ErrorLevel): monaco.MarkerSeverity {
         switch (errorlevel) {
             case "info": return monaco.MarkerSeverity.Info;
             case "warning": return monaco.MarkerSeverity.Warning;
             case "error": return monaco.MarkerSeverity.Error;
         }
+    }
+
+    getLinesDecorationsClassName(errorLevel: ErrorLevel): string {
+        switch (errorLevel) {
+            case "error": return 'jo_revealErrorLine';
+            case "warning": return 'jo_revealWarningLine';
+            case "info": return 'jo_revealInfoLine';
+        }
+    }
+
+    getBorderLeftClassName(errorLevel: ErrorLevel): string {
+        switch (errorLevel) {
+            case "error": return "jo_borderLeftError";
+            case "warning": return "jo_borderLeftWarning";
+            case "info": return "jo_borderLeftInfo";
+        }
+    }
+
+    getMinimapColor(errorLevel: ErrorLevel): string {
+        switch (errorLevel) {
+            case "error": return "#bc1616";
+            case "warning": return "#cca700";
+            case "info": return "#75beff";
+        }
+
     }
 
 }

@@ -1,7 +1,7 @@
-import { PrintManager } from "../compiler/common/interpreter/PrintManager";
+import { IPrintManager } from "../compiler/common/interpreter/PrintManager";
 import { Terminal } from 'xterm';
 
-export class TerminalPrintManager implements PrintManager {
+export class TerminalPrintManager implements IPrintManager {
     terminal : Terminal;
     command: string;
     constructor() {
@@ -51,6 +51,10 @@ export class TerminalPrintManager implements PrintManager {
 
     clear(){
         this.terminal.clear();
+    }
+
+    flush(): void {
+        
     }
 
 }

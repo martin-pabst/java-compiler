@@ -18,7 +18,7 @@ import jQuery from 'jquery';
 
 import { SpeedControl } from "./SpeedControl.js";
 import { Interpreter } from '../compiler/common/interpreter/Interpreter.js';
-import { ActionManager } from '../compiler/common/interpreter/IActionManager.js';
+import { ActionManager } from '../compiler/common/interpreter/ActionManager.js';
 
 
 type ButtonData = {

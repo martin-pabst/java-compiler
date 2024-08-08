@@ -8,7 +8,7 @@ import { JavaMethod } from "../../java/types/JavaMethod";
 import { NonPrimitiveType } from "../../java/types/NonPrimitiveType";
 import { IMain } from "../IMain";
 import { Module } from "../module/Module";
-import { ActionManager } from "./IActionManager";
+import { ActionManager } from "./ActionManager";
 import { Program } from "./Program";
 import { SchedulerState } from "./Scheduler";
 import { Helpers, StepParams } from "./StepFunction";

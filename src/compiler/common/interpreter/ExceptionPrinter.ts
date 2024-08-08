@@ -1,11 +1,11 @@
 import { range } from "lit/directives/range.js";
 import { Exception } from "./ExceptionInfo";
-import { PrintManager } from "./PrintManager";
+import { IPrintManager } from "./PrintManager";
 import { Stacktrace } from "./ThrowableType";
 
 export class ExceptionPrinter {
 
-    static print(exception: Exception, stacktrace: Stacktrace, printManager?: PrintManager){
+    static print(exception: Exception, stacktrace: Stacktrace, printManager?: IPrintManager){
 
         if(!printManager) return;
 

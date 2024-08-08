@@ -1,7 +1,7 @@
-import { PrintManager } from "../compiler/common/interpreter/PrintManager";
+import { IPrintManager } from "../compiler/common/interpreter/PrintManager";
 import { DOM } from "../tools/DOM";
 
-export class TestPrintManager implements PrintManager {
+export class TestPrintManager implements IPrintManager {
     print(text: string | undefined, withNewline: boolean, color: number | undefined): void {
         if(!text){
             text = "";
@@ -20,6 +20,10 @@ export class TestPrintManager implements PrintManager {
     clear(){
         let output = document.getElementById('output')!;
         DOM.clear(output);
+    }
+
+    flush(): void {
+        
     }
 
 }

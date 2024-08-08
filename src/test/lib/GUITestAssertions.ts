@@ -1,4 +1,4 @@
-import { PrintManager } from "../../compiler/common/interpreter/PrintManager";
+import { IPrintManager } from "../../compiler/common/interpreter/PrintManager";
 import { Step } from "../../compiler/common/interpreter/Program";
 import { Thread } from "../../compiler/common/interpreter/Thread";
 import { AssertionObserver } from "../../compiler/java/runtime/unittests/AssertionObserver.ts";

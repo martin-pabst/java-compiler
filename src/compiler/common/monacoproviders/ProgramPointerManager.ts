@@ -1,5 +1,6 @@
 import { IMain } from "../IMain"
 import { Program } from "../interpreter/Program"
+import { CompilerFile } from "../module/CompilerFile"
 import { Module } from "../module/Module"
 import { IRange, Range } from "../range/Range"
 
@@ -26,6 +27,11 @@ export class ProgramPointerManager {
 
     constructor(private main: IMain) {
         this.editor = main.getMainEditor();
+    }
+
+    fileIsCurrentlyShownInEditor(file: CompilerFile | undefined){
+        if(!file) return false;
+        return this.main.getCurrentWorkspace()?.getCurrentlyEditedFile() == file;
     }
 
     show(position: ProgramPointerPositionInfo, style: ProgramPointerStyle) {

@@ -32,7 +32,7 @@ import { KeyboardManager } from "./compiler/common/interpreter/KeyboardManager.t
 import { Range } from "./compiler/common/range/Range.ts";
 
 import { Debugger } from "./compiler/common/debugger/Debugger.ts";
-import { ActionManager } from "./compiler/common/interpreter/IActionManager.ts";
+import { ActionManager } from "./compiler/common/interpreter/ActionManager.ts";
 import { TestManager } from "./compiler/common/interpreter/TestManager.ts";
 import { ErrorMarker } from "./compiler/common/monacoproviders/ErrorMarker.ts";
 import { JavaOnDidTypeProvider } from "./compiler/java/monacoproviders/JavaOnDidTypeProvider.ts";
@@ -83,6 +83,8 @@ export class Main implements IMain {
   decorations?: monaco.editor.IEditorDecorationsCollection;
 
   replGUI!: ReplGUI;
+
+  errorMarker: ErrorMarker;
 
   constructor() {
     this.loadSpritesheet();
@@ -158,10 +160,13 @@ export class Main implements IMain {
       this.breakpointManager, _debugger, new ProgramPointerManager(this),
       testManager, inputManager, fileManager);
 
+    this.errorMarker = new ErrorMarker();
+
+
     /**
      * Compiler and Repl are fields of language!
     */
-    this.language = new JavaLanguage(this);
+    this.language = new JavaLanguage(this, this.errorMarker);
     this.language.registerLanguageAtMonacoEditor(this);
     this.language.getCompiler().setFiles(this.currentWorkspace.getFiles());
 
@@ -171,6 +176,7 @@ export class Main implements IMain {
     this.initButtons();
 
     new EditorOpenerProvider(this);
+
 
     // document.addEventListener('keydown', (key) => {
     //   console.log(key.code);

@@ -1,4 +1,4 @@
-import { PrintManager } from "../../compiler/common/interpreter/PrintManager";
+import { IPrintManager } from "../../compiler/common/interpreter/PrintManager";
 export abstract class TestResult {
     constructor(public testName: TestName) {
 
@@ -63,7 +63,7 @@ export class TestName {
 
     }
 
-    public print(testResult: TestResult, printManager: PrintManager) {
+    public print(testResult: TestResult, printManager: IPrintManager) {
         if (testResult.isOk()) {
             printManager.print(`\x1b[1m\x1b[1;42mBestanden\x1b[0m \x1b[0m\tTest "${this.name}"`,true, 0);
         }
@@ -91,7 +91,7 @@ export class GUITestRunner {
         return JSON.stringify(this.results);
     }
 
-    public printResults(printManager: PrintManager) {
+    public printResults(printManager: IPrintManager) {
         printManager.print("Test Results:", true, 0);
         this.results.forEach((testResult) => testResult.testName.print(testResult, printManager));
         if (this.numberOfFailedTests > 0 ) {

@@ -87,8 +87,12 @@ export class CompilerFile {
         return this.lastSavedMonacoVersion == this.getMonacoVersion();
     }
 
-    setSaved() {
-        this.lastSavedMonacoVersion = this.getMonacoVersion();
+    setSaved(isSaved: boolean) {
+        if(isSaved){
+            this.lastSavedMonacoVersion = this.getMonacoVersion();
+        } else {
+            this.lastSavedMonacoVersion = -1;
+        }
     }
 
     onFileContentChanged(listener: FileContentChangedListener){

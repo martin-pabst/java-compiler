@@ -7,13 +7,14 @@
  */
 
 import { Compiler } from "../common/Compiler.ts";
-import { Error } from "../common/Error.ts";
+import { Error, ErrorLevel } from "../common/Error.ts";
 import { Executable } from "../common/Executable.ts";
 import { IMain } from "../common/IMain.ts";
 import { KlassObjectRegistry } from "../common/interpreter/StepFunction.ts";
 import { CompilerFile } from "../common/module/CompilerFile";
 import { Module } from "../common/module/Module.ts";
 import { ErrorMarker } from "../common/monacoproviders/ErrorMarker.ts";
+import { Range } from "../common/range/Range.ts";
 import { TypeResolver } from "./TypeResolver/TypeResolver";
 import { CodeGenerator } from "./codegenerator/CodeGenerator";
 import { ExceptionTree } from "./codegenerator/ExceptionTree.ts";
@@ -28,9 +29,6 @@ import { Parser } from "./parser/Parser";
 enum CompilerState {
     compilingPeriodically, stopped
 }
-
-type CompiliationFinishedCallback = (lastCompiledExecutable?: Executable) => void;
-type AskBeforeCompilingCallback = () => boolean;
 
 export class JavaCompiler implements Compiler {
 
@@ -48,7 +46,7 @@ export class JavaCompiler implements Compiler {
     private maxMsBetweenRuns: number = 100;
 
 
-    constructor(public main?: IMain) {
+    constructor(public main?: IMain, private errorMarker?: ErrorMarker) {
         this.libraryModuleManager = new JavaLibraryModuleManager();
         this.moduleManager = new JavaModuleManager();
         this.startCompilingPeriodically();
@@ -63,6 +61,7 @@ export class JavaCompiler implements Compiler {
         let time = performance.now();
 
         if (this.main?.getInterpreter().isRunningOrPaused()) return;
+        if (!this.main?.getCurrentWorkspace()) return;
 
         /**
          * if no module has changed, return as fast as possible
@@ -133,7 +132,7 @@ export class JavaCompiler implements Compiler {
 
         if (this.lastCompiledExecutable) {
             for (let module of this.lastCompiledExecutable.moduleManager.modules) {
-                ErrorMarker.markErrorsOfModule(module);
+                this.errorMarker?.markErrorsOfModule(module);
             }
 
         }
@@ -217,6 +216,48 @@ export class JavaCompiler implements Compiler {
 
     getAllModules(): Module[] {
         return this.moduleManager.modules;
+    }
+
+    setFileDirty(file: CompilerFile): void {
+        let module = this.findModuleByFile(file);
+        module?.setDirty(true);
+    }
+
+    getSortedAndFilteredErrors(file: CompilerFile): Error[] {
+        let module = this.findModuleByFile(file);
+        if (!module) return [];
+
+        let list: Error[] = module.errors.slice();
+
+        list.sort((a, b) => {
+            return Range.compareRangesUsingStarts(a.range, b.range);
+        });
+
+        for (let i = 0; i < list.length - 1; i++) {
+            let e1 = list[i];
+            let e2 = list[i + 1];
+            if (e1.range.startLineNumber == e2.range.startLineNumber && e1.range.startColumn + 10 > e2.range.startColumn) {
+                if (this.errorLevelCompare(e1.level, e2.level) == 1) {
+                    list.splice(i + 1, 1);
+                } else {
+                    list.splice(i, 1);
+                }
+                i--;
+            }
+        }
+
+        return list;
+
+
+
+    }
+
+    errorLevelCompare(level1: ErrorLevel, level2: ErrorLevel): number {
+        if(level1 == "error") return 1;
+        if(level2 == "error") return -1;
+        if(level1 == "warning") return 1;
+        if(level2 == "warning") return -1;
+        return 1;
     }
 
 }

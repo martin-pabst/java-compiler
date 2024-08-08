@@ -6,10 +6,10 @@ import { JavaCompiler } from "../compiler/java/JavaCompiler";
 import { Interpreter } from "../compiler/common/interpreter/Interpreter";
 import { ViteTestAssertions } from "./lib/ViteTestAssertions";
 import chalk from "chalk";
-import { PrintManager } from "../compiler/common/interpreter/PrintManager";
+import { IPrintManager } from "../compiler/common/interpreter/PrintManager";
 import { getLine, getLineNumber, threeDez } from "../tools/StringTools";
 
-class StoreOutputPrintManager implements PrintManager {
+class StoreOutputPrintManager implements IPrintManager {
 
     output: string = "";
 

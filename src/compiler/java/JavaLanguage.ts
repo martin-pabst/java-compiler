@@ -2,6 +2,7 @@ import { Compiler } from "../common/Compiler";
 import { IMain } from "../common/IMain";
 import { Language } from "../common/Language";
 import { ColorProvider } from "../common/monacoproviders/ColorProvider";
+import { ErrorMarker } from "../common/monacoproviders/ErrorMarker";
 import { JavaCompiler } from "./JavaCompiler";
 import { JavaCompletionItemProvider } from "./monacoproviders/JavaCompletionItemProvider";
 import { JavaDefinitionProvider } from "./monacoproviders/JavaDefinitionProvider";
@@ -11,7 +12,7 @@ import { JavaOnDidTypeProvider } from "./monacoproviders/JavaOnDidTypeProvider";
 import { JavaReferenceProvider } from "./monacoproviders/JavaReferenceProvider";
 import { JavaRenameProvider } from "./monacoproviders/JavaRenameProvider";
 import { JavaSignatureHelpProvider } from "./monacoproviders/JavaSignatureHelpProvider";
-import { JavaSymbolMarker } from "./monacoproviders/JavaSymbolMarker";
+import { JavaSymbolAndMethodMarker } from "./monacoproviders/JavaSymbolAndMethodMarker";
 import { JavaRepl as JavaRepl } from "./parser/repl/JavaRepl";
 
 export class JavaLanguage extends Language {
@@ -20,10 +21,10 @@ export class JavaLanguage extends Language {
     compiler: JavaCompiler;
     repl: JavaRepl;
 
-    constructor(private main: IMain) {
+    constructor(private main: IMain, errorMarker: ErrorMarker) {
         super("Java", ".java");
-        this.compiler = new JavaCompiler(main);
-        this.repl = new JavaRepl(main, this.compiler.libraryModuleManager);
+        this.compiler = new JavaCompiler(main, errorMarker);
+        this.repl = new JavaRepl(main, this.compiler.libraryModuleManager, errorMarker);
     }
 
     registerLanguageAtMonacoEditor(): void {
@@ -43,7 +44,7 @@ export class JavaLanguage extends Language {
         monaco.languages.registerReferenceProvider('myJava', new JavaReferenceProvider(this.main));
         monaco.languages.registerSignatureHelpProvider('myJava', new JavaSignatureHelpProvider(this.main));
         monaco.languages.registerColorProvider('myJava', new ColorProvider(this.main));
-        new JavaSymbolMarker(this.main);
+        new JavaSymbolAndMethodMarker(this.main);
 
         let formatter = new JavaFormatter();
         monaco.languages.registerDocumentFormattingEditProvider('myJava', formatter);

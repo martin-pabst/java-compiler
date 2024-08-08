@@ -35,7 +35,7 @@ export class JavaRepl {
 
     lastCompiledModule?: JavaCompiledModule;
 
-    constructor(private main: IMain, libraryModuleManager: JavaLibraryModuleManager
+    constructor(private main: IMain, libraryModuleManager: JavaLibraryModuleManager, private errorMarker: ErrorMarker
     ) {
         let interpreter = this.getInterpreter();
         if(!interpreter){
@@ -212,7 +212,7 @@ export class JavaRepl {
         let monacoModel = editor.getModel();
         if (!monacoModel) return;
 
-        ErrorMarker.markErrors(errors, monacoModel);
+        this.errorMarker.markErrors(errors, monacoModel);
 
     }
 

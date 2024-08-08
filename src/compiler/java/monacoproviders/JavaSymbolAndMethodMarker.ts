@@ -2,7 +2,7 @@ import { IMain } from "../../common/IMain.ts";
 import { Range } from "../../common/range/Range.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 
-export class JavaSymbolMarker {
+export class JavaSymbolAndMethodMarker {
 
     decorations?: monaco.editor.IEditorDecorationsCollection;
 

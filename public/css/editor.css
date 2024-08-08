@@ -19,6 +19,19 @@
     --margin-breakpoint-active: rgba(255, 0, 0, 0.815);    
     --margin-breakpoint-mousedown: rgba(255, 153, 0, 0.815);    
 
+    /* Errors */
+    --reveal-error: rgba(253, 101, 101, 0.745);
+    --reveal-errorline-background: #bc1616;
+    --reveal-error-whole-line: rgba(255, 0, 0, 0.555);
+
+    --reveal-warning: rgba(146, 145, 65, 0.745);
+    --reveal-warningline-background: #cca700;
+    --reveal-warning-whole-line: rgb(238, 255, 0);
+
+    --reveal-info: rgba(58, 60, 173, 0.745);
+    --reveal-infoline-background: #75beff;
+    --reveal-info-whole-line: rgba(4, 0, 255, 0.555);
+
 }   
 
 
@@ -191,4 +204,55 @@
 .jo_inputManagerError {
     height: 16px;
     color: red;
+}
+
+/* Errors */
+.jo_revealError {
+    background-color: var(--reveal-error);
+}
+
+.jo_revealErrorLine {
+    background: var(--reveal-errorline-background);
+    width: 5px !important;
+    margin-left: 3px;
+}
+
+.jo_revealErrorWholeLine {
+    background: var(--reveal-error-whole-line);
+}
+
+.jo_warning_category {
+    color: yellow;
+}
+
+.jo_info_category {
+    color: rgb(88, 102, 221);
+}
+
+.jo_revealWarning {
+    background-color: var(--reveal-warning);
+}
+
+.jo_revealWarningLine {
+    background: var(--reveal-warningline-background);
+    width: 5px !important;
+    margin-left: 3px;
+}
+
+.jo_revealWarningWholeLine {
+    background: var(--reveal-warning-whole-line);
+}
+
+.jo_revealInfo {
+    background-color: var(--reveal-info);
+}
+
+.jo_revealInfoLine {
+    background: var(--reveal-infoline-background);
+    width: 5px !important;
+    margin-left: 3px;
+}
+
+.jo_revealInfoWholeLine {
+    background: var(--reveal-info-whole-line);
 }
