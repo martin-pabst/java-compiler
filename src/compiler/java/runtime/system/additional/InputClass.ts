@@ -61,14 +61,14 @@ export class InputClass extends ObjectClass {
             validator: validator
         })
 
-        if (!interpreter.objectStore["inputTaskRunning"]) {
+        if (!interpreter.retrieveObject("inputTaskRunning")) {
             let f = () => {
                 if (list.length > 0) {
-                    interpreter.objectStore["inputTaskRunning"] = true;
+                    interpreter.storeObject("inputTaskRunning", true);
                     let task = list.shift()!;
                     this.readInput(task, f)
                 } else {
-                    interpreter.objectStore["inputTaskRunning"] = false;
+                    interpreter.storeObject("inputTaskRunning", false);
                 }
             }
             f();

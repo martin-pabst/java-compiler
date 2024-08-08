@@ -20,7 +20,6 @@ export interface IMain {
     getRepl(): JavaRepl;
 
 
-
     getMainEditor(): monaco.editor.IStandaloneCodeEditor;
     
     getReplEditor(): monaco.editor.IStandaloneCodeEditor;
@@ -29,4 +28,6 @@ export interface IMain {
     getCurrentWorkspace(): CompilerWorkspace | undefined;
 
     onCompilationFinished(executable: Executable | undefined): void;
+
+    adjustWidthToWorld(): void;
 }

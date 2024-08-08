@@ -620,7 +620,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         return snippet;
     }
 
-    compileFieldAccess(symbol: BaseSymbol, range: IRange, outerClassLevel: number = 0): CodeSnippet | undefined {
+     compileFieldAccess(symbol: BaseSymbol, range: IRange, outerClassLevel: number = 0): CodeSnippet | undefined {
         let field = <JavaField>symbol;
 
         if (field._isStatic && this.classOfCurrentlyCompiledStaticInitialization) {
@@ -770,8 +770,20 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let field = objectType.getField(node.attributeIdentifier, TokenType.keywordPublic);
 
         if (!field && objectType instanceof StaticNonPrimitiveType) {
-            let innerType = objectType.nonPrimitiveType.innerTypes.find(type => type.identifier == node.attributeIdentifier) as NonPrimitiveType;
-            if (innerType) return new StringCodeSnippet(`${Helpers.classes}["${innerType.pathAndIdentifier}"]`, node.range, innerType.staticType);
+            if(objectType.identifier == 'SpriteLibraryEnum'){
+                let enumClass = objectType.nonPrimitiveType.runtimeClass;
+                if(enumClass){
+                    let id = (<JavaEnum>objectType.nonPrimitiveType).id;
+                    let value = enumClass.getSpriteLibrary(id, node.attributeIdentifier);
+                    if(value){
+                        return new StringCodeSnippet(`${Helpers.classes}["SpriteLibraryEnum"].getSpriteLibrary(${id}, "${node.attributeIdentifier}")`, node.range, objectType.nonPrimitiveType);
+                    }
+                }
+
+            } else {
+                let innerType = objectType.nonPrimitiveType.innerTypes.find(type => type.identifier == node.attributeIdentifier) as NonPrimitiveType;
+                if (innerType) return new StringCodeSnippet(`${Helpers.classes}["${innerType.pathAndIdentifier}"]`, node.range, innerType.staticType);
+            }
         }
 
         if (!field) {

@@ -31,7 +31,7 @@ export class GNGEreignisbehandlung extends ObjectClass implements IGNGEventListe
     _cj$_constructor_$Ereignisbehandlung$(t: Thread, callback: CallbackFunction) {
         t.s.push(this);
 
-        this.world = t.scheduler.interpreter.objectStore["World"];
+        this.world = t.scheduler.interpreter.retrieveObject("WorldClass");
         if(!this.world){
             new t.classes["World"]()._cj$_constructor_$World$(t, () => {
                 this.world = t.s.pop();

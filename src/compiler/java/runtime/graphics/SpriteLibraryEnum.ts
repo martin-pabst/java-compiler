@@ -1,4 +1,4 @@
-import { Klass } from '../../../common/interpreter/StepFunction';
+import { Klass } from '../../../common/interpreter/StepFunction.js';
 import { EmptyRange } from '../../../common/range/Range';
 import { TokenType } from '../../TokenType';
 import { JRC } from '../../language/JavaRuntimeLibraryComments.js';
@@ -21,6 +21,11 @@ export class SpriteLibraryEnum extends EnumClass {
     static type: JavaEnum;
 
     static values: SpriteLibraryEnum[] = SpriteLibraryEnum.initValues();
+    static typeIdToUserSpritesheetsMap: Map<number, Map<string, SpriteLibraryEnum>> = new Map();
+
+    constructor(name: string, index: number, isUserSpritesheet: boolean = false){
+        super(name, index);
+    }
 
     static initValues(): SpriteLibraryEnum[]{
         let i: number = 0;
@@ -34,10 +39,26 @@ export class SpriteLibraryEnum extends EnumClass {
         })
     }
 
-    static addEntry(name: string){
+    private static getSpritesheetsForTypeId(typeId: number): Map<string, SpriteLibraryEnum>{
+        let map: Map<string, SpriteLibraryEnum> | undefined = this.typeIdToUserSpritesheetsMap.get(typeId);
+        if(!map){
+            map = new Map();
+            this.typeIdToUserSpritesheetsMap.set(typeId, map);
+        }
+        return map;
+    }
+
+    static addEntry(name: string, typeId?: number){
 
         let value = new SpriteLibraryEnum(name, SpriteLibraryEnum.values.length);
-        this.values.push(value);
+        
+        if(typeId){
+            SpriteLibraryEnum.getSpritesheetsForTypeId(typeId).set(name, value);
+
+        } else {
+            this.values.push(value);
+        }
+        
 
         // if type is already constructed we have to add a appropriate attribute object:
         if(SpriteLibraryEnum.type){
@@ -54,6 +75,18 @@ export class SpriteLibraryEnum extends EnumClass {
             SpriteLibraryEnum.type.fields.push(field);
         } 
 
+    }
+
+    static removeUserSpritesheets(typeId: number){
+        this.typeIdToUserSpritesheetsMap.delete(typeId);
+    }
+    
+    static getSpriteLibrary(typeId: number, identifier: string){
+        //@ts-ignore
+        let v = SpriteLibraryEnum[identifier];
+        if(v) return v;
+        let map = this.getSpritesheetsForTypeId(typeId);
+        return map.get(identifier) || null;
     }
     
 }

@@ -156,7 +156,7 @@ export class Main implements IMain {
     let fileManager = new TestFileManager(this);
 
     this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager,
-      new GraphicsManager(this.graphicsDiv), keyboardManager,
+      new GraphicsManager(this.graphicsDiv, this), keyboardManager,
       this.breakpointManager, _debugger, new ProgramPointerManager(this),
       testManager, inputManager, fileManager);
 
@@ -316,6 +316,10 @@ export class Main implements IMain {
 
   getCurrentWorkspace(): CompilerWorkspace | undefined {
     return this.currentWorkspace;
+  }
+
+  adjustWidthToWorld(): void {
+      // nothing to do
   }
 
 }

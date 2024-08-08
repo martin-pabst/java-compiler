@@ -23,11 +23,14 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
     fields: JavaField[] = [];
     methods: JavaMethod[] = [];
 
+    id: number; // needed for user defined Sprites in SpriteLibraryEnum
+
     private implements: JavaInterface[] = [];
 
 
     constructor(identifier: string, identifierRange: IRange, path: string, module: JavaBaseModule, public baseEnumClass: JavaClass) {
         super(identifier, identifierRange, path, module);
+        this.id = Math.trunc(Math.random() * Number.MAX_SAFE_INTEGER);
     }
 
     getCompletionItemDetail(): string {
@@ -183,6 +186,7 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
     }
 
     addValuesMethod(klass: Klass, stringType: PrimitiveType) {
+        
         klass["_values"] = (klass["_mn$values$" + this.identifier + "_I$"] = () => {
             return klass.values;
         })

@@ -73,7 +73,7 @@ export class ActorClass extends ObjectClass implements IActor {
 
     _cj$_constructor_$Actor$(t: Thread, callback: CallbackParameter){
 
-        this.world = t.scheduler.interpreter.objectStore["World"];
+        this.world = t.scheduler.interpreter.retrieveObject("WorldClass");
         if(!this.world){
             new t.classes["World"]()._cj$_constructor_$World$(t, () => {
                 this.world = t.s.pop();
@@ -131,7 +131,7 @@ export class ActorClass extends ObjectClass implements IActor {
     }
 
     _mj$getWorld$World(t: Thread, callback: CallbackParameter){
-        t.s.push(t.scheduler.interpreter.objectStore["World"]);
+        t.s.push(t.scheduler.interpreter.retrieveObject("WorldClass"));
     }
 
     _isDestroyed(): boolean {

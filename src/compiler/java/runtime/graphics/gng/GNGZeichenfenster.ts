@@ -25,7 +25,7 @@ export class GNGZeichenfensterClass extends ObjectClass {
     static type: NonPrimitiveType;
 
     static getWorld(t: Thread, callback: (world: IWorld) => void){
-        let world = t.scheduler.interpreter.objectStore["World"] as IWorld;
+        let world = t.scheduler.interpreter.retrieveObject("WorldClass") as IWorld;
         if(!world){
             new t.classes["World"]()._cj$_constructor_$World$(t, () => {
                 world = t.s.pop();
@@ -38,7 +38,7 @@ export class GNGZeichenfensterClass extends ObjectClass {
     }
 
     static _mj$MalflächenBreiteGeben$int$(t: Thread){
-        let world = t.scheduler.interpreter.objectStore["World"] as IWorld;
+        let world = t.scheduler.interpreter.retrieveObject("WorldClass") as IWorld;
         if(world){
             return world.currentWidth;
         } else {
@@ -47,7 +47,7 @@ export class GNGZeichenfensterClass extends ObjectClass {
     }
     
     static _mj$MalflächenHöheGeben$int$(t: Thread){
-        let world = t.scheduler.interpreter.objectStore["World"] as IWorld;
+        let world = t.scheduler.interpreter.retrieveObject("WorldClass") as IWorld;
         if(world){
             return world.currentHeight;
         } else {

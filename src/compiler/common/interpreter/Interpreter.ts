@@ -45,7 +45,7 @@ export class Interpreter {
 
     eventManager: EventManager<InterpreterEvents> = new EventManager();
 
-    objectStore: { [key: string]: any } = {};
+    private objectStore: Map<string, any> = new Map();
 
     actions: string[] = ["start", "pause", "stop", "stepOver",
         "stepInto", "stepOut", "restart"];
@@ -471,9 +471,9 @@ export class Interpreter {
 
     hasActorsOrPApplet(): boolean {
 
-        if (this.objectStore["PApplet"]) return true;
+        if (this.retrieveObject("PAppletClass")) return true;
 
-        let world: IWorld = this.objectStore["World"];
+        let world: IWorld = this.retrieveObject("WorldClass");
         if (!world) return false;
         return world.hasActors();
     }
@@ -500,4 +500,15 @@ export class Interpreter {
         return false; // TODO
     }
 
+    public storeObject(classIdentifier: string, object: any){
+        this.objectStore.set(classIdentifier, object);
+    }
+
+    public retrieveObject(classIdentifier: string){
+        return this.objectStore.get(classIdentifier);
+    }
+
+    public deleteObject(classIdentifier: string){
+        this.objectStore.delete(classIdentifier);
+    }
 }

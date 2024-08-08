@@ -6,6 +6,7 @@
  * a former compilation run.
  */
 
+import { BaseType } from "../common/BaseType.ts";
 import { Compiler } from "../common/Compiler.ts";
 import { Error, ErrorLevel } from "../common/Error.ts";
 import { Executable } from "../common/Executable.ts";
@@ -50,6 +51,10 @@ export class JavaCompiler implements Compiler {
         this.libraryModuleManager = new JavaLibraryModuleManager();
         this.moduleManager = new JavaModuleManager();
         this.startCompilingPeriodically();
+    }
+
+    getType(identifier: string): BaseType | undefined {
+        return this.libraryModuleManager.typestore.getType(identifier);
     }
 
     setFiles(files: CompilerFile[]) {

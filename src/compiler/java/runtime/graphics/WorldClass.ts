@@ -88,7 +88,7 @@ export class WorldClass extends ObjectClass implements IWorld {
     cj$_constructor_$World$int$int(t: Thread, callback: CallbackParameter, width: number, height: number) {
 
         let interpreter = t.scheduler.interpreter;
-        let existingWorld = <WorldClass>interpreter.objectStore["World"];
+        let existingWorld = <WorldClass>interpreter.retrieveObject("WorldClass");
         if (existingWorld) {
             t.s.push(existingWorld);
             existingWorld.changeResolution(width, height);
@@ -97,7 +97,7 @@ export class WorldClass extends ObjectClass implements IWorld {
 
         this.actorManager = new ActorManager(interpreter);
 
-        interpreter.objectStore["World"] = this;
+        interpreter.storeObject("WorldClass", this);
 
         this.graphicsDiv = <HTMLDivElement>interpreter.graphicsManager?.graphicsDiv;
         this.graphicsDiv.style.overflow = "hidden";
@@ -137,6 +137,8 @@ export class WorldClass extends ObjectClass implements IWorld {
 
             t.s.push(this);
 
+            t.scheduler.interpreter.graphicsManager?.adjustWidthToWorld();
+
             if (callback) callback();
         })
 
@@ -149,7 +151,7 @@ export class WorldClass extends ObjectClass implements IWorld {
 
     addCallbacks(interpreter: Interpreter) {
         let onResetRuntimeCallback = () => {
-            delete interpreter.objectStore["World"];
+            interpreter.deleteObject("WorldClass");
             interpreter.eventManager.off(onResetRuntimeCallback);
             interpreter.eventManager.off(onProgramStoppedCallback);
             this.destroyWorld(interpreter);

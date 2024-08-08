@@ -262,7 +262,7 @@ export class PAppletClass extends ObjectClass {
         this.graphicsDiv = <HTMLDivElement>interpreter.graphicsManager?.graphicsDiv;
         this.graphicsDiv.style.overflow = "hidden";
 
-        this.setupGraphicsDiv(this.graphicsDiv);
+        this.setupGraphicsDiv(this.graphicsDiv, interpreter);
         this.setupProcessing(this.containerInner, interpreter);
 
         interpreter.eventManager.once("stop", () => {
@@ -283,15 +283,15 @@ export class PAppletClass extends ObjectClass {
 
         interpreter.eventManager.once("resetRuntime", () => {
             this.p5o.remove();
-            interpreter.objectStore["PApplet"] = undefined;
+            interpreter.deleteObject("PAppletClass");
             this.canvasCreated = false;
         })
-
-        interpreter.objectStore["PApplet"] = this;
+        
+        interpreter.storeObject("PAppletClass", this);
 
     }
 
-    setupGraphicsDiv(graphicsDiv: HTMLDivElement) {
+    setupGraphicsDiv(graphicsDiv: HTMLDivElement, interpreter: Interpreter) {
         this.containerOuter = DOM.makeDiv(undefined, 'jo_pAppletOuter');
 
         this.onSizeChanged = () => {
@@ -307,6 +307,9 @@ export class PAppletClass extends ObjectClass {
                 graphicsDiv.style.width = maxWidth + "px";
                 graphicsDiv.style.height = this.height / this.width * maxWidth + "px";
             }
+
+            interpreter.graphicsManager?.adjustWidthToWorld();
+            
         };
 
         graphicsDiv.onresize = (ev) => { this.onSizeChanged() }
