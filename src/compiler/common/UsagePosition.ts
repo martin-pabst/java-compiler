@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { BaseSymbol } from "./BaseSymbolTable";
 import { CompilerFile } from "./module/CompilerFile";
 import { Module } from "./module/Module";
@@ -88,17 +87,28 @@ export class UsageTracker {
     }
 
     getDependsOnModulesDebugInformation(): string {
-        let str: string = chalk.red("");
+        let str: string = "";
 
         this.dependsOnModules.forEach((moduleUsage, module) => {
             let mu: string = moduleUsage.toString();
             if(mu.length > 0){
-                str += chalk.blue("Depends on module " + module.file.name + ":\n");
-                str += chalk.white(moduleUsage.toString());
+                str += "Depends on module " + module.file.name + ":\n";
+                str += moduleUsage.toString();
             }
         })
 
         return str;
+        // let str: string = chalk.red("");
+
+        // this.dependsOnModules.forEach((moduleUsage, module) => {
+        //     let mu: string = moduleUsage.toString();
+        //     if(mu.length > 0){
+        //         str += chalk.blue("Depends on module " + module.file.name + ":\n");
+        //         str += chalk.white(moduleUsage.toString());
+        //     }
+        // })
+
+        // return str;
     }
 
     existsDependencyToOtherDirtyModule(): boolean {
