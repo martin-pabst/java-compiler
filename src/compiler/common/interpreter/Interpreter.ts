@@ -4,7 +4,7 @@ import { CodeReachedAssertions } from "./CodeReachedAssertions.ts";
 import { EventManager } from "./EventManager";
 import { LoadController } from "./LoadController";
 import { DummyPrintManager, IPrintManager } from "./PrintManager";
-import { Scheduler, SchedulerState } from "./Scheduler";
+import { Scheduler, SchedulerExitState, SchedulerState } from "./Scheduler";
 import { GraphicsManager } from "./GraphicsManager.ts";
 import { IWorld } from "../../java/runtime/graphics/IWorld.ts";
 import { KeyboardManager } from "./KeyboardManager.ts";
@@ -281,7 +281,9 @@ export class Interpreter {
         this.scheduler.setState(SchedulerState.running);
         try {
             while (this.scheduler.state == SchedulerState.running) {
-                this.scheduler.run(100);
+                if(this.scheduler.run(100) == SchedulerExitState.nothingMoreToDo){
+                    break;
+                };
             }
         } finally {
             this.scheduler.runsSynchronously = false;

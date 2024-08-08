@@ -23,6 +23,9 @@ class StoreOutputPrintManager implements IPrintManager {
         this.output = "";
     }
 
+    flush(): void {
+        
+    }
 }
 
 try {
