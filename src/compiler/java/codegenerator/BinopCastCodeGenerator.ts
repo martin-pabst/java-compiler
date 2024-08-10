@@ -243,9 +243,9 @@ export abstract class BinopCastCodeGenerator {
 
         let label = new LabelCodeSnippet();
         if (operator == TokenType.and) {
-            snippetContainer.addStringPart(`if(!${StepParams.stack}.pop()){s.push(false);`, EmptyRange.instance);
+            snippetContainer.addStringPart(`if(!${StepParams.stack}.pop()){${StepParams.stack}.push(false);`, EmptyRange.instance);
         } else {
-            snippetContainer.addStringPart(`if(${StepParams.stack}.pop()){s.push(true);`, EmptyRange.instance);
+            snippetContainer.addStringPart(`if(${StepParams.stack}.pop()){${StepParams.stack}.push(true);`, EmptyRange.instance);
         }
 
         snippetContainer.addParts(label.getJumpToSnippet());
