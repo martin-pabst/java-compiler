@@ -613,10 +613,8 @@ export class Thread {
         }
 
         if(typeof object == "object"){
-            object._mj$toString$String$(t, () => {
-                if (callback) callback();
-                return;
-            });
+            object._mj$toString$String$(t, callback);
+            return;
         }
 
         t.s.push("" + object);

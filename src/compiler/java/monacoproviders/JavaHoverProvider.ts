@@ -64,18 +64,24 @@ export class JavaHoverProvider {
     replReturnValueToOutput(replReturnValue: ReplReturnValue, caption: string) {
         if (typeof replReturnValue == "undefined") return caption + ": ---";
         let type: string = replReturnValue.type ? replReturnValue.type.toString() + " " : "";
-        let value = replReturnValue.text.substring(0, 20);
+        let text = replReturnValue.text;
+        //@ts-ignore#
+        if(text["value"]) text = text.value;
         switch (type) {
-            case "string":
-            case "String": value = '"' + value + '"';
+            case "string ":
+            case "String ": 
+            if(replReturnValue.value){
+                text = '"' + text + '"';
+            } else {
+                text = "null";
+            }
                 break;
-            case "char":
-            case "Character":
-                value = "'" + value + "'";
+            case "char ":
+            case "Character ":
+                text = "'" + text + "'";
                 break;
         }
 
-        let text = replReturnValue.text;
         if(text.length > 20){
             text = text.substring(0, 20) + " ...";
         }

@@ -18,7 +18,7 @@ import { Scheduler, SchedulerExitState, SchedulerState } from "./Scheduler";
 import { Thread, ThreadState } from "./Thread.ts";
 
 
-type InterpreterEvents = "stop" | "done" | "resetRuntime";
+type InterpreterEvents = "stop" | "done" | "resetRuntime" | "stateChanged";
 
 export class Interpreter {
 
@@ -409,7 +409,9 @@ export class Interpreter {
         //     //   this.debugger.enable();
         // }
 
+        this.eventManager.fire("stateChanged", this.scheduler.state, state);
         this.scheduler.setState(state);
+        
 
     }
 
