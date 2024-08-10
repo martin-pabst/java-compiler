@@ -50,7 +50,6 @@ export class JavaCompiler implements Compiler {
     constructor(public main?: IMain, private errorMarker?: ErrorMarker) {
         this.libraryModuleManager = new JavaLibraryModuleManager();
         this.moduleManager = new JavaModuleManager();
-        this.startCompilingPeriodically();
     }
 
     getType(identifier: string): BaseType | undefined {

@@ -16,6 +16,7 @@ import { JavaModuleManager } from "../../module/JavaModuleManager.ts";
 import { JavaLibraryModuleManager } from "../../module/libraries/JavaLibraryModuleManager.ts";
 import { JavaReplCompiledModule } from "./JavaReplCompiledModule.ts";
 import { JavaReplCompiler } from "./JavaReplCompiler.ts";
+import { ReplReturnValue } from "./ReplReturnValue.ts";
 
 type ProgramAndModule = { module: JavaReplCompiledModule, program: Program | undefined };
 
@@ -98,7 +99,7 @@ export class JavaRepl {
         return programAndModule;
     }
 
-    executeSynchronously(statement: string): any {
+    executeSynchronously(statement: string): ReplReturnValue {
 
         let interpreter = this.getInterpreter();
         let programAndModule = this.compileAndShowErrors(statement);
@@ -116,14 +117,14 @@ export class JavaRepl {
             interpreter.runREPLSynchronously();
         } catch(ex){
             console.log(ex);
-            return "---";
+            return undefined;
         }
 
         return thread.replReturnValue;
 
     }
 
-    async executeAsync(statement: string, withMaxSpeed: boolean): Promise<any> {
+    async executeAsync(statement: string, withMaxSpeed: boolean): Promise<ReplReturnValue> {
 
         let interpreter = this.getInterpreter();
         let programAndModule = this.compileAndShowErrors(statement);
@@ -134,16 +135,21 @@ export class JavaRepl {
 
 
         let p = new Promise<any>((resolve, reject) => {
-            let callback = (returnValue: any) => {
+
+            let thread: Thread | undefined;
+            
+            let callback = (returnValue: ReplReturnValue) => {
                 if(returnValue && returnValue["value"]) returnValue = returnValue.value;
                 resolve(returnValue);
             }
 
-            let thread = this.prepareThread(programAndModule!, callback, withMaxSpeed);
+            thread = this.prepareThread(programAndModule!, callback, withMaxSpeed);
             if (!thread) {
                 resolve(undefined);
                 return;
             }
+            
+
             
     
             interpreter.setState(SchedulerState.running);
@@ -157,7 +163,7 @@ export class JavaRepl {
 
 
 
-    prepareThread(programAndModule: { module: JavaReplCompiledModule; program: Program | undefined; }, callback?: (returnValue: any) => void,
+    prepareThread(programAndModule: { module: JavaReplCompiledModule; program: Program | undefined; }, callback?: (returnValue: ReplReturnValue) => void,
                    withMaxSpeed: boolean = true): Thread | undefined {
 
         let interpreter = this.getInterpreter();
@@ -207,7 +213,7 @@ export class JavaRepl {
     }
 
     showErrors(errors: Error[]) {
-        let editor = this.main.getMainEditor();
+        let editor = this.main.getReplEditor();
         if(!editor) return;
         let monacoModel = editor.getModel();
         if (!monacoModel) return;

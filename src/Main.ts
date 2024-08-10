@@ -169,6 +169,7 @@ export class Main implements IMain {
     this.language = new JavaLanguage(this, this.errorMarker);
     this.language.registerLanguageAtMonacoEditor(this);
     this.language.getCompiler().setFiles(this.currentWorkspace.getFiles());
+    this.language.getCompiler().startCompilingPeriodically();
 
     this.testResultViewer.addEventListener('run-all-tests',
       (e) => { if (e.type == "run-all-tests") testManager.executeAllTests(); });

@@ -1,6 +1,4 @@
 import { Compiler } from "../common/Compiler.ts";
-import { Module } from "../common/module/Module.ts";
-import { JavaBaseModule } from "../java/module/JavaBaseModule.ts";
 import { JavaRepl } from "../java/parser/repl/JavaRepl.ts";
 import { Executable } from "./Executable.ts";
 import { Interpreter } from "./interpreter/Interpreter.ts";

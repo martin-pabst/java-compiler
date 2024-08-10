@@ -68,8 +68,8 @@ export class ValueTool {
     }
 
     static hasChildren(value: any){
-        return ValueTool.isArray(value) || 
-        (ValueTool.isObject(value) && !ValueTool.isPrimitiveTypeOrNull(value) && !ValueTool.isEnum(value));
+        return value && (ValueTool.isArray(value) || 
+        (ValueTool.isObject(value) && !ValueTool.isPrimitiveTypeOrNull(value) && !ValueTool.isEnum(value)));
     }
 
     static getChildren(value: any): IdentifierValuePair[] {
@@ -112,6 +112,7 @@ export class ValueTool {
 
     // TODO: Invoke toString()-Method of objects...
     static renderValue(value: any, repl?: JavaRepl){
+        if(value == null) return 'null';
         if(typeof value == 'object'){
             let type = <NonPrimitiveType>value.constructor.type;
             

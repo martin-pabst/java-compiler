@@ -51,7 +51,7 @@ export class JavaReplCodeGenerator extends StatementCodeGenerator {
 
                 // wrap with to String call
                 if(snippet.type instanceof NonPrimitiveType){
-                    snippets.push(new StringCodeSnippet(`${Helpers.toString}(__t, undefined, ${Helpers.threadStack}.pop());\n`));
+                    snippets.push(new StringCodeSnippet(`${Helpers.toString}(__t, undefined, ${Helpers.threadStack}[${Helpers.threadStack}.length - 1]);\n`));
                 }
                 
             }

@@ -101,6 +101,7 @@ export class WorldClass extends ObjectClass implements IWorld {
 
         this.graphicsDiv = <HTMLDivElement>interpreter.graphicsManager?.graphicsDiv;
         this.graphicsDiv.style.overflow = "hidden";
+        this.graphicsDiv.innerHTML = "";
 
         t.state = ThreadState.waiting;
         this.app = new PIXI.Application();
@@ -173,9 +174,6 @@ export class WorldClass extends ObjectClass implements IWorld {
         this.actorManager.clear();
         this.gngEventlistenerManager.clear();
         
-        // it doesn't suffice to remove listener of this object because
-        // there may be sprites playing animations which are also ticker-listeners
-        this.app?.ticker.destroy();     
         interpreter.isExternalTimer = false;
         this.app?.destroy({ removeView: true }, {});
 
@@ -198,7 +196,7 @@ export class WorldClass extends ObjectClass implements IWorld {
 
         this.app?.renderer.resize(width, height, 1);
 
-        let rect = this.graphicsDiv!.getBoundingClientRect();
+        let rect = this.graphicsDiv!.parentElement!.getBoundingClientRect();
         if (rect.width == 0 || rect.height == 0) rect = this.graphicsDiv!.parentElement!.getBoundingClientRect();
 
         let newCanvasWidth: number;

@@ -12,4 +12,5 @@ export interface Compiler {
     setFileDirty(file: CompilerFile): void;
     getSortedAndFilteredErrors(file: CompilerFile): Error[];
     getType(identifier: string): BaseType | undefined;
+    startCompilingPeriodically(): void;
 }

@@ -16,6 +16,7 @@ import { IndexOutOfBoundsExceptionClass } from "../../java/runtime/system/javala
 import { CallbackParameter } from "./CallbackParameter.ts";
 import { ArrayToStringCaster, TextContainer } from "./ArrayToStringCaster.ts";
 import { ExceptionPrinter } from "./ExceptionPrinter.ts";
+import { ReplReturnValue } from "../../java/parser/repl/ReplReturnValue.ts";
 
 
 export type ProgramState = {
@@ -81,8 +82,8 @@ export class Thread {
     maxStepsPerSecond?: number;
     lastTimeThreadWasRun: number = performance.now();
 
-    stacksizeBeforeREPLProgram: number  = 0;
-    replReturnValue: any;
+    stacksizeBeforeREPLProgram: number = 0;
+    replReturnValue?: ReplReturnValue;
 
     numberOfSteps: number = 0;
 
@@ -193,7 +194,7 @@ export class Thread {
 
     public set state(state: ThreadState) {
         this._state = state;
-        if(state == ThreadState.terminated && this.callbackAfterTerminated){
+        if (state == ThreadState.terminated && this.callbackAfterTerminated) {
             this.callbackAfterTerminated();
             this.callbackAfterTerminated = undefined;
         }
@@ -244,7 +245,7 @@ export class Thread {
     }
 
     startIfNotEmptyOrDestroy() {
-        if(this.programStack.length == 0){
+        if (this.programStack.length == 0) {
             this.scheduler.removeThread(this);
             this.return;
         }
@@ -319,10 +320,10 @@ export class Thread {
         } while (this.programStack.length > 0 && !foundCatchBlockInfo)
 
         if (this.programStack.length == 0) {
-            this.stackTrace = rawStackTrace.map( ste => {
-                if(ste) {
+            this.stackTrace = rawStackTrace.map(ste => {
+                if (ste) {
                     return {
-                        range: ste.lastExecutedStep? ste.lastExecutedStep.range : ste.currentStepList[ste.stepIndex].range,
+                        range: ste.lastExecutedStep ? ste.lastExecutedStep.range : ste.currentStepList[ste.stepIndex].range,
                         methodIdentifierWithClass: ste.program.methodIdentifierWithClass
                     }
                 } else {
@@ -387,33 +388,38 @@ export class Thread {
         }
     }
 
-    startREPLProgram(){
+    startREPLProgram() {
         this.stacksizeBeforeREPLProgram = this.s.length;
     }
 
     /**
      * return from REPL-Program
      */
-    returnFromREPLProgram(){
+    returnFromREPLProgram() {
         let replProgram = this.programStack.pop();
         this.replReturnValue = undefined;
-        if(this.s.length > this.stacksizeBeforeREPLProgram){
-            this.replReturnValue = this.s.pop();
+        if (this.s.length > this.stacksizeBeforeREPLProgram) {
+            let text = this.s.pop();
+            let value = this.s.pop();
+            this.replReturnValue = {
+                value: value,
+                text: text
+            }
         }
         // shouldn't be necessary:
-        while(this.s.length > this.stacksizeBeforeREPLProgram){
+        while (this.s.length > this.stacksizeBeforeREPLProgram) {
             this.s.pop();
         }
 
-        if(replProgram?.callbackAfterFinished){
+        if (replProgram?.callbackAfterFinished) {
             replProgram.callbackAfterFinished();
         }
 
-        
+
         this.currentProgramState = this.programStack[this.programStack.length - 1];
         this.state = ThreadState.immediatelyAfterReplStatement;
 
-        if(!this.currentProgramState){
+        if (!this.currentProgramState) {
             this.currentProgramState = {
                 currentStepList: [],
                 stepIndex: 0,
@@ -501,7 +507,7 @@ export class Thread {
         this.scheduler.interpreter.printManager.print(text, true, color);
     }
 
-    clearScreen(){
+    clearScreen() {
         this.scheduler.interpreter.printManager.clear();
     }
 
@@ -587,19 +593,19 @@ export class Thread {
     }
 
     Instanceof(object: ObjectClass, type: string): boolean {
-        if(object == null) return false;
+        if (object == null) return false;
         let objType = object.getType() as NonPrimitiveType;
         return objType.fastExtendsImplements(type);
     }
 
-    ToString(t: Thread, callback: CallbackParameter, object: ObjectClass){
-        if(object == null){
+    ToString(t: Thread, callback: CallbackParameter, object: ObjectClass) {
+        if (object == null) {
             t.s.push(null);
-            if(callback) callback();
+            if (callback) callback();
             return;
         }
         object._mj$toString$String$(t, () => {
-            if(callback) callback();
+            if (callback) callback();
             return;
         });
     }
@@ -609,7 +615,7 @@ export class Thread {
     }
 
     exit() {
-        if(this.name == "main thread"){
+        if (this.name == "main thread") {
             console.log("Hier!");
         }
         this.state = ThreadState.terminated;
@@ -636,10 +642,10 @@ export class Thread {
     }
 
     _arrayOfObjectsToString(array: any[], callback?: CallbackParameter) {
-        let textContainer: TextContainer = {text: ""};
+        let textContainer: TextContainer = { text: "" };
         ArrayToStringCaster.arrayOfObjectsToString(textContainer, this, array, () => {
             this.s.push(textContainer.text);
-            if(callback) callback();
+            if (callback) callback();
         });
     }
 

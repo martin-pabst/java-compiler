@@ -25,6 +25,8 @@ export class DebuggerSymbolEntry {
     oldLength?: number; // old length if value is array
     isLocalVariable: boolean = true;
 
+    MAXCHILDREN: number = 20;
+
     static quickArrayOutputMaxLength = 20;
 
     constructor(private symbolTableSection: SymbolTableSection,
@@ -161,7 +163,7 @@ export class DebuggerSymbolEntry {
         if (a.length != this.oldLength || this.children.length == 0) {
             this.oldLength = a.length;
             this.removeChildren();
-            for (let i = 0; i < a.length; i++) {
+            for (let i = 0; i < Math.min(a.length, this.MAXCHILDREN); i++) {
                 this.children.push(new ArrayElementDebuggerEntry(
                     this.symbolTableSection, this, i,
                     elementtype

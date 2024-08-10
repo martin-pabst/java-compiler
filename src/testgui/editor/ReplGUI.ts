@@ -28,7 +28,7 @@ export class ReplGUI {
                     // let returnValue = main.getRepl().executeSynchronously(statement);
                     let returnValue = await main.getRepl().executeAsync(statement!, false);
                     let outputDiv = DOM.makeDiv(this.upperDiv);
-                    outputDiv.textContent = '' + returnValue;
+                    outputDiv.textContent = '' + returnValue?.text;
                     this.editor.getModel()?.setValue('');
                 }, 10);
             } else {

@@ -1,10 +1,10 @@
-import { IMain as CompilerMain } from "../IMain";
+import { IMain } from "../IMain";
 import { CompilerFile } from "./CompilerFile";
 import { Module } from "./Module";
 
 export abstract class CompilerWorkspace {
 
-    constructor(private cmain: CompilerMain) {
+    constructor(private cmain: IMain) { 
 
     }
 
@@ -21,6 +21,9 @@ export abstract class CompilerWorkspace {
 
     getModuleForMonacoModel(model: monaco.editor.ITextModel | null): Module | undefined {
         if (model == null) return undefined;
+
+        let compiler = this.cmain?.getCompiler();
+        if(!compiler) return undefined;
 
         for (let file of this.getFiles()) {
             if (file.getMonacoModel() == model) {
