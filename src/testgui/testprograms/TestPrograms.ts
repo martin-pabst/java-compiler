@@ -1,5 +1,10 @@
 export var testProgramsList = [
    ['', ``],
+   ['Ternary Operator', `int delta = 10;
+
+String s = delta > 0 ? "A" : "B";
+
+println(s);`],
    ['InnerClassInstanceInitializer', `
 Map<String, String> myMap = new HashMap<>() { {
       put("a", "b");

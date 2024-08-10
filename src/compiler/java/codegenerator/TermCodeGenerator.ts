@@ -479,7 +479,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                     return undefined;
                 }
                 let snippet = this.compileArrayLiteral(elementType.elementType, <ASTArrayLiteralNode>elementNode);
-                if(snippet) elementSnippets.push(snippet);
+                if (snippet) elementSnippets.push(snippet);
             } else {
                 let elementSnippet = this.compileTerm(elementNode);
                 if (elementSnippet && elementSnippet.type) {
@@ -620,7 +620,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         return snippet;
     }
 
-     compileFieldAccess(symbol: BaseSymbol, range: IRange, outerClassLevel: number = 0): CodeSnippet | undefined {
+    compileFieldAccess(symbol: BaseSymbol, range: IRange, outerClassLevel: number = 0): CodeSnippet | undefined {
         let field = <JavaField>symbol;
 
         if (field._isStatic && this.classOfCurrentlyCompiledStaticInitialization) {
@@ -650,7 +650,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 outerClassLevel--;
             }
 
-            if(field.template){
+            if (field.template) {
                 let objectSnippet = new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}${outerClassPraefix}`, range, type);
                 snippet = new OneParameterTemplate(field.template).applyToSnippet(type, range, objectSnippet);
             } else {
@@ -689,6 +689,9 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     }
 
     compileBinaryOperator(ast: ASTBinaryNode): CodeSnippet | undefined {
+
+        if (ast.operator == TokenType.ternaryOperator) return this.compileTernaryOperator(ast);
+
         let leftOperand = this.compileTerm(ast.leftSide, this.isAssignmentOperator(ast.operator));
         let rightOperand = ast.rightSide?.kind == TokenType.lambdaOperator ? this.compileLambdaFunction(<ASTLambdaFunctionDeclarationNode>ast.rightSide, leftOperand?.type) : this.compileTerm(ast.rightSide);
 
@@ -697,6 +700,49 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         return undefined;
+    }
+
+    /**
+     * a ? b : c
+     */
+    compileTernaryOperator(ast: ASTBinaryNode): CodeSnippet | undefined {
+        let leftOperand = this.compileTerm(ast.leftSide, false); // a
+        if (!ast.rightSide) return;
+        if (ast.rightSide.kind != TokenType.binaryOp || (<ASTBinaryNode>ast.rightSide).operator != TokenType.colon) {
+            this.pushError(JCM.colonExpectedAfterTernaryOperator(), "error", ast);
+            return undefined;
+        }
+
+        let firstAlternative = this.compileTerm((<ASTBinaryNode>ast.rightSide).leftSide);  // b
+        let secondAlternative = this.compileTerm((<ASTBinaryNode>ast.rightSide).rightSide);  // c
+
+        if (!this.canCastTo(leftOperand?.type, this.booleanType, "implicit")) {
+            this.pushError(JCM.booleanOperandOnTernaryOperatorLefthand(), "error", ast.leftSide);
+            return undefined;
+        }
+
+        if (!leftOperand || !firstAlternative || !secondAlternative) return undefined;
+        let firstType = firstAlternative.type;
+        let secondType = secondAlternative.type;
+
+        if (!firstType || !secondType) return undefined;
+
+        let destType: JavaType | undefined;
+        if (this.canCastTo(secondType, firstType, "implicit")) {
+            destType = firstType;
+            secondAlternative = this.compileCast(secondAlternative, firstType, "implicit")
+        } else if (this.canCastTo(firstType, secondType, "implicit")) {
+            destType = secondType;
+            firstAlternative = this.compileCast(firstAlternative, secondType, "implicit")
+        }
+
+        if (!destType) {
+            this.pushError(JCM.ternaryOperatorTypesNotCompatible(), "error", ast.rightSide);
+            return undefined;
+        }
+
+        return new SeveralParameterTemplate(`((§1) ? (§2) : (§3) )`).applyToSnippet(destType, ast.range, leftOperand, firstAlternative, secondAlternative);
+
     }
 
     compileUnaryPrefixOperator(ast: ASTUnaryPrefixNode): CodeSnippet | undefined {
@@ -770,12 +816,12 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let field = objectType.getField(node.attributeIdentifier, TokenType.keywordPublic);
 
         if (!field && objectType instanceof StaticNonPrimitiveType) {
-            if(objectType.identifier == 'SpriteLibraryEnum'){
+            if (objectType.identifier == 'SpriteLibraryEnum') {
                 let enumClass = objectType.nonPrimitiveType.runtimeClass;
-                if(enumClass){
+                if (enumClass) {
                     let id = (<JavaEnum>objectType.nonPrimitiveType).id;
                     let value = enumClass.getSpriteLibrary(id, node.attributeIdentifier);
-                    if(value){
+                    if (value) {
                         return new StringCodeSnippet(`${Helpers.classes}["SpriteLibraryEnum"].getSpriteLibrary(${id}, "${node.attributeIdentifier}")`, node.range, objectType.nonPrimitiveType);
                     }
                 }
@@ -818,20 +864,20 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         } else {
             let template: string = objectSnippet.type instanceof JavaEnum ? `§1` : `(§1 || ${Helpers.throwNPE}(${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn}))`;
 
-            if(field.template){
+            if (field.template) {
                 let objSnippet1 = new OneParameterTemplate(template).applyToSnippet(objectSnippet.type, objectSnippet.range!, objectSnippet);
                 let snippet = new OneParameterTemplate(field.template).applyToSnippet(field.type, range, objSnippet1);
                 snippet.isLefty = !field._isFinal;
-    
+
                 return snippet;
             } else {
                 let snippet = new OneParameterTemplate(`${template}.${field.getInternalName()}`)
                     .applyToSnippet(field.type, range, objectSnippet);
                 snippet.isLefty = !field._isFinal;
-    
+
                 return snippet;
             }
-            
+
         }
 
 
@@ -876,7 +922,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             let range = node.nodeToGetObject.range;
             if (
                 // !(objectSnippet.type instanceof JavaEnum) && 
-            objectSnippet.type != this.stringType
+                objectSnippet.type != this.stringType
                 && !(objectSnippet.type instanceof StaticNonPrimitiveType) && !objectSnippet.isSuperKeywordWithLevel) {
                 objectSnippet = SnippetFramer.frame(objectSnippet, `${Helpers.checkNPE('§1', range)}`);
             }
@@ -1135,11 +1181,11 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                     let toTypeString = toType.toString().toLocaleLowerCase();
                     let fromTypeString = fromType.toString().toLocaleLowerCase();
                     if (fromTypeString != toTypeString) {
-                        let toTypeIsString = toTypeString == 'string';                        
+                        let toTypeIsString = toTypeString == 'string';
                         if (this.canCastTo(fromType, toType, "implicit")) {
-                            if(toTypeIsString){
+                            if (toTypeIsString) {
                                 castsNeeded += 3;
-                            } else if(toTypeString == 'object'){
+                            } else if (toTypeString == 'object') {
                                 castsNeeded += 2;
                             } else {
                                 castsNeeded++;
@@ -1171,7 +1217,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
             let errors = bestMethodSoFar.checkCatches(methodCallPosition);
             // TODO!
-            
+
             // if (errors.length > 0) {
             //     this.module.errors.push(...errors);
             //     return { best: undefined, possible: possibleMethods };

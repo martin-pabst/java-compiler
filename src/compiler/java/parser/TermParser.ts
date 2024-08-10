@@ -17,11 +17,12 @@ export abstract class TermParser extends TokenIterator {
         TokenType.plus, TokenType.minus, TokenType.not, TokenType.tilde, TokenType.plusPlus, TokenType.minusMinus
     ];
 
+    static ternaryOperatorArray = [TokenType.ternaryOperator, TokenType.colon];
+
     static operatorPrecedence: TokenType[][] = [
         // Lambda-Operator: -1
         TermParser.assignmentOperators, // 0
-        [TokenType.ternaryOperator],    // 1
-        [TokenType.colon],              // 2
+        TermParser.ternaryOperatorArray,    // 1
         [TokenType.or],                 // 3
         [TokenType.and],                // 4
         [TokenType.OR],                 // 5
@@ -40,6 +41,7 @@ export abstract class TermParser extends TokenIterator {
         // member access: 24
     ];
 
+    static ternaryOperatorPrecedence = this.operatorPrecedence.indexOf(TermParser.ternaryOperatorArray);
 
     operatorToPrecedenceMap: { [op: number]: number } = {};
 
@@ -104,10 +106,25 @@ export abstract class TermParser extends TokenIterator {
             let h: number = 1;
             let newLeftNodesParent: ASTBinaryNode | null = null;
             let newLeftNode: ASTTermNode = node;
-            while (h < rightRidgeHeight && (<ASTBinaryNode>newLeftNode).precedence! < precedence) {
-                newLeftNodesParent = <ASTBinaryNode>newLeftNode;
-                newLeftNode = (<ASTBinaryNode>newLeftNode).rightSide;
-                h++;
+
+            if (precedence == TermParser.ternaryOperatorPrecedence) {
+                // ternary operator is evaluated right to left: a ? b ? c : d : e -> a ? (b ? c : d) : e
+                // The conditional operator is syntactically right-associative (it groups right-to-left). Thus, a?b:c?d:e?f:g means the same as a?b:(c?d:(e?f:g)).
+                // See: https://docs.oracle.com/javase/specs/jls/se17/html/jls-15.html#jls-15.25
+
+                while (h < rightRidgeHeight && (<ASTBinaryNode>newLeftNode).precedence! <= precedence &&
+                    !(operator == TokenType.colon && (<ASTBinaryNode>(<ASTBinaryNode>newLeftNode).rightSide)?.operator == TokenType.colon)
+                ) {
+                    newLeftNodesParent = <ASTBinaryNode>newLeftNode;
+                    newLeftNode = (<ASTBinaryNode>newLeftNode).rightSide;
+                    h++;
+                }
+            } else {
+                while (h < rightRidgeHeight && (<ASTBinaryNode>newLeftNode).precedence! < precedence) {
+                    newLeftNodesParent = <ASTBinaryNode>newLeftNode;
+                    newLeftNode = (<ASTBinaryNode>newLeftNode).rightSide;
+                    h++;
+                }
             }
 
             let newNode: ASTBinaryNode =
@@ -260,7 +277,7 @@ export abstract class TermParser extends TokenIterator {
             case TokenType.leftCurlyBracket:
                 node = this.parseArrayLiteral();
                 break;
-            }
+        }
 
         if (node) {
             while ([TokenType.dot, TokenType.leftSquareBracket].indexOf(this.tt) >= 0) {
@@ -318,7 +335,7 @@ export abstract class TermParser extends TokenIterator {
             do {
                 let termNode = this.parseTerm();
                 if (termNode) methodCallNode.parameterValues.push(termNode);
-                if(this.comesToken(TokenType.comma, false)){
+                if (this.comesToken(TokenType.comma, false)) {
                     methodCallNode.commaPositions.push(Range.getStartPosition(this.cct.range));
                 }
             } while (this.comesToken(TokenType.comma, true));
@@ -416,7 +433,7 @@ export abstract class TermParser extends TokenIterator {
 
                 while (this.comesToken(TokenType.dot, true)) {
                     let stringToken = this.expectAndSkipIdentifierAsToken();
-                    if(stringToken){
+                    if (stringToken) {
                         (<ASTBaseTypeNode>type).identifiers.push({
                             identifier: <string>stringToken.value,
                             identifierRange: stringToken.range
@@ -437,7 +454,7 @@ export abstract class TermParser extends TokenIterator {
                     this.expect(TokenType.greater, true);
                     this.setEndOfRange(type);
                 }
-                
+
                 if (this.comesToken(TokenType.leftRightSquareBracket, true)) {
                     type = this.nodeFactory.buildArrayTypeNode(type, type.range);
                     // [][][] at the end of type
@@ -459,7 +476,7 @@ export abstract class TermParser extends TokenIterator {
 
     buildBaseType(identifier: string): ASTTypeNode {
         let type: ASTTypeNode;
-        if(identifier == "void"){
+        if (identifier == "void") {
             type = this.nodeFactory.buildVoidTypeNode(EmptyRange.instance);
         } else {
             type = this.nodeFactory.buildBaseTypeNode(identifier, EmptyRange.instance);
@@ -518,7 +535,7 @@ export abstract class TermParser extends TokenIterator {
         } else if ('arrayDimensions' in type && 'arrayOf' in type) {
             let dimension = type.arrayDimensions as number;
             newArrayNode.dimensionCount = dimension;
-            if(dimension == 1){
+            if (dimension == 1) {
                 newArrayNode.arrayType = type.arrayOf as ASTTypeNode;
             } else {
                 newArrayNode.arrayType = this.nodeFactory.buildArrayTypeNode(type.arrayOf as ASTTypeNode, undefined, dimension - 1);
@@ -558,7 +575,7 @@ export abstract class TermParser extends TokenIterator {
                     let termNode = this.parseTerm();
                     if (termNode) newObjectNode.parameterValues.push(termNode);
 
-                    if(this.comesToken(TokenType.comma, false)){
+                    if (this.comesToken(TokenType.comma, false)) {
                         newObjectNode.commaPositions.push(Range.getStartPosition(this.getCurrentRangeCopy()));
                     }
 
@@ -621,10 +638,10 @@ export abstract class TermParser extends TokenIterator {
             }
 
             printlnStatement.rightBracketPosition = Range.getStartPosition(this.cct.range);
-            this.module.pushMethodCallPosition(printTokenRange, printlnStatement.commaPositions, 
+            this.module.pushMethodCallPosition(printTokenRange, printlnStatement.commaPositions,
                 printlnStatement.isPrintln ? "println" : "print", printlnStatement.rightBracketPosition!
             );
-            
+
             this.expect(TokenType.rightBracket, true);
         }
 

@@ -390,6 +390,21 @@ export class JCM {
         "en": `Operators ++ and -- can only operate on variables.`,
     })
 
+    static colonExpectedAfterTernaryOperator = () => le({
+        "de": `Nach dem Fragezeichenoperator ? ('ternary operator') wird ein : erwartet. Beispiel: Der Term a < b ? 10 : 12 hat den Wert 10, wenn a < b ist und 12 andernfalls.`,
+        "en": `Colon (:) expected after ternary operator (?). Example: The value of a < b ? 10 : 12 is 10 if a < b and 12 otherwise.`,
+    })
+
+    static booleanOperandOnTernaryOperatorLefthand = () => le({
+        "de": `Der Term links vom Fragezeichenoperator ? (ternary operator) muss einen booleschen Wert besitzen.`,
+        "en": `Boolean value expected on left side of ternary operator (?).`,
+    })
+
+    static ternaryOperatorTypesNotCompatible = () => le({
+        "de": `Die Typen der Operanden b und c beim Ausdruck a ? b : c sind im gegebenen Fall zu unterschiedlich.`,
+        "en": `Types b and c in expression a ? b : c are not compatible to each other.`,
+    })
+
     static plusPlusMinusMinusOnlyForTypes = () => le({
         "de": "Die Operatoren ++ und -- können nur bei Variablen mit den Datentypen byte, short, int, long, float und double benutzt werden.",
         "en": `Operators ++ and -- can only operate on types byte, short, int, long, float and double.`,
