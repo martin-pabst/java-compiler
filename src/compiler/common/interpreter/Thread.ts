@@ -17,6 +17,7 @@ import { CallbackParameter } from "./CallbackParameter.ts";
 import { ArrayToStringCaster, TextContainer } from "./ArrayToStringCaster.ts";
 import { ExceptionPrinter } from "./ExceptionPrinter.ts";
 import { ReplReturnValue } from "../../java/parser/repl/ReplReturnValue.ts";
+import { ValueTool } from "../debugger/ValueTool.ts";
 
 
 export type ProgramState = {
@@ -403,7 +404,8 @@ export class Thread {
             let value = this.s.pop();
             this.replReturnValue = {
                 value: value,
-                text: text
+                text: text,
+                type: replProgram?.program.module.returnType
             }
         }
         // shouldn't be necessary:
@@ -604,10 +606,22 @@ export class Thread {
             if (callback) callback();
             return;
         }
-        object._mj$toString$String$(t, () => {
-            if (callback) callback();
+
+        if(Array.isArray(object)){
+            this._arrayOfObjectsToString(object, callback);
             return;
-        });
+        }
+
+        if(typeof object == "object"){
+            object._mj$toString$String$(t, () => {
+                if (callback) callback();
+                return;
+            });
+        }
+
+        t.s.push("" + object);
+        if(callback) callback();
+        return;
     }
 
     NullstringIfNull(s: StringClass): string {

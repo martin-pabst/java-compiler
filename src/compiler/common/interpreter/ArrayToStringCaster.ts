@@ -48,7 +48,7 @@ export class ArrayToStringCaster {
                         }
                     })
                     return;
-                } else {
+                } else if(typeof element == 'object') {
                     // element is object => call it's toString()-method! 
                     element._mj$toString$String$(t, () => {
                         textContainer.text += t.s.pop().value;
@@ -63,6 +63,22 @@ export class ArrayToStringCaster {
                             return;
                         }
                     })
+                } else {
+                    if(typeof element == "string"){
+                        textContainer.text += '"' + element + '"';
+                    } else {
+                        textContainer.text += "" + element;
+                    }
+                    if (array.length > 0) {
+                        textContainer.text += ", ";
+                        t.s.push(array);
+                        f(callback1);
+                        return;
+                    } else {
+                        textContainer.text += "]";
+                        if (callback1) callback1();
+                        return;
+                    }
                 }
 
             }

@@ -30,35 +30,34 @@ export class JavaReplCodeGenerator extends StatementCodeGenerator {
         this.module.programsToCompileToFunctions = [];
 
         let program = new Program(this.module, this.currentSymbolTable, "Repl.method")
-        
+
         let snippets: CodeSnippet[] = [];
         snippets.push(new StringCodeSnippet(`${Helpers.startReplProgram}();\n`))
-        
+
         let snippet: CodeSnippet | undefined;
-        for(let statement of this.module.ast!.mainProgramNode.statements){
+        for (let statement of this.module.ast!.mainProgramNode.statements) {
             snippet = this.compileStatementOrTerm(statement);
-            if(snippet) snippets.push(snippet);
+            if (snippet) snippets.push(snippet);
         }
-        
-        if(snippet && snippet.type){
-            if(snippet.type != this.voidType){
-                
-                
+
+        if (snippet && snippet.type) {
+            if (snippet.type != this.voidType) {
+
+
                 let snippetWithValueOnStack = new CodeSnippetContainer(snippet, snippet.range, snippet.type);
                 snippetWithValueOnStack.ensureFinalValueIsOnStack();
                 snippets.pop();
                 snippets.push(snippetWithValueOnStack);
 
-                // wrap with to String call
-                if(snippet.type instanceof NonPrimitiveType){
-                    snippets.push(new StringCodeSnippet(`${Helpers.toString}(__t, undefined, ${Helpers.threadStack}[${Helpers.threadStack}.length - 1]);\n`));
-                }
-                
+                let lastSnippet = new StringCodeSnippet(`${Helpers.toString}(__t, undefined, ${Helpers.threadStack}[${Helpers.threadStack}.length - 1]);\n`);
+                snippets.push(lastSnippet);
+                this.module.returnType = snippet.type;
+
             }
         }
 
         snippets.push(new StringCodeSnippet(`${Helpers.returnFromReplProgram}();\n`))
-        
+
         new SnippetLinker().link(snippets, program);
 
         return program;

@@ -1,10 +1,11 @@
 import { removeJavadocSyntax } from "../../../tools/StringTools.ts";
 import { IMain } from "../../common/IMain.ts";
-import { ValueRenderer } from "../../common/debugger/ValueRenderer.ts";
+import { ValueTool } from "../../common/debugger/ValueTool.ts";
 import { SchedulerState } from "../../common/interpreter/Scheduler.ts";
 import { Module } from "../../common/module/Module.ts";
 import { Range } from "../../common/range/Range.ts";
 import { JavaLocalVariable } from "../codegenerator/JavaLocalVariable.ts";
+import { ReplReturnValue } from "../parser/repl/ReplReturnValue.ts";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType.ts";
 import { JavaField } from "../types/JavaField.ts";
 import { JavaMethod } from "../types/JavaMethod.ts";
@@ -60,11 +61,34 @@ export class JavaHoverProvider {
 
     }
 
+    replReturnValueToOutput(replReturnValue: ReplReturnValue, caption: string) {
+        if (typeof replReturnValue == "undefined") return caption + ": ---";
+        let type: string = replReturnValue.type ? replReturnValue.type.toString() + " " : "";
+        let value = replReturnValue.text.substring(0, 20);
+        switch (type) {
+            case "string":
+            case "String": value = '"' + value + '"';
+                break;
+            case "char":
+            case "Character":
+                value = "'" + value + "'";
+                break;
+        }
+
+        let text = replReturnValue.text;
+        if(text.length > 20){
+            text = text.substring(0, 20) + " ...";
+        }
+
+        return '```\n' + type + caption + " : " + text + '\n```'
+
+    }
+
     provideHover(model: monaco.editor.ITextModel, position: monaco.Position, token: monaco.CancellationToken):
         monaco.languages.ProviderResult<monaco.languages.Hover> {
 
         let editor = monaco.editor.getEditors().find(e => e.getModel() == model);
-        if(!editor) return;
+        if (!editor) return;
 
         let selection: monaco.Selection | null = editor.getSelection();
 
@@ -74,16 +98,14 @@ export class JavaHoverProvider {
                     (selection.startLineNumber < position.lineNumber || selection.startLineNumber == position.lineNumber && selection.startColumn <= position.column) &&
                     (selection.endLineNumber > position.lineNumber || selection.endLineNumber == position.lineNumber && selection.endColumn >= position.column)
                 ) {
-                    if(this.main.getInterpreter().scheduler.state != SchedulerState.paused) return;
+                    if (this.main.getInterpreter().scheduler.state != SchedulerState.paused) return;
                     let text = model.getValueInRange(selection);
-                    let value = this.main.getRepl().executeSynchronously(text);
-                    if(value != null){
-                        if(typeof value == 'string') value = '"' + value + '"';
-                        return {
-                            range: selection,
-                            contents: [{ value: '```\n' + text + " : " + value + '\n```'  }],
-                        };
-                    }
+                    let replReturnValue = this.main.getRepl().executeSynchronously(text);
+
+                    return {
+                        range: selection,
+                        contents: [{ value: this.replReturnValueToOutput(replReturnValue, text) }],
+                    };
                 }
             }
         }
@@ -108,7 +130,7 @@ export class JavaHoverProvider {
         if (usagePosition && symbol && symbol.identifier != "var") {
             if (symbol instanceof NonPrimitiveType || symbol instanceof JavaMethod) {
                 declarationAsString = "```\n" + symbol.getDeclaration() + "\n```";
-                if(symbol.documentation){
+                if (symbol.documentation) {
                     declarationAsString += "\n" + this.formatDocumentation(symbol.getDocumentation());
                 }
                 return {
@@ -117,18 +139,18 @@ export class JavaHoverProvider {
                 }
             } else if (symbol instanceof PrimitiveType) {
                 declarationAsString = "```\n" + symbol.identifier + "\n```  \nprimitiver Datentyp";
-                if(symbol.documentation){
+                if (symbol.documentation) {
                     declarationAsString += "\n" + this.formatDocumentation(symbol.getDocumentation());
                 }
                 return {
                     range: usagePosition.range,
                     contents: [{ value: declarationAsString }],
                 }
-            } else if(symbol instanceof JavaLocalVariable || symbol instanceof JavaField || symbol instanceof JavaParameter) {
+            } else if (symbol instanceof JavaLocalVariable || symbol instanceof JavaField || symbol instanceof JavaParameter) {
                 // Variable
-                
-                declarationAsString =  symbol.getDeclaration() ;
-                if(symbol.documentation){
+
+                declarationAsString = symbol.getDeclaration();
+                if (symbol.documentation) {
                     declarationAsString += "\n" + this.formatDocumentation(symbol.getDocumentation());
                 }
             }
@@ -157,19 +179,22 @@ export class JavaHoverProvider {
                 return null;
             }
 
-            let resultAsString: string | undefined = repl.executeSynchronously('"" + ' + identifier);
-//            let resultObject: any = repl.executeSynchronously(identifier);
+            let replReturnValue = repl.executeSynchronously(identifier);
+            //            let resultObject: any = repl.executeSynchronously(identifier);
 
-            let typeIdentifier = symbol?.getType().identifier;
+
+
+
             // if(resultObject?.getType){
             //     // let type = (<RuntimeObject>resultObject).getType();
             //     declarationAsString = typeIdentifier + " " + identifier + ": " + ValueRenderer.renderValue(resultObject, 12);
             // } else 
-            
-            if (resultAsString != null) {
-                declarationAsString = typeIdentifier + " " + identifier + ": " + ValueRenderer.renderValue(resultAsString, 12);
-            }
 
+            declarationAsString = this.replReturnValueToOutput(replReturnValue, identifier);
+            return {
+                range: undefined,
+                contents: [{ value: declarationAsString }]
+            }
         }
 
         let contents = [];
@@ -197,7 +222,7 @@ export class JavaHoverProvider {
     }
 
     formatDocumentation(documentation: string | undefined) {
-        if(documentation?.startsWith("/*")){
+        if (documentation?.startsWith("/*")) {
             documentation = removeJavadocSyntax(documentation, 1);
         }
         return documentation;

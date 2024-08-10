@@ -21,6 +21,8 @@ export abstract class Module {
 
     systemSymbolsUsageTracker: UsageTracker = new UsageTracker(this);
 
+    returnType?: JavaType;  // for use with Repl
+
 
     constructor(public file: CompilerFile, public isLibraryModule: boolean) {
 

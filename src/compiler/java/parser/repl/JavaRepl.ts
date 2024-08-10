@@ -139,7 +139,7 @@ export class JavaRepl {
             let thread: Thread | undefined;
             
             let callback = (returnValue: ReplReturnValue) => {
-                if(returnValue && returnValue["value"]) returnValue = returnValue.value;
+                
                 resolve(returnValue);
             }
 

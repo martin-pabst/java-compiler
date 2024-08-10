@@ -111,23 +111,23 @@ export class ValueTool {
     }
 
     // TODO: Invoke toString()-Method of objects...
-    static renderValue(value: any, repl?: JavaRepl){
+    static renderValue(value: any, maxLength: number = 20, repl?: JavaRepl){
         if(value == null) return 'null';
         if(typeof value == 'object'){
             let type = <NonPrimitiveType>value.constructor.type;
             
             if(value instanceof EnumClass){
-                return ValueTool.renderEnum(value, <JavaEnum>type);
+                return ValueTool.renderEnum(value, <JavaEnum>type).substring(0, maxLength);
             }
             
             if(type.isPrimitiveTypeWrapper){
-                return (<IPrimitiveTypeWrapper>value).debugOutput();
+                return (<IPrimitiveTypeWrapper>value).debugOutput().substring(0, maxLength);
             }
 
             return type.toString() + "-object";
 
         } else {
-            return ValueTool.renderPrimitiveValue(value);
+            return ValueTool.renderPrimitiveValue(value).substring(0, maxLength);
         }    
     }
 
