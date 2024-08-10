@@ -28,7 +28,7 @@ export class JavaLanguage extends Language {
     }
 
     registerLanguageAtMonacoEditor(): void {
-        this.registerLanguage();
+        JavaLanguage.registerLanguage();
         this.registerProviders();
     }  
 
@@ -54,7 +54,7 @@ export class JavaLanguage extends Language {
 
     }
 
-    private registerLanguage(): void {
+    public static registerLanguage(): void {
         monaco.languages.register({
             id: 'myJava',
             extensions: ['.learnJava'],

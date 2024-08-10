@@ -1,4 +1,3 @@
-import { range } from "lit/directives/range.js";
 import { Exception } from "./ExceptionInfo";
 import { IPrintManager } from "./PrintManager";
 import { Stacktrace } from "./ThrowableType";

@@ -1,23 +1,21 @@
+import { IWorld } from "../../java/runtime/graphics/IWorld.ts";
 import { AssertionObserver } from "../../java/runtime/unittests/AssertionObserver.ts";
+import { BreakpointManager } from "../BreakpointManager.ts";
+import { Debugger } from "../debugger/Debugger.ts";
 import { Executable } from "../Executable.ts";
+import { ProgramPointerManager, ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager.ts";
+import { ActionManager } from "./ActionManager.ts";
 import { CodeReachedAssertions } from "./CodeReachedAssertions.ts";
 import { EventManager } from "./EventManager";
+import { GraphicsManager } from "./GraphicsManager.ts";
+import { IFilesManager as IFileManager } from "./IFilesManager.ts";
+import { IInputManager } from "./IInputManager.ts";
+import { ITestManager } from "./ITestManager.ts";
+import { KeyboardManager } from "./KeyboardManager.ts";
 import { LoadController } from "./LoadController";
 import { DummyPrintManager, IPrintManager } from "./PrintManager";
 import { Scheduler, SchedulerExitState, SchedulerState } from "./Scheduler";
-import { GraphicsManager } from "./GraphicsManager.ts";
-import { IWorld } from "../../java/runtime/graphics/IWorld.ts";
-import { KeyboardManager } from "./KeyboardManager.ts";
 import { Thread, ThreadState } from "./Thread.ts";
-import { BreakpointManager } from "../BreakpointManager.ts";
-import { Debugger } from "../debugger/Debugger.ts";
-import { ProgramPointerManager, ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager.ts";
-import { Program } from "./Program.ts";
-import { TestManager } from "./TestManager.ts";
-import { ActionManager } from "./ActionManager.ts";
-import { JavaRepl } from "../../java/parser/repl/JavaRepl.ts";
-import { IInputManager } from "./IInputManager.ts";
-import { IFilesManager as IFileManager } from "./IFilesManager.ts";
 
 
 type InterpreterEvents = "stop" | "done" | "resetRuntime";
@@ -74,7 +72,7 @@ export class Interpreter {
     constructor(printManager?: IPrintManager, private actionManager?: ActionManager,
         public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager,
         public breakpointManager?: BreakpointManager, public _debugger?: Debugger,
-        public programPointerManager?: ProgramPointerManager, public testManager?: TestManager,
+        public programPointerManager?: ProgramPointerManager, public testManager?: ITestManager,
         public inputManager?: IInputManager, public fileManager?: IFileManager
     ) {
         // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {

@@ -3,11 +3,12 @@ import { Thread } from "../../../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../../../types/NonPrimitiveType";
 import { ObjectClass, StringClass } from "../../javalang/ObjectClassStringClass";
+import { IPrimitiveTypeWrapper } from "./IPrimitiveTypeWrapper";
 
 /**
  * @link https://docs.oracle.com/en/java/javase/20/docs/api/java.base/java/lang/Integer.html
  */
-export class NumberClass extends ObjectClass {
+export class NumberClass extends ObjectClass implements IPrimitiveTypeWrapper {
 
     value: number = 0;
 
@@ -29,6 +30,10 @@ export class NumberClass extends ObjectClass {
     constructor(n: number){
         super();
         this.value = n;
+    }
+
+    debugOutput(): string {
+        return "" + this.value;
     }
 
     __internalHashCode(): any {

@@ -6,8 +6,9 @@ import { LineElement, TurtleClass } from "../TurtleClass.ts";
 import { GNGBaseFigur, GNGPoint } from "./GNGBaseFigur.ts";
 import { GNGFarben } from "./GNGFarben.ts";
 import { GNGFigur } from "./GNGFigur.ts";
+import { IGNGEventListener } from "./IGNGEventListener.ts";
 
-export class GNGTurtle extends ObjectClass {
+export class GNGTurtle extends ObjectClass implements IGNGEventListener {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "class GTurtle extends Object", comment: "Turtle-Klasse der Graphics'n Games-Bibliothek (Cornelsen-Verlag)" },
 
@@ -147,16 +148,16 @@ export class GNGTurtle extends ObjectClass {
 
 
         // Eventlistener-dummies:
-        _mj$AktionAusführen$void$(t: Thread, callback: () => {} | undefined): void {
+        _mj$AktionAusführen$void$(t: Thread, callback: () => void | undefined): void {
             throw new Error("Method not implemented.");
         }
-        _mj$TasteGedrückt$void$char(t: Thread, callback: () => {} | undefined, key: string): void {
+        _mj$TasteGedrückt$void$char(t: Thread, callback: () => void | undefined, key: string): void {
             throw new Error("Method not implemented.");
         }
-        _mj$SondertasteGedrückt$void$int(t: Thread, callback: () => {} | undefined, key: number): void {
+        _mj$SondertasteGedrückt$void$int(t: Thread, callback: () => void | undefined, key: number): void {
             throw new Error("Method not implemented.");
         }
-        _mj$MausGeklickt$void$int$int$int(t: Thread, callback: () => {} | undefined, x: number, y: number, anzahl: number): void {
+        _mj$MausGeklickt$void$int$int$int(t: Thread, callback: () => void | undefined, x: number, y: number, anzahl: number): void {
             throw new Error("Method not implemented.");
         }
     

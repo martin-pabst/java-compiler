@@ -1,7 +1,5 @@
-import { Editor } from "../../../testgui/editor/Editor.ts";
-import { formatAsJavadocComment, removeJavadocSyntax } from "../../../tools/StringTools.ts";
+import { removeJavadocSyntax } from "../../../tools/StringTools.ts";
 import { IMain } from "../../common/IMain.ts";
-import { RuntimeObject } from "../../common/debugger/DebuggerSymbolEntry.ts";
 import { ValueRenderer } from "../../common/debugger/ValueRenderer.ts";
 import { SchedulerState } from "../../common/interpreter/Scheduler.ts";
 import { Module } from "../../common/module/Module.ts";

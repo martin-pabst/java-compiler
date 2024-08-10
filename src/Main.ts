@@ -33,7 +33,7 @@ import { Range } from "./compiler/common/range/Range.ts";
 
 import { Debugger } from "./compiler/common/debugger/Debugger.ts";
 import { ActionManager } from "./compiler/common/interpreter/ActionManager.ts";
-import { TestManager } from "./compiler/common/interpreter/TestManager.ts";
+import { TestManager } from "./test/TestManager.ts";
 import { ErrorMarker } from "./compiler/common/monacoproviders/ErrorMarker.ts";
 import { JavaOnDidTypeProvider } from "./compiler/java/monacoproviders/JavaOnDidTypeProvider.ts";
 import { ProgramPointerManager } from "./compiler/common/monacoproviders/ProgramPointerManager.ts";

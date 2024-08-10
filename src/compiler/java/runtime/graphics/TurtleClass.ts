@@ -55,6 +55,7 @@ export class TurtleClass extends FilledShapeClass {
 
     isFilled: boolean = false;
 
+    //@ts-ignore
     turtle!: PIXI.Graphics;             // If you change this identifier then you have to change corresponding declaration in class ShapeClass
     lineGraphic!: PIXI.Graphics;
 

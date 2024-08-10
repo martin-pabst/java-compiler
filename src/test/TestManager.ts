@@ -1,18 +1,13 @@
-import { GUITestAssertions } from "../../../test/lib/GUITestAssertions";
-import { GUITestRunner } from "../../../test/lib/GUITestRunner";
-import { TestResultViewer } from "../../../testgui/TestResultViewer";
-import { JavaBaseModule } from "../../java/module/JavaBaseModule";
-import { JavaCompiledModule } from "../../java/module/JavaCompiledModule";
-import { JavaClass } from "../../java/types/JavaClass";
-import { JavaMethod } from "../../java/types/JavaMethod";
-import { NonPrimitiveType } from "../../java/types/NonPrimitiveType";
-import { IMain } from "../IMain";
-import { Module } from "../module/Module";
-import { ActionManager } from "./ActionManager";
-import { Program } from "./Program";
-import { SchedulerState } from "./Scheduler";
-import { Helpers, StepParams } from "./StepFunction";
-import { ThreadState } from "./Thread";
+import { IMain } from "../compiler/common/IMain";
+import { ActionManager } from "../compiler/common/interpreter/ActionManager";
+import { ITestManager } from "../compiler/common/interpreter/ITestManager";
+import { SchedulerState } from "../compiler/common/interpreter/Scheduler";
+import { ThreadState } from "../compiler/common/interpreter/Thread";
+import { Module } from "../compiler/common/module/Module";
+import { JavaMethod } from "../compiler/java/types/JavaMethod";
+import { TestResultViewer } from "../testgui/TestResultViewer";
+import { GUITestAssertions } from "./lib/GUITestAssertions";
+import { GUITestRunner } from "./lib/GUITestRunner";
 
 type MouseDownHandler = () => void;
 
@@ -21,7 +16,7 @@ type DecorationInfo = {
     decorations: string[]
 }
 
-export class TestManager {
+export class TestManager implements ITestManager {
 
     decorationInfoList: DecorationInfo[] = [];
 

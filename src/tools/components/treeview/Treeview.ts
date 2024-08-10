@@ -402,8 +402,9 @@ export class Treeview<E> {
 
     removeDragGhost() {
         let ghosts = document.getElementsByClassName('jo_treeview_drag_ghost');
-        for (let ghost of ghosts) {
-            ghost.remove();
+        for (let index = 0; index < ghosts.length; index++) {
+            let ghost = ghosts.item(index);
+            ghost?.remove();
         }
     }
 

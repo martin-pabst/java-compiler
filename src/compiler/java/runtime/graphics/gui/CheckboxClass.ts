@@ -23,7 +23,6 @@ export class CheckboxClass extends GuiTextComponentClass {
 
     x!: number;
     y!: number;
-    dotWidth!: number;
 
     backgroundGraphics!: PIXI.Graphics;
     cross!: PIXI.Graphics;

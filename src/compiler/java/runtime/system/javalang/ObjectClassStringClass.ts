@@ -5,6 +5,7 @@ import { Thread, ThreadState } from "../../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
 import { JCM } from "../../../language/JavaCompilerMessages.ts";
+import { IPrimitiveTypeWrapper } from "../primitiveTypes/wrappers/IPrimitiveTypeWrapper.ts";
 
 export type ObjectClassOrNull = ObjectClass | null;
 
@@ -184,7 +185,7 @@ export class ObjectClass {
     
 }
 
-export class StringClass extends ObjectClass {
+export class StringClass extends ObjectClass implements IPrimitiveTypeWrapper {
     
     static isPrimitiveTypeWrapper: boolean = true;
     
@@ -237,6 +238,10 @@ export class StringClass extends ObjectClass {
     constructor(value?: string) {
         super();
         this.value = value || "";
+    }
+
+    debugOutput(): string {
+        return JSON.stringify(this.value);
     }
 
     __internalHashCode(): any {

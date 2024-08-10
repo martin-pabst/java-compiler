@@ -46,7 +46,6 @@ export class TextfieldClass extends GuiTextComponentClass {
     x!: number;
     y!: number;
     width!: number;
-    fontsize!: number;
     caption!: string;
 
 
@@ -224,7 +223,7 @@ export class TextfieldClass extends GuiTextComponentClass {
                 xFrom = z;
             }
             this.selectionRectangle.roundRect(xFrom, 0, xTo - xFrom, this.height, this.fontsize/8);
-            this.selectionRectangle.fill({color: 0x8080ff, alignment: 0.5});
+            this.selectionRectangle.fill({color: 0x8080ff});
         }
 
         this.renderCursor();

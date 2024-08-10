@@ -60,7 +60,7 @@ export class SpriteClass extends ShapeClass {
     x!: number;
     y!: number;
     spriteLibrary!: string;
-    imageIndex!: number;    // If you change this identifier then you have to change corresponding declaration in class ShapeClass
+    imageIndex: number = 0;    // If you change this identifier then you have to change corresponding declaration in class ShapeClass
 
     _cj$_constructor_$Sprite$double$double$SpriteLibrary$int$ScaleMode(t: Thread, callback: CallbackFunction,
         x: number, y: number, spriteLibrary: SpriteLibraryEnum | undefined, imageIndex: number,

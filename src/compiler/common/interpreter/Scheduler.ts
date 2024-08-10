@@ -1,14 +1,11 @@
-import { SpeedControl } from "../../../testgui/SpeedControl.ts";
 import { JavaTypeStore } from "../../java/module/JavaTypeStore.ts";
 import { JavaClass } from "../../java/types/JavaClass.ts";
 import { JavaMethod } from "../../java/types/JavaMethod.ts";
 import { Executable } from "../Executable.ts";
-import { Module } from "../module/Module";
 import { ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager.ts";
-import { IRange } from "../range/Range";
 import { Interpreter } from "./Interpreter";
-import { Program, Step } from "./Program";
-import { KlassObjectRegistry, Klass, StepParams, Helpers } from "./StepFunction.ts";
+import { Program } from "./Program";
+import { Helpers, KlassObjectRegistry, StepParams } from "./StepFunction.ts";
 import { Thread, ThreadState, ThreadStateInfoAfterRun } from "./Thread";
 
 export enum SchedulerState { not_initialized, running, paused, stopped, error }
@@ -226,13 +223,22 @@ export class Scheduler {
                 if (this.state == SchedulerState.running) {
                     let dt = performance.now() - this.timeStampProgramStarted;
                     let stepsPerSecond = Math.round(this.stepCountSinceStartOfProgram / dt * 1000);
-                    this.interpreter.printManager.print("Duration: " + Math.round(dt * 100) / 100 + " ms, " + this.stepCountSinceStartOfProgram + " steps, " + SpeedControl.printMillions(stepsPerSecond) + " steps/s", true, undefined);
+                    this.interpreter.printManager.print("Duration: " + Math.round(dt * 100) / 100 + " ms, " + this.stepCountSinceStartOfProgram + " steps, " + this.printMillions(stepsPerSecond) + " steps/s", true, undefined);
                 }
                 this.terminateAllThreads();
                 break;
         }
         this.state = newState;
     }
+
+    printMillions(n: number): string {
+        if(n < 1e6) return "" + Math.trunc(n);
+
+        n = Math.trunc(n/1e3)*1e3/1e6;
+
+        return n + " million";
+    }
+
 
     terminateAllThreads() {
         this.runningThreads.forEach(t => t.state = ThreadState.terminated);

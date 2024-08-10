@@ -27,7 +27,6 @@ export class RadiobuttonClass extends GuiTextComponentClass {
 
     x!: number;
     y!: number;
-    dotWidth!: number;
 
     backgroundGraphics!: PIXI.Graphics;
     dot!: PIXI.Graphics;
