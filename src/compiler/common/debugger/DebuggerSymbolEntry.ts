@@ -25,12 +25,13 @@ export class DebuggerSymbolEntry {
     oldLength?: number; // old length if value is array
     isLocalVariable: boolean = true;
 
-    MAXCHILDREN: number = 20;
+    static MAXCHILDREN: number = 20;
+    static MAXARRAYSECTIONLENGTH: number = 100;
 
     static quickArrayOutputMaxLength = 20;
 
-    constructor(private symbolTableSection: SymbolTableSection,
-        parent: DebuggerSymbolEntry | undefined, private type: BaseType | undefined, public identifier: string
+    constructor(protected symbolTableSection: SymbolTableSection,
+        parent: DebuggerSymbolEntry | undefined, protected type: BaseType | undefined, public identifier: string
     ) {
         this.treeViewNode = new TreeviewNode(symbolTableSection.treeview,
             false, "", undefined,
@@ -123,17 +124,22 @@ export class DebuggerSymbolEntry {
 
         if (typesDiffer || this.children.length == 0) {
             this.removeChildren();
-
             let fields: BaseField[] = type.getOwnAndInheritedFields();
-
-            for (let field of fields) {
-                let fde = new ObjectFieldDebuggerEntry(this.symbolTableSection, this, field);
-                this.children.push(fde);
-            }
             this.treeViewNode.isFolder = fields.length > 0;
             this.treeViewNode.expandCollapseComponent.setState("collapsed");
+            
+            this.treeViewNode.removeAllExpandListeners();
+            this.treeViewNode.addExpandListener((state) => {
+                if(state == "collapsed") return;
+                for (let field of fields) {
+                    let fde = new ObjectFieldDebuggerEntry(this.symbolTableSection, this, field);
+                    this.children.push(fde);
+                }
+                this.children.forEach(c => (<ObjectFieldDebuggerEntry>c).fetchValueFromObjectAndRender(o));
+            }, true)
+                        
         }
-
+        
         this.children.forEach(c => (<ObjectFieldDebuggerEntry>c).fetchValueFromObjectAndRender(o));
     }
 
@@ -154,29 +160,64 @@ export class DebuggerSymbolEntry {
     }
     
     renderArray(a: any[], maxLength: number) {
-        this.treeViewNode.isFolder = true;
-        this.treeViewNode.expandCollapseComponent.setState("collapsed");
+        if(a == null || !this.type) return;
 
+        this.treeViewNode.isFolder = a.length > 0;      // isFolder is a property -> a method gets called where the ExpandCollapseComponent is shown            
+
+        // on first opening:
+        if(typeof this.oldLength == "undefined") this.treeViewNode.expandCollapseComponent.setState("collapsed");
+        
         let elementtype = (<BaseArrayType><any>this.type).getElementType()
         this.setCaption(": " + elementtype.toString() + "[" + a.length + "] ", ValueRenderer.quickArrayOutput(a, DebuggerSymbolEntry.quickArrayOutputMaxLength) , "jo_debugger_value");
 
-        if (a.length != this.oldLength || this.children.length == 0) {
-            this.oldLength = a.length;
-            this.removeChildren();
-            for (let i = 0; i < Math.min(a.length, this.MAXCHILDREN); i++) {
-                this.children.push(new ArrayElementDebuggerEntry(
-                    this.symbolTableSection, this, i,
-                    elementtype
-                ))
-            }
+        while(this.children.length || 0 > a.length){
+            this.children.pop()!.treeViewNode.destroy();
         }
-        this.treeViewNode.isFolder = a.length > 0;
-        this.children.forEach(c => (<ArrayElementDebuggerEntry>c).fetchValueFromArrayAndRender(a));
+
+        if (a.length != this.oldLength || this.children.length == 0) {
+            
+            let addAndDisplayChildren = () => {
+
+                if(a.length! > DebuggerSymbolEntry.MAXARRAYSECTIONLENGTH){
+
+                    let subintervalLength = this.getSubintervalLength(a.length); 
+                    for(let nextIndex = 0; nextIndex < a.length; nextIndex += subintervalLength){
+                        this.children.push(new ArraySectionDebuggerEntry(
+                            this.symbolTableSection, this, nextIndex, Math.min(nextIndex + subintervalLength - 1, a.length - 1),
+                            elementtype
+                        ))
+                    }
+
+                } else {
+                    for (let i = this.oldLength || 0; i < Math.min(a.length, DebuggerSymbolEntry.MAXCHILDREN); i++) {
+                        this.children.push(new ArrayElementDebuggerEntry(
+                            this.symbolTableSection, this, i,
+                            elementtype
+                        ))
+                    }                
+                }
+
+
+                this.oldLength = a.length;
+                this.children.forEach(c => (<ArrayElementDebuggerEntry>c).fetchValueFromArrayAndRender(a));
+            }
+
+            if(this.treeViewNode.expandCollapseComponent.state == "expanded"){
+                addAndDisplayChildren();
+            } else {
+                this.treeViewNode.removeAllExpandListeners();
+                this.treeViewNode.addExpandListener((state) => {
+                    addAndDisplayChildren();
+                }, true);
+            }
+
+        }
     }
 
-
-    
-
+    getSubintervalLength(intervalLength: number){
+        let digits = Math.trunc(Math.log10(intervalLength));
+        return Math.trunc(Math.pow(10, Math.max(digits - 2, 2)));
+    }
 
 }
 
@@ -234,6 +275,73 @@ export class ArrayElementDebuggerEntry extends DebuggerSymbolEntry {
     fetchValueFromArrayAndRender(a: any[]) {
         let value = a[this.index];
         this.render(value);
+    }
+
+}
+
+export class ArraySectionDebuggerEntry extends DebuggerSymbolEntry {
+
+    constructor(symbolTableSection: SymbolTableSection,
+        parent: DebuggerSymbolEntry,
+        private indexFrom: number,
+        private indexTo: number,
+        elementType: BaseType) {
+        super(symbolTableSection, parent, elementType, parent.identifier);
+        this.setCaption("", "[" + this.indexFrom + " ... " + this.indexTo + "]", "jo_debugger_index");
+    }
+
+    fetchValueFromArrayAndRender(a: any[]) {
+        this.treeViewNode.isFolder = true;      // isFolder is a property -> a method gets called where the ExpandCollapseComponent is shown            
+
+        // on first rendering:
+        if(typeof this.oldLength == "undefined"){
+            this.treeViewNode.expandCollapseComponent.setState("collapsed");
+            this.treeViewNode.removeAllExpandListeners();
+            this.oldLength = this.indexTo - this.indexFrom + 1;
+            
+            this.treeViewNode.addExpandListener((state) => {
+                if(this.oldLength! > DebuggerSymbolEntry.MAXARRAYSECTIONLENGTH){
+
+                    let subintervalLength = this.getSubintervalLength(this.oldLength!); 
+                    for(let nextIndex = this.indexFrom; nextIndex <= this.indexTo; nextIndex += subintervalLength){
+                        this.children.push(new ArraySectionDebuggerEntry(
+                            this.symbolTableSection, this, nextIndex, 
+                            Math.min(nextIndex + subintervalLength - 1, this.indexTo),
+                            this.type!
+                        ))
+                    }
+
+                } else {
+                    for (let i = this.indexFrom || 0; i <= this.indexTo; i++) {
+                        this.children.push(new ArrayElementDebuggerEntry(
+                            this.symbolTableSection, this, i,
+                            this.type!
+                        ))
+                    }                
+                }
+                
+                this.children.forEach(c => (<ArrayElementDebuggerEntry>c).fetchValueFromArrayAndRender(a));
+            }, true);
+            
+            this.children.forEach(c => (<ArrayElementDebuggerEntry>c).fetchValueFromArrayAndRender(a));
+        } 
+        
+        
+        if (a.length != this.oldLength || this.children.length == 0) {
+            
+            let addAndDisplayChildren = () => {
+            }
+
+            if(this.treeViewNode.expandCollapseComponent.state == "expanded"){
+                addAndDisplayChildren();
+            } else {
+            }
+
+        }
+
+
+
+
     }
 
 }

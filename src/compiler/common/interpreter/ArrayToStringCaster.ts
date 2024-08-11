@@ -5,7 +5,9 @@ export type TextContainer = {text: string};
 
 export class ArrayToStringCaster {
 
-    public static arrayOfObjectsToString(textContainer: TextContainer, t: Thread, array: any[], callback?: CallbackParameter) {
+    public static arrayOfObjectsToString(textContainer: TextContainer, t: Thread, 
+        array: any[], callback?: CallbackParameter, maximumLength: number = 200) {
+
         if (array == null) {
             t.s.push("null");
             if (callback) callback();
@@ -19,6 +21,10 @@ export class ArrayToStringCaster {
 
         let f = (callback1: CallbackParameter) => {
             let array: any[] = t.s.pop();
+            if(textContainer.text.length > maximumLength){
+                if(callback1) callback1();
+                return;
+            }
             if (array.length > 0) {
                 let element = array.shift();
                 if (element == null) {
@@ -46,7 +52,7 @@ export class ArrayToStringCaster {
                             if (callback1) callback1();
                             return;
                         }
-                    })
+                    }, maximumLength)
                     return;
                 } else if(typeof element == 'object') {
                     // element is object => call it's toString()-method! 
@@ -62,7 +68,7 @@ export class ArrayToStringCaster {
                             if (callback1) callback1();
                             return;
                         }
-                    })
+                    }, maximumLength - textContainer.text.length)
                 } else {
                     if(typeof element == "string"){
                         textContainer.text += '"' + element + '"';

@@ -131,7 +131,7 @@ export class ObjectClass {
     }
     
     
-    _mj$toString$String$(t: Thread, callback: CallbackFunction){
+    _mj$toString$String$(t: Thread, callback: CallbackFunction, maximumLength: number = 200){
         t.s.push(new StringClass(ValueRenderer.renderValue(this, 200)));
         if(callback) callback();
         return;

@@ -600,7 +600,7 @@ export class Thread {
         return objType.fastExtendsImplements(type);
     }
 
-    ToString(t: Thread, callback: CallbackParameter, object: ObjectClass) {
+    ToString(t: Thread, callback: CallbackParameter, object: ObjectClass, maximumLength: number = 200) {
         if (object == null) {
             t.s.push(null);
             if (callback) callback();
@@ -608,16 +608,16 @@ export class Thread {
         }
 
         if(Array.isArray(object)){
-            this._arrayOfObjectsToString(object, callback);
+            this._arrayOfObjectsToString(object, callback, maximumLength);
             return;
         }
 
         if(typeof object == "object"){
-            object._mj$toString$String$(t, callback);
+            object._mj$toString$String$(t, callback, maximumLength);
             return;
         }
 
-        t.s.push("" + object);
+        t.s.push("" + object);    // parameter object is indeed no object
         if(callback) callback();
         return;
     }
@@ -653,12 +653,12 @@ export class Thread {
         aquiredLock.leaveSynchronizedBlock(this);
     }
 
-    _arrayOfObjectsToString(array: any[], callback?: CallbackParameter) {
+    _arrayOfObjectsToString(array: any[], callback?: CallbackParameter, maximumLength: number = 200) {
         let textContainer: TextContainer = { text: "" };
         ArrayToStringCaster.arrayOfObjectsToString(textContainer, this, array, () => {
             this.s.push(textContainer.text);
             if (callback) callback();
-        });
+        }, maximumLength);
     }
 
     _primitiveElementOrArrayToString(element: any): string {

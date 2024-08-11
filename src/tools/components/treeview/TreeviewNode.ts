@@ -1,6 +1,6 @@
 import { DOM } from "../../DOM.ts";
 import { ContextMenuItem, makeEditable, openContextMenu } from "../../HtmlTools.ts";
-import { ExpandCollapseComponent, ExpandCollapseState } from "../ExpandCollapseComponent.ts";
+import { ExpandCollapseComponent, ExpandCollapseListener, ExpandCollapseState } from "../ExpandCollapseComponent.ts";
 import { IconButtonComponent, IconButtonListener } from "../IconButtonComponent.ts";
 import { Treeview } from "./Treeview.ts";
 
@@ -63,6 +63,8 @@ export class TreeviewNode<E> {
     set onClickHandler(och: TreeviewNodeOnClickHandler<E>) {
         this._onClickHandler = och;
     }
+
+    private _onExpandListener: {listener: ExpandCollapseListener, once: boolean}[] = [];
 
     constructor(private _treeview: Treeview<E>,
         private _isFolder: boolean, private _caption: string,
@@ -237,6 +239,12 @@ export class TreeviewNode<E> {
 
         this.expandCollapseComponent =
             new ExpandCollapseComponent(this.expandCollapseDiv, (state: ExpandCollapseState) => {
+                if(state == "expanded"){
+                    this._onExpandListener.slice().forEach(handler => {
+                        handler.listener(state);
+                        if(handler.once) this._onExpandListener.splice(this._onExpandListener.indexOf(handler), 1);
+                    });
+                }
                 this.toggleChildrenDiv(state);
             }, "expanded")
         if (!this.isRootNode()) {
@@ -667,5 +675,14 @@ export class TreeviewNode<E> {
             this.treeview.rootNode.childrenDiv.appendChild(this.nodeWithChildrenDiv);
         }
     }
+
+    addExpandListener(listener: ExpandCollapseListener, once: boolean = false){
+        this._onExpandListener.push({listener: listener, once: once});
+    }
+
+    removeAllExpandListeners(){
+        this._onExpandListener = [];
+    }
+
 
 }

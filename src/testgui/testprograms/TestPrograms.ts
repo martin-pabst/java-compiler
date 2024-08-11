@@ -1,5 +1,27 @@
 export var testProgramsList = [
    ['', ``],
+   ['LongArray', `int[] n = new int[10000];
+for (int i = 0; i < 10000; i++) {
+   n[i] = 2 * i;
+}
+
+println(n);`],
+   ['RecursiveObjectsTest', `A a = new A();
+B b = new B();
+
+a.b = b;
+b.a = a;
+
+println(a);
+
+
+class A {
+   B b;
+}
+
+class B {
+   A a;
+}`],
    ['Ternary Operator', `int delta = 10;
 
 String s = delta > 0 ? "A" : "B";
