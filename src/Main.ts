@@ -162,6 +162,7 @@ export class Main implements IMain {
 
     this.errorMarker = new ErrorMarker();
 
+    this.initButtons();
 
     /**
      * Compiler and Repl are fields of language!
@@ -174,7 +175,6 @@ export class Main implements IMain {
     this.testResultViewer.addEventListener('run-all-tests',
       (e) => { if (e.type == "run-all-tests") testManager.executeAllTests(); });
 
-    this.initButtons();
 
     new EditorOpenerProvider(this);
 
