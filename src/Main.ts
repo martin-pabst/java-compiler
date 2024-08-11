@@ -1,7 +1,6 @@
 import { Language } from "./compiler/common/Language.ts";
 import { CompilerFile } from "./compiler/common/module/CompilerFile.ts";
 import { Module } from "./compiler/common/module/Module.ts";
-import { JavaCompiler } from "./compiler/java/JavaCompiler.ts";
 import { JavaLanguage } from "./compiler/java/JavaLanguage.ts";
 import { TokenPrinter } from "./compiler/java/lexer/TokenPrinter.ts";
 import { AstComponent } from "./testgui/AstComponent.ts";
@@ -14,7 +13,6 @@ import { ProgramControlButtons } from "./testgui/ProgramControlButtons.ts";
 import * as PIXI from 'pixi.js';
 
 import jQuery from "jquery";
-import { ProgramViewerComponent } from "./testgui/ProgramViewerComponent.ts";
 import { testProgramsList } from "./testgui/testprograms/TestPrograms.ts";
 import { TestResultViewer } from "./testgui/TestResultViewer.ts";
 import { TabbedEditorManager } from "./tools/TabbedEditorManager.ts";
@@ -29,28 +27,28 @@ import { BreakpointManager } from "./compiler/common/BreakpointManager.ts";
 import { IMain } from "./compiler/common/IMain.ts";
 import { GraphicsManager } from "./compiler/common/interpreter/GraphicsManager.ts";
 import { KeyboardManager } from "./compiler/common/interpreter/KeyboardManager.ts";
-import { Range } from "./compiler/common/range/Range.ts";
+import { IRange, Range } from "./compiler/common/range/Range.ts";
 
+import { Compiler } from "./compiler/common/Compiler.ts";
 import { Debugger } from "./compiler/common/debugger/Debugger.ts";
+import { Disassembler } from "./compiler/common/disassembler/Disassembler.ts";
+import { IJumpToCodeProvider } from "./compiler/common/disassembler/IJumpToCodeProvider.ts";
+import { Executable } from "./compiler/common/Executable.ts";
 import { ActionManager } from "./compiler/common/interpreter/ActionManager.ts";
-import { TestManager } from "./test/TestManager.ts";
+import { CompilerWorkspace } from "./compiler/common/module/CompilerWorkspace.ts";
+import { EditorOpenerProvider } from "./compiler/common/monacoproviders/EditorOpenerProvider.ts";
 import { ErrorMarker } from "./compiler/common/monacoproviders/ErrorMarker.ts";
-import { JavaOnDidTypeProvider } from "./compiler/java/monacoproviders/JavaOnDidTypeProvider.ts";
-import { ProgramPointerManager } from "./compiler/common/monacoproviders/ProgramPointerManager.ts";
+import { ProgramPointerManager, ProgramPointerPositionInfo } from "./compiler/common/monacoproviders/ProgramPointerManager.ts";
 import { JavaRepl } from "./compiler/java/parser/repl/JavaRepl.ts";
-import { JavaReplCompiledModule } from "./compiler/java/parser/repl/JavaReplCompiledModule.ts";
+import { CompilerWorkspaceImpl } from "./test/CompilerWorkspaceImpl.ts";
+import { TestManager } from "./test/TestManager.ts";
 import { ReplGUI } from "./testgui/editor/ReplGUI.ts";
 import { TestFileManager } from "./testgui/TestFileManager.ts";
 import { TestInputManager } from "./testgui/TestInputManager.ts";
 import spritesheetjson from '/include/graphics/spritesheet.json.txt';
 import spritesheetpng from '/include/graphics/spritesheet.png';
-import { Compiler } from "./compiler/common/Compiler.ts";
-import { Executable } from "./compiler/common/Executable.ts";
-import { CompilerWorkspace } from "./compiler/common/module/CompilerWorkspace.ts";
-import { CompilerWorkspaceImpl } from "./test/CompilerWorkspaceImpl.ts";
-import { EditorOpenerProvider } from "./compiler/common/monacoproviders/EditorOpenerProvider.ts";
 
-export class Main implements IMain {
+export class Main implements IMain, IJumpToCodeProvider {
 
   language: Language;
 
@@ -74,7 +72,7 @@ export class Main implements IMain {
 
   astComponent: AstComponent;
 
-  programViewerCompoment: ProgramViewerComponent;
+  disassembler: Disassembler;
 
   currentWorkspace: CompilerWorkspaceImpl;
 
@@ -119,7 +117,6 @@ export class Main implements IMain {
     this.astComponent = new AstComponent(this.astDiv);
 
 
-    this.programViewerCompoment = new ProgramViewerComponent(this.codeOutputDiv);
 
     this.currentWorkspace = new CompilerWorkspaceImpl(this);
 
@@ -178,10 +175,37 @@ export class Main implements IMain {
 
     new EditorOpenerProvider(this);
 
+    this.disassembler = new Disassembler(this.codeOutputDiv, this, this);
+
 
     // document.addEventListener('keydown', (key) => {
     //   console.log(key.code);
     // });
+
+
+  }
+  jumpTo(file: CompilerFile, range: IRange): void {
+    let monacoModel = file.getMonacoModel();
+    if (!monacoModel) return;
+    this.getMainEditor().setModel(monacoModel);
+    this.getMainEditor().revealPosition(Range.getStartPosition(range));
+
+    let p: ProgramPointerPositionInfo = {
+      moduleOrMonacoModel: monacoModel,
+      //@ts-ignore
+      program: undefined,
+      range: range
+    }
+
+    this.getInterpreter().programPointerManager?.show(p, {
+      key: "codePosition",
+      isWholeLine: true,
+      className: "jo_revealCallstackEntry",
+      minimapColor: "#3067ce",
+      rulerColor: "#3067ce",
+      beforeContentClassName: "jo_revealCallstackEntryBefore"
+    })
+
 
   }
 
@@ -260,8 +284,6 @@ export class Main implements IMain {
         TokenPrinter.print(jcm.tokens!, this.tokenDiv);
       }
 
-      this.programViewerCompoment.buildTreeView((<JavaCompiler>this.getCompiler()).moduleManager);
-
     }
 
   }
@@ -320,7 +342,7 @@ export class Main implements IMain {
   }
 
   adjustWidthToWorld(): void {
-      // nothing to do
+    // nothing to do
   }
 
 }

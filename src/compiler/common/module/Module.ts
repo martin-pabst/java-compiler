@@ -1,6 +1,7 @@
 import { JavaType } from "../../java/types/JavaType.ts";
 import { Error } from "../Error";
 import { UsagePosition, UsageTracker } from "../UsagePosition";
+import { CodeFragment } from "../disassembler/CodeFragment.ts";
 import { Program, Step } from "../interpreter/Program";
 import { Thread } from "../interpreter/Thread";
 import { Position } from "../range/Position.ts";
@@ -33,6 +34,8 @@ export abstract class Module {
     abstract startMainProgram(thread: Thread): boolean;
 
     abstract isReplModule(): boolean;
+
+    abstract getCodeFragments(): CodeFragment[];
 
     isStartable(): boolean {
         if (this.hasMainProgram()) {

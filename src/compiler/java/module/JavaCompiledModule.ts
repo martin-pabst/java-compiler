@@ -17,7 +17,10 @@ import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { JavaBaseModule } from "./JavaBaseModule";
 import { JavaModuleManager } from "./JavaModuleManager";
 import { TypePosition } from "./TypePosition.ts";
-import { IRange } from "../../common/range/Range.ts";
+import { IRange, Range } from "../../common/range/Range.ts";
+import { CodeFragment } from "../../common/disassembler/CodeFragment.ts";
+import { JavaCompiledModuleMessages } from "../language/JavaCompiledModuleMessages.ts";
+import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer.ts";
 
 export type JavaMethodCallPosition = {
     identifierRange: monaco.IRange,
@@ -41,14 +44,56 @@ export class JavaCompiledModule extends JavaBaseModule {
 
     symbolTables: JavaSymbolTable[] = [];  // contains one symbol table for main program and one for each class/interface/enum in global scope    
 
-    typePositions: {[line: number]: TypePosition[]} = {};
+    typePositions: { [line: number]: TypePosition[] } = {};
 
-    methodCallPositions: {[line: number]: JavaMethodCallPosition[]} = {};
+    methodCallPositions: { [line: number]: JavaMethodCallPosition[] } = {};
 
     methodDeclarationRanges: IRange[] = [];
 
-    constructor(file: CompilerFile, public moduleManager?: JavaModuleManager){
+    constructor(file: CompilerFile, public moduleManager?: JavaModuleManager) {
         super(file, false);
+    }
+
+
+    getCodeFragments(): CodeFragment[] {
+        let fragments: CodeFragment[] = [];
+        let mainClassType = this.mainClass?.resolvedType;
+        if (mainClassType && this.types.indexOf(mainClassType) < 0) {
+            if (mainClassType.identifier == "") {
+                mainClassType.identifier = "main class";
+            }
+            this.getCodeFragmentsForType(mainClassType, fragments);
+        }
+
+        for(let type of this.types){
+            if(type instanceof NonPrimitiveType) this.getCodeFragmentsForType(type, fragments);
+        }
+
+        return fragments;
+    }
+
+    private getCodeFragmentsForType(type: NonPrimitiveType, fragments: CodeFragment[]) {
+
+        if (type.staticInitializer && type.staticInitializer.stepsSingle.length > 0) {
+            fragments.push({
+                type: type,
+                signature: JavaCompiledModuleMessages.staticInitializerComment(),
+                program: type.staticInitializer,
+                methodDeclarationRange: type.identifierRange
+            })
+        }
+
+        // instance initializers are included in constructors, so we omit them here.
+
+        for (let method of type.getOwnMethods()) {
+            if (method.program) fragments.push({
+                type: type,
+                signature: method.getSignature(),
+                program: method.program,
+                methodDeclarationRange: method.identifierRange
+            })
+        }
+
     }
 
     isReplModule(): boolean {
@@ -62,12 +107,12 @@ export class JavaCompiledModule extends JavaBaseModule {
     }
 
 
-    addTypePosition(position: Position, type: JavaType){
+    addTypePosition(position: Position, type: JavaType) {
 
 
-        if(type instanceof NonPrimitiveType || type instanceof StaticNonPrimitiveType || type instanceof JavaArrayType){
+        if (type instanceof NonPrimitiveType || type instanceof StaticNonPrimitiveType || type instanceof JavaArrayType) {
             let list = this.typePositions[position.lineNumber];
-            if(list == null){
+            if (list == null) {
                 list = [];
                 this.typePositions[position.lineNumber] = list;
             }
@@ -85,12 +130,12 @@ export class JavaCompiledModule extends JavaBaseModule {
     }
 
 
-    setBreakpoint(line: number){
+    setBreakpoint(line: number) {
         let steps = this.findSteps(line);
         steps.forEach(step => step.setBreakpoint());
     }
 
-    clearBreakpoint(line: number){
+    clearBreakpoint(line: number) {
         let steps = this.findSteps(line);
         steps.forEach(step => step.clearBreakpoint());
     }
@@ -98,28 +143,28 @@ export class JavaCompiledModule extends JavaBaseModule {
     findSteps(line: number): Step[] {
 
         let types = this.types;
-        if(this.mainClass){
+        if (this.mainClass) {
             types = this.types.slice();
             types.push(this.mainClass.resolvedType!);
         }
 
-        for(let type of types){
+        for (let type of types) {
 
-            if(type instanceof NonPrimitiveType){
+            if (type instanceof NonPrimitiveType) {
 
-                if(type.staticInitializer){
+                if (type.staticInitializer) {
                     let step = type.staticInitializer.findStep(line);
-                    if(step) return [step];
+                    if (step) return [step];
                 }
 
                 // A instance initializer may have been copied to several constructors, so if 
                 // breakpoint in instance initializer is set there may be several steps to
                 // consider setting a breakpoint in.
                 let steps: Step[] = [];
-                for(let method of type.getOwnMethods()){
-                    if(method.program){
+                for (let method of type.getOwnMethods()) {
+                    if (method.program) {
                         let step = method.program.findStep(line);
-                        if(step) steps.push(step);
+                        if (step) steps.push(step);
                     }
                 }
 
@@ -132,7 +177,7 @@ export class JavaCompiledModule extends JavaBaseModule {
 
     }
 
-    resetBeforeCompilation(){
+    resetBeforeCompilation() {
         this.tokens = undefined;
         this.ast = undefined;
         this.types = [];
@@ -146,10 +191,10 @@ export class JavaCompiledModule extends JavaBaseModule {
     }
 
     hasMainProgram(): boolean {
-        if(!this.mainClass) return false;
-        let mainMethod = this.mainClass.methods.find( m => m.isStatic && m.identifier == "main")
+        if (!this.mainClass) return false;
+        let mainMethod = this.mainClass.methods.find(m => m.isStatic && m.identifier == "main")
 
-        if(mainMethod){
+        if (mainMethod) {
             let statements = mainMethod.statement as ASTBlockNode;
             return statements.statements.length > 0;
         }
@@ -160,16 +205,16 @@ export class JavaCompiledModule extends JavaBaseModule {
 
     startMainProgram(thread: Thread): boolean {
         let mainRuntimeClass = this.mainClass?.resolvedType?.runtimeClass;
-        if(!mainRuntimeClass) return false;
+        if (!mainRuntimeClass) return false;
         let mainMethod = this.mainClass?.resolvedType?.methods.find(m => m.getSignature() == "void main(String[])" && m.isStatic);
 
-        if(!mainMethod) return false;
+        if (!mainMethod) return false;
 
         let methodStub = mainRuntimeClass[mainMethod.getInternalNameWithGenericParameterIdentifiers("java")];
-        if(!methodStub) return false;
+        if (!methodStub) return false;
 
         let THIS = mainRuntimeClass;
-        
+
         methodStub.call(THIS, thread, thread.s);
 
         return true;
@@ -184,11 +229,11 @@ export class JavaCompiledModule extends JavaBaseModule {
     findSymbolTableAtPosition(position: Position): JavaSymbolTable | undefined {
         let tableWithSmallestNumberOfLines: JavaSymbolTable | undefined;
         let smallestNumberOfLines: number = Number.MAX_SAFE_INTEGER;
-        for(let table of this.symbolTables){
+        for (let table of this.symbolTables) {
             let t1: JavaSymbolTable | undefined = table.findSymbolTableAtPosition(position) as JavaSymbolTable;
-            if(t1){
+            if (t1) {
                 let lineCount = t1.range.endLineNumber - t1.range.startLineNumber + 1;
-                if(lineCount < smallestNumberOfLines){
+                if (lineCount < smallestNumberOfLines) {
                     smallestNumberOfLines = lineCount;
                     tableWithSmallestNumberOfLines = t1;
                 }
@@ -204,7 +249,7 @@ export class JavaCompiledModule extends JavaBaseModule {
 
     pushMethodCallPosition(identifierRange: monaco.IRange, commaPositions: monaco.IPosition[],
         possibleMethods: JavaMethod[] | string, rightBracketPosition: monaco.IPosition,
-    bestMethod?: JavaMethod) {
+        bestMethod?: JavaMethod) {
 
         let lines: number[] = [];
         lines.push(identifierRange.startLineNumber);

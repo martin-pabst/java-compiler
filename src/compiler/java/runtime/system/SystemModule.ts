@@ -128,6 +128,7 @@ import { StackClass } from "./collections/StackClass.ts";
 import { BiConsumerInterface } from "./functional/BiConsumerInterface.ts";
 import { PAppletClass } from "../graphics/processing/PAppletClass.ts";
 import { World3dClass } from "../graphics/3d/World3dClass.ts";
+import { CodeFragment } from "../../../common/disassembler/CodeFragment.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -241,4 +242,7 @@ export class SystemModule extends JavaLibraryModule {
         return false;
     }
 
+    getCodeFragments(): CodeFragment[] {
+        return [];
+    }
 }

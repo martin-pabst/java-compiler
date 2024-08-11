@@ -3,6 +3,7 @@ import { AssertionObserver } from "../../java/runtime/unittests/AssertionObserve
 import { BreakpointManager } from "../BreakpointManager.ts";
 import { Debugger } from "../debugger/Debugger.ts";
 import { Executable } from "../Executable.ts";
+import { Module } from "../module/Module.ts";
 import { ProgramPointerManager, ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager.ts";
 import { ActionManager } from "./ActionManager.ts";
 import { CodeReachedAssertions } from "./CodeReachedAssertions.ts";
@@ -18,7 +19,7 @@ import { Scheduler, SchedulerExitState, SchedulerState } from "./Scheduler";
 import { Thread, ThreadState } from "./Thread.ts";
 
 
-type InterpreterEvents = "stop" | "done" | "resetRuntime" | "stateChanged";
+type InterpreterEvents = "stop" | "done" | "resetRuntime" | "stateChanged" | "showProgramPointer" | "hideProgramPointer";
 
 export class Interpreter {
 
@@ -174,11 +175,13 @@ export class Interpreter {
 
                 _textPositionWithModule = this.scheduler.getNextStepPosition();
 
-                if(!this.programPointerManager.fileIsCurrentlyShownInEditor(_textPositionWithModule?.module.file)){
+                if(!this.programPointerManager.fileIsCurrentlyShownInEditor((<Module>_textPositionWithModule?.moduleOrMonacoModel).file)){
                     _textPositionWithModule = undefined;
                 }
+
             }  
             if (_textPositionWithModule?.range) {
+                this.eventManager.fire("showProgramPointer");
                 if (_textPositionWithModule.range.startLineNumber >= 0) {
 
                     this.programPointerManager.show(_textPositionWithModule, {
@@ -460,6 +463,7 @@ export class Interpreter {
 
     hideProgrampointerPosition(tag?: string) {
         this.programPointerManager?.hide(tag || Interpreter.ProgramPointerIndentifier);
+        this.eventManager.fire("hideProgramPointer");
     }
 
     registerCodeReached(key: string) {

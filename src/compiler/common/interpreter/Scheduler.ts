@@ -4,7 +4,7 @@ import { JavaMethod } from "../../java/types/JavaMethod.ts";
 import { Executable } from "../Executable.ts";
 import { ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager.ts";
 import { Interpreter } from "./Interpreter";
-import { Program } from "./Program";
+import { Program, Step } from "./Program";
 import { Helpers, KlassObjectRegistry, StepParams } from "./StepFunction.ts";
 import { Thread, ThreadState, ThreadStateInfoAfterRun } from "./Thread";
 
@@ -338,7 +338,13 @@ export class Scheduler {
         this.runningThreads.push(thread);
     }
 
-
+    public getNextStep(currentThread?: Thread): Step | undefined {
+        currentThread = currentThread || this.runningThreads[this.currentThreadIndex];
+        if (!currentThread) return undefined;
+        let programState = currentThread.currentProgramState;
+        let step = programState.currentStepList[programState.stepIndex];
+        return step || undefined;
+    }
 
     /**
      * for displaying next program position in editor
@@ -351,7 +357,7 @@ export class Scheduler {
         if (!step) return undefined;
 
         return {
-            module: programState.program.module,
+            moduleOrMonacoModel: programState.program.module,
             //@ts-ignore
             range: step.range,
             program: programState.program

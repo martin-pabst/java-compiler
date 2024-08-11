@@ -1,0 +1,57 @@
+:root {
+    --disassembler-horizontal-line: #808080;
+    --disassembler-heading: #51e24e;
+}   
+
+.disassemblerDiv {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: block;
+    margin-left: 5px;
+}
+
+.disassemblerHorizontalLine {
+    width: 100%;
+    height: 2px;
+    margin: 12px 0 5px 0;
+    border-top: 2px solid var(--disassembler-horizontal-line);
+}
+
+.disassemblerHeading {
+    font-size: 150%;
+    color: var(--disassembler-heading);
+}
+
+.disassemblerSignature {
+    font-size: 125%;
+    margin-bottom: 5px;
+}
+
+.disassemblerLink {
+    cursor: pointer;
+}
+
+.disassemblerLink:active {
+    filter: brightness(150%);
+}
+
+.disassemblerHighlight {
+    background-color: rgb(52, 222, 92);
+}
+
+.disassemblerStep {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    margin-left: 5px;
+    padding: 3px 0;
+    font-size: 14px;
+    text-wrap: wrap;
+}
+
+.disassemblerStepIndex {
+    color: 0xffffff;
+    margin-right: 5px;
+}

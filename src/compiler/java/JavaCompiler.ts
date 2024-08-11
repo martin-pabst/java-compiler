@@ -7,10 +7,11 @@
  */
 
 import { BaseType } from "../common/BaseType.ts";
-import { Compiler } from "../common/Compiler.ts";
+import { Compiler, CompilerEvents } from "../common/Compiler.ts";
 import { Error, ErrorLevel } from "../common/Error.ts";
 import { Executable } from "../common/Executable.ts";
 import { IMain } from "../common/IMain.ts";
+import { EventManager } from "../common/interpreter/EventManager.ts";
 import { KlassObjectRegistry } from "../common/interpreter/StepFunction.ts";
 import { CompilerFile } from "../common/module/CompilerFile";
 import { Module } from "../common/module/Module.ts";
@@ -46,6 +47,7 @@ export class JavaCompiler implements Compiler {
     public state: CompilerState = CompilerState.stopped;
     private maxMsBetweenRuns: number = 100;
 
+    public eventManager: EventManager<CompilerEvents> = new EventManager();
 
     constructor(public main?: IMain, private errorMarker?: ErrorMarker) {
         this.libraryModuleManager = new JavaLibraryModuleManager();
@@ -138,6 +140,7 @@ export class JavaCompiler implements Compiler {
         this.lastCompiledExecutable = executable;
 
         this.main?.onCompilationFinished(this.lastCompiledExecutable);
+        this.eventManager.fire("compilationFinished", this.lastCompiledExecutable);
 
         if (this.lastCompiledExecutable) {
             for (let module of this.lastCompiledExecutable.moduleManager.modules) {
