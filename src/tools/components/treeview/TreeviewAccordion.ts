@@ -121,7 +121,9 @@ class TreeviewSplitter {
         this.div.style.display = '';
         
         this.div.onpointerdown = (ev) => {
-            console.log("onPointerDown!");
+            
+            this.div.style.backgroundColor = '#800000';
+
             this.yStart = ev.pageY;
             let treeviewList: Treeview<any>[] = this.accordion.treeviewList;
             
@@ -132,19 +134,20 @@ class TreeviewSplitter {
                 tv.outerDiv.style.height = height + "px";
                 tv.outerDiv.style.flex = "none";
             }
-            
+
             this.transparentOverlay = DOM.makeDiv(document.body, 'jo_treeview_splitter_overlay');
+            this.transparentOverlay.style.cursor = 'ns-resize';
             
-            this.transparentOverlay.onpointermove = (ev) => {
+            this.transparentOverlay!.onpointermove = (ev) => {
                 this.onPointerMove(ev.pageY);
                 ev.stopPropagation();
             }
             
-            this.transparentOverlay.onmousemove = (ev) => {ev.stopPropagation()};
+            this.transparentOverlay!.onmousemove = (ev) => {ev.stopPropagation()};
             
-            this.transparentOverlay.onpointerup = () => {
-                console.log("onPointerUp!");
+            this.transparentOverlay!.onpointerup = () => {
                 this.transparentOverlay!.remove();
+                this.div.style.backgroundColor = '';
             }
             
         }
@@ -152,7 +155,6 @@ class TreeviewSplitter {
     }
     
     onPointerMove(newY: number){
-        console.log("onPointerMove!");
         let dyCursor = newY - this.yStart!;
         let treeviewList: Treeview<any>[] = this.accordion.treeviewList;
         let treeviewBelow = treeviewList[this.treeviewBelowIndex];
@@ -181,8 +183,6 @@ class TreeviewSplitter {
             }
             targetHeights[this.treeviewBelowIndex] -= dyCursor - dyTodo;
         }
-
-        console.log("Target heights: " + targetHeights)
 
         for(let i = 0; i <= this.treeviewBelowIndex; i++){
             treeviewList[i].outerDiv.style.height = targetHeights[i] + "px";

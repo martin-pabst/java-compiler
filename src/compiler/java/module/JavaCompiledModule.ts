@@ -142,6 +142,7 @@ export class JavaCompiledModule extends JavaBaseModule {
         this.typePositions = {};
         this.methodCallPositions = {};
         this.symbolTables = [];
+        this.methodDeclarationRanges = [];
     }
 
     hasMainProgram(): boolean {

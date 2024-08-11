@@ -65,6 +65,9 @@ export class JavaHoverProvider {
         if (typeof replReturnValue == "undefined") return caption + ": ---";
         let type: string = replReturnValue.type ? replReturnValue.type.toString() + " " : "";
         let text = replReturnValue.text;
+
+        if(text == null || typeof text == "undefined") return 'null';
+
         //@ts-ignore#
         if(text["value"]) text = text.value;
         switch (type) {

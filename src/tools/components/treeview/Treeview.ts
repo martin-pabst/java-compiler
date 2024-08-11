@@ -156,7 +156,7 @@ export class Treeview<E> {
             contextMenu: {
                 messageNewNode: "Neues Element anlegen..."
             },
-            minHeight: 200,
+            minHeight: 150,
             initialExpandCollapseState: "expanded",
             buttonAddFolders: true,
             buttonAddElements: true,
