@@ -121,6 +121,7 @@ class TreeviewSplitter {
         this.div.style.display = '';
         
         this.div.onpointerdown = (ev) => {
+            console.log("onPointerDown!");
             this.yStart = ev.pageY;
             let treeviewList: Treeview<any>[] = this.accordion.treeviewList;
             
@@ -142,6 +143,7 @@ class TreeviewSplitter {
             this.transparentOverlay.onmousemove = (ev) => {ev.stopPropagation()};
             
             this.transparentOverlay.onpointerup = () => {
+                console.log("onPointerUp!");
                 this.transparentOverlay!.remove();
             }
             
@@ -150,6 +152,7 @@ class TreeviewSplitter {
     }
     
     onPointerMove(newY: number){
+        console.log("onPointerMove!");
         let dyCursor = newY - this.yStart!;
         let treeviewList: Treeview<any>[] = this.accordion.treeviewList;
         let treeviewBelow = treeviewList[this.treeviewBelowIndex];
@@ -178,6 +181,8 @@ class TreeviewSplitter {
             }
             targetHeights[this.treeviewBelowIndex] -= dyCursor - dyTodo;
         }
+
+        console.log("Target heights: " + targetHeights)
 
         for(let i = 0; i <= this.treeviewBelowIndex; i++){
             treeviewList[i].outerDiv.style.height = targetHeights[i] + "px";
