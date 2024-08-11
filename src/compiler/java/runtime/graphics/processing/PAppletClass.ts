@@ -1,13 +1,13 @@
 // import p5 from "p5";  // unfortunately this breaks vite-test
-import { DOM } from "../../../../tools/DOM.ts";
-import { Interpreter } from "../../../common/interpreter/Interpreter.ts";
-import { SchedulerState } from "../../../common/interpreter/Scheduler.ts";
-import { CallbackFunction } from "../../../common/interpreter/StepFunction.ts";
-import { Thread } from "../../../common/interpreter/Thread.ts";
-import { JRC } from "../../language/JavaRuntimeLibraryComments.ts";
-import { LibraryDeclarations } from "../../module/libraries/DeclareType.ts";
-import { NonPrimitiveType } from "../../types/NonPrimitiveType.ts";
-import { ObjectClass } from "../system/javalang/ObjectClassStringClass.ts";
+import { DOM } from "../../../../../tools/DOM";
+import { Interpreter } from "../../../../common/interpreter/Interpreter";
+import { SchedulerState } from "../../../../common/interpreter/Scheduler";
+import { CallbackFunction } from "../../../../common/interpreter/StepFunction";
+import { Thread } from "../../../../common/interpreter/Thread";
+import { JRC } from "../../../language/JavaRuntimeLibraryComments";
+import { LibraryDeclarations } from "../../../module/libraries/DeclareType";
+import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
+import { ObjectClass } from "../../system/javalang/ObjectClassStringClass";
 
 type p5 = any;
 

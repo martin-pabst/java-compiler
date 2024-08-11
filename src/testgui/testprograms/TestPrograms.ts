@@ -1,5 +1,8 @@
 export var testProgramsList = [
    ['', ``],
+   ['World3dTest 1', `new World3d();
+
+while(true);`],
    ['LongArray', `int[] n = new int[10000];
 for (int i = 0; i < 10000; i++) {
    n[i] = 2 * i;

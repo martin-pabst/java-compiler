@@ -45,7 +45,7 @@ export class DebuggerWatchSection {
 
         let valueAsString: string = "---"
         let value = repl.executeSynchronously(debuggerWatchEntry.term);
-        if(value && value != '---'){
+        if(value && value.text != '---'){
             valueAsString = ValueRenderer.renderValue(value, 20);
         }
 
