@@ -35,6 +35,16 @@
 			", comment: JRC.",
 		],
 		"description": "Comment entry"
+	},
+
+	
+	"Insert Three.js-import": {
+		"scope": "typescript",
+		"prefix": "tji",
+		"body": [
+			"import * as THREE from 'three';",
+		],
+		"description": "Insert Three.js-importe"
 	}
 
 

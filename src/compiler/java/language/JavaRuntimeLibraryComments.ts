@@ -481,23 +481,23 @@ export class JRC {
     })
 
     static shapeCollidesWithComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn die Figur mit der anderen Figur überlappt.",
-    "en": "Returns true if graphic objects collide.",
+        "de": "Gibt genau dann true zurück, wenn die Figur mit der anderen Figur überlappt.",
+        "en": "Returns true if graphic objects collide.",
     })
 
     static shapeCollidesWithAnyShapeComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn die Figur mit irgendeiner anderen Figur überlappt.",
-    "en": "Returns true if graphic object collides with any other graphic object.",
+        "de": "Gibt genau dann true zurück, wenn die Figur mit irgendeiner anderen Figur überlappt.",
+        "en": "Returns true if graphic object collides with any other graphic object.",
     })
 
     static shapeCollidesWithFillColorComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn die Figur mit irgendeiner anderen Figur mit der angegebenen Füllfarbe überlappt.",
-    "en": "Returns true if graphic object collides with any other graphic object with given fillColor.",
+        "de": "Gibt genau dann true zurück, wenn die Figur mit irgendeiner anderen Figur mit der angegebenen Füllfarbe überlappt.",
+        "en": "Returns true if graphic object collides with any other graphic object with given fillColor.",
     })
 
     static shapeGetFirstCollidingSpriteComment = () => lm({
-    "de": "Falls dieses Grafikobjekt gerade mindestens ein Sprite mit dem übergebenen Bildindex (-1 bedeutet: mit irgendeinem BildIndex) berührt, wird das erste dieser Sprites zurückgegeben.",
-    "en": "If this graphic object collides with any sprite with given imageIndex then this method returns the first one. Use imageIndex == -1 to search for ANY colliding Sprite.",
+        "de": "Falls dieses Grafikobjekt gerade mindestens ein Sprite mit dem übergebenen Bildindex (-1 bedeutet: mit irgendeinem BildIndex) berührt, wird das erste dieser Sprites zurückgegeben.",
+        "en": "If this graphic object collides with any sprite with given imageIndex then this method returns the first one. Use imageIndex == -1 to search for ANY colliding Sprite.",
     })
 
     /**
@@ -593,53 +593,53 @@ export class JRC {
      * class Group
      */
     static groupClassComment = () => lm({
-    "de": "Eine Gruppe kann mehrere graphische Objekte (auch andere Gruppen) enthalten und miteinander verschieben, drehen, ...",
-    "en": "A group can contain several graphic objects (also other groups) and move, rotate, ... them together.",
+        "de": "Eine Gruppe kann mehrere graphische Objekte (auch andere Gruppen) enthalten und miteinander verschieben, drehen, ...",
+        "en": "A group can contain several graphic objects (also other groups) and move, rotate, ... them together.",
     })
 
     static groupConstructorComment = () => lm({
-    "de": "Erstellt eine neue Gruppe",
-    "en": "Creates a new Group",
+        "de": "Erstellt eine neue Gruppe",
+        "en": "Creates a new Group",
     })
 
     static groupAddComment = () => lm({
-    "de": "Fügt der Gruppe graphische Elemente hinzu. Tipp: Diese Methode kann beliebig viele Parameter haben.",
-    "en": "Adds graphic elements to this group. Hint: This method can have multiple parameters. ",
+        "de": "Fügt der Gruppe graphische Elemente hinzu. Tipp: Diese Methode kann beliebig viele Parameter haben.",
+        "en": "Adds graphic elements to this group. Hint: This method can have multiple parameters. ",
     })
 
     static groupRemoveComment = () => lm({
-    "de": "Entfernt das übergebene Objekt aus der Gruppe. Das Objekt wird dadurch nicht verändert.",
-    "en": "Removes given object from this group.",
+        "de": "Entfernt das übergebene Objekt aus der Gruppe. Das Objekt wird dadurch nicht verändert.",
+        "en": "Removes given object from this group.",
     })
 
     static groupRemoveWithIndexComment = () => lm({
-    "de": "Entfernt das Element mit dem gegebenen Index aus der Gruppe. Das erste Element hat Index 0.",
-    "en": "Removes element with given index from group. First element has index 0.",
+        "de": "Entfernt das Element mit dem gegebenen Index aus der Gruppe. Das erste Element hat Index 0.",
+        "en": "Removes element with given index from group. First element has index 0.",
     })
 
     static groupGetComment = () => lm({
-    "de": "Gibt das Element mit dem angegebenen Index zurück. Das erste Element der Gruppe hat Index 0.",
-    "en": "Returns element with given index. First element in group has index 0.",
+        "de": "Gibt das Element mit dem angegebenen Index zurück. Das erste Element der Gruppe hat Index 0.",
+        "en": "Returns element with given index. First element in group has index 0.",
     })
 
     static groupIndexOfComment = () => lm({
-    "de": "Gibt den Index des elements innerhalb der Gruppe zurück. Falls das Element nicht in der Gruppe enthalten ist, wird -1 zurückgegeben.",
-    "en": "Returns index of given element inside group. First element in group has index 0.",
+        "de": "Gibt den Index des elements innerhalb der Gruppe zurück. Falls das Element nicht in der Gruppe enthalten ist, wird -1 zurückgegeben.",
+        "en": "Returns index of given element inside group. First element in group has index 0.",
     })
 
     static groupSizeComment = () => lm({
-    "de": "Gibt die Anzahl der Elemente in dieser Gruppe zurück.",
-    "en": "Returns the number of elements in this group.",
+        "de": "Gibt die Anzahl der Elemente in dieser Gruppe zurück.",
+        "en": "Returns the number of elements in this group.",
     })
 
     static groupEmptyComment = () => lm({
-    "de": "Leert die Gruppe. Die in der Gruppe enthaltenen Elemente werden dadurch nicht verändert.",
-    "en": "Removes all elements from this group. This operation doesn't affect the elements themselves.",
+        "de": "Leert die Gruppe. Die in der Gruppe enthaltenen Elemente werden dadurch nicht verändert.",
+        "en": "Removes all elements from this group. This operation doesn't affect the elements themselves.",
     })
 
     static groupDestroyAllChildrenComment = () => lm({
-    "de": "Zerstört alle Elemente der Gruppe, nicht aber die Gruppe selbst.",
-    "en": "Destroys all elements inside this group, but not this group itself.",
+        "de": "Zerstört alle Elemente der Gruppe, nicht aber die Gruppe selbst.",
+        "en": "Destroys all elements inside this group, but not this group itself.",
     })
 
     /**
@@ -1687,8 +1687,8 @@ export class JRC {
      */
 
     static arrayListClassComment = () => lm({
-    "de": "Die Klasse ArrayList ist eine Liste, deren Elemente in einem Array gespeichert sind. Wird das Array zu klein, kopiert die ArrayList es automatisch in ein größeres Array.",
-    "en": "An ArrayList is a List backed by an array. If the array gets too small it's automatically copied into a larger one.",
+        "de": "Die Klasse ArrayList ist eine Liste, deren Elemente in einem Array gespeichert sind. Wird das Array zu klein, kopiert die ArrayList es automatisch in ein größeres Array.",
+        "en": "An ArrayList is a List backed by an array. If the array gets too small it's automatically copied into a larger one.",
     })
 
     static arrayListConstructorComment = () => lm({
@@ -3481,6 +3481,123 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
         "de": "Y-Komponente des Vektors",
         "en": "y-component",
     })
+    /**
+     * Vector3
+     */
+    static Vector3ClassComment = () => lm({
+        "de": "Ein zweidimensionaler Vektor mit double-Koordinaten.",
+        "en": "2-dimensional vector with double-precision.",
+    })
+
+    static Vector3ConstructorComment = () => lm({
+        "de": "Erstellt einen neuen Vektor mit den Koordinaten (x, y).",
+        "en": "Creates a new vector with given coordinates.",
+    })
+
+    static Vector3ToStringComment = () => lm({
+        "de": "Wandelt den Vektor in einen String der Form (x, y) um.",
+        "en": "Transforms vector into String (x, y).",
+    })
+
+    static Vector3FromPolarCoordinatesComment = () => lm({
+        "de": "Gibt einen neuen zweidimensionalen Vektor zurück, der mit den Polarkoordinaten (r/alphaDeg) gebildet wird. Datei ist r (Abstand zum Ursprung des Koordinatensystems) und alphaDeg (Winkel zur positiven x-Achse in Grad).",
+        "en": "Creates a new Vector3-object from given polar coordinates r, alphaDeg. r is it's length, alphaDeg it's angle towards the positive x-axis.",
+    })
+
+    static Vector3GetAngleDegComment = () => lm({
+        "de": "Gibt den Winkel zur positiven x-Achse in Grad zurück.",
+        "en": "Returns angle towards positive x-axis in degrees.",
+    })
+
+    static Vector3GetAngleRadComment = () => lm({
+        "de": "Gibt den Winkel zur positiven x-Achse im Bogenmaß (rad) zurück.",
+        "en": "Returns angle towards positive x-axis in radians.",
+    })
+
+    static Vector3GetLengthComment = () => lm({
+        "de": "Gibt die Länge des Vektors zurück.",
+        "en": "Returns length of this vector.",
+    })
+
+    static Vector3GetUnitVectorComment = () => lm({
+        "de": "Gibt einen NEUEN Vektor zurück, der parallel zu diesem ist aber die Länge 1 besitzt.",
+        "en": "Returns a NEW Vector parallel to this one but with length 1.",
+    })
+
+    static Vector3SetLengthComment = () => lm({
+        "de": "Streckt/staucht das Vector3-Objekt auf die angegebene Länge und gibt es zurück (für Method-Chaining!). Das Vector3-Objekt wird dabei verändert!",
+        "en": "Scales this Vector3-object to given length and returns it for method chaining.",
+    })
+
+    static Vector3ScaledByComment = () => lm({
+        "de": "Gibt ein NEUES Vector3-Objekt zurück, das parallel zu diesem ist aber um den angegebenen Faktor gestreckt ist.",
+        "en": "Returns a NEW Vector3-object parallel to this one but with given length.",
+    })
+
+    static Vector3ScaleComment = () => lm({
+        "de": "Streckt das Vector3-Objekt um den angegebenen Faktor und gibt es zurück (für Method-Chaining!). Diese Methode VERÄNDERT dieses Objekt!",
+        "en": "Scales Vector3-object by given factor and returns it (for method chaining). This method ALTERS this object!",
+    })
+
+    static Vector3RotateComment = () => lm({
+        "de": "Rotiert das Vector3-Objekt um den angegebenen Winkel (in Grad) und gibt es zurück (für Method-Chaining!). Positive Winkel bedeuten eine Drehung ENTGEGEN dem Uhrzeigersinn.",
+        "en": "Rotates this Vector3-object by given angle (in degrees) and returns it for method chaining. Positve angles lead to COUNTERCLOCKWISE rotation.",
+    })
+
+    static Vector3RotatedByComment = () => lm({
+        "de": "Gibt ein NEUES Vector3-Objekt zurück, das um den angegebenen Winkel (in Grad) gedreht ist. Positive Winkel bedeuten eine Drehung ENTGEGEN dem Uhrzeigersinn.",
+        "en": "Returns a NEW Vector3-object rotated by given angle (in degrees). Positve angles lead to COUNTERCLOCKWISE rotation.",
+    })
+
+    static Vector3PlusComment = () => lm({
+        "de": "Gibt ein NEUES Vector3-Objekt zurück, das aus Addition der beiden Vektoren entsteht.",
+        "en": "Returns a NEW Vector3-object which is the sum of the two vectors.",
+    })
+
+    static Vector3MinusComment = () => lm({
+        "de": "Gibt ein NEUES Vector3-Objekt zurück, das aus Subtraktion der beiden Vektoren entsteht.",
+        "en": "Returns a NEW Vector3-object which is the difference of the two vectors.",
+    })
+
+    static Vector3AddComment = () => lm({
+        "de": "Addiert den übergebenen Vektor zu diesem und gibt diesen zurück (für Method-Chaining!). Diese Methode VERÄNDERT dieses Objekt!",
+        "en": "Adds given vector to this one and returns this one. This Method ALTERS this object!",
+    })
+
+    static Vector3SubComment = () => lm({
+        "de": "Subtrahiert den übergebenen Vektor von diesem und gibt diesen zurück (für Method-Chaining!). Diese Methode VERÄNDERT dieses Objekt!",
+        "en": "Subtracts given vector from this one and returns this one. This Method ALTERS this object!",
+    })
+
+    static Vector3ScalarProductComment = () => lm({
+        "de": "Gibt das Skalarprodukt der beiden Vektoren zurück.",
+        "en": "Returns scalar product of vectors.",
+    })
+
+    static Vector3DistanceComment = () => lm({
+        "de": "Berechnet den Abstand der beiden Punkte (x1, y1) und (x2, y2).",
+        "en": "Returns distance of given points (x1, y1) and (x2, y2).",
+    })
+
+    static Vector3DistanceToComment = () => lm({
+        "de": "Berechnet die Länge der Differenz der beiden Vektoren.",
+        "en": "Returns the length of the difference of both vectors.",
+    })
+
+    static Vector3XComment = () => lm({
+        "de": "X-Komponente des Vektors",
+        "en": "x-component",
+    })
+
+    static Vector3YComment = () => lm({
+        "de": "Y-Komponente des Vektors",
+        "en": "y-component",
+    })
+
+    static Vector3xyNullPointerComment = (direction: string) => lm({
+        "de": `Der Parameter ${direction} darf nicht null sein!`,
+        "en": `The parameter ${direction} must not be null!`,
+    })
 
     /**
      * class MathTools
@@ -4434,18 +4551,18 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     })
 
     static mapForeachComment = () => lm({
-    "de": "Führt die angegebene Aktion für jedes Schlüssel-Wert-Paar dieser Map aus.",
-    "en": "Performs the given action for each key-value pair in this map until all entries have been processed.",
+        "de": "Führt die angegebene Aktion für jedes Schlüssel-Wert-Paar dieser Map aus.",
+        "en": "Performs the given action for each key-value pair in this map until all entries have been processed.",
     })
 
     static mapValuesComment = () => lm({
-    "de": "Gibt eine Collection zurück, die alle Werte der Map enthält (ggf. auch mehrfach).",
-    "en": "Returns a Collection containing all values of this map.",
+        "de": "Gibt eine Collection zurück, die alle Werte der Map enthält (ggf. auch mehrfach).",
+        "en": "Returns a Collection containing all values of this map.",
     })
 
     static mapKeySetComment = () => lm({
-    "en": "Returns a Set containing all keys of this map.",
-    "de": "Gibt ein Set zurück, das alle Schlüssel dieser Map enthält.",
+        "en": "Returns a Set containing all keys of this map.",
+        "de": "Gibt ein Set zurück, das alle Schlüssel dieser Map enthält.",
     })
     /**
      * Class HashMap
@@ -4495,42 +4612,62 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
      * Class Stack
      */
     static stackClassComment = () => lm({
-    "de": "Stack (Stapelspeicher/Kellerspeicher)",
-    "en": "Stack implementation using Javascript array",
+        "de": "Stack (Stapelspeicher/Kellerspeicher)",
+        "en": "Stack implementation using Javascript array",
     })
 
     static stackConstructorComment = () => lm({
-    "de": "Erstellt ein neues, leeres Stack-Objekt.",
-    "en": "Creates a new, empty stack object.",
+        "de": "Erstellt ein neues, leeres Stack-Objekt.",
+        "en": "Creates a new, empty stack object.",
     })
 
     static stackPushComment = () => lm({
-    "de": "Legt ein Element 'oben' auf den Stack.",
-    "en": "Pushes an element on top of this stack.",
+        "de": "Legt ein Element 'oben' auf den Stack.",
+        "en": "Pushes an element on top of this stack.",
     })
 
     static stackPopComment = () => lm({
-    "de": "Nimmt ein Element 'von oben' vom Stack.",
-    "en": "Pops an element from the top of this stack.",
+        "de": "Nimmt ein Element 'von oben' vom Stack.",
+        "en": "Pops an element from the top of this stack.",
     })
 
     static stackPeekComment = () => lm({
-    "de": "Gibt das oberste Elements des Stacks zurück ohne es vom Stack zu nehmen.",
-    "en": "Returns element at top of this stack without removing it from this stack.",
+        "de": "Gibt das oberste Elements des Stacks zurück ohne es vom Stack zu nehmen.",
+        "en": "Returns element at top of this stack without removing it from this stack.",
     })
 
     static stackEmptyComment = () => lm({
-    "de": "Gibt genau dann true zurück, wenn der Stack leer ist.",
-    "en": "Returns true if and only if this stack is empty.",
+        "de": "Gibt genau dann true zurück, wenn der Stack leer ist.",
+        "en": "Returns true if and only if this stack is empty.",
     })
 
     static stackSearchComment = () => lm({
-    "de": "Sucht das Element vom 'Boden' des Stack aus und gibt seinen Index zurück, falls das Element gefunden wurde. Das unterste Element hat Index 0. Falls das Element nicht gefunden wurde, wird -1 zurückgegeben.",
-    "en": "Returns the index of the first occurrence of the specified element in this vector, or -1 if this vector does not contain the element.",
+        "de": "Sucht das Element vom 'Boden' des Stack aus und gibt seinen Index zurück, falls das Element gefunden wurde. Das unterste Element hat Index 0. Falls das Element nicht gefunden wurde, wird -1 zurückgegeben.",
+        "en": "Returns the index of the first occurrence of the specified element in this vector, or -1 if this vector does not contain the element.",
     })
 
     static emptyStackException = () => lm({
-    "de": "Der Stack ist leer, daher kann diese Methode nicht aufgerufen werden.",
-    "en": "This stack is empty.",
+        "de": "Der Stack ist leer, daher kann diese Methode nicht aufgerufen werden.",
+        "en": "This stack is empty.",
     })
+
+    /**
+     * Object3d
+     */
+    static Object3dClassComment = () => lm({
+        "de": "Basisklasse für alle 3d-Objekte",
+        "en": "Base class of all 3d objects",
+    })
+
+
+    /**
+     * Mesh3d
+     */
+    static Mesh3dClassComment = () => lm({
+        "de": "Basisklasse für alle 3d-Meshes, d.h. Objekte, die aus Dreicken bestehen.",
+        "en": "Base class of all 3d meshes (objects consisting of triangles)",
+    })
+
+
+
 }  
