@@ -10,7 +10,7 @@
     overflow-y: auto;
     display: block;
     margin-left: 5px;
-    line-height: 17px;
+    line-height: normal;
     user-select: none;
 }
 
