@@ -90,8 +90,10 @@ export class StringCodeSnippet extends CodeSnippet {
     }
 
     ensureFinalValueIsOnStack(): void {
+        if(this.finalValueIsOnStack) return;
         if(this.text.endsWith(";\n")) this.text = this.text.substring(0, this.text.length - 2);
         this.text = `${StepParams.stack}.push(${this.text});\n`
+        this.finalValueIsOnStack = true;
     }
 
     index(lastIndex: number): number {

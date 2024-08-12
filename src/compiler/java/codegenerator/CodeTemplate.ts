@@ -34,7 +34,7 @@ export class OneParameterTemplate extends CodeTemplate {
 
         let snippetContainer = new CodeSnippetContainer(snippets[0].allButLastPart(), range, resultType);
         let lastPart = snippets[0].lastPartOrPop();
-        snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\§1', 'g'), lastPart.emit()), range, undefined, [lastPart]);
+        snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\§1', 'g'), lastPart.emit()), range, resultType, [lastPart]);
         return snippetContainer;
     }
 

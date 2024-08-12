@@ -138,26 +138,6 @@
     border-radius: var(--breakpoint-radius);
 }
 
-/* Debugger */
-.jo_debugger_type {
-    color:#6cbfe6;
-}
-
-.jo_debugger_localVariableIdentifier {
-    color:#4ffa2c;
-}
-
-.jo_debugger_fieldIdentifier {
-    color:#e6e92c;
-}
-
-.jo_debugger_value {
-    color:#ffffff;
-}
-
-.jo_debugger_index {
-    color:#b7b374;
-}
 
 /* PApplet */
 .jo_pAppletOuter {

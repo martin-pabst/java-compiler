@@ -69,7 +69,7 @@ export class JavaHoverProvider {
         if(text == null || typeof text == "undefined") return 'null';
 
         //@ts-ignore#
-        if(text["value"]) text = text.value;
+        if(typeof text["value"] !== "undefined") text = text.value;
         switch (type) {
             case "string ":
             case "String ": 

@@ -184,9 +184,11 @@ export class Thread {
                 // because callMethod or returnFromMethod may have been called since from within 
                 // step.run
             }
+
+            currentProgramState.lastExecutedStep = step!; 
+
         } catch (exception) {
             currentProgramState.stepIndex = stepIndex;
-            this.currentProgramState = currentProgramState;
 
             if (exception instanceof ThrowableClass) {
                 this.throwException(exception, step!);
@@ -196,6 +198,7 @@ export class Thread {
             }
 
         }
+
 
         return { state: this._state, stepsExecuted: this.numberOfSteps }
     }

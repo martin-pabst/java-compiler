@@ -256,6 +256,7 @@ export class CodeSnippetContainer extends CodeSnippet {
             let part = this.parts[i];
             if(part && part.type) return part;
         }
+        console.log("Error in CodeSnippetContainer.getLastPartWithType: Didn't find last part with type!");
         return undefined;
     }
 

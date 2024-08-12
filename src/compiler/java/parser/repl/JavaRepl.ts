@@ -82,7 +82,11 @@ export class JavaRepl {
                 let symbolTable = debuggerCallstackEntry.symbolTable as JavaSymbolTable;
 
                 if (symbolTable) {
+                    let oldNumberOfChildTables = symbolTable.childTables.length;
+
                     programAndModule = this.replCompiler.compile(statement, symbolTable, interpreter.executable);
+                    
+                    symbolTable.childTables.splice(oldNumberOfChildTables, symbolTable.childTables.length - oldNumberOfChildTables);
                 }
 
             }
@@ -108,13 +112,24 @@ export class JavaRepl {
             return undefined;
         }
 
+        let threadBefore = this.getInterpreter().scheduler.getCurrentThread();
+        let stackSizeBefore = threadBefore?.s.length;
+        let currentProgramState = threadBefore?.currentProgramState;
+        let lastExecutedStep = currentProgramState?.lastExecutedStep;
+
+        
         let thread = this.prepareThread(programAndModule);
         if (!thread) {
             return undefined;
         }
 
         try {
+
             interpreter.runREPLSynchronously();
+
+            if(currentProgramState) currentProgramState.lastExecutedStep = lastExecutedStep;
+            if(stackSizeBefore) threadBefore?.s.splice(stackSizeBefore, threadBefore?.s.length - stackSizeBefore);
+
         } catch(ex){
             console.log(ex);
             return undefined;
@@ -129,6 +144,12 @@ export class JavaRepl {
         let interpreter = this.getInterpreter();
         let programAndModule = this.compileAndShowErrors(statement);
 
+        let threadBefore = interpreter.scheduler.getCurrentThread();
+        let stackSizeBefore = threadBefore?.s.length;
+        let currentProgramState = threadBefore?.currentProgramState;
+        let lastExecutedStep = currentProgramState?.lastExecutedStep;
+
+
         if (!programAndModule) {
             return undefined;
         }
@@ -140,16 +161,18 @@ export class JavaRepl {
             
             let callback = (returnValue: ReplReturnValue) => {
                 
+                if(currentProgramState) currentProgramState.lastExecutedStep = lastExecutedStep;
+                if(stackSizeBefore) threadBefore?.s.splice(stackSizeBefore, threadBefore?.s.length - stackSizeBefore);
+
                 resolve(returnValue);
             }
 
             thread = this.prepareThread(programAndModule!, callback, withMaxSpeed);
+
             if (!thread) {
                 resolve(undefined);
                 return;
             }
-            
-
             
     
             interpreter.setState(SchedulerState.running);

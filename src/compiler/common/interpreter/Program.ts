@@ -178,6 +178,12 @@ export class Program {
         return message;
     }
 
+    logAllSteps(){
+        let i: number = 0;
+        for(let step of this.stepsSingle){
+            console.log((i++) + step.codeAsString);
+        }
+    }
 
     addStep(statement: string) {
         let step = new Step(this.stepsSingle.length, this.module);

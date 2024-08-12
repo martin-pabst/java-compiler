@@ -22,6 +22,7 @@ import { OptionView } from "./testgui/OptionView.ts";
 import { TerminalPrintManager } from "./testgui/TerminalPrintManager.ts";
 import '/include/css/button.css';
 import '/include/css/main.css';
+import '/include/css/junit.css';
 
 import { BreakpointManager } from "./compiler/common/BreakpointManager.ts";
 import { IMain } from "./compiler/common/IMain.ts";
