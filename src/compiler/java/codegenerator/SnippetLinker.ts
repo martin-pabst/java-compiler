@@ -37,9 +37,9 @@ export class SnippetLinker {
         this.index(flatList, 0);
 
         let steps: Step[] = [];
-        let currentStep = new Step(0);
+        let currentStep = new Step(0, program.module);
         for(let snippet of flatList){
-            currentStep = snippet.emitToStep(currentStep, steps);
+            currentStep = snippet.emitToStep(currentStep, steps, program.module);
         }
         
         if(!currentStep.isEmpty()) steps.push(currentStep);

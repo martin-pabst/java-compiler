@@ -4,10 +4,12 @@ import { BreakpointManager } from "../BreakpointManager.ts";
 import { Debugger } from "../debugger/Debugger.ts";
 import { Executable } from "../Executable.ts";
 import { Module } from "../module/Module.ts";
+import { ErrorMarker } from "../monacoproviders/ErrorMarker.ts";
 import { ProgramPointerManager, ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager.ts";
 import { ActionManager } from "./ActionManager.ts";
 import { CodeReachedAssertions } from "./CodeReachedAssertions.ts";
 import { EventManager } from "./EventManager";
+import { ExceptionMarker } from "./ExceptionMarker.ts";
 import { GraphicsManager } from "./GraphicsManager.ts";
 import { IFilesManager as IFileManager } from "./IFilesManager.ts";
 import { IInputManager } from "./IInputManager.ts";
@@ -74,22 +76,9 @@ export class Interpreter {
         public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager,
         public breakpointManager?: BreakpointManager, public _debugger?: Debugger,
         public programPointerManager?: ProgramPointerManager, public testManager?: ITestManager,
-        public inputManager?: IInputManager, public fileManager?: IFileManager
+        public inputManager?: IInputManager, public fileManager?: IFileManager,
+        public exceptionMarker?: ExceptionMarker
     ) {
-        // constructor(public main: MainBase, public primitiveTypes: NPrimitiveTypeManager, public controlButtons: ProgramControlButtons, $runDiv: JQuery<HTMLElement>) {
-
-        // this.printManager = new PrintManager($runDiv, this.main);
-        // this.inputManager = new InputManager($runDiv, this.main);
-        // if (main.isEmbedded()) {
-        //     this.keyboardTool = new KeyboardTool(jQuery('html'), main);
-        // } else {
-        //     this.keyboardTool = new KeyboardTool(jQuery(window), main);
-        // }
-
-        // this.gamepadTool = new GamepadTool();
-
-        // TODO: This wires up speedcontrol with interpreter
-        // controlButtons.setInterpreter(this);
 
         //@ts-ignore
         if(typeof p5 === 'object') p5.disableFriendlyErrors = true
@@ -354,6 +343,8 @@ export class Interpreter {
     }
 
     setState(state: SchedulerState) {
+
+        if(state == SchedulerState.running) this.exceptionMarker?.removeExceptionMarker();
 
         if (state == SchedulerState.stopped) {
             this.hideProgrampointerPosition();

@@ -1,5 +1,6 @@
 import { Step } from "../../common/interpreter/Program";
 import { StepParams } from "../../common/interpreter/StepFunction";
+import { Module } from "../../common/module/Module";
 import { EmptyRange, IRange } from "../../common/range/Range";
 import { JavaType } from "../types/JavaType";
 import { CodeSnippet, ConstantValue, EmitToStepListener, StringCodeSnippet } from "./CodeSnippet";
@@ -147,7 +148,7 @@ export class CodeSnippetContainer extends CodeSnippet {
      * @param steps 
      * @returns 
      */
-    emitToStep(currentStep: Step, steps: Step[]): Step {
+    emitToStep(currentStep: Step, steps: Step[], module: Module): Step {
 
         currentStep.setRangeStartIfUndefined(this.range);
 
@@ -157,7 +158,7 @@ export class CodeSnippetContainer extends CodeSnippet {
                 currentStep.setRangeStartIfUndefined(part.range);
                 lastCurrentStep = currentStep;
             }
-            currentStep = part.emitToStep(currentStep, steps);
+            currentStep = part.emitToStep(currentStep, steps, module);
         }
 
         currentStep.adaptRangeEnd(this.range);
@@ -284,7 +285,7 @@ export class NextStepMark extends CodeSnippet {
         return currentIndex + 1;
     }
 
-    emitToStep(currentStep: Step, steps: Step[]): Step {
+    emitToStep(currentStep: Step, steps: Step[], module: Module): Step {
         // does current step already end with return statement?
         let lastReturnIndex = currentStep.codeAsString.lastIndexOf("return");
         let stringAfterReturn = currentStep.codeAsString.substring(lastReturnIndex);
@@ -292,7 +293,7 @@ export class NextStepMark extends CodeSnippet {
             currentStep.codeAsString += "return " + (this.stepIndex + 1) + ";";
         }
         steps.push(currentStep);
-        return new Step(this.stepIndex + 1);
+        return new Step(this.stepIndex + 1, module);
     }
 
     flattenInto(flatList: CodeSnippet[]): void {

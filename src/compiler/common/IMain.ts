@@ -1,5 +1,6 @@
 import { Compiler } from "../common/Compiler.ts";
 import { JavaRepl } from "../java/parser/repl/JavaRepl.ts";
+import { Disassembler } from "./disassembler/Disassembler.ts";
 import { Executable } from "./Executable.ts";
 import { Interpreter } from "./interpreter/Interpreter.ts";
 import { Language } from "./Language.ts";
@@ -31,5 +32,6 @@ export interface IMain {
 
     showFile(file: CompilerFile): void;
 
+    getDisassembler(): Disassembler | undefined;
 
 }

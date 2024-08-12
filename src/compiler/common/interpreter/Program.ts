@@ -25,7 +25,7 @@ export class Step {
     innerClass?: Klass;         // if inner class is instantiated in this step
     lambdaObject?: any;
 
-    constructor(public index: number) {
+    constructor(public index: number, public module: Module) {
         this.range = { startLineNumber: undefined, startColumn: undefined, endLineNumber: undefined, endColumn: undefined };
     }
 
@@ -180,7 +180,7 @@ export class Program {
 
 
     addStep(statement: string) {
-        let step = new Step(this.stepsSingle.length);
+        let step = new Step(this.stepsSingle.length, this.module);
         step.codeAsString = statement;
         this.stepsSingle.push(step);
     }

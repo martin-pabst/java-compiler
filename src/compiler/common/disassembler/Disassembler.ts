@@ -24,9 +24,11 @@ export class Disassembler {
     disassembledSteps: DisassembledStep[] = [];
     stepToHtmlElementMap: Map<Step, HTMLElement> = new Map();
     
-    currentlyHighlightedHtmlElement: HTMLElement | undefined;
+    currentElementAtProgramPointer: HTMLElement | undefined;
     
     disassemblerDiv: HTMLDivElement;
+
+    lastMarkedElement?: HTMLElement;
     
     constructor(parentElement: HTMLElement, private main: IMain) {
         parentElement.innerHTML = "";
@@ -72,15 +74,29 @@ export class Disassembler {
         }
     }
     
-    markElement(element: HTMLElement){
-        this.unmarkAllElements();
+    markProgramPointer(element: HTMLElement){
+        this.unmarkProgramPointer();
         element.classList.add("jo_revealDisassemblerPosition");
+        this.lastMarkedElement = element;
     }
     
-    unmarkAllElements(){
+    unmarkProgramPointer(){
         //@ts-ignore
         for(let element of this.disassemblerDiv.children){
             element.classList.remove("jo_revealDisassemblerPosition");
+        }
+    }
+    
+    markException(step: Step){
+        let element = this.findHtmlElementForStep(step);
+        element?.classList.add("jo_revealDisassemblerException");
+        element?.scrollIntoView({block: "nearest", inline: "nearest"});
+    }
+    
+    unmarkException(){
+        //@ts-ignore
+        for(let element of this.disassemblerDiv.children){
+            element.classList.remove("jo_revealDisassemblerException");
         }
     }
 
@@ -114,21 +130,32 @@ export class Disassembler {
 
     showProgramPointer(step: Step) {
         this.hideProgramPointer();        
-        this.currentlyHighlightedHtmlElement = this.stepToHtmlElementMap.get(step);
+        this.currentElementAtProgramPointer = this.findHtmlElementForStep(step);
         
-        if (this.currentlyHighlightedHtmlElement) {
-            this.currentlyHighlightedHtmlElement.classList.add("jo_revealProgramPointer");
-            this.currentlyHighlightedHtmlElement.scrollIntoView({block: "nearest", inline: "nearest"});
+        if (this.currentElementAtProgramPointer) {
+            this.currentElementAtProgramPointer.classList.add("jo_revealProgramPointer");
+            this.currentElementAtProgramPointer.scrollIntoView({block: "nearest", inline: "nearest"});
         }    
     }    
+
+    findHtmlElementForStep(step: Step): HTMLElement | undefined {
+        let element = this.stepToHtmlElementMap.get(step);
+        if(element) return element;
+ 
+        this.currentModule = undefined;
+        this.disassembleModule(step.module);
+
+        return this.stepToHtmlElementMap.get(step);
+    }
+
     
     hideProgramPointer() {
         
-        if (this.currentlyHighlightedHtmlElement) {
-            this.currentlyHighlightedHtmlElement.classList.remove("jo_revealProgramPointer");
+        if (this.currentElementAtProgramPointer) {
+            this.currentElementAtProgramPointer.classList.remove("jo_revealProgramPointer");
         }    
         
-        this.currentlyHighlightedHtmlElement = undefined;
+        this.currentElementAtProgramPointer = undefined;
     }    
 
     clear() {
@@ -171,7 +198,7 @@ export class Disassembler {
         if (type.identifierRange && module) {
             headingDiv.addEventListener('pointerdown', (ev) => {
                 this.showElementpositionInMonacoModel(module.file, type.identifierRange);
-                this.markElement(headingDiv);
+                this.markProgramPointer(headingDiv);
             })
             headingDiv.classList.add("jo_disassemblerLink");
         }
@@ -189,7 +216,7 @@ export class Disassembler {
         if (range && module) {
             signatureDiv.addEventListener('pointerdown', (ev) => {
                 this.showElementpositionInMonacoModel(module.file, range);
-                this.markElement(signatureDiv);
+                this.markProgramPointer(signatureDiv);
             })
             signatureDiv.classList.add("jo_disassemblerLink");
         }
@@ -236,7 +263,7 @@ export class Disassembler {
                 if (range.startLineNumber && range.startColumn) {
                     stepDiv.addEventListener('pointerdown', (ev) => {
                         this.showElementpositionInMonacoModel(module!.file, <IRange>range);
-                        this.markElement(stepDiv);
+                        this.markProgramPointer(stepDiv);
                     })
                     stepDiv.classList.add("jo_disassemblerLink");
                 }

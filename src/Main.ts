@@ -27,18 +27,16 @@ import { BreakpointManager } from "./compiler/common/BreakpointManager.ts";
 import { IMain } from "./compiler/common/IMain.ts";
 import { GraphicsManager } from "./compiler/common/interpreter/GraphicsManager.ts";
 import { KeyboardManager } from "./compiler/common/interpreter/KeyboardManager.ts";
-import { IRange, Range } from "./compiler/common/range/Range.ts";
 
 import { Compiler } from "./compiler/common/Compiler.ts";
 import { Debugger } from "./compiler/common/debugger/Debugger.ts";
 import { Disassembler } from "./compiler/common/disassembler/Disassembler.ts";
-import { IShowFileProvider } from "./compiler/common/disassembler/IShowFileProvider.ts";
 import { Executable } from "./compiler/common/Executable.ts";
 import { ActionManager } from "./compiler/common/interpreter/ActionManager.ts";
 import { CompilerWorkspace } from "./compiler/common/module/CompilerWorkspace.ts";
 import { EditorOpenerProvider } from "./compiler/common/monacoproviders/EditorOpenerProvider.ts";
 import { ErrorMarker } from "./compiler/common/monacoproviders/ErrorMarker.ts";
-import { ProgramPointerManager, ProgramPointerPositionInfo } from "./compiler/common/monacoproviders/ProgramPointerManager.ts";
+import { ProgramPointerManager } from "./compiler/common/monacoproviders/ProgramPointerManager.ts";
 import { JavaRepl } from "./compiler/java/parser/repl/JavaRepl.ts";
 import { CompilerWorkspaceImpl } from "./test/CompilerWorkspaceImpl.ts";
 import { TestManager } from "./test/TestManager.ts";
@@ -47,8 +45,9 @@ import { TestFileManager } from "./testgui/TestFileManager.ts";
 import { TestInputManager } from "./testgui/TestInputManager.ts";
 import spritesheetjson from '/include/graphics/spritesheet.json.txt';
 import spritesheetpng from '/include/graphics/spritesheet.png';
+import { ExceptionMarker } from "./compiler/common/interpreter/ExceptionMarker.ts";
 
-export class Main implements IMain, IShowFileProvider {
+export class Main implements IMain {
 
   language: Language;
 
@@ -155,7 +154,7 @@ export class Main implements IMain, IShowFileProvider {
     this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager,
       new GraphicsManager(this.graphicsDiv, this), keyboardManager,
       this.breakpointManager, _debugger, new ProgramPointerManager(this),
-      testManager, inputManager, fileManager);
+      testManager, inputManager, fileManager, new ExceptionMarker(this));
 
     this.errorMarker = new ErrorMarker();
 
@@ -175,7 +174,7 @@ export class Main implements IMain, IShowFileProvider {
       
       new EditorOpenerProvider(this);
       
-      this.disassembler = new Disassembler(this.codeOutputDiv, this, this);
+      this.disassembler = new Disassembler(this.codeOutputDiv, this);
       
       this.tabbedEditorManager.eventManager.on("onActivateTab", (file: CompilerFile) => {
           this.disassembler.disassembleModule(this.getCompiler().findModuleByFile(file));        
@@ -328,6 +327,10 @@ export class Main implements IMain, IShowFileProvider {
 
   adjustWidthToWorld(): void {
     // nothing to do
+  }
+
+  getDisassembler(): Disassembler | undefined {
+    return this.disassembler;
   }
 
 }

@@ -18,6 +18,8 @@ import { ArrayToStringCaster, TextContainer } from "./ArrayToStringCaster.ts";
 import { ExceptionPrinter } from "./ExceptionPrinter.ts";
 import { ReplReturnValue } from "../../java/parser/repl/ReplReturnValue.ts";
 import { ValueTool } from "../debugger/ValueTool.ts";
+import { RuntimeExceptionClass } from "../../java/runtime/system/javalang/RuntimeException.ts";
+import { InterpreterMessages } from "../language/InterpreterMessages.ts";
 
 
 export type ProgramState = {
@@ -105,13 +107,16 @@ export class Thread {
     run(maxNumberOfSteps: number): ThreadStateInfoAfterRun {
         this.numberOfSteps = 0;
         let stack = this.s; // for performance reasons
+        let step: Step;
+        let currentProgramState!: ProgramState;
+        let stepIndex!: number;
 
         try {
             //@ts-ignore
             while (this.numberOfSteps < maxNumberOfSteps && this.state == ThreadState.runnable) {
                 // For performance reasons: store all necessary data in local variables
-                let currentProgramState = this.currentProgramState;
-                let stepIndex = currentProgramState.stepIndex;
+                currentProgramState = this.currentProgramState;
+                stepIndex = currentProgramState.stepIndex;
                 let currentStepList = currentProgramState.currentStepList;
                 let stackBase = currentProgramState.stackBase;
 
@@ -119,7 +124,7 @@ export class Thread {
                     // singlestep-mode (slower...)
                     while (this.numberOfSteps < maxNumberOfSteps &&
                         this.state == ThreadState.runnable && !this.isSingleStepCompleted()) {
-                        let step = currentStepList[stepIndex];
+                        step = currentStepList[stepIndex];
 
                         /**
                          * Behold, here the steps run!
@@ -146,7 +151,7 @@ export class Thread {
                 } else {
                     // not in singlestep-mode (faster!)
                     while (this.numberOfSteps < maxNumberOfSteps && this.state == ThreadState.runnable) {
-                        let step = currentStepList[stepIndex];
+                        step = currentStepList[stepIndex];
 
                         /**
                          * Behold, here the steps run!
@@ -180,11 +185,13 @@ export class Thread {
                 // step.run
             }
         } catch (exception) {
+            currentProgramState.stepIndex = stepIndex;
+            this.currentProgramState = currentProgramState;
 
             if (exception instanceof ThrowableClass) {
-                this.throwException(exception);
+                this.throwException(exception, step!);
             } else {
-                this.throwException(new SystemException("SystemException", "Systemfehler: " + exception));
+                this.throwException(new SystemException("SystemException", InterpreterMessages.SystemException() + exception), step!);
                 console.log(exception);
             }
 
@@ -255,7 +262,10 @@ export class Thread {
         }
     }
 
-    throwException(exception: Exception & IThrowable) {
+    throwException(exception: Exception & IThrowable, step: Step) {
+        
+        exception.file = this.currentProgramState.program.module.file;
+
         let classNames = exception.getExtendedImplementedIdentifiers().slice();
         classNames.push(exception.getIdentifier());
 
@@ -336,8 +346,10 @@ export class Thread {
             });
             this.exception = exception;
             this.state = ThreadState.terminatedWithException;
-            console.log(exception);
             ExceptionPrinter.print(exception, this.stackTrace, this.scheduler.interpreter.printManager);
+
+            this.scheduler.interpreter.exceptionMarker?.markException(exception, step)
+
             //@ts-ignore
             this.currentProgramState = undefined;
         } else {
@@ -485,6 +497,10 @@ export class Thread {
     newArray(defaultValue: any, ...dimensions: number[]): Array<any> {
         let n0 = dimensions[0];
 
+        if(n0 < 0){
+            throw new RuntimeExceptionClass(InterpreterMessages.ArrayLengthNegative());
+        }
+
         if (dimensions.length == 1) {
             return Array(n0).fill(defaultValue);
         }
@@ -568,7 +584,7 @@ export class Thread {
             endColumn: endColumn
         }
 
-        let exception = new NullPointerExceptionClass("Auf ein Attribut/eine Methode von null kann nicht zugegriffen werden.");
+        let exception = new NullPointerExceptionClass(InterpreterMessages.NullPointerException());
         exception.range = range;
 
         throw exception;
@@ -588,7 +604,7 @@ export class Thread {
             endColumn: endColumn
         }
 
-        let exception = new ClassCastExceptionClass(`Ein Objekt der Klasse ${type.identifier} ist kein Objekt der Klasse ${destType} und kann daher nicht in diesen Typ gecastet werden.`);
+        let exception = new ClassCastExceptionClass(InterpreterMessages.ClassCastException(type.identifier, destType));
         exception.range = range;
 
         throw exception;
@@ -627,9 +643,6 @@ export class Thread {
     }
 
     exit() {
-        if (this.name == "main thread") {
-            console.log("Hier!");
-        }
         this.state = ThreadState.terminated;
     }
 

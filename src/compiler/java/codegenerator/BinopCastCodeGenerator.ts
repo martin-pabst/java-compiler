@@ -237,9 +237,11 @@ export abstract class BinopCastCodeGenerator {
         // pure Term without pop => javascript interpreter does lazy evaluation for us:
         if (leftSnippet.isPureTermWithoutPop() && rightSnippet.isPureTermWithoutPop()) return new BinaryOperatorTemplate(TokenTypeReadable[operator], false).applyToSnippet(this.booleanType, wholeRange, leftSnippet, rightSnippet);
 
+        // ... otherwise we have to model lazy evaluation ourselves:
         let snippetContainer = new CodeSnippetContainer([], wholeRange, this.booleanType);
 
-        snippetContainer.addParts(leftSnippet.allButLastPart());
+        leftSnippet.ensureFinalValueIsOnStack();
+        snippetContainer.addParts(leftSnippet);
 
         let label = new LabelCodeSnippet();
         if (operator == TokenType.and) {
@@ -249,7 +251,7 @@ export abstract class BinopCastCodeGenerator {
         }
 
         snippetContainer.addParts(label.getJumpToSnippet());
-        snippetContainer.addStringPart('\n}', EmptyRange.instance);
+        snippetContainer.addStringPart('}', EmptyRange.instance);
 
         snippetContainer.addNextStepMark();
 

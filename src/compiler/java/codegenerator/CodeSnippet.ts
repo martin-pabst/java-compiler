@@ -1,5 +1,6 @@
 import { Step } from "../../common/interpreter/Program";
 import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
+import { Module } from "../../common/module/Module";
 import { IRange } from "../../common/range/Range";
 import { JavaType } from "../types/JavaType";
 
@@ -17,7 +18,7 @@ export abstract class CodeSnippet {
 
     abstract emit(): string;
     abstract index(currentIndex: number): number;
-    abstract emitToStep(currentStep: Step, steps: Step[]): Step;
+    abstract emitToStep(currentStep: Step, steps: Step[], module: Module): Step;
 
     abstract flattenInto(flatList: CodeSnippet[]): void;
 
