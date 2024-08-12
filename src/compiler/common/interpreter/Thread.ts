@@ -388,7 +388,7 @@ export class Thread {
         }
 
         let callback = this.programStack.pop()?.callbackAfterFinished;
-        if (returnValue != null) this.s.push(returnValue);
+        if (typeof returnValue !== "undefined") this.s.push(returnValue);
         if (callback != null) {
             callback();
         }
