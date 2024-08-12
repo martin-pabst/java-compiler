@@ -1,4 +1,4 @@
-import { EmptyRange, Range } from "../../common/range/Range.ts";
+import { EmptyRange, IRange, Range } from "../../common/range/Range.ts";
 import { JCM } from "../language/JavaCompilerMessages.ts";
 import { Token } from "../lexer/Token.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
@@ -40,8 +40,10 @@ export abstract class StatementParser extends TermParser {
             case TokenType.keywordReturn:
                 return this.parseReturn();
             case TokenType.semicolon:
+                let node = this.nodeFactory.buildBlockNode(this.cct);
+                node.isEmpty = true;
                 this.nextToken();
-                return undefined;
+                return node;
             case TokenType.keywordSynchronized:
                 return this.parseSynchronizedBlock();
             default:
@@ -150,7 +152,7 @@ export abstract class StatementParser extends TermParser {
             let condition = this.parseTerm();
             this.expect(TokenType.rightBracket);
 
-            let statementToRepeat = this.parseStatementOrExpression();
+            let statementToRepeat = this.parseStatementToRepeat();
 
             if (condition && statementToRepeat) {
 
@@ -172,7 +174,9 @@ export abstract class StatementParser extends TermParser {
 
         let doToken = this.getAndSkipToken();
 
-        let statementToRepeat = this.parseStatementOrExpression();
+        let statementToRepeat = this.parseStatementToRepeat();
+
+
         this.expect(TokenType.keywordWhile, true);
 
         if (this.comesToken(TokenType.leftBracket, true)) {
@@ -249,6 +253,8 @@ export abstract class StatementParser extends TermParser {
             if (statement) blockNode.statements.push(statement);
         }
 
+        if(blockNode.statements.length == 0) blockNode.isEmpty = true;
+
         this.expect(TokenType.rightCurlyBracket, true);
         this.setEndOfRange(blockNode);
 
@@ -282,7 +288,7 @@ export abstract class StatementParser extends TermParser {
 
         this.module.pushMethodCallPosition(forTokenRange, semicolonPositions, "for", rightBracketPosition);
 
-        let statementToRepeat = this.parseStatementOrExpression(false);
+        let statementToRepeat = this.parseStatementToRepeat();
 
         if (!statementToRepeat) {
             this.pushError(JCM.statementOrBlockExpected());
@@ -291,6 +297,15 @@ export abstract class StatementParser extends TermParser {
 
         return this.nodeFactory.buildForLoopNode(tokenFor, firstStatement, condition, lastStatement, statementToRepeat);
 
+    }
+
+    parseStatementToRepeat(): ASTStatementNode | undefined {
+        let statementToRepeat = this.parseStatementOrExpression(false);
+        if(statementToRepeat?.isEmpty){
+            let beginOfBlockRange: IRange = Range.fromPositions(Range.getStartPosition(statementToRepeat.range));
+            this.pushError(JCM.loopOverEmptyStatement(), "info", beginOfBlockRange);
+        }
+        return statementToRepeat;
     }
 
     parseEnhancedForLoop(tokenFor: Token): ASTEnhancedForLoopNode | undefined {

@@ -139,7 +139,6 @@ export class JavaCompiler implements Compiler {
 
         this.lastCompiledExecutable = executable;
 
-        this.main?.onCompilationFinished(this.lastCompiledExecutable);
         this.eventManager.fire("compilationFinished", this.lastCompiledExecutable);
 
         if (this.lastCompiledExecutable) {

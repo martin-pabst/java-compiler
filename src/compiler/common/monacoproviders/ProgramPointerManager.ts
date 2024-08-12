@@ -5,9 +5,8 @@ import { Module } from "../module/Module"
 import { IRange, Range } from "../range/Range"
 
 export type ProgramPointerPositionInfo = {
-    moduleOrMonacoModel: Module | monaco.editor.ITextModel,
+    programOrmoduleOrMonacoModel: Program | Module | monaco.editor.ITextModel,
     range: IRange,
-    program: Program
 }
 
 export type ProgramPointerStyle = {
@@ -35,7 +34,15 @@ export class ProgramPointerManager {
     }
 
     show(position: ProgramPointerPositionInfo, style: ProgramPointerStyle) {
-        let model = (position.moduleOrMonacoModel instanceof Module) ? position.moduleOrMonacoModel.file.getMonacoModel() : position.moduleOrMonacoModel;
+        let model: monaco.editor.ITextModel | undefined;
+        if(position.programOrmoduleOrMonacoModel instanceof Program){
+            model = position.programOrmoduleOrMonacoModel.module.file.getMonacoModel();
+        } else if(position.programOrmoduleOrMonacoModel instanceof Module){
+            model = position.programOrmoduleOrMonacoModel.file.getMonacoModel();
+        } else {
+            model = position.programOrmoduleOrMonacoModel;
+        }
+
         if(model){
             this.editor.setModel(model);
             this.editor.revealPosition(Range.getStartPosition(position.range));

@@ -2,7 +2,7 @@ import { CallbackParameter } from "../../common/interpreter/CallbackParameter.ts
 import { Program } from "../../common/interpreter/Program";
 import { CallbackFunction, Helpers, StepParams } from "../../common/interpreter/StepFunction.ts";
 import { Thread } from "../../common/interpreter/Thread.ts";
-import { EmptyRange } from "../../common/range/Range.ts";
+import { EmptyRange, IRange, Range } from "../../common/range/Range.ts";
 import { TokenType } from "../TokenType";
 import { JCM } from "../language/JavaCompilerMessages.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
@@ -597,10 +597,11 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
             }
 
             if (!this.missingStatementManager.hasReturnHappened() && !methodNode.isContructor) {
+                let endOfMethodRange: IRange = Range.fromPositions(Range.getEndPosition(methodNode.range));
                 if (method.isSynchronized) {
-                    snippets.push(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${ObjectClass.prototype.leaveSynchronizedBlock.name}(${StepParams.thread});\n`));
+                    snippets.push(new StringCodeSnippet(`${Helpers.elementRelativeToStackbase(0)}.${ObjectClass.prototype.leaveSynchronizedBlock.name}(${StepParams.thread});\n`, endOfMethodRange));
                 }
-                let sn1 = new CodeSnippetContainer([new StringCodeSnippet(`${Helpers.return}();`)]);
+                let sn1 = new CodeSnippetContainer([new StringCodeSnippet(`${Helpers.return}();`, endOfMethodRange)]);
                 sn1.enforceNewStepBeforeSnippet();
                 snippets.push(sn1);
             }

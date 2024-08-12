@@ -4,6 +4,7 @@ import { Executable } from "./Executable.ts";
 import { Interpreter } from "./interpreter/Interpreter.ts";
 import { Language } from "./Language.ts";
 import { CompilerWorkspace } from "./module/CompilerWorkspace.ts";
+import { ProgramPointerManager } from "./monacoproviders/ProgramPointerManager.ts";
 
 export interface IMain {
 
@@ -25,7 +26,6 @@ export interface IMain {
 
     getCurrentWorkspace(): CompilerWorkspace | undefined;
 
-    onCompilationFinished(executable: Executable | undefined): void;
-
     adjustWidthToWorld(): void;
+
 }

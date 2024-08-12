@@ -32,7 +32,7 @@ import { IRange, Range } from "./compiler/common/range/Range.ts";
 import { Compiler } from "./compiler/common/Compiler.ts";
 import { Debugger } from "./compiler/common/debugger/Debugger.ts";
 import { Disassembler } from "./compiler/common/disassembler/Disassembler.ts";
-import { IJumpToCodeProvider } from "./compiler/common/disassembler/IJumpToCodeProvider.ts";
+import { IShowFileProvider } from "./compiler/common/disassembler/IShowFileProvider.ts";
 import { Executable } from "./compiler/common/Executable.ts";
 import { ActionManager } from "./compiler/common/interpreter/ActionManager.ts";
 import { CompilerWorkspace } from "./compiler/common/module/CompilerWorkspace.ts";
@@ -48,7 +48,7 @@ import { TestInputManager } from "./testgui/TestInputManager.ts";
 import spritesheetjson from '/include/graphics/spritesheet.json.txt';
 import spritesheetpng from '/include/graphics/spritesheet.png';
 
-export class Main implements IMain, IJumpToCodeProvider {
+export class Main implements IMain, IShowFileProvider {
 
   language: Language;
 
@@ -166,17 +166,20 @@ export class Main implements IMain, IJumpToCodeProvider {
     */
     this.language = new JavaLanguage(this, this.errorMarker);
     this.language.registerLanguageAtMonacoEditor(this);
-    this.language.getCompiler().setFiles(this.currentWorkspace.getFiles());
+    this.language.getCompiler().eventManager.on("compilationFinished", this.onCompilationFinished, this)
     this.language.getCompiler().startCompilingPeriodically();
 
     this.testResultViewer.addEventListener('run-all-tests',
       (e) => { if (e.type == "run-all-tests") testManager.executeAllTests(); });
 
-
-    new EditorOpenerProvider(this);
-
-    this.disassembler = new Disassembler(this.codeOutputDiv, this, this);
-
+      
+      new EditorOpenerProvider(this);
+      
+      this.disassembler = new Disassembler(this.codeOutputDiv, this, this);
+      
+      this.tabbedEditorManager.eventManager.on("onActivateTab", (file: CompilerFile) => {
+          this.disassembler.disassembleModule(this.getCompiler().findModuleByFile(file));        
+      })
 
     // document.addEventListener('keydown', (key) => {
     //   console.log(key.code);
@@ -184,29 +187,11 @@ export class Main implements IMain, IJumpToCodeProvider {
 
 
   }
-  jumpTo(file: CompilerFile, range: IRange): void {
+
+  showFile(file: CompilerFile): void {
     let monacoModel = file.getMonacoModel();
     if (!monacoModel) return;
     this.getMainEditor().setModel(monacoModel);
-    this.getMainEditor().revealPosition(Range.getStartPosition(range));
-
-    let p: ProgramPointerPositionInfo = {
-      moduleOrMonacoModel: monacoModel,
-      //@ts-ignore
-      program: undefined,
-      range: range
-    }
-
-    this.getInterpreter().programPointerManager?.show(p, {
-      key: "codePosition",
-      isWholeLine: true,
-      className: "jo_revealCallstackEntry",
-      minimapColor: "#3067ce",
-      rulerColor: "#3067ce",
-      beforeContentClassName: "jo_revealCallstackEntryBefore"
-    })
-
-
   }
 
   isEmbedded(): boolean {

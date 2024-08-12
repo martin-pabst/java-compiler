@@ -171,8 +171,7 @@ export class Debugger {
         if(!entry.range) return;
 
         let position: ProgramPointerPositionInfo = {
-            module: entry.program.module,
-            program: entry.program,
+            programOrmoduleOrMonacoModel: entry.program,
             range: entry.range            
         }
         

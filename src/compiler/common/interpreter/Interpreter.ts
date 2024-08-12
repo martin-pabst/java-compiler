@@ -175,7 +175,7 @@ export class Interpreter {
 
                 _textPositionWithModule = this.scheduler.getNextStepPosition();
 
-                if(!this.programPointerManager.fileIsCurrentlyShownInEditor((<Module>_textPositionWithModule?.moduleOrMonacoModel).file)){
+                if(!this.programPointerManager.fileIsCurrentlyShownInEditor((<Module>_textPositionWithModule?.programOrmoduleOrMonacoModel).file)){
                     _textPositionWithModule = undefined;
                 }
 

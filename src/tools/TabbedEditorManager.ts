@@ -1,6 +1,9 @@
+import { EventManager } from '../compiler/common/interpreter/EventManager.ts';
 import { CompilerFile } from '../compiler/common/module/CompilerFile.ts';
 import { Editor } from '../testgui/editor/Editor.ts';
 import '/include/css/tabs.css';
+
+type TabbedEditorManagerEvents = "onActivateTab";
 
 export class TabbedEditorManager {
 
@@ -12,6 +15,8 @@ export class TabbedEditorManager {
     editor: Editor;
 
     activeIndex: number = 0;
+
+    eventManager: EventManager<TabbedEditorManagerEvents> = new EventManager();
 
     constructor(private container: HTMLElement, public files: CompilerFile[]) {
         this.container.classList.add('jo_tabs_container');
@@ -56,6 +61,8 @@ export class TabbedEditorManager {
         let file = this.files[this.activeIndex];
 
         this.editor.editor.setModel(file.getMonacoModel()!);
+
+        this.eventManager.fire("onActivateTab", file);
 
     }
 

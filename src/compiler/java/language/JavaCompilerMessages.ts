@@ -507,6 +507,11 @@ export class JCM {
      * class StatementParser
      */
 
+    static loopOverEmptyStatement = () => le({
+        "de": "Hier wird eine leere Anweisung (; oder {  }) wiederholt.",
+        "en": `Loop over empty statement (; or {  }).`,
+    })
+
     static statementOrBlockExpected = () => le({
         "de": "Hier wird eine Anweisung oder ein Anweisungsblock (in geschweiften Klammern) erwartet.",
         "en": `Statement or block-Statement in curly braces { ... } expected.`,

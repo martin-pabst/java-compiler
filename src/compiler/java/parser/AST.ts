@@ -269,7 +269,7 @@ export interface ASTProgramNode extends ASTNode {
 }
 
 export interface ASTStatementNode extends ASTNode {
-
+    isEmpty?: boolean;
 }
 
 /**
