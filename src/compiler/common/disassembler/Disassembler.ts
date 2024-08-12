@@ -1,17 +1,15 @@
-import { BaseType } from "../BaseType";
 import { DOM } from "../../../tools/DOM";
+import { BaseType } from "../BaseType";
 import { Module } from "../module/Module";
-import { IPosition } from "../range/Position";
 import { CodeFragment } from "./CodeFragment";
-import { IShowFileProvider } from "./IShowFileProvider";
 
-import '/include/css/disassembler.css';
-import { IRange, Range } from "../range/Range";
-import { IMain } from "../IMain";
 import { Executable } from "../Executable";
+import { IMain } from "../IMain";
 import { Step } from "../interpreter/Program";
 import { CompilerFile } from "../module/CompilerFile";
-import { ProgramPointerManager, ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager";
+import { ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager";
+import { IRange } from "../range/Range";
+import '/include/css/disassembler.css';
 
 type DisassembledStep = {
     element: HTMLElement;
@@ -30,10 +28,9 @@ export class Disassembler {
     
     disassemblerDiv: HTMLDivElement;
     
-    constructor(parentElement: HTMLElement, public showFileProvider: IShowFileProvider, 
-        private main: IMain) {
+    constructor(parentElement: HTMLElement, private main: IMain) {
         parentElement.innerHTML = "";
-        this.disassemblerDiv = DOM.makeDiv(parentElement, 'jo_disassemblerDiv');
+        this.disassemblerDiv = DOM.makeDiv(parentElement, 'jo_disassemblerDiv', 'jo_scrollable');
         let compiler = this.main.getCompiler();
         compiler.eventManager.on("compilationFinished", (executable: Executable) => {
             setTimeout(() => {
@@ -63,9 +60,10 @@ export class Disassembler {
     }
     
     disassembleModule(module: Module | undefined) {
-        this.clear();
         if(!module) return;
         if (module == this.currentModule) return;
+
+        this.clear();
         this.currentModule = module;
         this.currentType = undefined;
     
@@ -80,13 +78,14 @@ export class Disassembler {
     }
     
     unmarkAllElements(){
+        //@ts-ignore
         for(let element of this.disassemblerDiv.children){
             element.classList.remove("jo_revealDisassemblerPosition");
         }
     }
 
     showElementpositionInMonacoModel(file: CompilerFile, range: IRange ){
-        this.showFileProvider.showFile(file);
+        this.main.showFile(file);
         let model = file.getMonacoModel();
         if(!model) return;
         

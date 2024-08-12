@@ -10,6 +10,8 @@
     overflow-y: auto;
     display: block;
     margin-left: 5px;
+    line-height: 17px;
+    user-select: none;
 }
 
 .jo_disassemblerHorizontalLine {
@@ -49,6 +51,7 @@
     padding: 3px 0;
     font-size: 14px;
     text-wrap: wrap;
+    user-select: none;
 }
 
 .jo_disassemblerStepIndex {
