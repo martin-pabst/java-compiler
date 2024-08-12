@@ -36,6 +36,7 @@ export class Disassembler {
         let compiler = this.main.getCompiler();
         compiler.eventManager.on("compilationFinished", (executable: Executable) => {
             setTimeout(() => {
+                this.currentModule = undefined;
                 this.disassemble();
             }, 300);    
         });    
@@ -53,7 +54,7 @@ export class Disassembler {
             this.hideProgramPointer();
         })    
         
-        this.disassemble();
+        this.disassemble(); 
     }    
     
     disassemble() {
@@ -208,6 +209,7 @@ export class Disassembler {
     insertSignature(signature: string, range: IRange | undefined) {
         let signatureDiv = DOM.makeDiv(this.disassemblerDiv, "jo_disassemblerSignature");
 
+    
         monaco.editor.colorize(signature, 'myJava', { tabSize: 3 }).then((html) => {
             signatureDiv.innerHTML = html;
         });
