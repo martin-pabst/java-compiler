@@ -140,6 +140,7 @@ export class StringCodeSnippet extends CodeSnippet {
 
     alterPureTerm(newCode: string) {
         this.text = newCode;
+        this.constantValue = undefined;
     }
 
     getPureTerm() {

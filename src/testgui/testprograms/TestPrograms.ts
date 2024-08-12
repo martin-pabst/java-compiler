@@ -1,5 +1,10 @@
 export var testProgramsList = [
    ['', ``],
+   ['FieldInitializationBug', `A a = new A();
+println(a.test);
+class A {
+   String test = "";
+}`],
    ['World3dTest 1', `new World3d();
 
 while(true);`],
