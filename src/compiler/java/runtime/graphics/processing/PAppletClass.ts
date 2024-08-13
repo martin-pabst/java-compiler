@@ -311,8 +311,6 @@ export class PAppletClass extends ObjectClass implements GraphicSystem {
                 graphicsDiv.style.width = maxWidth + "px";
                 graphicsDiv.style.height = this.height / this.width * maxWidth + "px";
             }
-
-            interpreter.graphicsManager?.adjustWidthToWorld();
             
         };
 

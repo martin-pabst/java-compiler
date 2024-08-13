@@ -153,7 +153,7 @@ export class Main implements IMain {
     let fileManager = new TestFileManager(this);
 
     this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager,
-      new GraphicsManager(this.graphicsDiv, this), keyboardManager,
+      new GraphicsManager(this.graphicsDiv), keyboardManager,
       this.breakpointManager, _debugger, new ProgramPointerManager(this),
       testManager, inputManager, fileManager, new ExceptionMarker(this));
 

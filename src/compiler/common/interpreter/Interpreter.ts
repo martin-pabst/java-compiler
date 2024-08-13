@@ -85,6 +85,8 @@ export class Interpreter {
 
         this.printManager = printManager || new DummyPrintManager();
 
+        this.graphicsManager?.setInterpreter(this);
+
         this.registerActions();
 
         if (breakpointManager) breakpointManager.attachToInterpreter(this);

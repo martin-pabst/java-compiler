@@ -142,8 +142,6 @@ export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
 
             t.s.push(this);
 
-            t.scheduler.interpreter.graphicsManager?.adjustWidthToWorld();
-
             if (callback) callback();
         })
 

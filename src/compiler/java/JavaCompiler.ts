@@ -45,7 +45,7 @@ export class JavaCompiler implements Compiler {
     public files: CompilerFile[] = [];
 
     public state: CompilerState = CompilerState.stopped;
-    private maxMsBetweenRuns: number = 100;
+    private maxMsBetweenRuns: number = 500;
 
     public eventManager: EventManager<CompilerEvents> = new EventManager();
 
@@ -74,19 +74,26 @@ export class JavaCompiler implements Compiler {
             this.files = currentWorkspace.getFiles();
         }
 
-        /**
-         * if no module has changed, return as fast as possible
-         */
-        this.moduleManager.setDirtyFlags();
-        this.moduleManager.setupModulesBeforeCompiliation(this.files);
+        // we call moduleManager.getNewOrDirtyModules before iterativelySetDirtyFlags
+        // to check if ANY file has changed/is new since last compilation run:
         let newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
-        // console.log(Math.round(performance.now() - time) + " ms: Found " + newOrDirtyModules.length + " new or dirty modules.");
-
-        if(newOrDirtyModules.length > 0)
-        // console.log("New/dirty modules: " + newOrDirtyModules.map(m => m.file.name).join(", "));
-
+        /**
+        * if no module has changed, return as fast as possible
+        */
         if (newOrDirtyModules.length == 0) return this.lastCompiledExecutable;
 
+       // now we extend set of dirty modules to
+       //  - modules which had errors in last compilation run
+       //  - modules that are (indirectly) dependent on other dirty modules
+       this.moduleManager.iterativelySetDirtyFlags();
+       this.moduleManager.setupModulesBeforeCompiliation(this.files);
+                    
+       newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
+       // if(newOrDirtyModules.length > 0)
+       // console.log("New/dirty modules: " + newOrDirtyModules.map(m => m.file.name).join(", "));
+
+       if (newOrDirtyModules.length == 0) return this.lastCompiledExecutable;
+       
         this.errors = [];
 
         this.moduleManager.emptyTypeStore();

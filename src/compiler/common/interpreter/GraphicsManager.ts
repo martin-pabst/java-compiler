@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
-import { IMain } from '../IMain';
-import { RuntimeExceptionClass } from '../../java/runtime/system/javalang/RuntimeException';
 import { JRC } from '../../java/language/JavaRuntimeLibraryComments';
+import { RuntimeExceptionClass } from '../../java/runtime/system/javalang/RuntimeException';
+import { Interpreter } from './Interpreter';
 
 export interface GraphicSystem {
     getIdentifier(): string;
@@ -14,16 +14,10 @@ export class GraphicsManager {
 
     currentGraphicSystem?: GraphicSystem;
 
-    constructor(public graphicsDiv: HTMLElement | null, public main: IMain){
+    interpreter?: Interpreter;
 
-        main.getInterpreter().eventManager.on("resetRuntime", () => {
-            this.currentGraphicSystem = undefined;
-        });
+    constructor(public graphicsDiv: HTMLElement | null){
 
-    }
-
-    adjustWidthToWorld(){
-        this.main.adjustWidthToWorld();
     }
 
     registerGraphicSystem(graphicSystem: GraphicSystem){
@@ -32,6 +26,13 @@ export class GraphicsManager {
         }
 
         this.currentGraphicSystem = graphicSystem;
+    }
+
+    setInterpreter(interpreter: Interpreter){
+        this.interpreter = interpreter;
+        interpreter.eventManager.on("resetRuntime", () => {
+            this.currentGraphicSystem = undefined;
+        });
     }
 
 }

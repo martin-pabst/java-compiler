@@ -29,6 +29,7 @@ import { LabelCodeSnippet } from "./LabelManager.ts";
 import { CodeReacedAssertion, CodeReachedAssertions } from "../../common/interpreter/CodeReachedAssertions.ts";
 import { JavaLibraryModule } from "../module/libraries/JavaLibraryModule.ts";
 import { JCM } from "../language/JavaCompilerMessages.ts";
+import { Visibility } from "../types/Visibility.ts";
 
 export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
@@ -813,7 +814,17 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             return undefined;
         }
 
-        let field = objectType.getField(node.attributeIdentifier, TokenType.keywordPublic);
+        let visibility: Visibility = TokenType.keywordPublic;
+        if(this.currentSymbolTable.classContext){
+            if(this.currentSymbolTable.classContext.fastExtendsImplements(objectType.identifier)){
+                visibility = TokenType.keywordProtected;
+                if(objectType.fastExtendsImplements(this.currentSymbolTable.classContext.identifier)){
+                    visibility = TokenType.keywordPrivate;
+                }
+            }
+        }
+
+        let field = objectType.getField(node.attributeIdentifier, visibility);
 
         if (!field && objectType instanceof StaticNonPrimitiveType) {
             if (objectType.identifier == 'SpriteLibraryEnum') {

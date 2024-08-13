@@ -46,7 +46,7 @@ export class JavaModuleManager {
         this.typestore.empty();
     }
 
-    setDirtyFlags(){
+    iterativelySetDirtyFlags(){
 
         for(let module of this.modules){
             if(module.hasErrors()) module.setDirty(true);
