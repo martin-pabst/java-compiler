@@ -48,6 +48,10 @@ export class JavaModuleManager {
 
     setDirtyFlags(){
 
+        for(let module of this.modules){
+            if(module.hasErrors()) module.setDirty(true);
+        }
+
         let done: boolean = false;
         while(!done){
             done = true;
