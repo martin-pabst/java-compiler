@@ -263,7 +263,7 @@ export class BinaryOperatorTemplate extends CodeTemplate {
             snippetContainer.addParts(snippets[1].allButLastPart());
             let lastPart0 = snippets[0].lastPartOrPop();
             let lastPart1 = snippets[1].lastPartOrPop();
-            snippetContainer.addStringPart(`${lastPart0.emit()} ${this.operator} ${lastPart1.emit()}`, undefined, undefined, [lastPart0, lastPart1]);
+            snippetContainer.addStringPart(`${lastPart0.emit()} ${this.operator} ${lastPart1.emit()}`, _range, _resultType, [lastPart0, lastPart1]);
             snippetContainer.finalValueIsOnStack = false;
             return snippetContainer;
         }
@@ -275,12 +275,12 @@ export class BinaryOperatorTemplate extends CodeTemplate {
             snippetContainer.addParts(snippets[1]);
 
             switch (this.operator) {
-                case '-': snippetContainer.addStringPart(`-${StepParams.stack}.pop() + ${StepParams.stack}.pop()`, _range); break;
-                case '/': snippetContainer.addStringPart(`1/(${StepParams.stack}.pop() || ${Helpers.throwAE}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn})) * ${StepParams.stack}.pop()`, _range); break;
-                case '<': snippetContainer.addStringPart(`${StepParams.stack}.pop() > ${StepParams.stack}.pop()`, _range); break;
-                case '>': snippetContainer.addStringPart(`${StepParams.stack}.pop() < ${StepParams.stack}.pop()`, _range); break;
-                case '<=': snippetContainer.addStringPart(`${StepParams.stack}.pop() >= ${StepParams.stack}.pop()`, _range); break;
-                case '>=': snippetContainer.addStringPart(`${StepParams.stack}.pop() <= ${StepParams.stack}.pop()`, _range); break;
+                case '-': snippetContainer.addStringPart(`-${StepParams.stack}.pop() + ${StepParams.stack}.pop()`, _range, _resultType); break;
+                case '/': snippetContainer.addStringPart(`1/(${StepParams.stack}.pop() || ${Helpers.throwAE}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn})) * ${StepParams.stack}.pop()`, _range, _resultType); break;
+                case '<': snippetContainer.addStringPart(`${StepParams.stack}.pop() > ${StepParams.stack}.pop()`, _range, _resultType); break;
+                case '>': snippetContainer.addStringPart(`${StepParams.stack}.pop() < ${StepParams.stack}.pop()`, _range, _resultType); break;
+                case '<=': snippetContainer.addStringPart(`${StepParams.stack}.pop() >= ${StepParams.stack}.pop()`, _range, _resultType); break;
+                case '>=': snippetContainer.addStringPart(`${StepParams.stack}.pop() <= ${StepParams.stack}.pop()`, _range, _resultType); break;
             }
             snippetContainer.finalValueIsOnStack = false;
             return snippetContainer;
@@ -291,9 +291,9 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         snippetContainer.addParts(snippets[1]);
         snippetContainer.addParts(snippets[0]);
         if(this.operator == '%'){
-            snippetContainer.addStringPart(`pop() ${this.operator} (pop() || ${Helpers.throwAE}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`, _range);
+            snippetContainer.addStringPart(`pop() ${this.operator} (pop() || ${Helpers.throwAE}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`, _range, _resultType);
         } else {
-            snippetContainer.addStringPart(`pop() ${this.operator} pop()`, _range);
+            snippetContainer.addStringPart(`pop() ${this.operator} pop()`, _range, _resultType);
         }
 
         snippetContainer.finalValueIsOnStack = false;

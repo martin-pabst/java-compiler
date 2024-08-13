@@ -1,5 +1,19 @@
 export var testProgramsList = [
    ['', ``],
+   ['CharAdditionBug', `new Test().t();
+
+class Test {
+
+	void t(){
+      int i = 12;
+      String s = dummy() + " " + i;
+	}
+	
+	char dummy() {
+      return 'x';
+   }
+
+}`],
    ['FieldInitializationBug', `A a = new A();
 println(a.test);
 class A {
