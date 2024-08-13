@@ -104,7 +104,11 @@ export class TreeviewSplitter {
         }
 
         for(let i = 0; i < treeviewList.length; i++){
-            treeviewList[i].outerDiv.style.height = targetHeights[i] + "px";
+            let od = treeviewList[i].outerDiv;
+            od.style.height = targetHeights[i] + "px";
+            od.style.flexBasis = "";
+            od.style.flexGrow = "";
+
         }
 
 

@@ -54,42 +54,49 @@ export class TreeviewAccordion {
     }
 
     onExpandCollapseTreeview(tv: Treeview<any>, newState: ExpandCollapseState, deltaHeight: number) {
+        // if deltaHeight > 0 then newState == "collapsed" and there height to give out to the other treeviews
+        // if deltaHeight < 0 then the other treeviews must give some of their height...
         let currentIndex = this.treeviewList.indexOf(tv);
 
         let heightList: number[] = this.treeviewList.map(tv => tv.outerDiv.getBoundingClientRect().height);
-        
-        switch(newState){
+
+        let sumOfHeightOfOthers = 0;
+        for (let i = 0; i < this.treeviewList.length; i++) {
+            let tv1 = this.treeviewList[i];
+            if (i != currentIndex && !tv1.isCollapsed()) sumOfHeightOfOthers += heightList[i];
+        }
+
+        switch (newState) {
             case "collapsed":  // deltaHeight > 0;
                 // who gets the cake?
-                for(let i = this.treeviewList.length - 1; i >= 0; i -= 1){
-                    if(i == currentIndex) continue;
+                for (let i = 0; i < this.treeviewList.length; i++) {
+                    if (i == currentIndex) continue;
                     let tv1 = this.treeviewList[i];
-                    if(tv1.isCollapsed()) continue;
+                    if (tv1.isCollapsed()) continue;
 
-                    heightList[i] += deltaHeight;
+                    heightList[i] = heightList[i] + deltaHeight * (heightList[i] / sumOfHeightOfOthers);
                     tv1.outerDiv.style.height = heightList[i] + "px";
-                    break;
+                    tv1.outerDiv.style.flexBasis = "";
+                    tv1.outerDiv.style.flexGrow = "";
                 }
                 break;
             case "expanded": // deltaHeight < 0
                 // who pays the cake?
-                for(let i = this.treeviewList.length - 1; i >= 0; i -= 1){
-                    if(i == currentIndex) continue;
+                for (let i = 0; i < this.treeviewList.length; i++) {
+                    if (i == currentIndex) continue;
                     let tv1 = this.treeviewList[i];
-                    if(tv1.isCollapsed()) continue;
+                    if (tv1.isCollapsed()) continue;
 
-                    let givenHeight = Math.min(-deltaHeight, heightList[i] - tv1.config.minHeight!);
-                    if(givenHeight <= 0) continue;
+                    heightList[i] = heightList[i] + deltaHeight * (heightList[i] / sumOfHeightOfOthers);
 
-                    deltaHeight += givenHeight;
-                    heightList[i] -= givenHeight;
                     tv1.outerDiv.style.height = heightList[i] + "px";
-                    break;
+                    tv1.outerDiv.style.flexBasis = "";
+                    tv1.outerDiv.style.flexGrow = "";
                 }
                 break;
         }
 
-    }   
+    }
 
     switchToPixelHeights(){
         let heightList: number[] = this.treeviewList.map(tv => tv.outerDiv.getBoundingClientRect().height);

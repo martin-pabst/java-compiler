@@ -221,12 +221,16 @@ export class Treeview<E> {
             if (this.isCollapsed()) {
                 this._lastExpandedHeight = this._outerDiv.getBoundingClientRect().height;
                 let deltaHeight: number = this._lastExpandedHeight - this.getCaptionHeight();
+                this._outerDiv.style.flexBasis = "";
+                this._outerDiv.style.flexGrow = "";
                 this._outerDiv.style.height = this.getCaptionHeight() + "px";
                 if (this.treeviewAccordion) this.treeviewAccordion.onExpandCollapseTreeview(this, newState, deltaHeight);
             } else {
                 let deltaHeight: number = this.getCaptionHeight() - this._lastExpandedHeight;
-                this._outerDiv.style.height = this._lastExpandedHeight + "px";
                 if (this.treeviewAccordion) this.treeviewAccordion.onExpandCollapseTreeview(this, newState, deltaHeight);
+                this._outerDiv.style.flexBasis = "";
+                this._outerDiv.style.flexGrow = "";
+                this._outerDiv.style.height = this._lastExpandedHeight + "px";
             }
 
         }, "expanded")
