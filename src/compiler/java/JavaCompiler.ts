@@ -73,6 +73,8 @@ export class JavaCompiler implements Compiler {
             if (!currentWorkspace) return;
             this.files = currentWorkspace.getFiles();
         }
+        
+        this.moduleManager.setupModulesBeforeCompiliation(this.files);
 
         // we call moduleManager.getNewOrDirtyModules before iterativelySetDirtyFlags
         // to check if ANY file has changed/is new since last compilation run:
@@ -86,14 +88,15 @@ export class JavaCompiler implements Compiler {
        //  - modules which had errors in last compilation run
        //  - modules that are (indirectly) dependent on other dirty modules
        this.moduleManager.iterativelySetDirtyFlags();
-       this.moduleManager.setupModulesBeforeCompiliation(this.files);
-                    
-       newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
+       
+       // console.log(Math.round(performance.now() - time) + " ms: Found " + newOrDirtyModules.length + " new or dirty modules.");
+       
        // if(newOrDirtyModules.length > 0)
        // console.log("New/dirty modules: " + newOrDirtyModules.map(m => m.file.name).join(", "));
-
-       if (newOrDirtyModules.length == 0) return this.lastCompiledExecutable;
        
+        newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
+        if (newOrDirtyModules.length == 0) return this.lastCompiledExecutable;
+
         this.errors = [];
 
         this.moduleManager.emptyTypeStore();

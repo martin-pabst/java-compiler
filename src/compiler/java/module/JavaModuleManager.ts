@@ -88,7 +88,9 @@ export class JavaModuleManager {
     }
 
     getNewOrDirtyModules(): JavaCompiledModule[] {
-        return this.modules.filter(m => m.isDirty());
+        return this.modules.filter(
+            m => m.isDirty()
+        );
     }
 
     getUnChangedModules(): JavaCompiledModule[] {
