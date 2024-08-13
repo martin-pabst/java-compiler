@@ -37,8 +37,12 @@ export class DebuggerSymbolEntry {
             false, "", undefined,
             this, this, parent, true
         )
-
+        
         this.treeViewNode.render();
+
+        if(identifier == "this"){
+            this.treeViewNode.expandCollapseComponent.setState("expanded");
+        }
     }
 
     render(value: any) {
@@ -119,6 +123,8 @@ export class DebuggerSymbolEntry {
             caption = ValueRenderer.renderValue(o, DebuggerSymbolEntry.quickArrayOutputMaxLength);
         }
 
+        if(this.identifier == "this") caption = '';
+
         this.treeViewNode.iconClass = "img_debugger-object";
         this.setCaption(": " +  this.type.toString(), " " + caption, "jo_debugger_value");
 
@@ -126,7 +132,6 @@ export class DebuggerSymbolEntry {
             this.removeChildren();
             let fields: BaseField[] = type.getOwnAndInheritedFields();
             this.treeViewNode.isFolder = fields.length > 0;
-            this.treeViewNode.expandCollapseComponent.setState("collapsed");
             
             this.treeViewNode.removeAllExpandListeners();
             this.treeViewNode.addExpandListener((state) => {
@@ -137,7 +142,8 @@ export class DebuggerSymbolEntry {
                 }
                 this.children.forEach(c => (<ObjectFieldDebuggerEntry>c).fetchValueFromObjectAndRender(o));
             }, true)
-                        
+            
+            this.treeViewNode.expandCollapseComponent.setState(this.identifier == 'this' ? "expanded" : "collapsed");
         }
         
         this.children.forEach(c => (<ObjectFieldDebuggerEntry>c).fetchValueFromObjectAndRender(o));
