@@ -185,10 +185,10 @@ export class Thread {
                 // step.run
             }
 
-            currentProgramState.lastExecutedStep = step!; 
+            if(currentProgramState) currentProgramState.lastExecutedStep = step!; 
 
         } catch (exception) {
-            currentProgramState.stepIndex = stepIndex;
+            if(currentProgramState) currentProgramState.stepIndex = stepIndex;
 
             if (exception instanceof ThrowableClass) {
                 this.throwException(exception, step!);

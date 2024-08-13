@@ -252,14 +252,18 @@ export abstract class BinopCastCodeGenerator {
         }
 
         snippetContainer.addParts(label.getJumpToSnippet());
-        snippetContainer.addStringPart('}', EmptyRange.instance);
+        snippetContainer.addStringPart('};', EmptyRange.instance);
 
         snippetContainer.addNextStepMark();
 
         rightSnippet.ensureFinalValueIsOnStack();
         snippetContainer.addParts(rightSnippet);
 
+        snippetContainer.addNextStepMark();
+
         snippetContainer.addParts(label);
+
+        snippetContainer.finalValueIsOnStack = true;
 
         return snippetContainer;
 

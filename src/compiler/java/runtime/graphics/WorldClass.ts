@@ -262,7 +262,7 @@ export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
     }
 
     hasActors(): boolean {
-        return this.actorManager.hasActors() || this.gngEventlistenerManager.hasEventListeners();
+        return this.actorManager.hasActors() || this.gngEventlistenerManager?.hasEventListeners();
     }
 
     registerGNGEventListener(listener: IGNGEventListener, type: GNGEventListenerType): void {
