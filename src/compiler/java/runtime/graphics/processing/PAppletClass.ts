@@ -1,5 +1,6 @@
 // import p5 from "p5";  // unfortunately this breaks vite-test
 import { DOM } from "../../../../../tools/DOM";
+import { GraphicSystem } from "../../../../common/interpreter/GraphicsManager";
 import { Interpreter } from "../../../../common/interpreter/Interpreter";
 import { SchedulerState } from "../../../../common/interpreter/Scheduler";
 import { CallbackFunction } from "../../../../common/interpreter/StepFunction";
@@ -12,7 +13,7 @@ import { ObjectClass } from "../../system/javalang/ObjectClassStringClass";
 type p5 = any;
 
 
-export class PAppletClass extends ObjectClass {
+export class PAppletClass extends ObjectClass implements GraphicSystem {
     static __javaDeclarations: LibraryDeclarations = (<LibraryDeclarations>[
         { type: "declaration", signature: "class PApplet extends Object", comment: JRC.PAppletClassComment },
 
@@ -221,6 +222,7 @@ export class PAppletClass extends ObjectClass {
     containerOuter!: HTMLDivElement;
     containerInner!: HTMLDivElement;
 
+    resizeObserver?: ResizeObserver;
 
     width: number = 800;
     height: number = 600;
@@ -257,6 +259,9 @@ export class PAppletClass extends ObjectClass {
         t.s.push(this);
 
         let interpreter = t.scheduler.interpreter;
+
+        interpreter.graphicsManager?.registerGraphicSystem(this);
+
         interpreter.isExternalTimer = true;
         this.graphicsDiv = <HTMLDivElement>interpreter.graphicsManager?.graphicsDiv;
         this.graphicsDiv.style.overflow = "hidden";
@@ -311,7 +316,15 @@ export class PAppletClass extends ObjectClass {
             
         };
 
-        graphicsDiv.onresize = (ev) => { this.onSizeChanged() }
+        // graphicsDiv.onresize = (ev) => { 
+        //     this.onSizeChanged() 
+        // }
+
+        this.resizeObserver = new ResizeObserver(() => { 
+            this.onSizeChanged(); 
+        });
+        
+        this.resizeObserver.observe(this.graphicsDiv!.parentElement!);
 
         this.onSizeChanged();
 
@@ -464,6 +477,10 @@ export class PAppletClass extends ObjectClass {
         method.call(this, t, callback);
         t.startIfNotEmptyOrDestroy();
 
+    }
+
+    getIdentifier(): string {
+        return "Processing";
     }
 
 }

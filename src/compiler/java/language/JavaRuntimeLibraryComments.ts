@@ -4669,5 +4669,13 @@ rectMode(RADIUS) also uses the first two parameters as the x- and y-coordinates 
     })
 
 
+    /**
+     * GraphicsManager
+     */
+    static GraphicSystemNotAvailableError = (systemOld: string, systemNew: string) => lm({
+    "de": "Die Grafikausgabe ist schon in Gebrauch durch " + systemOld + ", daher kann das Graphiksystem " + systemNew + " nicht gestartet werden.",
+    "en": "Graphic output is in use by " + systemOld + ", therefore it is not available for " + systemNew + ".",
+    })
+
 
 }  

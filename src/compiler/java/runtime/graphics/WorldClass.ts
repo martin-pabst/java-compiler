@@ -16,9 +16,10 @@ import { ShapeClass } from './ShapeClass.ts';
 import { GNGEventListenerType, IGNGEventListener } from './gng/IGNGEventListener.ts';
 import { GNGEventlistenerManager } from './gng/GNGEventlistenerManager.ts';
 import { JRC } from '../../language/JavaRuntimeLibraryComments.ts';
+import { GraphicSystem } from '../../../common/interpreter/GraphicsManager.ts';
 
 
-export class WorldClass extends ObjectClass implements IWorld {
+export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "class World" },
 
@@ -88,6 +89,9 @@ export class WorldClass extends ObjectClass implements IWorld {
     cj$_constructor_$World$int$int(t: Thread, callback: CallbackParameter, width: number, height: number) {
 
         let interpreter = t.scheduler.interpreter;
+
+        interpreter.graphicsManager?.registerGraphicSystem(this);
+
         let existingWorld = <WorldClass>interpreter.retrieveObject("WorldClass");
         if (existingWorld) {
             t.s.push(existingWorld);
@@ -369,6 +373,10 @@ export class WorldClass extends ObjectClass implements IWorld {
         while(this.shapesWhichBelongToNoGroup.length > 0){
             this.shapesWhichBelongToNoGroup.pop()?.destroy();
         }    
+    }
+
+    getIdentifier(): string {
+        return "2D-World";
     }
 
 }
