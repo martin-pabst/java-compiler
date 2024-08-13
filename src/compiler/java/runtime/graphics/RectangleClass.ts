@@ -16,8 +16,8 @@ export class RectangleClass extends FilledShapeClass {
         { type: "method", signature: "Rectangle(double left, double top, double width, double height)", java: RectangleClass.prototype._cj$_constructor_$Rectangle$double$double$double$double, comment: JRC.rectangleConstructorComment },
         { type: "method", signature: "final void setWidth(double width)", native: RectangleClass.prototype._setWidth, comment: JRC.rectangleSetWidthComment },
         { type: "method", signature: "final void setHeight(double height)", native: RectangleClass.prototype._setHeight, comment: JRC.rectangleSetHeightComment },
-        { type: "method", signature: "final double getWidth()", template: '(&1.width*&1.scaleFactor)', comment: JRC.rectangleGetWidthComment },
-        { type: "method", signature: "final double getHeight()", template: '(&1.height*&1.scaleFactor)', comment: JRC.rectangleGetHeightComment },
+        { type: "method", signature: "final double getWidth()", template: '(§1.width*§1.scaleFactor)', comment: JRC.rectangleGetWidthComment },
+        { type: "method", signature: "final double getHeight()", template: '(§1.height*§1.scaleFactor)', comment: JRC.rectangleGetHeightComment },
         { type: "method", signature: "final Rectangle copy()", java: RectangleClass.prototype._mj$copy$Rectangle$, comment: JRC.rectangleCopyComment },
         { type: "method", signature: "final void moveTo(double x, double y)", native: RectangleClass.prototype._moveTo, comment: JRC.rectangleMoveToComment },
 

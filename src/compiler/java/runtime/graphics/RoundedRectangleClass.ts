@@ -16,8 +16,8 @@ export class RoundedRectangleClass extends FilledShapeClass {
         { type: "method", signature: "RoundedRectangle(double left, double top, double width, double height, double radius)", java: RoundedRectangleClass.prototype._cj$_constructor_$RoundedRectangle$double$double$double$double$double, comment: JRC.RoundedRectangleConstructorComment },
         { type: "method", signature: "final void setWidth(double width)", native: RoundedRectangleClass.prototype._setWidth, comment: JRC.RoundedRectangleSetWidthComment },
         { type: "method", signature: "final void setHeight(double height)", native: RoundedRectangleClass.prototype._setHeight, comment: JRC.RoundedRectangleSetHeightComment },
-        { type: "method", signature: "final double getWidth()", template: '(&1.width*&1.scaleFactor)', comment: JRC.RoundedRectangleGetWidthComment },
-        { type: "method", signature: "final double getHeight()", template: '(&1.height*&1.scaleFactor)', comment: JRC.RoundedRectangleGetHeightComment },
+        { type: "method", signature: "final double getWidth()", template: '(§1.width*§1.scaleFactor)', comment: JRC.RoundedRectangleGetWidthComment },
+        { type: "method", signature: "final double getHeight()", template: '(§1.height*§1.scaleFactor)', comment: JRC.RoundedRectangleGetHeightComment },
         { type: "method", signature: "final RoundedRectangle copy()", java: RoundedRectangleClass.prototype._mj$copy$RoundedRectangle$, comment: JRC.RoundedRectangleCopyComment },
         { type: "method", signature: "final void moveTo(double x, double y)", native: RoundedRectangleClass.prototype._moveTo, comment: JRC.RoundedRectangleMoveToComment },
 
