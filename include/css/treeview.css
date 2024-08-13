@@ -53,7 +53,6 @@
     border-width: 1px;
     font-weight: bold;
     user-select: none;
-
 }
 
 .jo_treeview_caption_text {
@@ -171,6 +170,7 @@
     overflow: hidden;
     flex: 1;
     user-select: none;
+    white-space: nowrap;
 }
 
 .jo_treeviewNode_icon {
