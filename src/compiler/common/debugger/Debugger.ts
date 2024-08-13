@@ -220,7 +220,6 @@ export class Debugger {
                 firstNonFittingFound = true;
             } else {
                 remainingSymbolTableSections.push(sts);
-                sts.attachNodesToTreeview();
             }
         }
 

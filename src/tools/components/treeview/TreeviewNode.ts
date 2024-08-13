@@ -625,6 +625,7 @@ export class TreeviewNode<E> {
     public remove(child: TreeviewNode<E>) {
         let index = this.children.indexOf(child);
         if (index >= 0) this.children.splice(index, 1);
+        child.getMainDiv().remove();
     }
 
     public sort(comparator: (e1: E, e2: E) => number) {
@@ -669,11 +670,14 @@ export class TreeviewNode<E> {
         this.treeview.nodes.splice(this.treeview.nodes.indexOf(this), 1);
     }
 
-    attach() {
-        if(this.treeview.nodes.indexOf(this) < 0) this.treeview.nodes.push(this);
-        if(this.parent == this.treeview.rootNode){
-            this.treeview.rootNode.childrenDiv.appendChild(this.nodeWithChildrenDiv);
-        }
+    attachAfterDetaching() {
+        if(this.treeview.nodes.indexOf(this) < 0){
+            this.treeview.nodes.push(this);
+            this.parent?.add(this);
+        } 
+        // if(this.parent == this.treeview.rootNode){
+        //     this.treeview.rootNode.childrenDiv.appendChild(this.nodeWithChildrenDiv);
+        // }
     }
 
     addExpandListener(listener: ExpandCollapseListener, once: boolean = false){

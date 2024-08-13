@@ -30,7 +30,7 @@ export class SymbolTableSection {
 
     attachNodesToTreeview() {
         for(let child of this.children){
-            child.treeViewNode.attach();
+            child.attachNodesToTreeview();
         }
     }
 

@@ -218,7 +218,6 @@ export class Interpreter {
     stop(restart: boolean) {
 
         this.hideProgrampointerPosition();
-        this.updateDebugger();
 
         // this.inputManager.hide();
         this.setState(SchedulerState.stopped);
@@ -348,7 +347,6 @@ export class Interpreter {
 
         if (state == SchedulerState.stopped) {
             this.hideProgrampointerPosition();
-            this.updateDebugger();
             this.keyboardManager?.unsubscribeAllListeners();
             this.eventManager.fire("stop");
             // TODO

@@ -28,11 +28,12 @@ export class DebuggerSymbolEntry {
     static MAXCHILDREN: number = 20;
     static MAXARRAYSECTIONLENGTH: number = 100;
 
-    static quickArrayOutputMaxLength = 20;
+    static quickArrayOutputMaxLength = 100;
 
     constructor(protected symbolTableSection: SymbolTableSection,
         parent: DebuggerSymbolEntry | undefined, protected type: BaseType | undefined, public identifier: string
     ) {
+
         this.treeViewNode = new TreeviewNode(symbolTableSection.treeview,
             false, "", undefined,
             this, this, parent, true
@@ -59,6 +60,12 @@ export class DebuggerSymbolEntry {
         }
 
     }
+
+    attachNodesToTreeview() {
+        this.treeViewNode.attachAfterDetaching();
+        this.children.forEach(c => c.attachNodesToTreeview());        
+    }
+
 
     removeChildren() {
         this.children.forEach(child => child.treeViewNode.destroy());
@@ -176,7 +183,7 @@ export class DebuggerSymbolEntry {
         let elementtype = (<BaseArrayType><any>this.type).getElementType()
         this.setCaption(": " + elementtype.toString() + "[" + a.length + "] ", ValueRenderer.quickArrayOutput(a, DebuggerSymbolEntry.quickArrayOutputMaxLength) , "jo_debugger_value");
 
-        while(this.children.length || 0 > a.length){
+        while((this.children.length || 0) > a.length){
             this.children.pop()!.treeViewNode.destroy();
         }
 
@@ -214,7 +221,7 @@ export class DebuggerSymbolEntry {
                 this.treeViewNode.removeAllExpandListeners();
                 this.treeViewNode.addExpandListener((state) => {
                     addAndDisplayChildren();
-                }, true);
+                });
             }
 
         }
