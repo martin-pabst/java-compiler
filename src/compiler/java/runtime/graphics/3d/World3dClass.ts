@@ -12,9 +12,10 @@ import { ActorManager } from '../ActorManager';
 import { ActorType, IActor } from '../IActor';
 import { MouseManager } from '../MouseManager';
 import { IWorld3d } from './IWorld3d';
+import { GraphicSystem } from '../../../../common/interpreter/GraphicsManager';
 
 
-export class World3dClass extends ObjectClass implements IWorld3d {
+export class World3dClass extends ObjectClass implements IWorld3d, GraphicSystem {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "class World3d" },
 
@@ -53,6 +54,8 @@ export class World3dClass extends ObjectClass implements IWorld3d {
 
         let interpreter = t.scheduler.interpreter;
 
+        interpreter.graphicsManager?.registerGraphicSystem(this);
+
         let existingWorld = <World3dClass>interpreter.retrieveObject("World3dClass");
         if (existingWorld) {
             t.s.push(existingWorld);
@@ -65,12 +68,7 @@ export class World3dClass extends ObjectClass implements IWorld3d {
 
 
         let graphicsDivParent = <HTMLDivElement>interpreter.graphicsManager?.graphicsDiv;
-        let oldGraphicsDiv = graphicsDivParent.getElementsByClassName('world3d');
-        if (oldGraphicsDiv.length > 0) {
-            for (let element of oldGraphicsDiv) {
-                element.remove();
-            }
-        }
+        graphicsDivParent.innerHTML = "";
 
         this.graphicsDiv = DOM.makeDiv(graphicsDivParent, 'world3d');
 
@@ -217,6 +215,10 @@ export class World3dClass extends ObjectClass implements IWorld3d {
 
     _clear() {
         // TODO!
+    }
+
+    getIdentifier(): string {
+        return "World3d";
     }
 
 }
