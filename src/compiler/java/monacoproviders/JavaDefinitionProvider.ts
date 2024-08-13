@@ -1,4 +1,6 @@
 import { IMain } from "../../common/IMain.ts";
+import { Position } from "../../common/range/Position.ts";
+import { EmptyRange, Range } from "../../common/range/Range.ts";
 import { UsagePosition } from "../../common/UsagePosition.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule.ts";
 
@@ -7,16 +9,37 @@ export class JavaDefinitionProvider implements monaco.languages.DefinitionProvid
     constructor(private main: IMain) {
     }
 
+    count: number = 0;
+
     provideDefinition(model: monaco.editor.ITextModel, position: monaco.Position, token: monaco.CancellationToken): monaco.languages.ProviderResult<monaco.languages.Definition> {
         let editor = monaco.editor.getEditors().find(e => e.getModel() == model);
         if(!editor) return;
 
         let usagePosition = this.getUsagePosition(position, editor);
         
-        let uri = usagePosition?.symbol.module.file.getMonacoModel()?.uri;
+        let targetModel = usagePosition?.symbol.module.file.getMonacoModel();
+        let uri = targetModel?.uri;
 
         if(!uri) return;
 
+        let range = usagePosition?.symbol.identifierRange;
+        if(!range) return;
+
+        /**
+         * bug in monaco-editor:
+         * if model is current model then cursor is set to definition position but view doesn't scroll
+         * to cursor, so:
+         */
+        setTimeout(() => {
+            let currentEditorPosition = editor.getPosition();
+            if(model == targetModel && currentEditorPosition){
+                if(Position.equals(editor.getPosition(), Range.getStartPosition(range))){
+                    editor.revealPositionInCenterIfOutsideViewport(currentEditorPosition);
+                }
+
+            } 
+        }, 200);
+        
         return {
             range: usagePosition!.symbol.identifierRange,
             uri: uri
