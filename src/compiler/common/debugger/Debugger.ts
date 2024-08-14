@@ -32,7 +32,7 @@ export class Debugger {
 
     watchSection: DebuggerWatchSection;
 
-    constructor(debuggerDiv: HTMLDivElement, public main: IMain){
+    constructor(private debuggerDiv: HTMLDivElement, public main: IMain){
 
         this.treeviewAccordion = new TreeviewAccordion(debuggerDiv);
         this.initShowVariablesTreeview();
@@ -41,6 +41,14 @@ export class Debugger {
         this.initThreadsTreeview();
 
         this.watchSection = new DebuggerWatchSection(this.watchTreeview, this);
+    }
+
+    hide(){
+        this.debuggerDiv.style.display = "none";
+    }
+    
+    show(){
+        this.debuggerDiv.style.display = "";
     }
     
     initWatchTreeview(){

@@ -29,6 +29,14 @@ export class Step {
         this.range = { startLineNumber: undefined, startColumn: undefined, endLineNumber: undefined, endColumn: undefined };
     }
 
+    getValidRangeOrUndefined(): IRange | undefined {
+        let r = this.range;
+        if(typeof r.startLineNumber != "undefined"){
+            return <any>r;
+        }
+        return undefined;
+    }
+
     setBreakpoint() {
 
         let breakpointRunFunction = (thread: Thread, stack: any[], stackBase: number): number => {

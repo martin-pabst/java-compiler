@@ -183,22 +183,28 @@ export class Thread {
                 // step.run
             }
 
-            if(currentProgramState) currentProgramState.lastExecutedStep = step!; 
+            if (currentProgramState) currentProgramState.lastExecutedStep = step!;
 
         } catch (exception) {
-            if(currentProgramState) currentProgramState.stepIndex = stepIndex;
+            if (currentProgramState) currentProgramState.stepIndex = stepIndex;
 
             if (exception instanceof ThrowableClass) {
                 this.throwException(exception, step!);
             } else {
-                this.throwException(new SystemException("SystemException", InterpreterMessages.SystemException() + exception), step!);
-                console.log(exception);
+                this.handleSystemException(exception, step!, currentProgramState);
             }
 
         }
 
 
         return { state: this._state, stepsExecuted: this.numberOfSteps }
+    }
+
+    handleSystemException(exception: any, step: Step, currentProgramState: ProgramState) {
+        this.throwException(new SystemException("SystemException", InterpreterMessages.SystemException() + exception), step!);
+        console.log(exception);
+        console.log(step!.codeAsString);
+        this.scheduler.interpreter.exceptionMarker?.markException({ file: currentProgramState.program.module.file, range: step!.getValidRangeOrUndefined() }, step!);
     }
 
     public set state(state: ThreadState) {
@@ -264,7 +270,7 @@ export class Thread {
     }
 
     throwException(exception: Exception & IThrowable, step: Step) {
-        
+
         exception.file = this.currentProgramState.program.module.file;
 
         let classNames = exception.getExtendedImplementedIdentifiers().slice();
@@ -498,7 +504,7 @@ export class Thread {
     newArray(defaultValue: any, ...dimensions: number[]): Array<any> {
         let n0 = dimensions[0];
 
-        if(n0 < 0){
+        if (n0 < 0) {
             throw new RuntimeExceptionClass(InterpreterMessages.ArrayLengthNegative());
         }
 
@@ -624,18 +630,18 @@ export class Thread {
             return;
         }
 
-        if(Array.isArray(object)){
+        if (Array.isArray(object)) {
             this._arrayOfObjectsToString(object, callback, maximumLength);
             return;
         }
 
-        if(typeof object == "object"){
+        if (typeof object == "object") {
             object._mj$toString$String$(t, callback);
             return;
         }
 
         t.s.push("" + object);    // parameter object is indeed no object
-        if(callback) callback();
+        if (callback) callback();
         return;
     }
 

@@ -1,6 +1,7 @@
 import { IMain } from "../IMain";
+import { CompilerFile } from "../module/CompilerFile";
 import { ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager";
-import { Exception } from "./ExceptionInfo";
+import { IRange } from "../range/Range";
 import { Step } from "./Program";
 import { IThrowable } from "./ThrowableType";
 import '/include/css/exceptionmarker.css';
@@ -13,7 +14,7 @@ export class ExceptionMarker {
 
     }
 
-    markException(exception: Exception & IThrowable, step: Step){
+    markException(exception: IThrowable | {file: CompilerFile, range: IRange | undefined}, step: Step){
         let file = exception.file;
         let range = exception.range;
         let model = file?.getMonacoModel();
