@@ -236,18 +236,29 @@ export class Disassembler {
             stepIndex.textContent = index + ":";
             let codeSpan = DOM.makeSpan(stepDiv, "jo_disassemblerCodeSpan");
 
+            /*
+             * prettify code
+             */
             let code = step.codeAsString.trim();
+            
+            // remove jumps to next step:
             let regExp = new RegExp("(.*)return " + (index + 1) + ";(\s*)$", "s");
             let match = code.match(regExp);
             if(match){
                 code = match[1].trim();
             }
 
+            let code1 = code.replaceAll(/\/\/ Label \d*\s*/g, "");
+            if(code1 !== code) stepIndex.classList.add("jo_disassemblerStepWithLabel");
             
+            code1 = code1.replaceAll(/(return) (\d*)/g, "jumpTo($2)")
+
+            code = code1;
+
             index++;
             
             monaco.editor.colorize(code, 'javascript', { tabSize: 3 }).then((html) => {
-                html = html.replaceAll("&nbsp;", " ");
+                // html = html.replaceAll("&nbsp;", " ");
                 html = html.replaceAll("\u00a0", " ");
                 codeSpan.innerHTML = html;
             });

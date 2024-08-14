@@ -1,6 +1,7 @@
 :root {
     --disassembler-horizontal-line: #808080;
     --disassembler-heading: #51e24e;
+    --disassembler-stepWithLabel: #64e33a;
 }   
 
 .jo_disassemblerDiv {
@@ -52,6 +53,10 @@
     font-size: 14px;
     text-wrap: wrap;
     user-select: none;
+}
+
+.jo_disassemblerStepWithLabel {
+    color:var(--disassembler-stepWithLabel);
 }
 
 .jo_disassemblerStepIndex {
