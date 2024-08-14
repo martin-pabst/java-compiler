@@ -53,16 +53,16 @@ export class Interpreter {
 
     // buttonActiveMatrix[button][i] tells if button is active at 
     // SchedulerState i
-    // export enum SchedulerState { not_initialized, running, paused, stopped }
+    // export enum SchedulerState { not_initialized, running, paused, stopped, error }
 
     buttonActiveMatrix: { [buttonName: string]: boolean[] } = {
-        "start": [false, false, true, true],
-        "pause": [false, true, false, false],
-        "stop": [false, true, true, false],
-        "stepOver": [false, false, true, true],
-        "stepInto": [false, false, true, true],
-        "stepOut": [false, false, true, false],
-        "restart": [false, true, true, true]
+        "start": [false, false, true, true, true],
+        "pause": [false, true, false, false, false],
+        "stop": [false, true, true, false, false],
+        "stepOver": [false, false, true, true, true],
+        "stepInto": [false, false, true, true, true],
+        "stepOut": [false, false, true, false, false],
+        "restart": [false, true, true, false, false]
     }
 
     static ProgramPointerIndentifier = "ProgramPointer";

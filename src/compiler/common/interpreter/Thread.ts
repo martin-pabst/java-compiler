@@ -352,11 +352,12 @@ export class Thread {
                 }
             });
             this.exception = exception;
-            this.state = ThreadState.terminatedWithException;
             ExceptionPrinter.print(exception, this.stackTrace, this.scheduler.interpreter.printManager);
-
+            
             this.scheduler.interpreter.exceptionMarker?.markException(exception, step)
-
+            
+            this.state = ThreadState.terminatedWithException;
+            
             //@ts-ignore
             this.currentProgramState = undefined;
         } else {
