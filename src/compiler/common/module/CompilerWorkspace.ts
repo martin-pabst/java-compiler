@@ -65,5 +65,19 @@ export abstract class CompilerWorkspace {
 
     }
 
+    /*
+     * monaco editor counts LanguageChangedListeners and issues ugly warnings in console if more than
+     * 200, 300, ... are created. Unfortunately it creates one each time a monaco.editor.ITextModel is created.
+     * To keep monaco.editor.ITextModel instance count low we instantiate it only when needed and dispose of it
+     * when switching to another workspace. 
+     */
+
+    disposeMonacoModels(){
+        this.getFiles().forEach(file => file.disposeMonacoModel());
+    }
+
+    createMonacoModels(){
+        this.getFiles().forEach(file => file.getMonacoModel());
+    }
 
 }
