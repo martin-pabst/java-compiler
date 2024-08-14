@@ -126,6 +126,10 @@ export class Debugger {
         }
     }
 
+    showCurrentThreadState(){
+        this.showThreadState(this.main.getInterpreter().scheduler.getCurrentThread());
+    }
+
     showThreadState(thread: Thread | undefined){
 
         if(!thread){

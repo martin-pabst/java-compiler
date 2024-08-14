@@ -63,8 +63,6 @@ export class Scheduler {
      */
     run(numberOfStepsMax: number): SchedulerExitState {
 
-        this.periodicallyUpdateDebugger();
-
         if (this.state != SchedulerState.running) return SchedulerExitState.nothingMoreToDo;
 
         // If pause button is pressed while no thread is in state running then noStartinNextThreadCallback is set to wait 
@@ -454,14 +452,17 @@ export class Scheduler {
         this.runningThreads.filter(t => t.maxStepsPerSecond).forEach(t => t.lastTimeThreadWasRun = performance.now());
     }
 
-    periodicallyUpdateDebugger() {
-        if(this.runsSynchronously) return;
-        if (this.state == SchedulerState.running &&
-            performance.now() - this.lastTimeDebuggeroutputWritten > this.updateDebuggerEveryMs) {
-            this.lastTimeDebuggeroutputWritten = performance.now();
-            this.interpreter.updateDebugger();
-        }
-    }
+    /**
+     * 14.08.2024: Not used -> looking for better alternatives
+     */
+    // periodicallyUpdateDebugger() {
+    //     if(this.runsSynchronously) return;
+    //     if (this.state == SchedulerState.running &&
+    //         performance.now() - this.lastTimeDebuggeroutputWritten > this.updateDebuggerEveryMs) {
+    //         this.lastTimeDebuggeroutputWritten = performance.now();
+    //         this.interpreter.updateDebugger();
+    //     }
+    // }
 
 
     setMaxSpeed(value: number, isMaxSpeed: boolean) {

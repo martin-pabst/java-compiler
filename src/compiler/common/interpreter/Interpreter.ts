@@ -213,8 +213,7 @@ export class Interpreter {
     }
 
     public updateDebugger() {
-        if (!this._debugger) return;
-        this._debugger.showThreadState(this.scheduler.getCurrentThread());
+        this._debugger?.showCurrentThreadState();
     }
 
     stop(restart: boolean) {
