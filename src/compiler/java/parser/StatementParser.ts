@@ -136,7 +136,6 @@ export abstract class StatementParser extends TermParser {
         }
         if (type && additionalDimension > 0) {
             type = this.nodeFactory.buildArrayTypeNode(type, type.range, additionalDimension);
-            this.module.ast?.collectedTypeNodes!.push(type);
         }
         return type;
     }

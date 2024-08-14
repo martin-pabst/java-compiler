@@ -1,5 +1,23 @@
 export var testProgramsList = [
    ['', ``],
+   ['2DArrayTest', `// Beispieldaten (nicht in der Lösung verlangt):
+int n = 5;
+int[][] entfernung = new int[][] {
+   { 0, 3, 20, 5, 4 },
+   { 3, 0, 15, 4, 1 },
+   { 20, 15, 0, 7, 6 },
+   { 5, 4, 7, 0, 6 },
+   { 4, 1, 6, 6, 0 }
+};
+ 
+int gesamtlänge = 0;
+for (int i = 1; i < n; i++) {
+   for (int j = 0; j < i; j++) {
+      gesamtlänge = gesamtlänge + entfernung[i][j];
+   }
+}
+
+println("Gesamtlänge: " + gesamtlänge);`],
    ['CharAdditionBug', `new Test().t();
 
 class Test {

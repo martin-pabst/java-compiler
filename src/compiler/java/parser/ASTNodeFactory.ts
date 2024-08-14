@@ -7,6 +7,8 @@ import { TermParser } from "./TermParser.ts";
 
 export class ASTNodeFactory {
 
+    public collectedTypenodesGettingRegisteredAtTypeResolver: ASTTypeNode[] = [];
+
     constructor(private parser: TermParser) {
 
     }
@@ -22,36 +24,48 @@ export class ASTNodeFactory {
     buildWildcardTypeNode(startRange?: IRange): ASTWildcardTypeNode {
         if (!startRange) startRange = this.parser.cct.range;
 
-        return {
+        let type: ASTWildcardTypeNode =  {
             kind: TokenType.wildcardType,
             range: startRange,
             extends: []
         }
-    }
+        this.collectedTypenodesGettingRegisteredAtTypeResolver.push(type);
 
+        return type;
+        
+    }
+    
     buildVoidTypeNode(startRange?: IRange): ASTVoidTypeNode {
         if (!startRange) startRange = this.parser.cct.range;
-
-        return {
+        
+        let type: ASTVoidTypeNode = {
             kind: TokenType.voidType,
             range: startRange
         }
-    }
 
+        this.collectedTypenodesGettingRegisteredAtTypeResolver.push(type);
+    
+        return type;
+    }
+    
     buildVarTypeNode(startRange?: IRange): ASTVarTypeNode {
         if (!startRange) startRange = this.parser.cct.range;
-
-        return {
+        
+        let type: ASTVarTypeNode = {
             kind: TokenType.varType,
             range: startRange
         }
-    }
 
+        this.collectedTypenodesGettingRegisteredAtTypeResolver.push(type);
+    
+        return type;
+    }
+    
     buildArrayTypeNode(arrayOf: ASTTypeNode, startRange?: IRange, additionalDimension: number = 1): ASTArrayTypeNode {
         if (!startRange) startRange = this.parser.cct.range;
-
+        
         let ret: ASTArrayTypeNode;
-
+        
         if (arrayOf.kind == TokenType.arrayType) {
             let atype = <ASTArrayTypeNode>arrayOf;
             ret = {
@@ -60,7 +74,7 @@ export class ASTNodeFactory {
                 arrayDimensions: atype.arrayDimensions + additionalDimension,
                 arrayOf: atype.arrayOf
             }
-
+            
         } else {
             ret = {
                 kind: TokenType.arrayType,
@@ -69,14 +83,16 @@ export class ASTNodeFactory {
                 arrayOf: arrayOf
             }
         }
-
+        
+        this.collectedTypenodesGettingRegisteredAtTypeResolver.push(ret);
+    
         return ret;
-
+        
     }
-
+    
     buildGenericTypeInstantiationNode(baseType: ASTTypeNode, startRange?: IRange): ASTGenericTypeInstantiationNode {
         if (!startRange) startRange = this.parser.cct.range;
-
+        
         return {
             kind: TokenType.genericTypeInstantiation,
             range: startRange,

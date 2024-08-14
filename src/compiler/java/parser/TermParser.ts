@@ -45,14 +45,13 @@ export abstract class TermParser extends TokenIterator {
 
     operatorToPrecedenceMap: { [op: number]: number } = {};
 
-    nodeFactory: ASTNodeFactory;
+    nodeFactory!: ASTNodeFactory;
 
     currentClassOrInterface?: ASTClassDefinitionNode | ASTInterfaceDefinitionNode;
     currentMethod?: ASTMethodDeclarationNode;
 
     constructor(public module: JavaCompiledModule) {
         super(module.tokens!, module);
-        this.nodeFactory = new ASTNodeFactory(this);
 
         this.initOperatorToPrecedenceMap();
 

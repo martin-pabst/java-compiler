@@ -15,6 +15,7 @@ import {
     ASTNewObjectNode,
     ASTNodeWithModifiers, ASTStatementNode, ASTTypeNode, TypeScope
 } from "./AST.ts";
+import { ASTNodeFactory } from "./ASTNodeFactory.ts";
 import { StatementParser } from "./StatementParser.ts";
 
 export class Parser extends StatementParser {
@@ -35,6 +36,7 @@ export class Parser extends StatementParser {
 
     constructor(private javaCompiledModule: JavaCompiledModule) {
         super(javaCompiledModule);
+        this.nodeFactory = new ASTNodeFactory(this);
         this.initializeAST();
     }
 
@@ -49,7 +51,7 @@ export class Parser extends StatementParser {
             range: globalRange,
             innerTypes: [],
             mainProgramNode: this.nodeFactory.buildMainProgramNode(this.cct),
-            collectedTypeNodes: [],
+            collectedTypeNodes: this.nodeFactory.collectedTypenodesGettingRegisteredAtTypeResolver,
             path: ""
         }
 
@@ -73,7 +75,6 @@ export class Parser extends StatementParser {
 
 
         let stringArrayType = this.nodeFactory.buildArrayTypeNode(this.buildBaseType("String"));
-        this.javaCompiledModule.ast?.collectedTypeNodes.push(stringArrayType);
         let parameter = this.nodeFactory.buildParameterNode(EmptyRange.instance, { tt: TokenType.identifier, value: "args", range: EmptyRange.instance }, stringArrayType, false, true);
         parameter.trackMissingReadAccess = false;
 
