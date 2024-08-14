@@ -201,10 +201,10 @@ export class Thread {
     }
 
     handleSystemException(exception: any, step: Step, currentProgramState: ProgramState) {
-        this.throwException(new SystemException("SystemException", InterpreterMessages.SystemException() + exception), step!);
         console.log(exception);
         console.log(step!.codeAsString);
         this.scheduler.interpreter.exceptionMarker?.markException({ file: currentProgramState.program.module.file, range: step!.getValidRangeOrUndefined() }, step!);
+        this.throwException(new SystemException("SystemException", InterpreterMessages.SystemException() + exception), step!);
     }
 
     public set state(state: ThreadState) {
