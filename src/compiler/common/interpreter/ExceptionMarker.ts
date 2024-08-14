@@ -40,7 +40,9 @@ export class ExceptionMarker {
             beforeContentClassName: "jo_revealExceptionPositionBefore"
           })
 
-          this.main.getDisassembler()?.markException(step);
+          setTimeout(() => {
+            this.main.getDisassembler()?.markException(step);
+          }, 1000);
 
     }
 

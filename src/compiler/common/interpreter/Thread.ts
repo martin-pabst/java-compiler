@@ -203,7 +203,6 @@ export class Thread {
     handleSystemException(exception: any, step: Step, currentProgramState: ProgramState) {
         console.log(exception);
         console.log(step!.codeAsString);
-        this.scheduler.interpreter.exceptionMarker?.markException({ file: currentProgramState.program.module.file, range: step!.getValidRangeOrUndefined() }, step!);
         this.throwException(new SystemException("SystemException", InterpreterMessages.SystemException() + exception), step!);
     }
 
@@ -272,6 +271,7 @@ export class Thread {
     throwException(exception: Exception & IThrowable, step: Step) {
 
         exception.file = this.currentProgramState.program.module.file;
+        exception.range = step.getValidRangeOrUndefined();
 
         let classNames = exception.getExtendedImplementedIdentifiers().slice();
         classNames.push(exception.getIdentifier());

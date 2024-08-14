@@ -27,7 +27,7 @@ export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
         { type: "method", signature: "World(int width, int height)", java: WorldClass.prototype.cj$_constructor_$World$int$int },
 
         { type: "method", signature: "void setBackgroundColor(int colorAsRGBInt)", native: WorldClass.prototype._setBackgroundColor, comment: JRC.worldSetBackgroundColorIntComment },
-        { type: "method", signature: "void setBackgroundColor(String colorAsString)", native: WorldClass.prototype._setBackgroundColor, comment: JRC.worldSetBackgroundColorStringComment },
+        { type: "method", signature: "void setBackgroundColor(string colorAsString)", native: WorldClass.prototype._setBackgroundColor, comment: JRC.worldSetBackgroundColorStringComment },
 
         { type: "method", signature: "void move(double dx, double dy)", native: WorldClass.prototype._move, comment: JRC.worldMoveComment },
         { type: "method", signature: "void rotate(double angleInDeg, double centerX, double centerY)", native: WorldClass.prototype._rotate, comment: JRC.worldRotateComment },

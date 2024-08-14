@@ -351,7 +351,7 @@ export class Scheduler {
         currentThread = currentThread || this.runningThreads[this.currentThreadIndex];
         if (!currentThread) return undefined;
         let programState = currentThread.currentProgramState;
-        let step = programState.currentStepList[programState.stepIndex];
+        let step = programState?.currentStepList[programState.stepIndex];
         if (!step) return undefined;
 
         return {

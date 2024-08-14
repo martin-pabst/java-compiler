@@ -140,7 +140,7 @@ export class Disassembler {
     }    
 
     findHtmlElementForStep(step: Step): HTMLElement | undefined {
-        let element = this.stepToHtmlElementMap.get(step);
+    let element = this.stepToHtmlElementMap.get(step);
         if(element) return element;
  
         this.currentModule = undefined;

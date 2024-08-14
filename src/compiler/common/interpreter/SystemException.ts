@@ -1,13 +1,19 @@
+import { CompilerFile } from "../module/CompilerFile";
+import { IRange } from "../range/Range";
 import { Exception } from "./ExceptionInfo";
 import { IThrowable, Stacktrace } from "./ThrowableType";
 
 export class SystemException implements Exception, IThrowable {
 
+    cause?: IThrowable | undefined;
+    stacktrace: Stacktrace = [];
+    file?: CompilerFile;
+    range?: IRange;
+
+
     constructor(public identifier: string, public message: string){
 
     }
-    cause?: IThrowable | undefined;
-    stacktrace: Stacktrace = [];
 
     getIdentifier(): string {
         return this.identifier;

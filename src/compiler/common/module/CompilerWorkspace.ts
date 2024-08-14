@@ -62,7 +62,7 @@ export abstract class CompilerWorkspace {
     getCurrentlyEditedFile(): CompilerFile | undefined {
         let model = this.cmain.getMainEditor().getModel();
         if (!model) return;
-
+        return this.getFileForMonacoModel(model);
     }
 
     /*
