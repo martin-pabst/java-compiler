@@ -1,7 +1,8 @@
+import { ExceptionTree } from "../java/codegenerator/ExceptionTree.ts";
+import { JCM } from "../java/language/JavaCompilerMessages.ts";
 import { JavaModuleManager } from "../java/module/JavaModuleManager";
 import { JavaLibraryModuleManager } from "../java/module/libraries/JavaLibraryModuleManager.ts";
 import { JavaClass } from "../java/types/JavaClass.ts";
-import { JavaTypeWithInstanceInitializer } from "../java/types/JavaTypeWithInstanceInitializer";
 import { JavaMethod } from "../java/types/JavaMethod.ts";
 import { NonPrimitiveType } from "../java/types/NonPrimitiveType";
 import { Error } from "./Error";
@@ -10,8 +11,6 @@ import { Klass, KlassObjectRegistry } from "./interpreter/StepFunction";
 import { CompilerFile } from "./module/CompilerFile";
 import { Module } from "./module/Module";
 import { EmptyRange } from "./range/Range";
-import { ExceptionTree } from "../java/codegenerator/ExceptionTree.ts";
-import { JCM } from "../java/language/JavaCompilerMessages.ts";
 
 type StaticInitializationStep = {
     klass: Klass,
@@ -140,8 +139,8 @@ export class Executable {
         return this.testClassToTestMethodMap;
     }
 
-    findMainModule(test: boolean, lastOpenedFile?: CompilerFile, currentlyOpenedModule?: Module) {
-        if (test) {
+    findMainModule(useTestModuleIfPresent: boolean, lastOpenedFile?: CompilerFile, currentlyOpenedModule?: Module) {
+        if (useTestModuleIfPresent) {
             let testModule = this.moduleManager.modules.find(m => m.file.name == "TEST_FILE");
             if (testModule) {
                 this.mainModule = testModule;

@@ -4,7 +4,6 @@ import { BreakpointManager } from "../BreakpointManager.ts";
 import { Debugger } from "../debugger/Debugger.ts";
 import { Executable } from "../Executable.ts";
 import { Module } from "../module/Module.ts";
-import { ErrorMarker } from "../monacoproviders/ErrorMarker.ts";
 import { ProgramPointerManager, ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager.ts";
 import { ActionManager } from "./ActionManager.ts";
 import { CodeReachedAssertions } from "./CodeReachedAssertions.ts";
@@ -71,6 +70,7 @@ export class Interpreter {
     mainThread?: Thread;
     public stepsPerSecondGoal: number = 1e8;
     public isMaxSpeed: boolean = true;
+    
 
     constructor(printManager?: IPrintManager, private actionManager?: ActionManager,
         public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager,
@@ -420,23 +420,19 @@ export class Interpreter {
 
         // this.main.getBottomDiv()?.console?.clearErrors();
 
-        // let cem = this.main.getCurrentlyEditedModule();
-
-        // cem.getBreakpointPositionsFromEditor();
-
+        
         // this.main.getBottomDiv()?.console?.clearExceptions();
-
+        
         // /*
         //     As long as there is no startable new Version of current workspace we keep current compiled modules so
         //     that variables and objects defined/instantiated via console can be kept, too. 
         // */
         // if (this.moduleStoreVersion != this.main.version && this.main.getCompiler().atLeastOneModuleIsStartable) {
-        //     this.main.copyExecutableModuleStoreToInterpreter();
-        //     this.main.getBottomDiv()?.console?.detachValues();  // detach values from console entries
-        // }
-
-
-
+            //     this.main.copyExecutableModuleStoreToInterpreter();
+            //     this.main.getBottomDiv()?.console?.detachValues();  // detach values from console entries
+            // }
+            
+            
         this.setState(SchedulerState.stopped);
         this.mainThread = this.scheduler.init(executable);
 

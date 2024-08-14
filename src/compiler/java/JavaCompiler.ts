@@ -66,6 +66,10 @@ export class JavaCompiler implements Compiler {
 
         let time = performance.now();
 
+        if(this.lastCompiledExecutable){
+            this.lastCompiledExecutable.findMainModule(false, this.lastOpenedFile, this.main?.getCurrentWorkspace()?.getCurrentlyEditedModule());
+        }
+
         // if we're not in test mode:
         if(this.main){
             if (this.main.getInterpreter().isRunningOrPaused()) return;

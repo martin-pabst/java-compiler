@@ -48,7 +48,7 @@ export class Debugger {
     }
     
     show(){
-        this.debuggerDiv.style.display = "";
+        this.debuggerDiv.style.display = "block";
     }
     
     initWatchTreeview(){
