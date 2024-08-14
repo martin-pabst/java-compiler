@@ -389,19 +389,17 @@ export class Interpreter {
             this.eventManager.fire("done");
 
         }
-
-        // if (oldState != SchedulerLstate.stopped && state == SchedulerLstate.stopped) {
-        //     // TODO
-        //     // this.debugger.disable();
-        //     this.keyboardTool.unsubscribeAllListeners();
-        // }
-
-        // if ([SchedulerLstate.running, SchedulerLstate.paused].indexOf(oldState) < 0
-        //     && state == SchedulerLstate.running) {
-        //     // TODO
-        //     //   this.debugger.enable();
-        // }
-
+        
+        let runningStates: SchedulerState[] = [SchedulerState.paused, SchedulerState.running];
+        if (runningStates.indexOf(this.scheduler.state) >= 0 && runningStates.indexOf(state) < 0) {
+            this._debugger?.hide();
+            this.keyboardManager?.unsubscribeAllListeners();
+        }
+        
+        if (runningStates.indexOf(this.scheduler.state) < 0 && runningStates.indexOf(state) >= 0) {
+            this._debugger?.show();
+        }
+        
         this.eventManager.fire("stateChanged", this.scheduler.state, state);
         this.scheduler.setState(state);
         
