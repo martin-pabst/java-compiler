@@ -1,25 +1,23 @@
-import { Program, Step } from "./Program";
-import { Scheduler, SchedulerState } from "./Scheduler";
-import { EmptyRange, IRange } from "../range/Range.ts";
-import { CallbackFunction, KlassObjectRegistry } from "./StepFunction.ts";
-import { ExceptionInfo, CatchBlockInfo, Exception } from "./ExceptionInfo.ts";
-import { ThrowableClass } from "../../java/runtime/system/javalang/ThrowableClass.ts";
-import { SystemException } from "./SystemException.ts";
-import { IThrowable, Stacktrace } from "./ThrowableType.ts";
+import { ReplReturnValue } from "../../java/parser/repl/ReplReturnValue.ts";
 import { ArithmeticExceptionClass } from "../../java/runtime/system/javalang/ArithmeticExceptionClass.ts";
-import { NullPointerExceptionClass } from "../../java/runtime/system/javalang/NullPointerExceptionClass.ts";
-import { AssertionObserver, DummyAssertionObserver } from "../../java/runtime/unittests/AssertionObserver.ts";
-import { ObjectClass, StringClass } from "../../java/runtime/system/javalang/ObjectClassStringClass.ts";
-import { NonPrimitiveType } from "../../java/types/NonPrimitiveType.ts";
 import { ClassCastExceptionClass } from "../../java/runtime/system/javalang/ClassCastExceptionClass.ts";
 import { IndexOutOfBoundsExceptionClass } from "../../java/runtime/system/javalang/IndexOutOfBoundsExceptionClass.ts";
-import { CallbackParameter } from "./CallbackParameter.ts";
-import { ArrayToStringCaster, TextContainer } from "./ArrayToStringCaster.ts";
-import { ExceptionPrinter } from "./ExceptionPrinter.ts";
-import { ReplReturnValue } from "../../java/parser/repl/ReplReturnValue.ts";
-import { ValueTool } from "../debugger/ValueTool.ts";
+import { NullPointerExceptionClass } from "../../java/runtime/system/javalang/NullPointerExceptionClass.ts";
+import { ObjectClass, StringClass } from "../../java/runtime/system/javalang/ObjectClassStringClass.ts";
 import { RuntimeExceptionClass } from "../../java/runtime/system/javalang/RuntimeException.ts";
+import { ThrowableClass } from "../../java/runtime/system/javalang/ThrowableClass.ts";
+import { NonPrimitiveType } from "../../java/types/NonPrimitiveType.ts";
 import { InterpreterMessages } from "../language/InterpreterMessages.ts";
+import { EmptyRange, IRange } from "../range/Range.ts";
+import { ArrayToStringCaster, TextContainer } from "./ArrayToStringCaster.ts";
+import { CallbackParameter } from "./CallbackParameter.ts";
+import { CatchBlockInfo, Exception, ExceptionInfo } from "./ExceptionInfo.ts";
+import { ExceptionPrinter } from "./ExceptionPrinter.ts";
+import { Program, Step } from "./Program";
+import { Scheduler } from "./Scheduler";
+import { CallbackFunction, KlassObjectRegistry } from "./StepFunction.ts";
+import { SystemException } from "./SystemException.ts";
+import { IThrowable, Stacktrace } from "./ThrowableType.ts";
 
 
 export type ProgramState = {
@@ -632,7 +630,7 @@ export class Thread {
         }
 
         if(typeof object == "object"){
-            object._mj$toString$String$(t, callback, maximumLength);
+            object._mj$toString$String$(t, callback);
             return;
         }
 

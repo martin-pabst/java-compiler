@@ -68,7 +68,7 @@ export class ArrayToStringCaster {
                             if (callback1) callback1();
                             return;
                         }
-                    }, maximumLength - textContainer.text.length)
+                    })
                 } else {
                     if(typeof element == "string"){
                         textContainer.text += '"' + element + '"';

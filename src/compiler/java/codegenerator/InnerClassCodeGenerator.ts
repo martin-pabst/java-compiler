@@ -430,6 +430,8 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
                 if (snippet.isConstant()) {
                     field.initialValue = snippet.getConstantValue();
                     field.initialValueIsConstant = true;
+                } else if(field.isFinal() && snippet.type == this.stringNonPrimitiveType && snippet.getConstantValue()){
+                    field.initialValueIsConstant = true;
                 }
 
                 let assignmentTemplate = `${Helpers.classes}.${classContext.identifier}.${field.getInternalName()} = §1;\n`;

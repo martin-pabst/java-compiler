@@ -53,6 +53,11 @@ export class JRC {
         "en": "A String is a character sequence.",
     })
 
+    static stringCompareToNullpointerException = () => lm({
+    "de": "Der Vergleich mit null ist nicht zulässig.",
+    "en": "Comparison with null is not possible.",
+    })
+
     static stringConstructorComment = () => lm({
         "de": "Erzeugt ein neues, leeres String-Objekt.",
         "en": "Creates a new empty string object.",

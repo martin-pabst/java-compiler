@@ -81,6 +81,10 @@ export class StringCodeSnippet extends CodeSnippet {
         this.constantValue = constantValue;
     }
 
+    setConstantValue(value: ConstantValue){
+        this.constantValue = value;
+    }
+
     getConstantValue(): ConstantValue | undefined {
         return this.constantValue;
     }

@@ -21,6 +21,4 @@ export class NullPointerExceptionClass extends RuntimeExceptionClass {
         super();
     }
 
-
-
 }

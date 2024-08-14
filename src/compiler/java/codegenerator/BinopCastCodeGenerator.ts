@@ -465,7 +465,11 @@ export abstract class BinopCastCodeGenerator {
         if (!castTo.isPrimitive) {
             if(castTo == this.stringNonPrimitiveType){
                 let templ = type == this.stringType ? '§1' : '"" + (§1)'
+                let constantValue = snippet.getConstantValue();
                 let sn1 = SnippetFramer.frame(snippet, `new ${Helpers.classes}["String"](${templ})`, this.stringNonPrimitiveType);
+                if(typeof constantValue == "string" && sn1 instanceof StringCodeSnippet){
+                    sn1.setConstantValue(constantValue);
+                }
                 return sn1;
             }
             // snippet has primitive type. boxing?

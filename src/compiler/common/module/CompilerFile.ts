@@ -7,11 +7,6 @@ export class CompilerFile {
      */
     public name: string;
 
-    /**
-     * When running tests we don't have monaco as dependency. Therefore 
-     * we store text in variable _testfileText in these cases.
-     */
-    private _testfileText: string = "";
     private monacoModel?: monaco.editor.ITextModel;
 
     private lastSavedMonacoVersion: number = -1;
@@ -32,46 +27,38 @@ export class CompilerFile {
     private storedMonacoModelVersion: number = 0;
 
 
-    constructor(name?: string, private withMonacoModel?: true) {
+    constructor(name?: string) {
         this.name = name || "";
     }
 
     getText() {
-        if (this.withMonacoModel) {
-            if (this.monacoModel) {
-                return this.monacoModel.getValue(monaco.editor.EndOfLinePreference.LF);
-            } else {
-                return this.__textWhenMonacoModelAbsent;
-            }
+        if (this.monacoModel) {
+            return this.monacoModel.getValue(monaco.editor.EndOfLinePreference.LF);
         } else {
-            return this._testfileText;
+            return this.__textWhenMonacoModelAbsent;
         }
     }
 
     setText(text: string) {
-        if (this.withMonacoModel) {
-            if (this.monacoModel) {
-                this.monacoModel.setValue(text);
-            } else {
-                this.__textWhenMonacoModelAbsent = text;
-            }
+        if (this.monacoModel) {
+            this.monacoModel.setValue(text);
         } else {
-            this._testfileText = text;
+            this.__textWhenMonacoModelAbsent = text;
         }
 
         this.notifyListeners();
     }
 
     getMonacoModel(): monaco.editor.ITextModel | undefined {
-        if(!this.monacoModel){
+        if (!this.monacoModel) {
             this.createMonacolModel();
-        } 
+        }
 
         return this.monacoModel;
     }
 
-    disposeMonacoModel(){
-        if(this.monacoModel){
+    disposeMonacoModel() {
+        if (this.monacoModel) {
             this.storedMonacoModelVersion = this.getMonacoVersion();
             this.__textWhenMonacoModelAbsent = this.monacoModel.getValue();
             this.monacoModel?.dispose();
@@ -97,7 +84,7 @@ export class CompilerFile {
 
         if (uriCounter > 0) path += " (" + uriCounter + ")";
         let uri = monaco.Uri.from({ path: path, scheme: 'inmemory' });
-        this.monacoModel = monaco.editor.createModel(this._testfileText, "myJava", uri);
+        this.monacoModel = monaco.editor.createModel(this.__textWhenMonacoModelAbsent, "myJava", uri);
         this.monacoModel.updateOptions({ tabSize: 3, bracketColorizationOptions: { enabled: true, independentColorPoolPerBracketType: false } });
 
         this.monacoModel.onDidChangeContent(() => { this.notifyListeners() });
