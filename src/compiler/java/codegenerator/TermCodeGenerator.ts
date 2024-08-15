@@ -846,6 +846,9 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         this.registerUsagePosition(field, node.range);
         let isEnum = objectType instanceof StaticNonPrimitiveType && objectType.nonPrimitiveType instanceof JavaEnum;
 
+        /**
+         * See user-defined-spritesheets.md
+         */
         if (isEnum && objectType.identifier == 'SpriteLibrary') {
             let enumType = <JavaEnum>(<StaticNonPrimitiveType>objectType).nonPrimitiveType;
             let id = enumType.id;
@@ -853,7 +856,6 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             if (value) {
                 return new StringCodeSnippet(`${Helpers.classes}["SpriteLibrary"].getSpriteLibrary(${id}, "${node.attributeIdentifier}")`, node.range, enumType);
             }
-
         }
 
         if (field._isFinal && field.initialValueIsConstant && !isEnum) {

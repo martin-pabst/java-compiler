@@ -23,7 +23,10 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
     fields: JavaField[] = [];
     methods: JavaMethod[] = [];
 
-    id: number; // needed for user defined Sprites in SpriteLibraryEnum
+    /**
+     * needed for user defined Sprites in SpriteLibraryEnum, see document user-defined-spritesheets.md
+     */
+    id: number; 
 
     private implements: JavaInterface[] = [];
 

@@ -48,13 +48,16 @@ export class SpriteLibraryEnum extends EnumClass {
         return map;
     }
 
+    /**
+     * See user-defined-spritesheets.md
+     */
     static addEntry(name: string, type: JavaEnum) {
         let userSpritesheets = SpriteLibraryEnum.getUserSpritesheetsForTypeId(type.id);
-        
+
         let value = new SpriteLibraryEnum(name, SpriteLibraryEnum.values.length + userSpritesheets.size);
-        
+
         userSpritesheets.set(name, value);
-        
+
         let field = new JavaField(name, EmptyRange.instance,
             type.module, type, TokenType.keywordPublic
         );
@@ -62,11 +65,14 @@ export class SpriteLibraryEnum extends EnumClass {
         field._isFinal = true;
         field.type = type
         field.classEnum = type;
-        
+
         type.fields.push(field);
-        
+
     }
-    
+
+    /**
+     * See user-defined-spritesheets.md
+     */
     static removeUserSpritesheets(type: JavaEnum) {
         let userSpritesheets = SpriteLibraryEnum.getUserSpritesheetsForTypeId(type.id);
 
@@ -77,10 +83,15 @@ export class SpriteLibraryEnum extends EnumClass {
         this.typeIdToUserSpritesheetsMap.delete(type.id);
     }
 
+    /**
+     * See user-defined-spritesheets.md
+     */
     static getSpriteLibrary(typeId: number, identifier: string) {
         //@ts-ignore
-        let v = SpriteLibraryEnum[identifier];
+        let v = SpriteLibraryEnum[identifier];      // built-in spritelibrary?
         if (v) return v;
+
+        // no => search for user-defined one:
         let map = this.getUserSpritesheetsForTypeId(typeId);
         return map.get(identifier) || null;
     }
