@@ -63,13 +63,13 @@ export class SpriteClass extends ShapeClass {
     imageIndex: number = 0;    // If you change this identifier then you have to change corresponding declaration in class ShapeClass
 
     _cj$_constructor_$Sprite$double$double$SpriteLibrary$int$ScaleMode(t: Thread, callback: CallbackFunction,
-        x: number, y: number, spriteLibrary: SpriteLibraryEnum | undefined, imageIndex: number,
+        x: number, y: number, spriteLibrary: SpriteLibraryEnum | string, imageIndex: number,
         scaleMode?: ScaleModeEnum, copyFromOtherShape?: ShapeClass
     ) {
         this._cj$_constructor_$Shape$(t, () => {
             this.x = x;
             this.y = y;
-            this.spriteLibrary = spriteLibrary?.name || "";
+            this.spriteLibrary = (typeof spriteLibrary == "string") ? spriteLibrary : spriteLibrary.name;
             this.imageIndex = imageIndex;
             this.scaleModeOrdinal = scaleMode?.ordinal || ScaleMode.nearest_neighbour;
 

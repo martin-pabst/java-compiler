@@ -46,6 +46,11 @@ export class JavaEnum extends JavaTypeWithInstanceInitializer {
 
     }
 
+    removeField(identifier: string){
+        let index = this.fields.findIndex(field => field.identifier == identifier);
+        if(index >= 0) this.fields.splice(index, 1);
+    }
+
     initRuntimeClass(baseClass: Klass) {
         let that = this;
         this.runtimeClass = class extends baseClass {

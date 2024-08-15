@@ -10,7 +10,7 @@ import { EnumClass } from '../system/javalang/EnumClass';
 //@ts-ignore
 import { SpriteLibrary } from "./SpriteLibrary.js";
 
-declare var SpriteLibrary :{index: number, name: string}[];
+declare var SpriteLibrary: { index: number, name: string }[];
 
 export class SpriteLibraryEnum extends EnumClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -23,13 +23,13 @@ export class SpriteLibraryEnum extends EnumClass {
     static values: SpriteLibraryEnum[] = SpriteLibraryEnum.initValues();
     static typeIdToUserSpritesheetsMap: Map<number, Map<string, SpriteLibraryEnum>> = new Map();
 
-    constructor(name: string, index: number, isUserSpritesheet: boolean = false){
+    constructor(name: string, index: number, isUserSpritesheet: boolean = false) {
         super(name, index);
     }
 
-    static initValues(): SpriteLibraryEnum[]{
+    static initValues(): SpriteLibraryEnum[] {
         let i: number = 0;
-        
+
         return SpriteLibrary.filter(
             (sle) => {
                 return sle.index == null || sle.index == 0
@@ -39,55 +39,51 @@ export class SpriteLibraryEnum extends EnumClass {
         })
     }
 
-    private static getSpritesheetsForTypeId(typeId: number): Map<string, SpriteLibraryEnum>{
+    private static getUserSpritesheetsForTypeId(typeId: number): Map<string, SpriteLibraryEnum> {
         let map: Map<string, SpriteLibraryEnum> | undefined = this.typeIdToUserSpritesheetsMap.get(typeId);
-        if(!map){
+        if (!map) {
             map = new Map();
             this.typeIdToUserSpritesheetsMap.set(typeId, map);
         }
         return map;
     }
 
-    static addEntry(name: string, typeId?: number){
-
-        let value = new SpriteLibraryEnum(name, SpriteLibraryEnum.values.length);
+    static addEntry(name: string, type: JavaEnum) {
+        let userSpritesheets = SpriteLibraryEnum.getUserSpritesheetsForTypeId(type.id);
         
-        if(typeId){
-            SpriteLibraryEnum.getSpritesheetsForTypeId(typeId).set(name, value);
-
-        } else {
-            this.values.push(value);
-        }
+        let value = new SpriteLibraryEnum(name, SpriteLibraryEnum.values.length + userSpritesheets.size);
         
-
-        // if type is already constructed we have to add a appropriate attribute object:
-        if(SpriteLibraryEnum.type){
-            let sle: Klass = SpriteLibraryEnum;
-            sle[name] = value;
-
-            let field = new JavaField(name, EmptyRange.instance, 
-                SpriteLibraryEnum.type.module, SpriteLibraryEnum.type, TokenType.keywordPublic
-            );
-            field._isStatic = true;
-            field._isFinal = true;
-            field.type = SpriteLibraryEnum.type;
-
-            SpriteLibraryEnum.type.fields.push(field);
-        } 
-
-    }
-
-    static removeUserSpritesheets(typeId: number){
-        this.typeIdToUserSpritesheetsMap.delete(typeId);
+        userSpritesheets.set(name, value);
+        
+        let field = new JavaField(name, EmptyRange.instance,
+            type.module, type, TokenType.keywordPublic
+        );
+        field._isStatic = true;
+        field._isFinal = true;
+        field.type = type
+        field.classEnum = type;
+        
+        type.fields.push(field);
+        
     }
     
-    static getSpriteLibrary(typeId: number, identifier: string){
+    static removeUserSpritesheets(type: JavaEnum) {
+        let userSpritesheets = SpriteLibraryEnum.getUserSpritesheetsForTypeId(type.id);
+
+        userSpritesheets.forEach((enumValue, identifier) => {
+            type.removeField(identifier);
+        })
+
+        this.typeIdToUserSpritesheetsMap.delete(type.id);
+    }
+
+    static getSpriteLibrary(typeId: number, identifier: string) {
         //@ts-ignore
         let v = SpriteLibraryEnum[identifier];
-        if(v) return v;
-        let map = this.getSpritesheetsForTypeId(typeId);
+        if (v) return v;
+        let map = this.getUserSpritesheetsForTypeId(typeId);
         return map.get(identifier) || null;
     }
-    
+
 }
 

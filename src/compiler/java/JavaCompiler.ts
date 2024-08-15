@@ -49,6 +49,8 @@ export class JavaCompiler implements Compiler {
 
     public eventManager: EventManager<CompilerEvents> = new EventManager();
 
+    private endOfLastCompilationRunMs = performance.now();
+
     constructor(public main?: IMain, private errorMarker?: ErrorMarker) {
         this.libraryModuleManager = new JavaLibraryModuleManager();
         this.moduleManager = new JavaModuleManager();
@@ -168,6 +170,8 @@ export class JavaCompiler implements Compiler {
 
         // console.log(Math.round(performance.now() - time) + " ms: Done compiling!");
 
+        this.endOfLastCompilationRunMs = performance.now();
+
         return executable;
 
     }
@@ -226,9 +230,18 @@ export class JavaCompiler implements Compiler {
         this.state = CompilerState.compilingPeriodically;
 
         let f = () => {
+
+            // if compileIfDirty() had been called from outside between two invocations of f, then 
+            // we don't need to compile this early:
+            let plannedNextCompilationTime = this.endOfLastCompilationRunMs + this.maxMsBetweenRuns;
+            if(performance.now() < plannedNextCompilationTime - 30){
+                setTimeout(f, plannedNextCompilationTime - performance.now());
+                return;
+            }
+
             if (this.state == CompilerState.compilingPeriodically) {
                 this.compileIfDirty();
-                setTimeout(f, this.maxMsBetweenRuns);
+                setTimeout(f,  this.maxMsBetweenRuns);
             }
         }
 

@@ -16,6 +16,9 @@ export class JavaField extends BaseField {
     _isStatic: boolean = false;
     _isFinal: boolean = false;
 
+    /**
+     * The class/enum this field belongs to
+     */
     classEnum!: JavaClass | JavaEnum | JavaInterface;
 
     internalName?: string;
