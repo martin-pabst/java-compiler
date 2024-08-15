@@ -22,7 +22,7 @@ export class DoubleClass extends NumberClass {
         {type: "method", signature: "public final int intValue()", native: DoubleClass.prototype.intValue, template: "(Math.trunc(§1.value) % 0x100000000 - 0x80000000)"},
         {type: "method", signature: "public final long longValue()", native: DoubleClass.prototype.longValue, template: "Math.trunc(§1.value)"},
         {type: "method", signature: "public int compareTo(Double otherValue)", native: DoubleClass.prototype._compareTo},
-        {type: "method", signature: "public int parseDouble(String s)", native: DoubleClass.prototype.parseDouble},
+        {type: "method", signature: "public static double parseDouble(String s)", native: DoubleClass.parseDouble},
         {type: "method", signature: "public static Double valueOf(double f)", native: DoubleClass.valueOf},
         {type: "method", signature: "public static Double valueOf(String s)", native: DoubleClass.valueOfString},
     ]
@@ -37,7 +37,7 @@ export class DoubleClass extends NumberClass {
         return this.value - otherValue.value;
     }
 
-    parseDouble(s: StringClass){
+    static parseDouble(s: StringClass){
         return Number.parseFloat(s.value);
     }
 

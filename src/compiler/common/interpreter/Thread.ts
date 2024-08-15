@@ -268,7 +268,7 @@ export class Thread {
         }
     }
 
-    throwException(exception: Exception & IThrowable, step: Step) {
+    private throwException(exception: Exception & IThrowable, step: Step) {
 
         exception.file = this.currentProgramState.program.module.file;
         exception.range = step.getValidRangeOrUndefined();

@@ -1,3 +1,5 @@
+import { FileTypeManager } from "./FileTypeManager";
+
 export type FileContentChangedListener = (changedfile: CompilerFile) => void;
 
 export class CompilerFile {
@@ -84,12 +86,13 @@ export class CompilerFile {
 
         if (uriCounter > 0) path += " (" + uriCounter + ")";
         let uri = monaco.Uri.from({ path: path, scheme: 'inmemory' });
-        this.monacoModel = monaco.editor.createModel(this.__textWhenMonacoModelAbsent, "myJava", uri);
+        let language = FileTypeManager.filenameToFileType(this.name).language;
+        this.monacoModel = monaco.editor.createModel(this.__textWhenMonacoModelAbsent, language, uri);
         this.monacoModel.updateOptions({ tabSize: 3, bracketColorizationOptions: { enabled: true, independentColorPoolPerBracketType: false } });
-
+        
         this.monacoModel.onDidChangeContent(() => { this.notifyListeners() });
     }
-
+    
     getMonacoVersion(): number {
         if (this.monacoModel) {
             return this.monacoModel.getAlternativeVersionId() + this.storedMonacoModelVersion;

@@ -21,7 +21,6 @@ export class Helpers {
     static threadStack = StepParams.thread + ".s";
     static pushProgram = StepParams.thread + "." + Thread.prototype.pushProgram.name;
     static getExceptionAndTrimStack = StepParams.thread + "." + Thread.prototype.getExceptionAndTrimStack.name;
-    static throwException = StepParams.thread + "." + Thread.prototype.throwException.name;
     static beginTryBlock = StepParams.thread + "." + Thread.prototype.beginTryBlock.name;
     static endTryBlock = StepParams.thread + "." + Thread.prototype.endCatchTryBlock.name;
     static throwAE = StepParams.thread + "." + Thread.prototype.AE.name;

@@ -1,5 +1,3 @@
-import { call } from "three/webgpu";
-
 type CallbackFunction = (...args: any[]) => void;
 
 type CallbackEntry = {

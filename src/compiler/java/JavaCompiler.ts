@@ -6,6 +6,7 @@
  * a former compilation run.
  */
 
+import { FileTypeManager } from "../common/module/FileTypeManager.ts";
 import { BaseType } from "../common/BaseType.ts";
 import { Compiler, CompilerEvents } from "../common/Compiler.ts";
 import { Error, ErrorLevel } from "../common/Error.ts";
@@ -77,7 +78,7 @@ export class JavaCompiler implements Compiler {
             if (this.main.getInterpreter().isRunningOrPaused()) return;
             let currentWorkspace = this.main?.getCurrentWorkspace();
             if (!currentWorkspace) return;
-            this.files = currentWorkspace.getFiles();
+            this.files = currentWorkspace.getFiles().filter(file => FileTypeManager.filenameToFileType(file.name).language == 'myJava');
         }
         
         this.moduleManager.setupModulesBeforeCompiliation(this.files);

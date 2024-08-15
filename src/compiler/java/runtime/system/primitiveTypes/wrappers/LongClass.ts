@@ -22,8 +22,8 @@ export class LongClass extends NumberClass {
         {type: "method", signature: "public final int intValue()", native: LongClass.prototype.intValue, template: "(§1.value % 0x100000000 - 0x80000000)"},
         {type: "method", signature: "public final long longValue()", native: LongClass.prototype.longValue, template: "§1.value"},
         {type: "method", signature: "public int compareTo(Long anotherLong)", native: LongClass.prototype._compareTo},
-        {type: "method", signature: "public int parseInt(String s)", native: LongClass.prototype.parseInt},
-        {type: "method", signature: "public int parseInt(String sr, int radix)", native: LongClass.prototype.parseInt},
+        {type: "method", signature: "public long parseLong(String s)", native: LongClass.parseLong},
+        {type: "method", signature: "public long parseLong(String sr, int radix)", native: LongClass.parseLong},
         {type: "method", signature: "public static Long valueOf(long i)", native: LongClass.valueOf},
         {type: "method", signature: "public static Long valueOf(String s)", native: LongClass.valueOfString},
         {type: "method", signature: "public static Long valueOf(String s, int radix)", native: LongClass.valueOfString},
@@ -39,7 +39,7 @@ export class LongClass extends NumberClass {
         return this.value - otherValue.value;
     }
 
-    parseInt(s: StringClass, radix: number = 10){
+    static parseLong(s: StringClass, radix: number = 10){
         return Number.parseInt(s.value, radix);
     }
 

@@ -22,8 +22,8 @@ export class ShortClass extends NumberClass {
         {type: "method", signature: "public final int intValue()", native: ShortClass.prototype.intValue, template: "§1.value"},
         {type: "method", signature: "public final long longValue()", native: ShortClass.prototype.longValue, template: "§1.value"},
         {type: "method", signature: "public int compareTo(Short otherShort)", native: ShortClass.prototype._compareTo},
-        {type: "method", signature: "public int parseShort(String s)", native: ShortClass.prototype.parseShort},
-        {type: "method", signature: "public int parseShort(String sr, int radix)", native: ShortClass.prototype.parseShort},
+        {type: "method", signature: "public static short parseShort(String s)", native: ShortClass.parseShort},
+        {type: "method", signature: "public static short parseShort(String sr, int radix)", native: ShortClass.parseShort},
         {type: "method", signature: "public static Short valueOf(short i)", native: ShortClass.valueOf},
         {type: "method", signature: "public static Short valueOf(String s)", native: ShortClass.valueOfString},
         {type: "method", signature: "public static Short valueOf(String s, short radix)", native: ShortClass.valueOfString},
@@ -39,7 +39,7 @@ export class ShortClass extends NumberClass {
         return this.value - otherValue.value;
     }
 
-    parseShort(s: StringClass, radix: number = 10){
+    static parseShort(s: StringClass, radix: number = 10){
         return Number.parseInt(s.value, radix) % 0x10000 - 0x8000;
     }
 

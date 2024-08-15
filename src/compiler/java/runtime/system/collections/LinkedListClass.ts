@@ -324,7 +324,7 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
     _addAll(t: Thread, callback: CallbackFunction, collection: CollectionInterface) {
 
         if (collection == null) {
-            t.throwException(new NullPointerExceptionClass("LinkedList.addAll wurde mit null als Argument aufgerufen."));
+            throw new NullPointerExceptionClass("LinkedList.addAll wurde mit null als Argument aufgerufen.");
             return;
         }
 
@@ -362,7 +362,7 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
     _mj$containsAll$boolean$Collection(t: Thread, callback: CallbackFunction, collection: CollectionInterface) {
 
         if (collection == null) {
-            t.throwException(new NullPointerExceptionClass("ArrayList.containsAll wurde mit null als Argument aufgerufen."));
+            throw new NullPointerExceptionClass("ArrayList.containsAll wurde mit null als Argument aufgerufen.");
             return;
         }
 
@@ -461,7 +461,7 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
     _removeAll(t: Thread, callback: CallbackFunction, collection: CollectionInterface) {
 
         if (collection == null) {
-            t.throwException(new NullPointerExceptionClass("LinkedList.removeAll wurde mit null als Argument aufgerufen."));
+            throw new NullPointerExceptionClass("LinkedList.removeAll wurde mit null als Argument aufgerufen.");
             return;
         }
 

@@ -22,7 +22,7 @@ export class FloatClass extends NumberClass {
         {type: "method", signature: "public final int intValue()", native: FloatClass.prototype.intValue, template: "(Math.trunc(§1.value) % 0x100000000 - 0x80000000)"},
         {type: "method", signature: "public final long longValue()", native: FloatClass.prototype.longValue, template: "Math.trunc(§1.value)"},
         {type: "method", signature: "public int compareTo(Float otherValue)", native: FloatClass.prototype._compareTo},
-        {type: "method", signature: "public int parseFloat(String s)", native: FloatClass.prototype.parseFloat},
+        {type: "method", signature: "public static float parseFloat(String s)", native: FloatClass.parseFloat},
         {type: "method", signature: "public static Float valueOf(float f)", native: FloatClass.valueOf},
         {type: "method", signature: "public static Float valueOf(String s)", native: FloatClass.valueOfString},
     ]
@@ -37,7 +37,7 @@ export class FloatClass extends NumberClass {
         return this.value - otherValue.value;
     }
 
-    parseFloat(s: StringClass){
+    static parseFloat(s: StringClass){
         return Math.fround(Number.parseFloat(s.value));
     }
 

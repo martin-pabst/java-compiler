@@ -22,8 +22,8 @@ export class IntegerClass extends NumberClass {
         {type: "method", signature: "public final int intValue()", native: IntegerClass.prototype.intValue, template: "§1.value"},
         {type: "method", signature: "public final long longValue()", native: IntegerClass.prototype.longValue, template: "§1.value"},
         {type: "method", signature: "public int compareTo(Integer anotherInteger)", native: IntegerClass.prototype._compareTo},
-        {type: "method", signature: "public int parseInt(String s)", native: IntegerClass.prototype.parseInt},
-        {type: "method", signature: "public int parseInt(String sr, int radix)", native: IntegerClass.prototype.parseInt},
+        {type: "method", signature: "public static int parseInt(String s)", native: IntegerClass.parseInt},
+        {type: "method", signature: "public static int parseInt(String sr, int radix)", native: IntegerClass.parseInt},
         {type: "method", signature: "public static Integer valueOf(int i)", native: IntegerClass.valueOf},
         {type: "method", signature: "public static Integer valueOf(String s)", native: IntegerClass.valueOfString},
         {type: "method", signature: "public static Integer valueOf(String s, int radix)", native: IntegerClass.valueOfString},
@@ -39,7 +39,7 @@ export class IntegerClass extends NumberClass {
         return this.value - otherValue.value;
     }
 
-    parseInt(s: StringClass, radix: number = 10){
+    static parseInt(s: StringClass, radix: number = 10){
         return Number.parseInt(s.value, radix) % 0x100000000 - 0x80000000;
     }
 

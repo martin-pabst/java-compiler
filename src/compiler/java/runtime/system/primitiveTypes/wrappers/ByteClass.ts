@@ -22,8 +22,8 @@ export class ByteClass extends NumberClass {
         {type: "method", signature: "public final int intValue()", native: ByteClass.prototype.intValue, template: "§1.value"},
         {type: "method", signature: "public final long longValue()", native: ByteClass.prototype.longValue, template: "§1.value"},
         {type: "method", signature: "public int compareTo(Short otherShort)", native: ByteClass.prototype._compareTo},
-        {type: "method", signature: "public int parseByte(String s)", native: ByteClass.prototype.parseByte},
-        {type: "method", signature: "public int parseByte(String sr, int radix)", native: ByteClass.prototype.parseByte},
+        {type: "method", signature: "public static byte parseByte(String s)", native: ByteClass.parseByte},
+        {type: "method", signature: "public static byte parseByte(String sr, int radix)", native: ByteClass.parseByte},
         {type: "method", signature: "public static Byte valueOf(byte i)", native: ByteClass.valueOf},
         {type: "method", signature: "public static Byte valueOf(String s)", native: ByteClass.valueOfString},
         {type: "method", signature: "public static Byte valueOf(String s, byte radix)", native: ByteClass.valueOfString},
@@ -39,7 +39,7 @@ export class ByteClass extends NumberClass {
         return this.value - otherValue.value;
     }
 
-    parseByte(s: StringClass, radix: number = 10){
+    static parseByte(s: StringClass, radix: number = 10){
         return Number.parseInt(s.value, radix) % 0x100 - 0x80;
     }
 
