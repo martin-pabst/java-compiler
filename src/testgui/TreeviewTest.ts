@@ -100,7 +100,7 @@ export class TreeviewTest {
         }
         
         tv1.initialRenderAll();
-        elements[0].treeviewLine?.setErrors("(10)");
+        elements[0].treeviewLine?.setRightPartOfCaption("(10)");
 
     }
 

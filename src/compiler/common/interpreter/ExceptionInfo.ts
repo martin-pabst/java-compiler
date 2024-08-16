@@ -1,4 +1,6 @@
 import { ObjectClass } from "../../java/runtime/system/javalang/ObjectClassStringClass";
+import { CompilerFile } from "../module/CompilerFile";
+import { Thread } from "./Thread";
 
 export type CatchBlockInfo = {
     exceptionTypes: Record<string, boolean>,
@@ -16,4 +18,6 @@ export interface Exception {
     getIdentifier(): string;
     getExtendedImplementedIdentifiers(): string[];
     getMessage(): string;
+    getThread(): Thread;  // Thread
+    getFile(): CompilerFile;    // CompilerFile
 }

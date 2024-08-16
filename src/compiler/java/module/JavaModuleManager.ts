@@ -4,6 +4,7 @@ import { JavaCompiledModule as JavaCompiledModule } from "./JavaCompiledModule";
 import { NonPrimitiveType } from "../types/NonPrimitiveType";
 import { JavaTypeWithInstanceInitializer } from "../types/JavaTypeWithInstanceInitializer";
 import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType";
+import { CompilerWorkspace } from "../../common/module/CompilerWorkspace";
 
 
 /**
@@ -17,12 +18,12 @@ export class JavaModuleManager {
 
     overriddenOrImplementedMethodPaths: Record<string, boolean> = {};
 
-    constructor(){
+    constructor(public workspace?: CompilerWorkspace){
         this.typestore = new JavaTypeStore();
     }
 
     copy(excludeTypesOfModule?: JavaCompiledModule): JavaModuleManager {
-        let mm = new JavaModuleManager();
+        let mm = new JavaModuleManager(this.workspace);
         mm.modules = this.modules.slice();
         mm.typestore = this.typestore.copy(excludeTypesOfModule);
 

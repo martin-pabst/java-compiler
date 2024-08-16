@@ -2,6 +2,7 @@ import { TokenType } from "../../TokenType.ts";
 import { JCM } from "../../language/JavaCompilerMessages.ts";
 import { JavaCompiledModule } from "../../module/JavaCompiledModule.ts";
 import { ASTAnonymousClassNode, ASTClassDefinitionNode, ASTEnumDefinitionNode, ASTInterfaceDefinitionNode, ASTNewObjectNode, ASTNodeWithModifiers } from "../AST.ts";
+import { ASTNodeFactory } from "../ASTNodeFactory.ts";
 import { StatementParser } from "../StatementParser.ts";
 
 
@@ -10,6 +11,7 @@ export class JavaReplParser extends StatementParser {
 
     constructor(module: JavaCompiledModule) {
         super(module);
+        this.nodeFactory = new ASTNodeFactory(this);
         this.initializeAST();
     }
 

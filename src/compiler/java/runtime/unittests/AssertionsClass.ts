@@ -6,7 +6,7 @@ import { Thread } from "../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
 import { ObjectClass } from "../system/javalang/ObjectClassStringClass";
-import { DummyAssertionObserver } from "./AssertionObserver";
+import { DummyAssertionObserver } from "./IAssertionObserver";
 
 /**
  * Java wrapper class to call methods from {@link AssertionHandler}-object inside {@link Interpreter.assertionObserverList}

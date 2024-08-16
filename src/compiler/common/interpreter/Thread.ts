@@ -272,6 +272,7 @@ export class Thread {
 
         exception.file = this.currentProgramState.program.module.file;
         exception.range = step.getValidRangeOrUndefined();
+        exception.thread = this;
 
         let classNames = exception.getExtendedImplementedIdentifiers().slice();
         classNames.push(exception.getIdentifier());
@@ -305,7 +306,8 @@ export class Thread {
                     exception.stacktrace = rawStackTrace.map(state => {
                         return {
                             methodIdentifierWithClass: state.program.methodIdentifierWithClass,
-                            range: <IRange>state.currentStepList[state.stepIndex].range
+                            range: <IRange>state.currentStepList[state.stepIndex].range,
+                            file: state.program.module.file
                         }
                     });
 
@@ -338,26 +340,24 @@ export class Thread {
         } while (this.programStack.length > 0 && !foundCatchBlockInfo)
 
         if (this.programStack.length == 0) {
-            this.stackTrace = rawStackTrace.map(ste => {
-                if (ste) {
-                    return {
-                        range: ste.lastExecutedStep ? ste.lastExecutedStep.range : ste.currentStepList[ste.stepIndex].range,
-                        methodIdentifierWithClass: ste.program.methodIdentifierWithClass
-                    }
-                } else {
-                    return {
-                        range: EmptyRange.instance,
-                        methodIdentifierWithClass: "---"
-                    }
+            this.stackTrace = rawStackTrace.filter(ste => ste != null).map(ste => {
+
+                return {
+                    range: ste.lastExecutedStep ? ste.lastExecutedStep.getValidRangeOrUndefined() : ste.currentStepList[ste.stepIndex].getValidRangeOrUndefined(),
+                    methodIdentifierWithClass: ste.program.methodIdentifierWithClass,
+                    file: ste.program.module.file
                 }
+
             });
             this.exception = exception;
-            ExceptionPrinter.print(exception, this.stackTrace, this.scheduler.interpreter.printManager);
-            
+            // ExceptionPrinter.print(exception, this.stackTrace, this.scheduler.interpreter.printManager);
+            ExceptionPrinter.printWithLinks(exception, this.stackTrace, this.scheduler.interpreter.printManager, 
+                this.scheduler.interpreter.breakpointManager?.main);
+
             this.scheduler.interpreter.exceptionMarker?.markException(exception, step)
-            
+
             this.state = ThreadState.terminatedWithException;
-            
+
             //@ts-ignore
             this.currentProgramState = undefined;
         } else {

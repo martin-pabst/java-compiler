@@ -9,23 +9,33 @@ export class ThrowableClass extends ObjectClass implements IThrowable, Exception
 
     stacktrace: Stacktrace = [];
     range?: IRange;
+    file?: any;
+    thread: any;
+
 
     static __javaDeclarations: LibraryDeclarations = [
-        {type: "declaration", signature: "class Throwable extends Object"},
-        {type: "method", signature: "public Throwable()", native: ThrowableClass.prototype._constructor},
-        {type: "method", signature: "public Throwable(String message)", native: ThrowableClass.prototype._constructor_m},
-        {type: "method", signature: "public Throwable(Throwable cause)", native: ThrowableClass.prototype._constructor_c},
-        {type: "method", signature: "public Throwable(String message, Throwable cause)", native: ThrowableClass.prototype._constructor_m_c},
-        {type: "method", signature: "public String toString()", native: ThrowableClass.prototype._toString},
-        {type: "method", signature: "public String getMessage()", native: ThrowableClass.prototype._getMessage},
+        { type: "declaration", signature: "class Throwable extends Object" },
+        { type: "method", signature: "public Throwable()", native: ThrowableClass.prototype._constructor },
+        { type: "method", signature: "public Throwable(String message)", native: ThrowableClass.prototype._constructor_m },
+        { type: "method", signature: "public Throwable(Throwable cause)", native: ThrowableClass.prototype._constructor_c },
+        { type: "method", signature: "public Throwable(String message, Throwable cause)", native: ThrowableClass.prototype._constructor_m_c },
+        { type: "method", signature: "public String toString()", native: ThrowableClass.prototype._toString },
+        { type: "method", signature: "public String getMessage()", native: ThrowableClass.prototype._getMessage },
     ]
 
 
     static type: NonPrimitiveType;
 
-    constructor(public message?: string, public cause?: ThrowableClass){
+    constructor(public message?: string, public cause?: ThrowableClass) {
         super();
         this.message = this.message || "";
+    }
+
+    getThread() {
+        return this.thread;
+    }
+    getFile() {
+        return this.file;
     }
 
     getIdentifier(): string {
@@ -57,11 +67,11 @@ export class ThrowableClass extends ObjectClass implements IThrowable, Exception
 
 
     _toString() {
-        return new StringClass(this.getClassName() + ": " + this.message ? this.message : "");        
+        return new StringClass(this.getClassName() + ": " + this.message ? this.message : "");
     }
 
     _getMessage() {
-        return new StringClass(this.message ? this.message : "");        
+        return new StringClass(this.message ? this.message : "");
     }
 
 

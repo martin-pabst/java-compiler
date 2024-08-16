@@ -80,4 +80,7 @@ export abstract class CompilerWorkspace {
         this.getFiles().forEach(file => file.getMonacoModel());
     }
 
+    getIdentifier(): string {
+        return "";
+    }
 }

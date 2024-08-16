@@ -1,7 +1,7 @@
 import { Step } from "../../../common/interpreter/Program";
 import { Thread } from "../../../common/interpreter/Thread";
 
-export interface AssertionObserver {
+export interface IAssertionObserver {
     notifyOnAssertTrue(thread: Thread, step: Step, condition: boolean, message: string): void;
     notifyOnAssertFalse(thread: Thread, step: Step, condition: boolean, message: string): void;
     notifyOnAssertEqualsNumber(thread: Thread, step: Step, expected: number, actual: number, message: string): void;
@@ -10,7 +10,7 @@ export interface AssertionObserver {
     notifyOnFail(thread: Thread, step: Step, message: string): void;
 }
 
-export class DummyAssertionObserver implements AssertionObserver {
+export class DummyAssertionObserver implements IAssertionObserver {
     
     notifyOnAssertTrue(thread: Thread, step: Step, condition: boolean, message: string): void {
     }

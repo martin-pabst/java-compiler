@@ -1,5 +1,5 @@
 import { IWorld } from "../../java/runtime/graphics/IWorld.ts";
-import { AssertionObserver } from "../../java/runtime/unittests/AssertionObserver.ts";
+import { IAssertionObserver } from "../../java/runtime/unittests/IAssertionObserver.ts";
 import { BreakpointManager } from "../BreakpointManager.ts";
 import { Debugger } from "../debugger/Debugger.ts";
 import { Executable } from "../Executable.ts";
@@ -12,15 +12,15 @@ import { ExceptionMarker } from "./ExceptionMarker.ts";
 import { GraphicsManager } from "./GraphicsManager.ts";
 import { IFilesManager as IFileManager } from "./IFilesManager.ts";
 import { IInputManager } from "./IInputManager.ts";
-import { ITestManager } from "./ITestManager.ts";
+import { DummyPrintManager, IPrintManager } from "./IPrintManager.ts";
 import { KeyboardManager } from "./KeyboardManager.ts";
 import { LoadController } from "./LoadController";
-import { DummyPrintManager, IPrintManager } from "./PrintManager";
 import { Scheduler, SchedulerExitState, SchedulerState } from "./Scheduler";
 import { Thread, ThreadState } from "./Thread.ts";
 
 
-type InterpreterEvents = "stop" | "done" | "resetRuntime" | "stateChanged" | "showProgramPointer" | "hideProgramPointer";
+type InterpreterEvents = "stop" | "done" | "resetRuntime" | "stateChanged" | 
+                         "showProgramPointer" | "hideProgramPointer" | "afterExcecutableInitialized";
 
 export class Interpreter {
 
@@ -33,7 +33,7 @@ export class Interpreter {
 
     executable?: Executable;
 
-    assertionObserverList: AssertionObserver[] = [];
+    assertionObserverList: IAssertionObserver[] = [];
     codeReachedAssertions: CodeReachedAssertions = new CodeReachedAssertions();
 
     // inputManager: InputManager;
@@ -75,7 +75,7 @@ export class Interpreter {
     constructor(printManager?: IPrintManager, private actionManager?: ActionManager,
         public graphicsManager?: GraphicsManager, public keyboardManager?: KeyboardManager,
         public breakpointManager?: BreakpointManager, public _debugger?: Debugger,
-        public programPointerManager?: ProgramPointerManager, public testManager?: ITestManager,
+        public programPointerManager?: ProgramPointerManager,
         public inputManager?: IInputManager, public fileManager?: IFileManager,
         public exceptionMarker?: ExceptionMarker
     ) {
@@ -106,7 +106,7 @@ export class Interpreter {
         if (executable.isCompiledToJavascript) {
             this.init(executable);
             this.setState(SchedulerState.stopped);
-            this.testManager?.markTestsInEditor();
+            this.eventManager.fire("afterExcecutableInitialized", executable);
         } else {
             this.setState(SchedulerState.not_initialized);
         }
@@ -115,8 +115,17 @@ export class Interpreter {
         // }
     }
 
-    attachAssertionObserver(observer: AssertionObserver) {
+    attachAssertionObserver(observer: IAssertionObserver) {
         this.assertionObserverList.push(observer);
+    }
+
+    detachAssertionObserver(observer: IAssertionObserver) {
+        let index = this.assertionObserverList.indexOf(observer);
+        if(index >= 0) this.assertionObserverList.splice(index, 1);
+    }
+
+    detachAllAssertionObservers(){
+        this.assertionObserverList = [];
     }
 
     initTimer() {

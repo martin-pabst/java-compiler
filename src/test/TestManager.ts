@@ -1,6 +1,6 @@
+import { Executable } from "../compiler/common/Executable";
 import { IMain } from "../compiler/common/IMain";
 import { ActionManager } from "../compiler/common/interpreter/ActionManager";
-import { ITestManager } from "../compiler/common/interpreter/ITestManager";
 import { SchedulerState } from "../compiler/common/interpreter/Scheduler";
 import { ThreadState } from "../compiler/common/interpreter/Thread";
 import { Module } from "../compiler/common/module/Module";
@@ -16,7 +16,7 @@ type DecorationInfo = {
     decorations: string[]
 }
 
-export class TestManager implements ITestManager {
+export class TestManager {
 
     decorationInfoList: DecorationInfo[] = [];
 
@@ -42,6 +42,8 @@ export class TestManager implements ITestManager {
             this.onMarginMouseDown(module, e.target.position.lineNumber);
             return;
         });
+
+        main.getInterpreter().eventManager.on("afterExcecutableInitialized", this.markTestsInEditor, this );
 
     }
 
@@ -97,14 +99,13 @@ export class TestManager implements ITestManager {
         })
     }
 
-    markTestsInEditor() {
+    markTestsInEditor(executable: Executable) {
 
         this.decorationInfoList.forEach(decorationInfo => decorationInfo.model.deltaDecorations(decorationInfo.decorations, []));
         this.decorationInfoList = [];
 
         this.mouseDownHandler.clear();
 
-        let executable = this.main.getInterpreter().executable;
         if (executable) {
 
             let testClassToTestMethodMap = executable.getTestMethods();

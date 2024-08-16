@@ -53,6 +53,10 @@ export class CodeGenerator extends InnerClassCodeGenerator {
             let type = cdef.resolvedType;
             if (!type || !cdef.resolvedType) return;
 
+            if(cdef.annotations){
+                type.setAnnotations(cdef.annotations.map(this.compileAnnotation));
+            }
+
             if (cdef.symbolTable) {
                 this.pushSymbolTable(cdef.symbolTable);
             } else {

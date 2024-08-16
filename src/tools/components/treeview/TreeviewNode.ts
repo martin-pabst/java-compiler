@@ -4,7 +4,7 @@ import { ExpandCollapseComponent, ExpandCollapseListener, ExpandCollapseState } 
 import { IconButtonComponent, IconButtonListener } from "../IconButtonComponent.ts";
 import { Treeview } from "./Treeview.ts";
 
-export type TreeviewNodeOnClickHandler<E> = (element: E) => void;
+export type TreeviewNodeOnClickHandler<E> = (element: E | undefined) => void;
 
 export class TreeviewNode<E> {
 
@@ -32,6 +32,14 @@ export class TreeviewNode<E> {
         }
     }
 
+    public scrollIntoView(){
+        let parent = this.parent;
+        while(parent){
+            parent.expandCollapseComponent.setState('expanded');
+            parent = parent.parent;
+        }
+        this.getMainDiv().scrollIntoView();
+    }
 
     protected children: TreeviewNode<E>[] = [];
 
@@ -51,7 +59,7 @@ export class TreeviewNode<E> {
     private expandCollapseDiv!: HTMLDivElement;
     private iconDiv!: HTMLDivElement;
     public captionDiv!: HTMLDivElement;
-    private errorsDiv!: HTMLDivElement;
+    private rightPartOfCaptionDiv!: HTMLDivElement;
     private buttonsDiv!: HTMLDivElement;
     //@ts-ignore
     public expandCollapseComponent!: ExpandCollapseComponent;
@@ -64,7 +72,13 @@ export class TreeviewNode<E> {
         this._onClickHandler = och;
     }
 
-    private _onExpandListener: {listener: ExpandCollapseListener, once: boolean}[] = [];
+    private _iconOnClickHandler?: TreeviewNodeOnClickHandler<E>;
+    set onIconClicked(ich: TreeviewNodeOnClickHandler<E>) {
+        this._iconOnClickHandler = ich;
+        this.iconDiv.classList.add('jo_iconButton');
+    }
+
+    private _onExpandListener: { listener: ExpandCollapseListener, once: boolean }[] = [];
 
     constructor(private _treeview: Treeview<E>,
         private _isFolder: boolean, private _caption: string,
@@ -77,7 +91,7 @@ export class TreeviewNode<E> {
         _treeview.addNodeInternal(this);
     }
 
-    set renderCaptionAsHtml(value: boolean){
+    set renderCaptionAsHtml(value: boolean) {
         this._renderCaptionAsHtml = value;
     }
 
@@ -207,8 +221,16 @@ export class TreeviewNode<E> {
             this.marginLeftDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_marginLeft');
             this.expandCollapseDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_expandCollapse');
             this.iconDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_icon');
+
+            this.iconDiv.onclick = (event) => {
+                if (this._iconOnClickHandler) {
+                    this._iconOnClickHandler(this.externalObject);
+                    event.stopPropagation();
+                }
+            }
+
             this.captionDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_caption');
-            this.errorsDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_errors');
+            this.rightPartOfCaptionDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_errors');
             this.buttonsDiv = DOM.makeDiv(this.nodeLineDiv, 'jo_treeviewNode_buttons');
 
             this.nodeLineDiv.onpointerup = (ev) => {
@@ -239,10 +261,10 @@ export class TreeviewNode<E> {
 
         this.expandCollapseComponent =
             new ExpandCollapseComponent(this.expandCollapseDiv, (state: ExpandCollapseState) => {
-                if(state == "expanded"){
+                if (state == "expanded") {
                     this._onExpandListener.slice().forEach(handler => {
                         handler.listener(state);
-                        if(handler.once) this._onExpandListener.splice(this._onExpandListener.indexOf(handler), 1);
+                        if (handler.once) this._onExpandListener.splice(this._onExpandListener.indexOf(handler), 1);
                     });
                 }
                 this.toggleChildrenDiv(state);
@@ -259,7 +281,7 @@ export class TreeviewNode<E> {
         if (this.treeview.config.withDeleteButtons && !this.isRootNode()) {
             this.addIconButton("img_delete", () => {
                 this.treeview.removeNode(this);
-                if(this.treeview.deleteCallback){
+                if (this.treeview.deleteCallback) {
                     this.treeview.deleteCallback(this.externalObject);
                 }
             }, "Löschen");
@@ -286,14 +308,20 @@ export class TreeviewNode<E> {
                 })
             }
 
-            if (this.isFolder) {
+            if (this.isFolder && this.treeview.config.buttonAddFolders) {
                 contextMenuItems = contextMenuItems.concat([
                     {
                         caption: "Neuen Unterordner anlegen (unterhalb '" + this.caption + "')...",
                         callback: () => {
                             // TODO
                         }
-                    }, {
+                    }
+                ])
+            }
+
+            if (this.treeview.config.buttonAddElements) {
+                contextMenuItems = contextMenuItems.concat([
+                    {
                         caption: "Neuer Workspace...",
                         callback: () => {
                             // TODO
@@ -591,8 +619,12 @@ export class TreeviewNode<E> {
         }
     }
 
-    setErrors(errors: string) {
-        this.errorsDiv.textContent = errors;
+    setRightPartOfCaptionErrors(errors: string) {
+        this.rightPartOfCaptionDiv.textContent = errors;
+    }
+
+    setRightPartOfCaptionHtml(html: string) {
+        this.rightPartOfCaptionDiv.innerHTML = html;
     }
 
     addIconButton(iconClass: string, listener: IconButtonListener, tooltip?: string): IconButtonComponent {
@@ -664,29 +696,30 @@ export class TreeviewNode<E> {
     }
 
     detach() {
-        if(this.parent == this.treeview.rootNode){
+        if (this.parent == this.treeview.rootNode) {
             this.treeview.rootNode.childrenDiv.removeChild(this.nodeWithChildrenDiv);
         }
         this.treeview.nodes.splice(this.treeview.nodes.indexOf(this), 1);
     }
 
     attachAfterDetaching() {
-        if(this.treeview.nodes.indexOf(this) < 0){
+        if (this.treeview.nodes.indexOf(this) < 0) {
             this.treeview.nodes.push(this);
             this.parent?.add(this);
-        } 
+        }
         // if(this.parent == this.treeview.rootNode){
         //     this.treeview.rootNode.childrenDiv.appendChild(this.nodeWithChildrenDiv);
         // }
     }
 
-    addExpandListener(listener: ExpandCollapseListener, once: boolean = false){
-        this._onExpandListener.push({listener: listener, once: once});
+    addExpandListener(listener: ExpandCollapseListener, once: boolean = false) {
+        this._onExpandListener.push({ listener: listener, once: once });
     }
 
-    removeAllExpandListeners(){
+    removeAllExpandListeners() {
         this._onExpandListener = [];
     }
+
 
 
 }
