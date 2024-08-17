@@ -27,7 +27,7 @@ export class DOM {
         elementsToPreserve.forEach(e => element.appendChild(e));
     }
 
-    public static makeDiv(parent: HTMLElement | undefined, ...classes: string[]): HTMLDivElement {
+    public static makeDiv(parent: HTMLElement | undefined, ...classes: (string|undefined)[]): HTMLDivElement {
         let div = document.createElement('div');
         if (classes != null) div.classList.add(...classes.filter(c => c != null));
         if (parent) parent.appendChild(div);

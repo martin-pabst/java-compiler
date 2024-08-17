@@ -14,12 +14,10 @@ import * as PIXI from 'pixi.js';
 
 import jQuery from "jquery";
 import { testProgramsList } from "./testgui/testprograms/TestPrograms.ts";
-import { TestResultViewer } from "./testgui/TestResultViewer.ts";
 import { TabbedEditorManager } from "./tools/TabbedEditorManager.ts";
 
 import { JavaCompiledModule } from "./compiler/java/module/JavaCompiledModule.ts";
 import { OptionView } from "./testgui/OptionView.ts";
-import { TerminalPrintManager } from "./testgui/TerminalPrintManager.ts";
 import '/include/css/button.css';
 import '/include/css/main.css';
 import '/include/css/junit.css';
@@ -40,13 +38,16 @@ import { ErrorMarker } from "./compiler/common/monacoproviders/ErrorMarker.ts";
 import { ProgramPointerManager } from "./compiler/common/monacoproviders/ProgramPointerManager.ts";
 import { JavaRepl } from "./compiler/java/parser/repl/JavaRepl.ts";
 import { CompilerWorkspaceImpl } from "./test/CompilerWorkspaceImpl.ts";
-import { TestManager } from "./test/TestManager.ts";
 import { ReplGUI } from "./testgui/editor/ReplGUI.ts";
 import { TestFileManager } from "./testgui/TestFileManager.ts";
 import { TestInputManager } from "./testgui/TestInputManager.ts";
 import spritesheetjson from '/include/graphics/spritesheet.json.txt';
 import spritesheetpng from '/include/graphics/spritesheet.png';
 import { ExceptionMarker } from "./compiler/common/interpreter/ExceptionMarker.ts";
+import { IPosition } from "./compiler/common/range/Position.ts";
+import { IRange, Range } from "./compiler/common/range/Range.ts";
+import { JUnitTestrunner } from "./compiler/common/testrunner/JUnitTestrunner.ts";
+import { TestPrintManager } from "./testgui/TestPrintManager.ts";
 
 export class Main implements IMain {
 
@@ -54,13 +55,12 @@ export class Main implements IMain {
 
   insightTabsManager: TabManager;
   tabbedEditorManager: TabbedEditorManager;
-  testResultViewer: TestResultViewer;
 
   tokenDiv: HTMLDivElement;
   astDiv: HTMLDivElement;
   codeOutputDiv: HTMLDivElement;
   errorDiv: HTMLDivElement;
-  testDiv: HTMLDivElement;
+  junitDiv: HTMLDivElement;
   graphicsDiv: HTMLDivElement;
   debuggerDiv: HTMLDivElement;
   inputDiv: HTMLDivElement;
@@ -104,30 +104,23 @@ export class Main implements IMain {
     this.codeOutputDiv.classList.add('codeOutput');
     this.astDiv.classList.add('astOutput');
     this.errorDiv = this.insightTabsManager.getBodyElement(3);
-    this.testDiv = this.insightTabsManager.getBodyElement(4);
+    this.junitDiv = this.insightTabsManager.getBodyElement(4);
     this.graphicsDiv = this.insightTabsManager.getBodyElement(5);
     this.debuggerDiv = this.insightTabsManager.getBodyElement(6);
     this.inputDiv = this.insightTabsManager.getBodyElement(7);
 
     this.debuggerDiv.id = "debuggerdiv";
 
-    this.testResultViewer = new TestResultViewer();
-
-    this.testDiv.appendChild(this.testResultViewer);
     this.astComponent = new AstComponent(this.astDiv);
-
-
 
     this.currentWorkspace = new CompilerWorkspaceImpl(this);
 
     for (let i = 0; i < 3; i++) {
       let file = new CompilerFile("module " + i);
-      file.createMonacolModel();
 
       this.currentWorkspace.addFile(file);
     }
     let file = new CompilerFile("Tests");
-    file.createMonacolModel();
     //file.setText(testPrograms.testFuerListe.trim());
     this.currentWorkspace.addFile(file);
 
@@ -146,16 +139,14 @@ export class Main implements IMain {
     this.breakpointManager = new BreakpointManager(this);
     let _debugger = new Debugger(this.debuggerDiv, this);
 
-    let testManager = new TestManager(this, this.actionManager, this.testResultViewer);
-
     let inputManager = new TestInputManager(this.inputDiv, this.insightTabsManager);
 
     let fileManager = new TestFileManager(this);
 
-    this.interpreter = new Interpreter(new TerminalPrintManager(), this.actionManager,
+    this.interpreter = new Interpreter(new TestPrintManager(), this.actionManager,
       new GraphicsManager(this.graphicsDiv), keyboardManager,
       this.breakpointManager, _debugger, new ProgramPointerManager(this),
-      testManager, inputManager, fileManager, new ExceptionMarker(this));
+      inputManager, fileManager, new ExceptionMarker(this));
 
     this.errorMarker = new ErrorMarker();
 
@@ -166,13 +157,12 @@ export class Main implements IMain {
     */
     this.language = new JavaLanguage(this, this.errorMarker);
     this.language.registerLanguageAtMonacoEditor(this);
+
+    new JUnitTestrunner(this, this.junitDiv);
+
     this.language.getCompiler().eventManager.on("compilationFinished", this.onCompilationFinished, this)
     this.language.getCompiler().startCompilingPeriodically();
-
-    this.testResultViewer.addEventListener('run-all-tests',
-      (e) => { if (e.type == "run-all-tests") testManager.executeAllTests(); });
-
-      
+     
       new EditorOpenerProvider(this);
       
       this.disassembler = new Disassembler(this.codeOutputDiv, this);
@@ -187,8 +177,24 @@ export class Main implements IMain {
 
 
   }
+  showProgramPosition(file?: CompilerFile, positionOrRange?: IPosition | IRange) {
+    this.showFile(file);
+    if(!positionOrRange) return;
+    // @ts-ignore
+    if(positionOrRange["startLineNumber"]) positionOrRange = Range.getStartPosition(<IRange>positionOrRange);
+    this.getMainEditor().setPosition(<IPosition>positionOrRange)
+    this.getMainEditor().focus();
 
-  showFile(file: CompilerFile): void {
+  }
+  getActionManager(): ActionManager {
+    return this.actionManager;
+  }
+  showJUnitDiv(): void {
+    this.tabbedEditorManager.setActive(this.junitDiv)
+  }
+
+  showFile(file?: CompilerFile): void {
+    if(!file) return;
     let monacoModel = file.getMonacoModel();
     if (!monacoModel) return;
     this.getMainEditor().setModel(monacoModel);

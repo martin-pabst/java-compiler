@@ -1,7 +1,13 @@
-import { IPrintManager } from "../compiler/common/interpreter/PrintManager";
+import { IPrintManager } from "../compiler/common/interpreter/IPrintManager";
 import { DOM } from "../tools/DOM";
 
 export class TestPrintManager implements IPrintManager {
+    
+    printHtmlElement(htmlElement: HTMLElement): void {
+        let output = document.getElementById('output')!;
+        output.append(htmlElement);
+    }
+
     print(text: string | undefined, withNewline: boolean, color: number | undefined): void {
         if(!text){
             text = "";

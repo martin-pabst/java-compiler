@@ -1,5 +1,29 @@
 export var testProgramsList = [
    ['', ``],
+   ['JUnit', `@Test
+class Tests {
+   @Test
+   void firstTest() {
+      for (int i = 0; i < 1000; i++) {
+         if(i % 100 == 0) println(i);
+      }
+      assertTrue(true, "Fehlermeldung!");
+   }
+
+   @Test
+   void secondTest() {
+      for (int i = 0; i < 1000; i++) {
+         if(i % 100 == 0) println(i);
+      }
+      doIt();
+      assertTrue(true, "Fehlermeldung!");
+   }
+
+   void doIt() {
+      throw new RuntimeException("Message!");
+   }
+} 
+ `],
    ['2DArrayTest', `// Beispieldaten (nicht in der Lösung verlangt):
 int n = 5;
 int[][] entfernung = new int[][] {
