@@ -13,6 +13,7 @@ import { ScaleMode, ScaleModeEnum } from './ScaleModeEnum';
 import { ShapeClass } from './ShapeClass';
 import { SpriteLibraryEnum } from './SpriteLibraryEnum';
 import { JRC } from '../../language/JavaRuntimeLibraryComments';
+import { ExceptionPrinter } from '../../../common/interpreter/ExceptionPrinter';
 
 export class SpriteClass extends ShapeClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -304,7 +305,7 @@ export class SpriteClass extends ShapeClass {
         let nameWithIndex = spriteLibrary + "#" + imageIndex;
         let texture: PIXI.Texture | undefined = sheet.textures[nameWithIndex];
         if (texture == null) {
-            let sheet1 = this.world.interpreter.graphicsManager?.userSpritesheet;
+            let sheet1 = this.world.interpreter?.graphicsManager?.userSpritesheet;
             texture = sheet1?.textures[nameWithIndex];
         }
 
@@ -443,7 +444,15 @@ export class SpriteClass extends ShapeClass {
         // console.log(this.animationTime);
         // console.log(image);
 
-        this.setTexture(this.spriteLibrary, this.animationIndices[image]);
+        // this method is called by PIXI.Ticker, not by Thread.run, so we have to catch 
+        // the exception ourselves...
+        try {
+            this.setTexture(this.spriteLibrary, this.animationIndices[image]);
+        } catch (exception){
+            this.world.interpreter.stop(false);
+            this.world.interpreter.printManager.printHtmlElement(ExceptionPrinter.getHtmlWithLinks(exception, [], this.world.interpreter.breakpointManager.main));
+            this._stopAnimation(false);
+        }
     }
 
     getTileImage(): TileImageClass {

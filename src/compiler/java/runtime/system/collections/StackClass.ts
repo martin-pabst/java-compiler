@@ -1,8 +1,7 @@
 import { JRC } from "../../../language/JavaRuntimeLibraryComments";
 import { LibraryDeclarations } from "../../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType";
-import { ObjectClass, ObjectClassOrNull } from "../javalang/ObjectClassStringClass";
-import { ArrayListClass } from "./ArrayListClass";
+import { ObjectClassOrNull } from "../javalang/ObjectClassStringClass";
 import { EmptyStackExceptionClass } from "./EmptyStackException";
 import { VectorClass } from "./VectorClass";
 

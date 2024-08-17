@@ -31,6 +31,9 @@ export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
 
         { type: "method", signature: "void move(double dx, double dy)", native: WorldClass.prototype._move, comment: JRC.worldMoveComment },
         { type: "method", signature: "void rotate(double angleInDeg, double centerX, double centerY)", native: WorldClass.prototype._rotate, comment: JRC.worldRotateComment },
+        { type: "method", signature: "void scale(double factor, double centerX, double centerY)", native: WorldClass.prototype._scale, comment: JRC.worldScaleComment },
+
+
         { type: "method", signature: "void setCoordinateSystem(double left, double top, double width, double height)", native: WorldClass.prototype._setCoordinateSystem, comment: JRC.worldSetCoordinateSystemComment },
         { type: "method", signature: "void setCursor(string cursor)", native: WorldClass.prototype._setCursor, comment: JRC.worldSetCursorComment },
         { type: "method", signature: "void clear()", native: WorldClass.prototype._clear, comment: JRC.worldClearComment },
@@ -88,7 +91,8 @@ export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
 
     cj$_constructor_$World$int$int(t: Thread, callback: CallbackParameter, width: number, height: number) {
 
-        let interpreter = t.scheduler.interpreter;
+        this.interpreter = t.scheduler.interpreter;
+        let interpreter = this.interpreter;
 
         interpreter.graphicsManager?.registerGraphicSystem(this);
 
@@ -283,7 +287,12 @@ export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
 
     _move(dx: number, dy: number) {
         let stage = this.app.stage;
+        let matrix = new PIXI.Matrix().copyFrom(stage.localTransform);
+
+        stage.localTransform.identity();
         stage.localTransform.translate(dx, dy);
+        stage.localTransform.prepend(matrix);
+
         stage.setFromMatrix(stage.localTransform);
         //@ts-ignore
         stage._didLocalTransformChangeId = stage._didChangeId;
@@ -292,10 +301,14 @@ export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
     _rotate(angleInDeg: number, centerX: number, centerY: number){
         let angleRad = -angleInDeg / 180 * Math.PI;
         let stage = this.app.stage;
+        let matrix = new PIXI.Matrix().copyFrom(stage.localTransform);
+
+        stage.localTransform.identity();
         stage.localTransform.translate(-centerX, -centerY);
         stage.localTransform.rotate(angleRad);
         stage.localTransform.translate(centerX, centerY);
-
+        stage.localTransform.prepend(matrix);
+        
         stage.setFromMatrix(stage.localTransform);
         //@ts-ignore
         stage._didLocalTransformChangeId = stage._didChangeId;
@@ -304,6 +317,29 @@ export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
         this.shapesNotAffectedByWorldTransforms.forEach(
             (shape) => {
                 shape._rotate(-angleInDeg, centerX, centerY);
+            });
+
+    }
+
+    _scale(factor: number, centerX: number, centerY: number){
+        if(Math.abs(factor) < 1e-14) return;
+        let stage = this.app.stage;
+        let matrix = new PIXI.Matrix().copyFrom(stage.localTransform);
+        
+        stage.localTransform.identity();
+        stage.localTransform.translate(-centerX, -centerY);
+        stage.localTransform.scale(factor, factor);
+        stage.localTransform.translate(centerX, centerY);
+        stage.localTransform.prepend(matrix);
+
+        stage.setFromMatrix(stage.localTransform);
+        //@ts-ignore
+        stage._didLocalTransformChangeId = stage._didChangeId;
+
+        this.computeCurrentWorldBounds();
+        this.shapesNotAffectedByWorldTransforms.forEach(
+            (shape) => {
+                shape._scale(1/factor, centerX, centerY);
             });
 
     }

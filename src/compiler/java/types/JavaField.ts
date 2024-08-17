@@ -74,11 +74,11 @@ export class JavaField extends BaseField {
         let decl: string = TokenTypeReadable[this.visibility] + " ";
         if(this._isStatic) decl += "static ";
         if(this._isFinal) decl += "final ";
-        return decl + this.type.toString() + " " + this.identifier;
+        return decl + this.type?.toString() + " " + this.identifier;
     }
 
     toString(): string {
-        return this.type.toString() + " " + this.identifier;
+        return this.type?.toString() + " " + this.identifier;
     }
 
     getType(): BaseType {

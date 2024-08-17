@@ -291,9 +291,9 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         snippetContainer.addParts(snippets[1]);
         snippetContainer.addParts(snippets[0]);
         if(this.operator == '%'){
-            snippetContainer.addStringPart(`pop() ${this.operator} (pop() || ${Helpers.throwAE}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`, _range, _resultType);
+            snippetContainer.addStringPart(`${StepParams.stack}.pop() ${this.operator} (${StepParams.stack}.pop() || ${Helpers.throwAE}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`, _range, _resultType);
         } else {
-            snippetContainer.addStringPart(`pop() ${this.operator} pop()`, _range, _resultType);
+            snippetContainer.addStringPart(`${StepParams.stack}.pop() ${this.operator} ${StepParams.stack}.pop()`, _range, _resultType);
         }
 
         snippetContainer.finalValueIsOnStack = false;

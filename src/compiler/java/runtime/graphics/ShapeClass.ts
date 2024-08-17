@@ -46,6 +46,9 @@ export class ShapeClass extends ActorClass {
         { type: "method", signature: "final void setVisible(boolean isVisible)", native: ShapeClass.prototype._setVisible, comment: JRC.shapeSetVisibleComment },
         { type: "method", signature: "final boolean isVisible()", template: '§1.container.visible', comment: JRC.shapeSetVisibleComment },
         { type: "method", signature: "final void setStatic(boolean isStatic)", native: ShapeClass.prototype._setStatic, comment: JRC.shapeSetStaticComment },
+        { type: "method", signature: "final void bringToFront()", native: ShapeClass.prototype._bringToFront, comment: JRC.shapeBringToFrontComment },
+        { type: "method", signature: "final void sendToBack()", native: ShapeClass.prototype._sendToBack, comment: JRC.shapeSendToBackComment },
+
 
         { type: "method", signature: "final boolean collidesWith(Shape otherShape)", native: ShapeClass.prototype._collidesWith, comment: JRC.shapeCollidesWithComment },
         { type: "method", signature: "final boolean collidesWithAnyShape()", native: ShapeClass.prototype._collidesWithAnyShape, comment: JRC.shapeCollidesWithAnyShapeComment },
@@ -650,4 +653,30 @@ export class ShapeClass extends ActorClass {
         this._rotate(angle - this.angle);
     }
 
+    _bringToFront(){
+
+        if(this.belongsToGroup) {
+            this.belongsToGroup.setChildIndex(this, this.belongsToGroup.shapes.length - 1);
+            return;
+        }
+
+        let parentContainer = this.world.app.stage;
+        let highestIndex = parentContainer.children.length - 1;
+        parentContainer.setChildIndex(this.container, highestIndex);
+        return;
+
+    }
+
+    _sendToBack(){
+
+        if(this.belongsToGroup) {
+            this.belongsToGroup.setChildIndex(this, 0);
+            return;
+        }
+
+        let parentContainer = this.world.app.stage;
+        parentContainer.setChildIndex(this.container, 0);
+        return;
+
+    }
 }
