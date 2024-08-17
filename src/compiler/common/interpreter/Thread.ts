@@ -8,7 +8,7 @@ import { RuntimeExceptionClass } from "../../java/runtime/system/javalang/Runtim
 import { ThrowableClass } from "../../java/runtime/system/javalang/ThrowableClass.ts";
 import { NonPrimitiveType } from "../../java/types/NonPrimitiveType.ts";
 import { InterpreterMessages } from "../language/InterpreterMessages.ts";
-import { EmptyRange, IRange } from "../range/Range.ts";
+import { IRange } from "../range/Range.ts";
 import { ArrayToStringCaster, TextContainer } from "./ArrayToStringCaster.ts";
 import { CallbackParameter } from "./CallbackParameter.ts";
 import { CatchBlockInfo, Exception, ExceptionInfo } from "./ExceptionInfo.ts";
@@ -87,6 +87,8 @@ export class Thread {
     replReturnValue?: ReplReturnValue;
 
     numberOfSteps: number = 0;
+
+    lastCheckedArrays: any[][] = [];
 
     callbackAfterTerminated?: () => void;
 
@@ -203,6 +205,7 @@ export class Thread {
     handleSystemException(exception: any, step: Step, currentProgramState: ProgramState) {
         console.log(exception);
         console.log(step!.codeAsString);
+        //@ts-ignore
         this.throwException(new SystemException("SystemException", InterpreterMessages.SystemException() + exception), step!);
     }
 
@@ -351,7 +354,7 @@ export class Thread {
             });
             this.exception = exception;
             // ExceptionPrinter.print(exception, this.stackTrace, this.scheduler.interpreter.printManager);
-            ExceptionPrinter.printWithLinks(exception, this.stackTrace, this.scheduler.interpreter.printManager, 
+            ExceptionPrinter.printWithLinks(exception, this.stackTrace, this.scheduler.interpreter.printManager,
                 this.scheduler.interpreter.breakpointManager?.main);
 
             this.scheduler.interpreter.exceptionMarker?.markException(exception, step)
@@ -560,29 +563,6 @@ export class Thread {
         throw exception;
     }
 
-    /**
-     * Runtime method to throw IndexOutOfBoundsException exception
-     * @param message 
-     * @param startLineNumber 
-     * @param startColumn 
-     * @param endLineNumber 
-     * @param endColumn 
-     */
-    IOBE(message: string, startLineNumber?: number, startColumn?: number, endLineNumber?: number, endColumn?: number) {
-
-        let range: IRange | undefined = startLineNumber ? {
-            startLineNumber: startLineNumber!,
-            startColumn: startColumn!,
-            endLineNumber: endLineNumber!,
-            endColumn: endColumn!
-        } : undefined;
-
-        let exception = new IndexOutOfBoundsExceptionClass(message);
-        exception.range = range;
-
-        throw exception;
-    }
-
     NPE(startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number) {
 
         let range: IRange = {
@@ -690,6 +670,85 @@ export class Thread {
         if (typeof element == "string") return '"' + element + '"';
 
         return "" + element;
+    }
+
+    /* 
+     * The following methods are used to check array indices, see TermCodeGenerator.compileSelectArrayElement
+     *  java: 17 + a[3][4]   -> javascript: 17 + __t.ArrayValue2(a, 3, 4)
+     * 
+     *  java: a[4] = 17 -> javascript: (__t.lastCheckedArray = a)[__t.CheckLastIndex(4)] = 17   (__t stores result of __t.Array1(a, 3))
+     *  java: a[3][4] = 17 -> javascript: __t.Array1(a, 3)[__t.CheckLastIndex(4)] = 17   (__t stores result of __t.Array1(a, 3))
+     *  java: a[3][4][5] = 17 -> javascript: __t.Array2(a, 3, 4)[__t.CheckLastIndex(5)] = 17 (__t stores result of __t.Array2(a, 3, 4))
+     */
+    ArrayValue1(array: any[], index: number) {
+        if (index < 0 || index >= array.length) throw new IndexOutOfBoundsExceptionClass(InterpreterMessages.ArrayIndexOutOfBoundsException(index, array.length, 1));
+        return array[index];
+    }
+
+    ArrayValue2(array: any[][], index1: number, index2: number) {
+        if (index1 < 0 || index1 >= array.length) throw new IndexOutOfBoundsExceptionClass(InterpreterMessages.ArrayIndexOutOfBoundsException(index1, array.length, 1));
+        let a2 = array[index1];
+        if (index2 < 0 || index2 >= a2.length) throw new IndexOutOfBoundsExceptionClass(InterpreterMessages.ArrayIndexOutOfBoundsException(index2, a2.length, 2));
+        return a2[index2];
+    }
+
+    ArrayValue3(array: any[], index1: number, index2: number, index3: number) {
+        if (index1 < 0 || index1 >= array.length) throw new IndexOutOfBoundsExceptionClass(InterpreterMessages.ArrayIndexOutOfBoundsException(index1, array.length, 1));
+        let a2 = array[index1];
+        if (index2 < 0 || index2 >= a2.length) throw new IndexOutOfBoundsExceptionClass(InterpreterMessages.ArrayIndexOutOfBoundsException(index2, a2.length, 2));
+        a2 = a2[index2];
+        if (index3 < 0 || index3 >= a2.length) throw new IndexOutOfBoundsExceptionClass(InterpreterMessages.ArrayIndexOutOfBoundsException(index3, a2.length, 3));
+        return a2[index3];
+    }
+
+    ArrayValueN(array: any[], ...indices: number[]) {
+        for (let i = 0; i < indices.length; i++) {
+            let index = indices[i];
+            if (index < 0 || index >= array.length) throw new IndexOutOfBoundsExceptionClass(InterpreterMessages.ArrayIndexOutOfBoundsException(index, array.length, i + 1));
+            array = array[index];
+        }
+        return array;
+    }
+
+    Array0(array: any[]){
+        this.lastCheckedArrays.push(array);
+        return array;
+    }
+
+    Array1(array: any[], index: number) {
+        if (index < 0 || index >= array.length) throw new IndexOutOfBoundsExceptionClass(InterpreterMessages.ArrayIndexOutOfBoundsException(index, array.length, 1));
+        let ret = array[index];
+        this.lastCheckedArrays.push(ret);
+        return ret;
+    }
+
+    Array2(array: any[][], index1: number, index2: number) {
+        if (index1 < 0 || index1 >= array.length) throw new IndexOutOfBoundsExceptionClass(InterpreterMessages.ArrayIndexOutOfBoundsException(index1, array.length, 1));
+        let a2 = array[index1];
+        if (index2 < 0 || index2 >= a2.length) throw new IndexOutOfBoundsExceptionClass(InterpreterMessages.ArrayIndexOutOfBoundsException(index2, a2.length, 2));
+
+        let ret = a2[index2];
+        this.lastCheckedArrays.push(ret);
+        return ret;
+
+    }
+
+    ArrayN(array: any[], ...indices: number[]) {
+        for (let i = 0; i < indices.length; i++) {
+            let index = indices[i];
+            if (index < 0 || index >= array.length) throw new IndexOutOfBoundsExceptionClass(InterpreterMessages.ArrayIndexOutOfBoundsException(index, array.length, i + 1));
+            array = array[index];
+        }
+
+        let ret = array;
+        this.lastCheckedArrays.push(ret);
+        return ret;
+    }
+
+    CheckLastIndex(index: number, dimension: number): number {
+        let array = this.lastCheckedArrays.pop();
+        if (index < 0 || index >= array!.length) throw new IndexOutOfBoundsExceptionClass(InterpreterMessages.ArrayIndexOutOfBoundsException(index, array!.length, dimension));
+        return index;
     }
 
 }

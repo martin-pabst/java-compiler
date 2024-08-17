@@ -24,7 +24,18 @@ export class Helpers {
     static beginTryBlock = StepParams.thread + "." + Thread.prototype.beginTryBlock.name;
     static endTryBlock = StepParams.thread + "." + Thread.prototype.endCatchTryBlock.name;
     static throwAE = StepParams.thread + "." + Thread.prototype.AE.name;
-    static throwIOBE = StepParams.thread + "." + Thread.prototype.IOBE.name;
+
+    static arrayValue1 = StepParams.thread + "." + Thread.prototype.ArrayValue1.name;
+    static arrayValue2 = StepParams.thread + "." + Thread.prototype.ArrayValue2.name;
+    static arrayValue3 = StepParams.thread + "." + Thread.prototype.ArrayValue3.name;
+    static arrayValueN = StepParams.thread + "." + Thread.prototype.ArrayValueN.name;
+
+    static array0 = StepParams.thread + "." + Thread.prototype.Array0.name;
+    static array1 = StepParams.thread + "." + Thread.prototype.Array1.name;
+    static array2 = StepParams.thread + "." + Thread.prototype.Array2.name;
+    static arrayN = StepParams.thread + "." + Thread.prototype.ArrayN.name;
+    static checkLastIndex = StepParams.thread + "." + Thread.prototype.CheckLastIndex.name;
+
     static throwNPE = StepParams.thread + "." + Thread.prototype.NPE.name;
     static checkCast = StepParams.thread + "." + Thread.prototype.CheckCast.name;
     static instanceof = StepParams.thread + "." + Thread.prototype.Instanceof.name;

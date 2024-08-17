@@ -1,4 +1,5 @@
 import jQuery from 'jquery';
+import { EmbeddedSlider } from "../../../tools/components/EmbeddedSlider";
 import { Treeview } from "../../../tools/components/treeview/Treeview";
 import { DOM } from "../../../tools/DOM";
 import { JavaClass } from "../../java/types/JavaClass";
@@ -9,10 +10,9 @@ import { Module } from "../module/Module";
 import { AssertionResult } from "./AggregatingAssertionObserver";
 import { JUnitTestrunnerLanguage } from "./JUnitTestrunnerLanguage";
 import { JUnitTreeviewEntry } from "./JUnitTreeviewEntry";
+import '/include/css/junit.css';
 import { JUnitProgressbar } from './JUnitProgressbar';
 import { TreeviewNode } from '../../../tools/components/treeview/TreeviewNode';
-import { EmbeddedSlider } from '../../../tools/components/EmbeddedSlider';
-import '/include/css/junit.css';
 
 type MouseDownHandler = () => void;
 
@@ -221,12 +221,12 @@ export class JUnitTestrunner {
     
     findTreeviewEntry(klass: JavaClass | undefined, method: JavaMethod | undefined) {
         if (method) {
-            return this.testTreeview.nodes.find(entry => entry.externalObject?.method == method)?.externalObject;
+            return this.testTreeview.nodes.find(entry => entry.externalObject.method == method)?.externalObject;
         }
         if (klass) {
-            return this.testTreeview.nodes.find(entry => entry.externalObject?.klass == klass)?.externalObject;
+            return this.testTreeview.nodes.find(entry => entry.externalObject.klass == klass)?.externalObject;
         }
-        return this.testTreeview.nodes.find(entry => !entry.externalObject?.klass && !entry.externalObject?.method)?.externalObject;
+        return this.testTreeview.nodes.find(entry => !entry.externalObject.klass && !entry.externalObject.method)?.externalObject;
         
     }
     
@@ -245,7 +245,7 @@ export class JUnitTestrunner {
         await this.executeTests(treeviewEntry);
     }
 
-    async executeTests(treeviewEntry: JUnitTreeviewEntry | undefined | null) {
+    async executeTests(treeviewEntry: JUnitTreeviewEntry | undefined) {
         this.main.showJUnitDiv();
         if (treeviewEntry) {
             treeviewEntry.treeviewNode.setSelected(true);

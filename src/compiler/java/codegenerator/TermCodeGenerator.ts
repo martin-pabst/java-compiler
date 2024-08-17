@@ -1,35 +1,35 @@
 import { BaseSymbol, SymbolOnStackframe } from "../../common/BaseSymbolTable";
+import { CodeReacedAssertion } from "../../common/interpreter/CodeReachedAssertions.ts";
 import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { EmptyRange, IRange, Range } from "../../common/range/Range";
 import { TokenType, TokenTypeReadable } from "../TokenType";
+import { JCM } from "../language/JavaCompilerMessages.ts";
 import { JavaCompiledModule } from "../module/JavaCompiledModule";
 import { JavaTypeStore } from "../module/JavaTypeStore";
-import { ASTBinaryNode, ASTLiteralNode, ASTNode, ASTPlusPlusMinusMinusSuffixNode, ASTTermNode, ASTUnaryPrefixNode, ASTSymbolNode, ASTBlockNode, ASTMethodCallNode, ASTNewArrayNode, ASTSelectArrayElementNode, ASTNewObjectNode, ASTAttributeDereferencingNode, ASTEnumValueNode, ASTAnonymousClassNode, ASTLambdaFunctionDeclarationNode, ASTCastNode, ASTArrayLiteralNode, ASTThisNode, ASTSuperNode } from "../parser/AST";
+import { JavaLibraryModule } from "../module/libraries/JavaLibraryModule.ts";
+import { ASTAnonymousClassNode, ASTArrayLiteralNode, ASTAttributeDereferencingNode, ASTBinaryNode, ASTCastNode, ASTEnumValueNode, ASTLambdaFunctionDeclarationNode, ASTLiteralNode, ASTMethodCallNode, ASTNewArrayNode, ASTNewObjectNode, ASTPlusPlusMinusMinusSuffixNode, ASTSelectArrayElementNode, ASTSuperNode, ASTSymbolNode, ASTTermNode, ASTThisNode, ASTUnaryPrefixNode } from "../parser/AST";
 import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaArrayType } from "../types/JavaArrayType";
-import { JavaField } from "../types/JavaField";
-import { JavaType } from "../types/JavaType";
-import { JavaParameter } from "../types/JavaParameter";
-import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
-import { JavaLocalVariable } from "./JavaLocalVariable";
-import { JavaSymbolTable } from "./JavaSymbolTable";
-import { SnippetFramer } from "./CodeSnippetTools";
-import { CodeTemplate, OneParameterTemplate, ParametersJoinedTemplate, SeveralParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
-import { CodeSnippetContainer } from "./CodeSnippetKinds";
 import { IJavaClass, JavaClass } from "../types/JavaClass.ts";
 import { JavaEnum } from "../types/JavaEnum.ts";
-import { BinopCastCodeGenerator } from "./BinopCastCodeGenerator.ts";
-import { GenericMethod, JavaMethod } from "../types/JavaMethod.ts";
-import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
-import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
-import { MissingStatementManager } from "./MissingStatementsManager.ts";
+import { JavaField } from "../types/JavaField";
 import { IJavaInterface, JavaInterface } from "../types/JavaInterface.ts";
-import { OuterClassFieldAccessTracker } from "./OuterClassFieldAccessTracker.ts";
-import { LabelCodeSnippet } from "./LabelManager.ts";
-import { CodeReacedAssertion, CodeReachedAssertions } from "../../common/interpreter/CodeReachedAssertions.ts";
-import { JavaLibraryModule } from "../module/libraries/JavaLibraryModule.ts";
-import { JCM } from "../language/JavaCompilerMessages.ts";
+import { GenericMethod, JavaMethod } from "../types/JavaMethod.ts";
+import { JavaParameter } from "../types/JavaParameter";
+import { JavaType } from "../types/JavaType";
+import { NonPrimitiveType } from "../types/NonPrimitiveType.ts";
+import { StaticNonPrimitiveType } from "../types/StaticNonPrimitiveType.ts";
 import { Visibility } from "../types/Visibility.ts";
+import { BinopCastCodeGenerator } from "./BinopCastCodeGenerator.ts";
+import { CodeSnippet, StringCodeSnippet } from "./CodeSnippet";
+import { CodeSnippetContainer } from "./CodeSnippetKinds";
+import { SnippetFramer } from "./CodeSnippetTools";
+import { CodeTemplate, OneParameterTemplate, ParametersJoinedTemplate, SeveralParameterTemplate, TwoParameterTemplate } from "./CodeTemplate";
+import { JavaLocalVariable } from "./JavaLocalVariable";
+import { JavaSymbolTable } from "./JavaSymbolTable";
+import { LabelCodeSnippet } from "./LabelManager.ts";
+import { MissingStatementManager } from "./MissingStatementsManager.ts";
+import { OuterClassFieldAccessTracker } from "./OuterClassFieldAccessTracker.ts";
 
 export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
@@ -89,7 +89,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 this.addTypePosition(snippet);
                 break;
             case TokenType.selectArrayElement:
-                snippet = this.compileSelectArrayElement(<ASTSelectArrayElementNode>ast);
+                snippet = this.compileSelectArrayElement(<ASTSelectArrayElementNode>ast, isWriteAccess);
                 this.addTypePosition(snippet);
                 break;
             case TokenType.dereferenceAttribute:
@@ -370,7 +370,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         this.currentSymbolTable = this.symbolTableStack[this.symbolTableStack.length - 1];
     }
 
-    compileSelectArrayElement(node: ASTSelectArrayElementNode): CodeSnippet | undefined {
+    compileSelectArrayElement(node: ASTSelectArrayElementNode, isLeftSideOfAssignment: boolean): CodeSnippet | undefined {
         let arraySnippet = this.compileTerm(node.array);
         let arrayType = arraySnippet?.type;
         if (!arraySnippet || !arrayType || !(arrayType instanceof JavaArrayType)) {
@@ -393,6 +393,8 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
             if (!(indsnip?.type?.isUsableAsIndex())) {
                 if (indsnip) this.pushError(JCM.indexMustHaveIntegerValue(), "error", index);
+
+                // set dummy replacement to keep on compiling...
                 indsnip = new StringCodeSnippet('0', index.range, this.intType);
             }
 
@@ -400,10 +402,43 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
 
         }
 
-        let squareBracketSnippet = ParametersJoinedTemplate.applyToSnippet(this.voidType, node.range, '[', '][', ']', ...indexSnippets);
+        /*
+         *  java: 17 + a[3][4]   -> javascript: 17 + __t.ArrayValue2(a, 3, 4)
+         *
+         *  java: a[4] = 17 -> javascript: (__t.lastCheckedArray = a)[__t.CheckLastIndex(4)] = 17   (__t stores result of __t.Array1(a, 3))
+         *  java: a[3][4] = 17 -> javascript: __t.Array1(a, 3)[__t.CheckLastIndex(4)] = 17   (__t stores result of __t.Array1(a, 3))
+         *  java: a[3][4][5] = 17 -> javascript: __t.Array2(a, 3, 4)[__t.CheckLastIndex(5)] = 17 (__t stores result of __t.Array2(a, 3, 4))
+         */
+        let returnSnippet!: CodeSnippet;
 
-        let returnSnippet = new TwoParameterTemplate("§1§2").applyToSnippet(remainingType, node.range, arraySnippet, squareBracketSnippet);
+        if (isLeftSideOfAssignment) {
+            if (indexSnippets.length == 1) {
+                returnSnippet = new TwoParameterTemplate(`${Helpers.array0}(§1)[${Helpers.checkLastIndex}(§2, 1)]`).applyToSnippet(remainingType, node.range, arraySnippet, indexSnippets[0]);
+            } else {
+                let lastIndexSnippet = indexSnippets.pop();
+                let indexSnippet = ParametersJoinedTemplate.applyToSnippet(this.voidType, node.range, '', ', ', '', ...indexSnippets);
+                let checkAndReturnArrayMethod = "";
+                switch (indexSnippets.length) {
+                    case 1: checkAndReturnArrayMethod = Helpers.array1; break;
+                    case 2: checkAndReturnArrayMethod = Helpers.array2; break;
+                    default: checkAndReturnArrayMethod = Helpers.arrayN; break;
+                }
 
+                returnSnippet = new SeveralParameterTemplate(`${checkAndReturnArrayMethod}(§1, §2)[${Helpers.checkLastIndex}(§3, ${indexSnippets.length + 1})]`)
+                    .applyToSnippet(remainingType, node.range, arraySnippet, indexSnippet, lastIndexSnippet!);
+            }
+        } else {
+            let indexSnippet = ParametersJoinedTemplate.applyToSnippet(this.voidType, node.range, '', ', ', '', ...indexSnippets);
+            let checkerMethod = "";
+            switch (indexSnippets.length) {
+                case 1: checkerMethod = Helpers.arrayValue1; break;
+                case 2: checkerMethod = Helpers.arrayValue2; break;
+                case 3: checkerMethod = Helpers.arrayValue3; break;
+                default: checkerMethod = Helpers.arrayValueN; break;
+            }
+
+            returnSnippet = new TwoParameterTemplate(`${checkerMethod}(§1, §2)`).applyToSnippet(remainingType, node.range, arraySnippet, indexSnippet);
+        }
 
         if (node.parenthesisNeeded) {
             returnSnippet = SnippetFramer.frame(returnSnippet, '($)');
@@ -692,7 +727,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
     compileBinaryOperator(ast: ASTBinaryNode): CodeSnippet | undefined {
 
         if (ast.operator == TokenType.ternaryOperator) return this.compileTernaryOperator(ast);
-
+        
         let leftOperand = this.compileTerm(ast.leftSide, this.isAssignmentOperator(ast.operator));
         let rightOperand = ast.rightSide?.kind == TokenType.lambdaOperator ? this.compileLambdaFunction(<ASTLambdaFunctionDeclarationNode>ast.rightSide, leftOperand?.type) : this.compileTerm(ast.rightSide);
 
@@ -852,7 +887,10 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         if (isEnum && objectType.identifier == 'SpriteLibrary') {
             let enumType = <JavaEnum>(<StaticNonPrimitiveType>objectType).nonPrimitiveType;
             let id = enumType.id;
-            let value = enumType.runtimeClass.getSpriteLibrary(id, node.attributeIdentifier);
+            
+            if(!enumType.runtimeClass) return undefined;
+
+            let value = enumType.runtimeClass!.getSpriteLibrary(id, node.attributeIdentifier);
             if (value) {
                 return new StringCodeSnippet(`${Helpers.classes}["SpriteLibrary"].getSpriteLibrary(${id}, "${node.attributeIdentifier}")`, node.range, enumType);
             }
