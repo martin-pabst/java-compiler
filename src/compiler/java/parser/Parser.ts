@@ -161,6 +161,8 @@ export class Parser extends StatementParser {
 
             // restore current class after leaving child class
             this.currentClassOrInterface = currentClassOrInterface;
+
+            while(this.comesToken(TokenType.semicolon, true)){}
         }
 
     }
