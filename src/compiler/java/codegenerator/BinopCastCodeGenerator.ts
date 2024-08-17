@@ -36,7 +36,7 @@ var boxedTypesMap: { [identifier: string]: number | undefined } = {
     "String": nString,
 }
 
-var unboxedNullValuesMap: {[identifier: string]: string } = {
+var unboxedNullValuesMap: { [identifier: string]: string } = {
     "Boolean": "false",
     "Character": "'_'",
     "Byte": "0",
@@ -123,7 +123,7 @@ export abstract class BinopCastCodeGenerator {
             return undefined;
         }
 
-        if(operator == TokenType.keywordInstanceof){
+        if (operator == TokenType.keywordInstanceof) {
             return this.compileInstanceOf(leftSnippet, rightSnippet, operatorRange, wholeRange);
         }
 
@@ -196,26 +196,26 @@ export abstract class BinopCastCodeGenerator {
         // operators are +, -, *, /, %
         let resultType = this.primitiveTypes[Math.max(lTypeIndex, rTypeIndex)];
         return new BinaryOperatorTemplate(operatorIdentifier, false).applyToSnippet(resultType, wholeRange, leftSnippet, rightSnippet);
-        
+
     }
-    
+
     compileInstanceOf(leftSnippet: CodeSnippet, rightSnippet: CodeSnippet, operatorRange: IRange, wholeRange: IRange): CodeSnippet | undefined {
         let leftType = leftSnippet.type!;
-        let rightType = rightSnippet.type!; 
-        
-        if(!(rightType instanceof StaticNonPrimitiveType)){
+        let rightType = rightSnippet.type!;
+
+        if (!(rightType instanceof StaticNonPrimitiveType)) {
             this.pushError(JCM.rightSideOfInstanceofError(), "error", operatorRange);
             return undefined;
         }
-        
-        if(!(leftType instanceof NonPrimitiveType)){
+
+        if (!(leftType instanceof NonPrimitiveType)) {
             this.pushError(JCM.leftSideOfInstanceofError(), "error", operatorRange);
             return undefined;
         }
-        
+
         return SnippetFramer.frame(leftSnippet, `${Helpers.instanceof}(§1, "${(<StaticNonPrimitiveType>rightType).nonPrimitiveType.pathAndIdentifier}")`
             , this.booleanType)
-        
+
     }
 
     /**
@@ -292,19 +292,19 @@ export abstract class BinopCastCodeGenerator {
     wrapWithArrayToString(source: CodeSnippet, primitiveOrClassNeeded: "string" | "String"): CodeSnippet {
         let newSnippet1: CodeSnippet;
 
-        if((<JavaArrayType>source.type!).elementType.isPrimitive){
+        if ((<JavaArrayType>source.type!).elementType.isPrimitive) {
             newSnippet1 = SnippetFramer.frame(source, `${Helpers.primitiveArrayToString}(§1)`);
         } else {
-            
+
             let newSnippet2 = SnippetFramer.frame(source, `${Helpers.objectArrayToString}(§1);\n`);
             newSnippet2.finalValueIsOnStack = true;
-            
+
             let newSnippet3 = new CodeSnippetContainer([newSnippet2]);
             newSnippet3.addNextStepMark();
             newSnippet1 = newSnippet3;
         }
 
-        if(primitiveOrClassNeeded == "String"){
+        if (primitiveOrClassNeeded == "String") {
             newSnippet1 = SnippetFramer.frame(newSnippet1, `new ${Helpers.classes}["String"](§1)`);
             newSnippet1.type = this.stringNonPrimitiveType;
         }
@@ -329,16 +329,16 @@ export abstract class BinopCastCodeGenerator {
             }
         }
 
-        if(leftSnippet.isConstant()){
+        if (leftSnippet.isConstant()) {
             let value = leftSnippet.getConstantValue();
-            if(primitiveOrClassNeeded == "string"){
-                return new StringCodeSnippet('', leftSnippet.range, this.stringType, value );
+            if (primitiveOrClassNeeded == "string") {
+                return new StringCodeSnippet('', leftSnippet.range, this.stringType, value);
             } else {
-                if(value === null){
+                if (value === null) {
                     leftSnippet.type = this.stringNonPrimitiveType;
                     return leftSnippet;
                 }
-                return new StringCodeSnippet(`new ${Helpers.classes}["String"]("${"" + value}")`, leftSnippet.range, this.stringNonPrimitiveType );
+                return new StringCodeSnippet(`new ${Helpers.classes}["String"]("${"" + value}")`, leftSnippet.range, this.stringNonPrimitiveType);
             }
         }
 
@@ -374,7 +374,11 @@ export abstract class BinopCastCodeGenerator {
         let operatorAsString = TokenTypeReadable[operator];
 
         if (operator == TokenType.assignment) {
-            rightSnippet = this.compileCast(rightSnippet, leftSnippet.type!, "implicit");
+            if(this.canCastTo(rightSnippet.type, leftSnippet.type, "implicit")){
+                rightSnippet = this.compileCast(rightSnippet, leftSnippet.type!, "implicit");
+            } else {
+                this.pushError(JCM.cantCastType(rightSnippet.type.identifier, leftSnippet.type.identifier), "error", rightSnippet.range!);
+            }
             return new BinaryOperatorTemplate(operatorAsString, false).applyToSnippet(leftSnippet.type!, wholeRange, leftSnippet, rightSnippet);
         }
 
@@ -433,16 +437,16 @@ export abstract class BinopCastCodeGenerator {
 
         if (!type.isPrimitive) {
             if (castTo.identifier == "string" || castTo.identifier == "String") {
-                if(type instanceof JavaArrayType){
+                if (type instanceof JavaArrayType) {
                     snippet = this.wrapWithArrayToString(snippet, castTo.identifier);
                 } else {
                     snippet = this.wrapWithToStringCall(snippet, castTo.identifier);
                 }
                 return snippet;
             }
-            if(type == this.nullType){
+            if (type == this.nullType) {
                 return snippet;
-            } 
+            }
             if (castTo.isPrimitive) {
                 let boxedIndex = boxedTypesMap[type.identifier];
                 if (boxedIndex) {
@@ -462,21 +466,22 @@ export abstract class BinopCastCodeGenerator {
             }
         }
 
+        // from here on type is primitive!
         if (!castTo.isPrimitive) {
-            if(castTo == this.stringNonPrimitiveType){
+            if (castTo == this.stringNonPrimitiveType) {
                 let templ = type == this.stringType ? '§1' : '"" + (§1)'
                 let constantValue = snippet.getConstantValue();
                 let sn1 = SnippetFramer.frame(snippet, `new ${Helpers.classes}["String"](${templ})`, this.stringNonPrimitiveType);
-                if(typeof constantValue == "string" && sn1 instanceof StringCodeSnippet){
+                if (typeof constantValue == "string" && sn1 instanceof StringCodeSnippet) {
                     sn1.setConstantValue(constantValue);
                 }
                 return sn1;
             }
             // snippet has primitive type. boxing?
-            // let boxedTypeIndex = boxedTypesMap[castTo.identifier];
-            // if (primitiveTypeMap[type.identifier] == boxedTypeIndex) {
-            return this.box(snippet);
-            // }
+            let boxedTypeIndex = boxedTypesMap[castTo.identifier];
+            if (primitiveTypeMap[type.identifier] == boxedTypeIndex) {
+                return this.box(snippet);
+            }
 
             this.pushError(JCM.cantCastType(type.identifier, castTo.identifier), "error", snippet.range!);
             return snippet;
@@ -583,7 +588,7 @@ export abstract class BinopCastCodeGenerator {
         if (typeToIndex == nString) return true;
 
         if ((!typeFrom.isPrimitive || typeFrom == this.stringType) && !typeTo.isPrimitive) {
-            if(typeFrom == this.nullType) return true;
+            if (typeFrom == this.nullType) return true;
             if (typeFrom == this.stringType) typeFrom = this.primitiveStringClass.type;
 
             if (typeFrom instanceof JavaArrayType || typeTo instanceof JavaArrayType) {
@@ -707,7 +712,7 @@ export abstract class BinopCastCodeGenerator {
             this.pushError(JCM.operatorNotUsableForOperands(operatorAsString, operand.type!.identifier), "error", operand.range!);
             return;
         }
-        
+
         if (operator == TokenType.not) {
             if (primitiveIndex == nBoolean) {
                 return this.applyUnaryOperatorConsideringConstantFolding("!", this.booleanType, operand.range!, operand);
@@ -715,7 +720,7 @@ export abstract class BinopCastCodeGenerator {
             this.pushError(JCM.notOperatorNeedsBooleanOperands(operand.type!.identifier), "error", operand.range!);
             return operand;
         }
-        
+
         if ([TokenType.plusPlus, TokenType.minusMinus].indexOf(operator) >= 0) {
             if (!operand.isLefty) {
                 this.pushError(JCM.plusPlusMinusMinusOnlyForLeftyOperands(operatorAsString), "error", operand.range!);
