@@ -2,6 +2,7 @@ import { JavaTypeStore } from "../../java/module/JavaTypeStore.ts";
 import { JavaClass } from "../../java/types/JavaClass.ts";
 import { JavaMethod } from "../../java/types/JavaMethod.ts";
 import { Executable } from "../Executable.ts";
+import { InterpreterMessages } from "../language/InterpreterMessages.ts";
 import { ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager.ts";
 import { Interpreter } from "./Interpreter";
 import { Program, Step } from "./Program";
@@ -221,7 +222,8 @@ export class Scheduler {
                 if (this.state == SchedulerState.running) {
                     let dt = performance.now() - this.timeStampProgramStarted;
                     let stepsPerSecond = Math.round(this.stepCountSinceStartOfProgram / dt * 1000);
-                    this.interpreter.printManager.print("Duration: " + Math.round(dt * 100) / 100 + " ms, " + this.stepCountSinceStartOfProgram + " steps, " + this.printMillions(stepsPerSecond) + " steps/s", true, undefined);
+                    this.interpreter.printManager.print("", true, undefined);
+                    this.interpreter.printManager.print(InterpreterMessages.ExecutionTime() + ": " + Math.round(dt * 100) / 100 + " ms, " + this.stepCountSinceStartOfProgram + " steps, " + this.printMillions(stepsPerSecond) + " steps/s", true, undefined);
                 }
                 this.terminateAllThreads();
                 break;

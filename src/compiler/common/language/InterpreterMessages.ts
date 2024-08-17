@@ -32,4 +32,8 @@ export class InterpreterMessages {
     "en": `A method of an already destroyed graphical object has been called.`,
     })
 
+    static ExecutionTime = () => lm({
+    "de": `Ausführungszeit`,
+    "en": `Excecution time`,
+    })
 }
