@@ -161,13 +161,13 @@ export class ArcClass extends FilledShapeClass {
         this.render();
     }
 
-    _setStartAngle(angleDeg: number){
-        this.startAngleRad = angleDeg/180*Math.PI;
+    _setStartAngle(angleDeg: number) {
+        this.startAngleRad = angleDeg / 180 * Math.PI;
         this.render();
     }
 
-    _setEndAngle(angleDeg: number){
-        this.endAngleRad = angleDeg/180*Math.PI;
+    _setEndAngle(angleDeg: number) {
+        this.endAngleRad = angleDeg / 180 * Math.PI;
         this.render();
     }
 
@@ -186,7 +186,7 @@ export class ArcClass extends FilledShapeClass {
 
         let r2 = dx * dx + dy * dy;
 
-        if ( r2 <= this.outerRadius * this.outerRadius && r2 >= this.innerRadius * this.innerRadius) {
+        if (r2 <= this.outerRadius * this.outerRadius && r2 >= this.innerRadius * this.innerRadius) {
             let towPI = 2 * Math.PI;
             let normalizedStartAngle = this.startAngleRad < 0 ? towPI + this.startAngleRad : this.startAngleRad;
             let normalizedEndAngle = this.endAngleRad < 0 ? towPI + this.endAngleRad : this.endAngleRad;
@@ -215,7 +215,8 @@ export class ArcClass extends FilledShapeClass {
     }
 
     _debugOutput() {
-        let s = `{startAngle: ${this.startAngleRad/Math.PI*180 * this.scaleFactor}, endAngle: ${this.endAngleRad/Math.PI*180 * this.scaleFactor}, innerRadius: ${this.innerRadius * this.scaleFactor}, outerRadius: ${this.outerRadius * this.scaleFactor}, mx: ${this._getCenterX()}, my: ${this._getCenterY()} }`;
+        if (this.isDestroyed) return "<destroyed Arc>"
+        let s = `{startAngle: ${this.startAngleRad / Math.PI * 180 * this.scaleFactor}, endAngle: ${this.endAngleRad / Math.PI * 180 * this.scaleFactor}, innerRadius: ${this.innerRadius * this.scaleFactor}, outerRadius: ${this.outerRadius * this.scaleFactor}, mx: ${this._getCenterX()}, my: ${this._getCenterY()} }`;
         return s;
     }
 

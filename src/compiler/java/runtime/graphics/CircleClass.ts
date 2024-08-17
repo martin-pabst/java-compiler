@@ -163,6 +163,7 @@ export class CircleClass extends FilledShapeClass {
     }
 
     _debugOutput(){
+        if(this.isDestroyed) return "<destroyed Circle>"
         let s = `{r: ${this.radius * this.scaleFactor}, mx: ${this._getCenterX()}, my: ${this._getCenterY()} }`;
         return s;
     }

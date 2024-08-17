@@ -203,6 +203,7 @@ export class Thread {
     }
 
     handleSystemException(exception: any, step: Step, currentProgramState: ProgramState) {
+
         console.log(exception);
         console.log(step!.codeAsString);
         //@ts-ignore

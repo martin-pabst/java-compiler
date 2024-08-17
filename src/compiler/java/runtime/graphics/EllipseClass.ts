@@ -153,6 +153,7 @@ export class EllipseClass extends FilledShapeClass {
     }
 
     _debugOutput(){
+        if(this.isDestroyed) return "<destroyed Ellipse>"
         let s = `{rx: ${this.radiusX * this.scaleFactor}, ry: ${this.radiusY * this.scaleFactor}, mx: ${this._getCenterX()}, my: ${this._getCenterY()} }`;
         return s;
     }

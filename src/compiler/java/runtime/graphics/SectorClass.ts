@@ -205,6 +205,7 @@ export class SectorClass extends FilledShapeClass {
     }
 
     _debugOutput() {
+        if(this.isDestroyed) return "<destroyed Sector>"
         let s = `{startAngle: ${this.startAngleRad / Math.PI * 180 * this.scaleFactor}, endAngle: ${this.endAngleRad / Math.PI * 180 * this.scaleFactor}, radius: ${this.radius * this.scaleFactor}, mx: ${this._getCenterX()}, my: ${this._getCenterY()} }`;
         return s;
     }

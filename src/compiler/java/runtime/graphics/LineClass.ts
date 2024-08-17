@@ -86,6 +86,7 @@ export class LineClass extends FilledShapeClass {
     }
 
     _debugOutput(){
+        if(this.isDestroyed) return "<destroyed Line>"
         this.transformHitPolygon();
         let s = `{x1: ${this.hitPolygonTransformed[0].x}, y1: ${this.hitPolygonTransformed[0].y}, x2: ${this.hitPolygonTransformed[1].x}, y2: ${this.hitPolygonTransformed[1].y}}`;
         return s;

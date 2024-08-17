@@ -578,6 +578,7 @@ export class TurtleClass extends FilledShapeClass {
     }
 
     _debugOutput() {
+        if(this.isDestroyed) return "<destroyed Turtle>"
         let s = `{centerX: ${this._getCenterX()}, centerY: ${this._getCenterY()} }`;
         return s;
     }

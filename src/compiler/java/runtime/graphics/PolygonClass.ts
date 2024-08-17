@@ -192,6 +192,7 @@ export class PolygonClass extends FilledShapeClass {
     }
 
     _debugOutput() {
+        if(this.isDestroyed) return "<destroyed Polygon>"
         this.transformHitPolygon();
         let points = this.hitPolygonTransformed.map((p) => "(" + p.x + ", " + p.y + ")").join(", ");
         let s = `{points: [${points}] }`;

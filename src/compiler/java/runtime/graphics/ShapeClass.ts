@@ -10,6 +10,7 @@ import { FilledShapeDefaults } from './FilledShapeDefaults';
 import { GroupClass } from './GroupClass';
 import { updateWorldTransformRecursively } from './PixiHelper';
 import { JRC } from '../../language/JavaRuntimeLibraryComments';
+import { ContainerProxy } from './ContainerProxy';
 
 export type MouseEventMethod = (t: Thread, callback: CallbackParameter, x: number, y: number, button: number) => void;
 
@@ -389,6 +390,8 @@ export class ShapeClass extends ActorClass {
         if (this.mouseEventsImplemented) {
             this.world.mouseManager.removeShapeWithImplementedMouseMethods(this);
         }
+
+        this.container = ContainerProxy.instance;
 
         super.destroy();
     }

@@ -27,4 +27,9 @@ export class InterpreterMessages {
     "en": `Index ${index}${dimension > 1 ? " (dimension " + dimension + ")" : ""} is out of bounds of this array. Possible values for this index are 0 ... ${length - 1}.`,
     })
 
+    static MethodOfDestroyedGraphicObjectCalled = () => lm({
+    "de": `Es wurde eine Methode eines schon mittels destroy() zerstörten Grafikobjekts aufgerufen.`,
+    "en": `A method of an already destroyed graphical object has been called.`,
+    })
+
 }

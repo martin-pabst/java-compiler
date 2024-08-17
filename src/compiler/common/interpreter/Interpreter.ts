@@ -410,6 +410,7 @@ export class Interpreter {
         }
         
         this.eventManager.fire("stateChanged", this.scheduler.state, state);
+
         this.scheduler.setState(state);
         
 

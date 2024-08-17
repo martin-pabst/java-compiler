@@ -283,6 +283,7 @@ export class BitmapClass extends ShapeClass {
     }
 
     _debugOutput() {
+        if(this.isDestroyed) return "<destroyed Bitmap>"
         let s = `{width: ${this.width * this.scaleFactor}, height: ${this.height * this.scaleFactor}, centerX: ${this._getCenterX()}, centerY: ${this._getCenterY()} }`;
         return s;
     }

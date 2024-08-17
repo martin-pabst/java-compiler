@@ -14,22 +14,22 @@ import '/include/css/disassembler.css';
 type DisassembledStep = {
     element: HTMLElement;
     range: IRange;
-}    
+}
 
 export class Disassembler {
-    
+
     currentModule?: Module;
     currentType?: BaseType;
-    
+
     disassembledSteps: DisassembledStep[] = [];
     stepToHtmlElementMap: Map<Step, HTMLElement> = new Map();
-    
+
     currentElementAtProgramPointer: HTMLElement | undefined;
-    
+
     disassemblerDiv: HTMLDivElement;
 
     lastMarkedElement?: HTMLElement;
-    
+
     constructor(parentElement: HTMLElement, private main: IMain) {
         parentElement.innerHTML = "";
         this.disassemblerDiv = DOM.makeDiv(parentElement, 'jo_disassemblerDiv', 'jo_scrollable');
@@ -38,126 +38,133 @@ export class Disassembler {
             setTimeout(() => {
                 this.currentModule = undefined;
                 this.disassemble();
-            }, 300);    
-        });    
-        
+            }, 300);
+        });
+
         this.main.getInterpreter().eventManager.on("showProgramPointer", () => {
             let step = this.main.getInterpreter().scheduler.getNextStep();
             if (step) {
                 this.showProgramPointer(step);
             } else {
                 this.hideProgramPointer();
-            }    
-        })    
+            }
+        })
+
+        // event stop is also fired when compiler sends new Executable to interpreter!
+        this.main.getInterpreter().eventManager.on("stop", () => {
+            this.unmarkException();
+        })
 
         this.main.getInterpreter().eventManager.on("hideProgramPointer", () => {
             this.hideProgramPointer();
-        })    
-        
-        this.disassemble(); 
-    }    
-    
+        })
+
+        this.disassemble();
+    }
+
     disassemble() {
         let module = this.main.getCurrentWorkspace()?.getCurrentlyEditedModule();
-        if(module) this.disassembleModule(module);
+        if (module) this.disassembleModule(module);
     }
-    
+
     disassembleModule(module: Module | undefined) {
-        if(!module) return;
+        if (!module) return;
         if (module == this.currentModule) return;
 
         this.clear();
         this.currentModule = module;
         this.currentType = undefined;
-    
+
         for (let fragment of module.getCodeFragments()) {
             this.dissassembleFragment(fragment);
         }
     }
-    
-    markProgramPointer(element: HTMLElement){
+
+    markProgramPointer(element: HTMLElement) {
         this.unmarkProgramPointer();
         element.classList.add("jo_revealDisassemblerPosition");
         this.lastMarkedElement = element;
     }
-    
-    unmarkProgramPointer(){
+
+    unmarkProgramPointer() {
         //@ts-ignore
-        for(let element of this.disassemblerDiv.children){
+        for (let element of this.disassemblerDiv.children) {
             element.classList.remove("jo_revealDisassemblerPosition");
         }
     }
-    
-    markException(step: Step){
+
+    markException(step: Step) {
+        this.unmarkException();
+
         let element = this.findHtmlElementForStep(step);
         element?.classList.add("jo_revealDisassemblerException");
-        element?.scrollIntoView({block: "nearest", inline: "nearest"});
+        element?.scrollIntoView({ block: "nearest", inline: "nearest" });
     }
-    
-    unmarkException(){
+
+    unmarkException() {
         //@ts-ignore
-        for(let element of this.disassemblerDiv.children){
+        for (let element of this.disassemblerDiv.children) {
             element.classList.remove("jo_revealDisassemblerException");
         }
     }
 
-    showElementpositionInMonacoModel(file: CompilerFile, range: IRange ){
+    showElementpositionInMonacoModel(file: CompilerFile, range: IRange) {
         this.main.showFile(file);
         let model = file.getMonacoModel();
-        if(!model) return;
-        
+        if (!model) return;
+
         let programPointerManager = this.main.getInterpreter().programPointerManager;
-        if(!programPointerManager) return;
+        if (!programPointerManager) return;
 
         let p: ProgramPointerPositionInfo = {
             programOrmoduleOrMonacoModel: model,
             range: range
-          }
-      
-          programPointerManager.show(p, {
+        }
+
+        programPointerManager.show(p, {
             key: "disassemblerPosition",
             isWholeLine: true,
             className: "jo_revealDisassemblerPosition",
             minimapColor: "#d6c91b56",
             rulerColor: "#d6c91b56",
             beforeContentClassName: "jo_revealDisassemblerPositionBefore"
-          })
+        })
 
     }
 
-    hideElementPositionsInMonacoModel(){
+    hideElementPositionsInMonacoModel() {
         this.main.getInterpreter().programPointerManager?.hide("disassemblerPosition");
     }
 
     showProgramPointer(step: Step) {
-        this.hideProgramPointer();        
+        this.hideProgramPointer();
         this.currentElementAtProgramPointer = this.findHtmlElementForStep(step);
-        
+
         if (this.currentElementAtProgramPointer) {
             this.currentElementAtProgramPointer.classList.add("jo_revealProgramPointer");
-            this.currentElementAtProgramPointer.scrollIntoView({block: "nearest", inline: "nearest"});
-        }    
-    }    
+            this.currentElementAtProgramPointer.scrollIntoView({ block: "nearest", inline: "nearest" });
+        }
+    }
 
     findHtmlElementForStep(step: Step): HTMLElement | undefined {
-    let element = this.stepToHtmlElementMap.get(step);
-        if(element) return element;
- 
+        let element = this.stepToHtmlElementMap.get(step);
+        if (element) return element;
+
         this.currentModule = undefined;
         this.disassembleModule(step.module);
 
         return this.stepToHtmlElementMap.get(step);
     }
 
-    
+
     hideProgramPointer() {
-        
+
         if (this.currentElementAtProgramPointer) {
             this.currentElementAtProgramPointer.classList.remove("jo_revealProgramPointer");
-        }    
-        
+        }
+
         this.currentElementAtProgramPointer = undefined;
-    }    
+    }
 
     clear() {
         this.currentModule = undefined;
@@ -189,7 +196,7 @@ export class Disassembler {
 
     insertTypeHeading(type: BaseType) {
         let headingDiv = DOM.makeDiv(this.disassemblerDiv, "jo_disassemblerHeading");
-        if(type.identifier == "main class"){
+        if (type.identifier == "main class") {
             headingDiv.textContent = "Main method:";
         } else {
             headingDiv.textContent = type.getDeclaration();
@@ -209,7 +216,7 @@ export class Disassembler {
     insertSignature(signature: string, range: IRange | undefined) {
         let signatureDiv = DOM.makeDiv(this.disassemblerDiv, "jo_disassemblerSignature");
 
-    
+
         monaco.editor.colorize(signature, 'myJava', { tabSize: 3 }).then((html) => {
             signatureDiv.innerHTML = html;
         });
@@ -240,23 +247,23 @@ export class Disassembler {
              * prettify code
              */
             let code = step.codeAsString.trim();
-            
+
             // remove jumps to next step:
             let regExp = new RegExp("(.*)return " + (index + 1) + ";(\s*)$", "s");
             let match = code.match(regExp);
-            if(match){
+            if (match) {
                 code = match[1].trim();
             }
 
             let code1 = code.replaceAll(/\/\/ Label \d*\s*/g, "");
-            if(code1 !== code) stepIndex.classList.add("jo_disassemblerStepWithLabel");
-            
+            if (code1 !== code) stepIndex.classList.add("jo_disassemblerStepWithLabel");
+
             code1 = code1.replaceAll(/(return) (\d*)/g, "jumpTo($2)")
 
             code = code1;
 
             index++;
-            
+
             monaco.editor.colorize(code, 'javascript', { tabSize: 3 }).then((html) => {
                 // html = html.replaceAll("&nbsp;", " ");
                 html = html.replaceAll("\u00a0", " ");

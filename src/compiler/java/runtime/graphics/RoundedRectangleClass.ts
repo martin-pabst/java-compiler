@@ -146,6 +146,7 @@ export class RoundedRectangleClass extends FilledShapeClass {
     }
 
     _debugOutput(){
+        if(this.isDestroyed) return "<destroyed RoundedRectangle>"
         let s = `{width: ${this.width * this.scaleFactor}, height: ${this.height * this.scaleFactor}, radius: ${this.radius * this.scaleFactor}, centerX: ${this._getCenterX()}, centerY: ${this._getCenterY()} }`;
         return s;
     }

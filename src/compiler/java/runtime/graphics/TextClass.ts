@@ -185,6 +185,7 @@ export class TextClass extends FilledShapeClass {
     }
 
     _debugOutput() {
+        if(this.isDestroyed) return "<destroyed Text>"
         let s = `{text: ${this.text}, centerX: ${this._getCenterX()}, centerY: ${this._getCenterY()} }`;
         return s;
     }

@@ -129,6 +129,7 @@ import { BiConsumerInterface } from "./functional/BiConsumerInterface.ts";
 import { PAppletClass } from "../graphics/processing/PAppletClass.ts";
 import { World3dClass } from "../graphics/3d/World3dClass.ts";
 import { CodeFragment } from "../../../common/disassembler/CodeFragment.ts";
+import { MethodOfDestroyedGOExceptionClass } from "./javalang/MethodOfDestroyedGOExceptionClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -208,7 +209,8 @@ export class SystemModule extends JavaLibraryModule {
             ScaleModeEnum, RepeatTypeEnum, SpriteLibraryEnum, TileImageClass, SpriteClass, // Sprite
             CircleClass, EllipseClass, ArcClass, SectorClass,
             PolygonClass, TriangleClass, LineClass, BitmapClass, TextClass, RoundedRectangleClass,
-            TurtleClass,
+            TurtleClass, 
+            MethodOfDestroyedGOExceptionClass,
 
             // Graphics 3D
             World3dClass,
