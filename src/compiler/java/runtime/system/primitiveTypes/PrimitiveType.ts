@@ -10,6 +10,7 @@ export abstract class PrimitiveType extends JavaType {
     myIndex: number;
 
     defaultValueAsString: string = "0";
+    defaultValue: any = 0;
 
     static boxedTypeIdentifiers: string[] = ["Boolean", "Character", "Byte", "Short", "Integer", "Long", "Float", "Double"];
     static typeIdentifiers: string[] = ['boolean', 'char', 'byte', 'short', 'int', 'long', 'float', 'double'];

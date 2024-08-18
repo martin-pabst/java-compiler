@@ -34,6 +34,6 @@ export class InterpreterMessages {
 
     static ExecutionTime = () => lm({
     "de": `Ausführungszeit`,
-    "en": `Excecution time`,
+    "en": `Execution time`,
     })
 }

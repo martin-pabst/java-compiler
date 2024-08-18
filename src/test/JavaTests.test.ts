@@ -1,21 +1,28 @@
+import chalk from "chalk";
 import fs from "fs";
 import { test } from "vitest";
-import { it } from 'vitest';
+import { Interpreter } from "../compiler/common/interpreter/Interpreter";
 import { CompilerFile } from "../compiler/common/module/CompilerFile";
 import { JavaCompiler } from "../compiler/java/JavaCompiler";
-import { Interpreter } from "../compiler/common/interpreter/Interpreter";
-import { ViteTestAssertions } from "./lib/ViteTestAssertions";
-import chalk from "chalk";
-import { IPrintManager } from "../compiler/common/interpreter/PrintManager";
 import { getLine, getLineNumber, threeDez } from "../tools/StringTools";
+import { ViteTestAssertions } from "./lib/ViteTestAssertions";
+import { IPrintManager } from "../compiler/common/interpreter/IPrintManager";
 
 class StoreOutputPrintManager implements IPrintManager {
-
+    
     output: string = "";
+    
+    isTestPrintManager(): boolean {
+        return true;
+    }
+
+    printHtmlElement(htmlElement: HTMLElement): void {
+        
+    }
 
     print(text: string | undefined, withNewline: boolean, color: number | undefined): void {
         if (!text) return;
-        if (text.startsWith("Duration")) return;
+        if (text.startsWith("Execution")) return;
         this.output += text;
         if (withNewline) this.output += "\n";
     }

@@ -133,7 +133,7 @@ export class MouseManager {
                     let mouseEventMethod: MouseEventMethod = shape.mouseEventsImplemented![mouseEventKind];
                     if (mouseEventMethod && shape._containsPoint(x, y) && !shape.mouseLastSeenInsideObject) {
                         shape.mouseLastSeenInsideObject = true;
-                        mouseEventMethod.call(shape, t, undefined, x, y, button);
+                        mouseEventMethod.call(shape, t, undefined, x, y);
                     }
                 }
                 break;
@@ -143,7 +143,7 @@ export class MouseManager {
                     let mouseEventMethod: MouseEventMethod = shape.mouseEventsImplemented![mouseEventKind];
                     if (mouseEventMethod && shape.mouseLastSeenInsideObject) {
                         shape.mouseLastSeenInsideObject = false;
-                        mouseEventMethod.call(shape, t, undefined, x, y, button);
+                        mouseEventMethod.call(shape, t, undefined, x, y);
                     }
                 }
                 break;
@@ -160,15 +160,15 @@ export class MouseManager {
                     ){
                         let containsPoint = shape._containsPoint(x, y);
                         if((shape.trackMouseMove || containsPoint) && mouseMoveEventMethod != null){
-                            mouseMoveEventMethod.call(shape, t, undefined, x, y, button);
+                            mouseMoveEventMethod.call(shape, t, undefined, x, y);
                         }
                         if(containsPoint && mouseEnterEventMethod != null && !shape.mouseLastSeenInsideObject){
                             shape.mouseLastSeenInsideObject = true;
-                            mouseEnterEventMethod.call(shape, t, undefined, x, y, button);
+                            mouseEnterEventMethod.call(shape, t, undefined, x, y);
                         }
                         if(!containsPoint && mouseLeaveEventMethod != null && shape.mouseLastSeenInsideObject){
                             shape.mouseLastSeenInsideObject = false;
-                            mouseLeaveEventMethod.call(shape, t, undefined, x, y, button);
+                            mouseLeaveEventMethod.call(shape, t, undefined, x, y);
                         }
                     }
                 }
@@ -180,4 +180,10 @@ export class MouseManager {
 
         t.startIfNotEmptyOrDestroy();
     }
+
+    hasMouseListeners(): boolean {
+        return this.shapesWithImplementedMouseMethods.length > 0;
+    }
+
+
 }

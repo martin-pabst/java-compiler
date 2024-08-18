@@ -34,12 +34,12 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
         this.linker = new SnippetLinker();
     }
 
-/**
- * 
- *  Compiles expressions like new MyAbstractClass(p1, p2){ attributeDeclarations, instanceInitializers, methodDeclarations }
- * 
- * @param node 
- */
+    /**
+     * 
+     *  Compiles expressions like new MyAbstractClass(p1, p2){ attributeDeclarations, instanceInitializers, methodDeclarations }
+     * 
+     * @param node 
+     */
     compileAnonymousInnerClass(node: ASTAnonymousClassNode): CodeSnippet | undefined {
 
         // let outerClass = this.currentSymbolTable.classContext;
@@ -328,10 +328,12 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
             method.identifier = classContext.identifier;
             method.hasImplementationWithNativeCallingConvention = false;
 
-            let parametersForSuperCall = baseConstructor.parameters.map(p => `${StepParams.stack}[${p.stackframePosition}]`).join(", ");
+            let stackframePosition: number = 1;  // 0 is thread, 1 is callback
+            let parametersForSuperCall = baseConstructor.parameters.map(p => `${StepParams.stack}[${StepParams.stackBase} + ${stackframePosition++}]`).join(", ");
 
             if (!baseConstructor.hasImplementationWithNativeCallingConvention) {
-                parametersForSuperCall = StepParams.thread + (parametersForSuperCall.length == 0 ? "" : ", ") + parametersForSuperCall;
+                // undefined für callback
+                parametersForSuperCall = StepParams.thread + ", undefined" + (parametersForSuperCall.length == 0 ? "" : ", ") + parametersForSuperCall;
             }
 
             if (parametersForSuperCall.length > 0) parametersForSuperCall = ", " + parametersForSuperCall;
@@ -379,7 +381,7 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
 
                 let functionStub = function (this: any, __t: Thread, callback: CallbackParameter, ...parameters: any) {
                     __t.s.push(this, ...parameters);
-                    __t.pushProgram(method!.program!);
+                    __t.pushProgram(method!.program!, callback);
                 }
 
                 runtimeClass.prototype[method.getInternalName("java")] = functionStub;
@@ -429,8 +431,8 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
 
                 if (snippet.isConstant()) {
                     field.initialValue = snippet.getConstantValue();
-                    field.initialValueIsConstant = true;
-                } else if(field.isFinal() && snippet.type == this.stringNonPrimitiveType && snippet.getConstantValue()){
+                    field.initialValueIsConstant = field.isFinal();
+                } else if (field.isFinal() && snippet.type == this.stringNonPrimitiveType && snippet.getConstantValue()) {
                     field.initialValueIsConstant = true;
                 }
 
@@ -461,9 +463,12 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
 
                 if (snippet.isConstant()) {
                     field.initialValue = snippet.getConstantValue();
-                    field.initialValueIsConstant = true;
-                    snippet = undefined;
-                } else {
+                    field.initialValueIsConstant = field.isFinal();
+                    if ((<JavaType>field.getType()).isPrimitive) {
+                        snippet = undefined;
+                    }
+                }
+                if (snippet) {
                     let assignmentTemplate = `${Helpers.elementRelativeToStackbase(0)}.${field.getInternalName()} = §1;\n`;
 
                     snippet = new OneParameterTemplate(assignmentTemplate).applyToSnippet(field.type, snippet.range!, snippet);
@@ -493,7 +498,7 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
 
     compileMethodDeclaration(methodNode: ASTMethodDeclarationNode, classContext: JavaClass | JavaEnum | JavaInterface) {
 
-        if(methodNode.path != '.main'){
+        if (methodNode.path != '.main') {
             this.module.methodDeclarationRanges.push(methodNode.range);
         }
 

@@ -100,7 +100,7 @@ export class JavaCompiler implements Compiler {
        // console.log(Math.round(performance.now() - time) + " ms: Found " + newOrDirtyModules.length + " new or dirty modules.");
        
        // if(newOrDirtyModules.length > 0)
-       console.log("New/dirty modules: " + newOrDirtyModules.map(m => m.file.name).join(", "));
+       //console.log("New/dirty modules: " + newOrDirtyModules.map(m => m.file.name).join(", "));
        
         newOrDirtyModules = this.moduleManager.getNewOrDirtyModules();
         if (newOrDirtyModules.length == 0) return this.lastCompiledExecutable;

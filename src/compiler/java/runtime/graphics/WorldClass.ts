@@ -94,14 +94,14 @@ export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
         this.interpreter = t.scheduler.interpreter;
         let interpreter = this.interpreter;
 
-        interpreter.graphicsManager?.registerGraphicSystem(this);
-
         let existingWorld = <WorldClass>interpreter.retrieveObject("WorldClass");
         if (existingWorld) {
             t.s.push(existingWorld);
             existingWorld.changeResolution(width, height);
             return existingWorld;
         }
+
+        interpreter.graphicsManager?.registerGraphicSystem(this);
 
         this.actorManager = new ActorManager(interpreter);
 
@@ -266,7 +266,7 @@ export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
     }
 
     hasActors(): boolean {
-        return this.actorManager.hasActors() || this.gngEventlistenerManager?.hasEventListeners();
+        return this.actorManager.hasActors() || this.mouseManager.hasMouseListeners() || this.gngEventlistenerManager?.hasEventListeners();
     }
 
     registerGNGEventListener(listener: IGNGEventListener, type: GNGEventListenerType): void {

@@ -720,6 +720,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         }
 
         let snippet = new StringCodeSnippet(valueAsString, node.range, type, node.value);
+        snippet.setConstantValue(node.value);
 
         return snippet;
     }

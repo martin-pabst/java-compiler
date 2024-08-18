@@ -103,7 +103,7 @@ export class InputClass extends ObjectClass {
     }
 
     static _mj$readBoolean$boolean$string$boolean(t: Thread, message: string, defaultValue?: string) {
-        InputClass.addTask(t, message, defaultValue, (value: string) => {
+        InputClass.addTask(t, message, defaultValue + "", (value: string) => {
             return {
                 convertedValue: value == 'true',
                 errorMessage: ['true', 'false'].indexOf(value) < 0 ? JRC.InputClassBooleanError() : undefined

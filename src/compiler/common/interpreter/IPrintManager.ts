@@ -1,4 +1,3 @@
-import { Exception } from "./ExceptionInfo";
 
 export interface IPrintManager {
     print(text: string | undefined, withNewline: boolean, color: number | undefined): void;
@@ -8,6 +7,8 @@ export interface IPrintManager {
     clear(): void;
 
     printHtmlElement(htmlElement: HTMLElement): void;
+
+    isTestPrintManager(): boolean;
 }
 
 export class DummyPrintManager implements IPrintManager {
@@ -24,6 +25,10 @@ export class DummyPrintManager implements IPrintManager {
     }
 
     clear(): void {
+    }
+
+    isTestPrintManager(): boolean {
+        return false;
     }
 
 }

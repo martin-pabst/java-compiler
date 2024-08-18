@@ -671,6 +671,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
         switch (typeId) {
             case 'String':
+            case 'string':
             case 'char':
                 caseSnippet.addStringPart(`case "${constantValue}": \n`, node.range); break;
             default:
@@ -711,6 +712,11 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
         if (!(enumType || type.identifier && ["byte", "short", "int", "char", "String"].includes(type.identifier))) {
             this.pushError(JCM.switchOnlyFeasibleForTypes(), "error", node.term.range);
+        }
+
+        if(type == this.stringNonPrimitiveType){
+            term = this.unbox(term);
+            type = this.stringType;
         }
 
         if (!type) return undefined;
@@ -926,6 +932,8 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
                     initValueSnippet = this.compileTerm(initializationNode);
             }
 
+
+
             if (!initValueSnippet?.type) return undefined;
 
 
@@ -955,8 +963,12 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
         } else {
             if(!destinationType) return undefined;
             
-            let defaultValue: string = destinationType.isPrimitive ? (<PrimitiveType>destinationType).defaultValueAsString : "null";
-            initValueSnippet = new StringCodeSnippet(defaultValue, EmptyRange.instance, destinationType);
+            let defaultValueAsString: string = destinationType.isPrimitive ? (<PrimitiveType>destinationType).defaultValueAsString : "null";
+            let defaultValue = destinationType.isPrimitive ? (<PrimitiveType>destinationType).defaultValue : null;
+            // initValueSnippet = new StringCodeSnippet(defaultValue, EmptyRange.instance, destinationType);
+            initValueSnippet = new StringCodeSnippet(defaultValueAsString, EmptyRange.instance, destinationType);
+            (<StringCodeSnippet>initValueSnippet).setConstantValue(defaultValue);
+            
         }
 
         return initValueSnippet;

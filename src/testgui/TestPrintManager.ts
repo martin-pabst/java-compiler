@@ -32,4 +32,9 @@ export class TestPrintManager implements IPrintManager {
         
     }
 
+    isTestPrintManager(): boolean {
+        return true;
+    }
+
+
 }

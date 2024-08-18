@@ -68,7 +68,7 @@ export class Interpreter {
     static ProgramPointerIndentifier = "ProgramPointer";
 
     mainThread?: Thread;
-    public stepsPerSecondGoal: number = 1e8;
+    public stepsPerSecondGoal: number | undefined = 1e8;
     public isMaxSpeed: boolean = true;
     
 
@@ -479,7 +479,7 @@ export class Interpreter {
     }
 
     setStepsPerSecond(value: number, isMaxSpeed: boolean) {
-        this.stepsPerSecondGoal = value;
+        this.stepsPerSecondGoal = isMaxSpeed ? undefined : value;
         this.isMaxSpeed = isMaxSpeed;
         if (this.mainThread) {
             this.mainThread.maxStepsPerSecond = isMaxSpeed ? undefined : value;

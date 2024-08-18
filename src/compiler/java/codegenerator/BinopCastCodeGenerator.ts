@@ -468,7 +468,12 @@ export abstract class BinopCastCodeGenerator {
 
         // from here on type is primitive!
         if (!castTo.isPrimitive) {
-            if (castTo == this.stringNonPrimitiveType) {
+            let boxedTypeIndex = boxedTypesMap[castTo.identifier];
+            if (primitiveTypeMap[type.identifier] == boxedTypeIndex) {
+                return this.box(snippet);
+            }
+
+            if (castTo == this.stringNonPrimitiveType || type == this.stringType) {
                 let templ = type == this.stringType ? '§1' : '"" + (§1)'
                 let constantValue = snippet.getConstantValue();
                 let sn1 = SnippetFramer.frame(snippet, `new ${Helpers.classes}["String"](${templ})`, this.stringNonPrimitiveType);
@@ -477,11 +482,10 @@ export abstract class BinopCastCodeGenerator {
                 }
                 return sn1;
             }
+
+
+
             // snippet has primitive type. boxing?
-            let boxedTypeIndex = boxedTypesMap[castTo.identifier];
-            if (primitiveTypeMap[type.identifier] == boxedTypeIndex) {
-                return this.box(snippet);
-            }
 
             this.pushError(JCM.cantCastType(type.identifier, castTo.identifier), "error", snippet.range!);
             return snippet;
@@ -662,9 +666,13 @@ export abstract class BinopCastCodeGenerator {
         let boxedIdentifier = boxedTypeIdentifiers[unboxedTypeIndex];
         if (!boxedIdentifier || boxedIdentifier.length == 0) return snippet;
 
+        let constant = snippet.getConstantValue();
         let boxedType = this.libraryTypestore.getType(boxedIdentifier);
+        let boxedSnippet = SnippetFramer.frame(snippet, `new ${Helpers.classes}["${boxedIdentifier}"](§1)`, boxedType);
+        
+        if(snippet instanceof StringCodeSnippet) snippet.setConstantValue(constant);
 
-        return SnippetFramer.frame(snippet, `new ${Helpers.classes}["${boxedIdentifier}"](§1)`, boxedType);
+        return boxedSnippet;
     }
 
     convertCharToNumber(snippet: CodeSnippet): CodeSnippet {

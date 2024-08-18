@@ -41,7 +41,10 @@ export class ShapeClass extends ActorClass {
         { type: "method", signature: "final void moveTo(double x, double y)", native: ShapeClass.prototype._moveTo, comment: JRC.shapeMoveToComment },
         { type: "method", signature: "final void defineCenter(double x, double y)", native: ShapeClass.prototype._defineCenter, comment: JRC.shapeDefineCenterComment },
         { type: "method", signature: "final void defineCenterRelative(double x, double y)", native: ShapeClass.prototype._defineCenterRelative, comment: JRC.shapeDefineCenterRelativeComment },
-
+        
+        { type: "method", signature: "final void tint(int color)", native: ShapeClass.prototype._setTintInt, comment: JRC.shapeTintComment },
+        { type: "method", signature: "final void tint(string color)", native: ShapeClass.prototype._setTintInt, comment: JRC.shapeTintComment },
+        
         { type: "method", signature: "static void setDefaultVisibility(boolean isVisible)", native: ShapeClass._setDefaultVisibility, comment: JRC.shapeSetDefaultVisibilityComment },
         { type: "method", signature: "final void setVisible(boolean isVisible)", native: ShapeClass.prototype._setVisible, comment: JRC.shapeSetVisibleComment },
         { type: "method", signature: "final boolean isVisible()", template: '§1.container.visible', comment: JRC.shapeSetVisibleComment },
@@ -61,6 +64,9 @@ export class ShapeClass extends ActorClass {
         { type: "method", signature: "void onMouseEnter(double x, double y)", java: ShapeClass.prototype._mj$onMouseEnter$void$double$double, comment: JRC.shapeOnMouseEnterComment },
         { type: "method", signature: "void onMouseLeave(double x, double y)", java: ShapeClass.prototype._mj$onMouseLeave$void$double$double, comment: JRC.shapeOnMouseLeaveComment },
         { type: "method", signature: "void onMouseMove(double x, double y)", java: ShapeClass.prototype._mj$onMouseMove$void$double$double, comment: JRC.shapeOnMouseMoveComment },
+        
+        { type: "method", signature: "void startTrackingEveryMouseMovement()", native: ShapeClass.prototype._startTrackingEveryMouseMovement, comment: JRC.shapeStartTrackingEveryMouseMovementComment },
+        { type: "method", signature: "void stopTrackingEveryMouseMovement()", native: ShapeClass.prototype._stopTrackingEveryMouseMovement, comment: JRC.shapeStartTrackingEveryMouseMovementComment },
 
 
     ]
@@ -465,9 +471,9 @@ export class ShapeClass extends ActorClass {
 
     _mj$onMouseUp$void$double$double$int(t: Thread, callback: CallbackParameter, x: number, y: number, button: number) { }
     _mj$onMouseDown$void$double$double$int(t: Thread, callback: CallbackParameter, x: number, y: number, button: number) { }
-    _mj$onMouseEnter$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number, button: number) { }
-    _mj$onMouseLeave$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number, button: number) { }
-    _mj$onMouseMove$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number, button: number) { }
+    _mj$onMouseEnter$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number) { }
+    _mj$onMouseLeave$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number) { }
+    _mj$onMouseMove$void$double$double(t: Thread, callback: CallbackParameter, x: number, y: number) { }
 
     _collidesWith(otherShape: ShapeClass): boolean {
 
@@ -679,4 +685,27 @@ export class ShapeClass extends ActorClass {
         return;
 
     }
+
+    _setTintInt(color: number) {
+        if(typeof this.container.tint !== 'undefined'){
+            this.container.tint = color % 0x1000000;
+        }
+    }
+
+    _setTintString(color: string) {
+        let c = ColorHelper.parseColorToOpenGL(color);
+        if(typeof this.container.tint !== 'undefined'){
+            this.container.tint = c.color!;
+        }
+    }
+
+    _startTrackingEveryMouseMovement(){
+        this.trackMouseMove = true;
+    }
+
+    _stopTrackingEveryMouseMovement(){
+        this.trackMouseMove = false;
+    }
+
+
 }

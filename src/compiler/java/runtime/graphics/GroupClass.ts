@@ -54,6 +54,19 @@ export class GroupClass extends ShapeClass {
 
     }
 
+
+    _containsPoint(x: number, y: number) {
+        if (!this.container.getBounds().containsPoint(x, y)) return false;
+
+        for(let shape of this.shapes){
+            if(shape._containsPoint(x, y)) return true;
+        }
+
+        return false;
+
+    }
+
+
     _collidesWith(otherShape: ShapeClass): boolean {
         if(!this.hasOverlappingBoundingBoxWith(otherShape)) return false;
 

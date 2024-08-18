@@ -24,18 +24,18 @@ export class JavaCompletionItemProvider implements monaco.languages.CompletionIt
 
     first: boolean = true;
     provideCompletionItems(model: monaco.editor.ITextModel, position: monaco.Position, context: monaco.languages.CompletionContext, token: monaco.CancellationToken): monaco.languages.ProviderResult<monaco.languages.CompletionList> {
-        
+
         // setTimeout(() => {
-            //@ts-ignore
-            // let sw = this.editor._contentWidgets["editor.widget.suggestWidget"]?.widget;
-            // if (sw != null && sw._widget != null && this.first) {
-            //     sw._widget.toggleDetails();
-            //     this.first = false;
-            // }
-            // sw.toggleSuggestionDetails();
-            // this.main.monaco.trigger('keyboard', 'editor.action.toggleSuggestionDetails', {});
-            // this.main.monaco.trigger('keyboard', 'editor.action.triggerSuggest', {});
-            // this.main.monaco.trigger(monaco.KeyMod.CtrlCmd + monaco.KeyCode.Space, 'type', {});
+        //@ts-ignore
+        // let sw = this.editor._contentWidgets["editor.widget.suggestWidget"]?.widget;
+        // if (sw != null && sw._widget != null && this.first) {
+        //     sw._widget.toggleDetails();
+        //     this.first = false;
+        // }
+        // sw.toggleSuggestionDetails();
+        // this.main.monaco.trigger('keyboard', 'editor.action.toggleSuggestionDetails', {});
+        // this.main.monaco.trigger('keyboard', 'editor.action.triggerSuggest', {});
+        // this.main.monaco.trigger(monaco.KeyMod.CtrlCmd + monaco.KeyCode.Space, 'type', {});
         // }, 300);
 
         // let consoleModel = this.main.getBottomDiv()?.console?.editor?.getModel();
@@ -48,7 +48,7 @@ export class JavaCompletionItemProvider implements monaco.languages.CompletionIt
         // let module: Module = this.isConsole ? this.main.getBottomDiv()?.console?.compiler.module :
         //     this.main.getCurrentWorkspace().getModuleByMonacoModel(model);
 
-        if(model.getLanguageId() != 'myJava') return;
+        if (model.getLanguageId() != 'myJava') return;
 
         let module = <JavaCompiledModule>this.main.getCurrentWorkspace()?.getModuleForMonacoModel(model);
 
@@ -58,7 +58,7 @@ export class JavaCompletionItemProvider implements monaco.languages.CompletionIt
 
         let symbolTable = module.findSymbolTableAtPosition(position);
         let classContext = symbolTable == null ? undefined : symbolTable.classContext;
-        
+
 
         let zeroLengthRange: IRange = Range.fromPositions(position);
 
@@ -278,30 +278,34 @@ export class JavaCompletionItemProvider implements monaco.languages.CompletionIt
 
         if (symbolTable?.methodContext != null) {
 
-            // don't show class completion items (methods, fields) in main class
-            if(classContext!= null && classContext.identifier != ''){
-                let fieldsAndMethods = classContext.getCompletionItems(TokenType.keywordPrivate, leftBracketAlreadyThere, identifierAndBracketAfterCursor, rangeToReplace, symbolTable.methodContext)
-                .map(ci => {
-                    ci.sortText = "aa" + ci.label;
-                    return ci;
-                }).filter(newItem => completionItems.findIndex(oldItem => oldItem.insertText == newItem.insertText) < 0);
+            if (classContext != null) {
+                // don't show class completion items (methods, fields) in main class
+                let fieldsAndMethods = classContext.getCompletionItems(TokenType.keywordPrivate, leftBracketAlreadyThere,
+                    identifierAndBracketAfterCursor, rangeToReplace, symbolTable.methodContext)
+                    .map(ci => {
+                        ci.sortText = "aa" + ci.label;
+                        return ci;
+                    }).filter(newItem => completionItems.findIndex(oldItem => oldItem.insertText == newItem.insertText) < 0);
                 completionItems = completionItems.concat(fieldsAndMethods);
-                completionItems.push(
-                    {
-                        label: "super",
-                        filterText: "super",
-                        insertText: "super.",
-                        detail: "Aufruf einer Methode einer Basisklasse",
-                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        kind: monaco.languages.CompletionItemKind.Snippet,
-                        range: rangeToReplace,
-                        command: {
-                            id: "editor.action.triggerSuggest",
-                            title: '123',
-                            arguments: []
+
+                if (!symbolTable.methodContext.isStatic) {
+                    completionItems.push(
+                        {
+                            label: "super",
+                            filterText: "super",
+                            insertText: "super.",
+                            detail: "Aufruf einer Methode einer Basisklasse",
+                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                            kind: monaco.languages.CompletionItemKind.Snippet,
+                            range: rangeToReplace,
+                            command: {
+                                id: "editor.action.triggerSuggest",
+                                title: '123',
+                                arguments: []
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
 
         } else {
