@@ -1,12 +1,11 @@
-import { Thread } from "../../compiler/common/interpreter/Thread";
-import { AssertionObserver } from "../../compiler/java/runtime/unittests/AssertionObserver";
-import { TestContext, assert, expect, it, test } from 'vitest';
 import chalk from 'chalk';
-import { createLogger } from "vite";
-import { Step } from "../../compiler/common/interpreter/Program";
-import { getLine, threeDez } from "../../tools/StringTools";
+import { TestContext } from 'vitest';
+import { Step } from "../compiler/common/interpreter/Program";
+import { Thread } from "../compiler/common/interpreter/Thread";
+import { getLine, threeDez } from "../tools/StringTools";
+import { DummyAssertionObserver } from '../compiler/java/runtime/unittests/IAssertionObserver';
 
-export class ViteTestAssertions implements AssertionObserver {
+export class ViteTestAssertions implements DummyAssertionObserver {
 
     check = '\xB7';
 

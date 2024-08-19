@@ -5,8 +5,8 @@ import { Interpreter } from "../compiler/common/interpreter/Interpreter";
 import { CompilerFile } from "../compiler/common/module/CompilerFile";
 import { JavaCompiler } from "../compiler/java/JavaCompiler";
 import { getLine, getLineNumber, threeDez } from "../tools/StringTools";
-import { ViteTestAssertions } from "./lib/ViteTestAssertions";
 import { IPrintManager } from "../compiler/common/interpreter/IPrintManager";
+import { ViteTestAssertions } from "./ViteTestAssertions";
 
 class StoreOutputPrintManager implements IPrintManager {
     
