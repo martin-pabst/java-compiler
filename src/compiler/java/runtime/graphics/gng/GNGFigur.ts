@@ -51,10 +51,10 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
         { type: "method", signature: "void FigurteilFestlegenDreieck(int x1, int y1, int x2, int y2, int x3, int y3, string farbe)", java: GNGFigur.prototype._j_figurteilFestlegenDreieck, comment: "Erzeugt ein neues, dreieckiges Element und fügt es der Figur hinzu." },
         { type: "method", signature: "void FigurteilFestlegenRechteck(int x, int y, int breite, int höhe, string farbe)", java: GNGFigur.prototype._j_figurteilFestlegenRechteck, comment: "Erzeugt ein neues, rechteckiges Element einer eigenen Darstellung der Figur." },
         { type: "method", signature: "void FigurteilFestlegenEllipse(int x, int y, int breite, int höhe, string farbe)", java: GNGFigur.prototype._j_figurteilFestlegenEllipse, comment: "Erzeugt ein neues, elliptisches Element einer eigenen Darstellung der Figur." },
-        
+
         { type: "method", signature: "void AktionAusführen()", java: GNGFigur.prototype._mj$AktionAusführen$void$, comment: "Diese Methode wird vom Taktgeber aufgerufen." },
         { type: "method", signature: "void TasteGedrückt(char taste)", java: GNGFigur.prototype._mj$TasteGedrückt$void$char, comment: "Wird aufgerufen, wenn eine Taste gedrückt wird." },
-        { type: "method", signature: "void SonderTasteGedrückt(int sondertaste)", java: GNGFigur.prototype._mj$SondertasteGedrückt$void$int, comment: "Wird aufgerufen, wenn eine SonderTaste gedrückt wird." },
+        { type: "method", signature: "void SonderTasteGedrückt(int sondertaste)", java: GNGFigur.prototype._mj$SonderTasteGedrückt$void$int, comment: "Wird aufgerufen, wenn eine SonderTaste gedrückt wird." },
         { type: "method", signature: "void MausGeklickt(int x, int y, int anzahl)", java: GNGFigur.prototype._mj$MausGeklickt$void$int$int$int, comment: "Wird aufgerufen, wenn eine die linke Maustaste gedrückt wird." },
 
 
@@ -80,28 +80,28 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
             t.s.push(this);
             this.setGNGBackgroundColor();
             this.drawInitialTriangle(t, () => {
-                
+
                 // registerEvents();
                 if (callback) callback();
             }, this.center)
+
+            if (this._mj$AktionAusführen$void$ != GNGFigur.prototype._mj$AktionAusführen$void$) {
+                this.group.world.registerGNGEventListener(this, "aktionAusführen");
+            }
+
+            if (this._mj$TasteGedrückt$void$char != GNGFigur.prototype._mj$TasteGedrückt$void$char) {
+                this.group.world.registerGNGEventListener(this, "tasteGedrückt");
+            }
+
+            if (this._mj$SonderTasteGedrückt$void$int != GNGFigur.prototype._mj$SonderTasteGedrückt$void$int) {
+                this.group.world.registerGNGEventListener(this, "sondertasteGedrückt");
+            }
+
+            if (this._mj$MausGeklickt$void$int$int$int != GNGFigur.prototype._mj$MausGeklickt$void$int$int$int) {
+                this.group.world.registerGNGEventListener(this, "mausGeklickt");
+            }
+
         });
-
-        if(this._mj$AktionAusführen$void$ != GNGFigur.prototype._mj$AktionAusführen$void$){
-            this.group.world.registerGNGEventListener(this, "aktionAusführen");
-        }
-
-        if(this._mj$TasteGedrückt$void$char != GNGFigur.prototype._mj$TasteGedrückt$void$char){
-            this.group.world.registerGNGEventListener(this, "tasteGedrückt");
-        }
-
-        if(this._mj$SondertasteGedrückt$void$int != GNGFigur.prototype._mj$SondertasteGedrückt$void$int){
-            this.group.world.registerGNGEventListener(this, "sondertasteGedrückt");
-        }
-
-        if(this._mj$MausGeklickt$void$int$int$int != GNGFigur.prototype._mj$MausGeklickt$void$int$int$int){
-            this.group.world.registerGNGEventListener(this, "mausGeklickt");
-        }
-
 
     }
 
@@ -112,7 +112,7 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
     }
 
     drawInitialTriangle(t: Thread, callback: CallbackFunction, center: GNGPoint) {
-        this.group._scale(1/this.group.scaleFactor);
+        this.group._scale(1 / this.group.scaleFactor);
         let polygon: PolygonClass = new PolygonClass();
         polygon._cj$_constructor_$Polygon$boolean$double_I(t, () => {
             t.s.pop();
@@ -185,6 +185,10 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
     }
 
     _entfernen() {
+        this.group.world.unRegisterGNGEventListener(this, "aktionAusführen");        
+        this.group.world.unRegisterGNGEventListener(this, "tasteGedrückt");
+        this.group.world.unRegisterGNGEventListener(this, "sondertasteGedrückt");
+        this.group.world.unRegisterGNGEventListener(this, "mausGeklickt");
         this.group.destroy();
     }
 
@@ -206,18 +210,19 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
 
     _mj$eigeneFigurLoeschen$void$(t: Thread, callback: CallbackFunction) {
         this.group.destroyAllChildren();
-        this.drawInitialTriangle(t, callback, this.center);
+        // this.drawInitialTriangle(t, callback, this.center);
     }
 
-    _beruehrt() {
+    _beruehrt(): boolean {
         for (let shape of this.group.world.shapesWhichBelongToNoGroup) {
             if (shape != this.group && shape._collidesWith(this.group)) {
                 return true;
             }
         }
+        return false;
     }
 
-    _beruehrtFarbe(farbeAsString: string) {
+    _beruehrtFarbe(farbeAsString: string): boolean {
         let farbe = GNGFarben[farbeAsString];
         if (farbe == null) farbe = 0;
 
@@ -240,29 +245,31 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
 
             }
         }
+
+        return false;
     }
 
-    _beruehrtObjekt(objekt: ObjectClass){
-        if(objekt instanceof GNGFigur){
+    _beruehrtObjekt(objekt: ObjectClass): boolean {
+        if (objekt instanceof GNGFigur) {
             return this.group._collidesWith(objekt.group);
         }
 
-        if(objekt instanceof GNGBaseFigur){
+        if (objekt instanceof GNGBaseFigur) {
             return this.group._collidesWith(objekt.filledShape);
         }
 
         return false;
     }
 
-    _j_figurteilFestlegenDreieck(t: Thread, callback: CallbackFunction, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, farbeString: string){
+    _j_figurteilFestlegenDreieck(t: Thread, callback: CallbackFunction, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, farbeString: string) {
         let farbe = GNGFarben[farbeString];
         if (farbe == null) farbe = 0;
 
-        if(this.isInitialTriangle) this.group.destroyAllChildren();
+        if (this.isInitialTriangle) this.group.destroyAllChildren();
         this.isInitialTriangle = false;
 
         let triangle = new PolygonClass();
-        triangle._cj$_constructor_$Polygon$boolean$double_I(t, () => {   
+        triangle._cj$_constructor_$Polygon$boolean$double_I(t, () => {
             triangle._rotate(this.group.angle, 0, 0);
             triangle._scale(this.group.scaleFactor, 0, 0);
             triangle._move(this.center.x, this.center.y);
@@ -270,20 +277,20 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
             triangle._setBorderColorString("black");
             triangle._setBorderWidth(2);
             this.group.add(triangle);
-            if(callback) callback();
+            if (callback) callback();
         }, true, [x1, y1, x2, y2, x3, y3], true);
 
     }
 
-    _j_figurteilFestlegenRechteck(t: Thread, callback: CallbackFunction, x: number, y: number, breite: number, hoehe: number, farbeString: string){
+    _j_figurteilFestlegenRechteck(t: Thread, callback: CallbackFunction, x: number, y: number, breite: number, hoehe: number, farbeString: string) {
         let farbe = GNGFarben[farbeString];
         if (farbe == null) farbe = 0;
 
-        if(this.isInitialTriangle) this.group.destroyAllChildren();
+        if (this.isInitialTriangle) this.group.destroyAllChildren();
         this.isInitialTriangle = false;
 
         let rectangle = new RectangleClass();
-        rectangle._cj$_constructor_$Rectangle$double$double$double$double(t, () => {   
+        rectangle._cj$_constructor_$Rectangle$double$double$double$double(t, () => {
             rectangle._rotate(this.group.angle, 0, 0);
             rectangle._scale(this.group.scaleFactor, 0, 0);
             rectangle._move(this.center.x, this.center.y);
@@ -291,24 +298,24 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
             rectangle._setBorderColorString("black");
             rectangle._setBorderWidth(2);
             this.group.add(rectangle);
-            if(callback) callback();
-        }, x + 0.05, y + 0.05, breite - 0.1, hoehe - 0.1 );
+            if (callback) callback();
+        }, x + 0.05, y + 0.05, breite - 0.1, hoehe - 0.1);
 
     }
 
 
-    _j_figurteilFestlegenEllipse(t: Thread, callback: CallbackFunction, x: number, y: number, breite: number, hoehe: number, farbeString: string){
+    _j_figurteilFestlegenEllipse(t: Thread, callback: CallbackFunction, x: number, y: number, breite: number, hoehe: number, farbeString: string) {
         let farbe = GNGFarben[farbeString];
         if (farbe == null) farbe = 0;
 
-        if(this.isInitialTriangle) this.group.destroyAllChildren();
+        if (this.isInitialTriangle) this.group.destroyAllChildren();
         this.isInitialTriangle = false;
 
         hoehe = hoehe - 0.1;      // hack to ensure collision-handling identical to gng (also 0.05 two lines below)
         breite = breite - 0.1;
 
         let ellipse = new EllipseClass();
-        ellipse._cj$_constructor_$Ellipse$double$double$double$double(t, () => {   
+        ellipse._cj$_constructor_$Ellipse$double$double$double$double(t, () => {
             ellipse._rotate(this.group.angle, 0, 0);
             ellipse._scale(this.group.scaleFactor, 0, 0);
             ellipse._move(this.center.x, this.center.y);
@@ -316,8 +323,8 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
             ellipse._setBorderColorString("black");
             ellipse._setBorderWidth(2);
             this.group.add(ellipse);
-            if(callback) callback();
-        },x + breite / 2 + 0.05, y + hoehe / 2 + 0.05, breite / 2, hoehe / 2);
+            if (callback) callback();
+        }, x + breite / 2 + 0.05, y + hoehe / 2 + 0.05, breite / 2, hoehe / 2);
     }
 
     // Eventlistener-dummies:
@@ -327,7 +334,7 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
     _mj$TasteGedrückt$void$char(t: Thread, callback: () => void | undefined, key: string): void {
         throw new Error("Method not implemented.");
     }
-    _mj$SondertasteGedrückt$void$int(t: Thread, callback: () => void | undefined, key: number): void {
+    _mj$SonderTasteGedrückt$void$int(t: Thread, callback: () => void | undefined, key: number): void {
         throw new Error("Method not implemented.");
     }
     _mj$MausGeklickt$void$int$int$int(t: Thread, callback: () => void | undefined, x: number, y: number, anzahl: number): void {
@@ -351,7 +358,7 @@ export class GNGFigur extends ObjectClass implements IGNGEventListener {
         throw new Error("Method not implemented.");
     }
 
-    _containsPoint(x: number, y: number){
+    _containsPoint(x: number, y: number) {
         return this.group._containsPoint(x, y);
     }
 }

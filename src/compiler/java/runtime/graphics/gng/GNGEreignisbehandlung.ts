@@ -19,7 +19,7 @@ export class GNGEreignisbehandlung extends ObjectClass implements IGNGEventListe
         // events:
         { type: "method", signature: "void TaktImpulsAusführen()", java: GNGEreignisbehandlung.prototype._mj$TaktImpulsAusführen$void$, comment: "Diese Methode wird vom Taktgeber aufgerufen." },
         { type: "method", signature: "void TasteGedrückt(char taste)", java: GNGEreignisbehandlung.prototype._mj$TasteGedrückt$void$char, comment: "Wird aufgerufen, wenn eine Taste gedrückt wird." },
-        { type: "method", signature: "void SonderTasteGedrückt(int sondertaste)", java: GNGEreignisbehandlung.prototype._mj$SondertasteGedrückt$void$int, comment: "Wird aufgerufen, wenn eine SonderTaste gedrückt wird." },
+        { type: "method", signature: "void SonderTasteGedrückt(int sondertaste)", java: GNGEreignisbehandlung.prototype._mj$SonderTasteGedrückt$void$int, comment: "Wird aufgerufen, wenn eine SonderTaste gedrückt wird." },
         { type: "method", signature: "void MausGeklickt(int x, int y, int anzahl)", java: GNGEreignisbehandlung.prototype._mj$MausGeklickt$void$int$int$int, comment: "Wird aufgerufen, wenn eine die linke Maustaste gedrückt wird." },
 
     ];
@@ -54,7 +54,7 @@ export class GNGEreignisbehandlung extends ObjectClass implements IGNGEventListe
             this.world.registerGNGEventListener(this, "tasteGedrückt");
         }
     
-        if(this._mj$SondertasteGedrückt$void$int != GNGEreignisbehandlung.prototype._mj$SondertasteGedrückt$void$int){
+        if(this._mj$SonderTasteGedrückt$void$int != GNGEreignisbehandlung.prototype._mj$SonderTasteGedrückt$void$int){
             this.world.registerGNGEventListener(this, "sondertasteGedrückt");
         }
     
@@ -73,7 +73,7 @@ export class GNGEreignisbehandlung extends ObjectClass implements IGNGEventListe
     _mj$TasteGedrückt$void$char(t: Thread, callback: () => void | undefined, key: string): void {
         throw new Error("Method not implemented.");
     }
-    _mj$SondertasteGedrückt$void$int(t: Thread, callback: () => void | undefined, key: number): void {
+    _mj$SonderTasteGedrückt$void$int(t: Thread, callback: () => void | undefined, key: number): void {
         throw new Error("Method not implemented.");
     }
     _mj$MausGeklickt$void$int$int$int(t: Thread, callback: () => void | undefined, x: number, y: number, anzahl: number): void {

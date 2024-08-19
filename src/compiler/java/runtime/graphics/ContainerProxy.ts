@@ -12,12 +12,13 @@ export class ContainerProxy {
     private static getInstance(){
         const handler = {
             get(target, prop, receiver) {
+                
                 throw new MethodOfDestroyedGOExceptionClass(InterpreterMessages.MethodOfDestroyedGraphicObjectCalled());
                 
-                return function (...args) {
-                    // console.log(`Intercepted '${prop}' with arguments ${JSON.stringify(args)}`);
-                    // target.callMethod(prop);
-                };
+                // return function (...args) {
+                //     // console.log(`Intercepted '${prop}' with arguments ${JSON.stringify(args)}`);
+                //     // target.callMethod(prop);
+                // };
             }
         };
 

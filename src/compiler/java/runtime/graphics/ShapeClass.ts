@@ -41,10 +41,10 @@ export class ShapeClass extends ActorClass {
         { type: "method", signature: "final void moveTo(double x, double y)", native: ShapeClass.prototype._moveTo, comment: JRC.shapeMoveToComment },
         { type: "method", signature: "final void defineCenter(double x, double y)", native: ShapeClass.prototype._defineCenter, comment: JRC.shapeDefineCenterComment },
         { type: "method", signature: "final void defineCenterRelative(double x, double y)", native: ShapeClass.prototype._defineCenterRelative, comment: JRC.shapeDefineCenterRelativeComment },
-        
+
         { type: "method", signature: "final void tint(int color)", native: ShapeClass.prototype._setTintInt, comment: JRC.shapeTintComment },
         { type: "method", signature: "final void tint(string color)", native: ShapeClass.prototype._setTintInt, comment: JRC.shapeTintComment },
-        
+
         { type: "method", signature: "static void setDefaultVisibility(boolean isVisible)", native: ShapeClass._setDefaultVisibility, comment: JRC.shapeSetDefaultVisibilityComment },
         { type: "method", signature: "final void setVisible(boolean isVisible)", native: ShapeClass.prototype._setVisible, comment: JRC.shapeSetVisibleComment },
         { type: "method", signature: "final boolean isVisible()", template: '§1.container.visible', comment: JRC.shapeSetVisibleComment },
@@ -64,7 +64,7 @@ export class ShapeClass extends ActorClass {
         { type: "method", signature: "void onMouseEnter(double x, double y)", java: ShapeClass.prototype._mj$onMouseEnter$void$double$double, comment: JRC.shapeOnMouseEnterComment },
         { type: "method", signature: "void onMouseLeave(double x, double y)", java: ShapeClass.prototype._mj$onMouseLeave$void$double$double, comment: JRC.shapeOnMouseLeaveComment },
         { type: "method", signature: "void onMouseMove(double x, double y)", java: ShapeClass.prototype._mj$onMouseMove$void$double$double, comment: JRC.shapeOnMouseMoveComment },
-        
+
         { type: "method", signature: "void startTrackingEveryMouseMovement()", native: ShapeClass.prototype._startTrackingEveryMouseMovement, comment: JRC.shapeStartTrackingEveryMouseMovementComment },
         { type: "method", signature: "void stopTrackingEveryMouseMovement()", native: ShapeClass.prototype._stopTrackingEveryMouseMovement, comment: JRC.shapeStartTrackingEveryMouseMovementComment },
 
@@ -387,13 +387,23 @@ export class ShapeClass extends ActorClass {
 
     public destroy() {
         if (this.isDestroyed) return;
+
+        let world = this.world;
+
         if (this.belongsToGroup) {
             let index = this.belongsToGroup.shapes.indexOf(this);
             if (index >= 0) {
                 this.belongsToGroup.shapes.splice(index, 1);
             }
             this.belongsToGroup.container.removeChildAt(this.belongsToGroup.container.getChildIndex(this.container))
+        } else {
+            let index1 = world.shapesWhichBelongToNoGroup.indexOf(this);
+            if (index1 >= 0) world.shapesWhichBelongToNoGroup.splice(index1, 1);
         }
+
+        let index2 = world.shapesNotAffectedByWorldTransforms.indexOf(this);
+        if (index2 >= 0) world.shapesNotAffectedByWorldTransforms.splice(index2, 1);
+
         this.container.destroy();
 
         if (this.mouseEventsImplemented) {
@@ -659,9 +669,9 @@ export class ShapeClass extends ActorClass {
         this._rotate(angle - this.angle);
     }
 
-    _bringToFront(){
+    _bringToFront() {
 
-        if(this.belongsToGroup) {
+        if (this.belongsToGroup) {
             this.belongsToGroup.setChildIndex(this, this.belongsToGroup.shapes.length - 1);
             return;
         }
@@ -673,9 +683,9 @@ export class ShapeClass extends ActorClass {
 
     }
 
-    _sendToBack(){
+    _sendToBack() {
 
-        if(this.belongsToGroup) {
+        if (this.belongsToGroup) {
             this.belongsToGroup.setChildIndex(this, 0);
             return;
         }
@@ -687,23 +697,23 @@ export class ShapeClass extends ActorClass {
     }
 
     _setTintInt(color: number) {
-        if(typeof this.container.tint !== 'undefined'){
+        if (typeof this.container.tint !== 'undefined') {
             this.container.tint = color % 0x1000000;
         }
     }
 
     _setTintString(color: string) {
         let c = ColorHelper.parseColorToOpenGL(color);
-        if(typeof this.container.tint !== 'undefined'){
+        if (typeof this.container.tint !== 'undefined') {
             this.container.tint = c.color!;
         }
     }
 
-    _startTrackingEveryMouseMovement(){
+    _startTrackingEveryMouseMovement() {
         this.trackMouseMove = true;
     }
 
-    _stopTrackingEveryMouseMovement(){
+    _stopTrackingEveryMouseMovement() {
         this.trackMouseMove = false;
     }
 

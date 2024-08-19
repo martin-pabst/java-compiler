@@ -34,23 +34,21 @@ export class GNGTurtle extends ObjectClass implements IGNGEventListener {
         { type: "method", signature: "int XPositionGeben()", template: `(§1.turtle.getPosition().x)`, comment: "Gibt x-Position der Turtle zurück." },
         { type: "method", signature: "int YPositionGeben()", template: `(§1.turtle.getPosition().y)`, comment: "Gibt y-Position der Turtle zurück." },
         { type: "method", signature: "void SichtbarkeitSetzen(boolean sichtbarkeit)", template: `§1.turtle._setVisible(§2)`, comment: "Schaltet die Sichtbarkeit der Figur ein oder aus." },
-        { type: "method", signature: "void Entfernen()", template: `§1.turtle.destroy()`, comment: "Entfernt die Figur von der Zeichenfläche." },
+        { type: "method", signature: "void Entfernen()", native: GNGTurtle.prototype._entfernen, comment: "Entfernt die Figur von der Zeichenfläche." },
 
-        {type: "method", signature: "void GanzNachVornBringen()", native: GNGTurtle.prototype._ganzNachVornBringen, comment: "Setzt das Grafikobjekt vor alle anderen."},
-        {type: "method", signature: "void GanzNachHintenBringen()", native: GNGTurtle.prototype._ganzNachHintenBringen, comment: "Setzt das Grafikobjekt hinter alle anderen."},
-        {type: "method", signature: "void NachVornBringen()", native: GNGTurtle.prototype._nachVornBringen, comment: "Setzt das Grafikobjekt eine Ebene nach vorne."},
-        {type: "method", signature: "void NachHintenBringen()", native: GNGTurtle.prototype._nachHintenBringen, comment: "Setzt das Grafikobjekt eine Ebene nach hinten."},
-        
-        {type: "method", signature: "boolean Berührt()", template: `§1.turtle.touchesAtLeastOneFigure()`, comment: "Gibt genau dann true zurück, wenn sich an der aktuellen Position der Turtle mindestens eine andere Figur befindet."},
-        {type: "method", signature: "boolean Berührt(String farbe)", template: `§1.touchesShape()`, comment: "Gibt genau dann true zurück, wenn sich an der aktuellen Position der Turtle mindestens eine andere Figur mit der angegebenen Farbe befindet."},
-        {type: "method", signature: "boolean Berührt(Object object)", template: `§1.touchesColor()`, comment: "Gibt genau dann true zurück, wenn die übergebene Figur die aktuelle Turtleposition enthält."},
+        { type: "method", signature: "void GanzNachVornBringen()", native: GNGTurtle.prototype._ganzNachVornBringen, comment: "Setzt das Grafikobjekt vor alle anderen." },
+        { type: "method", signature: "void GanzNachHintenBringen()", native: GNGTurtle.prototype._ganzNachHintenBringen, comment: "Setzt das Grafikobjekt hinter alle anderen." },
+        { type: "method", signature: "void NachVornBringen()", native: GNGTurtle.prototype._nachVornBringen, comment: "Setzt das Grafikobjekt eine Ebene nach vorne." },
+        { type: "method", signature: "void NachHintenBringen()", native: GNGTurtle.prototype._nachHintenBringen, comment: "Setzt das Grafikobjekt eine Ebene nach hinten." },
+
+        { type: "method", signature: "boolean Berührt()", template: `§1.turtle.touchesAtLeastOneFigure()`, comment: "Gibt genau dann true zurück, wenn sich an der aktuellen Position der Turtle mindestens eine andere Figur befindet." },
+        { type: "method", signature: "boolean Berührt(String farbe)", template: `§1.touchesShape()`, comment: "Gibt genau dann true zurück, wenn sich an der aktuellen Position der Turtle mindestens eine andere Figur mit der angegebenen Farbe befindet." },
+        { type: "method", signature: "boolean Berührt(Object object)", template: `§1.touchesColor()`, comment: "Gibt genau dann true zurück, wenn die übergebene Figur die aktuelle Turtleposition enthält." },
 
         { type: "method", signature: "void AktionAusführen()", java: GNGTurtle.prototype._mj$AktionAusführen$void$, comment: "Diese Methode wird vom Taktgeber aufgerufen." },
         { type: "method", signature: "void TasteGedrückt(char taste)", java: GNGTurtle.prototype._mj$TasteGedrückt$void$char, comment: "Wird aufgerufen, wenn eine Taste gedrückt wird." },
-        { type: "method", signature: "void SonderTasteGedrückt(int sondertaste)", java: GNGTurtle.prototype._mj$SondertasteGedrückt$void$int, comment: "Wird aufgerufen, wenn eine SonderTaste gedrückt wird." },
+        { type: "method", signature: "void SonderTasteGedrückt(int sondertaste)", java: GNGTurtle.prototype._mj$SonderTasteGedrückt$void$int, comment: "Wird aufgerufen, wenn eine SonderTaste gedrückt wird." },
         { type: "method", signature: "void MausGeklickt(int x, int y, int anzahl)", java: GNGTurtle.prototype._mj$MausGeklickt$void$int$int$int, comment: "Wird aufgerufen, wenn eine die linke Maustaste gedrückt wird." },
-
-
     ];
 
 
@@ -74,28 +72,28 @@ export class GNGTurtle extends ObjectClass implements IGNGEventListener {
             this.turtle._setBorderColorInt(0x000000);
             this.turtle.render();
 
-            this.moveAnchor = {x: 10, y: 10};
+            this.moveAnchor = { x: 10, y: 10 };
 
             this.setGNGBackgroundColor();
 
             if (callback) callback();
+
+            if (this._mj$AktionAusführen$void$ != GNGTurtle.prototype._mj$AktionAusführen$void$) {
+                this.turtle.world.registerGNGEventListener(this, "aktionAusführen");
+            }
+
+            if (this._mj$TasteGedrückt$void$char != GNGTurtle.prototype._mj$TasteGedrückt$void$char) {
+                this.turtle.world.registerGNGEventListener(this, "tasteGedrückt");
+            }
+
+            if (this._mj$SonderTasteGedrückt$void$int != GNGTurtle.prototype._mj$SonderTasteGedrückt$void$int) {
+                this.turtle.world.registerGNGEventListener(this, "sondertasteGedrückt");
+            }
+
+            if (this._mj$MausGeklickt$void$int$int$int != GNGTurtle.prototype._mj$MausGeklickt$void$int$int$int) {
+                this.turtle.world.registerGNGEventListener(this, "mausGeklickt");
+            }
         }, 100, 200);
-
-        if(this._mj$AktionAusführen$void$ != GNGTurtle.prototype._mj$AktionAusführen$void$){
-            this.turtle.world.registerGNGEventListener(this, "aktionAusführen");
-        }
-
-        if(this._mj$TasteGedrückt$void$char != GNGTurtle.prototype._mj$TasteGedrückt$void$char){
-            this.turtle.world.registerGNGEventListener(this, "tasteGedrückt");
-        }
-
-        if(this._mj$SondertasteGedrückt$void$int != GNGTurtle.prototype._mj$SondertasteGedrückt$void$int){
-            this.turtle.world.registerGNGEventListener(this, "sondertasteGedrückt");
-        }
-
-        if(this._mj$MausGeklickt$void$int$int$int != GNGTurtle.prototype._mj$MausGeklickt$void$int$int$int){
-            this.turtle.world.registerGNGEventListener(this, "mausGeklickt");
-        }
 
     }
 
@@ -105,35 +103,35 @@ export class GNGTurtle extends ObjectClass implements IGNGEventListener {
         }
     }
 
-    _groesseSetzen(groesse: number){
+    _groesseSetzen(groesse: number) {
         this.turtle.turtleSize = groesse;
-        this.turtle.borderWidth = groesse/100;
-        this.turtle.moveTurtleTo(0,0, 0);
+        this.turtle.borderWidth = groesse / 100;
+        this.turtle.moveTurtleTo(0, 0, 0);
         this.turtle.initTurtle(0, 0, this.turtle.angle);
         this.turtle.moveTurtleTo(this.turtle.lineElements[this.turtle.lineElements.length - 1].x, this.turtle.lineElements[this.turtle.lineElements.length - 1].y, this.turtle.angle)
         this.turtle._turn(0);
     }
 
-    _farbeSetzen(farbe: string){
+    _farbeSetzen(farbe: string) {
         this.colorString = farbe;
-        if(!farbe) farbe = "schwarz";
+        if (!farbe) farbe = "schwarz";
         let color: number = GNGFarben[farbe.toLocaleLowerCase()];
         this.turtle._setBorderColorInt(color);
     }
 
-    _ganzNachVornBringen(){
+    _ganzNachVornBringen() {
         this.turtle.bringToFront();
     }
 
-    _ganzNachHintenBringen(){
+    _ganzNachHintenBringen() {
         this.turtle.sendToBack();
     }
 
-    _nachVornBringen(){
+    _nachVornBringen() {
         this.turtle.bringOnePlaneFurtherToFront();
     }
 
-    _nachHintenBringen(){
+    _nachHintenBringen() {
         this.turtle.bringOnePlaneFurtherToBack();
     }
 
@@ -141,44 +139,53 @@ export class GNGTurtle extends ObjectClass implements IGNGEventListener {
         let lastLineElement = this.turtle.lineElements[this.turtle.lineElements.length - 1];
         let x = lastLineElement.x;
         let y = lastLineElement.y;
-        if(object instanceof ShapeClass || object instanceof GNGBaseFigur || object instanceof GNGFigur || object instanceof GNGTurtle) return object._containsPoint(x, y);
+        if (object instanceof ShapeClass || object instanceof GNGBaseFigur || object instanceof GNGFigur || object instanceof GNGTurtle) return object._containsPoint(x, y);
 
         return false;
     }
 
 
-        // Eventlistener-dummies:
-        _mj$AktionAusführen$void$(t: Thread, callback: () => void | undefined): void {
-            throw new Error("Method not implemented.");
-        }
-        _mj$TasteGedrückt$void$char(t: Thread, callback: () => void | undefined, key: string): void {
-            throw new Error("Method not implemented.");
-        }
-        _mj$SondertasteGedrückt$void$int(t: Thread, callback: () => void | undefined, key: number): void {
-            throw new Error("Method not implemented.");
-        }
-        _mj$MausGeklickt$void$int$int$int(t: Thread, callback: () => void | undefined, x: number, y: number, anzahl: number): void {
-            throw new Error("Method not implemented.");
-        }
-    
-        _mj$TaktImpulsAusführen$void$(t: Thread, callback: (() => void) | undefined): void {
-            throw new Error("Method not implemented.");
-        }
-    
-        _mj$Ausführen$void$(t: Thread, callback: (() => void) | undefined): void {
-            throw new Error("Method not implemented.");
-        }
-        _mj$Taste$void$char(t: Thread, callback: (() => void) | undefined, key: string): void {
-            throw new Error("Method not implemented.");
-        }
-        _mj$SonderTaste$void$int(t: Thread, callback: (() => void) | undefined, key: number): void {
-            throw new Error("Method not implemented.");
-        }
-        _mj$Geklickt$void$int$int$int(t: Thread, callback: (() => void) | undefined, x: number, y: number, anzahl: number): void {
-            throw new Error("Method not implemented.");
-        }
-    
-        _containsPoint(x: number, y: number){
-            return this.turtle._containsPoint(x, y);
-        }
+    // Eventlistener-dummies:
+    _mj$AktionAusführen$void$(t: Thread, callback: () => void | undefined): void {
+        throw new Error("Method not implemented.");
+    }
+    _mj$TasteGedrückt$void$char(t: Thread, callback: () => void | undefined, key: string): void {
+        throw new Error("Method not implemented.");
+    }
+    _mj$SonderTasteGedrückt$void$int(t: Thread, callback: () => void | undefined, key: number): void {
+        throw new Error("Method not implemented.");
+    }
+    _mj$MausGeklickt$void$int$int$int(t: Thread, callback: () => void | undefined, x: number, y: number, anzahl: number): void {
+        throw new Error("Method not implemented.");
+    }
+
+    _mj$TaktImpulsAusführen$void$(t: Thread, callback: (() => void) | undefined): void {
+        throw new Error("Method not implemented.");
+    }
+
+    _mj$Ausführen$void$(t: Thread, callback: (() => void) | undefined): void {
+        throw new Error("Method not implemented.");
+    }
+    _mj$Taste$void$char(t: Thread, callback: (() => void) | undefined, key: string): void {
+        throw new Error("Method not implemented.");
+    }
+    _mj$SonderTaste$void$int(t: Thread, callback: (() => void) | undefined, key: number): void {
+        throw new Error("Method not implemented.");
+    }
+    _mj$Geklickt$void$int$int$int(t: Thread, callback: (() => void) | undefined, x: number, y: number, anzahl: number): void {
+        throw new Error("Method not implemented.");
+    }
+
+    _containsPoint(x: number, y: number) {
+        return this.turtle._containsPoint(x, y);
+    }
+
+    _entfernen(){
+        this.turtle.world.unRegisterGNGEventListener(this, "aktionAusführen");        
+        this.turtle.world.unRegisterGNGEventListener(this, "tasteGedrückt");
+        this.turtle.world.unRegisterGNGEventListener(this, "sondertasteGedrückt");
+        this.turtle.world.unRegisterGNGEventListener(this, "mausGeklickt");
+        this.turtle.destroy();
+    }   
+
 }

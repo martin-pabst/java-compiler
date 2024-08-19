@@ -266,11 +266,15 @@ export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
     }
 
     hasActors(): boolean {
-        return this.actorManager.hasActors() || this.mouseManager.hasMouseListeners() || this.gngEventlistenerManager?.hasEventListeners();
+        return this.actorManager?.hasActors() || this.mouseManager.hasMouseListeners() || this.gngEventlistenerManager?.hasEventListeners();
     }
 
     registerGNGEventListener(listener: IGNGEventListener, type: GNGEventListenerType): void {
         this.gngEventlistenerManager.registerEventlistener(listener, type);
+    }
+
+    unRegisterGNGEventListener(listener: IGNGEventListener, type: GNGEventListenerType): void {
+        this.gngEventlistenerManager.removeEventlistener(listener, type);
     }
 
     _setBackgroundColor(color: string | number) {

@@ -201,7 +201,7 @@ export class SeveralParameterTemplate extends CodeTemplate {
         */
         let parametersInDescendingOrder = this.orderedParameters.sort((p1, p2) => p2.order - p1.order);
         let lastParts: CodeSnippet[] = [];
-        for (let i = parametersInDescendingOrder.length - 1; i >= 0; i--) {
+        for (let i = 0; i < parametersInDescendingOrder.length; i++) {
             let parameter = parametersInDescendingOrder[i];
             snippetContainer.addParts(snippets[parameter.n - 1].allButLastPart());
             let lastPart = snippets[parameter.n - 1].lastPartOrPop();

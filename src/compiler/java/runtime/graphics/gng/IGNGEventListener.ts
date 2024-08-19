@@ -12,7 +12,7 @@ export interface IGNGEventListener {
     _mj$TaktImpulsAusführen$void$(t: Thread, callback: (() => void) | undefined): void;
     _mj$TasteGedrückt$void$char(t: Thread, callback: (() => void) | undefined, key: string): void;
     _mj$Taste$void$char(t: Thread, callback: (() => void) | undefined, key: string): void;
-    _mj$SondertasteGedrückt$void$int(t: Thread, callback: (() => void) | undefined, key: number): void;
+    _mj$SonderTasteGedrückt$void$int(t: Thread, callback: (() => void) | undefined, key: number): void;
     _mj$SonderTaste$void$int(t: Thread, callback: (() => void) | undefined, key: number): void;
     _mj$MausGeklickt$void$int$int$int(t: Thread, callback: (() => void) | undefined, x: number, y: number, anzahl: number): void;
     _mj$Geklickt$void$int$int$int(t: Thread, callback: (() => void) | undefined, x: number, y: number, anzahl: number): void;

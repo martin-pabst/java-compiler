@@ -59,6 +59,13 @@ export class RectangleClass extends FilledShapeClass {
 
     }
 
+    calculateHitPolygonInitial(){
+        this.hitPolygonInitial = [
+            { x: this.left, y: this.top }, { x: this.left, y: this.top + this.height },
+            { x: this.left + this.width, y: this.top + this.height }, { x: this.left + this.width, y: this.top }
+        ];
+    }
+
     _mj$copy$Rectangle$(t: Thread, callback: CallbackFunction){
         let copy = new RectangleClass();
         copy._cj$_constructor_$Rectangle$double$double$double$double(t, callback, this.left, this.top, this.width, this.height);
@@ -104,13 +111,14 @@ export class RectangleClass extends FilledShapeClass {
     _setWidth(width: number){
         this.width = width / this.container.scale.x;
         this.centerXInitial = this.left + this.width / 2;
-
+        this.calculateHitPolygonInitial();
         this.render();
     }
-
+    
     _setHeight(height: number){
         this.height = height / this.container.scale.y;
         this.centerYInitial = this.top + this.height / 2;
+        this.calculateHitPolygonInitial();
 
         this.render();
     }

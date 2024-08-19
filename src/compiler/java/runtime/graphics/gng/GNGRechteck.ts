@@ -39,6 +39,8 @@ export class GNGRechteck extends GNGBaseFigur {
         rectangle.width = this.width;
         rectangle.height = this.height;
 
+        rectangle.calculateHitPolygonInitial();
+
         rectangle.render();
 
         rectangle.container.localTransform.identity();

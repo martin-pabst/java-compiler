@@ -190,7 +190,7 @@ export class GNGEventlistenerManager implements InternalMouseListener {
                 let t = this.interpreter.scheduler.createThread("GNG SondertasteGedrückt event thread");
     
                 for (let actor of this.listeners["sondertasteGedrückt"]) {
-                    actor._mj$SondertasteGedrückt$void$int(t, undefined, keyCode);
+                    actor._mj$SonderTasteGedrückt$void$int(t, undefined, keyCode);
                 }
                 for (let actor of this.listeners["sondertaste"]) {
                     actor._mj$SonderTaste$void$int(t, undefined, keyCode);

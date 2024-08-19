@@ -28,7 +28,7 @@ export class GNGAktionsempfaenger extends InterfaceClass implements IGNGEventLis
     _mj$TasteGedrückt$void$char(t: Thread, callback: () => void | undefined, key: string): void {
         throw new Error("Method not implemented.");
     }
-    _mj$SondertasteGedrückt$void$int(t: Thread, callback: () => void | undefined, key: number): void {
+    _mj$SonderTasteGedrückt$void$int(t: Thread, callback: () => void | undefined, key: number): void {
         throw new Error("Method not implemented.");
     }
     _mj$MausGeklickt$void$int$int$int(t: Thread, callback: () => void | undefined, x: number, y: number, anzahl: number): void {

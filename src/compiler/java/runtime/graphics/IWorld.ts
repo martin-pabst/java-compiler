@@ -34,6 +34,7 @@ export interface IWorld {
     _setBackgroundColor(color: string | number): void;
 
     registerGNGEventListener(listener: IGNGEventListener, type: GNGEventListenerType): void;
+    unRegisterGNGEventListener(listener: IGNGEventListener, type: GNGEventListenerType): void;
 
     _setCursor(cursor: string): void;
 
