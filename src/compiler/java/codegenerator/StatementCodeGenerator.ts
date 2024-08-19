@@ -848,7 +848,7 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
 
     compilePrintStatement(node: ASTPrintStatementNode): CodeSnippet | undefined {
         let firstParameter = this.compileTerm(node.firstParameter);
-        let secondParameter = this.compileTerm(node.secondParameter);
+        let secondParameter = node.secondParameter ? this.compileTerm(node.secondParameter) : undefined;
 
 
         let statement = node.isPrintln ? Helpers.println : Helpers.print;

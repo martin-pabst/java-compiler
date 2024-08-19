@@ -214,13 +214,13 @@ export class JavaClass extends IJavaClass {
                 if (m.isAbstract) {
                     abstractMethods.push(m);
                 } else {
-                    concreteMethodSignatures.set(m.getSignature(), m);
+                    concreteMethodSignatures.set(m.getSignatureWithoutReturnParameter(), m);
                 }
             }
             klass = klass.getExtends();
         }
 
-        let abstractMethodsNotYetImplemented = abstractMethods.filter(m => !concreteMethodSignatures.get(m.getSignature()));
+        let abstractMethodsNotYetImplemented = abstractMethods.filter(m => !concreteMethodSignatures.get(m.getSignatureWithoutReturnParameter()));
 
         return abstractMethodsNotYetImplemented;
 
@@ -601,9 +601,9 @@ export class GenericVariantOfJavaClass extends IJavaClass {
         let newTypeMap: Map<GenericTypeParameter, NonPrimitiveType> = new Map();
         let copyNeeded = false;
         this.typeMap.forEach((jt, gt) => {
-            let jtCopy = jt.getCopyWithConcreteType(otherTypeMap);
+            let jtCopy = <NonPrimitiveType>jt.getCopyWithConcreteType(otherTypeMap);
             if (jt != jtCopy) copyNeeded = true;
-            newTypeMap.set(gt, jt);
+            newTypeMap.set(gt, jtCopy);
         })
 
         if (!copyNeeded) return this;

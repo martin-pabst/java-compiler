@@ -74,4 +74,9 @@ export abstract class PrimitiveType extends JavaType {
     getAbsoluteName(): string {
         return this.toString();
     }
+
+    isByteShortIntLong(){
+        return false;
+    }
+
 }

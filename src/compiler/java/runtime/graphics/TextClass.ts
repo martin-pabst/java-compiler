@@ -97,6 +97,10 @@ export class TextClass extends FilledShapeClass {
 
     }
 
+    _mj$copy$Shape$(t: Thread, callback: CallbackParameter){
+        this._mj$copy$Text$(t, callback);
+    }
+
     _mj$copy$Text$(t: Thread, callback: CallbackFunction) {
         let copy = new TextClass();
         copy._cj$_constructor_$Text$double$double$double$string(t, callback, this.x, this.y, this.fontsize, this.text, this.fontFamily);

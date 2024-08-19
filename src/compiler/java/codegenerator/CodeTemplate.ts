@@ -1,6 +1,7 @@
 import { Helpers, StepParams } from "../../common/interpreter/StepFunction";
 import { IRange } from "../../common/range/Range";
 import { JCM } from "../language/JavaCompilerMessages";
+import { PrimitiveType } from "../runtime/system/primitiveTypes/PrimitiveType";
 import { JavaType } from "../types/JavaType";
 import { CodeSnippet, ConstantValue, StringCodeSnippet } from "./CodeSnippet";
 import { CodeSnippetContainer } from "./CodeSnippetKinds";
@@ -10,10 +11,10 @@ export abstract class CodeTemplate {
 
     abstract applyToSnippet(resultType: JavaType, range: IRange, ...snippets: CodeSnippet[]): CodeSnippet;
 
-    static getCommaSeparatedParameterIdentifiers(from: number, to: number){
+    static getCommaSeparatedParameterIdentifiers(from: number, to: number) {
         let s: string = "";
-        for(let i = from; i < to; i++) s += ("§" + i + ", ");
-        if(to >= from) s += "§" + to;
+        for (let i = from; i < to; i++) s += ("§" + i + ", ");
+        if (to >= from) s += "§" + to;
         return s;
     }
 
@@ -60,7 +61,7 @@ export class TwoParameterTemplate extends CodeTemplate {
         let countPlaceholderOne = (this.templateString.match(/\§1/g) || []).length;
         let countPlaceholderTwo = (this.templateString.match(/\§2/g) || []).length;
 
-        if((countPlaceholderOne > 1 && !snippet0Pure) || (countPlaceholderTwo > 1 && !snippet1Pure)){
+        if ((countPlaceholderOne > 1 && !snippet0Pure) || (countPlaceholderTwo > 1 && !snippet1Pure)) {
             throw "TwoParameterTemplate: can't replace more than one placeholder with non-pure snippet."
         }
 
@@ -86,7 +87,7 @@ export class TwoParameterTemplate extends CodeTemplate {
             snippetContainer.addParts(snippets[0]);
         } else {
             snippetContainer.addParts(snippets[0]);
-            snippetContainer.addParts(snippets[1]); 
+            snippetContainer.addParts(snippets[1]);
         }
 
         snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\§1', 'g'), `${StepParams.stack}.pop()`)
@@ -107,40 +108,40 @@ type OrderedParameter = { parameter: string, n: number, order: number };
 
 
 export class ParametersJoinedTemplate {
-    static applyToSnippet(resultType: JavaType, range: IRange, 
+    static applyToSnippet(resultType: JavaType, range: IRange,
         prefix: string, separator: string, suffix: string,
         ...snippets: CodeSnippet[]): CodeSnippet {
-    
-            // only pure Terms? => faster variant
-            let onlyPureTerms = true;
-            for(let snippet of snippets){
-                if(!snippet.isPureTerm()){
-                    onlyPureTerms = false;
-                    break;
-                }
-            }
-    
-            if(onlyPureTerms){
-                let newSnippet = new StringCodeSnippet(prefix + snippets.map(s => s.emit()).join(separator) + suffix, range, resultType);
-                snippets.forEach(sn => newSnippet.takeEmitToStepListenersFrom(sn));
-                return newSnippet;
-            }
-    
-            let snippetContainer = new CodeSnippetContainer([], range, resultType);
-            
-            for (let i = snippets.length - 1; i >= 0; i--) {
-                snippetContainer.addParts(snippets[i].allButLastPart());
-            }
 
-            let lastParts = snippets.map(sn => sn.lastPartOrPop());
+        // only pure Terms? => faster variant
+        let onlyPureTerms = true;
+        for (let snippet of snippets) {
+            if (!snippet.isPureTerm()) {
+                onlyPureTerms = false;
+                break;
+            }
+        }
 
-            let term = prefix + lastParts.map( lp => lp.emit()).join(separator) + suffix;
+        if (onlyPureTerms) {
+            let newSnippet = new StringCodeSnippet(prefix + snippets.map(s => s.emit()).join(separator) + suffix, range, resultType);
+            snippets.forEach(sn => newSnippet.takeEmitToStepListenersFrom(sn));
+            return newSnippet;
+        }
 
-            snippetContainer.addStringPart(term, range, resultType, lastParts);
-    
-            return snippetContainer;
-    
-        }    
+        let snippetContainer = new CodeSnippetContainer([], range, resultType);
+
+        for (let i = snippets.length - 1; i >= 0; i--) {
+            snippetContainer.addParts(snippets[i].allButLastPart());
+        }
+
+        let lastParts = snippets.map(sn => sn.lastPartOrPop());
+
+        let term = prefix + lastParts.map(lp => lp.emit()).join(separator) + suffix;
+
+        snippetContainer.addStringPart(term, range, resultType, lastParts);
+
+        return snippetContainer;
+
+    }
 }
 
 /**
@@ -149,12 +150,16 @@ export class ParametersJoinedTemplate {
  */
 export class SeveralParameterTemplate extends CodeTemplate {
 
-    private orderedParameters: OrderedParameter[] = [];
+    private orderedParameters!: OrderedParameter[];
     private maxN: number = -1;
 
     constructor(private templateString: string) {
         super();
-        let parameterStrings = templateString.match(/\§\d*/g);  // is undefined if none where found
+    }
+
+    analyzeTemplateString() {
+        this.orderedParameters = [];
+        let parameterStrings = this.templateString.match(/\§\d*/g);  // is undefined if none where found
 
         if (parameterStrings) {
             for (let i = 0; i < parameterStrings.length; i++) {
@@ -168,6 +173,14 @@ export class SeveralParameterTemplate extends CodeTemplate {
 
     applyToSnippet(resultType: JavaType, range: IRange, ...snippets: CodeSnippet[]): CodeSnippet {
 
+        // if there are <= 2 parameters: use faster templates which don't need to analyze the template string and may generate more efficient code:
+        // switch (snippets.length) {
+        //     case 1: return new OneParameterTemplate(this.templateString).applyToSnippet(resultType, range, snippets[0]);
+        //     case 2: return new TwoParameterTemplate(this.templateString).applyToSnippet(resultType, range, snippets[0], snippets[1]);
+        // }
+
+        this.analyzeTemplateString();
+
         if (snippets.length < this.maxN) {
             console.log("SeveralParameterTemplate.applyToSnippet: too few parameters!");
             return new StringCodeSnippet("Error, see console log.", range);
@@ -177,24 +190,24 @@ export class SeveralParameterTemplate extends CodeTemplate {
 
         // only pure Terms? => faster variant
         let onlyPureTerms = true;
-        for(let snippet of snippets){
-            if(!snippet.isPureTerm()){
+        for (let snippet of snippets) {
+            if (!snippet.isPureTerm()) {
                 onlyPureTerms = false;
                 break;
             }
         }
 
-        if(onlyPureTerms){
-            for(let parameter of this.orderedParameters){
+        if (onlyPureTerms) {
+            for (let parameter of this.orderedParameters) {
                 appliedTemplate = appliedTemplate.replace(new RegExp('\\' + parameter.parameter, 'g'), snippets[parameter.n - 1].emit());
-            }            
+            }
             let snippet = new StringCodeSnippet(appliedTemplate, range, resultType);
             snippet.takeEmitToStepListenersFrom(snippets);
             return snippet;
         }
 
         let snippetContainer = new CodeSnippetContainer([], range, resultType);
-        
+
         /*
         * Some snippets may push values to stack. We have to ensure they do this in reversed parameter order so that
         * values get popped in unreversed order.
@@ -233,21 +246,35 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         let snippet0IsConstant = snippets[0].isConstant();
         let snippet1IsConstant = snippets[1].isConstant();
 
-        if(snippet0IsConstant && snippet1IsConstant){
+        if (snippet0IsConstant && snippet1IsConstant) {
             return this.foldConstants(snippets[0], snippets[1], this.operator, _resultType, _range);
         }
 
         if (snippet0IsPure && snippet1IsPure) {
             let snippet: StringCodeSnippet;
-            if(this.operator == "/" || this.operator == "%"){
-                if(snippet1IsConstant && snippets[1].getConstantValue() != 0){
-                    snippet = new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm(),
-                     _range, _resultType);
-                } else {
-                    snippet = new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " (" + snippets[1].getPureTerm() + 
-                    `|| ${Helpers.throwAE}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`,
-                     _range, _resultType);
+            
+            if (this.operator == "/" || this.operator == "%") {
+                let prefix: string = "";
+                let suffix: string = "";
+                
+                if(this.operator == "/"){
+                    let bothTypesAreShortByteIntLong: boolean = snippets[0].type instanceof PrimitiveType && snippets[0].type.isByteShortIntLong() && snippets[1].type instanceof PrimitiveType && snippets[1].type.isByteShortIntLong();
+                    if (bothTypesAreShortByteIntLong) {
+                        prefix = "Math.trunc( ";
+                        suffix = ")";
+                    }
                 }
+
+                if (snippet1IsConstant && snippets[1].getConstantValue() != 0) {
+                    snippet = new StringCodeSnippet(prefix + snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm() + suffix,
+                        _range, _resultType);
+                } else {
+                        snippet = new StringCodeSnippet(prefix +  snippets[0].getPureTerm() + " " + this.operator + " (" + snippets[1].getPureTerm() +
+                        `|| ${Helpers.throwArithmeticException}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))` + suffix,
+                        _range, _resultType);
+                }
+
+                
             } else {
                 snippet = new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm(), _range, _resultType);
             }
@@ -276,7 +303,14 @@ export class BinaryOperatorTemplate extends CodeTemplate {
 
             switch (this.operator) {
                 case '-': snippetContainer.addStringPart(`-${StepParams.stack}.pop() + ${StepParams.stack}.pop()`, _range, _resultType); break;
-                case '/': snippetContainer.addStringPart(`1/(${StepParams.stack}.pop() || ${Helpers.throwAE}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn})) * ${StepParams.stack}.pop()`, _range, _resultType); break;
+                case '/':
+                    let bothTypesAreShortByteIntLong: boolean = snippets[0].type instanceof PrimitiveType && snippets[0].type.isByteShortIntLong() && snippets[1].type instanceof PrimitiveType && snippets[1].type.isByteShortIntLong();
+                    if (bothTypesAreShortByteIntLong) {
+                        snippetContainer.addStringPart(`Math.trunc( 1/(${StepParams.stack}.pop() || ${Helpers.throwArithmeticException}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn})) * ${StepParams.stack}.pop() );`, _range, _resultType);
+                    } else {
+                        snippetContainer.addStringPart(`1/(${StepParams.stack}.pop() || ${Helpers.throwArithmeticException}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn})) * ${StepParams.stack}.pop()`, _range, _resultType);
+                    }
+                    break;
                 case '<': snippetContainer.addStringPart(`${StepParams.stack}.pop() > ${StepParams.stack}.pop()`, _range, _resultType); break;
                 case '>': snippetContainer.addStringPart(`${StepParams.stack}.pop() < ${StepParams.stack}.pop()`, _range, _resultType); break;
                 case '<=': snippetContainer.addStringPart(`${StepParams.stack}.pop() >= ${StepParams.stack}.pop()`, _range, _resultType); break;
@@ -290,8 +324,8 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         snippets[1].ensureFinalValueIsOnStack();
         snippetContainer.addParts(snippets[1]);
         snippetContainer.addParts(snippets[0]);
-        if(this.operator == '%'){
-            snippetContainer.addStringPart(`${StepParams.stack}.pop() ${this.operator} (${StepParams.stack}.pop() || ${Helpers.throwAE}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`, _range, _resultType);
+        if (this.operator == '%') {
+            snippetContainer.addStringPart(`${StepParams.stack}.pop() ${this.operator} (${StepParams.stack}.pop() || ${Helpers.throwArithmeticException}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))`, _range, _resultType);
         } else {
             snippetContainer.addStringPart(`${StepParams.stack}.pop() ${this.operator} ${StepParams.stack}.pop()`, _range, _resultType);
         }
@@ -300,15 +334,15 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         return snippetContainer;
     }
 
-    foldConstants(snippet0: CodeSnippet, snippet1: CodeSnippet, operator: string, 
+    foldConstants(snippet0: CodeSnippet, snippet1: CodeSnippet, operator: string,
         resultType: JavaType, range: IRange): CodeSnippet {
-        
+
         let value0 = snippet0.getConstantValue()!;
-        let value1 = snippet1.getConstantValue()!; 
+        let value1 = snippet1.getConstantValue()!;
 
         let result!: ConstantValue;
 
-        switch(operator){
+        switch (operator) {
             //@ts-ignore
             case "+": result = value0 + value1; break;
             //@ts-ignore

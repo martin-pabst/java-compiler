@@ -16,4 +16,8 @@ export class ShortPrimitiveType extends PrimitiveType {
         return 0;
     }
 
+    isByteShortIntLong(){
+        return true;
+    }
+
 }

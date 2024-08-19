@@ -8,6 +8,7 @@ import { FilledShapeDefaults } from './FilledShapeDefaults';
 import { ColorClass } from './ColorClass';
 import { ColorHelper } from '../../lexer/ColorHelper';
 import { JRC } from '../../language/JavaRuntimeLibraryComments';
+import { NullPointerExceptionClass } from '../system/javalang/NullPointerExceptionClass';
 
 export class FilledShapeClass extends ShapeClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -15,11 +16,15 @@ export class FilledShapeClass extends ShapeClass {
 
         { type: "method", signature: "FilledShape()", java: FilledShapeClass.prototype._cj$_constructor_$FilledShape$ },
         { type: "method", signature: "Color getFillColor()", native: FilledShapeClass.prototype._getFillColor , comment: JRC.fsGetFillColorComment},
+        { type: "method", signature: "void setFillColor(Color color)", native: FilledShapeClass.prototype._setFillColorColor , comment: JRC.fsSetFillColorCommentColor},
+        { type: "method", signature: "void setFillColor(Color color, double alpha)", native: FilledShapeClass.prototype._setFillColorColor , comment: JRC.fsSetFillColorCommentColor},
         { type: "method", signature: "void setFillColor(int color)", native: FilledShapeClass.prototype._setFillColorInt , comment: JRC.fsSetFillColorCommentInt},
         { type: "method", signature: "void setFillColor(int color, double alpha)", native: FilledShapeClass.prototype._setFillColorIntDouble , comment: JRC.fsSetFillColorCommentIntDouble},
         { type: "method", signature: "void setFillColor(string color)", native: FilledShapeClass.prototype._setFillColorString , comment: JRC.fsSetFillColorCommentString},
         { type: "method", signature: "void setFillColor(string color, double alpha)", native: FilledShapeClass.prototype._setFillColorStringDouble , comment: JRC.fsSetFillColorCommentStringDouble},
         { type: "method", signature: "Color getBorderColor()", native: FilledShapeClass.prototype._getBorderColor , comment: JRC.fsGetBorderColorComment},
+        { type: "method", signature: "void setBorderColor(Color color)", native: FilledShapeClass.prototype._setBorderColorColor , comment: JRC.fsSetBorderColorCommentColor},
+        { type: "method", signature: "void setBorderColor(Color color, double alpha)", native: FilledShapeClass.prototype._setBorderColorColor , comment: JRC.fsSetBorderColorCommentColor},
         { type: "method", signature: "void setBorderColor(int color)", native: FilledShapeClass.prototype._setBorderColorInt , comment: JRC.fsSetBorderColorCommentInt},
         { type: "method", signature: "void setBorderColor(int color, double alpha)", native: FilledShapeClass.prototype._setBorderColorIntDouble , comment: JRC.fsSetBorderColorCommentIntDouble},
         { type: "method", signature: "void setBorderColor(string color)", native: FilledShapeClass.prototype._setBorderColorString , comment: JRC.fsSetBorderColorCommentString},
@@ -103,6 +108,20 @@ export class FilledShapeClass extends ShapeClass {
 
     _setFillColorInt(color: number) {
         this.fillColor = color % 0x1000000;
+        this.render();
+    }
+
+    _setFillColorColor(color: ColorClass, alpha?: number) {
+        if(color == null) throw new NullPointerExceptionClass(JRC.fsColorIsNullException());
+        this.fillColor = color.red * 0x10000 + color.green * 0x100 + color.blue;
+        if(alpha) this.fillAlpha = alpha;
+        this.render();
+    }
+
+    _setBorderColorColor(color: ColorClass, alpha?: number) {
+        if(color == null) throw new NullPointerExceptionClass(JRC.fsColorIsNullException());
+        this.borderColor = color.red * 0x10000 + color.green * 0x100 + color.blue;
+        if(alpha) this.borderAlpha = alpha;
         this.render();
     }
 

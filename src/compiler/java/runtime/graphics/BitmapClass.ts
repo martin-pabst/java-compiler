@@ -145,6 +145,10 @@ export class BitmapClass extends ShapeClass {
         this.world.app.stage.addChild(this.container);
     }
 
+    _mj$copy$Shape$(t: Thread, callback: CallbackParameter){
+        this._mj$copy$Bitmap$(t, callback);
+    }
+
     _mj$copy$Bitmap$(t: Thread, callback: CallbackFunction) {
         let copy = new BitmapClass();
         copy._cj$_constructor_$Bitmap$int$int$double$double$double$double(t, callback, this.anzahlX, this.anzahlY, this.left, this.top, this.width, this.height,

@@ -40,7 +40,7 @@ export class ShortClass extends NumberClass {
     }
 
     static parseShort(s: StringClass, radix: number = 10){
-        return Number.parseInt(s.value, radix) % 0x10000 - 0x8000;
+        return (Number.parseInt(s.value, radix) + 0x8000) % 0x10000 - 0x8000;
     }
 
     intValue(){

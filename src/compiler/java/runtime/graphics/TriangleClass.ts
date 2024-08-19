@@ -1,3 +1,4 @@
+import { CallbackParameter } from '../../../common/interpreter/CallbackParameter.ts';
 import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { Thread } from "../../../common/interpreter/Thread";
 import { JRC } from '../../language/JavaRuntimeLibraryComments.ts';
@@ -32,7 +33,11 @@ export class TriangleClass extends PolygonClass {
 
     }
 
-    _mj$copy$Triangle$(t: Thread, callback: CallbackFunction){
+    _mj$copy$Shape$(t: Thread, callback: CallbackParameter){
+        this._mj$copy$Triangle$(t, callback);
+    }
+
+    _mj$copy$Triangle$(t: Thread, callback: CallbackParameter){
         let copy = new TriangleClass();
         copy._cj$_constructor_$Polygon$boolean$double_I(t, callback, true, [this.hitPolygonInitial[0].x, this.hitPolygonInitial[0].y,this.hitPolygonInitial[1].x, this.hitPolygonInitial[1].y,this.hitPolygonInitial[2].x, this.hitPolygonInitial[2].y,] );
         copy.copyFrom(this);

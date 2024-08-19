@@ -67,6 +67,10 @@ export class ArcClass extends FilledShapeClass {
 
     }
 
+    _mj$copy$Shape$(t: Thread, callback: CallbackParameter){
+        this._mj$copy$Arc$(t, callback);
+    }
+
     _mj$copy$Arc$(t: Thread, callback: CallbackFunction) {
         let copy = new ArcClass();
         copy._cj$_constructor_$Arc$double$double$double$double$double$double(t, callback, this.mx, this.my, this.innerRadius, this.outerRadius, this.startAngleRad, this.endAngleRad);

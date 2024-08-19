@@ -129,6 +129,10 @@ export class PolygonClass extends FilledShapeClass {
 
     }
 
+    _mj$copy$Shape$(t: Thread, callback: CallbackParameter){
+        this._mj$copy$Polygon$(t, callback);
+    }
+
     _mj$copy$Polygon$(t: Thread, callback: CallbackFunction) {
         let copy = new PolygonClass();
         copy._cj$_constructor_$Polygon$boolean$double_I(t, callback, this.closeAndFill, [], this.isClosed);

@@ -1,7 +1,9 @@
+import { Klass } from "../../../common/interpreter/StepFunction";
 import { SystemModule } from "../../runtime/system/SystemModule";
+import { GenericTypeParameter } from "../../types/GenericTypeParameter";
 import { JavaType } from "../../types/JavaType";
 import { JavaTypeStore } from "../JavaTypeStore";
-import { JavaLibraryModule, JavaTypeMap } from "./JavaLibraryModule";
+import { JavaLibraryModule, JavaTypeMap, LibraryKlassType } from "./JavaLibraryModule";
 import { LibraryDeclarationParser } from "./LibraryDeclarationParser";
 
 export class JavaLibraryModuleManager {
@@ -23,8 +25,8 @@ export class JavaLibraryModuleManager {
 
         let ldp: LibraryDeclarationParser = new LibraryDeclarationParser(this.systemModule);
         ldp.parseClassOrEnumOrInterfaceDeclarationWithoutGenerics(this.systemModule.primitiveStringClass, this.systemModule);
-        ldp.parseAttributesAndMethods(this.systemModule.primitiveStringClass, this.typestore, this.systemModule);
         ldp.parseClassOrInterfaceDeclarationGenericsAndExtendsImplements(this.systemModule.primitiveStringClass, this.typestore, this.systemModule);
+        ldp.parseFieldsAndMethods(this.systemModule.primitiveStringClass, this.typestore, this.systemModule);
 
         this.typestore.initFastExtendsImplementsLookup();
 
@@ -51,11 +53,22 @@ export class JavaLibraryModuleManager {
 
         }
 
+        let classToGenericTypeParameterMap: Map<Klass, Record<string, GenericTypeParameter>> = new Map();
+
         for(let module of this.libraryModules){
             for(let klass of module.classes){
-                ldp.genericParameterMapStack.push({});
+                let genericTypeParameterMap: Record<string, GenericTypeParameter> = {};
+                classToGenericTypeParameterMap.set(klass, genericTypeParameterMap);
+                ldp.genericParameterMapStack.push(genericTypeParameterMap);
                 ldp.parseClassOrInterfaceDeclarationGenericsAndExtendsImplements(klass, this.typestore, module);
-                ldp.parseAttributesAndMethods(klass, this.typestore, module);
+                ldp.genericParameterMapStack.pop();
+            }
+        }        
+
+        for(let module of this.libraryModules){
+            for(let klass of module.classes){
+                ldp.genericParameterMapStack.push(classToGenericTypeParameterMap.get(klass)!);
+                ldp.parseFieldsAndMethods(klass, this.typestore, module);
                 ldp.genericParameterMapStack.pop();
             }
         }        

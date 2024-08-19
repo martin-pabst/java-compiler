@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js';
 import { convexhull } from '../../../../tools/ConvexHull';
-import { CallbackFunction } from '../../../common/interpreter/StepFunction';
 import { Thread } from "../../../common/interpreter/Thread";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
@@ -14,6 +13,7 @@ import { ShapeClass } from './ShapeClass';
 import { SpriteLibraryEnum } from './SpriteLibraryEnum';
 import { JRC } from '../../language/JavaRuntimeLibraryComments';
 import { ExceptionPrinter } from '../../../common/interpreter/ExceptionPrinter';
+import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
 
 export class SpriteClass extends ShapeClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -63,7 +63,7 @@ export class SpriteClass extends ShapeClass {
     spriteLibrary!: string;
     imageIndex: number = 0;    // If you change this identifier then you have to change corresponding declaration in class ShapeClass
 
-    _cj$_constructor_$Sprite$double$double$SpriteLibrary$int$ScaleMode(t: Thread, callback: CallbackFunction,
+    _cj$_constructor_$Sprite$double$double$SpriteLibrary$int$ScaleMode(t: Thread, callback: CallbackParameter,
         x: number, y: number, spriteLibrary: SpriteLibraryEnum | string, imageIndex: number,
         scaleMode?: ScaleModeEnum, copyFromOtherShape?: ShapeClass
     ) {
@@ -104,19 +104,19 @@ export class SpriteClass extends ShapeClass {
 
     }
 
-    _cj$_constructor_$Sprite$double$double$SpriteLibrary$int(t: Thread, callback: CallbackFunction,
+    _cj$_constructor_$Sprite$double$double$SpriteLibrary$int(t: Thread, callback: CallbackParameter,
         x: number, y: number, spriteLibrary: SpriteLibraryEnum | undefined, imageIndex: number
     ) {
         return this._cj$_constructor_$Sprite$double$double$SpriteLibrary$int$ScaleMode(t, callback, x, y, spriteLibrary, imageIndex, undefined);
     }
 
-    _cj$_constructor_$Sprite$double$double$SpriteLibrary(t: Thread, callback: CallbackFunction,
+    _cj$_constructor_$Sprite$double$double$SpriteLibrary(t: Thread, callback: CallbackParameter,
         x: number, y: number, spriteLibrary: SpriteLibraryEnum | undefined
     ) {
         return this._cj$_constructor_$Sprite$double$double$SpriteLibrary$int$ScaleMode(t, callback, x, y, spriteLibrary, 0, undefined);
     }
 
-    _cj$_constructor_$Sprite$Shape$ScaleMode(t: Thread, callback: CallbackFunction, shape: ShapeClass, scaleMode?: ScaleModeEnum) {
+    _cj$_constructor_$Sprite$Shape$ScaleMode(t: Thread, callback: CallbackParameter, shape: ShapeClass, scaleMode?: ScaleModeEnum) {
 
         if (!shape) {
             throw new RuntimeExceptionClass(JRC.spriteShapeIsNullError());
@@ -127,7 +127,7 @@ export class SpriteClass extends ShapeClass {
         );
     }
 
-    _cj$_constructor_$Sprite$Shape(t: Thread, callback: CallbackFunction, shape: ShapeClass) {
+    _cj$_constructor_$Sprite$Shape(t: Thread, callback: CallbackParameter, shape: ShapeClass) {
 
         return this._cj$_constructor_$Sprite$Shape$ScaleMode(
             t, callback, shape, undefined
@@ -157,7 +157,8 @@ export class SpriteClass extends ShapeClass {
             height: height
         })
 
-        tileSprite.parent = sprite.parent;
+        sprite.parent.addChild(tileSprite);
+
         tileSprite.setFromMatrix(sprite.localTransform);
         tileSprite.updateLocalTransform();
 
@@ -273,7 +274,11 @@ export class SpriteClass extends ShapeClass {
         return sprite.height * this.scaleFactor;
     }
 
-    _mj$copy$Sprite$(t: Thread, callback: CallbackFunction) {
+    _mj$copy$Shape$(t: Thread, callback: CallbackParameter){
+        this._mj$copy$Sprite$(t, callback);
+    }
+
+    _mj$copy$Sprite$(t: Thread, callback: CallbackParameter) {
         let copy = new SpriteClass();
         copy._cj$_constructor_$Sprite$double$double$SpriteLibrary$int$ScaleMode(
             t, callback, this.x, this.y, SpriteLibraryEnum.values.find(v => v.name == this.spriteLibrary)!,

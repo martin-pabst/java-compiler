@@ -40,7 +40,7 @@ export class IntegerClass extends NumberClass {
     }
 
     static parseInt(s: StringClass, radix: number = 10){
-        return Number.parseInt(s.value, radix) % 0x100000000 - 0x80000000;
+        return (Number.parseInt(s.value, radix) + 0x80000000) % 0x100000000 - 0x80000000;
     }
 
     intValue(){

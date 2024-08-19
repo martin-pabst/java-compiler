@@ -41,7 +41,7 @@ class MissingStatements {
         if(i >= 0) {
             if(!this.symbolWriteHappened[i]){
                 let error = JCM.variableNotInitialized(symbol.identifier);
-                errors.push({message: error.message, id: error.id, level: "error", range: range});
+                errors.push({message: error.message, id: error.id, level: "warning", range: range});
             }
             this.symbolReadHappened[i] = true;
         }

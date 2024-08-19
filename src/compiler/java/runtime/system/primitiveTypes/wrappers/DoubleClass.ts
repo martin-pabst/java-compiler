@@ -14,6 +14,8 @@ export class DoubleClass extends NumberClass {
     static __javaDeclarations: LibraryDeclarations = [
         {type: "declaration", signature: "class Double extends Number implements Comparable<Double>"},
         {type: "field", signature: "static final int MAX_VALUE", constantValue: Number.MAX_VALUE}, 
+        {type: "field", signature: "static final int POSITIVE_INFINITY", constantValue: Number.POSITIVE_INFINITY}, 
+        {type: "field", signature: "static final int NEGATIVE_INFINITY", constantValue: Number.NEGATIVE_INFINITY}, 
         {type: "field", signature: "static final int MIN_VALUE", constantValue: Number.MIN_VALUE},
         // for doubleValue(), floatValue(), intValue() and longValue() there are methods (if called for a Number variable containing an Long value) and templates
         // (if called fo Long variable). Offering templates to the compiler is only possible because the methods are final.

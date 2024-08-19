@@ -164,6 +164,14 @@ export class JavaMethod extends BaseSymbol {
         }
     }
 
+    getSignatureWithoutReturnParameter() {
+        if (this.isConstructor) {
+            return this.identifier + "(" + this.parameters.map(p => p.type.getReifiedIdentifier()).join(", ") + ")";
+        } else {
+            return this.identifier + "(" + this.parameters.map(p => p.type.getReifiedIdentifier()).join(", ") + ")";
+        }
+    }
+
     getDeclaration(): string {
         let decl: string = TokenTypeReadable[this.visibility] + " ";
         if (this.isStatic) decl += "static ";

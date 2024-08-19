@@ -44,7 +44,7 @@ export class LongClass extends NumberClass {
     }
 
     intValue(){
-        return this.value % 0x100000000 - 0x80000000;
+        return (this.value + 0x80000000) % 0x100000000 - 0x80000000;
     }
 
     longValue(){

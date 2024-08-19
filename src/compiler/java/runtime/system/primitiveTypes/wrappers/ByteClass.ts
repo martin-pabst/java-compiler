@@ -40,7 +40,7 @@ export class ByteClass extends NumberClass {
     }
 
     static parseByte(s: StringClass, radix: number = 10){
-        return Number.parseInt(s.value, radix) % 0x100 - 0x80;
+        return (Number.parseInt(s.value, radix) + 0x80) % 0x100 - 0x80;
     }
 
     intValue(){

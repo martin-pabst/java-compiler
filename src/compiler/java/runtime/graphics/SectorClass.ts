@@ -65,6 +65,10 @@ export class SectorClass extends FilledShapeClass {
 
     }
 
+    _mj$copy$Shape$(t: Thread, callback: CallbackParameter){
+        this._mj$copy$Sector$(t, callback);
+    }
+
     _mj$copy$Sector$(t: Thread, callback: CallbackFunction) {
         let copy = new SectorClass();
         copy._cj$_constructor_$Sector$double$double$double$double$double(t, callback, this.mx, this.my, this.radius, this.startAngleRad, this.endAngleRad);

@@ -222,6 +222,11 @@ export class JRC {
         "en": "Sets world's background color. Color is coded as integer number, e.g. in hexadecimal writing (setBackgroundColor(0xff8080)).",
     })
 
+    static worldSetBackgroundColorColorComment = () => lm({
+        "de": "Setzt die Hintergrundfarbe. Die Farbe wird als Color-Objekt erwartet.",
+        "en": "Sets world's background color. Color is coded as color object.",
+    })
+
     static worldSetBackgroundColorStringComment = () => lm({
         "de": 'Setzt die Hintergrundfarbe. Die Farbe ist entweder eine vordefinierte Farbe ("schwarz", "rot", ...) oder eine css-Farbe der Art "#ffa7b3" (ohne alpha), "#ffa7b380" (mit alpha), "rgb(172, 22, 18)" oder "rgba(123, 22,18, 0.3)',
         "en": 'Sets world\'s background color. Color is coded as predefined color ("black", "red", ...) or css color like "#ffa7b3" (ohne alpha), "#ffa7b380" (mit alpha), "rgb(172, 22, 18)" oder "rgba(123, 22,18, 0.3).',
@@ -375,6 +380,11 @@ export class JRC {
     "en": `Makes the object react to mouse move events even if it doesn't contain the mouse pointer. Hint: use this method to create drag/drop-functionality.`,
     })
 
+    static shapeCopyComment = () => lm({
+    "de": `Erstellt eine Kopie des Grafikobjekts und gibt sie zurück.`,
+    "en": `Creates and returns a copy of this object.`,
+    })
+
     static shapeStopTrackingEveryMouseMovementComment = () => lm({
     "de": `Sorgt dafür, dass ab jetzt nur noch dann Bewegungen des Mauszeigers ein MouseMove-Ereignis für dieses Objekt auslösen, wenn sich der Mauszeiger über dem Objekt befindet. -> Praktisch zur Umsetzung des "Ziehens" von Objekten mit der Maus!`,
     "en": `Makes the object react to mouse move events only if it contains the mouse pointer. Hint: use this method to create drag/drop-functionality.`,
@@ -515,6 +525,11 @@ export class JRC {
         "en": "If this graphic object collides with any sprite with given imageIndex then this method returns the first one. Use imageIndex == -1 to search for ANY colliding Sprite.",
     })
 
+    static shapeGetCollidingShapesComment = () => lm({
+    "de": `Gibt alle Elemente der Group zurück, die mit diesem graphischen Objekt kollidieren.`,
+    "en": `Returns each element of given Group whicht collide with this object.`,
+    })
+
     static shapeBringToFrontComment = () => lm({
     "de": `Setzt das Grafikobjekt vor alle anderen innerhalb der Gruppe.`,
     "en": `Displays this object in front of all others inside the same group.`,
@@ -541,22 +556,32 @@ export class JRC {
 
     static fsSetFillColorCommentInt = () => lm({
         "de": "Setzt die Füllfarbe des Objekts. Die Farbe wird als integer-Wert angegeben.\n Tipp: Schreibe die Farbe in der Form 0xffffff, dann zeigt die IDE ein kleines Farbquadrat, mit dem Du einen Color Picker öffnen kannst.",
-        "en": "Set fill color as int value.\n Hint: If you write fillcolor as hex value like 0xffffff then the IDE shows a little color patch. Hover over it to open a color picker.",
+        "en": "Set fill color from int value.\n Hint: If you write fillcolor as hex value like 0xffffff then the IDE shows a little color patch. Hover over it to open a color picker.",
+    })
+
+    static fsSetFillColorCommentColor = () => lm({
+        "de": "Setzt die Füllfarbe des Objekts. Die Farbe wird als Color-Objekt angegeben.",
+        "en": "Set fill color from Color object value.",
+    })
+
+    static fsColorIsNullException = () => lm({
+    "de": `Die angegebene Farbe ist null.`,
+    "en": `Color is null.`,
     })
 
     static fsSetFillColorCommentIntDouble = () => lm({
         "de": "Setzt die Füllfarbe des Objekts. Die Farbe wird als integer-Wert angegeben, der alpha-Wert (Durchsichtigkeit) als double-Wert. 0.0 bedeutet komplett durchsichtig, 1.0 bedeutet kompett undurchsichtig.\n Tipp: Schreibe die Farbe in der Form 0xffffff, dann zeigt die IDE ein kleines Farbquadrat, mit dem Du einen Color Picker öffnen kannst.",
-        "en": "Set fill color as int value. Alpha-value is given as double value: 0.0 means completely transparent, 1.0 means completely opaque. \n Hint: If you write fillcolor as hex value like 0xffffff then the IDE shows a little color patch. Hover over it to open a color picker.",
+        "en": "Set fill color from int value. Alpha-value is given as double value: 0.0 means completely transparent, 1.0 means completely opaque. \n Hint: If you write fillcolor as hex value like 0xffffff then the IDE shows a little color patch. Hover over it to open a color picker.",
     })
 
     static fsSetFillColorCommentString = () => lm({
         "de": 'Setzt die Füllfarbe des Objekts. Die Farbe wird als Zeichenkette angegeben. Möglich sind Farbkonstanten ("rot", "red", ...) oder css-Syntax wie "#ff034a", "rgb(100, 200, 10)" oder "rgba(100, 10, 10, 0.8)".',
-        "en": 'Set fill color as string value. Possible values are color constants like "red", "green", "blue", ... and css syntax like  "#ff034a", "rgb(100, 200, 10)" oder "rgba(100, 10, 10, 0.8)"',
+        "en": 'Set fill color from string value. Possible values are color constants like "red", "green", "blue", ... and css syntax like  "#ff034a", "rgb(100, 200, 10)" oder "rgba(100, 10, 10, 0.8)"',
     })
 
     static fsSetFillColorCommentStringDouble = () => lm({
         "de": 'Setzt die Füllfarbe des Objekts. Die Farbe wird als Zeichenkette angegeben, der Alpha-Wert (Undurchsichtigkeit) als double-Wert zwischen 0.0 (komplett durchsichtig) und 1.0 (komplett undurchsichtig). Möglich sind Farbkonstanten ("rot", "red", ...) oder css-Syntax wie "#ff034a", "rgb(100, 200, 10)" oder "rgba(100, 10, 10, 0.8)".',
-        "en": 'Set fill color as string value, alpha-Value (opacity between 0.0 and 1.0) as double value. Possible values are color constants like "red", "green", "blue", ... and css syntax like  "#ff034a", "rgb(100, 200, 10)" oder "rgba(100, 10, 10, 0.8)"',
+        "en": 'Set fill color from string value, alpha-Value (opacity between 0.0 and 1.0) as double value. Possible values are color constants like "red", "green", "blue", ... and css syntax like  "#ff034a", "rgb(100, 200, 10)" oder "rgba(100, 10, 10, 0.8)"',
     })
 
     static fsGetBorderColorComment = () => lm({
@@ -567,6 +592,11 @@ export class JRC {
     static fsSetBorderColorCommentInt = () => lm({
         "de": "Setzt die Randfarbe des Objekts. Die Farbe wird als integer-Wert angegeben.\n Tipp: Schreibe die Farbe in der Form 0xffffff, dann zeigt die IDE ein kleines Farbquadrat, mit dem Du einen Color Picker öffnen kannst.",
         "en": "Set border color as int value.\n Hint: If you write BorderColor as hex value like 0xffffff then the IDE shows a little color patch. Hover over it to open a color picker.",
+    })
+
+    static fsSetBorderColorCommentColor = () => lm({
+        "de": "Setzt die Randfarbe des Objekts. Die Farbe wird als Color-Objekt angegeben.",
+        "en": "Set border color from color object.",
     })
 
     static fsSetBorderColorCommentIntDouble = () => lm({
@@ -671,6 +701,49 @@ export class JRC {
         "de": "Zerstört alle Elemente der Gruppe, nicht aber die Gruppe selbst.",
         "en": "Destroys all elements inside this group, but not this group itself.",
     })
+
+    static groupCopyComment = () => lm({
+    "de": `Erstellt eine Kopie dieser Gruppe inclusive Kopien aller ihrer Elemente.`,
+    "en": `Creates a copy of this group containing copies of it's elements.`,
+    })
+
+    static groupGetCollidingShapesComment = () => lm({
+    "de": `Gibt die Elemente der Gruppe zurück, die mit dem übergebenen Shape kollidieren.`,
+    "en": `Returns all elements of this group which collide with given Shape.`,
+    })
+
+    static groupGetCollisionPairsComment = () => lm({
+    "de": 'Überprüft, welche Objekte der Gruppe mit welchen der anderen kollidieren.' +
+            ' Gibt für jede Kollision ein Collisionpair-Objekt zurück, das die beiden kollidierenden Objekte enthält.' +
+        ' Falls maxOneCollisionPerShape == true ist jedes Objekt dabei aber nur in max. einem Collisionpair-Objekt enthalten.',
+    "en": `Checks which elements of this group collide with elements of the other one. For each detected collision ` + 
+          `it returns a Collisionpair-object that contains both elements.` + 
+          ` If maxOneCollisionPerShape == true then no shape of this group is contained two or more of the returned collisionpair-objects.`,
+    })
+
+    /**
+     * class CollisionPair
+     */
+    static collisionPairClassComment = () => lm({
+    "de": `Speichert die Referenzen auf zwei Figuren, die gerade kollidiert sind. Diese Klasse von den Kollisionsmethden der Klasse Group benutzt.`,
+    "en": `Saves pointers to two graphical objects which have collided. This class is used by Group.getCollisionPairs(Group otherGroup).`,
+    })
+
+    static collisionPairShapeAComment = () => lm({
+    "de": `Die erste der beiden kollidierenden Figuren. Sie gehört zu group1 des Methodenaufrufs group1.getCollisionPairs(group2).`,
+    "en": `First colliding Shape. It belongs to group1 of method call group1.getCollisionPairs(group2).`,
+    })
+
+    static collisionPairShapeBComment = () => lm({
+    "de": `Die zweite der beiden kollidierenden Figuren. Sie gehört zu group2 des Methodenaufrufs group1.getCollisionPairs(group2).`,
+    "en": `Second colliding Shape. It belongs to group2 of method call group1.getCollisionPairs(group2).`,
+    })
+
+    static collisionPairConstructorComment = () => lm({
+    "de": `Erzeugt ein paar zweier Shape-objekte.`,
+    "en": `Creates a tuple of two shapes.`,
+    })
+
 
     /**
      * Class Circle

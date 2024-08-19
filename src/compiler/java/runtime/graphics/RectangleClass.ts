@@ -65,7 +65,10 @@ export class RectangleClass extends FilledShapeClass {
             { x: this.left + this.width, y: this.top + this.height }, { x: this.left + this.width, y: this.top }
         ];
     }
-
+    
+    _mj$copy$Shape$(t: Thread, callback: CallbackParameter){
+        this._mj$copy$Rectangle$(t, callback);
+    }
     _mj$copy$Rectangle$(t: Thread, callback: CallbackFunction){
         let copy = new RectangleClass();
         copy._cj$_constructor_$Rectangle$double$double$double$double(t, callback, this.left, this.top, this.width, this.height);

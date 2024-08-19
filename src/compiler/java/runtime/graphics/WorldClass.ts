@@ -17,6 +17,8 @@ import { GNGEventListenerType, IGNGEventListener } from './gng/IGNGEventListener
 import { GNGEventlistenerManager } from './gng/GNGEventlistenerManager.ts';
 import { JRC } from '../../language/JavaRuntimeLibraryComments.ts';
 import { GraphicSystem } from '../../../common/interpreter/GraphicsManager.ts';
+import { ColorClass } from './ColorClass.ts';
+import { NullPointerExceptionClass } from '../system/javalang/NullPointerExceptionClass.ts';
 
 
 export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
@@ -26,6 +28,7 @@ export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
         { type: "method", signature: "World()", java: WorldClass.prototype._cj$_constructor_$World$ },
         { type: "method", signature: "World(int width, int height)", java: WorldClass.prototype.cj$_constructor_$World$int$int },
 
+        { type: "method", signature: "void setBackgroundColor(Color colorAsObject)", native: WorldClass.prototype._setBackgroundColorColor, comment: JRC.worldSetBackgroundColorColorComment },
         { type: "method", signature: "void setBackgroundColor(int colorAsRGBInt)", native: WorldClass.prototype._setBackgroundColor, comment: JRC.worldSetBackgroundColorIntComment },
         { type: "method", signature: "void setBackgroundColor(string colorAsString)", native: WorldClass.prototype._setBackgroundColor, comment: JRC.worldSetBackgroundColorStringComment },
 
@@ -286,8 +289,15 @@ export class WorldClass extends ObjectClass implements IWorld, GraphicSystem {
         } else {
             renderer.background.color.setValue(color);
         }
-
+        
     }
+    
+    _setBackgroundColorColor(color: ColorClass) {
+        let renderer = (<PIXI.Renderer>(this.app.renderer));
+        if(color == null) throw new NullPointerExceptionClass(JRC.fsColorIsNullException());
+        renderer.background.color = color.red * 0x10000 + color.green * 0x100 + color.blue;
+    }
+
 
     _move(dx: number, dy: number) {
         let stage = this.app.stage;

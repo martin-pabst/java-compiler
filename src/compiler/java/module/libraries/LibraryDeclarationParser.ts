@@ -212,6 +212,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
             let gp = new GenericTypeParameter(identifier, module, LibraryDeclarationParser.nullRange, [], undefined);
             gi.push(gp);
             currentGenericParameterMap[identifier] = gp;
+            this.nextToken();
             this.skipSymmetricBracketsUntil([TokenType.comma, TokenType.greater])
 
         } while (this.comesToken(TokenType.comma, true))
@@ -297,7 +298,7 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         let type = this.findType(id);
 
         if (this.comesToken(TokenType.lower, true)) {
-            if (!type.genericTypeParameters) {
+            if (type.genericTypeParameters?.length == 0) {
                 this.pushError("Der Typ " + type.identifier + " ist nicht generisch.");
                 this.skipTill(TokenType.greater, true);
             } else {
@@ -472,10 +473,10 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
     }
 
     /**
-     * Parse Attributes and Methods
+     * Parse fields and Methods
      */
 
-    parseAttributesAndMethods(klass: Klass & LibraryKlassType, typestore: JavaTypeStore, module: JavaBaseModule) {
+    parseFieldsAndMethods(klass: Klass & LibraryKlassType, typestore: JavaTypeStore, module: JavaBaseModule) {
 
         this.currentTypeStore = typestore;
 
@@ -487,12 +488,12 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
         for (let decl of javaClassDeclaration.filter(cd => cd.type == "field" || cd.type == "method")) {
             this.initTokens(decl.signature);
-            this.parseAttributeOrMethod(klass, module, decl);
+            this.parseFieldOrMethod(klass, module, decl);
         }
 
     }
 
-    parseAttributeOrMethod(klass: Klass & LibraryKlassType, module: JavaBaseModule, decl: LibraryMethodOrAttributeDeclaration) {
+    parseFieldOrMethod(klass: Klass & LibraryKlassType, module: JavaBaseModule, decl: LibraryMethodOrAttributeDeclaration) {
 
         this.genericParameterMapStack.push({});
 

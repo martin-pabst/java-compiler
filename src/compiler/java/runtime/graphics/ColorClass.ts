@@ -1,8 +1,9 @@
-import { Klass } from "../../../common/interpreter/StepFunction";
+import { CallbackFunction, Klass } from "../../../common/interpreter/StepFunction";
+import { Thread } from "../../../common/interpreter/Thread";
 import { ColorHelper } from "../../lexer/ColorHelper";
 import { LibraryDeclarations } from "../../module/libraries/DeclareType";
 import { NonPrimitiveType } from "../../types/NonPrimitiveType";
-import { ObjectClass, StringClass } from "../system/javalang/ObjectClassStringClass";
+import { ObjectClass, ObjectClassOrNull, StringClass } from "../system/javalang/ObjectClassStringClass";
 
 export class ColorClass extends ObjectClass {
     static __javaDeclarations: LibraryDeclarations = [
@@ -19,15 +20,15 @@ export class ColorClass extends ObjectClass {
         { type: "method", signature: "static int randomColor(int minimumRGBValue)", native: ColorClass._randomColorMin },
         { type: "method", signature: "static int randomColor(int minimumRGBValue, int maximumRGBValue)", native: ColorClass._randomColorMinMax },
         { type: "method", signature: "final String toString()", native: ColorClass.prototype._toString },
-        { type: "method", signature: "final int toInt()", template: `(§1.red * 0x10000 + §1.green * 0x100 + §1.blue)` },
-        { type: "method", signature: "final boolean equals(Color otherColor)", template: `(§1.red == §2.red && §1.green == §2.green && §1.blue == §2.blue)` },
+        { type: "method", signature: "final int toInt()", native: ColorClass.prototype._toInt },
+        { type: "method", signature: "final boolean equals(Color otherColor)", java: ColorClass.prototype._mj$equals$boolean$Object },
         { type: "method", signature: "final int getRed()", template: `(§1.red)` },
         { type: "method", signature: "final int getGreen()", template: `(§1.green)` },
         { type: "method", signature: "final int getBlue()", template: `(§1.blue)` },
-        { type: "method", signature: "static int fromRGB(int red, int green, int blue)", native: ColorClass.prototype._fromRGB },
-        { type: "method", signature: "static string fromRGBA(int red, int green, int blue, double alpha)", native: ColorClass.prototype._fromRGBA },
-        { type: "method", signature: "static string fromHSLA(double hue, double saturation, double luminance, double alpha)", native: ColorClass.prototype._fromHSLA },
-        { type: "method", signature: "static int fromHSL(double hue, double saturation, double luminance)", native: ColorClass.prototype._fromHSL },
+        { type: "method", signature: "static int fromRGB(int red, int green, int blue)", native: ColorClass._fromRGB },
+        { type: "method", signature: "static string fromRGBA(int red, int green, int blue, double alpha)", native: ColorClass._fromRGBA },
+        { type: "method", signature: "static string fromHSLA(double hue, double saturation, double luminance, double alpha)", native: ColorClass._fromHSLA },
+        { type: "method", signature: "static int fromHSL(double hue, double saturation, double luminance)", native: ColorClass._fromHSL },
     ]
 
     static type: NonPrimitiveType;
@@ -110,7 +111,7 @@ export class ColorClass extends ObjectClass {
         return new StringClass(ColorHelper.rgbColorToHexRGB(this.red, this.green, this.blue));
     }
 
-    _fromRGB(r: number, g: number, b: number): number {
+    static _fromRGB(r: number, g: number, b: number): number {
         r = Math.min(r, 255); r = Math.max(0, r);
         g = Math.min(g, 255); g = Math.max(0, g);
         b = Math.min(b, 255); b = Math.max(0, b);
@@ -119,7 +120,7 @@ export class ColorClass extends ObjectClass {
 
     }
 
-    _fromRGBA(r: number, g: number, b: number, a: number): string {
+    static _fromRGBA(r: number, g: number, b: number, a: number): string {
         r = Math.min(r, 255); r = Math.max(0, r);
         g = Math.min(g, 255); g = Math.max(0, g);
         b = Math.min(b, 255); b = Math.max(0, b);
@@ -132,13 +133,13 @@ export class ColorClass extends ObjectClass {
         return "#" + color;
     }
 
-    _fromHSLA(h: number, s: number, l: number, a: number): string {
+    static _fromHSLA(h: number, s: number, l: number, a: number): string {
         h = Math.min(h, 360); h = Math.max(0, h);
         s = Math.min(s, 100); s = Math.max(0, s);
         l = Math.min(l, 100); l = Math.max(0, l);
         a = Math.min(a, 1); a = Math.max(0, a);
 
-        let rgb = this.hslToRgb(h, s, l);
+        let rgb = ColorClass.hslToRgb(h, s, l);
 
         let color: string = (rgb.r * 0x1000000 + rgb.g * 0x10000 + rgb.b * 0x100 + Math.floor(a * 255)).toString(16);
         while (color.length < 8) color = "0" + color;
@@ -147,17 +148,17 @@ export class ColorClass extends ObjectClass {
 
     }
 
-    _fromHSL(h: number, s: number, l: number): number {
+    static _fromHSL(h: number, s: number, l: number): number {
         h = Math.min(h, 360); h = Math.max(0, h);
         s = Math.min(s, 100); s = Math.max(0, s);
         l = Math.min(l, 100); l = Math.max(0, l);
 
-        let rgb = this.hslToRgb(h, s, l);
+        let rgb = ColorClass.hslToRgb(h, s, l);
 
         return (rgb.r * 0x10000 + rgb.g * 0x100 + rgb.b);
     }
 
-    hslToRgb(h: number, s: number, l: number): { r: number, g: number, b: number } {
+    static hslToRgb(h: number, s: number, l: number): { r: number, g: number, b: number } {
 
         s /= 100;
         l /= 100;
@@ -198,6 +199,24 @@ export class ColorClass extends ObjectClass {
             this.blue = color & 0xff;
         }
         this.alpha = alpha;
+    }
+
+    _toInt(): number {
+        return this.red * 0x10000 + this.green * 0x100 + this.blue;
+    }
+
+    _mj$equals$boolean$Object(t: Thread, callback: CallbackFunction, otherObject: ObjectClassOrNull): void {
+        if(otherObject instanceof ColorClass){
+            if(otherObject == null){
+                t.s.push(false); 
+                if(callback) callback();
+                return;
+            }
+            t.s.push(this.red == otherObject.red && this.green == otherObject.green && this.blue == otherObject.blue);
+            if(callback) callback();
+        } else {
+            super._mj$equals$boolean$Object(t, callback, otherObject);
+        }
     }
 
 }

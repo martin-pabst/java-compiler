@@ -11,6 +11,7 @@ import { GroupClass } from './GroupClass';
 import { updateWorldTransformRecursively } from './PixiHelper';
 import { JRC } from '../../language/JavaRuntimeLibraryComments';
 import { ContainerProxy } from './ContainerProxy';
+import { ColorClass } from './ColorClass';
 
 export type MouseEventMethod = (t: Thread, callback: CallbackParameter, x: number, y: number, button: number) => void;
 
@@ -43,7 +44,7 @@ export class ShapeClass extends ActorClass {
         { type: "method", signature: "final void defineCenterRelative(double x, double y)", native: ShapeClass.prototype._defineCenterRelative, comment: JRC.shapeDefineCenterRelativeComment },
 
         { type: "method", signature: "final void tint(int color)", native: ShapeClass.prototype._setTintInt, comment: JRC.shapeTintComment },
-        { type: "method", signature: "final void tint(string color)", native: ShapeClass.prototype._setTintInt, comment: JRC.shapeTintComment },
+        { type: "method", signature: "final void tint(string color)", native: ShapeClass.prototype._setTintString, comment: JRC.shapeTintComment },
 
         { type: "method", signature: "static void setDefaultVisibility(boolean isVisible)", native: ShapeClass._setDefaultVisibility, comment: JRC.shapeSetDefaultVisibilityComment },
         { type: "method", signature: "final void setVisible(boolean isVisible)", native: ShapeClass.prototype._setVisible, comment: JRC.shapeSetVisibleComment },
@@ -57,7 +58,10 @@ export class ShapeClass extends ActorClass {
         { type: "method", signature: "final boolean collidesWithAnyShape()", native: ShapeClass.prototype._collidesWithAnyShape, comment: JRC.shapeCollidesWithAnyShapeComment },
         { type: "method", signature: "final boolean collidesWithFillColor(int color)", native: ShapeClass.prototype._collidesWithAnyShape, comment: JRC.shapeCollidesWithFillColorComment },
         { type: "method", signature: "final boolean collidesWithFillColor(string color)", native: ShapeClass.prototype._collidesWithAnyShape, comment: JRC.shapeCollidesWithFillColorComment },
+        { type: "method", signature: "final boolean collidesWithFillColor(Color color)", native: ShapeClass.prototype._collidesWithAnyShape, comment: JRC.shapeCollidesWithFillColorComment },
         { type: "method", signature: "final Sprite getFirstCollidingSprite(int imageIndex)", native: ShapeClass.prototype._getFirstCollidingSprite, comment: JRC.shapeGetFirstCollidingSpriteComment },
+        { type: "method", signature: "final <T> T[] getCollidingShapes(Group<T> group)", native: ShapeClass.prototype._getCollidingShapes, comment: JRC.shapeGetCollidingShapesComment },
+
 
         { type: "method", signature: "void onMouseUp(double x, double y, int button)", java: ShapeClass.prototype._mj$onMouseUp$void$double$double$int, comment: JRC.shapeOnMouseUpComment },
         { type: "method", signature: "void onMouseDown(double x, double y, int button)", java: ShapeClass.prototype._mj$onMouseDown$void$double$double$int, comment: JRC.shapeOnMouseDownComment },
@@ -67,6 +71,9 @@ export class ShapeClass extends ActorClass {
 
         { type: "method", signature: "void startTrackingEveryMouseMovement()", native: ShapeClass.prototype._startTrackingEveryMouseMovement, comment: JRC.shapeStartTrackingEveryMouseMovementComment },
         { type: "method", signature: "void stopTrackingEveryMouseMovement()", native: ShapeClass.prototype._stopTrackingEveryMouseMovement, comment: JRC.shapeStartTrackingEveryMouseMovementComment },
+        
+        { type: "method", signature: "abstract Shape copy()", java: ShapeClass.prototype._mj$copy$Shape$, comment: JRC.shapeCopyComment },
+
 
 
     ]
@@ -137,6 +144,10 @@ export class ShapeClass extends ActorClass {
     }
 
     render(): void { };
+
+    _mj$copy$Shape$(t: Thread, callback: CallbackParameter){
+        // this method is abstract => empty method stub
+    }
 
     _cj$_constructor_$Shape$(t: Thread, callback: CallbackParameter) {
         this._cj$_constructor_$Actor$(t, () => {
@@ -572,6 +583,18 @@ export class ShapeClass extends ActorClass {
         return this.getFirstCollidingSpriteHelper(imageIndex, this.world.shapesWhichBelongToNoGroup, this.container.getBounds());
     }
 
+    _getCollidingShapes(group: GroupClass): ShapeClass[] | null {
+        if(group == null) return [];
+
+        if(!this.hasOverlappingBoundingBoxWith(group)) return [];
+
+        let ret: ShapeClass[] = [];
+        for(let shape of group.shapes){
+            if(this._collidesWith(shape)) ret.push(shape);
+        }
+        return ret;
+    }
+
     collidesWithAnyShapeHelper(color: number | undefined, shapes: ShapeClass[], bounds: PIXI.Bounds): boolean {
 
         if (this.hitPolygonDirty) this.transformHitPolygon();
@@ -614,11 +637,16 @@ export class ShapeClass extends ActorClass {
 
     }
 
-    _collidesWithAnyShape(color?: number | string): boolean {
+    _collidesWithAnyShape(color?: number | string | ColorClass): boolean {
 
-        if (color && (typeof color == "string")) {
-            color = ColorHelper.parseColorToOpenGL(color).color;
+        if(color){
+            if (typeof color == "string") {
+                color = ColorHelper.parseColorToOpenGL(color).color;
+            } else if(color instanceof ColorClass){
+                color = color._toInt();
+            }
         }
+
 
         if (this.isDestroyed) return false;
 
@@ -640,7 +668,7 @@ export class ShapeClass extends ActorClass {
 
     public getWorldTransform(): PIXI.Matrix {
         //@ts-ignore
-        if (!this.worldTransformDirty) return this.container._worldTransform;
+        if (!this.worldTransformDirty) return this.container._worldTransform || PIXI.Matrix.IDENTITY;
         if (this.belongsToGroup != null) this.belongsToGroup.getWorldTransform();
         let parent = this.container.parent;
 

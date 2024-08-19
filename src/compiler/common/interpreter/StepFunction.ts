@@ -23,7 +23,7 @@ export class Helpers {
     static getExceptionAndTrimStack = StepParams.thread + "." + Thread.prototype.getExceptionAndTrimStack.name;
     static beginTryBlock = StepParams.thread + "." + Thread.prototype.beginTryBlock.name;
     static endTryBlock = StepParams.thread + "." + Thread.prototype.endCatchTryBlock.name;
-    static throwAE = StepParams.thread + "." + Thread.prototype.AE.name;
+    static throwArithmeticException = StepParams.thread + "." + Thread.prototype.AE.name;
 
     static arrayValue1 = StepParams.thread + "." + Thread.prototype.ArrayValue1.name;
     static arrayValue2 = StepParams.thread + "." + Thread.prototype.ArrayValue2.name;

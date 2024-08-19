@@ -425,6 +425,11 @@ export abstract class BinopCastCodeGenerator {
             return leftSnippet;
         }
 
+        if(operator == TokenType.divisionAssignment && leftTypeIndex >= nByte && leftTypeIndex <= nLong){
+            return new TwoParameterTemplate(`§1 = Math.trunc(§1/(§2 || ${Helpers.throwArithmeticException}("${JCM.divideByZero()}", ${wholeRange.startLineNumber}, ${wholeRange.startColumn}, ${wholeRange.endLineNumber}, ${wholeRange.endColumn})))`)
+                .applyToSnippet(leftSnippet.type!, wholeRange, leftSnippet, rightSnippet);    
+        }
+
         return new BinaryOperatorTemplate(operatorAsString, false).applyToSnippet(leftSnippet.type!, wholeRange, leftSnippet, rightSnippet);
 
     }
@@ -492,7 +497,7 @@ export abstract class BinopCastCodeGenerator {
         }
 
         // now snippet.type and castTo are primitive.
-        // nVoid = 2, nBoolean = 3, nChar = 4, nByte = 5, nShort = 6, nInteger = 7, nLong = 8, nFloat = 9, nDouble = 10, nString = 11
+        // nVoid = 1, nBoolean = 2, nChar = 3, nByte = 4, nShort = 5, nInteger = 6, nLong = 7, nFloat = 8, nDouble = 9, nString = 10
         let snippetTypeIndex = primitiveTypeMap[snippet.type!.identifier]!;
         let castToTypeIndex = primitiveTypeMap[castTo.identifier]!;
         if (snippetTypeIndex == castToTypeIndex) {
@@ -530,7 +535,11 @@ export abstract class BinopCastCodeGenerator {
 
 
         // now both types are in nByte = 5, nShort = 6, nInteger = 7, nLong = 8, nFloat = 9, nDouble = 10
-        if (snippetTypeIndex <= castToTypeIndex) return snippet;
+        if (snippetTypeIndex <= castToTypeIndex) 
+        {
+            snippet.type = castTo;
+            return snippet;
+        }
 
         if (castType == "implicit") {
             this.pushError(JCM.cantCastType(type.identifier, castTo.identifier), "error", snippet.range!);

@@ -64,6 +64,10 @@ export class RoundedRectangleClass extends FilledShapeClass {
 
     }
 
+    _mj$copy$Shape$(t: Thread, callback: CallbackParameter){
+        this._mj$copy$RoundedRectangle$(t, callback);
+    }
+
     _mj$copy$RoundedRectangle$(t: Thread, callback: CallbackFunction){
         let copy = new RoundedRectangleClass();
         copy._cj$_constructor_$RoundedRectangle$double$double$double$double$double(t, callback, this.left, this.top, this.width, this.height, this.radius);

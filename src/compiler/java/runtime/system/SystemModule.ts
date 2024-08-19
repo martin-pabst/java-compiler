@@ -131,6 +131,7 @@ import { World3dClass } from "../graphics/3d/World3dClass.ts";
 import { CodeFragment } from "../../../common/disassembler/CodeFragment.ts";
 import { MethodOfDestroyedGOExceptionClass } from "./javalang/MethodOfDestroyedGOExceptionClass.ts";
 import { GNGEreignisbehandlung } from "../graphics/gng/GNGEreignisbehandlung.ts";
+import { CollisionPairClass } from "../graphics/CollisionpairClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 
@@ -206,7 +207,8 @@ export class SystemModule extends JavaLibraryModule {
             // Graphics
             ColorClass, DirectionEnum, AlignmentEnum,
             MouseListenerInterface,
-            WorldClass, ActorClass, ShapeClass, FilledShapeClass, RectangleClass, GroupClass,
+            WorldClass, ActorClass, ShapeClass, FilledShapeClass, RectangleClass, 
+            CollisionPairClass, GroupClass,
             ScaleModeEnum, RepeatTypeEnum, SpriteLibraryEnum, TileImageClass, SpriteClass, // Sprite
             CircleClass, EllipseClass, ArcClass, SectorClass,
             PolygonClass, TriangleClass, LineClass, BitmapClass, TextClass, RoundedRectangleClass,

@@ -40,6 +40,10 @@ export class LineClass extends FilledShapeClass {
 
     }
 
+    _mj$copy$Shape$(t: Thread, callback: CallbackParameter){
+        this._mj$copy$Line$(t, callback);
+    }
+
     _mj$copy$Line$(t: Thread, callback: CallbackFunction){
         let copy = new LineClass();
         copy._cj$_constructor_$Line$double$double$double$double(t, callback, this.hitPolygonInitial[0].x, this.hitPolygonInitial[0].y, this.hitPolygonInitial[1].x, this.hitPolygonInitial[1].y);

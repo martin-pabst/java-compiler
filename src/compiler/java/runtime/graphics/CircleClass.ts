@@ -54,6 +54,11 @@ export class CircleClass extends FilledShapeClass {
 
     }
 
+
+    _mj$copy$Shape$(t: Thread, callback: CallbackParameter){
+        this._mj$copy$Circle$(t, callback);
+    }
+
     _mj$copy$Circle$(t: Thread, callback: CallbackFunction){
         let copy = new CircleClass();
         copy._cj$_constructor_$Circle$double$double$double(t, callback, this.mx, this.my, this.radius);

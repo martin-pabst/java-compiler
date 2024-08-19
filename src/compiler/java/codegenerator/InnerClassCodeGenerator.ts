@@ -566,7 +566,10 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
             if (snippet) snippets.push(snippet);
 
             if (methodNode.isContructor) {
-                snippets.push(new StringCodeSnippet(`${Helpers.return}(${Helpers.elementRelativeToStackbase(0)});\n`))
+                let endOfMethodRange: IRange = Range.fromPositions(Range.getEndPosition(methodNode.range));
+                let returnSnippet = new CodeSnippetContainer([new StringCodeSnippet(`${Helpers.return}(${Helpers.elementRelativeToStackbase(0)});\n`, endOfMethodRange)]);
+                returnSnippet.enforceNewStepBeforeSnippet();
+                snippets.push(returnSnippet);
 
                 if (!(thisCallHappened || superCallHappened)) {
                     // Has base class a parameterless super constructor?

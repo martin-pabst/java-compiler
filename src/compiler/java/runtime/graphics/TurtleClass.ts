@@ -118,7 +118,7 @@ export class TurtleClass extends FilledShapeClass {
 
             this.render();
 
-            if(callback) callback();
+            if (callback) callback();
         });   // call base class constructor
 
 
@@ -155,7 +155,7 @@ export class TurtleClass extends FilledShapeClass {
         this.moveTurtleTo(lastLineElement.x, lastLineElement.y, this.turtleAngleDeg);
     }
 
-    _setAngle(angleDeg: number){
+    _setAngle(angleDeg: number) {
         this._turn(angleDeg + this.turtleAngleDeg)
     }
 
@@ -291,7 +291,7 @@ export class TurtleClass extends FilledShapeClass {
             this.render();
         }
 
-        if(!this.hasOverlappingBoundingBoxWith(shape)) return false;
+        if (!this.hasOverlappingBoundingBoxWith(shape)) return false;
 
         if (shape.shapes) {
             return shape._collidesWith(this);
@@ -484,6 +484,9 @@ export class TurtleClass extends FilledShapeClass {
         return this.lineElements[this.lineElements.length - 1];
     }
 
+    _mj$copy$Shape$(t: Thread, callback: CallbackParameter) {
+        this._mj$copy$Turtle$(t, callback);
+    }
 
     _mj$copy$Turtle$(t: Thread, callback: CallbackFunction) {
         let copy = new TurtleClass();
@@ -500,7 +503,7 @@ export class TurtleClass extends FilledShapeClass {
 
         let g: PIXI.Graphics = this.lineGraphic;
 
-        if(this.lineElements.length > 1){
+        if (this.lineElements.length > 1) {
             let le = this.lineElements[1];
             this.lastLineWidth = le.lineWidth;
             this.lastColor = le.color;
@@ -515,7 +518,7 @@ export class TurtleClass extends FilledShapeClass {
 
         for (let i = 1; i < this.lineElements.length; i++) {
             let le: LineElement = this.lineElements[i];
-            if (le.color != null) {
+            if(this.lastColor != null){
                 if (!this.isFilled && i > 1) {
                     if (le.lineWidth != this.lastLineWidth || le.color != this.lastColor || le.alpha != this.lastAlpha) {
                         g.stroke({
@@ -525,16 +528,18 @@ export class TurtleClass extends FilledShapeClass {
                             alignment: 0.5
                         })
                         this.lastLineWidth = le.lineWidth;
-                        this.lastColor = le.color;
                         this.lastAlpha = le.alpha;
                     }
                 }
+            }
+            if (le.color != null) {
                 g.lineTo(le.x, le.y);
                 // console.log("LineTo: " + le.x + ", " + le.y);
             } else {
                 g.moveTo(le.x, le.y);
                 // console.log("MoveTo: " + le.x + ", " + le.y);
             }
+            this.lastColor = le.color;
         }
 
         if (this.isFilled) {
@@ -546,7 +551,7 @@ export class TurtleClass extends FilledShapeClass {
                 alignment: 0.5
             })
         } else {
-            if(this.lineElements.length > 1){
+            if (this.lineElements.length > 1) {
                 let lastLineElement = this.lineElements[this.lineElements.length - 1];
                 g.stroke({
                     width: lastLineElement.lineWidth,
@@ -578,7 +583,7 @@ export class TurtleClass extends FilledShapeClass {
     }
 
     _debugOutput() {
-        if(this.isDestroyed) return "<destroyed Turtle>"
+        if (this.isDestroyed) return "<destroyed Turtle>"
         let s = `{centerX: ${this._getCenterX()}, centerY: ${this._getCenterY()} }`;
         return s;
     }

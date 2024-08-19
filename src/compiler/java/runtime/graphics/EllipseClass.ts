@@ -60,6 +60,10 @@ export class EllipseClass extends FilledShapeClass {
 
     }
 
+    _mj$copy$Shape$(t: Thread, callback: CallbackParameter){
+        this._mj$copy$Ellipse$(t, callback);
+    }
+
     _mj$copy$Ellipse$(t: Thread, callback: CallbackFunction){
         let copy = new EllipseClass();
         copy._cj$_constructor_$Ellipse$double$double$double$double(t, callback, this.mx, this.my, this.radiusX, this.radiusY);
