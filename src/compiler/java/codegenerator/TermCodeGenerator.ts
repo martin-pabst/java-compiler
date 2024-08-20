@@ -186,10 +186,10 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
             return objectSnippet;
         }
 
-        if (!destType.fastExtendsImplements(sourceType.identifier)) {
-            this.pushError(JCM.cantCastFromTo(sourceType.identifier, destType.identifier), "error", node);
-            return objectSnippet;
-        }
+        // if (!destType.fastExtendsImplements(sourceType.identifier)) {
+        //     this.pushError(JCM.cantCastFromTo(sourceType.identifier, destType.identifier), "error", node);
+        //     return objectSnippet;
+        // }
 
         let range = node.range;
         return SnippetFramer.frame(objectSnippet, `${Helpers.checkCast}(§1, "${destType.pathAndIdentifier}", ${range.startLineNumber}, ${range.startColumn}, ${range.endLineNumber}, ${range.endColumn})`
@@ -298,6 +298,11 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
         let classHasOuterType: boolean = (klassType.outerType && !klassType.isStatic) ? true : false;
 
         let callingConvention: CallingConvention = method.hasImplementationWithNativeCallingConvention && !classHasOuterType ? "native" : "java";
+        
+        // if this is no library class: use java calling convention because 
+        // new MyClass() could be compiled before standard constructors of MyClass() are built
+        // if new MyClass is part of instanceInitializers of other class.
+        if(method.classEnumInterface != klassType) callingConvention = 'java';
 
         if (!newObjectSnippet) {
             newObjectSnippet = new StringCodeSnippet(`new ${Helpers.classes}["${klassType.pathAndIdentifier}"](${enumValueIdentifier ? '"' + enumValueIdentifier + '", ' + enumValueIndex : ""})`);
@@ -1055,7 +1060,7 @@ export abstract class TermCodeGenerator extends BinopCastCodeGenerator {
                 }
             }
         }
-
+        // if(node.identifier == "addBlockSquareWithTiles") debugger;
         // cast parameter values
         parameterValueSnippet = this.castParameterValuesAndPackEllipsis(parameterValueSnippet, method);
 

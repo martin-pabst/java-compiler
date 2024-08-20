@@ -7,9 +7,10 @@ import { RuntimeExceptionClass } from '../system/javalang/RuntimeException';
 import { ShapeClass } from './ShapeClass';
 import { JRC } from '../../language/JavaRuntimeLibraryComments';
 import { CallbackParameter } from '../../../common/interpreter/CallbackParameter';
-import { CollisionPairClass } from './CollisionpairClass';
+import { CollisionPairClass } from './CollisionPairClass';
+import { BaseListType } from '../../../common/BaseType';
 
-export class GroupClass extends ShapeClass {
+export class GroupClass extends ShapeClass implements BaseListType {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "class Group<T extends Shape> extends Shape", comment: JRC.groupClassComment },
 
@@ -21,7 +22,7 @@ export class GroupClass extends ShapeClass {
         { type: "method", signature: "final void remove(int index)", native: GroupClass.prototype.removeWithIndex, comment: JRC.groupRemoveWithIndexComment },
         { type: "method", signature: "final T get(int index)", native: GroupClass.prototype.get, comment: JRC.groupGetComment },
         { type: "method", signature: "final int indexOf(T shape)", native: GroupClass.prototype.indexOf, comment: JRC.groupIndexOfComment },
-        { type: "method", signature: "final int size()", template: `&1.shapes.length`, comment: JRC.groupSizeComment },
+        { type: "method", signature: "final int size()", template: `§1.shapes.length`, comment: JRC.groupSizeComment },
         { type: "method", signature: "final void empty()", native: GroupClass.prototype.removeAllChildren, comment: JRC.groupEmptyComment },
         { type: "method", signature: "final void destroyAllChildren()", native: GroupClass.prototype.destroyAllChildren, comment: JRC.groupDestroyAllChildrenComment },
         // { type: "method", signature: "Rectangle(double left, double top, double width, double height)", java: GroupClass.prototype._cj$_constructor_$Rectangle$double$double$double$double },
@@ -30,7 +31,7 @@ export class GroupClass extends ShapeClass {
 
         { type: "method", signature: "final boolean collidesWith(Shape otherShape)", native: GroupClass.prototype._collidesWith, comment: JRC.shapeCollidesWithComment },
         { type: "method", signature: "final T[] getCollidingShapes(Shape otherShape)", native: GroupClass.prototype._getCollidingShapesGroup, comment: JRC.groupGetCollidingShapesComment },
-        { type: "method", signature: "final <V> CollisionPair<T, V> getCollisionPairs(Group<V> otherGroup, boolean maxOneCollisionPerShape)", native: GroupClass.prototype._getCollisionPairs, comment: JRC.groupGetCollisionPairsComment },
+        { type: "method", signature: "final <V extends Shape> CollisionPair<T, V>[] getCollisionPairs(Group<V> otherGroup, boolean maxOneCollisionPerShape)", native: GroupClass.prototype._getCollisionPairs, comment: JRC.groupGetCollisionPairsComment },
 
     ]
 
@@ -58,6 +59,10 @@ export class GroupClass extends ShapeClass {
 
     render() {
 
+    }
+
+    getElements(): any[] {
+        return this.shapes;
     }
 
     _mj$copy$Shape$(t: Thread, callback: CallbackParameter){

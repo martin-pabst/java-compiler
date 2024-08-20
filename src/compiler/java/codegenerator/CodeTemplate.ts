@@ -33,9 +33,10 @@ export class OneParameterTemplate extends CodeTemplate {
             newSnippet.takeEmitToStepListenersFrom(snippets);
         }
 
-        let snippetContainer = new CodeSnippetContainer(snippets[0].allButLastPart(), range, resultType);
+        let snippetContainer = new CodeSnippetContainer(snippets[0].allButLastPart(), range);
         let lastPart = snippets[0].lastPartOrPop();
         snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\§1', 'g'), lastPart.emit()), range, resultType, [lastPart]);
+        snippetContainer.type = resultType;
         return snippetContainer;
     }
 
@@ -55,7 +56,9 @@ export class TwoParameterTemplate extends CodeTemplate {
         if (snippet0Pure && snippet1Pure) {
             let code: string = this.templateString.replace(new RegExp('\\§1', 'g'), snippets[0].getPureTerm());
             code = code.replace(new RegExp('\\§2', 'g'), snippets[1].getPureTerm());
-            return new StringCodeSnippet(code, range, resultType);
+            let newSnippet = new StringCodeSnippet(code, range, resultType);
+            newSnippet.takeEmitToStepListenersFrom(snippets);
+            return newSnippet;
         }
 
         let countPlaceholderOne = (this.templateString.match(/\§1/g) || []).length;
@@ -65,7 +68,7 @@ export class TwoParameterTemplate extends CodeTemplate {
             throw "TwoParameterTemplate: can't replace more than one placeholder with non-pure snippet."
         }
 
-        let snippetContainer = new CodeSnippetContainer([], range, resultType);
+        let snippetContainer = new CodeSnippetContainer([], range);
         if (snippet0Pure || snippet1Pure) {
             snippetContainer.addParts(snippets[0].allButLastPart());
             snippetContainer.addParts(snippets[1].allButLastPart());
@@ -75,6 +78,8 @@ export class TwoParameterTemplate extends CodeTemplate {
 
             snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\§1', 'g'), lastPart1.emit())
                 .replace(new RegExp('\\§2', 'g'), lastPart2.emit()), range, undefined, [lastPart1, lastPart2]);
+            snippetContainer.type = resultType;
+
             return snippetContainer;
         }
 
@@ -92,6 +97,8 @@ export class TwoParameterTemplate extends CodeTemplate {
 
         snippetContainer.addStringPart(this.templateString.replace(new RegExp('\\§1', 'g'), `${StepParams.stack}.pop()`)
             .replace(new RegExp('\\§2', 'g'), `${StepParams.stack}.pop()`), range);
+
+        snippetContainer.type = resultType;
         return snippetContainer;
 
     }
@@ -127,7 +134,7 @@ export class ParametersJoinedTemplate {
             return newSnippet;
         }
 
-        let snippetContainer = new CodeSnippetContainer([], range, resultType);
+        let snippetContainer = new CodeSnippetContainer([], range);
 
         for (let i = snippets.length - 1; i >= 0; i--) {
             snippetContainer.addParts(snippets[i].allButLastPart());
@@ -138,6 +145,8 @@ export class ParametersJoinedTemplate {
         let term = prefix + lastParts.map(lp => lp.emit()).join(separator) + suffix;
 
         snippetContainer.addStringPart(term, range, resultType, lastParts);
+
+        snippetContainer.type = resultType;
 
         return snippetContainer;
 
@@ -174,10 +183,10 @@ export class SeveralParameterTemplate extends CodeTemplate {
     applyToSnippet(resultType: JavaType, range: IRange, ...snippets: CodeSnippet[]): CodeSnippet {
 
         // if there are <= 2 parameters: use faster templates which don't need to analyze the template string and may generate more efficient code:
-        // switch (snippets.length) {
-        //     case 1: return new OneParameterTemplate(this.templateString).applyToSnippet(resultType, range, snippets[0]);
-        //     case 2: return new TwoParameterTemplate(this.templateString).applyToSnippet(resultType, range, snippets[0], snippets[1]);
-        // }
+        switch (snippets.length) {
+            case 1: return new OneParameterTemplate(this.templateString).applyToSnippet(resultType, range, snippets[0]);
+            case 2: return new TwoParameterTemplate(this.templateString).applyToSnippet(resultType, range, snippets[0], snippets[1]);
+        }
 
         this.analyzeTemplateString();
 
@@ -198,7 +207,8 @@ export class SeveralParameterTemplate extends CodeTemplate {
         }
 
         if (onlyPureTerms) {
-            for (let parameter of this.orderedParameters) {
+            for(let i: number = this.orderedParameters.length -1; i >= 0; i--){
+                let parameter = this.orderedParameters[i];
                 appliedTemplate = appliedTemplate.replace(new RegExp('\\' + parameter.parameter, 'g'), snippets[parameter.n - 1].emit());
             }
             let snippet = new StringCodeSnippet(appliedTemplate, range, resultType);
@@ -206,13 +216,13 @@ export class SeveralParameterTemplate extends CodeTemplate {
             return snippet;
         }
 
-        let snippetContainer = new CodeSnippetContainer([], range, resultType);
+        let snippetContainer = new CodeSnippetContainer([], range);
 
         /*
         * Some snippets may push values to stack. We have to ensure they do this in reversed parameter order so that
         * values get popped in unreversed order.
         */
-        let parametersInDescendingOrder = this.orderedParameters.sort((p1, p2) => p2.order - p1.order);
+       let parametersInDescendingOrder = this.orderedParameters.sort((p1, p2) => p2.order - p1.order);
         let lastParts: CodeSnippet[] = [];
         for (let i = 0; i < parametersInDescendingOrder.length; i++) {
             let parameter = parametersInDescendingOrder[i];
@@ -223,7 +233,7 @@ export class SeveralParameterTemplate extends CodeTemplate {
         }
 
         snippetContainer.addStringPart(appliedTemplate, range, resultType, lastParts);
-
+        snippetContainer.type = resultType;
         return snippetContainer;
 
     }
@@ -252,12 +262,12 @@ export class BinaryOperatorTemplate extends CodeTemplate {
 
         if (snippet0IsPure && snippet1IsPure) {
             let snippet: StringCodeSnippet;
-            
+
             if (this.operator == "/" || this.operator == "%") {
                 let prefix: string = "";
                 let suffix: string = "";
-                
-                if(this.operator == "/"){
+
+                if (this.operator == "/") {
                     let bothTypesAreShortByteIntLong: boolean = snippets[0].type instanceof PrimitiveType && snippets[0].type.isByteShortIntLong() && snippets[1].type instanceof PrimitiveType && snippets[1].type.isByteShortIntLong();
                     if (bothTypesAreShortByteIntLong) {
                         prefix = "Math.trunc( ";
@@ -269,12 +279,12 @@ export class BinaryOperatorTemplate extends CodeTemplate {
                     snippet = new StringCodeSnippet(prefix + snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm() + suffix,
                         _range, _resultType);
                 } else {
-                        snippet = new StringCodeSnippet(prefix +  snippets[0].getPureTerm() + " " + this.operator + " (" + snippets[1].getPureTerm() +
+                    snippet = new StringCodeSnippet(prefix + snippets[0].getPureTerm() + " " + this.operator + " (" + snippets[1].getPureTerm() +
                         `|| ${Helpers.throwArithmeticException}("${JCM.divideByZero()}", ${_range.startLineNumber}, ${_range.startColumn}, ${_range.endLineNumber}, ${_range.endColumn}))` + suffix,
                         _range, _resultType);
                 }
 
-                
+
             } else {
                 snippet = new StringCodeSnippet(snippets[0].getPureTerm() + " " + this.operator + " " + snippets[1].getPureTerm(), _range, _resultType);
             }
@@ -282,7 +292,7 @@ export class BinaryOperatorTemplate extends CodeTemplate {
             return snippet;
         }
 
-        let snippetContainer = new CodeSnippetContainer([], _range, _resultType);
+        let snippetContainer = new CodeSnippetContainer([], _range);
 
 
         if (snippet0IsPure || snippet1IsPure) {
@@ -292,6 +302,7 @@ export class BinaryOperatorTemplate extends CodeTemplate {
             let lastPart1 = snippets[1].lastPartOrPop();
             snippetContainer.addStringPart(`${lastPart0.emit()} ${this.operator} ${lastPart1.emit()}`, _range, _resultType, [lastPart0, lastPart1]);
             snippetContainer.finalValueIsOnStack = false;
+            snippetContainer.type = _resultType;
             return snippetContainer;
         }
 
@@ -317,6 +328,9 @@ export class BinaryOperatorTemplate extends CodeTemplate {
                 case '>=': snippetContainer.addStringPart(`${StepParams.stack}.pop() <= ${StepParams.stack}.pop()`, _range, _resultType); break;
             }
             snippetContainer.finalValueIsOnStack = false;
+
+            snippetContainer.type = _resultType;
+
             return snippetContainer;
         }
 
@@ -331,6 +345,8 @@ export class BinaryOperatorTemplate extends CodeTemplate {
         }
 
         snippetContainer.finalValueIsOnStack = false;
+        
+        snippetContainer.type = _resultType;
         return snippetContainer;
     }
 

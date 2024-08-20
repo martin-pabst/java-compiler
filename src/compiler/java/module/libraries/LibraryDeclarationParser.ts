@@ -502,6 +502,10 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
         // example: "public <E> E testMethod(List<? extends E> li, E element)"
         let modifiers = this.parseModifiersAndType(false);
 
+        // if(decl.signature.indexOf('getCollidingShapes') >= 0){
+        //     debugger;
+        // }
+
         let genericParameters = this.parseGenericParameters(module);
 
         let type = this.parseType(module);
@@ -606,6 +610,9 @@ export class LibraryDeclarationParser extends LibraryDeclarationLexer {
 
             if (mdecl.template) {
                 m.template = mdecl.template;
+                if(m.template.indexOf("&") >= 0){
+                    console.log("WARNING: Template '" + m.template + "' contains letter & instead of §!")
+                }
             }
 
             if (mdecl.constantFoldingFunction) {

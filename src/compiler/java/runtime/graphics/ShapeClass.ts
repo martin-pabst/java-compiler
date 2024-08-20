@@ -12,6 +12,8 @@ import { updateWorldTransformRecursively } from './PixiHelper';
 import { JRC } from '../../language/JavaRuntimeLibraryComments';
 import { ContainerProxy } from './ContainerProxy';
 import { ColorClass } from './ColorClass';
+import { DirectionEnum } from './DirectionEnum';
+import { RuntimeExceptionClass } from '../system/javalang/RuntimeException';
 
 export type MouseEventMethod = (t: Thread, callback: CallbackParameter, x: number, y: number, button: number) => void;
 
@@ -20,8 +22,8 @@ export class ShapeClass extends ActorClass {
         { type: "declaration", signature: "abstract class Shape extends Actor", comment: JRC.shapeClassComment },
 
         { type: "field", signature: "private double angle", comment: JRC.shapeAngleComment },
-        { type: "field", signature: "private double centerX", comment: JRC.shapeCenterXComment },
-        { type: "field", signature: "private double centerY", comment: JRC.shapeCenterYComment },
+        { type: "field", signature: "protected double centerX", comment: JRC.shapeCenterXComment },
+        { type: "field", signature: "protected double centerY", comment: JRC.shapeCenterYComment },
 
         { type: "method", signature: "Shape()", java: ShapeClass.prototype._cj$_constructor_$Shape$ },
         { type: "method", signature: "final void move(double dx, double dy)", native: ShapeClass.prototype._move, comment: JRC.shapeMoveComment },
@@ -45,6 +47,9 @@ export class ShapeClass extends ActorClass {
 
         { type: "method", signature: "final void tint(int color)", native: ShapeClass.prototype._setTintInt, comment: JRC.shapeTintComment },
         { type: "method", signature: "final void tint(string color)", native: ShapeClass.prototype._setTintString, comment: JRC.shapeTintComment },
+        
+        { type: "method", signature: "final Direction directionRelativeTo(Shape otherShape)", native: ShapeClass.prototype._directionRelativeTo, comment: JRC.shapeDirectionRelativeToComment },
+        { type: "method", signature: "final void moveBackFrom(Shape otherShape, boolean keepColliding)", native: ShapeClass.prototype._moveBackFrom, comment: JRC.shapeMoveBackFromComment },
 
         { type: "method", signature: "static void setDefaultVisibility(boolean isVisible)", native: ShapeClass._setDefaultVisibility, comment: JRC.shapeSetDefaultVisibilityComment },
         { type: "method", signature: "final void setVisible(boolean isVisible)", native: ShapeClass.prototype._setVisible, comment: JRC.shapeSetVisibleComment },
@@ -380,13 +385,13 @@ export class ShapeClass extends ActorClass {
 
     public _getCenterX(): number {
         let p = new PIXI.Point(this.centerXInitial, this.centerYInitial);
-        this.getWorldTransform().apply(p, p);
+        if(this.container) this.getWorldTransform().apply(p, p);
         return p.x;
     }
 
     public _getCenterY(): number {
         let p = new PIXI.Point(this.centerXInitial, this.centerYInitial);
-        this.getWorldTransform().apply(p, p);
+        if(this.container) this.getWorldTransform().apply(p, p);
         return p.y;
     }
 
@@ -415,13 +420,11 @@ export class ShapeClass extends ActorClass {
         let index2 = world.shapesNotAffectedByWorldTransforms.indexOf(this);
         if (index2 >= 0) world.shapesNotAffectedByWorldTransforms.splice(index2, 1);
 
-        this.container.destroy();
+        this.world.registerShapeToDestroy(this);
 
         if (this.mouseEventsImplemented) {
             this.world.mouseManager.removeShapeWithImplementedMouseMethods(this);
         }
-
-        this.container = ContainerProxy.instance;
 
         super.destroy();
     }
@@ -460,7 +463,7 @@ export class ShapeClass extends ActorClass {
 
     _defineCenter(x: number, y: number) {
         let p = new PIXI.Point(x, y);
-        this.container.worldTransform.applyInverse(p, p);
+        this.getWorldTransform().applyInverse(p, p);
         this.centerXInitial = p.x;
         this.centerYInitial = p.y;
     }
@@ -743,6 +746,108 @@ export class ShapeClass extends ActorClass {
 
     _stopTrackingEveryMouseMovement() {
         this.trackMouseMove = false;
+    }
+
+    _directionRelativeTo(otherShape: ShapeClass): DirectionEnum {
+        if(otherShape == null) throw new RuntimeExceptionClass(JRC.shapeNullError());
+        if(otherShape.isDestroyed) throw new RuntimeExceptionClass(JRC.shapeAlreadyDestroyedError());
+
+        let bb = this.container.getBounds();
+        let bb1 = otherShape.container.getBounds();
+
+        let dx1 = bb1.left - bb.right;  // positive if left
+        let dx2 = bb.left - bb1.right;  // positive if right
+
+        let dy1 = bb1.top - bb.bottom;  // positive if top
+        let dy2 = bb.top - bb1.bottom;  // positive if bottom
+
+        let pairs: { distance: number, ei: DirectionEnum }[] = [];
+
+        if (this.lastMoveDx > 0) {
+            pairs.push({ distance: dx1, ei: DirectionEnum.values[3] });
+        } else if (this.lastMoveDx < 0) {
+            pairs.push({ distance: dx2, ei: DirectionEnum.values[1] });
+        }
+
+        if (this.lastMoveDy > 0) {
+            pairs.push({ distance: dy1, ei: DirectionEnum.values[0] });
+        } else if (this.lastMoveDy < 0) {
+            pairs.push({ distance: dy2, ei: DirectionEnum.values[2] });
+        }
+
+        if (pairs.length == 0) {
+            pairs = [
+                { distance: dx1, ei: DirectionEnum.values[3] },
+                { distance: dx2, ei: DirectionEnum.values[1] },
+                { distance: dy1, ei: DirectionEnum.values[0] },
+                { distance: dy2, ei: DirectionEnum.values[2] }
+            ]
+        }
+
+
+        let max = pairs[0].distance;
+        let ei = pairs[0].ei;
+        for (let i = 1; i < pairs.length; i++) {
+            if (pairs[i].distance > max) {
+                max = pairs[i].distance;
+                ei = pairs[i].ei;
+            }
+        }
+
+        return ei;
+    } 
+
+    _moveBackFrom(sh1: ShapeClass, keepColliding: boolean) {
+        if(sh1 == null) throw new RuntimeExceptionClass(JRC.shapeNullError());
+        if(sh1.isDestroyed) throw new RuntimeExceptionClass(JRC.shapeAlreadyDestroyedError());
+        
+                // subsequent calls to move destroy values in this.lastMoveDx and this.lastMoveDy, so:
+                let lmdx = this.lastMoveDx;
+                let lmdy = this.lastMoveDy;
+        
+                let length = Math.sqrt(lmdx * lmdx + lmdy * lmdy);
+                if (length < 0.001) return;
+        
+                if (!this._collidesWith(sh1)) return;
+        
+                let parameterMax = 0;       // collision with this parameter
+                this._move(-lmdx, -lmdy);
+        
+                let currentParameter = -1;  // move to parameterMin
+        
+                while (this._collidesWith(sh1)) {
+                    parameterMax = currentParameter;    // collision at this parameter
+                    let newParameter = currentParameter * 2;
+                    this._move(lmdx * (newParameter - currentParameter), lmdy * (newParameter - currentParameter));
+                    currentParameter = newParameter;
+                    if ((currentParameter + 1) * length < -100) {
+                        this._move(lmdx * (-1 - currentParameter), lmdy * (-1 - currentParameter));
+                        return;
+                    }
+                }
+                let parameterMin = currentParameter;
+        
+                let isColliding: boolean = false;
+                // Situation now: no collision at parameterMin == currentParameter, collision at parameterMax
+                while ((parameterMax - parameterMin) * length > 1) {
+                    let np = (parameterMax + parameterMin) / 2;
+                    this._move(lmdx * (np - currentParameter), lmdy * (np - currentParameter));
+                    if (isColliding = this._collidesWith(sh1)) {
+                        parameterMax = np;
+                    } else {
+                        parameterMin = np;
+                    }
+                    currentParameter = np;
+                }
+        
+                if (keepColliding && !isColliding) {
+                    this._move(lmdx * (parameterMax - currentParameter), lmdy * (parameterMax - currentParameter));
+                } else if (isColliding && !keepColliding) {
+                    this._move(lmdx * (parameterMin - currentParameter), lmdy * (parameterMin - currentParameter));
+                }
+        
+                this.lastMoveDx = lmdx;
+                this.lastMoveDy = lmdy;
     }
 
 

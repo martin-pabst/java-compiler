@@ -1,8 +1,11 @@
+import * as PIXI from 'pixi.js';
 import { Interpreter } from "../../../common/interpreter/Interpreter";
 import { KeyDownListener, KeyPressedListener, KeyUpListener, KeyboardManager } from "../../../common/interpreter/KeyboardManager";
 import { Thread, ThreadState } from "../../../common/interpreter/Thread";
 import { StringClass } from "../system/javalang/ObjectClassStringClass";
 import { ActorType, ActorTypes, IActor } from "./IActor";
+import { ShapeClass } from './ShapeClass';
+import { ContainerProxy } from './ContainerProxy';
 
 export class ActorManager {
 
@@ -25,6 +28,8 @@ export class ActorManager {
     keyTypedListener: KeyPressedListener = (key: string) => {
         this.onKeyPressed(key);
     }
+
+    shapesToDestroy: ShapeClass[] = [];
 
     constructor(private interpreter: Interpreter) {
         this.clear();
@@ -55,6 +60,12 @@ export class ActorManager {
             this.tickHappenedWhenThreadNotEmpty = true;
             return;
         }
+
+        this.shapesToDestroy.forEach( shape => {
+            shape.container.destroy();
+            shape.container = ContainerProxy.instance;
+        });
+        this.shapesToDestroy = [];
 
         this.tickHappenedWhenThreadNotEmpty = false;
 

@@ -35,15 +35,15 @@ export class MathClass extends ObjectClass {
         {type: "method", signature: "public static double log(double value)", template: 'Math.log(§1)', constantFoldingFunction: (value) => Math.log(value) , comment: JRC.mathLogComment},
         {type: "method", signature: "public static double log10(double value)", template: 'Math.log10(§1)', constantFoldingFunction: (value) => Math.log10(value) , comment: JRC.mathLog10Comment},
 
-        {type: "method", signature: "public static int max(int a, int b)", template: 'Math.max(§1)', constantFoldingFunction: (a) => Math.max(a), comment: JRC.mathMaxComment},
-        {type: "method", signature: "public static long max(long a, long b)", template: 'Math.max(§1)', constantFoldingFunction: (a) => Math.max(a), comment: JRC.mathMaxComment},
-        {type: "method", signature: "public static float max(float a, float b)", template: 'Math.max(§1)', constantFoldingFunction: (a) => Math.max(a), comment: JRC.mathMaxComment},
-        {type: "method", signature: "public static double max(double a, double b)", template: 'Math.max(§1)', constantFoldingFunction: (a) => Math.max(a), comment: JRC.mathMaxComment},
+        {type: "method", signature: "public static int max(int a, int b)", template: 'Math.max(§1, §2)', constantFoldingFunction: (a, b) => Math.max(a, b), comment: JRC.mathMaxComment},
+        {type: "method", signature: "public static long max(long a, long b)", template: 'Math.max(§1, §2)', constantFoldingFunction: (a, b) => Math.max(a, b), comment: JRC.mathMaxComment},
+        {type: "method", signature: "public static float max(float a, float b)", template: 'Math.max(§1, §2)', constantFoldingFunction: (a, b) => Math.max(a, b), comment: JRC.mathMaxComment},
+        {type: "method", signature: "public static double max(double a, double b)", template: 'Math.max(§1, §2)', constantFoldingFunction: (a, b) => Math.max(a, b), comment: JRC.mathMaxComment},
 
-        {type: "method", signature: "public static int min(int a, int b)", template: 'Math.min(§1)', constantFoldingFunction: (a) => Math.min(a) , comment: JRC.mathMinComment},
-        {type: "method", signature: "public static long min(long a, long b)", template: 'Math.min(§1)', constantFoldingFunction: (a) => Math.min(a) , comment: JRC.mathMinComment},
-        {type: "method", signature: "public static float min(float a, float b)", template: 'Math.min(§1)', constantFoldingFunction: (a) => Math.min(a) , comment: JRC.mathMinComment},
-        {type: "method", signature: "public static double min(double a, double b)", template: 'Math.min(§1)', constantFoldingFunction: (a) => Math.min(a) , comment: JRC.mathMinComment},
+        {type: "method", signature: "public static int min(int a, int b)", template: 'Math.min(§1, §2)', constantFoldingFunction: (a, b) => Math.min(a, b) , comment: JRC.mathMinComment},
+        {type: "method", signature: "public static long min(long a, long b)", template: 'Math.min(§1, §2)', constantFoldingFunction: (a, b) => Math.min(a, b) , comment: JRC.mathMinComment},
+        {type: "method", signature: "public static float min(float a, float b)", template: 'Math.min(§1, §2)', constantFoldingFunction: (a, b) => Math.min(a, b) , comment: JRC.mathMinComment},
+        {type: "method", signature: "public static double min(double a, double b)", template: 'Math.min(§1, §2)', constantFoldingFunction: (a, b) => Math.min(a, b) , comment: JRC.mathMinComment},
 
     ]
 

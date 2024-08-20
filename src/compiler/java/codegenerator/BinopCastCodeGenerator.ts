@@ -463,7 +463,8 @@ export abstract class BinopCastCodeGenerator {
                 }
             } else {
                 // cast object to object
-                if (castType == "explicit" && this.canCastTo(snippet.type, castTo, "explicit") || castType == "implicit" && this.canCastTo(snippet.type, castTo, "implicit")) {
+                if (castType == "explicit" && this.canCastTo(snippet.type, castTo, "explicit") 
+                    || castType == "implicit" && this.canCastTo(snippet.type, castTo, "implicit")) {
                     return snippet;
                 }
                 this.pushError(JCM.cantCastType(type.identifier, castTo.identifier), "error", snippet.range!);

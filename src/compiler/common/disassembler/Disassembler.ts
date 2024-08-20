@@ -10,6 +10,8 @@ import { CompilerFile } from "../module/CompilerFile";
 import { ProgramPointerPositionInfo } from "../monacoproviders/ProgramPointerManager";
 import { IRange } from "../range/Range";
 import '/include/css/disassembler.css';
+import { Klass } from "../interpreter/StepFunction";
+import { NonPrimitiveType } from "../../java/types/NonPrimitiveType";
 
 type DisassembledStep = {
     element: HTMLElement;
@@ -76,7 +78,7 @@ export class Disassembler {
         this.currentType = undefined;
 
         for (let fragment of module.getCodeFragments()) {
-            this.dissassembleFragment(fragment);
+            this.dissassembleFragment(fragment, 0);
         }
     }
 
@@ -109,15 +111,11 @@ export class Disassembler {
     }
 
     showElementpositionInMonacoModel(file: CompilerFile, range: IRange) {
-        this.main.showFile(file);
-        let model = file.getMonacoModel();
-        if (!model) return;
-
         let programPointerManager = this.main.getInterpreter().programPointerManager;
         if (!programPointerManager) return;
 
         let p: ProgramPointerPositionInfo = {
-            programOrmoduleOrMonacoModel: model,
+            programOrmoduleOrFile: file,
             range: range
         }
 
@@ -174,33 +172,36 @@ export class Disassembler {
         this.currentType = undefined;
     }
 
-    dissassembleFragment(fragment: CodeFragment) {
+    dissassembleFragment(fragment: CodeFragment, marginLeft: number) {
 
         if ((typeof this.currentType != "undefined") && this.currentType != fragment.type) {
-            this.insertHorizontalLine();
+            this.insertHorizontalLine(2);
         }
 
         if (this.currentType != fragment.type) {
             this.currentType = fragment.type;
-            this.insertTypeHeading(fragment.type);
+            this.insertTypeHeading(fragment.type, marginLeft);
         }
 
-        this.insertSignature(fragment.signature, fragment.methodDeclarationRange)
-        this.insertCode(fragment);
+        this.insertSignature(fragment.signature, fragment.methodDeclarationRange, marginLeft)
+        this.insertCode(fragment, marginLeft);
 
     }
 
-    insertHorizontalLine() {
-        DOM.makeDiv(this.disassemblerDiv, 'jo_disassemblerHorizontalLine');
+    insertHorizontalLine(width: number) {
+        let lineDiv = DOM.makeDiv(this.disassemblerDiv, 'jo_disassemblerHorizontalLine');
+        lineDiv.style.borderTopWidth = width + "px";
     }
 
-    insertTypeHeading(type: BaseType) {
+    insertTypeHeading(type: BaseType, marginLeft: number) {
         let headingDiv = DOM.makeDiv(this.disassemblerDiv, "jo_disassemblerHeading");
+        headingDiv.style.marginLeft = marginLeft + "px";
         if (type.identifier == "main class") {
             headingDiv.textContent = "Main method:";
         } else {
             headingDiv.textContent = type.getDeclaration();
         }
+
 
         let module = type.module;
         if (type.identifierRange && module) {
@@ -213,7 +214,7 @@ export class Disassembler {
 
     }
 
-    insertSignature(signature: string, range: IRange | undefined) {
+    insertSignature(signature: string, range: IRange | undefined, marginLeft: number) {
         let signatureDiv = DOM.makeDiv(this.disassemblerDiv, "jo_disassemblerSignature");
 
 
@@ -228,16 +229,18 @@ export class Disassembler {
                 this.markProgramPointer(signatureDiv);
             })
             signatureDiv.classList.add("jo_disassemblerLink");
+            signatureDiv.style.marginLeft = marginLeft + "px";
         }
 
     }
 
-    insertCode(fragment: CodeFragment) {
+    insertCode(fragment: CodeFragment, marginLeft: number) {
         let index: number = 0;
         let elements: HTMLElement[] = [];
 
         for (let step of fragment.program.stepsSingle) {
             let stepDiv = DOM.makeDiv(this.disassemblerDiv, "jo_disassemblerStep");
+            stepDiv.style.marginLeft = marginLeft + "px";
             elements.push(stepDiv);
             let stepIndex = DOM.makeSpan(stepDiv, "jo_disassemblerStepIndex");
             stepIndex.textContent = index + ":";
@@ -289,8 +292,48 @@ export class Disassembler {
                 }
             }
 
+            if (step.lambdaObject || step.innerClass) {
+                this.insertLambdaOrInnerClass(step, marginLeft + 10);
+            }
+
         }
     }
+
+    insertLambdaOrInnerClass(step: Step, marginLeft: number) {
+        let klass: Klass = step.innerClass;
+        if (step.lambdaObject) klass = step.lambdaObject.constructor;
+
+        let type: NonPrimitiveType = klass.type;
+        let innerclassOrLambdaHeading = step.innerClass ? "Inner class:" : "Lambda object:";
+
+        this.insertHorizontalLine(1);
+
+        let headingDiv = DOM.makeDiv(this.disassemblerDiv, "jo_disassemblerLambdaHeading");
+        headingDiv.style.marginLeft = marginLeft + "px";
+        headingDiv.textContent = innerclassOrLambdaHeading;
+
+        this.insertSignature(type.getDeclaration(), type.identifierRange, marginLeft);
+
+        let codeFragments: CodeFragment[] = type.getOwnMethods()
+            .filter(method => typeof method.program !== "undefined")
+            .map(method => {
+                return {
+                    type: type,
+                    program: method.program,
+                    signature: method.getSignature(),
+                    methodDeclarationRange: method.identifierRange
+                }
+            })
+
+        for (let fragment of codeFragments) {
+            this.insertSignature(fragment.signature, fragment.methodDeclarationRange, marginLeft);
+            this.insertCode(fragment, marginLeft);
+        }
+
+        this.insertHorizontalLine(1);
+
+    }
+
 
 
 }

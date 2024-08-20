@@ -486,11 +486,6 @@ export class LinkedListClass extends ObjectClass implements BaseListType {
 
     }
 
-
-    isBaseListType(): boolean {
-        return true;
-    }
-
     getElements(): any[] {
         return this.elements;
     }

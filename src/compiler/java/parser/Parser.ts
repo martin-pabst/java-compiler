@@ -597,6 +597,8 @@ export class Parser extends StatementParser {
         let parent: TypeScope = this.currentClassOrInterface || this.javaCompiledModule.ast!;
 
         let classNode = this.nodeFactory.buildClassNode(this.nodeFactory.buildNodeWithModifiers(this.cct.range), undefined, parent, [], this.javaCompiledModule);
+        classNode.identifierRange = newObjectNode.range;
+        classNode.range = newObjectNode.range;
         classNode.isAnonymousInnerType = true;
 
         this.parseClassBody(classNode);

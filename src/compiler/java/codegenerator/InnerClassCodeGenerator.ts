@@ -55,7 +55,7 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
 
         };  //
 
-        let oldClass = klass.runtimeClass;
+        let oldRuntimeClass = klass.runtimeClass;
         // oldClass.__programs = [];
 
         // let type = node.newObjectNode.type.resolvedType;
@@ -103,8 +103,10 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
 
         };  //
 
-        Object.assign(klass.runtimeClass, oldClass);
-        Object.assign(klass.runtimeClass.prototype, oldClass.prototype);
+        klass.runtimeClass.type = klass;
+
+        Object.assign(klass.runtimeClass, oldRuntimeClass);
+        Object.assign(klass.runtimeClass.prototype, oldRuntimeClass.prototype);
         // snippet which instantiates object of this class calling it's typescript constructor and it's java constructor
 
         // klass.checkIfInterfacesAreImplementedAndSupplementDefaultMethods({});
@@ -167,9 +169,11 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
         }
         method.takeInternalJavaNameWithGenericParamterIdentifiersFrom(methodToImplement);
 
+        method.identifierRange = node.statement?.range || node.range;
+
         //@ts-ignore    (fake methodNode to use compileMethodDeclaration later)
         let methodNode: ASTMethodDeclarationNode = {
-            range: node.range,
+            range: method.identifierRange,
             statement: node.statement,
             isContructor: false,
             identifier: method.identifier,
@@ -190,7 +194,7 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
 
         };  //
 
-        let oldClass = klass.runtimeClass;
+        let oldRuntimeClass = klass.runtimeClass;
         // oldClass.__programs = [];
         klass.addImplements(functionalInterface);
 
@@ -221,8 +225,10 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
 
         };  //
 
-        Object.assign(klass.runtimeClass, oldClass);
-        Object.assign(klass.runtimeClass.prototype, oldClass.prototype);
+        klass.runtimeClass.type = klass;
+
+        Object.assign(klass.runtimeClass, oldRuntimeClass);
+        Object.assign(klass.runtimeClass.prototype, oldRuntimeClass.prototype);
         // snippet which instantiates object of this class calling it's typescript constructor and it's java constructor
 
         let parameterString = Helpers.elementRelativeToStackbase(0);
@@ -305,6 +311,8 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
     buildStandardConstructors(classContext: JavaClass) {
         if (classContext.methods.some(m => m.isConstructor)) return;
 
+        // if(classContext.identifier == 'History') debugger;
+
         let baseClass: IJavaClass = classContext;
         while (!baseClass.getOwnMethods().find(m => m.isConstructor && m.visibility != TokenType.keywordPrivate)) baseClass = baseClass.getExtends()!;
         // TypeResolver enforces base class to be at least Object
@@ -345,11 +353,12 @@ export class InnerClassCodeGenerator extends StatementCodeGenerator {
                 steps.unshift(storeOuterClassReferenceSnippet);
             }
 
-            let getBaseClass: string = `let obj = ${Helpers.elementRelativeToStackbase(0)};\nlet baseKlass = Object.getPrototypeOf(Object.getPrototypeOf(obj));\n`
-            let superCall: string = `baseKlass.${baseConstructor.getInternalName(baseConstructor.hasImplementationWithNativeCallingConvention ? "native" : "java")}.call(obj${parametersForSuperCall});\n`;
+            // let getBaseClass: string = `let obj = ${Helpers.elementRelativeToStackbase(0)};\nlet baseKlass = ${Helpers.classes}.Object.getPrototypeOf(Object.getPrototypeOf(obj));\n`
+            let getBaseClass: string = `let obj = ${Helpers.elementRelativeToStackbase(0)};\nlet baseKlass = ${Helpers.classes}.${baseClass.identifier};\n`
+            let superCall: string = `baseKlass.prototype.${baseConstructor.getInternalName(baseConstructor.hasImplementationWithNativeCallingConvention ? "native" : "java")}.call(obj${parametersForSuperCall});\n`;
             let returnCall: string = `${Helpers.return}(${Helpers.elementRelativeToStackbase(0)});\n`;
 
-            steps.push(new StringCodeSnippet(getBaseClass + superCall));
+            steps.unshift(new StringCodeSnippet(getBaseClass + superCall));
             let returnSnippet = new CodeSnippetContainer(new StringCodeSnippet(returnCall));
             returnSnippet.enforceNewStepBeforeSnippet();
             steps.push(returnSnippet);

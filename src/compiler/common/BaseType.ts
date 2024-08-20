@@ -28,6 +28,5 @@ export interface BaseArrayType {
 }
 
 export interface BaseListType {
-    isBaseListType(): boolean;
     getElements(): any[];
 }

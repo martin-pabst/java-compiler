@@ -292,6 +292,11 @@ export class JRC {
         "en": "Returns group to which all new graphic objects are added by default. If no default group is set, this method returns null.",
     })
 
+    static worldFollowComment = () => lm({
+    "de": `Verschiebt die Welt so, dass das übergebene graphische Objekt (shape) sichtbar wird. Verschoben wird nur, wenn das Objekt weniger als frameWidth vom Rand entfernt ist und die Welt nicht über die gegebenen Koordinaten xMin, xMax, yMin und yMax hinausragt.`,
+    "en": `Moves world coordinate system to make given shape visible again. It is only moved if the shape is less than frameWidth from the edge and the world does not extend beyond the given coordinates xMin, xMax, yMin and yMax.`,
+    })
+
     static worldSetDefaultGroupComment = () => lm({
         "de": "Legt die Gruppe fest, zu der aktuell alle neuen Objekte automatisch hinzugefügt werden. Falls keine defaultGroup gewünscht ist, rufen Sie setDefaultGroup(null) auf.",
         "en": "Sets group to which all new graphic objects are added by default. For 'no default group' call setDefaultGroup(null).",
@@ -443,6 +448,26 @@ export class JRC {
     static shapeDefineDirectionComment = () => lm({
         "de": "Setzt die Blickrichtung des graphischen Objekts. Dies ist die Richtung, in die es durch Aufruf der Methode forward bewegt wird. \nBemerkung: die Methode rotate ändert auch die Blickrichtung!",
         "en": "Defines direction of object. Direction is used when calling method 'forward'.",
+    })
+
+    static shapeDirectionRelativeToComment = () => lm({
+    "de": `Gibt die Richtung (top, right, bottom oder left) zurück, in der das graphische Objekt relativ zum übergebenen graphischen Objekt steht.`,
+    "en": `Returns direction (top, right, bottom, left) of this shape's position relative to the other shape's position.`,
+    })
+
+    static shapeAlreadyDestroyedError = () => lm({
+    "de": `Das im Parameter übergebene Shape wurde mit der Methode destroy() bereits zerstört.`,
+    "en": `Shape given in parameter is already destroyed.`,
+    })
+
+    static shapeNullError = () => lm({
+    "de": `Das im Parameter übergebene Shape hat den Wert null.`,
+    "en": `Shape given in parameter has value null.`,
+    })
+
+    static shapeMoveBackFromComment = () => lm({
+    "de": `Rückt das Objekt entlang der letzten durch Aufruf der Methode move() vorgegebenen Richtung zurück, bis es das übergebene Objekt gerade noch (keepColliding == true) bzw. gerade nicht mehr (keepColliding == false) berührt.`,
+    "en": `Moves the object back along the last direction specified by calls to method move() until it just (keepColliding == true) or no longer touches the passed object (keepColliding == false).`,
     })
 
     static shapeForwardComment = () => lm({

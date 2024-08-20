@@ -17,7 +17,7 @@ export class CircleClass extends FilledShapeClass {
         { type: "method", signature: "Circle(double mx, double my, double r)", java: CircleClass.prototype._cj$_constructor_$Circle$double$double$double, comment: JRC.circleConstructorComment },
 
         { type: "method", signature: "final void setRadius(double radius)", native: CircleClass.prototype._setRadius, comment: JRC.circleSetRadiusComment },
-        { type: "method", signature: "final double getRadius()", template: '(&1.radius*§1.scaleFactor)', comment: JRC.circleGetRadiusComment },
+        { type: "method", signature: "final double getRadius()", template: '(§1.radius*§1.scaleFactor)', comment: JRC.circleGetRadiusComment },
         { type: "method", signature: "final Circle copy()", java: CircleClass.prototype._mj$copy$Circle$, comment: JRC.circleCopyComment },
 
         { type: "method", signature: "final boolean containsPoint(double x, double y)", native: CircleClass.prototype._containsPoint , comment: JRC.shapeContainsPointComment},

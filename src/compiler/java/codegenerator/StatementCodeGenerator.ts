@@ -230,7 +230,9 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             collectionElementType = collectionType.getElementType();
             if (node.elementType.kind != TokenType.varType) {
                 if (!this.typesAreIdentical(elementType!, collectionElementType)) {
-                    this.pushError(JCM.wrongArrayElementType(elementType!.toString(), node.elementIdentifier, collectionElementType.toString()), "error", node.elementIdentifierPosition);
+                    if(!this.canCastTo(collectionElementType, elementType, "implicit")){
+                        this.pushError(JCM.wrongArrayElementType(elementType!.toString(), node.elementIdentifier, collectionElementType.toString()), "error", node.elementIdentifierPosition);
+                    }
                 }
             }
             elementType = collectionElementType;
@@ -258,11 +260,11 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
             forLoopSnippet.addNextStepMark();
             forLoopSnippet.addParts(breakLabel);
 
-        } else if (collectionType instanceof IJavaClass && collectionType.runtimeClass!.prototype instanceof SystemCollection) {
+        } else if (collectionType instanceof IJavaClass && collectionType.runtimeClass!.prototype.getElements) {
             /*
              * Loop over SystemCollection
             */
-            let assignCollectionSnippet = SnippetFramer.frame(collectionSnippet, `${Helpers.elementRelativeToStackbase(stackIndexForCollection)} = ${Helpers.checkNPE('§1', node.collection.range)}.getAllElements();\n`);
+            let assignCollectionSnippet = SnippetFramer.frame(collectionSnippet, `${Helpers.elementRelativeToStackbase(stackIndexForCollection)} = ${Helpers.checkNPE('§1', node.collection.range)}.getElements();\n`);
             assignCollectionSnippet.range = node.collection.range;
             forLoopSnippet.addParts(assignCollectionSnippet);
 
@@ -274,6 +276,8 @@ export abstract class StatementCodeGenerator extends TermCodeGenerator {
                 } else {
                     collectionElementType = firstGenericParametersType;
                 }
+            } else if(collectionType.identifier == "Group"){
+                collectionElementType = this.libraryTypestore.getType("Shape");
             }
             if (node.elementType.kind != TokenType.varType) {
                 if (!this.typesAreIdentical(elementType!, collectionElementType)) {

@@ -20,7 +20,6 @@ export class ExceptionMarker {
 
     let file = exception.file;
     let range = exception.range;
-    let model = file?.getMonacoModel();
 
     if (!file || !model || !range) return;
 
@@ -30,7 +29,7 @@ export class ExceptionMarker {
     this.main.showFile(file);
 
     let p: ProgramPointerPositionInfo = {
-      programOrmoduleOrMonacoModel: model,
+      programOrmoduleOrFile: file,
       range: range
     }
 

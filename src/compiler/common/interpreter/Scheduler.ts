@@ -363,7 +363,7 @@ export class Scheduler {
         if (!step) return undefined;
 
         return {
-            programOrmoduleOrMonacoModel: programState.program,
+            programOrmoduleOrFile: programState.program,
             //@ts-ignore
             range: step.range,
         }

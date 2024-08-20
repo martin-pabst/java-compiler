@@ -465,6 +465,12 @@ export class JavaClass extends IJavaClass {
             return this.extends.canImplicitlyCastTo(bType); // A extends C; if C can cast to B, then also A can
         }
 
+        if(bType instanceof GenericVariantOfJavaClass){
+            // TODO: Group<T extends Shape> can't cast to Group<Rectangle>...
+
+            return this.canImplicitlyCastTo(bType.isGenericVariantOf);
+        }
+
         if (bType instanceof GenericTypeParameter) {
             for (let ext of bType.upperBounds) {
                 if (!this.canImplicitlyCastTo(ext)) return false;

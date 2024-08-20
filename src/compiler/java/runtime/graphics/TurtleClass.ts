@@ -35,8 +35,8 @@ export class TurtleClass extends FilledShapeClass {
         { type: "method", signature: "final boolean collidesWithBorderColor(int borderColor)", native: TurtleClass.prototype._collidesWithBorderColor, comment: JRC.TurtleCollidesWithBorderColorComment },
         { type: "method", signature: "final boolean collidesWithBorderColor(String borderColor)", native: TurtleClass.prototype._collidesWithBorderColor, comment: JRC.TurtleCollidesWithBorderColorComment },
         { type: "method", signature: "final double getLastSegmentLength()", native: TurtleClass.prototype._getLastSegmentLength, comment: JRC.TurtleGetLastSegmentLengthComment },
-        { type: "method", signature: "final double getX()", template: `&1.getPosition().x`, comment: JRC.TurtleGetXComment },
-        { type: "method", signature: "final double getY()", template: `&1.getPosition().y`, comment: JRC.TurtleGetYComment },
+        { type: "method", signature: "final double getX()", template: `§1.getPosition().x`, comment: JRC.TurtleGetXComment },
+        { type: "method", signature: "final double getY()", template: `§1.getPosition().y`, comment: JRC.TurtleGetYComment },
         { type: "method", signature: "final void moveTo(double x, double y)", native: TurtleClass.prototype._moveTo, comment: JRC.TurtleMoveToComment },
 
 

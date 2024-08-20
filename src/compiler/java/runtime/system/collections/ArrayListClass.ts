@@ -1,52 +1,51 @@
-import { CallbackFunction, Klass } from "../../../../common/interpreter/StepFunction.ts";
+import { BaseListType } from "../../../../common/BaseType.ts";
+import { CallbackFunction } from "../../../../common/interpreter/StepFunction.ts";
 import { Thread } from "../../../../common/interpreter/Thread.ts";
+import { JRC } from "../../../language/JavaRuntimeLibraryComments";
+import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
 import { NonPrimitiveType } from "../../../types/NonPrimitiveType.ts";
+import { ConsumerInterface } from "../functional/ConsumerInterface.ts";
+import { IndexOutOfBoundsExceptionClass } from "../javalang/IndexOutOfBoundsExceptionClass.ts";
 import { NullPointerExceptionClass } from "../javalang/NullPointerExceptionClass.ts";
 import { ObjectClass, ObjectClassOrNull, StringClass } from "../javalang/ObjectClassStringClass.ts";
 import { CollectionInterface } from "./CollectionInterface.ts";
-import { SystemCollection } from "./SystemCollection.ts";
-import { LibraryDeclarations } from "../../../module/libraries/DeclareType.ts";
-import { IndexOutOfBoundsExceptionClass } from "../javalang/IndexOutOfBoundsExceptionClass.ts";
-import { ConsumerInterface } from "../functional/ConsumerInterface.ts";
 import { ComparatorInterface } from "./ComparatorInterface.ts";
-import { BaseListType, BaseType } from "../../../../common/BaseType.ts";
-import { ArrayToStringCaster } from "../../../../common/interpreter/ArrayToStringCaster.ts";
-import { JRC } from "../../../language/JavaRuntimeLibraryComments";
+import { SystemCollection } from "./SystemCollection.ts";
 
 export class ArrayListClass extends SystemCollection implements BaseListType {
     static __javaDeclarations: LibraryDeclarations = [
         { type: "declaration", signature: "class ArrayList<E> implements List<E>", comment: JRC.arrayListClassComment },
 
-        { type: "method", signature: "ArrayList()", native: ArrayListClass.prototype._constructor , comment: JRC.arrayListConstructorComment},
+        { type: "method", signature: "ArrayList()", native: ArrayListClass.prototype._constructor, comment: JRC.arrayListConstructorComment },
 
         // from IterableInterface
-        { type: "method", signature: "Iterator<E> iterator()", native: ArrayListClass.prototype._iterator , comment: JRC.arrayListIteratorComment},
-        { type: "method", signature: "void forEach(Consumer<? super E> action)", java: ArrayListClass.prototype._mj$forEach$void$Consumer , comment: JRC.arrayListForeachComment},
+        { type: "method", signature: "Iterator<E> iterator()", native: ArrayListClass.prototype._iterator, comment: JRC.arrayListIteratorComment },
+        { type: "method", signature: "void forEach(Consumer<? super E> action)", java: ArrayListClass.prototype._mj$forEach$void$Consumer, comment: JRC.arrayListForeachComment },
 
         // from CollectionInterface
-        { type: "method", signature: "Object[] toArray()", native: ArrayListClass.prototype._toArray, template: "§1.elements.slice()" , comment: JRC.collectionToArrayComment},
-        { type: "method", signature: "<T> T[] toArray(T[] a)", native: ArrayListClass.prototype._toArray, template: "§1.elements.slice()" , comment: JRC.collectionToArrayComment2},
-        { type: "method", signature: "boolean add(E e)", native: ArrayListClass.prototype._add, template: "(§1.elements.push(§2) >= 0)" , comment: JRC.collectionAddElementComment},
-        { type: "method", signature: "boolean addAll(Collection<? extends E> c)", java: ArrayListClass.prototype._addAll , comment: JRC.collectionAddAllComment},
-        { type: "method", signature: "void clear()", native: ArrayListClass.prototype._clear, template: "§1.elements.length = 0" , comment: JRC.collectionClearComment},
-        { type: "method", signature: "boolean contains(E Element)", java: ArrayListClass.prototype._mj$contains$boolean$E, comment: JRC.collectionContainsComment},
-        { type: "method", signature: "boolean containsAll(Collection<?> c)", java: ArrayListClass.prototype._mj$containsAll$boolean$Collection , comment: JRC.collectionContainsAllComment},
-        { type: "method", signature: "boolean isEmpty()", native: ArrayListClass.prototype._isEmpty, template: "(§1.elements.length == 0)" , comment: JRC.collectionIsEmptyComment},
-        { type: "method", signature: "boolean remove(E element)", java: ArrayListClass.prototype._mj$remove$boolean$E , comment: JRC.collectionRemoveObjectComment},
-        { type: "method", signature: "boolean removeAll(Collection<?> c)", java: ArrayListClass.prototype._removeAll , comment: JRC.collectionRemoveAllComment},
-        { type: "method", signature: "int size()", native: ArrayListClass.prototype._size, template: "§1.elements.length" , comment: JRC.collectionSizeComment},
+        { type: "method", signature: "Object[] toArray()", native: ArrayListClass.prototype._toArray, template: "§1.elements.slice()", comment: JRC.collectionToArrayComment },
+        { type: "method", signature: "<T> T[] toArray(T[] a)", native: ArrayListClass.prototype._toArray, template: "§1.elements.slice()", comment: JRC.collectionToArrayComment2 },
+        { type: "method", signature: "boolean add(E e)", native: ArrayListClass.prototype._add, template: "(§1.elements.push(§2) >= 0)", comment: JRC.collectionAddElementComment },
+        { type: "method", signature: "boolean addAll(Collection<? extends E> c)", java: ArrayListClass.prototype._addAll, comment: JRC.collectionAddAllComment },
+        { type: "method", signature: "void clear()", native: ArrayListClass.prototype._clear, template: "§1.elements.length = 0", comment: JRC.collectionClearComment },
+        { type: "method", signature: "boolean contains(E Element)", java: ArrayListClass.prototype._mj$contains$boolean$E, comment: JRC.collectionContainsComment },
+        { type: "method", signature: "boolean containsAll(Collection<?> c)", java: ArrayListClass.prototype._mj$containsAll$boolean$Collection, comment: JRC.collectionContainsAllComment },
+        { type: "method", signature: "boolean isEmpty()", native: ArrayListClass.prototype._isEmpty, template: "(§1.elements.length == 0)", comment: JRC.collectionIsEmptyComment },
+        { type: "method", signature: "boolean remove(E element)", java: ArrayListClass.prototype._mj$remove$boolean$E, comment: JRC.collectionRemoveObjectComment },
+        { type: "method", signature: "boolean removeAll(Collection<?> c)", java: ArrayListClass.prototype._removeAll, comment: JRC.collectionRemoveAllComment },
+        { type: "method", signature: "int size()", native: ArrayListClass.prototype._size, template: "§1.elements.length", comment: JRC.collectionSizeComment },
 
         // from ListInterface
-        { type: "method", signature: "boolean add(int index, E element)", native: ArrayListClass.prototype._addWithIndex , comment: JRC.listAddElementComment},
-        { type: "method", signature: "boolean addAll(int index, Collection<? extends E> c)", java: ArrayListClass.prototype._addAllWithIndex , comment: JRC.listAddAllElementsComment},
-        { type: "method", signature: "E get (int index)", native: ArrayListClass.prototype._getWithIndex , comment: JRC.listGetComment},
-        { type: "method", signature: "int indexOf (E Element)", java: ArrayListClass.prototype._mj$indexOf$int$E , comment: JRC.listIndexOfComment},
-        { type: "method", signature: "E remove (int index)", native: ArrayListClass.prototype._removeWithIndex , comment: JRC.listRemoveComment},
-        { type: "method", signature: "E set (int index, E Element)", native: ArrayListClass.prototype._setWithIndex , comment: JRC.listSetComment},
-        { type: "method", signature: "void sort(Comparator<? super E> comparator)", java: ArrayListClass.prototype._mj$sort$void$Comparator , comment: JRC.listSortComment},
+        { type: "method", signature: "boolean add(int index, E element)", native: ArrayListClass.prototype._addWithIndex, comment: JRC.listAddElementComment },
+        { type: "method", signature: "boolean addAll(int index, Collection<? extends E> c)", java: ArrayListClass.prototype._addAllWithIndex, comment: JRC.listAddAllElementsComment },
+        { type: "method", signature: "E get (int index)", native: ArrayListClass.prototype._getWithIndex, comment: JRC.listGetComment },
+        { type: "method", signature: "int indexOf (E Element)", java: ArrayListClass.prototype._mj$indexOf$int$E, comment: JRC.listIndexOfComment },
+        { type: "method", signature: "E remove (int index)", native: ArrayListClass.prototype._removeWithIndex, comment: JRC.listRemoveComment },
+        { type: "method", signature: "E set (int index, E Element)", native: ArrayListClass.prototype._setWithIndex, comment: JRC.listSetComment },
+        { type: "method", signature: "void sort(Comparator<? super E> comparator)", java: ArrayListClass.prototype._mj$sort$void$Comparator, comment: JRC.listSortComment },
 
         // override toString-method
-        { type: "method", signature: "String toString()", java: ArrayListClass.prototype._mj$toString$String$ , comment: JRC.objectToStringComment},
+        { type: "method", signature: "String toString()", java: ArrayListClass.prototype._mj$toString$String$, comment: JRC.objectToStringComment },
         // 
     ]
 
@@ -54,7 +53,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
 
     protected elements: ObjectClassOrNull[] = [];
 
-    constructor(elements?: ObjectClassOrNull[]){
+    constructor(elements?: ObjectClassOrNull[]) {
         super();
         this.elements = elements || [];
     }
@@ -80,21 +79,21 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
     }
 
     _mj$toString$String$(t: Thread, callback: CallbackFunction) {
-        if(this.elements.length == 0){
+        if (this.elements.length == 0) {
             t.s.push("[]");
-            if(callback) callback();
+            if (callback) callback();
             return;
         }
         let element = this.elements[0];
-        if(typeof element == "object" || Array.isArray(element) || element == null){
+        if (typeof element == "object" || Array.isArray(element) || element == null) {
             t._arrayOfObjectsToString(this.elements, () => {
                 t.s.push(new StringClass(t.s.pop()));
-                if(callback) callback();
+                if (callback) callback();
             })
             return;
         } else {
             t.s.push(new StringClass(t._primitiveElementOrArrayToString(this.elements)));
-            if(callback) callback();
+            if (callback) callback();
             return;
         }
     }
@@ -226,7 +225,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
         this._mj$indexOf$int$E(t, () => {
             let index = t.s.pop();
             t.s.push(index >= 0);
-            if(callback) callback();
+            if (callback) callback();
         }, element);
     }
 
@@ -240,18 +239,18 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
 
         let f = (t: Thread, callback: CallbackFunction, elementsToCheck: any[]) => {
 
-            if(elementsToCheck.length > 0){
+            if (elementsToCheck.length > 0) {
                 this._mj$contains$boolean$E(t, () => {
-                    if(t.s.pop()){
+                    if (t.s.pop()) {
                         f(t, callback, elementsToCheck);
                     } else {
                         t.s.push(false);
-                        if(callback) callback();
+                        if (callback) callback();
                     }
                 }, elementsToCheck.pop());
             } else {
                 t.s.push(true);
-                if(callback) callback();
+                if (callback) callback();
             }
 
         }
@@ -285,13 +284,13 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
 
         this._mj$indexOf$int$E(t, () => {
             let index = t.s.pop();
-            if(index >= 0){
+            if (index >= 0) {
                 this.elements.splice(index, 1)
                 t.s.push(true);
             } else {
                 t.s.push(false);
             }
-            if(callback) callback();
+            if (callback) callback();
             return;
         }, o)
     }
@@ -307,11 +306,11 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
 
         let f = (t: Thread, callback: CallbackFunction, elementsToRemove: any[]) => {
 
-            if(elementsToRemove.length > 0){
-                this._mj$remove$boolean$E(t, () => {f(t, callback, elementsToRemove);}, elementsToRemove.pop());
+            if (elementsToRemove.length > 0) {
+                this._mj$remove$boolean$E(t, () => { f(t, callback, elementsToRemove); }, elementsToRemove.pop());
             } else {
                 t.s.push(this.elements.length != oldLength);
-                if(callback) callback();
+                if (callback) callback();
             }
 
         }
@@ -330,7 +329,7 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
 
     }
 
-    _mj$indexOf$int$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) { 
+    _mj$indexOf$int$E(t: Thread, callback: CallbackFunction, element: ObjectClassOrNull) {
         let firstIndex: number = -1;
         if (element == null || element._mj$equals$boolean$Object == ObjectClass.prototype._mj$equals$boolean$Object) {
             firstIndex = this.elements.indexOf(element);
@@ -339,16 +338,16 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
         } else {
             let index = 0;
             let f = () => {
-                if(index >= this.elements.length){
+                if (index >= this.elements.length) {
                     t.s.push(-1);
-                    if(callback) callback();
+                    if (callback) callback();
                     return;
                 } else {
                     element._mj$equals$boolean$Object(t, () => {
-                        if(t.s.pop()){
+                        if (t.s.pop()) {
                             t.s.push(index);
-                            if(callback) callback();
-                            return;            
+                            if (callback) callback();
+                            return;
                         } else {
                             index++;
                             f();
@@ -438,10 +437,6 @@ export class ArrayListClass extends SystemCollection implements BaseListType {
 
 
     // }
-
-    isBaseListType(): boolean {
-        return true;
-    }
 
     getElements(): any[] {
         return this.elements;

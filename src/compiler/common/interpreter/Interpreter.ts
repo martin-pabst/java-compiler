@@ -163,6 +163,7 @@ export class Interpreter {
         }
         this.scheduler.runSingleStepKeepingThread(stepInto, () => {
             this.pause();
+            this.showProgramPointer(this.scheduler.getNextStepPosition());
         });
         if (!stepInto) {
             this.setState(SchedulerState.running);
@@ -175,7 +176,7 @@ export class Interpreter {
 
                 _textPositionWithModule = this.scheduler.getNextStepPosition();
 
-                if(!this.programPointerManager.fileIsCurrentlyShownInEditor((<Module>_textPositionWithModule?.programOrmoduleOrMonacoModel)?.file)){
+                if(!this.programPointerManager.fileIsCurrentlyShownInEditor((<Module>_textPositionWithModule?.programOrmoduleOrFile)?.file)){
                     _textPositionWithModule = undefined;
                 }
 

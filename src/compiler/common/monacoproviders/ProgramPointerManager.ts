@@ -5,7 +5,7 @@ import { Module } from "../module/Module"
 import { IRange, Range } from "../range/Range"
 
 export type ProgramPointerPositionInfo = {
-    programOrmoduleOrMonacoModel: Program | Module | monaco.editor.ITextModel,
+    programOrmoduleOrFile: Program | Module | CompilerFile,
     range: IRange,
 }
 
@@ -34,18 +34,19 @@ export class ProgramPointerManager {
     }
 
     show(position: ProgramPointerPositionInfo, style: ProgramPointerStyle) {
-        let model: monaco.editor.ITextModel | undefined;
-        if(position.programOrmoduleOrMonacoModel instanceof Program){
-            model = position.programOrmoduleOrMonacoModel.module.file.getMonacoModel();
-        } else if(position.programOrmoduleOrMonacoModel instanceof Module){
-            model = position.programOrmoduleOrMonacoModel.file.getMonacoModel();
+        let file: CompilerFile | undefined;
+        if(position.programOrmoduleOrFile instanceof Program){
+            file = position.programOrmoduleOrFile.module.file;
+        } else if(position.programOrmoduleOrFile instanceof Module){
+            file = position.programOrmoduleOrFile.file;
         } else {
-            model = position.programOrmoduleOrMonacoModel;
+            file = position.programOrmoduleOrFile;
         }
 
+        let model: monaco.editor.ITextModel | undefined = file.getMonacoModel();
+
         if(model){
-            this.editor.setModel(model);
-            this.editor.revealPosition(Range.getStartPosition(position.range));
+            this.main.showProgramPosition(file, position.range);
         }
 
         let oldDecorations = this.keyToDecorationsMap.get(style.key);

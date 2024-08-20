@@ -22,7 +22,6 @@ export class MouseManager {
     listeners: Map<string, any> = new Map();
 
     constructor(private world: IWorld) {
-        this.registerListeners();
     }
 
     unregisterListeners(){
