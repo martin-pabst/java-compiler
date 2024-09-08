@@ -131,7 +131,7 @@ import { World3dClass } from "../graphics/3d/World3dClass.ts";
 import { CodeFragment } from "../../../common/disassembler/CodeFragment.ts";
 import { MethodOfDestroyedGOExceptionClass } from "./javalang/MethodOfDestroyedGOExceptionClass.ts";
 import { GNGEreignisbehandlung } from "../graphics/gng/GNGEreignisbehandlung.ts";
-import { CollisionPairClass } from "../graphics/CollisionpairClass.ts";
+import { CollisionPairClass } from "../graphics/CollisionPairClass.ts";
 
 export class SystemModule extends JavaLibraryModule {
 

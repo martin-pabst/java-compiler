@@ -29,7 +29,7 @@ export class AggregatingAssertionObserver implements IAssertionObserver {
     }
 
     notifyOnAssertFalse(thread: Thread, step: Step, condition: boolean, message: string): void {
-        if (condition !== true) {
+        if (condition !== false) {
             this.addFailedResult(thread, step, "notifyOnAssertFalse", "false", "true", message);
         }
     }
